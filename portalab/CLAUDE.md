@@ -3,10 +3,10 @@
 Auto-generated from all feature plans. Last updated: 2026-10-01
 
 ## Active Technologies
-- Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2) (016-support)
-- PostgreSQL schema `identity` (see `data-model.md`); avatar/export blobs via kernel `core.blobstore` (filesystem baseline) (016-support)
+- Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2) (011-content-news-wiki-calendar)
+- PostgreSQL schema `identity` (see `data-model.md`); avatar/export blobs via kernel `core.blobstore` (filesystem baseline) (011-content-news-wiki-calendar)
 
-- Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7 (016-support)
+- Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7 (011-content-news-wiki-calendar)
 
 ## Project Structure
 
@@ -27,9 +27,9 @@ cd frontend && npm run lint && npm run typecheck && npm test
 Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain): Follow standard conventions
 
 ## Recent Changes
-- 016-support: Added Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2)
+- 011-content-news-wiki-calendar: Added Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2)
 
-- 016-support: Added Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7,
+- 011-content-news-wiki-calendar: Added Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7,
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
