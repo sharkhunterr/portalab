@@ -1,0 +1,83 @@
+/* Functional state presentation: color comes from tokens; meaning comes from icon + text (never color alone). */
+.functional-state {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.functional-state__icon {
+  flex: none;
+}
+
+.functional-state__label {
+  font-weight: 600;
+}
+
+.functional-state__retry {
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.functional-state--loading .functional-state__icon,
+.functional-state--syncing .functional-state__icon {
+  animation: functional-state-spin 1s linear infinite;
+}
+
+@keyframes functional-state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.functional-state--loading {
+  color: var(--state-loading-fg);
+  background: var(--state-loading-bg);
+}
+.functional-state--available {
+  color: var(--state-available-fg);
+  background: var(--state-available-bg);
+}
+.functional-state--partial {
+  color: var(--state-partial-fg);
+  background: var(--state-partial-bg);
+}
+.functional-state--stale {
+  color: var(--state-stale-fg);
+  background: var(--state-stale-bg);
+}
+.functional-state--error {
+  color: var(--state-error-fg);
+  background: var(--state-error-bg);
+}
+.functional-state--unavailable {
+  color: var(--state-unavailable-fg);
+  background: var(--state-unavailable-bg);
+}
+.functional-state--maintenance {
+  color: var(--state-maintenance-fg);
+  background: var(--state-maintenance-bg);
+}
+.functional-state--unauthorized {
+  color: var(--state-unauthorized-fg);
+  background: var(--state-unauthorized-bg);
+}
+.functional-state--no-data {
+  color: var(--state-no-data-fg);
+  background: var(--state-no-data-bg);
+}
+.functional-state--syncing {
+  color: var(--state-syncing-fg);
+  background: var(--state-syncing-bg);
+}

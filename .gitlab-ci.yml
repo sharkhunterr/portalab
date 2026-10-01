@@ -1,0 +1,171 @@
+# Portalab CI — stages validate → test → build → publish (spec 001 plan §10, research R13).
+# The application lives in ./portalab (backend/ + frontend/); this file sits at the repository root.
+# Pipelines run on merge requests, the default branch and tags; images are pushed only when enabled.
+
+stages:
+  - validate
+  - test
+  - build
+  - publish
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+variables:
+  APP_DIR: "$CI_PROJECT_DIR/portalab"
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/uv"
+  npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+  # feature toggles (same convention as the sibling projects)
+  ENABLE_BACKEND_TESTS: "true"
+  ENABLE_FRONTEND_TESTS: "true"
+  ENABLE_DOCKER_BUILD: "true"
+  ENABLE_GITLAB_REGISTRY: "false"
+  # test database (service container below)
+  POSTGRES_DB: portalab_ci
+  POSTGRES_USER: portalab
+  POSTGRES_HOST_AUTH_METHOD: trust  # ephemeral, isolated CI service container: no password needed
+
+.python:
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet "uv>=0.9,<1"
+    - cd "$APP_DIR/backend"
+    - uv sync --frozen
+  cache:
+    key:
+      files: [portalab/backend/uv.lock]
+    paths: [.cache/uv]
+
+.node:
+  image: node:22-alpine
+  before_script:
+    - cd "$APP_DIR/frontend"
+    - npm ci --no-audit --no-fund
+  cache:
+    key:
+      files: [portalab/frontend/package-lock.json]
+    paths: [.cache/npm]
+
+.docker:
+  image: docker:27-cli
+  services:
+    - name: docker:27-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+
+# ---------------------------------------------------------------- validate
+ruff:
+  extends: .python
+  stage: validate
+  script:
+    - uv run ruff check .
+    - uv run ruff format --check .
+
+mypy:
+  extends: .python
+  stage: validate
+  script:
+    - uv run mypy
+
+import-linter:
+  extends: .python
+  stage: validate
+  script:
+    - uv run lint-imports --config importlinter.ini
+
+biome:
+  extends: .node
+  stage: validate
+  script:
+    - npx biome ci .
+
+typescript:
+  extends: .node
+  stage: validate
+  script:
+    - npm run typecheck
+
+api-drift:
+  extends: .node
+  stage: validate
+  script:
+    - npm run check:api-drift
+
+secret-scan:
+  stage: validate
+  image:
+    name: zricethezav/gitleaks:v8.21.2
+    entrypoint: [""]
+  script:
+    - gitleaks detect --source "$CI_PROJECT_DIR" --no-banner --redact --verbose
+
+# ---------------------------------------------------------------- test
+backend-tests:
+  extends: .python
+  stage: test
+  services:
+    - name: postgres:16-alpine
+      alias: postgres
+  variables:
+    PORTALAB_TEST_DATABASE_URL: "postgresql://portalab@postgres:5432/portalab_ci"
+    PORTALAB_REQUIRE_DB: "1"
+  script:
+    # unit + contract + boundary + integration (real PostgreSQL, migrations from scratch and upgrade)
+    - uv run pytest --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: portalab/backend/report.xml
+  rules:
+    - if: $ENABLE_BACKEND_TESTS == "true"
+
+frontend-tests:
+  extends: .node
+  stage: test
+  script:
+    # unit + accessibility (axe, WCAG 2.2 AA token contrast) — Vitest
+    - npx vitest run --reporter=default --reporter=junit --outputFile.junit=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: portalab/frontend/report.xml
+  rules:
+    - if: $ENABLE_FRONTEND_TESTS == "true"
+
+# ---------------------------------------------------------------- build
+docker-image:
+  extends: .docker
+  stage: build
+  script:
+    - docker build -f portalab/deploy/Dockerfile -t "portalab:$CI_COMMIT_SHORT_SHA" .
+    # the same image must start as `serve` and as `worker` (smoke check 8)
+    - docker run --rm "portalab:$CI_COMMIT_SHORT_SHA" --help
+    - docker save "portalab:$CI_COMMIT_SHORT_SHA" -o portalab-image.tar
+  artifacts:
+    paths: [portalab-image.tar]
+    expire_in: 1 day
+  rules:
+    - if: $ENABLE_DOCKER_BUILD == "true"
+
+# ---------------------------------------------------------------- publish
+gitlab-registry:
+  extends: .docker
+  stage: publish
+  needs: [docker-image]
+  script:
+    - docker load -i portalab-image.tar
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker tag "portalab:$CI_COMMIT_SHORT_SHA" "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+    - docker tag "portalab:$CI_COMMIT_SHORT_SHA" "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+  rules:
+    - if: $CI_COMMIT_TAG && $ENABLE_GITLAB_REGISTRY == "true" && $ENABLE_DOCKER_BUILD == "true"

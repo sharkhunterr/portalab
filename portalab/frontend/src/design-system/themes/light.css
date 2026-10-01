@@ -1,0 +1,32 @@
+/* Light theme — appearance only (CD-022). Every token of tokens.css color roles is redefined. */
+[data-theme="light"] {
+  --color-surface: #ffffff;
+  --color-surface-raised: #f4f5f7;
+  --color-text: #16181d;
+  --color-text-muted: #4a4f5a;
+  --color-border: #c9cdd4;
+  --color-accent: #1f4fd1;
+  --color-accent-contrast: #ffffff;
+  --color-focus: #1f4fd1;
+
+  --state-loading-fg: #3b4252;
+  --state-loading-bg: #eceff4;
+  --state-available-fg: #15603a;
+  --state-available-bg: #e3f4ea;
+  --state-partial-fg: #7a4b00;
+  --state-partial-bg: #fdf1dc;
+  --state-stale-fg: #6b4a00;
+  --state-stale-bg: #faf1d7;
+  --state-error-fg: #a1121d;
+  --state-error-bg: #fde7e8;
+  --state-unavailable-fg: #57303a;
+  --state-unavailable-bg: #f3e6ea;
+  --state-maintenance-fg: #4b2b8f;
+  --state-maintenance-bg: #ede6fb;
+  --state-unauthorized-fg: #7a1f52;
+  --state-unauthorized-bg: #f9e4ef;
+  --state-no-data-fg: #3f4652;
+  --state-no-data-bg: #eef0f3;
+  --state-syncing-fg: #0f4c75;
+  --state-syncing-bg: #e1eff8;
+}

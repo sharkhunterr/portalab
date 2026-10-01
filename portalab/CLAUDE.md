@@ -23,9 +23,23 @@ plugins/{available,installed}/ · examples/plugins/
 
 ## Commands
 
-Planned (not yet implemented — see specs/001-portal-global-spec/quickstart.md):
-cd backend && uv run pytest && uv run ruff check . && uv run mypy src && uv run lint-imports
-cd frontend && npm run lint && npm run typecheck && npm test
+```bash
+# backend (Python 3.12, uv) — integration tests need PostgreSQL:
+#   docker run -d --name portalab-test-pg -e POSTGRES_USER=portalab -e POSTGRES_PASSWORD=portalab_test \
+#     -p 127.0.0.1:55432:5432 postgres:16-alpine
+#   export PORTALAB_TEST_DATABASE_URL=postgresql://portalab:portalab_test@127.0.0.1:55432/postgres
+cd backend && uv sync && uv run pytest
+uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run lint-imports --config importlinter.ini
+uv run portalab migrate | serve | worker | openapi -o openapi.json   # bootstrap settings via env/_FILE
+
+# frontend (Node 22)
+cd frontend && npm ci && npm run lint && npm run typecheck && npm test && npm run build
+npm run gen:api && npm run check:api-drift   # after changing the API (backend/openapi.json)
+
+# image + acceptance checks (docker)
+docker build -f portalab/deploy/Dockerfile -t portalab .   # from the repository root
+portalab/scripts/smoke.sh
+```
 
 ## Code Style
 

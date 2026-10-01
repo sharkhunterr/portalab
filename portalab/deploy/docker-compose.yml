@@ -1,0 +1,77 @@
+# Portalab — self-hosted deployment (spec 001 quickstart).
+# Secrets are files mounted with Docker secrets; create them first (never commit real values):
+#   mkdir -p deploy/secrets
+#   openssl rand -base64 32 > deploy/secrets/db_password
+#   echo "postgresql://portalab:$(cat deploy/secrets/db_password)@postgres:5432/portalab" > deploy/secrets/database_url
+#   openssl rand -base64 48 > deploy/secrets/secret_key
+# Then:  docker compose -f deploy/docker-compose.yml up -d postgres
+#        docker compose -f deploy/docker-compose.yml run --rm migrate
+#        docker compose -f deploy/docker-compose.yml up -d portalab worker
+
+x-portalab: &portalab
+  image: ${PORTALAB_IMAGE:-portalab:local}
+  build:
+    context: ../..
+    dockerfile: portalab/deploy/Dockerfile
+  environment:
+    DATABASE_URL_FILE: /run/secrets/database_url
+    SECRET_KEY_FILE: /run/secrets/secret_key
+    BIND_HOST: 0.0.0.0
+    BIND_PORT: "8080"
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  secrets: [database_url, secret_key]
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: portalab
+      POSTGRES_USER: portalab
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portalab -d portalab"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *portalab
+    command: ["migrate"]
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  portalab:
+    <<: *portalab
+    command: ["serve"]
+    ports:
+      - "${PORTALAB_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    <<: *portalab
+    command: ["worker"]
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+secrets:
+  db_password:
+    file: ./secrets/db_password
+  database_url:
+    file: ./secrets/database_url
+  secret_key:
+    file: ./secrets/secret_key
+
+volumes:
+  postgres-data:
