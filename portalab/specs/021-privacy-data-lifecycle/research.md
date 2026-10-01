@@ -1,0 +1,16 @@
+# Research — Privacy, Data Lifecycle & Audit/Security completion (spec 021, roadmap step 3)
+
+| # | Decision | Rationale | Alternatives rejected |
+|---|---|---|---|
+| R1 | **Visibility engine = pure function of (viewer, subject, datum class/ref)**: effective level = active admin policy ▸ owner preference ▸ admin class default; composed *after* authorization via the `VisibilityFilter` port from spec 003 | FR-001..004, CD-016; privacy independent of permission | Storing a "current" visibility that policies overwrite (loses the preference) |
+| R2 | **Preferences stay with their data owners** (profile fields in identity, class defaults in Administration user-tier config); 021 reads them through a `VisibilityPreferenceProvider` capability | No second preference store (CD-011) | A central `visibility_preferences` table |
+| R3 | **Admin override = a `visibility_policies` row with `ends_at/removed_at`**; the preference is never touched, so "restore" is simply the policy ending; one active policy per (subject, class) via partial unique index | FR-005..008, OQ-100 (no stacking) | Mutating preferences and snapshotting/restoring them |
+| R4 | **Retention engine over a `RetentionTarget` registry** (modules register table, class, timestamp column, action, `integrity_necessary`); policy values come from Administration config; run by a worker job; integrity-necessary targets are never deleted | FR-018/019 | Per-module cleanup scripts |
+| R5 | **Append-only tables (audit, events, ledger) hold ids/enums, never PII bodies** — enforced by a CI test; retention of audit/events = **time-partition drop** by a maintenance role, so row-level UPDATE/DELETE stays impossible | Keeps append-only guarantee *and* retention; tombstoning needs no rewrite | Rewriting append-only rows to anonymize |
+| R6 | **Generic registry-driven erasure participant** (kernel PII registry) so most modules need no custom erasure code; modules with special data implement their own participant | R11 of spec 002; one mechanism | Hard-coded table lists |
+| R7 | **Audit completion on the same `audit.audit_entries`** (no second model): monthly range partitions, hash-chain **checkpoints** computed by a job (batch hash chained to the previous checkpoint), `portalab audit verify` CLI, query/export API, audited audit-reads | CD-013, FR-037 tamper-evident intent; avoids per-insert serialization of a row-level chain | Per-row hash chain (write contention), external ledger |
+| R8 | **Aggregation guard**: `AggregationGuard` suppresses groups below `privacy.minAggregateSize` (default 5, admin-configurable) | FR-023, Statistics OQ-82 default | No protection / differential privacy (disproportionate) |
+| R9 | **Purge of a disconnected service's data** = separate `services.purge` permission, sensitive, audited, executed as a job; never triggered by disconnect | FR-021, CD-014 | Cascade delete on disconnect |
+| R10 | **Security hardening baseline**: strict security headers (CSP, HSTS, X-Content-Type-Options, frame-ancestors none), request-size limits, global rate limiting middleware (per IP and per user), `pip-audit` + `npm audit` + secret scan in CI | Constitution VI; roadmap step "Security" | Deferring all hardening |
+
+No `NEEDS CLARIFICATION` remains; thresholds/durations are admin config (registry defaults).
