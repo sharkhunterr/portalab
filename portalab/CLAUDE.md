@@ -3,8 +3,10 @@
 Auto-generated from all feature plans. Last updated: 2026-10-01
 
 ## Active Technologies
+- Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2) (002-identity-users)
+- PostgreSQL schema `identity` (see `data-model.md`); avatar/export blobs via kernel `core.blobstore` (filesystem baseline) (002-identity-users)
 
-- Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7 (001-architecture)
+- Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7 (002-identity-users)
 
 ## Project Structure
 
@@ -25,8 +27,9 @@ cd frontend && npm run lint && npm run typecheck && npm test
 Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain): Follow standard conventions
 
 ## Recent Changes
+- 002-identity-users: Added Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2)
 
-- 001-architecture: Added Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7,
+- 002-identity-users: Added Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7,
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
