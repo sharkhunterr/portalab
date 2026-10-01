@@ -25,7 +25,7 @@
 Global: `notifications.coalesceWindowSeconds` (120), `notifications.retentionDays` (90), `notifications.email.enabled`, `.email.from`, `.email.smtp.host|port|tls|username` (+ `password` secret), `notifications.email.maxAttempts` (5), `notifications.digest.defaultMode`, category policy (mandatory/default channels). User: `notifications.preferences.<category>.<channel>`, `notifications.email.digest`. Presentation prefs reuse 022 (`ui.notificationPosition|DurationSeconds|Style`, `ui.soundEnabled`).
 
 ## Events (via 007)
-Consumed: `maintenance.scheduled|rescheduled|cancelled|started|completed` (006), `service.state_changed` (006, critical ⇒ system alert), `user.suspended|reactivated|deletion_requested` (account security), `admin.config_changed`. Produced: `notification.sent` (communication-level counts), `notification.read` (user-level, dedup `(notification_id)`), `notification.delivery_failed` (diagnostic, deduped per channel/min).
+Consumed: `maintenance.scheduled|rescheduled|started|ended|cancelled` (006, with `schedule_version`), `service.status_changed` (006, critical ⇒ system alert), `user.suspended|reactivated|deletion_requested` (account security), `admin.config_changed`. Produced: `notification.sent` (communication-level counts), `notification.read` (user-level, dedup `(notification_id)`), `notification.delivery_failed` (diagnostic, deduped per channel/min).
 
 ## Privacy / retention
 Inbox and deliveries are `activity` personal data (export/erasure participant); pending/undelivered follow 021 purge; email bodies purged after send; rendered content excluded from logs/events.

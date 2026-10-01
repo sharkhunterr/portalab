@@ -77,7 +77,11 @@ Prerequisites (not implemented here): `D-001` kernel · `D-002` principal/prefer
 - [ ] T041 [P] Write `backend/tests/security/i18n/test_catalog_security.py`: catalogs/logs/stats contain no secrets or PII; ICU input cannot inject markup/execute; personal data (language/locale/tz) covered by 020 export/erasure; retention of `missing_key_stats` registered with 021
 - [ ] T042 [P] Add `/i18n/*`, `/admin/i18n/*` to the permission-matrix test, regenerate OpenAPI client, wire `portalab i18n check` and `npm run i18n:check` into the GitLab CI `validate` stage
 - [ ] T043 [P] Write `docs/i18n.md` (contributor guide: keys, ICU rules, pseudo-locales, adding a language, plugin catalogs, operator settings)
-- [ ] T044 Run `specs/026-i18n/quickstart.md` end-to-end and record deviations; record product confirmations for OQ-125..129 defaults
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T044 [P] Expose owner-tagged registration on the plugin catalog registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/i18n/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T045 Run `specs/026-i18n/quickstart.md` end-to-end and record deviations; record product confirmations for OQ-125..129 defaults
 
 ## Dependencies & Order
 Setup → spike T004 → Foundational → US1 (MVP) → US4 → US2 → US3 → US10 → US11 → US5/US6 → US7/US8 → US9 → Polish. US2/US3 are independent once contracts exist; US10 needs 020; US11 needs 022/004; US9 needs 023 events (stub until then).
@@ -85,4 +89,4 @@ Setup → spike T004 → Foundational → US1 (MVP) → US4 → US2 → US3 → 
 **MVP**: Phases 1–4 (resolution + catalogs/ICU with fallback + frontend provider).
 
 ## Format validation
-44 tasks, all checkbox + ID + path; story labels only on story phases.
+45 tasks, all checkbox + ID + path; story labels only on story phases.

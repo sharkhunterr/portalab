@@ -7,6 +7,8 @@ FKs only intra-module or to `identity.users(id)`; event/source references are op
 - **gamification.balances** (derived cache): `user_id` FK · `value` · `amount` bigint CHECK `amount >= 0` · `last_seq` · `level` int null (xp only) · `curve_version` · PK `(user_id, value)`.
 - **gamification.withheld** (bounded retention): `id` · `user_id` · `value` · `proposed_delta` · `reason` (`cooldown|cap|anomaly`) · `rule_key/version` · `trigger_event_id` · `status` (`flagged|approved|rejected|dropped`) · `reviewed_by` · `occurred_at`.
 
+- **gamification.reservations**: `id` · `user_id` FK · `amount` · `source_kind` (`community_funding`) · `source_ref` · `status` (`active|released|consumed|destroyed`) · `reserve_tx_id` · `resolution_tx_id` null · `created_at` · `resolved_at` null. Ledger kinds add `reserve|reserve_release|reserve_consume`; available balance = balance − active reservations (never negative). Final deletion releases then destroys all reservations (CD-005, decided 2026-10-01).
+
 ## Definitions (versioned; effective by instant)
 - **gamification.reward_rules**: `key` · `version` · `status` (`draft|active|retired`) · `effective_from` timestamptz · `definition` jsonb (event_type, predicate, grants[], multiplier, limits{cooldown_s, caps[], diminishing}) · `created_by` · `created_at`. PK `(key, version)`; append-only versions.
 - **gamification.level_curves**: `version` · `effective_from` · `definition` jsonb (formula/parameters) · PK `version`.

@@ -9,6 +9,8 @@
 ## User UI preferences (stored in Administration config, user scope — NOT a new table)
 `ui.theme`, `ui.density` (`compact|comfortable|spacious`), `ui.textScale` (0.85–2.0), `ui.contrast` (`default|high`), `ui.reducedMotion` (`system|on|off`), `ui.soundEnabled`, `ui.notificationPosition`, `ui.notificationDurationSeconds`, `ui.notificationStyle`, `ui.layoutPresets` (dashboard handled by 009).
 
+Additional user key: `ui.campaignThemes` (`allow|ignore`, default `allow`) — campaign theme overlays (014) apply only when allowed by policy and this preference; accessibility preferences always win.
+
 ## Admin policy (config, global scope)
 `ui.allowedThemes[]`, `ui.defaultTheme`, `ui.forceReducedMotion?`, bounds for text scale; policy constrains user values while the stored preference is retained (CD-011).
 

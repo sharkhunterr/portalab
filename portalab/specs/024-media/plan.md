@@ -17,7 +17,7 @@ I/II capability decoupling, source of truth (CD-014/026) · III extensible types
 Connectors (005) ─ media.library sync ─▶ RecordSink ─▶ source_items ─▶ IdentityResolver(id-first; fuzzy→candidates) ─▶ media.objects/external_ids
                                                          └▶ FieldResolver(candidates + priority + admin override) ─▶ effective + provenance ; images→blobstore
 media.playback (live) ─▶ PlaybackPoller job ─▶ normalize ─▶ playback_sessions ─▶ events(007) ─▶ HistoryProjection ─▶ history_entries/user_progress
-request.service ─ submit/status/sync ─▶ RequestService (quota via RequestQuotaProvider) ─▶ media.requests
+request.service ─ submit/status/sync ─▶ RequestService (quota via own RequestQuotaService; units sold by 015) ─▶ media.requests
 Read side: Catalog API · Detail sections (independent) · Discovery shelves · providers (Search/Widgets/Stats/AI tools)
 Availability ⟂ service_state (006) ⟂ sync_state (005) returned side by side
 ```
@@ -36,13 +36,13 @@ Availability ⟂ service_state (006) ⟂ sync_state (005) returned side by side
 | `HistoryProjection` | events → history/progress, finished thresholds, reconciliation | 007 consumers | `@consumer` | idempotent, `occurred_at`, finished sticky | replay tests |
 | `RequestService` | submit/mirror/cancel, quota, state normalization | `request.service`, 015 port | API | no paid priority; idempotent | request tests |
 | `Discovery` + `RecommendationProvider` | shelves | 017, history | API | permission/privacy bounded | shelf tests |
-| `DetailSections` + slot registry | independent sections + plugin blocks | 022/004 | API/UI | each section own state | isolation tests |
+| `DetailSections` + slot registry | independent sections (info, sources/availability, history, progress, requests, people, statistics, associated events, actions, external links) + plugin blocks | 022/004 | API/UI | each section own state | isolation tests |
 | Integrations | Search/widgets/stats packs/notification categories/AI tools/palette | 008/009/017/010/018 | registrations | thin | contract tests |
 
 ## 3. Data Model — `data-model.md` · 4. Contracts — `contracts/media-contracts.md`
 
 ## 5. Events
-Produced (007 envelope, ids/counters only): `media.item_added`, `media.item_availability_changed`, `media.merged|split`, `media.playback_*`, `media.finished`, `media.request_*`. Consumers (013 rewards, 014 campaigns, 017 stats, 010 notifications, 018, 019) idempotent via dedup keys `(session_key, state_seq)`, `(user_id, object_id, finished)`, `(request_id, state)`. Progress throttled to state change or ≥ 60 s. Ordering: by `occurred_at`; late events never revert *finished*. Consumed: `service.state_changed`, erasure participant calls.
+Produced (007 envelope, ids/counters only): `media.added|updated|removed`, `media.availability_changed`, `media.merged|split` (portal-native identity events), `media.playback_started|progressed|paused|finished|abandoned|error` (resume ⇒ `progressed`; session ended at/above the finished threshold ⇒ `finished`, below ⇒ `abandoned`; source lost ⇒ `error`), `media.resume_available`, `media.request_created|updated|available` — names as listed in spec 024 / EVENT_MODEL. Consumers (013 rewards, 014 campaigns, 017 stats, 010 notifications, 018, 019) idempotent via dedup keys `(session_key, state_seq)`, `(session_key, 'finished')`, `(request_id, state)`. Progress throttled to state change or ≥ 60 s. Ordering: by `occurred_at`; late events never revert *finished*. Consumed: `service.status_changed`, erasure participant calls.
 
 ## 6. Permissions & Security
 `media.read` (default grant) + visibility per datum class (021) for personal sections; `media.request` (default grant, quota-bound); `media.manage` Admin-only (merge/split/override/matching; sensitive actions confirmed + audited). Destructive actions on source services are **not provided** in this plan (would require `media.source.delete`, sensitive + confirmation). User links verified where the service supports it; unlinked activity never attributed. Source payloads sanitized (no tokens/URLs with credentials); images proxied; external text escaped.
@@ -53,7 +53,7 @@ Produced (007 envelope, ids/counters only): `media.item_added`, `media.item_avai
 Only through capabilities/connectors. Reference connectors (Plex/Jellyfin, Radarr/Sonarr, Seerr, Grimmory, RomM, …) are separate connector implementations delivered later via 005's SDK + this plan's conformance kits; none is required.
 
 ## 9. Error Handling & Resilience
-Source outage ⇒ section `unavailable`/`stale` with `as_of`, catalog intact · sync error ⇒ shown as sync state, last good data retained · poll failure ⇒ sessions `stale` then `interrupted` · duplicate source records ⇒ idempotent upsert · identity conflict ⇒ candidate queue, no auto-merge · missing user link ⇒ unlinked, not attributed · quota exceeded ⇒ 429-class problem · image fetch failure ⇒ placeholder · replay/duplicates ⇒ no double history/rewards.
+Source outage ⇒ section `unavailable`/`stale` with `as_of`, catalog intact · sync error ⇒ shown as sync state, last good data retained · poll failure ⇒ sessions `stale` then `interrupted` (`media.playback_error`) · duplicate source records ⇒ idempotent upsert · identity conflict ⇒ candidate queue, no auto-merge · missing user link ⇒ unlinked, not attributed · quota exceeded ⇒ 429-class problem · image fetch failure ⇒ placeholder · replay/duplicates ⇒ no double history/rewards.
 
 ## 10. Observability
 Per-service poll/sync lag, unresolved/unlinked counts, candidate queue size, match/merge counts, request failures, section latency; registers `media` with 025 (functional: catalog freshness per service, playback poll health).
@@ -65,7 +65,7 @@ Capability conformance kits (fake `media.library|playback|request.service`). Uni
 Alembic revision for `media`; capability Protocols and `SourceRecord` schemas semver'd; new media types are additive registry entries; effective-field rebuild job after priority changes (audited).
 
 ## 13. Cross-Spec Dependencies
-Prerequisites: 001, 002/003, 005 (sinks, capability mechanism), 006 (health), 007, 020, 021 (visibility datum classes `media_history`, `media_request`), 022/004. Consumes optionally: 015 (`RequestQuotaProvider`), 013/014 (via events), 018 (tools). Exposes: `MediaCatalog`/`HistoryReader` to 012, 013, 014, 017, 018, 019; slot registry to 023. Connectors for concrete services are separate deliverables.
+Prerequisites: 001, 002/003, 005 (sinks, capability mechanism), 006 (health), 007, 020, 021 (visibility datum classes `media_history`, `media_request`), 022/004. Consumes optionally: 015 (credits quota units through `RequestQuotaService.add_units`), 013/014 (via events), 018 (tools). Exposes: `MediaCatalog`/`HistoryReader` to 012, 013, 014, 017, 018, 019; slot registry to 023. Connectors for concrete services are separate deliverables.
 
 ## 14. Implementation Phases
 1 Capabilities, schema, type registry → 2 Library sink + identity + field resolution → 3 Catalog API + detail page sections → 4 Availability/degraded modes → 5 Playback poller/sessions/events → 6 History projection + progress + finished → 7 Requests → 8 Discovery + providers (search, widgets, stats, notifications, AI) → 9 Admin matching/merge/overrides → 10 Extensibility slots + hardening.

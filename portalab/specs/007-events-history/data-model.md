@@ -23,7 +23,9 @@ Indexes: (seq); (type, occurred_at); (subject_type, subject_id, occurred_at); (a
 `id` · `projection` · `from_occurred_at` · `to_occurred_at` · `requested_by` · `status` · `started_at` · `finished_at`.
 
 ## Registries (code)
-`EventType` (name, version, schema, dedup_fields/source-id flag, retention_class `business|technical`, visibility_class), `Consumer` (name, event types, handler, replay_safe).
+`EventType` (name, version, schema with per-field annotations `rewardable` (013) / `aggregatable` (017), `automatable` flag (019), owner tag, dedup_fields/source-id flag, retention_class `business|technical`, visibility_class), `Consumer` (name, event types, handler, replay_safe).
+
+Envelope conventions: `actor_kind` ∈ `user|system|ai|automation|plugin`; `provenance.automation{id, execution_id, depth}` set by actions run by 019 (loop prevention).
 
 ## Lifecycle / retention / privacy
 Events immutable; retention by dropping partitions per class (021 engine; `business` kept long, `technical` short; both configurable); personal events reference `actor_user_id` only (tombstone safe); history is owner-only by default (021). Deleted-user events remain with the same id.

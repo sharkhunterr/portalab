@@ -68,7 +68,12 @@ Prerequisites (not implemented here): `D-001` kernel · `D-002` principal + `Onb
 - [ ] T034 [P] Implement `DB/invalidate/bridge.py` mapping registered `invalidate_on` events to `widget.invalidate {key}` SSE messages (key only; refetch re-authorizes) and frontend handler invalidating the matching query; test with duplicate events
 - [ ] T035 [P] Register `dashboard` with Observability (functional probe: effective dashboard contains mandatory widgets; per-widget latency/state/timeout metrics) in `DB/observability.py`
 - [ ] T036 [P] Add `/dashboard*`, `/widgets/*`, `/admin/dashboard/*` to the permission-matrix test, regenerate OpenAPI client, write `docs/dashboard-widgets.md` (how domains register widgets/providers, template catalog, policy semantics)
-- [ ] T037 Run `specs/009-dashboard-widgets/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-40..44 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T037 Filter the widget catalog by 015 `EntitlementReader.owns(user, widget_product)` for Marketplace widget products (stub until 015); test `backend/tests/integration/dashboard/test_widget_entitlements.py` (F9)
+- [ ] T038 [P] Expose owner-tagged registration on the widget registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/dashboard/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T039 Run `specs/009-dashboard-widgets/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-40..44 defaults)
 
 ## Dependencies & Order
 Setup → Foundational → US1 (MVP) → US8 → US2 → US3 → US4 → US5 → US6 → US7 → Polish. US3 enforcement hooks into US2 writes; US4 needs US3 overlay; US6 needs registry + templates; US7 can run in parallel after US1.
@@ -76,4 +81,4 @@ Setup → Foundational → US1 (MVP) → US8 → US2 → US3 → US4 → US5 →
 **MVP**: Phases 1–3 (registry, gateway with per-widget states, dashboard page with isolated frames and first widgets).
 
 ## Format validation
-37 tasks, all checkbox + ID + path; story labels only on story phases.
+39 tasks, all checkbox + ID + path; story labels only on story phases.

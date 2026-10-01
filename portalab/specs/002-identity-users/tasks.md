@@ -10,6 +10,7 @@ description: "Task list — Identity & Users (spec 002)"
 Paths relative to repo root `portalab/`; `backend/src/portalab/modules/identity` abbreviated **`IDN/`**.
 
 ## Scope note
+US4 (preferences) is delivered by 020 (`/me/preferences`, tasks T014–T016 of 020) per CD-011; this list only declares identity keys.
 FR-013/014/015/017 (preferences) and the preference half of FR-016 are **declared, not served** here: user-tier values belong to the Administration configuration system (Configuration step). FR-018/019/022–024 are delivered through participant capabilities whose engine semantics are owned by Privacy (021).
 
 ## Phase 1: Setup
@@ -71,10 +72,10 @@ FR-013/014/015/017 (preferences) and the preference half of FR-016 are **declare
 - [ ] T038 [US3] Implement `IDN/services/profile.py` and `IDN/services/avatar.py` (Pillow decode/re-encode, blobstore, old-blob deletion job)
 - [ ] T039 [US3] Add routers `PATCH /me/profile`, `PUT|DELETE /me/avatar`, `GET /users/{id}/profile` (visibility filtering delegated to the 021 port; default not-public) in `IDN/api/profile.py`
 
-## Phase 7: US6 — Deletion lifecycle (P1)
+## Phase 7: US6 + US5 — Deletion lifecycle and personal-data export (P1/P2)
 **Independent test**: request → pending (sessions revoked), cancel restores prior state; after `due_at` the saga tombstones the user while ledger/history rows keep the same `id`.
 - [ ] T040 [P] [US6] Write `backend/tests/integration/identity/test_deletion_saga.py`: cancel before due; finalize runs every registered participant (one failing once, retried); tombstone nulls PII, keeps id; name key released; sole Admin refused
-- [ ] T041 [P] [US6] Write `backend/tests/integration/identity/test_export.py`: bundle contains the user's contributor records, never credentials/tokens/other users' private data; expires
+- [ ] T041 [P] [US5] Write `backend/tests/integration/identity/test_export.py`: bundle contains the user's contributor records, never credentials/tokens/other users' private data; expires
 - [ ] T042 [US6] Define the `privacy.erasure_participant` and `privacy.export_contributor` capability contracts in `backend/src/portalab/capabilities/privacy_participants.py`
 - [ ] T043 [US6] Implement `IDN/services/deletion.py` (request/cancel/finalize saga, per-participant state in `deletion_requests.saga_state`, step-up re-auth) and the job `finalize_deletion` in `IDN/jobs/finalize_deletion.py`
 - [ ] T044 [US6] Register identity's own erasure participant (credentials, sessions, verification tokens, avatar blob, profile fields) and export contributor in `IDN/services/participants.py`

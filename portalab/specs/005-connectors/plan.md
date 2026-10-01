@@ -45,7 +45,7 @@ Produced: `service.connected|disconnected|status_changed`, `sync.started|complet
 `services.read`, `services.manage`, `connectors.manage` (sensitive), `services.purge` (021). Enable/disable/disconnect/resync-large audited with confirmation. Credentials write-only; outbound calls limited to the configured base URL host; response size/time limits.
 
 ## 7. Configuration (declared)
-`connectors.defaultSyncIntervalSeconds`, `connectors.circuit.failureThreshold`, `connectors.circuit.cooldownSeconds`, `connectors.http.timeoutSeconds`, `connectors.http.maxResponseBytes`, `connectors.fieldPriority.<domain>` (per-field source priority tables, CD-026), `connectors.resync.confirmDeleteRatio`.
+`connectors.defaultSyncIntervalSeconds`, `connectors.circuit.failureThreshold`, `connectors.circuit.cooldownSeconds`, `connectors.http.timeoutSeconds`, `connectors.http.maxResponseBytes`, `media.fieldPriority.<kind>.<field>` (per-field source priority tables, shape defined by 024 — F7, CD-026), `connectors.resync.confirmDeleteRatio`.
 
 ## 8. External Integrations
 Defined by SDK only; each concrete service (Plex, Radarr, Sonarr, Seerr, RomM, Grimmory, …) is added later as a connector package with the conformance kit. Contract per integration: auth, timeout, unavailable ⇒ typed result + stale, malformed ⇒ `InvalidResponse`, retry bounded.

@@ -25,7 +25,7 @@
 `incident_id`, `ticket_id` references live in Support; 006 stores only `health.service_incident_links(service_id, incident_id, linked_at)`.
 
 ## Events
-`service.status_changed` (dedup `(service_id, to_state, state_seq)`), `service.health_recorded`, `maintenance.scheduled|started|ended|cancelled`, `service.operation_performed`.
+`service.status_changed` (dedup `(service_id, to_state, state_seq)`), `service.health_recorded`, `maintenance.scheduled|rescheduled|started|ended|cancelled` (payload carries `schedule_version`), `service.operation_performed`.
 
 ## Retention / privacy
 Samples and infra samples are technical class (days/weeks, config); rollups and state history longer; no personal data. Error messages redacted.

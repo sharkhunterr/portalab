@@ -10,7 +10,7 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 
 ## Phase 1: Setup
 - [ ] T001 Create `CAP/__init__.py`, `GM/{ledger,economy,rules,calculator,modifiers,antiabuse,consumers,levels,achievements,manual,anomaly,privacy,progression,verify,leaderboards,quests,api,models}/__init__.py`, `backend/migrations/gamification/versions/`, `FG/{progression,history,achievements,admin,leaderboards,quests}/`, `backend/tests/{unit,integration,contract,security}/gamification/`, `frontend/tests/{unit,e2e}/gamification/`
-- [ ] T002 [P] Declare settings (`economy.maxTotalBoost`, `economy.manualGrantConfirmThreshold`, `economy.anomaly.maxGrantsPerHour|maxCoinsPerDay`, `economy.timezone`, `economy.leaderboards.*`, `economy.withheldRetentionDays`, `economy.levelCurve.active`) in `GM/settings.py`; permissions `gamification.read` (default grant), `economy.rules.manage`, `economy.grant`, `economy.audit`, `economy.anomaly.review` (Admin, sensitive, audited) in `GM/permissions.py`
+- [ ] T002 [P] Declare settings (`economy.maxTotalBoost`, `economy.manualGrantConfirmThreshold`, `economy.anomaly.maxGrantsPerHour|maxCoinsPerDay`, `economy.timezone`, `economy.leaderboards.*`, `economy.withheldRetentionDays`, `economy.levelCurve.active`) in `GM/settings.py`; permissions `gamification.read` (default grant), `gamification.manage`, `rewards.grant`, `economy.manage` (Admin, sensitive, audited; 003 catalog names) in `GM/permissions.py`
 - [ ] T003 [P] Register datum class `progression` with 021 visibility, retention targets (withheld, usage windows), notification categories `gamification.reward|level_up|achievement|quest` (010), and event types with `rewardable` attribute declarations in the 007 registry
 
 ## Phase 2: Foundational — schema, ledger, level curve (Slice A)
@@ -26,11 +26,11 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 **Independent test**: grants, spends, refunds, corrections and destruction are all new rows; balances derive from the ledger.
 - [ ] T009 [P] [US6] Write `backend/tests/integration/gamification/test_economy_service.py`: spend decreases balance atomically; overspend ⇒ `economy.insufficient_coins` with no side effects; refund creates new transaction referencing the original; idempotency key replays return the same transaction; Coins cannot be created from money (no such path); history cursor pagination owner-only
 - [ ] T010 [US6] Implement `GM/economy/service.py` (`EconomyService.spend/refund/balance/history`) registered as capability for 015/012, and routers `GET /me/economy/transactions`, `GET /me/progression`
-- [ ] T011 [US6] Implement `GM/verify/verifier.py` + CLI `portalab economy verify` and admin `GET /admin/economy/verify` (`economy.audit`): recompute balances from ledger, detect drift
+- [ ] T011 [US6] Implement `GM/verify/verifier.py` + CLI `portalab economy verify` and admin `GET /admin/economy/verify` (`economy.manage`): recompute balances from ledger, detect drift
 
 ## Phase 4: US7 — Administrative rewards and rule versioning (P1)
 - [ ] T012 [P] [US7] Write `backend/tests/unit/gamification/test_rule_versions.py`: version in force chosen by event `occurred_at`; new version never edits old; transactions keep `rule_key/version`; closed schema validation (unknown attributes/fields rejected); simulation performs no writes
-- [ ] T013 [P] [US7] Write `backend/tests/integration/gamification/test_manual_rewards.py`: requires `economy.grant`; reason mandatory; marked manual with actor; audited; ≥ threshold requires confirmation; AI/automation callers bounded by acting principal; rule publish/retire audited and sensitive
+- [ ] T013 [P] [US7] Write `backend/tests/integration/gamification/test_manual_rewards.py`: requires `rewards.grant`; reason mandatory; marked manual with actor; audited; ≥ threshold requires confirmation; AI/automation callers bounded by acting principal; rule publish/retire audited and sensitive
 - [ ] T014 [US7] Implement `GM/rules/{store,resolver,simulate}.py`, routers `GET/POST /admin/gamification/rules[/{key}]`, `POST …/publish|retire|simulate`, `GM/manual/service.py` + `POST /admin/gamification/manual-grants`, and `FG/admin/{RuleEditor,SimulationPanel,ManualGrant}.tsx`
 
 ## Phase 5: US1 — Earn XP, Contribution, Coins deterministically from events (P1)
@@ -45,7 +45,7 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 ## Phase 7: US5 — Anti-abuse: cooldown, caps, diminishing returns, anomalies (P1)
 - [ ] T020 [P] [US5] Write `backend/tests/unit/gamification/test_antiabuse.py`: cooldown withholds/reduces repeats; per-period caps (rule and value level) trim to remaining cap; diminishing curves (geometric/steps); windows keyed by `occurred_at`; applied equally to XP/Contribution/Coins; multipliers cannot exceed caps
 - [ ] T021 [P] [US5] Write `backend/tests/integration/gamification/test_anomaly_review.py`: threshold breach ⇒ withheld + `anomaly_flagged` + flag row; admin approve ⇒ transaction created; reject ⇒ dropped with reason; confirm-abuse ⇒ correction transactions (never edits); every decision audited; no silent drops
-- [ ] T022 [US5] Implement `GM/antiabuse/{guards,windows}.py`, `GM/anomaly/service.py`, routers `GET /admin/economy/anomalies`, `POST …/approve|reject|confirm-abuse`, and `FG/admin/AnomalyQueue.tsx`
+- [ ] T022 [US5] Implement `GM/antiabuse/{guards,windows}.py`, `GM/anomaly/service.py`, routers `GET /admin/economy/anomalies`, `POST …/approve|reject|confirm-abuse`, optional escalation to an Incident via 016 `support.incidents.create` (`economy.anomaly.escalateToIncident`), and `FG/admin/AnomalyQueue.tsx`
 
 ## Phase 8: US2 — Levels derived from XP (P1)
 - [ ] T023 [P] [US2] Write `backend/tests/integration/gamification/test_levels.py`: crossing emits one `user.level_up` (dedup `(user, level)`); level never spendable or stored as balance; reconstruction from ledger yields same level; display separate from other values
@@ -60,19 +60,25 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 - [ ] T028 [US8] Implement `GM/privacy/participant.py` (erasure + export participants for 002/021) and visibility integration for `GET /users/{id}/progression`
 
 ## Phase 11: Slice A closure — progression APIs, observability, integrations
-- [ ] T029 [P] [US9] Write `backend/tests/security/gamification/test_progression_privacy.py`: another user's progression only per 021 visibility; ledger views owner/`economy.audit` only (audited); no private data exposed by permission alone; no PII in events
+- [ ] T029 [P] [US9] Write `backend/tests/security/gamification/test_progression_privacy.py`: another user's progression only per 021 visibility; ledger views owner/`economy.manage` only (audited); no private data exposed by permission alone; no PII in events
 - [ ] T030 [P] Register `ProgressionReader` for 017/015/012, statistics pack `backend/definitions/packs/gamification.json` (017), dashboard widgets `gamification.progress` (009), AI tool `progression.get` (018), `GM/observability.py` (grants/s, withheld by reason, drift, consumer lag; 025 registration)
 - [ ] T031 [P] Add `/me/progression`, `/me/economy/*`, `/me/achievements`, `/achievements/*`, `/admin/gamification/*`, `/admin/economy/*` routes to the permission-matrix test, regenerate OpenAPI client, write `docs/economy.md` (values, ledger rules, rule authoring, modifier cap, anti-abuse, verification)
-- [ ] T032 Run `specs/013-gamification-economy/quickstart.md` steps 1–7 end-to-end; record deviations and open product confirmations (OQ-60..64 defaults, R2 boundary)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T032 Add Coin **reservations** for Marketplace funding (CD-008): table `gamification.reservations`, ledger kinds `reserve|reserve_release|reserve_consume`, `EconomyService.reserve/release/consume`, and an optional caller unit of work on `spend/refund/reserve` for atomic multi-module transactions; test `backend/tests/integration/gamification/test_reservations.py` (available balance, never negative, idempotent, final deletion destroys reservations) (F3)
+- [ ] T033 Implement `RewardService.grant_via_automation(...)` (anti-abuse-bound, `source_kind=automation`, author-bounded) and register the 019 action types `award.xp|coins|contribution` and `reward.unlock`; test `backend/tests/contract/gamification/test_automation_awards.py` (F4)
+- [ ] T034 Add a `DefinitionSource` extension point so achievement/quest evaluators also read campaign-scoped definitions from 014 `CampaignContentProvider` while the campaign is active; test `backend/tests/unit/gamification/test_definition_sources.py` (F5)
+
+- [ ] T035 Run `specs/013-gamification-economy/quickstart.md` steps 1–7 end-to-end; record deviations and open product confirmations (OQ-60..64 defaults, R2 boundary)
 
 ## Phase 12: Slice B — Leaderboards (step 23) — US9
-- [ ] T033 [P] [US9] Write `backend/tests/integration/gamification/test_leaderboards.py`: metrics (xp, level, contribution, achievements; Coins only when enabled); periods all-time/month/week from ledger windows; visibility/opt-out (021 levels: Public/Community/Leaderboards-only/Private) honored; viewer always sees own rank; ties deterministic; tombstoned users excluded; no private data exposed
-- [ ] T034 [US9] Implement `GM/leaderboards/{service,job}.py` (snapshots every `refreshMinutes`), routers `GET /leaderboards/{metric}`, `GET /me/leaderboard-position`, and `FG/leaderboards/Leaderboard.tsx` (accessible table, own-rank highlight, states)
+- [ ] T036 [P] [US9] Write `backend/tests/integration/gamification/test_leaderboards.py`: metrics (xp, level, contribution, achievements; Coins only when enabled); periods all-time/month/week from ledger windows; visibility/opt-out (021 levels: Public/Community/Leaderboards-only/Private) honored; viewer always sees own rank; ties deterministic; tombstoned users excluded; no private data exposed
+- [ ] T037 [US9] Implement `GM/leaderboards/{service,job}.py` (snapshots every `refreshMinutes`), routers `GET /leaderboards/{metric}`, `GET /me/leaderboard-position`, and `FG/leaderboards/Leaderboard.tsx` (accessible table, own-rank highlight, states)
 
 ## Phase 13: Slice C — Quests, daily objectives, challenges (step 24) — US3b
-- [ ] T035 [P] [US3] Write `backend/tests/integration/gamification/test_quests.py`: quest/daily/challenge criteria over counters; period keys in `economy.timezone` incl. DST; daily reset; completion once per `(user, quest, period)`; reward auto-granted via ledger; `quest.completed` emitted; campaign-linked quests respect campaign window (014 stub); duplicate/late events safe
-- [ ] T036 [US3] Implement `GM/quests/{evaluator,service}.py`, routers `GET /me/quests`, `GET /quests/catalog`, admin CRUD (`economy.rules.manage`), widget `gamification.daily_objectives` (009), and `FG/quests/QuestPanel.tsx`
-- [ ] T037 Run quests/leaderboard quickstart extensions; update `docs/economy.md`; record Slice B/C completion
+- [ ] T038 [P] [US3] Write `backend/tests/integration/gamification/test_quests.py`: quest/daily/challenge criteria over counters; period keys in `economy.timezone` incl. DST; daily reset; completion once per `(user, quest, period)`; reward auto-granted via ledger; `quest.completed` emitted; campaign-linked quests respect campaign window (014 stub); duplicate/late events safe
+- [ ] T039 [US3] Implement `GM/quests/{evaluator,service}.py`, routers `GET /me/quests`, `GET /quests/catalog`, admin CRUD (`gamification.manage`), widget `gamification.daily_objectives` (009), and `FG/quests/QuestPanel.tsx`
+- [ ] T040 Run quests/leaderboard quickstart extensions; update `docs/economy.md`; record Slice B/C completion
 
 ## Dependencies & Order
 **Slice A**: Setup → Foundational → US6 (ledger/service) → US7 (rules/versioning/manual) → US1 (consumer) → US4 → US5 → US2 → US3a → US8 → closure. **Slice B** needs ledger + visibility (021). **Slice C** needs counters + economy tz + (optionally) 014 campaigns.
@@ -80,4 +86,4 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 **MVP (Slice A)**: Phases 1–5 (ledger, economy service, versioned rules, event-driven rewards).
 
 ## Format validation
-37 tasks, all checkbox + ID + path; story labels only on story phases.
+40 tasks, all checkbox + ID + path; story labels only on story phases.

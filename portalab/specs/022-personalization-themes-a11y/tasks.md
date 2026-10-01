@@ -72,7 +72,12 @@ Prerequisites (not implemented here): `D-001` frontend scaffold + `FunctionalSta
 - [ ] T038 [P] Implement remaining catalog components (Card, Panel, Badge, Progress, Timeline, Calendar, Chart wrapper, Avatar, Media/Service/User/Achievement/Project cards) in `DS/components/` with state docs, incrementally as consumers need them
 - [ ] T039 [P] Build dev-only component gallery route `frontend/src/features/dev/gallery` showing every component × state × theme; wire `npm run test:a11y` (axe on gallery + key routes) into CI `test` stage in `.gitlab-ci.yml`
 - [ ] T040 [P] Add `/ui/*` routes to the permission-matrix test and OpenAPI client regeneration; write `docs/design-system.md` (tokens, theme authoring, floor rules, WCAG 2.2 checklist)
-- [ ] T041 Run `specs/022-personalization-themes-a11y/quickstart.md` end-to-end and record deviations
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T041 Add user preference `ui.campaignThemes` (`allow|ignore`) and the campaign theme overlay in `DS/themes/ThemeProvider.tsx` (overlay only if allowed by policy and preference; accessibility preferences still win); theme availability for Marketplace theme products reads 015 `EntitlementReader`; test `frontend/tests/unit/campaign-overlay.test.tsx` (F8)
+- [ ] T042 [P] Expose owner-tagged registration on the theme registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/ui/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T043 Run `specs/022-personalization-themes-a11y/quickstart.md` end-to-end and record deviations
 
 ## Dependencies & Order
 Setup → Foundational → US1 (MVP) → US3 → US4 → US5 → US7 → US2 → US6 → US8 → Polish. US3/US4 may run in parallel after US1; US5 needs the floor from Foundational; US7 needs 020 preferences; US2 depends on policy keys from T003.
@@ -80,4 +85,4 @@ Setup → Foundational → US1 (MVP) → US3 → US4 → US5 → US7 → US2 →
 **MVP**: Phases 1–3 (tokens, schema/floor, functional-state mapping, theme switch, theme API).
 
 ## Format validation
-41 tasks, all checkbox + ID + path; story labels only on story phases.
+43 tasks, all checkbox + ID + path; story labels only on story phases.

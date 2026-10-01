@@ -1,5 +1,5 @@
 # Quickstart — Gamification & Economy
-1. Publish a reward rule (event `media.finished` → 20 XP, 5 Coins); emit the event for user A → one XP and one Coins transaction with rule version; re-deliver the same event → no double grant.
+1. Publish a reward rule (event `media.playback_finished` → 20 XP, 5 Coins); emit the event for user A → one XP and one Coins transaction with rule version; re-deliver the same event → no double grant.
 2. Cross a level threshold → `user.level_up` once; Level is displayed, never a balance.
 3. Add a campaign modifier x2 and a rule multiplier x1.5 → ×3 applied, capped at `economy.maxTotalBoost`; hit the daily cap → further grants withheld; cooldown blocks rapid repeats; diminishing returns reduce repeats.
 4. Spend Coins via the service (stub marketplace) → balance drops; overspend refused; refund creates a new transaction; no row is ever updated or deleted (attempt fails at the DB).

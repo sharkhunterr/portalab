@@ -11,15 +11,15 @@
 ## HTTP (`/api/v1`)
 | Path | Permission |
 |---|---|
-| GET `/admin/automations` · GET `/admin/automations/{id}` (+versions) | `automations.read` |
-| POST `/admin/automations` (draft) · PUT `/admin/automations/{id}` · POST `…/publish` | `automations.manage` (sensitive when critical actions; `ConfirmationService`; audited) |
-| POST `/admin/automations/{id}/pause|resume|archive` · POST `…/reenable` (after suspension) | `automations.manage` (audited) |
-| POST `/admin/automations/{id}/dry-run` `{sample_event|event_id}` | `automations.manage` (no side effects) |
-| POST `/admin/automations/{id}/run` (manual run for schedule/test, real, confirmation) | `automations.manage` (sensitive) |
-| GET `/admin/automations/{id}/executions?status&cursor` · GET `/admin/automations/executions/{id}` | `automations.read` |
-| GET `/admin/automations/approvals?status` · POST `/admin/automations/approvals/{id}/approve|reject` | `automations.approve` (audited; approver ≠ unauthorized) |
-| GET `/admin/automations/catalog` (triggers, condition leaves, action types incl. sensitivity) | `automations.read` |
-| GET `/admin/automations/templates` · POST `…/templates/{key}/instantiate` | `automations.manage` |
+| GET `/admin/automations` · GET `/admin/automations/{id}` (+versions) | `automation.read` |
+| POST `/admin/automations` (draft) · PUT `/admin/automations/{id}` · POST `…/publish` | `automation.manage` (sensitive when critical actions; `ConfirmationService`; audited) |
+| POST `/admin/automations/{id}/pause|resume|archive` · POST `…/reenable` (after suspension) | `automation.manage` (audited) |
+| POST `/admin/automations/{id}/dry-run` `{sample_event|event_id}` | `automation.manage` (no side effects) |
+| POST `/admin/automations/{id}/run` (manual run for schedule/test, real, confirmation) | `automation.manage` (sensitive) |
+| GET `/admin/automations/{id}/executions?status&cursor` · GET `/admin/automations/executions/{id}` | `automation.read` |
+| GET `/admin/automations/approvals?status` · POST `/admin/automations/approvals/{id}/approve|reject` | `automation.approve` (audited; approver ≠ unauthorized) |
+| GET `/admin/automations/catalog` (triggers, condition leaves, action types incl. sensitivity) | `automation.read` |
+| GET `/admin/automations/templates` · POST `…/templates/{key}/instantiate` | `automation.manage` |
 Problem codes: `automation.invalid_definition`, `automation.action_forbidden`, `automation.loop_prevented`, `automation.suspended`, `automation.approval_required`.
 
 ## Frontend

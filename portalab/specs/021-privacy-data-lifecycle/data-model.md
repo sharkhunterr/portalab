@@ -19,5 +19,8 @@ Converted to **monthly range partitions** on `occurred_at` (expand/contract migr
 ## Rules enforced by tests
 Append-only tables contain no PII-class columns · every mutable table with PII is classified · retention never targets `integrity_necessary` tables · aggregate endpoints use `AggregationGuard`.
 
+## User visibility preferences
+Stored as user-tier settings `privacy.visibility.<datum_class>` in 020 (CD-011), read through `VisibilityPreferenceProvider`; datum classes are registered by owning modules via `register_datum_class(key, owner, default_level, classification)`. Admin overrides never overwrite them (CD-016).
+
 ## Events
 `privacy.override_applied`, `privacy.override_removed`, `privacy.retention_applied`, `service.data_purged`, `audit.checkpoint_created`, `audit.verification_failed`.

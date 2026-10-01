@@ -4,6 +4,9 @@
 - `EconomyService.spend(user, amount, *, reason, source_kind, source_ref, idempotency_key) -> Transaction` (atomic, non-negative, raises `InsufficientCoins`) · `refund(transaction_id, *, reason, idempotency_key)` · `balance(user, value)` · `history(user, filters, cursor)`; used by Marketplace (015) and Community funding via 015.
 - `RewardService.grant_manual(actor, user, value, amount, reason, ...)` (bounded admin action; callable by 019 as an action under the author's permissions) and `grant_contribution(user, amount, source_ref, idempotency_key)` (used by 016 conversion; subject to anti-abuse).
 - `ProgressionReader` (for 017/015/012): `level(user)`, `xp/contribution/coins(user)`, `has_achievement(user, key)`, `progress(user)`.
+- `EconomyService.reserve(user, amount, *, source_ref, idempotency_key, uow=None)` · `release(reservation_id, *, reason)` · `consume(reservation_id)` (Marketplace funding, CD-008); `spend/refund/reserve` accept the caller's unit of work for atomic multi-module operations.
+- `RewardService.grant_via_automation(principal, user, value, amount, automation_ref, idempotency_key)` — anti-abuse-bound, registered as 019 actions `award.xp|coins|contribution`, `reward.unlock`.
+- `DefinitionSource` extension: evaluators also read campaign-scoped achievements/quests from 014 `CampaignContentProvider`.
 - `ModifierProvider` (implemented by 014): `modifiers_for(user, event, value, at) -> list[Modifier{source_ref, factor}]`.
 - Participants: 021/002 deletion saga `erasure_participant` (destroy Coins) and export contributor.
 - Event field registry hooks: reward rules may only reference event attributes marked `rewardable` in 007's type registry.
@@ -15,13 +18,13 @@
 | GET `/users/{id}/progression` | `gamification.read` + subject visibility (021) | A |
 | GET `/me/economy/transactions?value&cursor` | self | A |
 | GET `/me/achievements` · GET `/achievements/catalog` | self / `gamification.read` | A |
-| GET/POST `/admin/gamification/rules[/{key}]` · POST `…/{key}/publish|retire|simulate` | `economy.rules.manage` (sensitive, audited, versioned) | A |
-| POST `/admin/gamification/manual-grants` | `economy.grant` (sensitive, audited; ≥ threshold needs confirmation) | A |
-| GET/PUT `/admin/gamification/level-curve` · achievements CRUD | `economy.rules.manage` | A |
-| GET `/admin/economy/transactions?user&…` · GET `/admin/economy/verify` | `economy.audit` (audited access) | A |
-| GET `/admin/economy/anomalies` · POST `…/{id}/approve|reject|confirm-abuse` | `economy.anomaly.review` (audited) | A |
+| GET/POST `/admin/gamification/rules[/{key}]` · POST `…/{key}/publish|retire|simulate` | `gamification.manage` (sensitive, audited, versioned) | A |
+| POST `/admin/gamification/manual-grants` | `rewards.grant` (sensitive, audited; ≥ threshold needs confirmation) | A |
+| GET/PUT `/admin/gamification/level-curve` · achievements CRUD | `gamification.manage` | A |
+| GET `/admin/economy/transactions?user&…` · GET `/admin/economy/verify` | `economy.manage` (audited access) | A |
+| GET `/admin/economy/anomalies` · POST `…/{id}/approve|reject|confirm-abuse` | `economy.manage` (audited) | A |
 | GET `/leaderboards/{metric}?period` · GET `/me/leaderboard-position` | `gamification.read`; visibility/opt-out | B |
-| GET `/me/quests` · GET `/quests/catalog` · admin CRUD | self / `gamification.read` / `economy.rules.manage` | C |
+| GET `/me/quests` · GET `/quests/catalog` · admin CRUD | self / `gamification.read` / `gamification.manage` | C |
 Problem codes: `economy.insufficient_coins`, `economy.rule_invalid`, `economy.duplicate`, `economy.forbidden_conversion`.
 
 ## Frontend

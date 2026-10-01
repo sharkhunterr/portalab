@@ -38,7 +38,7 @@ AppShell: Header(SearchEntry, AiEntry, Notifications, Identity) · PrimaryNav ·
 ## 3. Domain / Data Model — `data-model.md` · 4. Contracts — `contracts/shell-contracts.md`
 
 ## 5. Events
-Consumed: `authz.permissions_changed`, `module.enabled|disabled`, `plugin.state_changed`, `service.state_changed`, user preference changes → bump epochs, emit SSE `navigation.changed`. Emitted: `navigation.contribution_rejected` (diagnostic). Consumers idempotent (epoch increments are monotonic; duplicate events cause at most one extra refetch). Ordering irrelevant (last epoch wins).
+Consumed: `permission.*` (003), `admin.module_toggled|plugin_toggled` (020), `plugin.state_changed`, `service.status_changed`, user preference changes → bump epochs, emit SSE `navigation.changed`. Emitted: `navigation.contribution_rejected` (diagnostic). Consumers idempotent (epoch increments are monotonic; duplicate events cause at most one extra refetch). Ordering irrelevant (last epoch wins).
 
 ## 6. Permissions & Security
 Entries/commands carry `required_permission`; assembler evaluates server-side; route data endpoints re-authorize (nav hiding is convenience only). `/me/navigation` never reveals names of entries the user cannot access. `existence_sensitive` routes answer identically for missing and forbidden. Admin layout editing requires `shell.manage` (audited). SSE carries no sensitive payload.

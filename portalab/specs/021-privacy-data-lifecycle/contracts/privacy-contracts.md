@@ -11,6 +11,7 @@
 ## HTTP (`/api/v1`)
 | Path | Permission |
 |---|---|
+| GET `/me/privacy` (inventory of datum classes held about me: owner module, classification, current level, policy lock, retention; links to export/deletion of 002) · PUT `/me/privacy/visibility/{datum_class}` | `users.self.manage` (own data only; within admin policy, preference retained under override) |
 | POST `/privacy/policies`, DELETE `/privacy/policies/{id}` | `privacy.manage` (sensitive, audited) |
 | GET `/privacy/policies` | `privacy.manage` |
 | GET `/audit`, GET `/audit/export` | `audit.read` (context fields redacted by viewer level) |

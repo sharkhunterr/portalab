@@ -40,10 +40,10 @@ Staff console ─▶ queue/filters/assign/transition/bulk-on-incident ; Feedback
 ## 3. Data Model — `data-model.md` · 4. Contracts — `contracts/support-contracts.md`
 
 ## 5. Events
-Produced: `incident.created|updated|resolved`, `ticket.created|assigned|state_changed|reopened|resolved|closed`, `feedback.submitted|converted` (ids/state only). Dedup per data-model; per-ticket/incident ordering by `seq`. Consumers: 010 (notifications), 013/014 (quests/rewards), 017 stats, 019 automations (reactions to transitions), 009 widgets. Consumed here: none required (ports are synchronous); optionally `service.status_changed` for suggestions.
+Produced: `incident.created|updated|resolved`, `ticket.created|updated|assigned|state_changed|reopened|resolved|closed`, `feedback.submitted|converted` (ids/state only). Dedup per data-model; per-ticket/incident ordering by `seq`. Consumers: 010 (notifications), 013/014 (quests/rewards), 017 stats, 019 automations (reactions to transitions), 009 widgets. Consumed here: none required (ports are synchronous); optionally `service.status_changed` for suggestions.
 
 ## 6. Permissions & Security
-Per research R9: `tickets.create|read|comment|assign|transition|internal_note|close_any`, `incidents.read|manage`, `feedback.submit|review|convert[.contribution]`, `support.configure`. Own-ticket access is implicit and enforced in queries; staff scopes via 003. Sensitive actions (cross-user reassign, close-any, private data/attachment access, conversion to contribution/project, incident critical/resolve, bulk updates) audited via `AuditSink` with `ConfirmationService` where irreversible. AI acts only as the principal; Support exposes tools that call the same authorization. Attachments per R5; all user text escaped/sanitized on render; downloads from non-inline route.
+Per research R9: `tickets.create|comment|manage`, `incidents.read|manage`, `feedback.submit|read|convert[.contribution]`, `support.configure`. Own-ticket access is implicit and enforced in queries; staff scopes via 003. Sensitive actions (cross-user reassign, close-any, private data/attachment access, conversion to contribution/project, incident critical/resolve, bulk updates) audited via `AuditSink` with `ConfirmationService` where irreversible. AI acts only as the principal; Support exposes tools that call the same authorization. Attachments per R5; all user text escaped/sanitized on render; downloads from non-inline route.
 
 ## 7. Configuration — `data-model.md` settings (declared into 020).
 

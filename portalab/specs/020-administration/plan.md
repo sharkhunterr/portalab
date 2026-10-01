@@ -18,8 +18,8 @@ declare_setting() (modules/plugins at import) ─▶ SettingRegistry ──▶ C
                                                      │  resolve: code default ▸ Global ▸ Module ▸ Plugin ▸ User, then policies
                                  config.settings · config.policies · config.setting_history
 Toggle service ─▶ admin.extension_toggles ─▶ events (navigation/registry consumers)
-Control Center: PanelProvider[*] + RequiredActionProvider[*] ─▶ /admin/overview (independent, per-panel state)
-First run: wizard ─▶ IdentityBootstrap (002) ─▶ admin.first_run
+Control Center: PanelProvider[*] (health 025, infrastructure 006, storage, audit 021, …) + RequiredActionProvider[*] ─▶ /admin/overview (independent, per-panel state)
+First run: wizard ─▶ IdentityBootstrap (002) ─▶ registered wizard steps (e.g. "services" contributed by 005: connect first services, skippable) ─▶ admin.first_run
 ```
 
 ## 2. Components
@@ -32,7 +32,8 @@ First run: wizard ─▶ IdentityBootstrap (002) ─▶ admin.first_run
 | `ConfigPorts` adapters | implement read ports for identity (`identity.*` keys) and i18n (`UserLocalePreferenceReader`, `I18nPolicyReader`) | ConfigService | ports from 002/026 | thin | contract tests |
 | `ToggleService` | enable/disable module/plugin/connector/service/automation, data retained | `core.db`, events | API + events | audited; compatibility check hook (023) | toggle tests |
 | `ImportExportService` | versioned JSON export (no secrets), validate/conflict/apply import | ConfigService | API | conflicts surfaced, never silent overwrite | import/export tests |
-| `FirstRunService` | guarded wizard flow | `IdentityBootstrap` | API | once only; reset audited | first-run tests |
+| `AdminSurfaceRegistry` | domains register their admin surfaces (route, label, permission); Control Center lists permitted ones | registries | API | owner-tagged | contract tests |
+| `FirstRunService` | guarded wizard flow with a `FirstRunStep` registry (services step from 005; user onboarding has no services step — decided 2026-10-01) | `IdentityBootstrap` | API | once only; reset audited | first-run tests |
 | `ControlCenter` | `/admin/overview` aggregation + required actions | providers | API | panels independent, failures isolated | degraded-panel tests |
 | `OperatorCLI` | `portalab backup|restore|migrate` wrappers, status endpoints read-only | kernel CLI | CLI | no UI restore (OQ-96) | CLI smoke |
 

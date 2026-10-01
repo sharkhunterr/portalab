@@ -10,7 +10,7 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-003` prin
 
 ## Phase 1: Setup
 - [ ] T001 Create `CAP/__init__.py`, `AU/{definitions,registries,triggers,scheduler,gate,evaluator,runner,identity,approvals,suspender,history,dryrun,templates,api,models}/__init__.py`, `backend/migrations/automations/versions/`, `backend/automations/templates/`, `FA/{builder,history,approvals,templates}/`, `backend/tests/{unit,integration,contract,security}/automations/`, `frontend/tests/{unit,e2e}/automations/`
-- [ ] T002 [P] Declare settings (`automations.enabled`, `.allowUserAuthoring`, `.maxSteps`, `.maxChainDepth`, `.executionTimeoutSeconds`, `.actionTimeoutSeconds`, `.defaultRatePerMinute`, `.globalConcurrency`, `.suspendAfterFailures`, `.suspendFailureRate`, `.approvalTtlHours`, `.executionRetentionDays`, `.minScheduleIntervalMinutes`) in `AU/settings.py`; permissions `automations.read|manage|approve` (Admin; manage/approve sensitive, audited) in `AU/permissions.py`
+- [ ] T002 [P] Declare settings (`automations.enabled`, `.allowUserAuthoring`, `.maxSteps`, `.maxChainDepth`, `.executionTimeoutSeconds`, `.actionTimeoutSeconds`, `.defaultRatePerMinute`, `.globalConcurrency`, `.suspendAfterFailures`, `.suspendFailureRate`, `.approvalTtlHours`, `.executionRetentionDays`, `.minScheduleIntervalMinutes`) in `AU/settings.py`; permissions `automation.read|manage|approve` (Admin; manage/approve sensitive, audited) in `AU/permissions.py`
 - [ ] T003 [P] Register retention targets (executions, dedup windows), notification categories `automations.suspended` and `automations.approval` (010), event types `automation.*` with 007
 
 ## Phase 2: Foundational — contracts, schema, registries, definition model
@@ -33,7 +33,7 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-003` prin
 - [ ] T013 [US2] Implement `AU/identity/guard.py` (author/system identity resolution, per-action `authorize`, `needs_review` flagging, scopes validation at publish)
 
 ## Phase 5: US3 — Sensitive actions, approval, deterministic critical rules (P1)
-- [ ] T014 [P] [US3] Write `backend/tests/integration/automations/test_approvals.py`: destructive action ⇒ `awaiting_approval` per run; approve ⇒ runs once (params-hash bound); reject/expire ⇒ not executed; non-destructive sensitive with standing approval attested at publish runs without per-run approval; approver must hold `automations.approve`; all decisions audited
+- [ ] T014 [P] [US3] Write `backend/tests/integration/automations/test_approvals.py`: destructive action ⇒ `awaiting_approval` per run; approve ⇒ runs once (params-hash bound); reject/expire ⇒ not executed; non-destructive sensitive with standing approval attested at publish runs without per-run approval; approver must hold `automation.approve`; all decisions audited
 - [ ] T015 [P] [US3] Write `backend/tests/unit/automations/test_ai_boundary.py`: `ai.*` outputs cannot appear in conditions or in sensitive action params (rejected at publish); `ai.invoke` allowed only for text-field drafting in non-critical steps; AI never auto-approves; critical outcome paths are fully deterministic
 - [ ] T016 [US3] Implement `AU/approvals/service.py` + routers `GET /admin/automations/approvals`, `POST …/approve|reject`, expiry job, and the sensitive-action catalog validation (`docs/automations.md` references the 018 catalog)
 
@@ -69,7 +69,11 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-003` prin
 - [ ] T033 [P] Wire existing contract points: validate 014 announcement presets against real `campaign.*` event types and verify `communication.produce` end-to-end with the real 010 `send` (integration test `backend/tests/integration/automations/test_with_notifications.py`)
 - [ ] T034 [P] Add `/admin/automations*` routes to the permission-matrix test, regenerate OpenAPI client
 - [ ] T035 [P] Write `docs/automations.md` (model, catalogs, safety controls, approvals, AI boundary, authoring guide, how owners register actions/conditions) including the **follow-up list** for 007 (`automatable`/`rewardable`/`aggregatable` flags, `provenance.automation`), 013 (`grant_via_automation`), 016, 018 (`ai.invoke`), 011 (`content.publish`)
-- [ ] T036 Run `specs/019-automations/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-90..94 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T036 [P] Expose owner-tagged registration on the action/condition/trigger registries: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/automations/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T037 Run `specs/019-automations/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-90..94 defaults)
 
 ## Dependencies & Order
 Setup → Foundational → US1 (MVP) → US2 → US3 → US5 → US4 → US6 → US7 → US8 → authoring UX → Polish. US2/US3 must land before any owner registers a sensitive action; US7 safety controls must be complete before schedule triggers (US4) go live in production configurations.
@@ -77,4 +81,4 @@ Setup → Foundational → US1 (MVP) → US2 → US3 → US5 → US4 → US6 →
 **MVP**: Phases 1–3 (registries, versioned definitions, event-triggered run with history and the notification action).
 
 ## Format validation
-36 tasks, all checkbox + ID + path; story labels only on story phases.
+37 tasks, all checkbox + ID + path; story labels only on story phases.

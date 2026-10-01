@@ -12,7 +12,7 @@
 |---|---|
 | GET `/news?category&cursor` · GET `/news/featured` · GET `/news/{slug}` | `news.read` (default grant) + article audience |
 | GET `/news/categories` | `news.read` |
-| POST/PATCH `/admin/news/articles[/{id}]` (draft edits) | `news.create` / `news.edit` (own drafts or all per role) |
+| POST/PATCH `/admin/news/articles[/{id}]` (draft edits) | `news.create` / `news.modify` (own drafts or all per role) |
 | POST `/admin/news/articles/{id}/publish|schedule|feature|unfeature|archive|restore` | `news.publish` / `news.archive` (sensitive configurable, audited) |
 | DELETE `/admin/news/articles/{id}` | `news.delete` (drafts; archived = sensitive + confirmation) |
 | CRUD `/admin/news/categories` | `news.manage_categories` |
@@ -25,7 +25,7 @@
 | GET `/wiki/pages/{id}/revisions` · `/revisions/{v}` · `/compare?from&to` | `wiki.history.read` |
 | POST `/wiki/pages/{id}/restore` `{version}` | `wiki.edit` (creates new revision) |
 | GET `/help?key=` | authenticated (permitted pages only) |
-| POST `/content/assets` | `wiki.edit` or `news.edit` (owner permission) |
+| POST `/content/assets` | `wiki.edit` or `news.modify` (owner permission) |
 | POST `/content/links/resolve` (batch refs) | authenticated; returns per-viewer state |
 ## Calendar
 | Path | Permission |

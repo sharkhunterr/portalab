@@ -33,7 +33,7 @@ Prerequisites (not implemented here): `D-005` services/breaker/sync state · `D-
 - [ ] T014 [US4] Add `GET /services/{id}/health/history` and the recent-errors section in `HL/api/history.py`
 
 ## Phase 5: US1 — Maintenance windows (P1)
-- [ ] T015 [P] [US1] Write `backend/tests/integration/health/test_maintenance.py`: schedule/cancel; jobs flip to Maintenance/back at absolute instants; missed job reconciled at startup; events `maintenance.scheduled|started|ended|cancelled`; reference time zone stored for wall-clock intents
+- [ ] T015 [P] [US1] Write `backend/tests/integration/health/test_maintenance.py`: schedule/cancel; jobs flip to Maintenance/back at absolute instants; missed job reconciled at startup; events `maintenance.scheduled|rescheduled|started|ended|cancelled` with `schedule_version` (consumed by 010 reminders); reference time zone stored for wall-clock intents
 - [ ] T016 [US1] Implement `HL/maintenance/service.py` + jobs `maintenance_start`/`maintenance_end` and routers `GET|POST|PATCH|DELETE /maintenance`, `GET /services/{id}/maintenance` (`services.manage`, cancel sensitive)
 
 ## Phase 6: US2/US6 — Permission-tiered infrastructure and operations (P1/P2)
@@ -45,14 +45,14 @@ Prerequisites (not implemented here): `D-005` services/breaker/sync state · `D-
 - [ ] T020 [US6] Implement `HL/operations/service.py` (capability `server.operations`, sensitive, confirmation, `service.operation_performed`) and routers `GET|POST /services/{id}/operations`
 
 ## Phase 7: US3/US7 — Detail page and degraded mode (P1)
-- [ ] T021 [P] [US3] Write `backend/tests/integration/health/test_detail_sections.py`: sections independent (state, availability, errors, maintenance, incidents, tickets, sync, infra, history); a failing/slow section reports its own state while others render; Service State, Incident, Maintenance, Ticket and Sync State remain distinct elements
+- [ ] T021 [P] [US7] Write `backend/tests/integration/health/test_detail_sections.py`: sections independent (state, availability, errors, maintenance, incidents, tickets, sync, infra, history); a failing/slow section reports its own state while others render; Service State, Incident, Maintenance, Ticket and Sync State remain distinct elements
 - [ ] T022 [US3] Implement `HL/detail/assembler.py` (per-section timeout/state, permission tiers) and `GET /services/{id}/health` full response
 - [ ] T023 [US3] Implement `HL/detail/incidents.py` using the `support.incidents` port (`open_for_service`, `link`) with an empty-provider default and `health.service_incident_links`
 
 ## Phase 8: Polish & validation (UI at roadmap step 13)
 - [ ] T024 [P] Build `frontend/src/features/services/` overview and detail page (state badges non-color-only, sections with loading/error/unavailable/stale states, tier-aware rendering, keyboard, axe, externalized strings)
 - [ ] T025 [P] Add observability in `HL/observability.py` (probe latency/failures, state changes, section failures, rollup lag) with redaction test
-- [ ] T026 Permission-matrix test for all health routes, migration-upgrade test (005 → health) and full validation; record results
+- [ ] T026 Permission-matrix test for all health routes (`backend/tests/security/test_permission_matrix.py`), migration-upgrade test `backend/tests/migrations/test_upgrade_health.py` (005 → health) and full validation; record results
 
 ## Dependencies & Execution Order
 Setup → Foundational → **US1/US5 (MVP)** → availability/history → maintenance → tiers/infra/operations → detail assembler → Polish. UI work (T024) is scheduled with roadmap step 13; backend tasks T001–T023 belong to step 6.

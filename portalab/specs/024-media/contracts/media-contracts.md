@@ -7,14 +7,14 @@
 - Conformance kits for each capability (001 rule) + fake providers for tests.
 
 ## Media capability for other modules (`capabilities/media_core`)
-`MediaCatalog.get(object_id, viewer) / resolve_ref(ref)`; `MediaHistoryReader.for_user(user, filters)` (privacy-bounded); `ProgressReader`; `RequestQuotaProvider` (015 implements); `RecommendationProvider.recommend(viewer, ctx) -> list[MediaRef]`; `MediaType` registry (`register_media_type(kind, label_key, parent_kinds, finished_threshold, detail_slots)`); detail slot registry `register_detail_block(slot, block_def)` (declarative template + permission).
+`MediaCatalog.get(object_id, viewer) / resolve_ref(ref)`; `MediaHistoryReader.for_user(user, filters)` (privacy-bounded); `ProgressReader`; `RequestQuotaService` (owned by Media, OQ-72): `base_quota(user, period)`, `available(user)`, `add_units(user, units, source_ref, idempotency_key)` / `remove_units(...)` (called by 015 on quota purchase/refund), `consume(user, request_ref)` — never consulted for ordering or priority; `RecommendationProvider.recommend(viewer, ctx) -> list[MediaRef]`; `MediaType` registry (`register_media_type(kind, label_key, parent_kinds, finished_threshold, detail_slots)`); detail slot registry `register_detail_block(slot, block_def)` (declarative template + permission).
 
 ## HTTP (`/api/v1`)
 | Path | Permission | Notes |
 |---|---|---|
 | GET `/media?kind&genre&year&availability&q&cursor` | `media.read` (default grant) | catalog; visibility/privacy bounded |
 | GET `/media/{id}` | `media.read` | core info + section manifest |
-| GET `/media/{id}/sections/{info|sources|history|progress|requests|people|blocks}` | `media.read` (+ visibility for personal sections) | each section returns `{state, as_of, data}` independently |
+| GET `/media/{id}/sections/{info|sources|history|progress|requests|people|statistics|events|actions|links|blocks}` | `media.read` (+ visibility for personal sections) | each section returns `{state, as_of, data}` independently |
 | GET `/media/images/{id}` | `media.read` | proxy from blobstore |
 | GET `/me/media/now-playing`, `/me/media/continue`, `/me/media/history?cursor` | self | |
 | GET `/media/discovery/{shelf}` | `media.read` | `new|recent|continue|trending|recommended` |

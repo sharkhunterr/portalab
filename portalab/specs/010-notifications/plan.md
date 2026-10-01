@@ -44,7 +44,7 @@ MaintenanceReminders (system source): 006 maintenance.* events ─▶ jobs(run_a
 ## 3. Data Model — `data-model.md` · 4. Contracts — `contracts/notifications-contracts.md`
 
 ## 5. Events
-Consumed: `maintenance.*`, `service.state_changed`, `user.suspended|reactivated|deletion_requested`, `admin.config_changed`; idempotent through `ctx.idempotent_effect` and dedup keys (`maintenance_id:schedule_version:kind`, `service_id:state_seq`). Produced: `notification.sent` (counts), `notification.read`, `notification.delivery_failed` (diagnostic, rate-limited). Ordering: per-maintenance order by `schedule_version`; stale versions ignored. Late events use `occurred_at`; relevance via `valid_until`.
+Consumed: `maintenance.*`, `service.status_changed`, `user.suspended|reactivated|deletion_requested`, `admin.config_changed`; idempotent through `ctx.idempotent_effect` and dedup keys (`maintenance_id:schedule_version:kind`, `service_id:state_seq`). Produced: `notification.sent` (counts), `notification.read`, `notification.delivery_failed` (diagnostic, rate-limited). Ordering: per-maintenance order by `schedule_version`; stale versions ignored. Late events use `occurred_at`; relevance via `valid_until`.
 
 ## 6. Permissions & Security
 Sending: internal capability; automations act on behalf of the author and may only target audiences within the author's visibility (`notifications.send_to_audience`); admin broadcast requires `notifications.broadcast` (audited). Recipients read only their own items. Admin screens expose delivery metadata, never content. Templates escape params; email HTML sanitized from catalog templates; links are internal routes (no open redirects); SMTP password only in `core.secrets`; email addresses never logged (hash).

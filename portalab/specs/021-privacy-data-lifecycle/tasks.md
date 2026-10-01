@@ -69,7 +69,15 @@ Prerequisites (not implemented here): `D-001` kernel registry/tombstone · `D-00
 - [ ] T034 [P] Extend `.gitlab-ci.yml` `validate` with `pip-audit`, `npm audit --omit=dev`, secret scanning and fail on high severity
 - [ ] T035 [P] Add observability (`PV/observability.py`): visibility decisions, active overrides, retention rows, checkpoint lag, verification status; test no PII in logs
 - [ ] T036 [P] Add admin UI screens (policies, audit viewer) in `frontend/src/features/privacy/` with loading/error/unauthorized states, keyboard, axe, externalized strings
-- [ ] T037 Add the migration-upgrade test (003 → privacy, audit partitioned with data) and run the full validation (`ruff`, `mypy`, `lint-imports`, suites); record results
+## Privacy center (user journey "Profile / Data Center → inspect data → visibility/preferences → export/delete")
+- [ ] T037 [P] [US1] Write `backend/tests/integration/privacy/test_privacy_center.py`: `GET /me/privacy` lists the datum classes held about me (owner module, classification, current visibility level, policy lock, retention) and links export/deletion (002); `PUT /me/privacy/visibility/{datum_class}` changes my preference within admin policy; under an admin override the stored preference is kept and restored when the override ends (CD-016)
+- [ ] T038 [US1] Implement `PV/center/service.py` + routers `GET /me/privacy`, `PUT /me/privacy/visibility/{datum_class}` (preferences stored as user-tier settings `privacy.visibility.<datum_class>` in 020, read by `VisibilityPreferenceProvider`), and frontend `frontend/src/features/privacy/PrivacyCenter.tsx` (inventory, per-datum visibility, export/delete entry points; accessible states)
+
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T039 Expose `register_datum_class(key, owner, default_level, classification)` for modules (`progression`, `media_history`, `member_listing`, `community_activity`, `projects`, `votes`, …) and refuse plugin loads declaring personal data without an erasure participant; test `backend/tests/unit/privacy/test_datum_registry.py` (F19)
+
+- [ ] T040 Add the migration-upgrade test (003 → privacy, audit partitioned with data) and run the full validation (`ruff`, `mypy`, `lint-imports`, suites); record results
 
 ## Dependencies & Execution Order
 Setup → Foundational → **US1 (MVP)** → US2 → US3 audit completion (partition → checkpoints → query) → US4/US5 (parallel with US6/US7/US8, disjoint files) → Security/Polish. T018 must run before T019–T021. T029 uses a connectors stub until spec 005.

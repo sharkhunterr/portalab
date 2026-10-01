@@ -44,9 +44,9 @@ Prerequisites (not implemented here): `D-001` jobs/outbox/secrets · `D-002` pri
 - [ ] T020 [P] [US5] Write `backend/tests/integration/notifications/test_maintenance_reminders.py` (fake clock): J-1 and H-1 produced for permitted audience; start alert on `maintenance.started`; reschedule cancels pending and sends corrective to already-notified; cancel sends corrective; late evaluation past `valid_until` ⇒ suppressed `expired`; replayed/duplicate events ⇒ no duplicates; per-user preferences/permissions respected
 - [ ] T021 [US5] Implement `NT/maintenance/reminders.py` (consumers for `maintenance.*`, jobs with `run_at`, dedup `(maintenance_id, schedule_version, kind)`, state in `notify.maintenance_reminders`) using `category=system.maintenance` and audience from 006 service permissions
 
-## Phase 7: US6 — Automatic, admin-rule, event, automation sources (P2)
-- [ ] T022 [P] [US6] Write `backend/tests/integration/notifications/test_sources.py`: critical `service.state_changed` ⇒ alert once per state change; account security events ⇒ mandatory notification; admin broadcast needs `notifications.broadcast` and is audited; event-sourced communications use `occurred_at` and are idempotent on replay
-- [ ] T023 [P] [US6] Write `backend/tests/contract/notifications/test_automation_action.py`: `communication.produce` ActionType registered against a fake engine; author-bounded audience; duplicate trigger ⇒ one communication; unpermitted audience rejected
+## Phase 7: US6 + US4 — Automatic, admin-rule, event sources; communications via the Automations engine (P2/P1)
+- [ ] T022 [P] [US6] Write `backend/tests/integration/notifications/test_sources.py`: critical `service.status_changed` ⇒ alert once per state change; account security events ⇒ mandatory notification; admin broadcast needs `notifications.broadcast` and is audited; event-sourced communications use `occurred_at` and are idempotent on replay
+- [ ] T023 [P] [US4] Write `backend/tests/contract/notifications/test_automation_action.py`: `communication.produce` ActionType registered against a fake engine; author-bounded audience; duplicate trigger ⇒ one communication; unpermitted audience rejected
 - [ ] T024 [US6] Implement `NT/sources/{services,security}.py`, admin broadcast endpoint `POST /admin/notifications/broadcast`, and `register_action_type("communication.produce")` in `NT/automation.py` (stub registry until 019)
 
 ## Phase 8: US8 — Email and multi-channel delivery (P2)
@@ -58,7 +58,11 @@ Prerequisites (not implemented here): `D-001` jobs/outbox/secrets · `D-002` pri
 - [ ] T028 [P] Write `backend/tests/security/notifications/test_privacy_authz.py`: permission lost before delivery ⇒ suppressed; no content in events/logs; recipient cannot read others' items; admin delivery view has no content; erasure/export participant covers inbox
 - [ ] T029 [P] Register `notifications` with Observability (delivery success by channel, fan-out lag, SMTP errors, suppressed-by-reason, coalescing ratio) in `NT/observability.py`; wire `notifications.send_alert` port for 025
 - [ ] T030 [P] Add `/me/notification*`, `/notifications/*`, `/admin/notifications/*` to the permission-matrix test, regenerate OpenAPI client, write `docs/notifications.md` (categories, sending guide, automation action contract, maintenance reminder semantics)
-- [ ] T031 Run `specs/010-notifications/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-45..49 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T031 [P] Expose owner-tagged registration on the notification category registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/notifications/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T032 Run `specs/010-notifications/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-45..49 defaults)
 
 ## Dependencies & Order
 Setup → Foundational → US1/US2 (MVP) → US3 → US7 → US5 → US6 → US8 → Polish. US5 needs 006 events; US6 contract test uses a fake 019; US8 independent of US5/US6 after fan-out exists.
@@ -66,4 +70,4 @@ Setup → Foundational → US1/US2 (MVP) → US3 → US7 → US5 → US6 → US8
 **MVP**: Phases 1–3 (producer, fan-out, portal channel, notification center with alerts vs notifications).
 
 ## Format validation
-31 tasks, all checkbox + ID + path; story labels only on story phases.
+32 tasks, all checkbox + ID + path; story labels only on story phases.

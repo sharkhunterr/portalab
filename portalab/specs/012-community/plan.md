@@ -29,10 +29,11 @@ Discovery ─▶ shelves + SearchProviders(members, proposals) ; Admin/mod ─�
 | `ProfileAssembler` + section registry | per-viewer independent sections | sections providers | API | permission alone never reveals Private | per-section tests |
 | `FeedProjector` / `FeedService` | project allow-listed events, read-time filtering | 007, 021 | consumer/API | idempotent; Private skipped; no reactions | projection tests |
 | `LeaderboardView` / `AchievementsView` / `QuestsView` | presentation of 013 data | 013 ports | API | no re-definition; hidden stay hidden | delegation tests |
-| `ProposalService` | create/edit/withdraw, optional moderation, lifecycle registration | 015 port, renderer | API | state from 015 only | proposal tests |
+| `ProposalService` | create/edit/withdraw, moderation (on by default), lifecycle registration | 015 port, renderer | API | state from 015 only | proposal tests |
 | `VoteService` | cast/retract/re-cast, counts, eligibility | `is_active_account`, `accepts_votes` | API | one active vote; free; no min level; independent of funding | concurrency/eligibility tests |
 | `ParticipationService` + `Recognition` | participate, recognize once, limits, event | 013 (via event) | API | no self-recognition; per-day and pair limits | abuse tests |
-| `ModerationService` | optional proposal moderation | authz | API | audited | moderation tests |
+| `CommunityEvents` | community events + `CalendarSource` for 011 | renderer, 021 | API/port | audience-bound; no attendee graph | events tests |
+| `ModerationService` | proposal moderation (default on, configurable) | authz | API | audited | moderation tests |
 | `Discovery` + providers | shelves, search providers | 008 | API | visibility-bound; next-action empty states | discovery tests |
 | Non-goal guard | route/schema scan for forbidden features | OpenAPI | CI test | fails build on match | guard test |
 | Frontend | pages and slots | 022/004 | components | accessible; independent states | a11y/e2e |
@@ -70,7 +71,7 @@ Prerequisites: 001, 002 (directory, active-account port), 003, 007, 010, 011 (re
 ## 15. Technical Decisions — `research.md` R1–R12.
 
 ## 16. Risks / Open Technical Questions
-- **R1** OQ-55..59: decision authority and reserved-funds rules belong to 015; Community defaults for voting/proposing/participation in research (R7, R8, R10). **Product confirmation requested** (vote retract/re-cast, moderation default off, help prompts scope, recognition limits).
+- **R1** OQ-55..59: decision authority and reserved-funds rules belong to 015; Community defaults for voting/proposing/participation in research (R7, R8, R10). **Product confirmation requested** (vote retract/re-cast, help prompts scope, recognition limits).
 - **R2** "Help prompts" interpreted minimally (help-wanted flag + participation) to avoid building a forum/chat; confirm.
 - **R3** Slice D depends on 015's lifecycle for state/funding display; ordering enforced by the roadmap.
 - **R4** Read-time visibility checks on feeds can be costly: bounded page size and per-actor preference caching.

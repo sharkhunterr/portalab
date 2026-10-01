@@ -65,11 +65,18 @@ Prerequisites (not implemented here): `D-001` registry/jobs/secrets · `D-003` a
 - [ ] T032 [P] Implement the `ConformanceKit` in `backend/src/portalab/connectors/conformance.py` (health, timeouts, garbage payloads, auth errors, idempotent sync) and run it against the `fake` connector
 - [ ] T033 [P] Add observability in `CN/observability.py` (state, last success, run duration/counts, breaker, latency) with redaction test
 - [ ] T034 [P] Admin UI in `frontend/src/features/admin/services/` (list, configure + test, enable/disable, sync history) with states, keyboard, axe, externalized strings
-- [ ] T035 Permission-matrix test, migration-upgrade test (007 → connectors) and full validation; record results
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T035 Read per-field source-priority tables from the shape defined by 024 (`media.fieldPriority.<kind>.<field>`, CD-026) instead of a separate connectors key; document it in `docs/connectors.md` (F7)
+- [ ] T036 Register automation action types `connector.sync` and `connector.action` (019) through the owners' action contract in `CN/automation.py`, with permission and idempotency; test `backend/tests/contract/connectors/test_automation_actions.py` (F14)
+- [ ] T037 Register the optional, skippable `services` step of the Admin first-run wizard (020 `FirstRunStep`) in `CN/firstrun.py`: list available connectors and configure first services (decided 2026-10-01: Admin wizard only, not user onboarding)
+- [ ] T038 [P] Expose owner-tagged registration on the connector/capability registries: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/connectors/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T039 Permission-matrix test (`backend/tests/security/test_permission_matrix.py`), migration-upgrade test `backend/tests/migrations/test_upgrade_connectors.py` (007 → connectors) and full validation; record results
 
 ## Dependencies & Execution Order
 Setup → Foundational → **US1 (MVP)** → US3/US9 → US2 → US5/US6 → US4 → US7/US8 → Polish. T024 sink contract precedes T023 use in domain plans. Real connectors come with Media (024) and later domains.
 
 ## Traceability (FR → tasks)
-FR-001..004 T009–T012, T024 · FR-005/006 T018, T019, T013 · FR-007 T013, T016 · FR-008/009 T014, T016 · FR-010..013 T010, T011, T026, T027 · FR-014..018 T020, T023, T025 · FR-019..021 T021, T024 · FR-022..024 T028, T030 · FR-025..028 T029, T031 · FR-029 T015, T017 · FR-030..032 T003, T013, T035 · FR-033 T012, T032.
+FR-001..004 T009–T012, T024 · FR-005/006 T018, T019, T013 · FR-007 T013, T016 · FR-008/009 T014, T016 · FR-010..013 T010, T011, T026, T027 · FR-014..018 T020, T023, T025 · FR-019..021 T021, T024 · FR-022..024 T028, T030 · FR-025..028 T029, T031 · FR-029 T015, T017 · FR-030..032 T003, T013, T039 · FR-033 T012, T032.
 Total: **35 tasks**. MVP = Setup + Foundational + US1.

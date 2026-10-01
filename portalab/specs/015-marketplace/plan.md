@@ -21,7 +21,7 @@ Slice A: Community proposal ─register─▶ ProjectService(state machine, rule
 Slice B: Catalog (products + versions + categories) ─▶ Eligibility(AND of closed conditions: 013/014/003)
    acquire(user, product, idem) ─ UoW ─▶ ownership check ─▶ EconomyService.spend(uow) ─▶ ownership(snapshot) ─▶ outbox ─▶ after commit: ActivationHandler(type) ⇒ active | needs_configuration | failed
    Refund/Grant/Revoke ─▶ RefundService (new tx) / GrantService / RevocationService (ground+reason) ─▶ audit+events+notifications
-   QuotaService (units) ─▶ RequestQuotaProvider(024) ; EntitlementReader ─▶ 009/022/017/Community
+   quota products ─▶ 024 RequestQuotaService.add_units ; EntitlementReader ─▶ 009/022/017/Community
 ```
 
 ## 2. Components
@@ -36,7 +36,7 @@ Slice B: Catalog (products + versions + categories) ─▶ Eligibility(AND of cl
 | `ActivationService` + handlers | per-type activation, retries, needs-configuration | 009/022/017/023/003 ports | internal/job | failure isolated; allow-listed access grants | handler tests |
 | `RefundService` | policy-based refunds as new tx, revoke ownership | `EconomyService` | API | window/percent; non-refundable labelled | refund tests |
 | `GrantService` / `RevocationService` | grants (marked), revocation grounds | audit, notifications | admin API | reason mandatory; history intact | audit tests |
-| `QuotaService` | extra units, provider impl | `quota_units` | `RequestQuotaProvider` | no priority input | quota tests |
+| Quota activation handler | credit/debit request units on purchase/refund | 024 `RequestQuotaService` | handler | sells only; no priority input | quota tests |
 | `EntitlementReader` | ownership reads for consumers | `ownerships` | capability | cached per epoch | contract tests |
 | Frontend | catalog, purchase, owned, projects, admin | 022/004 | components | accessible; conditions named | a11y/e2e |
 
@@ -65,7 +65,7 @@ State-machine tables (project + product availability); property tests for fundin
 Alembic revision for `marketplace` (slice A tables first, B additive); product versions append-only; project funding rules frozen; ProductType registry additive; contracts semver'd.
 
 ## 13. Cross-Spec Dependencies
-Prerequisites: 001, 002 (deletion saga), 003, 007, 010, 013 (+ **follow-ups: `reserve/release/consume`, `spend(uow)`**), 012 (proposals/votes; calls `ProjectLifecycle`), 014 (`CampaignReader`), 020, 021, 022, 026. Consumers: 009 (widget entitlements), 022 (theme availability), 017 (`product_owned`), 024 (quota), Community (cosmetics sections), 023 (`ExtensionActivation`, step 27). **Follow-ups to apply in earlier plans**: 013 reservation operations and ledger kinds; 009/022/017 read `EntitlementReader`; 024 consumes `RequestQuotaProvider`; 023 provides `ExtensionActivation`.
+Prerequisites: 001, 002 (deletion saga), 003, 007, 010, 013 (+ **follow-ups: `reserve/release/consume`, `spend(uow)`**), 012 (proposals/votes; calls `ProjectLifecycle`), 014 (`CampaignReader`), 020, 021, 022, 026. Consumers: 009 (widget entitlements), 022 (theme availability), 017 (`product_owned`), 024 (`RequestQuotaService` owned by Media), Community (cosmetics sections), 023 (`ExtensionActivation`, step 27). **Follow-ups to apply in earlier plans**: 013 reservation operations and ledger kinds; 009/022/017 read `EntitlementReader`; quota products credit units through 024 `RequestQuotaService` (CD-034); 023 provides `ExtensionActivation`.
 
 ## 14. Implementation Phases
 **Slice A (25)**: 1 schema + project state machine → 2 `ProjectLifecycle` port + Community integration → 3 funding (reserve, acknowledgement) → 4 validation/transitions/notifications → 5 resolution (release/consume/milestones, deletion handling) → 6 UI.
@@ -78,7 +78,7 @@ Prerequisites: 001, 002 (deletion saga), 003, 007, 010, 013 (+ **follow-ups: `re
 - **R2** 013 must gain reservation operations and a unit-of-work-aware `spend` (follow-ups); until then this plan's tests run against a compliant fake and the saga fallback is specified.
 - **R3** Per-user ownership vs portal-level plugin installation needs product confirmation (R10).
 - **R4** `access` products touching permissions are high risk: allow-list + Admin approval only.
-- **R5** Funding deletion default (R6) is a policy choice to confirm.
+- **R5** Funding on deletion decided (R6: everything destroyed, CD-005 strict).
 - **R6** Real-money purchase is impossible by design (no payment code, tests assert no such path).
 
 ## Project Structure

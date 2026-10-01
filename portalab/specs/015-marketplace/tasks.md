@@ -11,14 +11,14 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox/UoW · `D-002` 
 ## Phase 1: Setup (Slice A)
 - [ ] T001 Create `CAP/__init__.py`, `MK/{projects,funding,resolution,products,types,eligibility,purchase,activation,refunds,grants,revocation,quota,entitlements,providers,api,models}/__init__.py`, `backend/migrations/marketplace/versions/`, `FM/{catalog,product,owned,projects,admin}/`, `backend/tests/{unit,integration,contract,security}/marketplace/`, `frontend/tests/{unit,e2e}/marketplace/`
 - [ ] T002 [P] Declare settings (`marketplace.refundDefaults.<type>`, `.access.allowedPermissions`, `.funding.minAmount|maxPerUser|defaultRules`, `.quota.kinds`, `.activationRetryMinutes`) in `MK/settings.py`; permissions `marketplace.read|purchase` (default grants for active accounts), `marketplace.manage|grant|revoke|refund|audit`, `projects.manage` (Admin; sensitive, audited) in `MK/permissions.py`; notification categories `marketplace.purchase|refund|revocation|project` (010); event types with 007
-- [ ] T003 [P] Register retention targets and the 020/021 export+erasure participant `MK/privacy.py` implementing the R6 deletion policy (committed funds after development stay and are anonymized; earlier funds released then destroyed; ownerships tombstoned)
+- [ ] T003 [P] Register retention targets and the 020/021 export+erasure participant `MK/privacy.py` implementing the R6 deletion policy (all reservations released then destroyed with the account's Coins whatever the project state; funding rows anonymized; ownerships tombstoned)
 
 ## Phase 2: Foundational — schema, ports (Slice A)
 ### Tests first
 - [ ] T004 [P] Write `backend/tests/integration/marketplace/test_schema_projects.py`: tables/constraints, append-only `project_state_history`, `funding_rules` immutable after `rules_frozen_at`, FKs only intra-module/`identity.users(id)`
 - [ ] T005 [P] Write `backend/tests/contract/marketplace/test_economy_port.py`: `EconomyService.reserve/release/consume` conformance kit (fake until 013 follow-up): reserve decreases available balance without consuming, insufficient funds refused, release = new transaction, consume final, idempotency, balance never negative
 ### Implementation
-- [ ] T006 Implement `CAP/` contracts (`ProjectLifecycle`, `EntitlementReader`, `RequestQuotaProvider`, `ProductType`, `ActivationHandler`) and `MK/models` + Alembic revision (slice A tables: projects, project_state_history, project_fundings, project_notes)
+- [ ] T006 Implement `CAP/` contracts (`ProjectLifecycle`, `EntitlementReader`, `ProductType`, `ActivationHandler`; consumed 024 `RequestQuotaService` stub) and `MK/models` + Alembic revision (slice A tables: projects, project_state_history, project_fundings, project_notes)
 
 ## Phase 3: US7 — Lifecycle state machine and Community integration (P1) 🎯 MVP (Slice A)
 **Independent test**: a project moves idea → release with audited, permissioned transitions; Community can register and read it.
@@ -31,19 +31,19 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox/UoW · `D-002` 
 - [ ] T011 [US7] Implement `MK/funding/service.py`, router `POST /projects/{id}/fund`, `GET /me/fundings`, and the non-guarantee notice text catalog keys (026)
 
 ## Phase 5: US7 — Resolution: refund and consume (P1)
-- [ ] T012 [P] [US7] Write `backend/tests/integration/marketplace/test_resolution.py`: reject/abandon ⇒ all reservations released per frozen rules (new refund transactions, `funding_released` events); release ⇒ consumed per rules (all at release or per milestone percentages); never silent or partial without rule; idempotent job re-runs; ledger/reservation reconciliation equals zero drift; deletion of a funder follows R6 for each state
+- [ ] T012 [P] [US7] Write `backend/tests/integration/marketplace/test_resolution.py`: reject/abandon ⇒ all reservations released per frozen rules (new refund transactions, `funding_released` events); release ⇒ consumed per rules (all at release or per milestone percentages); never silent or partial without rule; idempotent job re-runs; ledger/reservation reconciliation equals zero drift; deletion of a funder destroys all of their reservations in every project state (R6) and project totals are recomputed
 - [ ] T013 [US7] Implement `MK/resolution/service.py` (release/consume/milestones, deletion handling, reconciliation job) and notifications `marketplace.project` (status changes, refunds) via 010 with coalescing
 - [ ] T014 [US7] Implement frontend `FM/projects/{ProjectPage,Timeline,FundingPanel,MyFundings}.tsx` (state timeline with icon+text, published rules, non-guarantee notice, accessible) and admin `FM/admin/ProjectConsole.tsx`; wire Community slice D stubs to the real `ProjectLifecycle`
 
 ## Phase 6: Slice A closure
 - [ ] T015 [P] Write `backend/tests/security/marketplace/test_projects_authz.py`: only Admin transitions/validates; funders see own funding, aggregates public, other funders' identities private; IDOR on fundings; audit completeness; no secrets in events
 - [ ] T016 [P] Register `marketplace` with Observability (stuck states, reserved vs consumed vs released totals, reconciliation drift) in `MK/observability.py`; add `/projects*`, `/me/fundings`, `/admin/projects*` routes to the permission-matrix test and OpenAPI client
-- [ ] T017 Run quickstart steps 1–2 end-to-end; record deviations, open product confirmations (funding formulas, deletion handling) and the 013 follow-up status
+- [ ] T017 Run `specs/015-marketplace/quickstart.md` steps 1–2 end-to-end; record deviations, open product confirmations (funding formulas, deletion handling) and the 013 follow-up status
 
 ## Phase 7: Catalog and product model — US1, US8 (Slice B, step 26)
 - [ ] T018 [P] [US1] Write `backend/tests/integration/marketplace/test_catalog.py`: categories, product types, detail shows type/price/conditions/refund policy and the viewer's ownership/eligibility; availability states `draft|available|unavailable|archived`; archived hidden from new purchase but visible to owners; multilingual names via 026; search provider `product` (008 conformance)
 - [ ] T019 [P] [US8] Write `backend/tests/integration/marketplace/test_product_admin.py`: publish/price/condition/refund-policy changes create new versions (history never reinterpreted), are sensitive, confirmed and audited; type registry extension without schema change
-- [ ] T020 [US1] Implement Alembic revision for slice B tables (categories, products, product_versions, ownerships, refunds, quota_units, quota_ledger), `MK/products/service.py`, `MK/types/registry.py` (`register_product_type` baseline types), routers `GET /marketplace/categories|products[/{key}]`, search provider (008)
+- [ ] T020 [US1] Implement Alembic revision for slice B tables (categories, products, product_versions, ownerships, refunds), `MK/products/service.py`, `MK/types/registry.py` (`register_product_type` baseline types), routers `GET /marketplace/categories|products[/{key}]`, search provider (008)
 - [ ] T021 [US8] Implement admin routers `/admin/marketplace/products*` with versioning/audit and frontend `FM/catalog/{CatalogPage,ProductCard}.tsx`, `FM/product/ProductDetail.tsx`, `FM/admin/ProductEditor.tsx`
 
 ## Phase 8: US2 + US3 — Acquisition with conditions; ownership (P1)
@@ -64,19 +64,23 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox/UoW · `D-002` 
 - [ ] T030 [US5] Implement `MK/grants/service.py`, `MK/revocation/service.py`, routers `POST /admin/marketplace/grants`, `POST /admin/marketplace/ownerships/{id}/revoke`, `GET /admin/marketplace/audit`, expiry job, notifications `marketplace.revocation`, and frontend `FM/admin/{Grants,Revocations,Audit}.tsx`
 
 ## Phase 12: US6 — Quota products with no paid priority (P1)
-- [ ] T031 [P] [US6] Write `backend/tests/integration/marketplace/test_quota.py`: quota purchase adds units via ledger transaction; `RequestQuotaProvider` consumed after the base per-period quota (024 stub); consumption/refund ledgered; **no input from ownership/quota to request ordering** (contract test against 024's queue ordering function: identical order for buyers/non-buyers); product definitions cannot declare a priority attribute (schema rejects)
-- [ ] T032 [US6] Implement `MK/quota/service.py` (units, ledger, provider), register `RequestQuotaProvider` for 024, and add the schema guard rejecting priority-like fields in product definitions
+- [ ] T031 [P] [US6] Write `backend/tests/integration/marketplace/test_quota.py`: quota purchase spends Coins via the ledger and credits units through 024 `RequestQuotaService.add_units` (stub until 024); refund of unused units calls `remove_units`; Marketplace never consumes quota; **no input from ownership/quota to request ordering** (contract test against 024's queue ordering function: identical order for buyers/non-buyers); product definitions cannot declare a priority attribute (schema rejects)
+- [ ] T032 [US6] Implement the quota activation handler `MK/activation/handlers/quota.py` (credit/debit units via 024 `RequestQuotaService`), and add the schema guard rejecting priority-like fields in product definitions
 
 ## Phase 13: Polish & cross-cutting
-- [ ] T033 [P] Implement integrations: `EntitlementReader` consumers contract tests for 009 (widget catalog), 022 (theme availability), 017 (`product_owned`), Community cosmetics sections; statistics pack `backend/definitions/packs/marketplace.json` (017); notification templates for purchase/refund/revocation (010); AI read tool `marketplace.catalog` (018)
+- [ ] T033 [P] Implement integrations: dashboard widget `marketplace.featured` (REQ-018, 009); `EntitlementReader` consumers contract tests for 009 (widget catalog), 022 (theme availability), 017 (`product_owned`), Community cosmetics sections; statistics pack `backend/definitions/packs/marketplace.json` (017); notification templates for purchase/refund/revocation (010); AI read tool `marketplace.catalog` (018)
 - [ ] T034 [P] Write `backend/tests/security/marketplace/test_no_real_money.py`: no payment/real-money code paths or fields exist; Coins purchasable only via earning; idempotency on all money-like endpoints; amount/price validation (integers, bounds)
 - [ ] T035 [P] Register slice B observability (activation failures/retries, purchases/refunds/grants, drift between ownership and ledger) in `MK/observability.py`; add `/marketplace*`, `/me/marketplace*`, `/admin/marketplace*` to the permission-matrix test and OpenAPI client; write `docs/marketplace.md` (types, conditions, refund/revocation policy, funding rules, port contracts, follow-ups for 013/009/022/017/024/023)
-- [ ] T036 Run `specs/015-marketplace/quickstart.md` steps 3–7 end-to-end; record deviations and open product confirmations (OQ-70..74 defaults, per-user vs portal-level activation)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T036 [P] Expose owner-tagged registration on the product-type registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/marketplace/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T037 Run `specs/015-marketplace/quickstart.md` steps 3–7 end-to-end; record deviations and open product confirmations (OQ-70..74 defaults, per-user vs portal-level activation)
 
 ## Dependencies & Order
-**Slice A**: Setup → Foundational → US7 lifecycle → funding → resolution → closure (needs 013 follow-up or compliant fake). **Slice B**: catalog → acquisition → activation → refunds → grants/revocation → quota → polish. US2 needs eligibility ports (013/014/003); US4 handlers need consumers (009/022/017) or fakes; US6 needs 024's `RequestQuotaProvider` consumer.
+**Slice A**: Setup → Foundational → US7 lifecycle → funding → resolution → closure (needs 013 follow-up or compliant fake). **Slice B**: catalog → acquisition → activation → refunds → grants/revocation → quota → polish. US2 needs eligibility ports (013/014/003); US4 handlers need consumers (009/022/017) or fakes; US6 needs 024's `RequestQuotaService` (stub until 024).
 **Parallel examples**: T004/T005 · T007/T008 · T018/T019 · T022/T023 · T029 with T031 · T033/T034/T035.
 **MVP (Slice A)**: Phases 1–4 (lifecycle state machine and reserved funding); **MVP (Slice B)**: Phases 7–8 (catalog and atomic acquisition).
 
 ## Format validation
-36 tasks, all checkbox + ID + path; story labels only on story phases.
+37 tasks, all checkbox + ID + path; story labels only on story phases.

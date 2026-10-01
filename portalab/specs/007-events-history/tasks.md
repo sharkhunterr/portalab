@@ -62,7 +62,12 @@ Prerequisites (not implemented here): `D-001` jobs/db · `D-003` authz+audit · 
 - [ ] T029 [P] Add SSE subscriber for the 001 stream endpoint in `EV/consumers/sse.py` (permission-filtered) with test `backend/tests/integration/events/test_sse_filter.py`
 - [ ] T030 [P] Add observability in `EV/observability.py`: consumer lag, failures, dead letters, ingestion accepted/duplicate/quarantined; test no PII in logs
 - [ ] T031 [P] Admin UI in `frontend/src/features/admin/events/` (deliveries, dead letters, quarantine, replay) with loading/error/unauthorized, keyboard, axe, externalized strings
-- [ ] T032 Permission-matrix test for all events routes `backend/tests/security/events/test_permission_matrix.py` and migration-upgrade test (020 → events); run full validation and record results
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T032 Extend the event-type registry in `EV/registry/` with per-field annotations `rewardable` (013) and `aggregatable` (017), a per-type `automatable` flag (019), the `provenance.automation{id, execution_id, depth}` convention and `actor_kind` values `ai|automation`; test `backend/tests/unit/events/test_registry_annotations.py` (F2)
+- [ ] T033 [P] Expose owner-tagged registration on the event-type registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/events/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T034 Permission-matrix test for all events routes `backend/tests/security/events/test_permission_matrix.py` and migration-upgrade test (020 → events); run full validation and record results
 
 ## Dependencies & Execution Order
 Setup → Foundational → **US3 (MVP)** → US1/US4 consumers → US2 → US5 history → US6/US7 → US8 → Polish. T011 swaps the publisher implementation (contract test guards earlier modules).

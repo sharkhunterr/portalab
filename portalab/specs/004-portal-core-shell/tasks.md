@@ -29,7 +29,7 @@ Prerequisites (not implemented here): `D-001` capability registry + SSE kernel �
 - [ ] T011 [P] [US2] Write `backend/tests/integration/shell/test_contribution_isolation.py`: malformed or raising contribution dropped with diagnostic, remaining nav intact
 - [ ] T012 [US2] Implement `SH/assembler/assembler.py` (`NavigationAssembler.build`) with enablement check, batched `authorize()`, layout, caching and fail-closed fallback
 - [ ] T013 [US2] Implement routers `GET /me/navigation` (ETag) in `SH/api/router.py` and register first-party contributions for existing modules (Home, Admin, Profile) via `register_contribution`
-- [ ] T014 [US2] Implement epoch bump consumers for `authz.permissions_changed`, `module.enabled|disabled`, `plugin.state_changed` in `SH/assembler/epochs.py`; emit `navigation.contribution_rejected` diagnostic event
+- [ ] T014 [US2] Implement epoch bump consumers for `permission.*` (003), `admin.module_toggled|plugin_toggled` (020), `plugin.state_changed` in `SH/assembler/epochs.py`; emit `navigation.contribution_rejected` diagnostic event
 - [ ] T015 [US2] Implement `GET /me/stream` SSE (`navigation.changed`, heartbeat) and `GET/PUT /admin/shell/layout`, `GET /admin/shell/contribution-errors` (`shell.manage`, audited)
 
 ## Phase 4: US1 — Persistent shell, one environment (P1)
@@ -65,7 +65,12 @@ Prerequisites (not implemented here): `D-001` capability registry + SSE kernel �
 - [ ] T033 [P] Write `backend/tests/security/shell/test_no_enumeration.py`: `/me/navigation` for different principals never exposes unauthorized entry labels; SSE payload carries only version
 - [ ] T034 [P] Register `shell` component with Observability (functional check: assembler builds for a probe principal), add metrics (assembly latency, cache hit ratio, rejected contributions) in `SH/observability.py`
 - [ ] T035 [P] Add `/me/navigation`, `/me/stream`, `/admin/shell/*` to the permission-matrix test, regenerate the OpenAPI client, update `docs/navigation-contributions.md` (how modules/plugins contribute)
-- [ ] T036 Run `specs/004-portal-core-shell/quickstart.md` end-to-end and record deviations
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T036 Extend `NavigationContribution(kind=command)` with `sensitivity` and `confirmation_required` (008), and add the help-entry slot fed by 011 `HelpResolver` in `FE/slots/HelpEntry.tsx` (F17)
+- [ ] T037 [P] Expose owner-tagged registration on the navigation contribution registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/shell/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T038 Run `specs/004-portal-core-shell/quickstart.md` end-to-end and record deviations
 
 ## Dependencies & Order
 Setup → Foundational → US2 (MVP) → US1 → US7 → US4 → US5 → US3 → US6 → Polish. US1 needs the T013 API; US5 needs navigation `commands[]`; US7 independent of US2 backend after T017; US3/US6 parallel after US1.
@@ -73,4 +78,4 @@ Setup → Foundational → US2 (MVP) → US1 → US7 → US4 → US5 → US3 →
 **MVP**: Phases 1–4 (contribution registry, assembler/API with permission filtering and live updates, persistent shell and nav).
 
 ## Format validation
-36 tasks, all checkbox + ID + path; story labels only on story phases.
+38 tasks, all checkbox + ID + path; story labels only on story phases.

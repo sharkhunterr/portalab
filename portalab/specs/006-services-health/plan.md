@@ -38,7 +38,7 @@ Detail API: sections [state|availability|errors|maintenance|incidents|tickets|sy
 `data-model.md`, `contracts/health-contracts.md`.
 
 ## 5. Events
-Produced: `service.status_changed`, `service.health_recorded`, `maintenance.scheduled|started|ended|cancelled`, `service.operation_performed` (007 publisher; dedup `(service, to_state, state_seq)` / `(maintenance_id, transition)`). Consumed: `sync.*` and `service.*` from 005 (breaker/state inputs), `incident.*` (display links, from 016). Failure: idempotent state derivation (recompute from inputs).
+Produced: `service.status_changed`, `service.health_recorded`, `maintenance.scheduled|rescheduled|started|ended|cancelled` (payload carries `schedule_version`; consumed by 010 reminders, 011 calendar), `service.operation_performed` (007 publisher; dedup `(service, to_state, state_seq)` / `(maintenance_id, transition)`). Consumed: `sync.*` and `service.*` from 005 (breaker/state inputs), `incident.*` (display links, from 016). Failure: idempotent state derivation (recompute from inputs).
 
 ## 6. Permissions & Security
 Standard: `services.read` (state, availability); `infrastructure.read` (metrics, uptime details per registry default); `services.manage` (maintenance create/edit, operations — sensitive, confirmation, audited). Shape differences enforced server-side; errors/metrics redacted.

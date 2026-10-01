@@ -64,7 +64,12 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/secrets · `D-002/003`
 - [ ] T032 [P] Register `ai` with Observability (provider latency/errors, tokens, tool-call outcomes, pending-action funnel, guard trips; technical vs functional axes) in `AI/observability.py`; emit `ai.*` events (no content)
 - [ ] T033 [P] Write `backend/tests/security/ai/test_secrets_audit.py`: no secrets/API keys/MCP credentials in prompts, tool results, logs, events, audit or responses; audit entries contain ids/hashes not prompts; conversations excluded from admin views and exports to others
 - [ ] T034 [P] Add `/ai/*`, `/admin/ai/*` to the permission-matrix test, regenerate OpenAPI client, write `docs/ai.md` (tool authoring guide, sensitivity classes, provider adapters, MCP allow-list, injection model)
-- [ ] T035 Run `specs/018-ai-capability/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-85..89 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T035 Provide the read-only `ai.invoke` facade for 019 (text drafting/classification into text fields, read-only tool policy, never usable as a condition or in sensitive params) in `AI/facades/automation.py`; test `backend/tests/contract/ai/test_ai_invoke.py` (F12)
+- [ ] T036 [P] Expose owner-tagged registration on the AI tool registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/ai/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T037 Run `specs/018-ai-capability/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-85..89 defaults)
 
 ## Dependencies & Order
 Setup → Foundational → US1 (MVP) → US8 → US5 → US2 → US6/US3/US4 → ports/facades → US7 → Polish. US5 depends on the executor and `ConfirmationService`; facades need the orchestrator and tool policies; injection corpus (T022) must pass before any write tool from other specs is registered.
@@ -72,4 +77,4 @@ Setup → Foundational → US1 (MVP) → US8 → US5 → US2 → US6/US3/US4 →
 **MVP**: Phases 1–3 (provider port + adapter, permission-filtered tools, orchestrator with SSE chat and conversations).
 
 ## Format validation
-35 tasks, all checkbox + ID + path; story labels only on story phases.
+37 tasks, all checkbox + ID + path; story labels only on story phases.

@@ -11,7 +11,7 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/blobstore · `D-002/00
 ## Phase 1: Setup
 - [ ] T001 Create `CT/__init__.py`, `NW/`, `WK/`, `CL/` packages (`service,api,models,jobs`), `backend/migrations/{news,wiki,calendar,content}/versions/`, `FC/{news,wiki,calendar,content}/`, `backend/tests/{unit,integration,security}/{news,wiki,calendar,content}/`, `frontend/tests/{unit,e2e}/content/`
 - [ ] T002 [P] Add deps (`markdown-it-py`, `mdit-py-plugins`, `nh3`, `diff-match-patch`; frontend `mermaid`) and declare settings (`content.allowExternalImages`, `content.mermaid.enabled`, `news.maxFeatured`, `news.defaultAudience`, `wiki.history.visibility`, `wiki.maxPageBytes`, `calendar.sourceTimeoutMs`, `calendar.maxRangeDays`, `calendar.reminderLeadOptions`) in `{NW,WK,CL}/settings.py`
-- [ ] T003 [P] Declare permissions with default role grants (`news.read|create|edit|publish|archive|delete|manage_categories`, `wiki.read|edit|publish|delete|history.read`, `calendar.read`) in `{NW,WK,CL}/permissions.py`; notification categories `news.published`, `calendar.reminder` (010); retention targets and erasure participant for reminders/authors in `{NW,WK,CL}/privacy.py`
+- [ ] T003 [P] Declare permissions with default role grants (`news.read|create|modify|publish|archive|delete|manage_categories`, `wiki.read|edit|publish|delete|history.read`, `calendar.read`) in `{NW,WK,CL}/permissions.py`; notification categories `news.published`, `calendar.reminder` (010); retention targets and erasure participant for reminders/authors in `{NW,WK,CL}/privacy.py`
 
 ## Phase 2: Foundational — shared safe rendering, assets, links
 ### Tests first
@@ -65,7 +65,12 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/blobstore · `D-002/00
 - [ ] T031 [P] Write `backend/tests/security/content/test_authz_idor.py`: draft/unpublished/forbidden content not reachable via ids, slugs, assets, search, featured, calendar or notifications; admin-only operations enforced; sensitive actions audited; AI/knowledge ports principal-bounded
 - [ ] T032 [P] Register `content` with Observability (scheduled-publish lag, sanitizer strips, render failures, conflict rate, calendar source health, broken links) in `{NW,WK,CL}/observability.py`; renderer-upgrade lazy re-render job with corpus regression
 - [ ] T033 [P] Add all `/news*`, `/admin/news/*`, `/wiki/*`, `/help`, `/content/*`, `/calendar*`, `/me/calendar/*` routes to the permission-matrix test, regenerate OpenAPI client, write `docs/content.md` (Markdown feature set/safety policy, audiences, featuring, calendar source contract)
-- [ ] T034 Run `specs/011-content-news-wiki-calendar/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-50..54 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T034 Register the 019 action type `content.publish` (author principal, publish rules unchanged) in `NW/automation.py`; test `backend/tests/contract/news/test_publish_action.py` (F13)
+- [ ] T035 [P] Expose owner-tagged registration on the calendar source and link-resolver registries: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/content/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T036 Run `specs/011-content-news-wiki-calendar/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-50..54 defaults)
 
 ## Dependencies & Order
 Setup → Foundational (shared rendering) → US3 → US4 → US5 → US1 → US2 → US6 → US7 → US8 → Polish. Wiki first because 016 diagnosis/precheck consumes `support.knowledge`; News needs the shared renderer; Calendar sources `news`/`maintenance` need US1 and 006; US8 needs all three resolvers.
@@ -73,4 +78,4 @@ Setup → Foundational (shared rendering) → US3 → US4 → US5 → US1 → US
 **MVP**: Phases 1–3 (safe rendering pipeline and Wiki pages) then Phase 6 (News publication).
 
 ## Format validation
-34 tasks, all checkbox + ID + path; story labels only on story phases.
+36 tasks, all checkbox + ID + path; story labels only on story phases.

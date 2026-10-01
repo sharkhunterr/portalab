@@ -65,7 +65,11 @@ Prerequisites (not implemented here): `D-001` jobs/outbox + capability registry 
 - [ ] T033 [P] Implement admin `POST /admin/search/reindex`, `GET /admin/search/status` (`search.manage`, audited) and Observability registration (probe search per provider, latency/timeout/zero-result/index-lag metrics) in `SR/observability.py`
 - [ ] T034 [P] Emit `search.performed` (counts only, dedup `(user_id, request_id)`) and `search.provider_failed` via `EventPublisher`; add test that no query text reaches events or logs
 - [ ] T035 [P] Add `/search*`, `/palette/*`, `/me/search-history*`, `/admin/search/*` to the permission-matrix test, regenerate OpenAPI client, wire provider conformance kit into CI `test` stage
-- [ ] T036 Run `specs/008-search-command-palette/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-35..39 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T036 [P] Expose owner-tagged registration on the search provider and action registries: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/search/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T037 Run `specs/008-search-command-palette/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-35..39 defaults)
 
 ## Dependencies & Order
 Setup → Foundational → US1/US3 (MVP) → US2 → US4 → US7 → US5 → US6 → US8 → Polish. US4 hardening should land before any real domain provider ships; US7 depends on 004 palette; US8 depends on US7; US2 needs only the port stub.
@@ -73,4 +77,4 @@ Setup → Foundational → US1/US3 (MVP) → US2 → US4 → US7 → US5 → US6
 **MVP**: Phases 1–3 (SDK, coordinator, lexical grouped search with filters, first providers, UI).
 
 ## Format validation
-36 tasks, all checkbox + ID + path; story labels only on story phases.
+37 tasks, all checkbox + ID + path; story labels only on story phases.

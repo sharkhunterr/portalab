@@ -62,7 +62,7 @@ Prerequisites (not implemented here): `D-001` kernel · `D-003` authz · `D-007`
 - [ ] T031 [US10] Implement `GET /admin/observability/trends` and the retention targets (T003)
 - [ ] T032 [US11] Implement the optional `/metrics` endpoint (disabled by default, token/permission protected) and the observability self-component (queue depth, drops, collector lag)
 - [ ] T033 [P] Admin UI in `frontend/src/features/admin/observability/` (overview, components, errors, anomalies, trends) with loading/error/unauthorized states, non-color-only status, keyboard, axe, externalized strings
-- [ ] T034 Permission-matrix test for all observability routes, migration-upgrade test (006 → obs) and full validation; record results
+- [ ] T034 Permission-matrix test for all observability routes (`backend/tests/security/test_permission_matrix.py`), migration-upgrade test `backend/tests/migrations/test_upgrade_observability.py` (006 → obs) and full validation; record results
 
 ## Dependencies & Execution Order
 Setup → Foundational (T006 retrofit first) → errors → **health evaluator (MVP)** → adapters → performance → detectors/escalation → alerts/overview → trends/UI. Ports to 016/010 are stubs until those specs.

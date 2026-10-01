@@ -62,7 +62,11 @@ Prerequisites (not implemented here): `D-001` kernel/jobs · `D-003` authz + `Co
 ## Phase 10: Polish & cross-cutting
 - [ ] T031 [P] Implement admin `GET /admin/statistics/status` (lag, rebuild runs) and Observability registration (functional freshness check, metrics) in `ST/observability.py`; handle `admin.config_changed` for tz/first-day (flag rebuild required)
 - [ ] T032 [P] Add `/statistics*`, `/me/statistics*`, `/me/wrapped*`, `/admin/statistics/*` to the permission-matrix test, regenerate OpenAPI client, write `docs/statistics.md` (definition authoring, pack format, time semantics, privacy thresholds)
-- [ ] T033 Run `specs/017-statistics/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-80..84 defaults)
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T033 [P] Expose owner-tagged registration on the statistics definition-pack registry: `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/statistics/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T034 Run `specs/017-statistics/quickstart.md` end-to-end; record deviations and open product confirmations (OQ-80..84 defaults)
 
 ## Dependencies & Order
 Setup → Foundational → US2 (MVP) → US1 → US5 → US6 → US4/US3 → US8 → US7 → Polish. US5 needs the provider from US2; US6 needs provider + 009 registry; US7 needs unlock + privacy + provider; domain packs from other specs plug in after US3.
@@ -70,4 +74,4 @@ Setup → Foundational → US2 (MVP) → US1 → US5 → US6 → US4/US3 → US8
 **MVP**: Phases 1–3 (definitions, deterministic projection, permission/privacy-bounded provider and API).
 
 ## Format validation
-33 tasks, all checkbox + ID + path; story labels only on story phases.
+34 tasks, all checkbox + ID + path; story labels only on story phases.

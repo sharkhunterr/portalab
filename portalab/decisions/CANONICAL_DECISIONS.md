@@ -306,3 +306,43 @@ enrich, per CD-003/017).
   edits, no rule changes) to tidy cross-references; and confirming the §3 DEFAULT items + i18n OQ-125…129
   at leisure. The project is **planning-ready**.
 
+## 7. Planning-Phase Decisions (pre-implementation audit, 2026-10-01)
+
+Recorded after the compliance audit of all 26 plans/task lists against the constitution, this registry and
+the product/architecture/UX documents. Decided by the project owner; plans and task lists are aligned.
+
+- **CD-028 (Community events)**: dated community events (DATA_MODEL `CalendarEvent`, 011 "community events")
+  are **owned by Community (012)** and aggregated by the Calendar (011) as a `CalendarSource`; created by
+  moderators/Admin; no attendee lists (no social graph).
+- **CD-029 (Reserved funding at final deletion)**: strict reading of CD-005 — at final account deletion
+  **all** of the user's funding reservations are released and **destroyed** with the remaining Coins,
+  whatever the project state; nothing is transferred to the project.
+- **CD-030 (Proposal moderation)**: OQ-59 confirmed — community proposals are **moderated before becoming
+  visible/votable** by default (configurable).
+- **CD-031 (Duplicate tickets)**: OQ-79 confirmed — duplicates are **linked** to the incident (each ticket
+  keeps its history; audited bulk actions allowed); no ticket merging.
+- **CD-032 (Services onboarding step)**: the "services" step of the first-connection journey exists **only in
+  the Admin first-run wizard** (020, step contributed by 005, skippable); user onboarding has no services
+  step.
+- **CD-033 (Naming)**: permission keys follow the 003 catalog (`automation.manage`, `gamification.manage`,
+  `rewards.grant`, `economy.manage`, `tickets.manage`, `feedback.read`, `news.modify`, `events.manage` for the
+  event store, `campaigns.manage` for campaigns); finer keys are allowed only as refinements. Event names
+  follow EVENT_MODEL and the owning spec (e.g. `media.added`, `media.playback_finished`,
+  `service.status_changed`); `campaign.started|ended` supersede EVENT_MODEL's `event.started|ended` (CD-009).
+- **CD-034 (Quota ownership)**: OQ-72 applied — request quota semantics/accounting belong to the request
+  side (Media 024 `RequestQuotaService`); Marketplace only sells units.
+- **CD-035 (Plan defaults accepted)**: every remaining DEFAULT/PENDING/ARCH item is decided as written in the
+  plans' `research.md`, including: OQ-52 optimistic wiki editing with conflict diff (011); OQ-56/70/71 refund
+  defaults (7 days/100 %, non-refundable plugin/access/consumed quota) and funding rules frozen at opening
+  (015); OQ-76/123 support vs observability split as in 016/025; OQ-93 automation authoring Admin-only (019);
+  OQ-111 plugins installed by the Admin only, tiered plugin model (023); OQ-116 finished thresholds 90 %
+  video, 95 % books, 80 % tracks, games explicit (024); OQ-118 recommendations from Statistics data with a
+  deterministic baseline, AI enrichment optional (024/018); OQ-125 RTL capability built, no RTL language
+  enabled by default; OQ-126 `en` default + `fr`; OQ-127 human-authored translations, machine translation
+  optional later; OQ-128 schedules absolute by default, wall-clock opt-in per schedule; OQ-129 unknown-language
+  content shown as-is with a marker (026); ARCH OQ-37/41/44/51/84/85/96/97/104/108/110/112/124 as designed in
+  the respective plans. All values that are numbers or policies remain admin configuration (CD-011).
+
+Status: **implementation-ready**. Cross-plan obligations found by the audit are listed with their
+location in `decisions/PLAN_FOLLOWUPS.md`.
+

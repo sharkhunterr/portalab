@@ -3,7 +3,7 @@
 ## Ports provided
 - **`ProjectLifecycle`** (to Community 012): `register(proposal_ref, proposer) -> ProjectRef`, `state(project_ref)`, `accepts_votes(project_ref)`, `funding_summary(project_ref)`.
 - **`EntitlementReader`** (to 009 widgets, 022 themes, 017 `product_owned`, Community cosmetics, 003 access checks): `owns(user, product_key) -> bool`, `owned_by_type(user, type)`, `state(user, product_key)`.
-- **`RequestQuotaProvider`** (to 024): `extra_available(user, kind)`, `consume(user, kind, units, idempotency_key)`, `refund(...)` — never consulted for ordering/priority.
+- Quota products call Media's **`RequestQuotaService.add_units/remove_units`** (024) — Marketplace never measures or consumes quota and never influences ordering/priority.
 - `ProductType` registry + `ActivationHandler` Protocol (`activate(ownership) -> ActivationResult{active|needs_configuration|failed|incompatible}`, `deactivate`), `register_product_type(...)`.
 ## Ports consumed
 `EconomyService.reserve|release|consume|spend|refund` (013; **follow-up: reservations + unit-of-work**) · `ProgressionReader`, `CampaignReader`, authz roles/`authorize` · `ExtensionActivation` (023, stub until step 27) · `notifications.send` (010) · `AuditSink`/`ConfirmationService` (003) · `SearchProvider` SDK (008) · `ContentLocalizer` (026).

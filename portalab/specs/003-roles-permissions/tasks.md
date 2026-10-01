@@ -71,7 +71,12 @@ Prerequisite `D-001`: kernel (db, errors, jobs, secrets, `EventPublisher` from 0
 - [ ] T033 [P] Add metrics/logging in `AZ/observability.py` (decisions by permission, sensitive denials, audit failures, confirmations); test no secrets in logs
 - [ ] T034 [P] Add the migration-upgrade test (002 → authz/audit) `backend/tests/integration/authz/test_migration_upgrade.py`
 - [ ] T035 Add the admin UI screens for roles/groups/grants in `frontend/src/features/authz/` with loading/error/unauthorized states, keyboard operation, axe tests, externalized strings (UI hints only — server remains the authority)
-- [ ] T036 Run the full validation (`ruff`, `mypy`, `lint-imports`, backend + frontend suites) and record results
+
+## Cross-spec obligations (audit 2026-10-01 — see `decisions/PLAN_FOLLOWUPS.md`)
+- [ ] T036 Add `declare_permission(..., default_roles=[...])` for per-module default grants (`user|support|moderator|editor`), plugin-scoped grants `plugin:<key>.use` issued by Marketplace activation, allow-listed scoped grants for `access` products (never Admin-reserved), and principal channels `ai|automation`; tests `backend/tests/integration/authz/test_declared_defaults.py` (F15)
+- [ ] T037 [P] Expose owner-tagged registration on the permission catalog (plugin-declared permissions): `register(..., owner="module:<id>|plugin:<key>")` and `unregister(owner)`, with a test in `backend/tests/unit/authz/test_registry_owner.py` proving all contributions of an owner disappear (required by 023's conformance sweep, F20)
+
+- [ ] T038 Run the full validation (`ruff`, `mypy`, `lint-imports`, backend + frontend suites) and record results
 
 ## Dependencies & Execution Order
 Setup → Data (T004–T006, after 002 identity tables) → US6 catalog → **US1 engine (MVP)** → scopes/read-write → US2 assignments → US3 admin authority (needed by 002's bootstrap/transfer) → audit/confirmation → privacy composition → Polish. T028 replaces 002's audit double; T015 replaces 001's stub.

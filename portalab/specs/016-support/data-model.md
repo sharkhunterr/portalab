@@ -28,7 +28,7 @@ FKs only intra-module or to `identity.users(id)`; `service_id`, `plugin_id` are 
 `support.attachments.maxBytes|maxPerPost|allowedTypes`, `support.ticketRetentionMonths` (24), `support.reopenWindowDays` (14), `support.draftTtlMinutes` (60), `support.incident.precheckMatchMode`, `support.sla.*` (display only, no enforcement in v1).
 
 ## Events (via 007; ids/state only)
-Produced: `incident.created|updated|resolved` (dedup `(incident_id, update_seq)`), `ticket.created|assigned|state_changed|reopened|resolved|closed` (dedup `(ticket_id, seq)`), `feedback.submitted|converted` (dedup `(feedback_id, target_kind)`). Consumed: `observability` escalations (via port, not events), `service.status_changed` (006, optional suggestions), `user` erasure participant calls.
+Produced: `incident.created|updated|resolved` (dedup `(incident_id, update_seq)`), `ticket.created|updated|assigned|state_changed|reopened|resolved|closed` (`ticket.updated` for field/tag/comment changes, EVENT_MODEL) (dedup `(ticket_id, seq)`), `feedback.submitted|converted` (dedup `(feedback_id, target_kind)`). Consumed: `observability` escalations (via port, not events), `service.status_changed` (006, optional suggestions), `user` erasure participant calls.
 
 ## Privacy / retention
 Personal data: ticket text/comments (`content`), requester/assignee refs, attachments; private custom fields; internal notes staff-only. Retention by 021 (`support.ticketRetentionMonths`); history append-only; erasure tombstones requester and removes attachments/private fields per participant.

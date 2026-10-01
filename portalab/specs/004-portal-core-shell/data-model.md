@@ -16,7 +16,7 @@ Closed schema; unknown fields rejected. Plugin contributions additionally constr
 Global: `shell.navigation.layout` (groups, order overrides, pinned), `shell.navigation.allowUserOrdering`, `shell.shortcuts.defaults`. User: `shell.navigation.userOrder`, `shell.shortcuts`, `shell.sidebarCollapsed`.
 
 ## Events
-Consumes: `authz.permissions_changed`, `module.enabled|disabled`, `plugin.state_changed`, `service.state_changed` (for badges). Emits (via 007): `navigation.contribution_rejected` (diagnostic). Dedup `(owner, key, reason, manifest_hash)`.
+Consumes: `permission.role_assigned|role_revoked|group_changed|permission_granted|permission_revoked|policy_changed` (003), `admin.module_toggled|plugin_toggled` (020), `plugin.state_changed`, `service.status_changed` (for badges). Emits (via 007): `navigation.contribution_rejected` (diagnostic). Dedup `(owner, key, reason, manifest_hash)`.
 
 ## Privacy
 No personal data stored; navigation views are computed per request/session and not logged with identifiers.

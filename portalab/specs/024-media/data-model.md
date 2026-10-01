@@ -19,13 +19,15 @@ Cross-module references (`service_id`, `plugin_id`, request source) are opaque i
 - **media.user_progress** (derived): `user_id` · `object_id` · `resume_position_s` · `percent` · `state` (`in_progress|finished`) · `last_occurred_at`. PK `(user_id, object_id)`.
 
 ## Requests
+- **media.request_quota_units**: `user_id` FK · `units_remaining` bigint CHECK ≥ 0 · `updated_at` · PK `user_id` — extra units credited by Marketplace purchases.
+- **media.request_quota_ledger** (append-only): `id` · `user_id` FK · `delta` · `reason` (`purchase|refund|consumption|admin`) · `source_ref` · `idempotency_key` unique · `created_at`.
 - **media.requests**: `id` · `object_id` FK null · `external_ref` jsonb (scheme/value when not in catalog) · `requester_user_id` FK · `service_id` · `external_request_id` · `state` (`pending|approved|declined|processing|available|failed|cancelled`) · `source_state` · `requested_at` · `updated_at`. Unique `(service_id, external_request_id)`.
 
 ## Registries (in memory) / Settings (020)
-`MediaType`, detail-page slots, `RecommendationProvider`, `RequestQuotaProvider` port. Settings: `media.fieldPriority.<kind>.<field>` (ordered source systems), `media.finishedThreshold.<kind>`, `media.playback.pollActiveSeconds` (15) / `.pollIdleSeconds` (60) / `.staleTimeoutSeconds` (120) / `.progressEventSeconds` (60), `media.requests.quotaPerPeriod`, `media.requests.period`, `media.match.autoThreshold`, `media.discovery.*`.
+`MediaType`, detail-page slots, `RecommendationProvider`, `RequestQuotaService` (owned here; Marketplace only credits/debits units). Settings: `media.fieldPriority.<kind>.<field>` (ordered source systems), `media.finishedThreshold.<kind>`, `media.playback.pollActiveSeconds` (15) / `.pollIdleSeconds` (60) / `.staleTimeoutSeconds` (120) / `.progressEventSeconds` (60), `media.requests.quotaPerPeriod`, `media.requests.period`, `media.match.autoThreshold`, `media.discovery.*`.
 
 ## Events (via 007; payload = ids/counters only)
-Produced: `media.item_added`, `media.item_availability_changed`, `media.merged`, `media.split`, `media.playback_started|progressed|paused|resumed|stopped|interrupted`, `media.finished`, `media.request_created|updated|fulfilled`. Dedup: `(session_key, state_seq)`, `(user_id, object_id, finished)`, `(request_id, state)`. Consumed: connector sync results via RecordSinks (not events), `service.state_changed` (006), `identity` erasure participant.
+Produced: `media.added|updated|removed`, `media.availability_changed`, `media.merged|split` (portal-native identity events), `media.playback_started|progressed|paused|finished|abandoned|error` (resume ⇒ `progressed`; session ended at/above the finished threshold ⇒ `finished`, below ⇒ `abandoned`; source lost ⇒ `error`), `media.resume_available`, `media.request_created|updated|available` — names as listed in spec 024 / EVENT_MODEL. Dedup: `(session_key, state_seq)`, `(session_key, 'finished')`, `(request_id, state)`. Consumed: connector sync results via RecordSinks (not events), `service.status_changed` (006), `identity` erasure participant.
 
 ## Privacy / retention
 `history_entries`, `user_progress`, `user_links`, `requests`(requester), sessions = personal data (`activity`/`media_history`); erased/anonymized by 020/021 participant (objects and aggregates unaffected); history retention per 021.
