@@ -3,10 +3,10 @@
 Auto-generated from all feature plans. Last updated: 2026-10-01
 
 ## Active Technologies
-- Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2) (007-events-history)
-- PostgreSQL schema `identity` (see `data-model.md`); avatar/export blobs via kernel `core.blobstore` (filesystem baseline) (007-events-history)
+- Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2) (005-connectors)
+- PostgreSQL schema `identity` (see `data-model.md`); avatar/export blobs via kernel `core.blobstore` (filesystem baseline) (005-connectors)
 
-- Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7 (007-events-history)
+- Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7 (005-connectors)
 
 ## Project Structure
 
@@ -27,9 +27,9 @@ cd frontend && npm run lint && npm run typecheck && npm test
 Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain): Follow standard conventions
 
 ## Recent Changes
-- 007-events-history: Added Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2)
+- 005-connectors: Added Python 3.12 · **Dependencies (new)**: `argon2-cffi`, `Pillow` (avatar validation), plus the 001 baseline (FastAPI, SQLAlchemy 2 async, Alembic, Pydantic 2)
 
-- 007-events-history: Added Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7,
+- 005-connectors: Added Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain) + FastAPI, Pydantic 2, SQLAlchemy 2 (async) + asyncpg, Alembic, httpx; React 19, Vite 7,
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
