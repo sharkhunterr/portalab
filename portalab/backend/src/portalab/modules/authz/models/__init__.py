@@ -26,6 +26,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from portalab.core.append_only import APPEND_ONLY_INFO
 from portalab.core.db import TZDateTime, schema_metadata
 from portalab.core.ids import new_id
 from portalab.core.privacy_registry import not_personal
@@ -192,7 +193,11 @@ class Confirmation(AuthzBase):
 
 
 class AuditEntry(AuditBase):
-    """Append-only (trigger). ``actor_user_id`` keeps the pseudonymous id so tombstoning keeps integrity."""
+    """Append-only (trigger), range-partitioned by month on ``occurred_at`` (spec 021 T018).
+
+    ``actor_user_id`` keeps the pseudonymous id so tombstoning keeps integrity; ``seq`` orders entries and
+    drives the hash-chain checkpoints.
+    """
 
     __tablename__ = "audit_entries"
     __table_args__ = (
@@ -203,11 +208,13 @@ class AuditEntry(AuditBase):
         ),
         Index("ix_audit_entries_occurred_at", "occurred_at"),
         Index("ix_audit_entries_actor_user_id", "actor_user_id"),
+        Index("ix_audit_entries_seq", "seq"),
+        {"info": APPEND_ONLY_INFO, "postgresql_partition_by": "RANGE (occurred_at)"},
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
-    seq: Mapped[int] = mapped_column(BigInteger, Identity(always=True), nullable=False, unique=True)
-    occurred_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    seq: Mapped[int] = mapped_column(BigInteger, Identity(always=True), nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(TZDateTime, primary_key=True)
     received_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     actor_user_id: Mapped[UUID | None] = mapped_column()
     actor_kind: Mapped[str] = mapped_column(String(16), nullable=False)
@@ -220,3 +227,19 @@ class AuditEntry(AuditBase):
     result: Mapped[str] = mapped_column(String(8), nullable=False)
     context: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
     correlation_id: Mapped[str | None] = mapped_column(String(64))
+
+
+class AuditCheckpoint(AuditBase):
+    """Append-only hash chain over ``seq`` batches of audit entries (spec 021 R7)."""
+
+    __tablename__ = "audit_checkpoints"
+    __table_args__ = ({"info": APPEND_ONLY_INFO},)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    from_seq: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    to_seq: Mapped[int] = mapped_column(BigInteger, nullable=False, unique=True)
+    entry_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    batch_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    prev_checkpoint_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    checkpoint_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

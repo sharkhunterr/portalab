@@ -16,4 +16,9 @@
 | GET `/privacy/policies` | `privacy.manage` |
 | GET `/audit`, GET `/audit/export` | `audit.read` (context fields redacted by viewer level) |
 | POST `/services/{id}/purge` | `services.purge` (sensitive, audited, confirmation) |
-CLI: `portalab audit verify [--from SEQ --to SEQ]`.
+CLI: `portalab audit verify [--from SEQ --to SEQ]` (exit 4 on tampering).
+Purge confirmation: the first `POST /services/{id}/purge` answers 409 `authz.confirmation_required` with a one-time
+`confirmation` code bound to that service; repeating the call with `{"confirmation": "<code>"}` queues the purge (202).
+Capabilities added: `authz.confirmations` (issue/consume), `connectors.service_data` (providers from 005),
+`privacy.aggregation_guard`. Security baseline: CSP/HSTS/nosniff/frame-ancestors none, body cap (413
+`request.too_large`), rate limits per IP and per session (429 `rate_limited`, health probes exempt).

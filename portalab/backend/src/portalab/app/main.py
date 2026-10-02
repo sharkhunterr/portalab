@@ -17,7 +17,7 @@ import portalab
 from portalab.app.composition import BACKEND_DIR
 from portalab.app.health import router as health_router
 from portalab.app.migrations import expected_heads
-from portalab.app.security import PrincipalResolver, enforce_default_deny
+from portalab.app.security import PrincipalResolver, SecurityMiddleware, enforce_default_deny
 from portalab.app.spa import SPAStaticFiles, spa_directory
 from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
@@ -44,6 +44,9 @@ from portalab.modules.authz.module import AuthzModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
+from portalab.modules.privacy.api import routers as privacy_routers
+from portalab.modules.privacy.module import PrivacyModule
+from portalab.modules.privacy.settings import SecurityConfig
 
 CORRELATION_HEADER = "X-Correlation-Id"
 _CORRELATION_RE = re.compile(r"^[A-Za-z0-9._\-]{1,64}$")
@@ -69,6 +72,8 @@ def create_app(
     identity: IdentityContext | None = None,
     capabilities: CapabilityRegistry | None = None,
     authz: AuthzModule | None = None,
+    privacy: PrivacyModule | None = None,
+    security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
 
@@ -84,6 +89,7 @@ def create_app(
             capabilities=app.state.capabilities,
         )
         app.state.authz_module = platform.authz
+        app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
         if isinstance(app.state.authorizer, DeferredAuthorizer):
             app.state.authorizer.target = platform.authz.engine
@@ -114,6 +120,7 @@ def create_app(
     app.state.authorizer = authorizer
     app.state.capabilities = identity.capabilities if identity else (capabilities or new_registry())
     app.state.authz_module = authz
+    app.state.privacy_module = privacy
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
     if database is not None:
@@ -182,9 +189,16 @@ def create_app(
         problem["status"] = exc.status_code
         return _problem_response(problem)
 
+    security = security_config or SecurityConfig()
+    app.add_middleware(
+        SecurityMiddleware,
+        max_body_bytes=security.max_body_bytes,
+        per_ip_per_minute=security.rate_limit_per_ip_per_minute,
+        per_user_per_minute=security.rate_limit_per_user_per_minute,
+    )
     app.include_router(health_router)
     app.include_router(stream_router)
-    for router in [*identity_routers(), *authz_routers()]:
+    for router in [*identity_routers(), *authz_routers(), *privacy_routers()]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None
     if spa is not None:

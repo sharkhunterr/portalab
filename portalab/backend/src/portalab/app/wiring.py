@@ -5,7 +5,9 @@ and the ``authz.admin_authority`` capability — then identity (spec 002), which
 publisher is the kernel outbox until the Events module (spec 007) replaces it.
 """
 
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 
 from portalab.capabilities.registry import CapabilityRegistry
@@ -14,10 +16,12 @@ from portalab.core.authz_port import Authorizer, DenyAllAuthorizer, Principal, R
 from portalab.core.blobstore import FileSystemBlobStore
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, OutboxEventPublisher
+from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
+from portalab.modules.privacy.module import PrivacyModule
 
 
 class DeferredAuthorizer:
@@ -68,7 +72,13 @@ def wire_identity(context: IdentityContext, *, jobs: JobRegistry | None = None) 
 @dataclass
 class Platform:
     authz: AuthzModule
+    privacy: PrivacyModule
     identity: IdentityModule
+    seeds: list[Callable[[], Awaitable[None]]]
+
+    async def seed_periodic_jobs(self) -> None:
+        for seed in self.seeds:
+            await seed()
 
 
 def wire_platform(
@@ -81,15 +91,40 @@ def wire_platform(
     """Production wiring shared by ``serve``, ``worker`` and the CLI."""
     events = OutboxEventPublisher()
     authz = wire_authz(database, events, capabilities)
-    identity = wire_identity(
-        default_identity_context(
-            database,
-            data_dir=data_dir,
-            capabilities=capabilities,
-            authorizer=authz.engine,
-            audit=authz.audit,
-            events=events,
-        ),
-        jobs=jobs,
+    privacy = PrivacyModule(database, events, authz.audit, capabilities)
+    privacy.register_capabilities()
+    context = default_identity_context(
+        database,
+        data_dir=data_dir,
+        capabilities=capabilities,
+        authorizer=authz.engine,
+        audit=authz.audit,
+        events=events,
     )
-    return Platform(authz, identity)
+    context.visibility = privacy.filter
+    identity = wire_identity(context, jobs=jobs)
+    seeds: list[Callable[[], Awaitable[None]]] = []
+    if jobs is not None:
+        seeds.extend(privacy.register_jobs(jobs))
+        seeds.append(
+            register_periodic(
+                jobs,
+                database,
+                "audit.partition_maintenance",
+                timedelta(days=1),
+                lambda: authz.maintain_audit_partitions(privacy.config.audit_retention_months),
+                owner="module:authz",
+            )
+        )
+        seeds.append(
+            register_periodic(
+                jobs,
+                database,
+                "audit.checkpoint",
+                timedelta(hours=1),
+                authz.seal_audit_checkpoint,
+                owner="module:authz",
+            )
+        )
+        seeds.append(identity.ensure_sweeps_scheduled)
+    return Platform(authz, privacy, identity, seeds)

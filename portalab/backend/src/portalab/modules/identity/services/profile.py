@@ -19,6 +19,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.blobstore import BlobNotFound
 from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.jobs.queue import enqueue
+from portalab.core.visibility_port import Redacted
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.domain.display_name import clean_display_name, display_name_key
 from portalab.modules.identity.domain.state_machine import AccountState
@@ -26,6 +27,7 @@ from portalab.modules.identity.models import VISIBILITY_PREFERENCES, Profile, Pr
 from portalab.modules.identity.services.account_service import is_unique_violation
 from portalab.modules.identity.services.avatar import OUTPUT_CONTENT_TYPE, normalize_avatar
 from portalab.modules.identity.services.common import DisplayNameTaken, UserNotFound, publish
+from portalab.modules.identity.services.visibility import PROFILE_FIELD
 
 FIELD_KEY = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
 MAX_FIELDS = 20
@@ -139,16 +141,16 @@ class ProfileService:
                     occurred_at=now,
                     metadata={"changed": sorted(changed)},
                 )
-            return await self._view(session, user_id, viewer_is_owner=True)
+            return await self._view(session, user_id, viewer=principal)
 
     async def view(self, viewer: Principal, user_id: UUID) -> ProfileView:
         async with self.ctx.database.session() as session:
             user = await session.get(User, user_id)
             if user is None or user.state == AccountState.DELETED.value:
                 raise UserNotFound()
-            return await self._view(session, user_id, viewer_is_owner=viewer.user_id == user_id)
+            return await self._view(session, user_id, viewer=viewer)
 
-    async def _view(self, session: AsyncSession, user_id: UUID, *, viewer_is_owner: bool) -> ProfileView:
+    async def _view(self, session: AsyncSession, user_id: UUID, *, viewer: Principal) -> ProfileView:
         user = await session.get(User, user_id)
         profile = await session.get(Profile, user_id)
         rows = (
@@ -156,17 +158,23 @@ class ProfileService:
                 select(ProfileField).where(ProfileField.user_id == user_id).order_by(ProfileField.key)
             )
         ).scalars()
-        fields = [
-            FieldView(row.key, row.value, row.visibility_preference)
-            for row in rows
-            if visible_to(row.visibility_preference, viewer_is_owner=viewer_is_owner)
-        ]
+        fields = []
+        for row in rows:
+            if await self._shown(viewer, user_id, row):
+                fields.append(FieldView(row.key, row.value, row.visibility_preference))
         return ProfileView(
             user_id=user_id,
             display_name=user.display_name if user else None,
             has_avatar=bool(profile and profile.avatar_blob_key),
             fields=fields,
         )
+
+    async def _shown(self, viewer: Principal, owner: UUID, row: ProfileField) -> bool:
+        """Visibility is decided by the privacy engine (021) when installed, else by the baseline rule."""
+        if self.ctx.visibility is None:
+            return visible_to(row.visibility_preference, viewer_is_owner=viewer.user_id == owner)
+        shown = await self.ctx.visibility.filter(viewer, owner, PROFILE_FIELD, row.key, row.value)
+        return not isinstance(shown, Redacted)
 
     # --- avatar --------------------------------------------------------------------------------------
     async def set_avatar(self, principal: Principal, data: bytes) -> None:

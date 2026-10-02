@@ -71,11 +71,21 @@ def _diff(connection: Connection) -> list[object]:
     )
     # compare every module schema at once (per-schema comparisons report the other schemas' indexes)
     metadatas = [metadata for metadata in all_metadata() if metadata.schema is not None]
+    modelled = {table.fullname for metadata in metadatas for table in metadata.tables.values()}
     return [
         diff
         for diff in compare_metadata(context, metadatas)  # type: ignore[arg-type]
-        if not (isinstance(diff, tuple) and diff[0] == "remove_table") and not _db_only_users_fk(diff)
+        if not (isinstance(diff, tuple) and diff[0] == "remove_table")
+        and not _db_only_users_fk(diff)
+        and not _unmodelled_table_index(diff, modelled)
     ]
+
+
+def _unmodelled_table_index(diff: object, modelled: set[str]) -> bool:
+    """Indexes of tables that are not modelled (time partitions of ``audit.audit_entries``)."""
+    if not (isinstance(diff, tuple) and diff[0] == "remove_index"):
+        return False
+    return diff[1].table.fullname not in modelled
 
 
 def _db_only_users_fk(diff: object) -> bool:

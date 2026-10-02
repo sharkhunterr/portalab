@@ -129,6 +129,31 @@ def _cmd_admin_bootstrap(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _audit_verify(args: argparse.Namespace) -> int:
+    from portalab.app.composition import import_all_models
+    from portalab.core.db import Database
+    from portalab.core.event_port import OutboxEventPublisher
+    from portalab.modules.authz.audit.verify import verify
+
+    settings = load_settings()
+    import_all_models()
+    database = Database.from_url(settings.database_url.reveal())
+    try:
+        report = await verify(database, OutboxEventPublisher(), from_seq=args.from_seq, to_seq=args.to_seq)
+    finally:
+        await database.dispose()
+    sys.stdout.write(f"checked={report.checked} pruned={report.pruned} failures={len(report.failures)}\n")
+    for failure in report.failures:
+        sys.stdout.write(f"FAIL {failure}\n")
+    return 0 if report.ok else 4
+
+
+def _cmd_audit_verify(args: argparse.Namespace) -> int:
+    """Verify the audit hash chain (spec 021 T020); exit code 4 when tampering is detected."""
+    configure_logging(load_settings().log_level)
+    return asyncio.run(_audit_verify(args))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="portalab", description="Portalab — personal extensible portal")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -148,6 +173,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--password-file", default=None, help="file containing the password (else prompted)"
     )
     bootstrap.set_defaults(func=_cmd_admin_bootstrap)
+    audit = sub.add_parser("audit", help="audit log commands").add_subparsers(
+        dest="audit_command", required=True
+    )
+    audit_verify = audit.add_parser("verify", help="verify the audit hash-chain checkpoints")
+    audit_verify.add_argument("--from", dest="from_seq", type=int, default=None)
+    audit_verify.add_argument("--to", dest="to_seq", type=int, default=None)
+    audit_verify.set_defaults(func=_cmd_audit_verify)
     openapi = sub.add_parser("openapi", help="export the OpenAPI schema")
     openapi.add_argument("--output", "-o", default="-")
     openapi.set_defaults(func=_cmd_openapi)

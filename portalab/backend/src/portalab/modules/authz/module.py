@@ -1,12 +1,14 @@
 """Authorization module facade: engine, catalog, grants, Admin authority, audit store, confirmations."""
 
+from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.permissions import PermissionRegistry, default_permissions
-from portalab.core.time import Clock
+from portalab.core.time import Clock, utc_now
 from portalab.modules.authz.admin_authority.service import AdminAuthorityService, register_admin_authority
+from portalab.modules.authz.audit.query import AuditQuery
 from portalab.modules.authz.audit.store import DatabaseAuditSink
 from portalab.modules.authz.catalog import core_permissions  # noqa: F401 — declares the core catalog
 from portalab.modules.authz.catalog.sync import CatalogSync
@@ -40,6 +42,9 @@ class AuthzModule:
         self.admin_authority = AdminAuthorityService(database, self.audit, events, clock=clock)
         self.engine = AuthorizationEngine(database, self.catalog, self.audit, events, clock=clock)
         self.grants = GrantService(database, self.audit, events, self.admin_authority, clock=clock)
+        self.audit_query = AuditQuery(database, self.audit, self.engine)
+        self.events = events
+        self.clock = clock
         self.confirmations = ConfirmationService(
             database, ttl_seconds=self.config.confirmation_ttl_seconds, clock=clock
         )
@@ -49,3 +54,18 @@ class AuthzModule:
         self.capabilities.provide(
             USER_GRANTS, UserGrantsProvider(self.grants), instance_ref="authz", owner=OWNER
         )
+        self.capabilities.provide(CONFIRMATIONS, self.confirmations, instance_ref="authz", owner=OWNER)
+
+    async def maintain_audit_partitions(self, retention_months: int | None) -> dict[str, list[str]]:
+        """Create upcoming audit partitions, drop expired ones (spec 021 T019)."""
+        from portalab.modules.authz.audit import partitions
+
+        return await partitions.maintain(
+            self.database, utc_now(self.clock), retention_months=retention_months
+        )
+
+    async def seal_audit_checkpoint(self) -> object:
+        """Seal the next settled range of audit entries in the hash chain (spec 021 T020)."""
+        from portalab.modules.authz.audit import checkpoints
+
+        return await checkpoints.create_checkpoint(self.database, self.events, clock=self.clock)

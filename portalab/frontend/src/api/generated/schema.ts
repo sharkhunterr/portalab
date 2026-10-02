@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Audit */
+        get: operations["search_audit_api_v1_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Audit */
+        get: operations["export_audit_api_v1_audit_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/deletion/cancel": {
         parameters: {
             query?: never;
@@ -335,6 +369,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Privacy */
+        get: operations["my_privacy_api_v1_me_privacy_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/privacy/visibility/{datum_class}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set My Visibility */
+        put: operations["set_my_visibility_api_v1_me_privacy_visibility__datum_class__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/profile": {
         parameters: {
             query?: never;
@@ -364,6 +432,41 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/privacy/policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Policies */
+        get: operations["list_policies_api_v1_privacy_policies_get"];
+        put?: never;
+        /** Apply Policy */
+        post: operations["apply_policy_api_v1_privacy_policies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/privacy/policies/{policy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Policy */
+        delete: operations["remove_policy_api_v1_privacy_policies__policy_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -417,6 +520,23 @@ export interface paths {
         put?: never;
         /** Add Role Grant */
         post: operations["add_role_grant_api_v1_roles__role_id__grants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/services/{service_id}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Purge Service */
+        post: operations["purge_service_api_v1_services__service_id__purge_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -707,12 +827,42 @@ export interface components {
              */
             target_user_id: string;
         };
+        /** AuditPage */
+        AuditPage: {
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
         /** CredentialsConfirmation */
         CredentialsConfirmation: {
             /** Login */
             login: string;
             /** Password */
             password: string;
+        };
+        /** DatumOut */
+        DatumOut: {
+            /** Classification */
+            classification: string;
+            /** Datum Class */
+            datum_class: string;
+            /** Default Level */
+            default_level: string;
+            /** Description */
+            description: string;
+            /** Effective Level */
+            effective_level: string;
+            /** Locked By Policy */
+            locked_by_policy: boolean;
+            /** Owner */
+            owner: string;
+            /** Retention Days */
+            retention_days: number | null;
+            /** User Choosable */
+            user_choosable: boolean;
         };
         /** DeletionStatus */
         DeletionStatus: {
@@ -915,6 +1065,84 @@ export interface components {
             /** User Grantable */
             user_grantable: boolean;
         };
+        /** PolicyIn */
+        PolicyIn: {
+            /** Datum Class */
+            datum_class: string;
+            /** Ends At */
+            ends_at?: string | null;
+            /** Level */
+            level?: ("public" | "community" | "leaderboard" | "private") | null;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "user_choice" | "force_visible" | "force_private";
+            /** Reason */
+            reason: string;
+            /** Subject User Id */
+            subject_user_id?: string | null;
+        };
+        /** PolicyOut */
+        PolicyOut: {
+            /** Datum Class */
+            datum_class: string;
+            /** Ends At */
+            ends_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Level */
+            level: string | null;
+            /** Mode */
+            mode: string;
+            /** Reason */
+            reason: string;
+            /**
+             * Set At
+             * Format: date-time
+             */
+            set_at: string;
+            /** Subject User Id */
+            subject_user_id: string | null;
+        };
+        /** PreferenceIn */
+        PreferenceIn: {
+            /** Datum Ref */
+            datum_ref?: string | null;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "public" | "community" | "leaderboard" | "private";
+        };
+        /** PreferenceOut */
+        PreferenceOut: {
+            /** Effective Now */
+            effective_now: boolean;
+            /**
+             * Stored
+             * @default true
+             */
+            stored: boolean;
+        };
+        /** PrivacyInventory */
+        PrivacyInventory: {
+            /** Data */
+            data: components["schemas"]["DatumOut"][];
+            /**
+             * Deletion Endpoint
+             * @default /api/v1/me/deletion
+             */
+            deletion_endpoint: string;
+            /**
+             * Export Endpoint
+             * @default /api/v1/me/export
+             */
+            export_endpoint: string;
+        };
         /** ProfileFieldOut */
         ProfileFieldOut: {
             /** Key */
@@ -949,6 +1177,18 @@ export interface components {
             fields?: {
                 [key: string]: components["schemas"]["FieldUpdateBody"];
             } | null;
+        };
+        /** PurgeIn */
+        PurgeIn: {
+            /** Confirmation */
+            confirmation?: string | null;
+        };
+        /** PurgeOut */
+        PurgeOut: {
+            /** Job Id */
+            job_id: string;
+            /** Service Id */
+            service_id: string;
         };
         /** RegisterRequest */
         RegisterRequest: {
@@ -1109,6 +1349,83 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_audit_api_v1_audit_get: {
+        parameters: {
+            query?: {
+                action?: string | null;
+                actor_user_id?: string | null;
+                resource_type?: string | null;
+                resource_id?: string | null;
+                decision?: ("allow" | "deny" | "n/a") | null;
+                since?: string | null;
+                until?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_audit_api_v1_audit_export_get: {
+        parameters: {
+            query?: {
+                action?: string | null;
+                actor_user_id?: string | null;
+                resource_type?: string | null;
+                resource_id?: string | null;
+                decision?: ("allow" | "deny" | "n/a") | null;
+                since?: string | null;
+                until?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "application/x-ndjson": string;
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1799,6 +2116,68 @@ export interface operations {
             };
         };
     };
+    my_privacy_api_v1_me_privacy_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivacyInventory"];
+                };
+            };
+        };
+    };
+    set_my_visibility_api_v1_me_privacy_visibility__datum_class__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                datum_class: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferenceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferenceOut"];
+                };
+            };
+            /** @description privacy.preference_not_supported */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_profile_api_v1_me_profile_patch: {
         parameters: {
             query?: never;
@@ -1855,6 +2234,106 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PermissionOut"][];
+                };
+            };
+        };
+    };
+    list_policies_api_v1_privacy_policies_get: {
+        parameters: {
+            query?: {
+                subject_user_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_policy_api_v1_privacy_policies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PolicyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOut"];
+                };
+            };
+            /** @description privacy.policy_exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_policy_api_v1_privacy_policies__policy_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -2037,6 +2516,48 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    purge_service_api_v1_services__service_id__purge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurgeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurgeOut"];
+                };
+            };
+            /** @description authz.confirmation_required (carries `confirmation`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

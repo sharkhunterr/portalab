@@ -30,12 +30,18 @@ async def platform(database: Database, tmp_path: Path, clock: FixedClock) -> Aut
 @pytest.fixture
 def app(platform: AuthzPlatform, heads: set[str]) -> FastAPI:
     from portalab.app.main import create_app
+    from portalab.modules.privacy.module import PrivacyModule
 
+    privacy = PrivacyModule(
+        platform.database, platform.authz.engine.events, platform.authz.audit, platform.identity.capabilities
+    )
+    privacy.register_capabilities()
     return create_app(
         database=platform.database,
         migration_heads=heads,
         identity=platform.identity,
         authz=platform.authz,
+        privacy=privacy,
         static_dir=None,
     )
 

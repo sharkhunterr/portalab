@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AccountPage, AuthGate, SignOutButton } from "./features/auth";
 import { AuthzAdminPage, useHasPermission } from "./features/authz";
+import { AuditViewer, PoliciesAdmin, PrivacyCenter } from "./features/privacy";
 import { AppShell } from "./shell/AppShell";
 import "./styles.css";
 
@@ -11,7 +12,16 @@ const queryClient = new QueryClient({
 });
 
 function AdminSections() {
-  return useHasPermission("users.roles.manage") ? <AuthzAdminPage /> : null;
+  const roles = useHasPermission("users.roles.manage");
+  const privacy = useHasPermission("privacy.manage");
+  const audit = useHasPermission("audit.read");
+  return (
+    <>
+      {roles ? <AuthzAdminPage /> : null}
+      {privacy ? <PoliciesAdmin /> : null}
+      {audit ? <AuditViewer /> : null}
+    </>
+  );
 }
 
 const container = document.getElementById("root");
@@ -26,6 +36,7 @@ createRoot(container).render(
         {() => (
           <AppShell navigation={<SignOutButton />}>
             <AccountPage />
+            <PrivacyCenter />
             <AdminSections />
           </AppShell>
         )}

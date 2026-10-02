@@ -21,6 +21,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from portalab.core.append_only import APPEND_ONLY_INFO
 from portalab.core.db import TZDateTime, schema_metadata
 from portalab.core.ids import new_id
 from portalab.core.privacy_registry import not_personal, pii
@@ -190,6 +191,7 @@ class AccountStateHistory(IdentityBase):
     __tablename__ = "account_state_history"
     __table_args__ = (
         Index("ix_account_state_history_user_id_seq", "user_id", "transition_seq", unique=True),
+        {"info": APPEND_ONLY_INFO},
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)

@@ -2,8 +2,9 @@
 
 from fastapi import APIRouter
 
+from portalab.modules.authz.api.audit import router as audit_router
 from portalab.modules.authz.api.routes import router
 
 
 def routers() -> list[APIRouter]:
-    return [router]
+    return [router, audit_router]

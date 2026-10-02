@@ -13,6 +13,10 @@ import re
 
 FUNCTION = "core.reject_append_only_mutation"
 
+APPEND_ONLY_INFO = {"portalab_append_only": True}
+"""``Table.info`` marker for append-only tables (``__table_args__ = (..., {"info": APPEND_ONLY_INFO})``):
+the boundary tests check that such tables hold no personal-data columns (spec 021 R5)."""
+
 _IDENT = re.compile(r"^[a-z_][a-z0-9_]*$")
 
 

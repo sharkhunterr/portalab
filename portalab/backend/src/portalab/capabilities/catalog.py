@@ -1,6 +1,15 @@
 """Capability contracts known to the kernel, declared once into a fresh registry at start-up."""
 
-from portalab.capabilities import admin_authority, identity_directory, privacy_participants, user_grants
+from portalab.capabilities import (
+    admin_authority,
+    aggregation,
+    confirmations,
+    identity_directory,
+    privacy_participants,
+    service_data,
+    user_grants,
+    visibility,
+)
 from portalab.capabilities.registry import CapabilityRegistry, CapabilitySpec
 
 KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
@@ -9,6 +18,10 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     privacy_participants.ERASURE_SPEC,
     privacy_participants.EXPORT_SPEC,
     user_grants.SPEC,
+    confirmations.SPEC,
+    service_data.SPEC,
+    visibility.PREFERENCE_SPEC,
+    aggregation.SPEC,
 )
 
 

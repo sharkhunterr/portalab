@@ -93,6 +93,35 @@
         "title": "AdminTransferRequest",
         "type": "object"
       },
+      "AuditPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "AuditPage",
+        "type": "object"
+      },
       "CredentialsConfirmation": {
         "additionalProperties": false,
         "properties": {
@@ -114,6 +143,66 @@
           "password"
         ],
         "title": "CredentialsConfirmation",
+        "type": "object"
+      },
+      "DatumOut": {
+        "properties": {
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "datum_class": {
+            "title": "Datum Class",
+            "type": "string"
+          },
+          "default_level": {
+            "title": "Default Level",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "effective_level": {
+            "title": "Effective Level",
+            "type": "string"
+          },
+          "locked_by_policy": {
+            "title": "Locked By Policy",
+            "type": "boolean"
+          },
+          "owner": {
+            "title": "Owner",
+            "type": "string"
+          },
+          "retention_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retention Days"
+          },
+          "user_choosable": {
+            "title": "User Choosable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "datum_class",
+          "owner",
+          "classification",
+          "description",
+          "default_level",
+          "effective_level",
+          "locked_by_policy",
+          "user_choosable",
+          "retention_days"
+        ],
+        "title": "DatumOut",
         "type": "object"
       },
       "DeletionStatus": {
@@ -673,6 +762,229 @@
         "title": "PermissionOut",
         "type": "object"
       },
+      "PolicyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "datum_class": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Datum Class",
+            "type": "string"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "public",
+                  "community",
+                  "leaderboard",
+                  "private"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "mode": {
+            "enum": [
+              "user_choice",
+              "force_visible",
+              "force_private"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "subject_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject User Id"
+          }
+        },
+        "required": [
+          "datum_class",
+          "mode",
+          "reason"
+        ],
+        "title": "PolicyIn",
+        "type": "object"
+      },
+      "PolicyOut": {
+        "properties": {
+          "datum_class": {
+            "title": "Datum Class",
+            "type": "string"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "set_at": {
+            "format": "date-time",
+            "title": "Set At",
+            "type": "string"
+          },
+          "subject_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject User Id"
+          }
+        },
+        "required": [
+          "id",
+          "datum_class",
+          "mode",
+          "level",
+          "subject_user_id",
+          "reason",
+          "set_at",
+          "ends_at"
+        ],
+        "title": "PolicyOut",
+        "type": "object"
+      },
+      "PreferenceIn": {
+        "additionalProperties": false,
+        "properties": {
+          "datum_ref": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datum Ref"
+          },
+          "level": {
+            "enum": [
+              "public",
+              "community",
+              "leaderboard",
+              "private"
+            ],
+            "title": "Level",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "PreferenceIn",
+        "type": "object"
+      },
+      "PreferenceOut": {
+        "properties": {
+          "effective_now": {
+            "title": "Effective Now",
+            "type": "boolean"
+          },
+          "stored": {
+            "default": true,
+            "title": "Stored",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "effective_now"
+        ],
+        "title": "PreferenceOut",
+        "type": "object"
+      },
+      "PrivacyInventory": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/DatumOut"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "deletion_endpoint": {
+            "default": "/api/v1/me/deletion",
+            "title": "Deletion Endpoint",
+            "type": "string"
+          },
+          "export_endpoint": {
+            "default": "/api/v1/me/export",
+            "title": "Export Endpoint",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "PrivacyInventory",
+        "type": "object"
+      },
       "ProfileFieldOut": {
         "properties": {
           "key": {
@@ -779,6 +1091,43 @@
           }
         },
         "title": "ProfilePatch",
+        "type": "object"
+      },
+      "PurgeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          }
+        },
+        "title": "PurgeIn",
+        "type": "object"
+      },
+      "PurgeOut": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "service_id": {
+            "title": "Service Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_id",
+          "job_id"
+        ],
+        "title": "PurgeOut",
         "type": "object"
       },
       "RegisterRequest": {
@@ -1176,6 +1525,349 @@
         "summary": "Transfer Admin",
         "tags": [
           "identity-admin"
+        ]
+      }
+    },
+    "/api/v1/audit": {
+      "get": {
+        "operationId": "search_audit_api_v1_audit_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "action",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actor_user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor User Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resource_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resource_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "decision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "allow",
+                    "deny",
+                    "n/a"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Decision"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "until",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Audit",
+        "tags": [
+          "audit"
+        ]
+      }
+    },
+    "/api/v1/audit/export": {
+      "get": {
+        "operationId": "export_audit_api_v1_audit_export_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "action",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actor_user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor User Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resource_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resource_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "decision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "allow",
+                    "deny",
+                    "n/a"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Decision"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "until",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Audit",
+        "tags": [
+          "audit"
         ]
       }
     },
@@ -1989,6 +2681,82 @@
         ]
       }
     },
+    "/api/v1/me/privacy": {
+      "get": {
+        "operationId": "my_privacy_api_v1_me_privacy_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyInventory"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Privacy",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/v1/me/privacy/visibility/{datum_class}": {
+      "put": {
+        "operationId": "set_my_visibility_api_v1_me_privacy_visibility__datum_class__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "datum_class",
+            "required": true,
+            "schema": {
+              "title": "Datum Class",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenceIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferenceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "privacy.preference_not_supported"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set My Visibility",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
     "/api/v1/me/profile": {
       "patch": {
         "operationId": "update_profile_api_v1_me_profile_patch",
@@ -2055,6 +2823,138 @@
         "summary": "List Permissions",
         "tags": [
           "authz"
+        ]
+      }
+    },
+    "/api/v1/privacy/policies": {
+      "get": {
+        "operationId": "list_policies_api_v1_privacy_policies_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subject_user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Subject User Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PolicyOut"
+                  },
+                  "title": "Response List Policies Api V1 Privacy Policies Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Policies",
+        "tags": [
+          "privacy"
+        ]
+      },
+      "post": {
+        "operationId": "apply_policy_api_v1_privacy_policies_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "privacy.policy_exists"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply Policy",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/v1/privacy/policies/{policy_id}": {
+      "delete": {
+        "operationId": "remove_policy_api_v1_privacy_policies__policy_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "policy_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Policy Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Policy",
+        "tags": [
+          "privacy"
         ]
       }
     },
@@ -2297,6 +3197,62 @@
         "summary": "Add Role Grant",
         "tags": [
           "authz"
+        ]
+      }
+    },
+    "/api/v1/services/{service_id}/purge": {
+      "post": {
+        "operationId": "purge_service_api_v1_services__service_id__purge_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurgeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurgeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "authz.confirmation_required (carries `confirmation`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Purge Service",
+        "tags": [
+          "privacy"
         ]
       }
     },

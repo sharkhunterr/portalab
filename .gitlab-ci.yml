@@ -99,6 +99,20 @@ api-drift:
   script:
     - npm run check:api-drift
 
+python-dependency-audit:
+  extends: .python
+  stage: validate
+  script:
+    # known vulnerabilities in runtime dependencies fail the pipeline (spec 021 T034)
+    - uv export --frozen --no-dev --format requirements-txt --no-emit-project > /tmp/requirements.txt
+    - uvx pip-audit --strict -r /tmp/requirements.txt
+
+node-dependency-audit:
+  extends: .node
+  stage: validate
+  script:
+    - npm audit --omit=dev --audit-level=high
+
 secret-scan:
   stage: validate
   image:

@@ -24,6 +24,7 @@ from portalab.modules.identity.services.profile import AVATAR_GC_JOB, ProfileSer
 from portalab.modules.identity.services.registration import RegistrationService, VerificationChannel
 from portalab.modules.identity.services.sessions import SessionService
 from portalab.modules.identity.services.throttle import LoginThrottleService
+from portalab.modules.identity.services.visibility import register_visibility
 
 SWEEP_INTERVAL = timedelta(hours=1)
 SWEEPS = (verification_expiry.KIND, dormancy.KIND, sessions_prune.KIND)
@@ -51,6 +52,7 @@ class IdentityModule:
     def register_capabilities(self) -> None:
         register_directory(self.ctx.capabilities, self.ctx)
         register_participants(self.ctx.capabilities, self.ctx)
+        register_visibility(self.ctx.capabilities, self.ctx)
 
     # --- jobs ----------------------------------------------------------------------------------------
     def register_jobs(self, registry: JobRegistry) -> None:

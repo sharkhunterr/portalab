@@ -22,5 +22,16 @@ Append-only tables contain no PII-class columns · every mutable table with PII 
 ## User visibility preferences
 Stored as user-tier settings `privacy.visibility.<datum_class>` in 020 (CD-011), read through `VisibilityPreferenceProvider`; datum classes are registered by owning modules via `register_datum_class(key, owner, default_level, classification)`. Admin overrides never overwrite them (CD-016).
 
+## Implementation notes (2026-10-02)
+- Level names are `public | community | leaderboard | private` (same spelling as identity's profile fields).
+- `audit.audit_entries` primary key is `(id, occurred_at)` (partition key included); `seq` keeps its identity
+  sequence and a plain index. Partitions are `audit.audit_entries_pYYYYMM` + `audit_entries_pdefault`.
+- `audit.audit_checkpoints` also stores `entry_count`; only entries received more than 5 minutes ago are sealed.
+- Append-only tables carry `Table.info["portalab_append_only"]` and are checked for PII by a boundary test.
+- Registries (datum classes, retention targets) live in the capability layer (`capabilities.visibility`,
+  `capabilities.retention`) so every module can declare without importing `privacy`.
+- Until Configuration (020) exists, a datum class without an owner provider is not user-selectable
+  (`PUT /me/privacy/visibility/...` ⇒ 409 `privacy.preference_not_supported`); identity provides `profile_field`.
+
 ## Events
 `privacy.override_applied`, `privacy.override_removed`, `privacy.retention_applied`, `service.data_purged`, `audit.checkpoint_created`, `audit.verification_failed`.
