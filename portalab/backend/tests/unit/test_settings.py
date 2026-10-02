@@ -38,6 +38,7 @@ def test_loads_from_files(tmp_path: Path, key_file: str) -> None:
 def test_defaults(key_file: str) -> None:
     settings = load_settings({"DATABASE_URL": URL, "SECRET_KEY_FILE": key_file})
     assert (settings.bind_host, settings.bind_port, settings.log_level) == ("0.0.0.0", 8080, "INFO")
+    assert settings.data_dir == Path("/var/lib/portalab")
 
 
 @pytest.mark.parametrize(
@@ -50,6 +51,7 @@ def test_defaults(key_file: str) -> None:
         ({"DATABASE_URL": URL, "BIND_PORT": "http"}, "BIND_PORT"),
         ({"DATABASE_URL": URL, "LOG_LEVEL": "LOUD"}, "LOG_LEVEL"),
         ({"DATABASE_URL": URL, "DATABASE_URL_FILE": "/x"}, "not both"),
+        ({"DATABASE_URL": URL, "DATA_DIR": "relative/dir"}, "DATA_DIR"),
     ],
 )
 def test_invalid_settings_fail_fast_without_leaking(env: dict[str, str], message: str, key_file: str) -> None:

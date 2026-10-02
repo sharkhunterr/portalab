@@ -19,7 +19,10 @@ x-portalab: &portalab
     BIND_HOST: 0.0.0.0
     BIND_PORT: "8080"
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    DATA_DIR: /var/lib/portalab
   secrets: [database_url, secret_key]
+  volumes:
+    - portalab-data:/var/lib/portalab
   restart: unless-stopped
 
 services:
@@ -75,3 +78,4 @@ secrets:
 
 volumes:
   postgres-data:
+  portalab-data:

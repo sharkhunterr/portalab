@@ -11,6 +11,7 @@ not become a second one. The split is strict:
 | `SECRET_KEY_FILE` | application key for encrypting stored credentials & signing | file path; never an inline value in compose files committed to Git |
 | `BIND_HOST` / `BIND_PORT` | HTTP listener | defaults safe for containers |
 | `LOG_LEVEL` | bootstrap log verbosity | runtime log policy later via Administration |
+| `DATA_DIR` | root of the filesystem blob store (avatars, exports) | absolute path, default `/var/lib/portalab`; a persistent volume (added by spec 002) |
 | `RUN_MODE` | `serve` or `worker` entrypoint | CLI argument preferred |
 
 Rules: validated at start (fail fast with a clear error); secrets only through `*_FILE`; no business or UX

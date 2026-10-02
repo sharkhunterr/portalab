@@ -39,4 +39,7 @@ Purpose: the account/identity. Owner: identity. Lifecycle: see state machine.
 Roles/permissions/groups (`authz`, spec 003) · preferences (Administration, user tier) · visibility engine & overrides (021) · audit store (`AuditSink`, introduced in 003) · event store (007).
 
 ## Events produced (via `EventPublisher`)
-`user.created`, `user.verified`, `user.signed_in`, `user.signed_out`, `user.profile_updated`, `user.deactivated`, `user.reactivated`, `user.suspended`, `user.data_export_requested`, `user.data_exported`, `user.deletion_requested`, `user.deletion_cancelled`, `user.anonymized`, `user.deleted`; `user.admin_transferred` is emitted by the transfer orchestration.
+`user.created`, `user.verified`, `user.signed_in`, `user.signed_out`, `user.profile_updated`, `user.deactivated`, `user.reactivated`, `user.suspended`, `user.data_export_requested`, `user.data_exported`, `user.deletion_requested`, `user.deletion_cancelled`, `user.anonymized`, `user.deleted`; `user.admin_transferred` is emitted by the transfer orchestration; `user.onboarding_completed` when every onboarding step is completed.
+
+## Kernel additions made by this spec
+`core.event_outbox` (EventPublisher outbox adapter, migration `core_0005`), `core.blobstore` (filesystem, root from the bootstrap setting `DATA_DIR`), `core.audit_port` (interim `LogAuditSink` until 003), `core.authorization` (`require()`/`public` usable by modules), setting `identity.exportTtlHours`.

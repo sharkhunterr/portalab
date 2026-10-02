@@ -10,12 +10,15 @@ import { FunctionalState, type FunctionalStateName } from "../design-system/Func
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string | undefined;
+  /** Extra members of the problem document (e.g. `retry_after_seconds`), never secrets. */
+  readonly extensions: Readonly<Record<string, unknown>>;
 
-  constructor(status: number, message: string, code?: string) {
+  constructor(status: number, message: string, code?: string, extensions: Record<string, unknown> = {}) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.extensions = extensions;
   }
 }
 

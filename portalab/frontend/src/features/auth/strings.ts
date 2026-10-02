@@ -1,0 +1,59 @@
+/**
+ * Auth screen strings (spec 002 T049). Externalized so the i18n module (spec 026) can replace this English
+ * catalog with localized ones without touching the components.
+ */
+export const authStrings = {
+  loginTitle: "Sign in",
+  loginField: "Login",
+  passwordField: "Password",
+  signIn: "Sign in",
+  signingIn: "Signing in…",
+  signOut: "Sign out",
+  invalidCredentials: "The login or password is incorrect.",
+  throttled: (seconds: number) => `Too many attempts. Try again in ${seconds} seconds.`,
+  accountUnavailable: "This account cannot sign in right now.",
+  pendingDeletion: (until: string) =>
+    `This account is scheduled for deletion. You can still cancel until ${until}.`,
+  cancelDeletion: "Cancel the deletion",
+  deletionCancelled: "The deletion was cancelled. You can sign in again.",
+  unavailable: "Sign-in is temporarily unavailable. Try again later.",
+  verifyTitle: "Activate your account",
+  tokenField: "Activation code",
+  newPasswordField: "Choose a password",
+  newPasswordHint: "At least 12 characters.",
+  activate: "Activate",
+  activated: "Your account is active. You can sign in now.",
+  invalidToken: "This activation code is invalid or has expired. Ask the administrator for a new one.",
+  accountTitle: "My account",
+  profileTitle: "Profile",
+  displayNameField: "Display name",
+  bioField: "About me",
+  visibilityField: "Who can see “About me”",
+  visibility: {
+    public: "Everyone",
+    community: "Portal members",
+    leaderboard: "Leaderboards only",
+    private: "Only me",
+  },
+  save: "Save",
+  saved: "Saved.",
+  displayNameTaken: "This display name is already in use. Choose another one.",
+  avatarTitle: "Avatar",
+  avatarField: "Choose an image (PNG, JPEG, WebP or GIF, up to 2 MiB)",
+  avatarRemove: "Remove the avatar",
+  avatarInvalid: "This image cannot be used.",
+  exportTitle: "My data",
+  exportRequest: "Request a copy of my data",
+  exportStatus: (status: string) => `Export status: ${status}`,
+  exportDownload: "Download my data",
+  deletionTitle: "Delete my account",
+  deletionWarning:
+    "Your account will be deleted after a grace period. You can cancel during that period by signing in again.",
+  deletionConfirmPassword: "Confirm with your password",
+  deletionRequest: "Delete my account",
+  deletionRequested: (until: string) => `Deletion scheduled. You can cancel until ${until}.`,
+  soleAdmin: "The Admin account cannot be deleted. Transfer the Admin role first.",
+  genericError: "Something went wrong. Try again.",
+} as const;
+
+export type VisibilityPreference = keyof typeof authStrings.visibility;

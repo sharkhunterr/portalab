@@ -27,6 +27,7 @@ class BootstrapSettings:
     bind_host: str = "0.0.0.0"  # noqa: S104 — container default, documented
     bind_port: int = 8080
     log_level: str = "INFO"
+    data_dir: Path = Path("/var/lib/portalab")  # filesystem blob storage root (core.blobstore)
 
 
 def normalize_database_url(url: str) -> str:
@@ -84,10 +85,15 @@ def load_settings(env: Mapping[str, str] | None = None) -> BootstrapSettings:
     if log_level not in LOG_LEVELS:
         raise SettingsError(f"LOG_LEVEL must be one of {sorted(LOG_LEVELS)}")
 
+    data_dir = Path(env.get("DATA_DIR", "/var/lib/portalab"))
+    if not data_dir.is_absolute():
+        raise SettingsError("DATA_DIR must be an absolute path")
+
     return BootstrapSettings(
         database_url=database_url,
         secret_key=secret_key,
         bind_host=bind_host,
         bind_port=bind_port,
         log_level=log_level,
+        data_dir=data_dir,
     )

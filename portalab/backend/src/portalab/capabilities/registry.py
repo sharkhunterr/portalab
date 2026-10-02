@@ -107,6 +107,14 @@ class CapabilityRegistry:
         return removed
 
     # --- resolution --------------------------------------------------------------------------------
+    def system_providers(self, name: str) -> list[ProviderRegistration]:
+        """All providers ordered by (priority, instance_ref), for *system* use (sagas, kernel wiring).
+
+        Never use this on behalf of a user: user-initiated access goes through :meth:`resolve`.
+        """
+        self.spec(name)
+        return sorted(self._providers[name].values(), key=lambda reg: reg.sort_key)
+
     async def resolve(
         self,
         name: str,

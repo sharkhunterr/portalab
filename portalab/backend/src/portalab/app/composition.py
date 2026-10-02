@@ -12,7 +12,11 @@ import portalab.modules
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 MIGRATIONS_DIR = BACKEND_DIR / "migrations"
 
-KERNEL_MODEL_MODULES: tuple[str, ...] = ("portalab.core.jobs.models", "portalab.core.live")
+KERNEL_MODEL_MODULES: tuple[str, ...] = (
+    "portalab.core.jobs.models",
+    "portalab.core.live",
+    "portalab.core.event_port",
+)
 
 
 def module_names() -> list[str]:

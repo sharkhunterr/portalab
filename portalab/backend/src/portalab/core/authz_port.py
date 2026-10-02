@@ -20,6 +20,7 @@ class Principal:
     user_id: UUID | None = None
     channel: Channel = "user"
     acting_for: UUID | None = None
+    session_id: UUID | None = None  # set by identity's session resolver (spec 002, ``identity.principal``)
 
     @property
     def is_authenticated(self) -> bool:

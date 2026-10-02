@@ -21,7 +21,7 @@ PASSED=0
 
 cleanup() {
   rm -f "$FORBIDDEN_IMPORT"
-  docker rm -f "$APP" "$WORKER" "$PG" >/dev/null 2>&1 || true
+  docker rm -f -v "$APP" "$WORKER" "$PG" >/dev/null 2>&1 || true
   docker network rm "$NET" >/dev/null 2>&1 || true
   rm -rf "$SECRETS"
 }
@@ -72,10 +72,10 @@ ok "2. import-linter passes and rejects a forbidden import"
 
 # 3 & 4. migration tests and job semantics (real PostgreSQL)
 TEST_URL="postgresql://portalab:$DB_PASSWORD@127.0.0.1:55433/postgres"
-docker rm -f "$PG-tests" >/dev/null 2>&1 || true
+docker rm -f -v "$PG-tests" >/dev/null 2>&1 || true
 docker run -d --name "$PG-tests" -e POSTGRES_USER=portalab -e POSTGRES_PASSWORD="$DB_PASSWORD" \
   -e POSTGRES_DB=postgres -p 127.0.0.1:55433:5432 postgres:16-alpine >/dev/null
-trap 'docker rm -f "$PG-tests" >/dev/null 2>&1 || true; cleanup' EXIT
+trap 'docker rm -f -v "$PG-tests" >/dev/null 2>&1 || true; cleanup' EXIT
 for _ in $(seq 1 30); do docker exec "$PG-tests" pg_isready -U portalab -q && break; sleep 1; done
 sleep 1
 (cd "$BACKEND" && PORTALAB_TEST_DATABASE_URL="$TEST_URL" PORTALAB_REQUIRE_DB=1 uv run pytest -q \
@@ -107,9 +107,16 @@ ok "7. OpenAPI schema and generated client match"
 
 # 8. one image, two roles
 docker run -d --name "$WORKER" "${RUN_ARGS[@]}" "$IMAGE" worker >/dev/null
-sleep 3
-[ "$(docker inspect -f '{{.State.Running}}' "$WORKER")" = "true" ] || fail "8. worker container is not running"
-docker logs "$WORKER" 2>&1 | grep -q '"message": "worker started"' || fail "8. worker did not start"
+started=""
+for _ in $(seq 1 30); do
+  if docker logs "$WORKER" 2>&1 | grep -q '"message": "worker started"'; then started=1; break; fi
+  [ "$(docker inspect -f '{{.State.Running}}' "$WORKER")" = "true" ] || break
+  sleep 1
+done
+if [ -z "$started" ]; then
+  docker logs "$WORKER" 2>&1 | tail -20 >&2
+  fail "8. worker did not start"
+fi
 ok "8. the same image runs as serve and as worker"
 
 echo "✔ all $PASSED smoke checks passed"

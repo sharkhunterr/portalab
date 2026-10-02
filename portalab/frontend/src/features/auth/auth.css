@@ -1,0 +1,62 @@
+/* Auth forms (spec 002 T049) — tokens only, visible focus, text never conveyed by color alone. */
+.auth-form {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 28rem;
+  margin-block: var(--space-4);
+}
+
+.auth-form input,
+.auth-form textarea,
+.auth-form select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.auth-form button,
+.account-page button {
+  justify-self: start;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.auth-form :focus-visible,
+.account-page :focus-visible,
+.form-message:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.form-message {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.form-message-error {
+  color: var(--state-error-fg);
+  background: var(--state-error-bg);
+}
+
+.form-message-success {
+  color: var(--state-available-fg);
+  background: var(--state-available-bg);
+}
+
+.field-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

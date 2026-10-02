@@ -66,6 +66,60 @@ def _cmd_openapi(args: argparse.Namespace) -> int:
     return 0
 
 
+def _read_password(path: str | None) -> str:
+    if path:
+        return Path(path).read_text(encoding="utf-8").rstrip("\n")
+    import getpass
+
+    first = getpass.getpass("Admin password: ")
+    if first != getpass.getpass("Repeat the password: "):
+        raise ValueError("the passwords do not match")
+    return first
+
+
+async def _bootstrap_admin(args: argparse.Namespace, password: str) -> str:
+    from portalab.app.composition import import_all_models
+    from portalab.app.wiring import default_identity_context, wire_identity
+    from portalab.capabilities.catalog import new_registry
+    from portalab.core.authz_port import DenyAllAuthorizer
+    from portalab.core.db import Database
+
+    settings = load_settings()
+    import_all_models()
+    database = Database.from_url(settings.database_url.reveal())
+    try:
+        module = wire_identity(
+            default_identity_context(
+                database,
+                data_dir=settings.data_dir,
+                capabilities=new_registry(),
+                authorizer=DenyAllAuthorizer(),
+            )
+        )
+        user_id = await module.bootstrap.create_first_admin(
+            login=args.login, password=password, display_name=args.display_name, email=args.email
+        )
+        return str(user_id)
+    finally:
+        await database.dispose()
+
+
+def _cmd_admin_bootstrap(args: argparse.Namespace) -> int:
+    """Create the sole Admin of a fresh portal (refuses when an Admin exists, research R13)."""
+    from portalab.core.errors import PortalError
+
+    configure_logging(load_settings().log_level)
+    try:
+        password = _read_password(args.password_file)
+        user_id = asyncio.run(_bootstrap_admin(args, password))
+    except (PortalError, ValueError, OSError) as exc:
+        detail = exc.detail if isinstance(exc, PortalError) else str(exc)
+        sys.stderr.write(f"admin bootstrap refused: {detail}\n")
+        return 3
+    sys.stdout.write(f"Admin account created: {user_id}\n")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="portalab", description="Portalab — personal extensible portal")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -74,6 +128,17 @@ def build_parser() -> argparse.ArgumentParser:
     migrate = sub.add_parser("migrate", help="apply database migrations")
     migrate.add_argument("revision", nargs="?", default="heads")
     migrate.set_defaults(func=_cmd_migrate)
+    admin = sub.add_parser("admin", help="administration commands").add_subparsers(
+        dest="admin_command", required=True
+    )
+    bootstrap = admin.add_parser("bootstrap", help="create the sole Admin account of a fresh portal")
+    bootstrap.add_argument("--login", required=True)
+    bootstrap.add_argument("--display-name", default=None)
+    bootstrap.add_argument("--email", default=None)
+    bootstrap.add_argument(
+        "--password-file", default=None, help="file containing the password (else prompted)"
+    )
+    bootstrap.set_defaults(func=_cmd_admin_bootstrap)
     openapi = sub.add_parser("openapi", help="export the OpenAPI schema")
     openapi.add_argument("--output", "-o", default="-")
     openapi.set_defaults(func=_cmd_openapi)

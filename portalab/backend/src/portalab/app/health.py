@@ -5,7 +5,7 @@ from typing import Any
 from fastapi import APIRouter, Request
 
 from portalab.app.migrations import is_up_to_date
-from portalab.app.security import public
+from portalab.core.authorization import public
 from portalab.core.db import Database
 from portalab.core.errors import Unavailable
 

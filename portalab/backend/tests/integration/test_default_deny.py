@@ -11,11 +11,20 @@ from fastapi import FastAPI, Request
 from fastapi.routing import APIRoute
 
 from portalab.app.main import create_app
-from portalab.app.security import public, require, route_access
+from portalab.app.security import api_routes, public, require, route_access
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.db import Database
 
-ALLOW_LISTED = {"/healthz", "/readyz"}
+ALLOW_LISTED = {
+    "/healthz",
+    "/readyz",
+    # sign-in flows (spec 002): reachable before authentication by definition
+    "/api/v1/auth/login",
+    "/api/v1/auth/logout",
+    "/api/v1/auth/register",
+    "/api/v1/auth/verify",
+    "/api/v1/auth/deletion/cancel",
+}
 
 
 class AllowAll:
@@ -55,7 +64,7 @@ def _with_probe_routes(app: FastAPI) -> FastAPI:
 
 
 def _api_routes(app: FastAPI) -> list[APIRoute]:
-    return [r for r in app.routes if isinstance(r, APIRoute)]
+    return api_routes(app.routes)
 
 
 async def _call(app: FastAPI, route: APIRoute, method: str) -> httpx.Response:
@@ -65,7 +74,9 @@ async def _call(app: FastAPI, route: APIRoute, method: str) -> httpx.Response:
 
 def test_production_routes_all_declare_their_access(heads: set[str]) -> None:
     app = create_app(migration_heads=heads)
-    undeclared = [r.path for r in _api_routes(app) if route_access(r) is None]
+    routes = _api_routes(app)
+    assert len(routes) > 10  # health, stream and the identity API are all discovered
+    undeclared = [r.path for r in routes if route_access(r) is None]
     assert undeclared == [], f"routes without require()/public: {undeclared}"
     public_paths = {r.path for r in _api_routes(app) if route_access(r) == "public"}
     assert public_paths <= ALLOW_LISTED

@@ -17,10 +17,13 @@ import portalab
 from portalab.app.composition import BACKEND_DIR
 from portalab.app.health import router as health_router
 from portalab.app.migrations import expected_heads
-from portalab.app.security import AnonymousResolver, PrincipalResolver, enforce_default_deny
+from portalab.app.security import PrincipalResolver, enforce_default_deny
 from portalab.app.spa import SPAStaticFiles, spa_directory
 from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
+from portalab.app.wiring import default_identity_context, wire_identity
+from portalab.capabilities.catalog import new_registry
+from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Authorizer, DenyAllAuthorizer
 from portalab.core.db import Database
 from portalab.core.errors import (
@@ -35,6 +38,9 @@ from portalab.core.errors import (
 )
 from portalab.core.logging import correlation_scope, get_correlation_id, get_logger
 from portalab.core.settings import BootstrapSettings
+from portalab.modules.identity.api import routers as identity_routers
+from portalab.modules.identity.api.middleware import SessionPrincipalResolver
+from portalab.modules.identity.context import IdentityContext
 
 CORRELATION_HEADER = "X-Correlation-Id"
 _CORRELATION_RE = re.compile(r"^[A-Za-z0-9._\-]{1,64}$")
@@ -57,15 +63,27 @@ def create_app(
     migration_heads: set[str] | None = None,
     stream_options: StreamOptions | None = None,
     static_dir: Path | None = DEFAULT_STATIC_DIR,
+    identity: IdentityContext | None = None,
+    capabilities: CapabilityRegistry | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
 
     owns_database = database is None and settings is not None
 
+    def wire_modules(app: FastAPI, db: Database) -> None:
+        context = identity or default_identity_context(
+            db,
+            data_dir=settings.data_dir if settings else Path("/var/lib/portalab"),
+            capabilities=app.state.capabilities,
+            authorizer=app.state.authorizer,
+        )
+        app.state.identity_module = wire_identity(context)
+
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if owns_database and settings is not None:
             app.state.database = Database.from_url(settings.database_url.reveal())
+            wire_modules(app, app.state.database)
         try:
             yield
         finally:
@@ -82,8 +100,12 @@ def create_app(
         openapi_url=None,  # schema exported by `portalab openapi`; the portal is authenticated-only (CD-025)
     )
     app.state.database = database
-    app.state.authorizer = authorizer or DenyAllAuthorizer()
-    app.state.principal_resolver = principal_resolver or AnonymousResolver()
+    app.state.authorizer = authorizer or (identity.authorizer if identity else DenyAllAuthorizer())
+    app.state.capabilities = identity.capabilities if identity else (capabilities or new_registry())
+    app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
+    app.state.identity_module = None
+    if database is not None:
+        wire_modules(app, database)
     app.state.stream_options = stream_options or StreamOptions()
     if migration_heads is None:
         url = settings.database_url.reveal() if settings else "postgresql+asyncpg://unused/unused"
@@ -150,6 +172,8 @@ def create_app(
 
     app.include_router(health_router)
     app.include_router(stream_router)
+    for router in identity_routers():
+        app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None
     if spa is not None:
         app.mount("/", SPAStaticFiles(directory=spa, html=True), name="spa")

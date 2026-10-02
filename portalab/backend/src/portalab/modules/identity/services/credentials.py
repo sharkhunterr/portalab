@@ -1,0 +1,94 @@
+"""Local credential store — Argon2id (research R2).
+
+* per-hash salt, parameters from ``identity.argon2Params``; a parameter change re-hashes on next sign-in;
+* unknown logins are verified against a dummy hash so the work (and timing) matches the real path (R4);
+* hashing runs in a worker thread: Argon2 is deliberately CPU/memory hard.
+"""
+
+import secrets
+from datetime import datetime
+from uuid import UUID
+
+import anyio
+from argon2 import PasswordHasher, Type
+from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from portalab.core.errors import ValidationFailed
+from portalab.modules.identity.models import Credential
+from portalab.modules.identity.settings import Argon2Params, PasswordPolicy
+
+SCHEME = "argon2id"
+
+
+class PasswordRejected(ValidationFailed):
+    default_code = "user.password_invalid"
+    default_title = "Password does not meet the policy"
+
+
+def params_version(params: Argon2Params) -> str:
+    return f"t{params.time_cost}-m{params.memory_cost_kib}-p{params.parallelism}"
+
+
+def check_password_policy(password: str, policy: PasswordPolicy) -> None:
+    if not policy.min_length <= len(password) <= policy.max_length:
+        raise PasswordRejected(
+            f"Use a password of {policy.min_length} to {policy.max_length} characters.",
+            extensions={"min_length": policy.min_length, "max_length": policy.max_length},
+        )
+    if password.strip() == "":
+        raise PasswordRejected("A password cannot be blank.")
+
+
+class CredentialHasher:
+    def __init__(self, params: Argon2Params) -> None:
+        self.params = params
+        self.version = params_version(params)
+        self._hasher = PasswordHasher(
+            time_cost=params.time_cost,
+            memory_cost=params.memory_cost_kib,
+            parallelism=params.parallelism,
+            type=Type.ID,
+        )
+        # verifying against this hash costs the same as a real verification
+        self._dummy = self._hasher.hash(secrets.token_urlsafe(24))
+
+    async def hash(self, password: str) -> str:
+        return await anyio.to_thread.run_sync(self._hasher.hash, password)
+
+    def _verify(self, stored: str, password: str) -> bool:
+        try:
+            return bool(self._hasher.verify(stored, password))
+        except (VerifyMismatchError, VerificationError, InvalidHashError):
+            return False
+
+    async def verify(self, stored: str | None, password: str) -> bool:
+        """Constant-work verification; ``stored=None`` (unknown login) always fails after the same work."""
+        if stored is None:
+            await anyio.to_thread.run_sync(self._verify, self._dummy, password)
+            return False
+        return await anyio.to_thread.run_sync(self._verify, stored, password)
+
+    def needs_rehash(self, stored: str) -> bool:
+        try:
+            return bool(self._hasher.check_needs_rehash(stored))
+        except InvalidHashError:
+            return True
+
+
+async def set_password(
+    session: AsyncSession, hasher: CredentialHasher, user_id: UUID, password: str, now: datetime
+) -> None:
+    hashed = await hasher.hash(password)
+    credential = await session.get(Credential, user_id)
+    if credential is None:
+        session.add(
+            Credential(
+                user_id=user_id, scheme=SCHEME, hash=hashed, params_version=hasher.version, changed_at=now
+            )
+        )
+    else:
+        credential.hash = hashed
+        credential.params_version = hasher.version
+        credential.changed_at = now
+    await session.flush()

@@ -24,4 +24,10 @@
 | POST `/me/deletion` · DELETE `/me/deletion` | `users.self.manage` | request / cancel within grace; re-auth required |
 | GET `/users` · POST `/users/{id}/suspend|reactivate|deletion` | `users.manage` | audited, confirmation |
 | POST `/admin/transfer` | `users.admin.transfer` | step-up re-authentication; atomic |
-Error codes (problem+json `code`): `auth.invalid_credentials` (single code for all unauthenticated failures), `auth.account_unavailable`, `user.display_name_taken`, `user.state_transition_forbidden`, `admin.sole_admin_protected`.
+| POST `/users` · POST `/users/{id}/verification` | `users.manage` | CD-036: Admin-created account / re-issued token, shown once |
+| DELETE `/users/{id}/deletion` | `users.manage` | Admin cancels a pending deletion within grace |
+| POST `/auth/deletion/cancel` | public (credentials) | sign-in is refused in Pending Deletion, so the owner cancels by re-entering credentials (throttled) |
+| GET `/users/{id}/avatar` | `users.read` | streamed through an authenticated route, never static |
+| GET `/me/export/{id}/content` | `users.self.manage` | downloads a ready, unexpired bundle (owner only) |
+| GET `/me/onboarding` · POST `/me/onboarding/{step}/complete` | `users.self.manage` | progress only; step content owned by other modules |
+Error codes (problem+json `code`): `auth.invalid_credentials` (single code for all unauthenticated failures), `auth.account_unavailable`, `user.display_name_taken`, `user.state_transition_forbidden`, `admin.sole_admin_protected`; implementation also uses `auth.throttled` (429), `auth.csrf_failed`, `auth.invalid_token`, `auth.registration_closed`, `auth.unavailable` (503, fail closed), `user.display_name_invalid`, `user.login_invalid`, `user.login_taken` (Admin creation only), `user.password_invalid`, `user.password_required`, `user.avatar_invalid`, `user.deletion_not_cancellable`, `admin.already_exists`, `audit.unavailable`.

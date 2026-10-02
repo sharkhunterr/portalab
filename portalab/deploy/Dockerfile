@@ -27,7 +27,9 @@ COPY portalab/backend/ ./
 RUN uv sync --frozen --no-dev
 COPY --from=frontend /build/frontend/dist ./static
 
-RUN useradd --system --uid 10001 --home-dir /app --shell /usr/sbin/nologin portalab
+RUN useradd --system --uid 10001 --home-dir /app --shell /usr/sbin/nologin portalab \
+    && install -d -o 10001 -g 10001 -m 0700 /var/lib/portalab
+VOLUME ["/var/lib/portalab"]
 USER 10001
 
 EXPOSE 8080

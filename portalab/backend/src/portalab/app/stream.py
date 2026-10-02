@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 
-from portalab.app.security import current_principal, require
+from portalab.core.authorization import current_principal, require
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
 from portalab.core.errors import Unavailable

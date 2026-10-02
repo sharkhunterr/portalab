@@ -342,6 +342,10 @@ the product/architecture/UX documents. Decided by the project owner; plans and t
   optional later; OQ-128 schedules absolute by default, wall-clock opt-in per schedule; OQ-129 unknown-language
   content shown as-is with a marker (026); ARCH OQ-37/41/44/51/84/85/96/97/104/108/110/112/124 as designed in
   the respective plans. All values that are numbers or policies remain admin configuration (CD-011).
+- **CD-036 (Registration modes, decided 2026-10-01 during 002 implementation)**: `identity.registrationMode` is
+  `open | invite_only` (default `invite_only`). `invite_only` closes self-registration: the Admin creates
+  accounts (`POST /users`, `users.manage`), each receiving a one-time verification token shown once to the
+  Admin, who hands it over; the person sets a password while verifying. No invitation-code entity exists.
 
 Status: **implementation-ready**. Cross-plan obligations found by the audit are listed with their
 location in `decisions/PLAN_FOLLOWUPS.md`.

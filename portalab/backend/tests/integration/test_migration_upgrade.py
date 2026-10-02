@@ -69,16 +69,13 @@ def _diff(connection: Connection) -> list[object]:
             "compare_type": True,
         },
     )
-    diffs: list[object] = []
-    for metadata in all_metadata():
-        if metadata.schema is None:
-            continue
-        diffs.extend(
-            diff
-            for diff in compare_metadata(context, metadata)
-            if not (isinstance(diff, tuple) and diff[0] == "remove_table")
-        )
-    return diffs
+    # compare every module schema at once (per-schema comparisons report the other schemas' indexes)
+    metadatas = [metadata for metadata in all_metadata() if metadata.schema is not None]
+    return [
+        diff
+        for diff in compare_metadata(context, metadatas)  # type: ignore[arg-type]
+        if not (isinstance(diff, tuple) and diff[0] == "remove_table")
+    ]
 
 
 async def test_models_and_migrations_are_in_sync(database: Database) -> None:
