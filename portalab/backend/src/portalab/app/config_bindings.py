@@ -12,6 +12,7 @@ from typing import Any
 from portalab.core.logging import get_logger
 from portalab.modules.administration.config.service import ConfigService
 from portalab.modules.connectors.settings import SETTINGS as CONNECTORS_FIELDS
+from portalab.modules.health.settings import SETTINGS as HEALTH_FIELDS
 
 log = get_logger("portalab.config")
 
@@ -67,6 +68,9 @@ async def refresh(platform: Any) -> None:
     connectors = getattr(platform, "connectors", None)
     if connectors is not None:
         connectors.config = replace(connectors.config, **await _values(config, CONNECTORS_FIELDS))
+    health = getattr(platform, "health", None)
+    if health is not None:
+        health.config = replace(health.config, **await _values(config, HEALTH_FIELDS))
 
 
 async def safe_refresh(platform: Any) -> bool:
@@ -83,5 +87,5 @@ def bind(platform: Any) -> None:
     async def on_change(keys: set[str]) -> None:
         await safe_refresh(platform)
 
-    for prefix in ("identity.", "privacy.", "authz.", "connectors."):
+    for prefix in ("identity.", "privacy.", "authz.", "connectors.", "health."):
         platform.administration.config.on_change(prefix, on_change)

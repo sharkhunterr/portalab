@@ -481,6 +481,7 @@ class ServiceManager:
             event_type,
             {
                 "service_id": str(row.id),
+                "dimension": "connection",
                 "connector": row.connector_key,
                 "from_state": before,
                 "to_state": to,

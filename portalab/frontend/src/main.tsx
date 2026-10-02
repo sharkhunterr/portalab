@@ -5,6 +5,7 @@ import { ConfigEditor, ControlCenter, EventsAdmin, ServicesAdmin, Toggles } from
 import { AccountPage, AuthGate, SignOutButton } from "./features/auth";
 import { AuthzAdminPage, useHasPermission } from "./features/authz";
 import { AuditViewer, PoliciesAdmin, PrivacyCenter } from "./features/privacy";
+import { ServicesHealth } from "./features/services";
 import { AppShell } from "./shell/AppShell";
 import "./styles.css";
 
@@ -33,6 +34,10 @@ function AdminSections() {
   );
 }
 
+function ServicesSection() {
+  return useHasPermission("services.read") ? <ServicesHealth /> : null;
+}
+
 const container = document.getElementById("root");
 if (!container) {
   throw new Error("missing #root element");
@@ -46,6 +51,7 @@ createRoot(container).render(
           <AppShell navigation={<SignOutButton />}>
             <AccountPage />
             <PrivacyCenter />
+            <ServicesSection />
             <AdminSections />
           </AppShell>
         )}

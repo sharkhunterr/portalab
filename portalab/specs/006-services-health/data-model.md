@@ -29,3 +29,16 @@
 
 ## Retention / privacy
 Samples and infra samples are technical class (days/weeks, config); rollups and state history longer; no personal data. Error messages redacted.
+
+## Implementation notes (2026-10-02)
+- `service_id` is the connectors service id as text (logical reference, no FK). `service_state` also keeps
+  `rules_version` (deriver rules, `RULES_VERSION = 1`); reasons are `probe|breaker|stale|maintenance|inactive|latency`.
+- `health_samples` / `infra_samples` are RANGE-partitioned by month (+ `_pdefault`); the probe sweep keeps
+  partitions two months ahead and the 021 engine drops expired ones. `maintenance_windows` also stores
+  `schedule_version` and `reference_time_zone`; `recent_errors` is unique per `(service_id, code)`.
+- `service.status_changed` is one shared event type (`portalab.capabilities.service_events`) with a
+  `dimension` field: `connection` (005 lifecycle) or `health` (006 derived state); dedup
+  `(service_id, dimension, to_state, state_seq)`.
+- Inputs come through capabilities: `connectors.directory` (005, services + sync state), per-service
+  `service.health_probe` / `infrastructure.metrics` / `server.operations` providers, and the Support ports
+  `support.incidents` / `support.service_tickets` (empty until 016).

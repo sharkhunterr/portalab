@@ -3,17 +3,9 @@
 from pydantic import BaseModel
 
 from portalab.capabilities.events import EventType, default_event_types
+from portalab.capabilities.service_events import ServiceStatus, register_status_changed
 
 OWNER = "module:connectors"
-
-
-class ServiceStatus(BaseModel):
-    service_id: str
-    connector: str
-    from_state: str | None = None
-    to_state: str
-    state_seq: int
-    reason: str | None = None
 
 
 class SyncPayload(BaseModel):
@@ -37,7 +29,7 @@ class ConnectorPayload(BaseModel):
     purged: int | None = None
 
 
-_STATUS = ("service.connected", "service.disconnected", "service.status_changed")
+_STATUS = ("service.connected", "service.disconnected")
 _SYNC = ("sync.started", "sync.completed", "sync.failed")
 _CONNECTOR = (
     "connector.discovered",
@@ -48,6 +40,7 @@ _CONNECTOR = (
 
 
 def register_event_types() -> None:
+    register_status_changed()
     for name in _STATUS:
         default_event_types.register(
             EventType(
@@ -55,7 +48,7 @@ def register_event_types() -> None:
                 owner=OWNER,
                 schema=ServiceStatus,
                 open_payload=False,
-                dedup_fields=("service_id", "to_state", "state_seq"),
+                dedup_fields=("service_id", "dimension", "to_state", "state_seq"),
                 retention_class="technical",
                 visibility_class="restricted",
                 automatable=True,

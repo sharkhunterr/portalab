@@ -99,6 +99,8 @@ class ConformanceKit:
             source_system="conformance", policy=IsolationPolicy(timeout_seconds=1, max_retries=0)
         )
         for binding in connector.provides:
+            if not binding.syncable:
+                continue  # data capabilities; probes/operations report the service's condition themselves
             provider = connector.provider(binding.spec.name, handle)
             for name in sorted(getattr(binding.spec.protocol, "__protocol_attrs__", ())):
                 method: Any = getattr(provider, name)

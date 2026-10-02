@@ -42,7 +42,7 @@ async def test_disabled_capability_is_not_provided(cn: ConnectorsHarness) -> Non
 async def test_restore_rebuilds_providers_from_stored_state(cn: ConnectorsHarness) -> None:
     service_id = await cn.enabled()
     cn.full.identity.capabilities.unregister(f"service:{service_id}")  # e.g. a fresh process
-    assert await cn.module.start() == 1
+    assert await cn.module.start() == 4  # items, probe, metrics, operations
     assert [r.instance_ref for r in cn.full.identity.capabilities.system_providers(CAPABILITY)] == [
         str(service_id)
     ]

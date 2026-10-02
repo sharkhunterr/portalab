@@ -24,6 +24,18 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
     TestResult,
 )
+from portalab.capabilities.health import (
+    HEALTH_PROBE,
+    INFRA_METRICS,
+    SERVER_OPERATIONS,
+    MetricValue,
+    NotAvailable,
+    Operation,
+    ProbeResult,
+)
+from portalab.capabilities.health import (
+    SPECS as HEALTH_SPECS,
+)
 from portalab.capabilities.registry import CapabilitySpec
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 
@@ -59,6 +71,11 @@ class FakeBackend:
     fail_after: int | None = None  # sync raises after yielding this many records
     calls: int = 0
     reachable_targets: set[str] = field(default_factory=set)
+    probe_latency_ms: float = 20.0
+    metrics: dict[str, tuple[float, str] | None] = field(
+        default_factory=lambda: {"cpu": (12.5, "%"), "ram": (2048.0, "MiB"), "gpu": None}
+    )
+    operations_run: list[str] = field(default_factory=list)
 
     def put(self, external_id: str, at: int = 0, **payload: Any) -> None:
         self.items[external_id] = {"payload": payload, "at": at}
@@ -99,13 +116,76 @@ class _Provider:
         return [{"id": key, **value["payload"]} for key, value in sorted(remote.items.items())]
 
 
+class _Probe:
+    def __init__(self, handle: ServiceHandle) -> None:
+        self.handle = handle
+
+    async def probe(self) -> ProbeResult:
+        remote = backend(str(self.handle.config["base_url"]))
+        try:
+            await remote.answer()
+        except ProviderAuthError:
+            return ProbeResult(
+                reachable=True,
+                latency_ms=remote.probe_latency_ms,
+                error_code="auth",
+                detail="The service rejected the credentials.",
+            )
+        except ConnectionError:
+            return ProbeResult(
+                reachable=False, error_code="unreachable", detail="The service cannot be reached."
+            )
+        return ProbeResult(reachable=True, latency_ms=remote.probe_latency_ms)
+
+
+class _Metrics:
+    def __init__(self, handle: ServiceHandle) -> None:
+        self.handle = handle
+
+    async def fetch(self, metrics: list[str]) -> dict[str, MetricValue | NotAvailable]:
+        remote = backend(str(self.handle.config["base_url"]))
+        await remote.answer()
+        result: dict[str, MetricValue | NotAvailable] = {}
+        for metric in metrics:
+            value = remote.metrics.get(metric)
+            result[metric] = (
+                MetricValue(*value) if value is not None else NotAvailable("not reported by the host")
+            )
+        return result
+
+
+class _Operations:
+    def __init__(self, handle: ServiceHandle) -> None:
+        self.handle = handle
+
+    async def list_operations(self) -> list[Operation]:
+        await backend(str(self.handle.config["base_url"])).answer()
+        return [Operation("restart", "Restart the service", "Restarts the service process.")]
+
+    async def execute(self, operation: str, params: Mapping[str, Any]) -> Mapping[str, Any]:
+        remote = backend(str(self.handle.config["base_url"]))
+        await remote.answer()
+        if operation != "restart":
+            raise ValueError(f"unknown operation {operation!r}")
+        remote.operations_run.append(operation)
+        return {"restarted": True}
+
+
+_HEALTH = {spec.name: spec for spec in HEALTH_SPECS}
+
+
 class FakeConnector:
     key = "fake"
     name = "Fake service"
     manifest = Manifest(version="1.0.0", requires_portal=">=0.1,<2")
     config_schema = FakeConfig
     secret_fields = frozenset({"api_token"})
-    provides: Sequence[CapabilityBinding] = (CapabilityBinding(SPEC, syncable=True),)
+    provides: Sequence[CapabilityBinding] = (
+        CapabilityBinding(SPEC, syncable=True),
+        CapabilityBinding(_HEALTH[HEALTH_PROBE]),
+        CapabilityBinding(_HEALTH[INFRA_METRICS]),
+        CapabilityBinding(_HEALTH[SERVER_OPERATIONS]),
+    )
 
     def __init__(self, *, key: str = "fake", manifest: Manifest | None = None) -> None:
         self.key = key
@@ -180,7 +260,14 @@ class FakeConnector:
         yield SyncProgress(cursor={"at": newest})
 
     def provider(self, capability: str, service: ServiceHandle) -> Any:
-        return _Provider(service) if capability == CAPABILITY else None
+        factories = {
+            CAPABILITY: _Provider,
+            HEALTH_PROBE: _Probe,
+            INFRA_METRICS: _Metrics,
+            SERVER_OPERATIONS: _Operations,
+        }
+        factory = factories.get(capability)
+        return factory(service) if factory else None
 
     def actions(self) -> Mapping[str, Callable[[ServiceHandle, Mapping[str, Any]], Any]]:
         async def refresh(service: ServiceHandle, arguments: Mapping[str, Any]) -> dict[str, Any]:

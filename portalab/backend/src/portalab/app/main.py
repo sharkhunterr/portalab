@@ -48,6 +48,8 @@ from portalab.modules.connectors.api import routers as connectors_routers
 from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.events.api import routers as events_routers
 from portalab.modules.events.module import EventsModule
+from portalab.modules.health.api import routers as health_routers
+from portalab.modules.health.module import HealthModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
@@ -84,6 +86,7 @@ def create_app(
     administration: AdministrationModule | None = None,
     events: EventsModule | None = None,
     connectors: ConnectorsModule | None = None,
+    health: HealthModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -104,6 +107,7 @@ def create_app(
         app.state.administration_module = platform.administration
         app.state.events_module = platform.events
         app.state.connectors_module = platform.connectors
+        app.state.health_module = platform.health
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -143,6 +147,7 @@ def create_app(
     app.state.administration_module = administration
     app.state.events_module = events
     app.state.connectors_module = connectors
+    app.state.health_module = health
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -227,6 +232,7 @@ def create_app(
         *privacy_routers(),
         *admin_routers(),
         *events_routers(),
+        *health_routers(),  # before connectors: /services/health must not match /services/{id}
         *connectors_routers(),
     ]:
         app.include_router(router)

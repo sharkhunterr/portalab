@@ -81,3 +81,32 @@
   color: var(--state-syncing-fg);
   background: var(--state-syncing-bg);
 }
+
+/* Service health badges (spec 006): icon + text, colors from the same state tokens. */
+.health-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.4rem;
+  border-radius: 0.25rem;
+}
+.health-badge--operational {
+  color: var(--state-available-fg);
+  background: var(--state-available-bg);
+}
+.health-badge--degraded {
+  color: var(--state-partial-fg);
+  background: var(--state-partial-bg);
+}
+.health-badge--unavailable {
+  color: var(--state-unavailable-fg);
+  background: var(--state-unavailable-bg);
+}
+.health-badge--maintenance {
+  color: var(--state-maintenance-fg);
+  background: var(--state-maintenance-bg);
+}
+.health-badge--unknown {
+  color: var(--state-stale-fg);
+  background: var(--state-stale-bg);
+}

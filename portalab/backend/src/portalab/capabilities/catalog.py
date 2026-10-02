@@ -6,6 +6,7 @@ from portalab.capabilities import (
     aggregation,
     config,
     confirmations,
+    health,
     identity_directory,
     privacy_participants,
     service_data,
@@ -28,6 +29,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     config.LOCALE_SPEC,
     config.I18N_SPEC,
     *administration.SPECS,
+    *health.SPECS,
 )
 
 

@@ -10,6 +10,7 @@ from portalab.capabilities.administration import (
 )
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.connector_sdk import ConnectorRegistry, default_connectors
+from portalab.capabilities.health import SERVICE_DIRECTORY
 from portalab.capabilities.record_sink import SinkRegistry, default_sinks
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.service_data import CAPABILITY as SERVICE_DATA
@@ -24,6 +25,7 @@ from portalab.modules.connectors import event_types as _event_types  # noqa: F40
 from portalab.modules.connectors import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.connectors.automation import ConnectorActions, register_actions
 from portalab.modules.connectors.data import ServiceDataOwner
+from portalab.modules.connectors.directory import ConnectorServiceDirectory
 from portalab.modules.connectors.discovery.service import DiscoveryService
 from portalab.modules.connectors.firstrun import STEP, ServicesFirstRunStep
 from portalab.modules.connectors.permissions import SERVICES_READ
@@ -96,6 +98,9 @@ class ConnectorsModule:
     def register_capabilities(self) -> None:
         self.manager.declare_specs()
         self.capabilities.provide(SERVICE_DATA, self.data, instance_ref="connectors", owner=OWNER)
+        self.capabilities.provide(
+            SERVICE_DIRECTORY, ConnectorServiceDirectory(self.manager), instance_ref="connectors", owner=OWNER
+        )
         self.capabilities.provide(
             TOGGLE_HOOK_CAPABILITY,
             CompatibilityToggleHook(self.manager.checker, self.manager.connector_key_of),

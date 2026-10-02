@@ -20,3 +20,14 @@
 | GET `/services/{id}/maintenance`, POST/PATCH/DELETE `/maintenance` | `services.read` / `services.manage` (sensitive for cancel) |
 | GET `/services/{id}/operations`, POST `/services/{id}/operations/{op}` | `services.manage`, sensitive, confirmation, audited |
 Sections of the detail response each carry `{state, as_of, data}`; unavailable sections never fail the response.
+
+## Implementation notes (2026-10-02)
+- Probes/metrics/operations providers are bound to one service (`instance_ref` = service id) and return
+  `CapabilityResult` values through the 005 isolation wrapper; `HealthProbe.probe()`,
+  `InfrastructureMetrics.fetch(metrics)`, `ServerOperations.list_operations()/execute(op, params)`.
+- Detail tiers: `services.read` → state, availability, maintenance, incidents, sync, history;
+  `infrastructure.read` adds errors, tickets, infrastructure (and details inside state/availability/sync);
+  `services.manage` adds operations. Executing an operation needs a single-use confirmation (409
+  `authz.confirmation_required`) and is audited; cancelling a maintenance window is audited as sensitive.
+- `GET /maintenance` (all upcoming windows) is added for the calendar/overview; health routes are mounted
+  before the connectors routes so `/services/health` is not taken for a service id.
