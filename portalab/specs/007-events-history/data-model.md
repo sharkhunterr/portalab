@@ -27,6 +27,17 @@ Indexes: (seq); (type, occurred_at); (subject_type, subject_id, occurred_at); (a
 
 Envelope conventions: `actor_kind` ∈ `user|system|ai|automation|plugin`; `provenance.automation{id, execution_id, depth}` set by actions run by 019 (loop prevention).
 
+## Implementation notes (2026-10-02)
+- `events.events` is partitioned LIST (`retention_class`) → `events_business` / `events_technical`, each RANGE
+  monthly on `occurred_at` (+ `_pdefault`); primary key `(event_id, retention_class, occurred_at)`.
+- `deliveries` also stores `event_seq` and `next_attempt_at`; `quarantine` stores `event_type`, `detail`,
+  `resolved_by/at`; `replay_runs.processed` counts replayed events.
+- The registry and consumer contracts live in `portalab.capabilities.events`; each module registers its own
+  types (`modules/<m>/event_types.py`). The store-backed publisher keeps the kernel `EventPublisher` signature;
+  test fixtures of earlier specs may still use the kernel outbox adapter.
+- The worker runs the dispatcher every second (single node, plan risk R4); `audit.audit_entries.event_id`
+  correlates audit and event (identity transitions and authz grants write it).
+
 ## Lifecycle / retention / privacy
 Events immutable; retention by dropping partitions per class (021 engine; `business` kept long, `technical` short; both configurable); personal events reference `actor_user_id` only (tombstone safe); history is owner-only by default (021). Deleted-user events remain with the same id.
 

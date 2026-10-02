@@ -43,6 +43,7 @@ class SubjectRef:
 class PublishResult:
     event_id: UUID
     duplicate: bool = False
+    quarantined: bool = False  # invalid or unknown type: kept aside for review, not in history (spec 007)
 
 
 class EventPublisher(Protocol):
@@ -58,6 +59,8 @@ class EventPublisher(Protocol):
         source: str = DEFAULT_SOURCE,
         dedup_key: str | None = None,
         version: int = 1,
+        source_event_id: str | None = None,
+        provenance: Mapping[str, Any] | None = None,
     ) -> PublishResult: ...
 
 
@@ -100,6 +103,8 @@ class OutboxEventPublisher:
         source: str = DEFAULT_SOURCE,
         dedup_key: str | None = None,
         version: int = 1,
+        source_event_id: str | None = None,
+        provenance: Mapping[str, Any] | None = None,
     ) -> PublishResult:
         if not event_type or "." not in event_type:
             raise ValueError(f"event type {event_type!r} must look like '<domain>.<action>'")

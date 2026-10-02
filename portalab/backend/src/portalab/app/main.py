@@ -44,6 +44,8 @@ from portalab.modules.administration.api import routers as admin_routers
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.api import routers as authz_routers
 from portalab.modules.authz.module import AuthzModule
+from portalab.modules.events.api import routers as events_routers
+from portalab.modules.events.module import EventsModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
@@ -78,6 +80,7 @@ def create_app(
     authz: AuthzModule | None = None,
     privacy: PrivacyModule | None = None,
     administration: AdministrationModule | None = None,
+    events: EventsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -96,6 +99,7 @@ def create_app(
         )
         app.state.platform = platform
         app.state.administration_module = platform.administration
+        app.state.events_module = platform.events
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -132,6 +136,7 @@ def create_app(
     app.state.authz_module = authz
     app.state.privacy_module = privacy
     app.state.administration_module = administration
+    app.state.events_module = events
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -210,7 +215,13 @@ def create_app(
     )
     app.include_router(health_router)
     app.include_router(stream_router)
-    for router in [*identity_routers(), *authz_routers(), *privacy_routers(), *admin_routers()]:
+    for router in [
+        *identity_routers(),
+        *authz_routers(),
+        *privacy_routers(),
+        *admin_routers(),
+        *events_routers(),
+    ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None
     if spa is not None:

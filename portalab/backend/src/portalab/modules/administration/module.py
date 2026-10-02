@@ -12,6 +12,7 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock
+from portalab.modules.administration import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.administration import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.administration import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.administration.config.ports import (

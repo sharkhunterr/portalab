@@ -30,6 +30,7 @@ async def full(database: Database, tmp_path: Path, clock: FixedClock) -> FullPla
 @pytest.fixture
 def app(full: FullPlatform, heads: set[str]) -> FastAPI:
     from portalab.app.main import create_app
+    from portalab.modules.events.module import EventsModule
 
     return create_app(
         database=full.database,
@@ -38,6 +39,9 @@ def app(full: FullPlatform, heads: set[str]) -> FastAPI:
         authz=full.authz,
         privacy=full.privacy,
         administration=full.administration,
+        events=EventsModule(
+            full.database, full.authz.audit, full.identity.capabilities, visibility=full.privacy.filter
+        ),
         static_dir=None,
     )
 

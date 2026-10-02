@@ -9,6 +9,7 @@ Audit/Security step (021) completes it; until then :class:`LogAuditSink` writes 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +29,7 @@ class AuditRecord:
     result: Result = "success"
     context: Mapping[str, Any] = field(default_factory=dict)
     sensitive: bool = False
+    event_id: UUID | None = None  # the domain event describing the same action (spec 007, CD-013)
 
 
 class AuditError(RuntimeError):

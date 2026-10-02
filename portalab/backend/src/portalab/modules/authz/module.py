@@ -10,6 +10,7 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.permissions import PermissionRegistry, default_permissions
 from portalab.core.time import Clock, utc_now
+from portalab.modules.authz import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.authz.admin_authority.service import AdminAuthorityService, register_admin_authority
 from portalab.modules.authz.audit.query import AuditQuery
 from portalab.modules.authz.audit.store import DatabaseAuditSink

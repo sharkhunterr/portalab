@@ -64,6 +64,7 @@ class DatabaseAuditSink:
             "result": entry.result,
             "context": bounded_context(dict(entry.context), self.max_context_bytes),
             "correlation_id": get_correlation_id(),
+            "event_id": entry.event_id,
         }
 
     async def record(self, session: AsyncSession | None, entry: AuditRecord) -> None:

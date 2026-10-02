@@ -10,6 +10,7 @@ from portalab.capabilities.administration import BOOTSTRAP_CAPABILITY as BOOTSTR
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.core.jobs.queue import enqueue
 from portalab.core.jobs.registry import JobRegistry
+from portalab.modules.identity import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.identity.context import OWNER, IdentityContext
 from portalab.modules.identity.jobs import dormancy, finalize_deletion, sessions_prune, verification_expiry
 from portalab.modules.identity.services.account_service import AccountService

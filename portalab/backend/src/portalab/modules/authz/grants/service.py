@@ -85,7 +85,7 @@ class GrantService:
         metadata: Mapping[str, Any],
     ) -> None:
         details = {key: str(value) if isinstance(value, UUID) else value for key, value in metadata.items()}
-        await self.events.publish(
+        published = await self.events.publish(
             session,
             event,
             details,
@@ -104,6 +104,7 @@ class GrantService:
                 result="success",
                 context=details,
                 sensitive=True,
+                event_id=published.event_id,
             ),
         )
 

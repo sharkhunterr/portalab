@@ -6,7 +6,8 @@ deleted; append-only stores are retained by dropping whole time partitions (R5),
 """
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import timedelta
 from typing import Literal
 
 from portalab.capabilities.visibility import DATA_CLASSES, DataClass
@@ -28,6 +29,7 @@ class RetentionTarget:
     owner: str
     integrity_necessary: bool = False
     extra_condition: str | None = None  # constant SQL predicate written by the owner, never user input
+    window: Callable[[], timedelta | None] | None = field(default=None, compare=False)  # owner-defined window
 
 
 class RetentionRegistry:

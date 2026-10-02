@@ -74,6 +74,9 @@ class RetentionEngine:
         self.clock = clock
 
     def cutoff_for(self, target: RetentionTarget, now: datetime) -> datetime | None:
+        if target.window is not None:
+            window = target.window()
+            return now - window if window else None
         if target.action == "drop_partition" and target.data_class == "audit":
             months = self.config.audit_retention_months
             return months_before(now, months) if months else None

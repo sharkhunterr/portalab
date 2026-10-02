@@ -164,7 +164,7 @@ class AccountService:
         )
         await session.flush()
         event_type = event_for(current, target)
-        await publish(
+        published = await publish(
             self.ctx,
             session,
             event_type,
@@ -187,5 +187,6 @@ class AccountService:
             resource=user_ref(user.id),
             context={"from_state": current.value, "to_state": target.value, "reason": reason},
             sensitive=sensitive or actor.kind == "admin",
+            event_id=published.event_id,
         )
         return event_type

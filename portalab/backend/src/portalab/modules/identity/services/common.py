@@ -106,6 +106,7 @@ async def audit(
     decision: str = "n/a",
     context: Mapping[str, Any] | None = None,
     sensitive: bool = False,
+    event_id: UUID | None = None,
 ) -> None:
     """Write an audit record; a failure refuses a *sensitive* action and is only logged otherwise."""
     entry = AuditRecord(
@@ -116,6 +117,7 @@ async def audit(
         result=result,  # type: ignore[arg-type]
         context=dict(context or {}),
         sensitive=sensitive,
+        event_id=event_id,
     )
     try:
         await ctx.audit.record(session, entry)

@@ -24,3 +24,6 @@
 | POST `/admin/events/quarantine/{id}/release|discard` | `events.manage` (sensitive, audited) |
 | POST `/admin/replay` | `events.replay` (sensitive, audited, confirmation) |
 Problem codes: `events.unknown_type`, `events.invalid_payload`, `events.duplicate` (informational).
+Replay confirmation: the first `POST /admin/replay` answers 409 `authz.confirmation_required` with a one-time
+`confirmation`; repeat with `{"confirmation": "<code>"}`. `GET /subjects/{type}/{id}/history` serves `user` now;
+other subject types appear when their module registers a read permission.

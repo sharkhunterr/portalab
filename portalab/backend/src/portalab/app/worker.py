@@ -30,6 +30,20 @@ async def schedule_sweeps(platform: Platform, stop: asyncio.Event) -> None:
                 await asyncio.wait_for(stop.wait(), timeout=SCHEDULE_RETRY_SECONDS)
 
 
+DISPATCH_INTERVAL_SECONDS = 1.0
+
+
+async def dispatch_events(platform: Platform, stop: asyncio.Event) -> None:
+    """Fan stored events out to their consumers (spec 007), independently of the job queue."""
+    while not stop.is_set():
+        try:
+            await platform.events.dispatcher.run_once()
+        except Exception:
+            log.warning("event dispatch round failed, will retry")
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(stop.wait(), timeout=DISPATCH_INTERVAL_SECONDS)
+
+
 async def run_worker(settings: BootstrapSettings) -> None:
     import_all_models()
     database = Database.from_url(settings.database_url.reveal())
@@ -46,9 +60,11 @@ async def run_worker(settings: BootstrapSettings) -> None:
     for signum in (signal.SIGTERM, signal.SIGINT):
         loop.add_signal_handler(signum, stop.set)
     scheduler = asyncio.create_task(schedule_sweeps(platform, stop))
+    dispatcher = asyncio.create_task(dispatch_events(platform, stop))
     try:
         await Worker(database, default_registry).run_forever(stop)
     finally:
         stop.set()
         await scheduler
+        await dispatcher
         await database.dispose()

@@ -21,6 +21,8 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.secrets import SecretBox
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.module import AuthzModule
+from portalab.modules.events.module import EventsModule
+from portalab.modules.events.publisher.publisher import EventStorePublisher
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.privacy.module import PrivacyModule
@@ -77,6 +79,7 @@ class Platform:
     privacy: PrivacyModule
     administration: AdministrationModule
     identity: IdentityModule
+    events: EventsModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -98,7 +101,7 @@ def wire_platform(
     jobs: JobRegistry | None = None,
 ) -> Platform:
     """Production wiring shared by ``serve``, ``worker`` and the CLI."""
-    events = OutboxEventPublisher()
+    events = EventStorePublisher()
     authz = wire_authz(database, events, capabilities)
     privacy = PrivacyModule(database, events, authz.audit, capabilities)
     privacy.register_capabilities()
@@ -116,6 +119,10 @@ def wire_platform(
     )
     context.visibility = privacy.filter
     identity = wire_identity(context, jobs=jobs)
+    events_module = EventsModule(
+        database, authz.audit, capabilities, visibility=privacy.filter, publisher=events
+    )
+    events_module.register()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -140,7 +147,7 @@ def wire_platform(
             )
         )
         seeds.append(identity.ensure_sweeps_scheduled)
-    platform = Platform(authz, privacy, administration, identity, seeds)
+    platform = Platform(authz, privacy, administration, identity, events_module, seeds)
     from portalab.app.config_bindings import bind
 
     bind(platform)

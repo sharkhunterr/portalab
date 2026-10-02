@@ -227,6 +227,7 @@ class AuditEntry(AuditBase):
     result: Mapped[str] = mapped_column(String(8), nullable=False)
     context: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
     correlation_id: Mapped[str | None] = mapped_column(String(64))
+    event_id: Mapped[UUID | None] = mapped_column()  # correlation with events.events (spec 007 T026)
 
 
 class AuditCheckpoint(AuditBase):

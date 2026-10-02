@@ -13,6 +13,7 @@ from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock
+from portalab.modules.privacy import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.privacy import permissions  # noqa: F401 — declares privacy permissions
 from portalab.modules.privacy.aggregation.guard import AggregationGuard
 from portalab.modules.privacy.center.service import PrivacyCenter
