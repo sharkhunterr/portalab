@@ -1,5 +1,9 @@
-/** Shell strings (spec 004) — default English, replaced by i18n catalogs (026). Navigation labels come as
- * keys from the server (``label_key``) and resolve here until the catalogs land. */
+import { useMemo } from "react";
+import { type Translate, useT } from "../i18n/hooks/useT";
+
+/** Shell strings (spec 004) — the English defaults; components read them through ``useShellStrings()``,
+ * which resolves the ``shell`` and ``nav`` i18n catalogs (spec 026) and falls back to these values.
+ * Navigation labels come as keys from the server (``label_key``). */
 export const shellStrings = {
   brand: "Portalab",
   skip: "Skip to content",
@@ -35,6 +39,7 @@ export const shellStrings = {
     "nav.home": "Home",
     "nav.account": "Account",
     "nav.appearance": "Appearance",
+    "nav.language": "Language & region",
     "nav.privacy": "Privacy",
     "nav.services": "Services",
     "nav.shortcuts": "Keyboard shortcuts",
@@ -54,4 +59,32 @@ export const shellStrings = {
 
 export function label(key: string): string {
   return shellStrings.labels[key] ?? key;
+}
+
+type Strings = typeof shellStrings;
+export type ShellStrings = {
+  [K in Exclude<keyof Strings, "labels">]: Strings[K] extends (count: number) => string
+    ? (count: number) => string
+    : string;
+} & { label: (key: string) => string };
+
+const PLURALS = new Set(["degraded", "paletteResults"]);
+
+/** Shell strings in the active language (catalog namespaces ``shell`` and ``nav``). */
+export function useShellStrings(): ShellStrings {
+  const t = useT();
+  return useMemo(() => build(t), [t]);
+}
+
+function build(t: Translate): ShellStrings {
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(shellStrings)) {
+    if (key === "labels") continue;
+    out[key] = PLURALS.has(key) ? (count: number) => t(`shell:${key}`, { count }) : t(`shell:${key}`);
+  }
+  out.label = (key: string) => {
+    const text = t(`nav:${key}`);
+    return text === key ? label(key) : text;
+  };
+  return out as ShellStrings;
 }

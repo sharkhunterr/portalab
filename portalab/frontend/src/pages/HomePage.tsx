@@ -1,10 +1,11 @@
 import { Link } from "react-router";
 import { EmptyState } from "../shell/breadcrumbs/Breadcrumbs";
 import { useNavigationView } from "../shell/nav/NavigationProvider";
-import { label, shellStrings } from "../shell/strings";
+import { useShellStrings } from "../shell/strings";
 
 /** Home (placeholder until the dashboard, spec 009): never a dead end — it offers the user's destinations. */
 export default function HomePage() {
+  const shellStrings = useShellStrings();
   const { view } = useNavigationView();
   const destinations = view.groups
     .flatMap((g) => g.entries)
@@ -15,7 +16,7 @@ export default function HomePage() {
       title={shellStrings.homeTitle}
       nextAction={destinations.map((entry) => (
         <Link key={entry.key} className="ds-button ds-button--secondary" to={entry.route ?? "/"}>
-          {label(entry.label_key)}
+          {shellStrings.label(entry.label_key)}
         </Link>
       ))}
     >

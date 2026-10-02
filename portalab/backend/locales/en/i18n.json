@@ -1,0 +1,13 @@
+{
+  "auto": "Automatic",
+  "firstDayOfWeek": "First day of the week",
+  "h12": "12-hour",
+  "h23": "24-hour",
+  "hourCycle": "Clock",
+  "language": "Interface language",
+  "locale": "Formats (dates, numbers)",
+  "preview": "Preview: {date}",
+  "retained": "Your choice ({language}) is kept and will apply again when it is enabled.",
+  "timeZone": "Time zone",
+  "title": "Language & region"
+}

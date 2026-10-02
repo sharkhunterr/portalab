@@ -53,6 +53,8 @@ from portalab.modules.events.api import routers as events_routers
 from portalab.modules.events.module import EventsModule
 from portalab.modules.health.api import routers as health_routers
 from portalab.modules.health.module import HealthModule
+from portalab.modules.i18n.api import routers as i18n_routers
+from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
@@ -107,6 +109,7 @@ def create_app(
     observability: ObservabilityModule | None = None,
     ui: UiModule | None = None,
     shell: ShellModule | None = None,
+    i18n: I18nModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -131,6 +134,7 @@ def create_app(
         app.state.observability_module = platform.observability
         app.state.ui_module = platform.ui
         app.state.shell_module = platform.shell
+        app.state.i18n_module = platform.i18n
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -183,6 +187,7 @@ def create_app(
     app.state.observability_module = observability
     app.state.ui_module = ui
     app.state.shell_module = shell
+    app.state.i18n_module = i18n
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -284,6 +289,7 @@ def create_app(
         *observability_routers(),
         *ui_routers(),
         *shell_routers(),
+        *i18n_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

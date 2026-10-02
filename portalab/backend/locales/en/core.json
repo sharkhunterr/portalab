@@ -1,0 +1,10 @@
+{
+  "cancel": "Cancel",
+  "close": "Close",
+  "error.generic": "Something went wrong.",
+  "items": "{count, plural, =0 {No items} one {# item} other {# items}}",
+  "loading": "Loading",
+  "notTranslated": "Not available in your language — shown in {language}.",
+  "retry": "Retry",
+  "save": "Save"
+}

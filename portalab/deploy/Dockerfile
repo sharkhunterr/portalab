@@ -8,6 +8,7 @@ COPY portalab/frontend/package.json portalab/frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY portalab/frontend/ ./
 COPY portalab/backend/openapi.json ../backend/openapi.json
+COPY portalab/backend/locales ../backend/locales
 RUN npm run build
 
 # ---------------------------------------------------------------- runtime

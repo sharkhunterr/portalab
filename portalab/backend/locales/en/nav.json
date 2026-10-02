@@ -1,0 +1,20 @@
+{
+  "nav.account": "Account",
+  "nav.admin.audit": "Audit",
+  "nav.admin.configuration": "Configuration",
+  "nav.admin.control_center": "Control Center",
+  "nav.admin.events": "Events",
+  "nav.admin.observability": "Observability",
+  "nav.admin.privacy": "Privacy policies",
+  "nav.admin.roles": "Roles & permissions",
+  "nav.admin.services": "Manage services",
+  "nav.appearance": "Appearance",
+  "nav.group.admin": "Administration",
+  "nav.group.main": "Portal",
+  "nav.group.me": "My account",
+  "nav.home": "Home",
+  "nav.language": "Language & region",
+  "nav.privacy": "Privacy",
+  "nav.services": "Services",
+  "nav.shortcuts": "Keyboard shortcuts"
+}

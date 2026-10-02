@@ -4,12 +4,13 @@ confirmations. Only permission keys and outcome kinds — never user ids, tokens
 import re
 import threading
 from collections import Counter
+from contextlib import suppress
 
 from portalab.core.logging import get_logger
 
 log = get_logger("portalab.authz")
 
-_METRIC = re.compile(r"^authz\.[a-z_]+(\.[a-z_]+)*$")
+_METRIC = re.compile(r"^authz\.[a-z_][a-z0-9_]*(\.[a-z0-9_]+)*$")
 
 
 class AuthzMetrics:
@@ -24,9 +25,12 @@ class AuthzMetrics:
             self._counts[name] += amount
 
     def decision(self, permission: str, allowed: bool) -> None:
+        """Count a decision; metrics never interfere with authorization (fail-open)."""
         outcome = "allow" if allowed else "deny"
-        self.increment(f"authz.decisions.{outcome}")
-        self.increment(f"authz.decisions.{outcome}.{permission.replace(':', '_').replace('-', '_')}")
+        part = re.sub(r"[^a-z0-9_.]", "_", permission.lower())
+        with suppress(ValueError):
+            self.increment(f"authz.decisions.{outcome}")
+            self.increment(f"authz.decisions.{outcome}.{part}")
 
     def snapshot(self) -> dict[str, int]:
         with self._lock:

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useNavigationView } from "../nav/NavigationProvider";
-import { shellStrings } from "../strings";
+import { useShellStrings } from "../strings";
 
 /**
  * Degraded-mode banner (spec 004 T023; R12): when several services are degraded or unavailable (health
@@ -12,6 +12,7 @@ import { shellStrings } from "../strings";
 export const DEGRADED_THRESHOLD = 2;
 
 export function GlobalStatusBanner() {
+  const shellStrings = useShellStrings();
   const { view } = useNavigationView();
   const canRead = view.groups.some((g) => g.entries.some((e) => e.key === "health.services"));
   const summary = useQuery({

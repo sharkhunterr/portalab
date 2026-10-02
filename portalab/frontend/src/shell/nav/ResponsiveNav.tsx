@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "../../design-system/components/Button";
 import { useBreakpoint } from "../../design-system/components/Layout";
 import { Drawer } from "../../design-system/components/Overlays";
-import { shellStrings } from "../strings";
+import { useShellStrings } from "../strings";
 import { PrimaryNav } from "./PrimaryNav";
 
 /**
@@ -10,6 +10,7 @@ import { PrimaryNav } from "./PrimaryNav";
  * small screens — the same destination set everywhere.
  */
 export function ResponsiveNav({ collapsed = false }: { collapsed?: boolean }) {
+  const shellStrings = useShellStrings();
   const wide = useBreakpoint("md");
   const [open, setOpen] = useState(false);
   if (wide) {

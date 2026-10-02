@@ -195,13 +195,16 @@ async def test_end_to_end_over_http(migrated_db_url: str, heads: set[str]) -> No
         ):
             assert response.status_code == 200
             assert response.headers["content-type"].startswith("text/event-stream")
+            chunks = response.aiter_text()
+            # the first heartbeat proves the subscription took its tip: publishing earlier could be skipped
+            buffer = await asyncio.wait_for(anext(chunks), timeout=5)
             async with database.unit_of_work() as uow:
                 seq = await publish_live(uow.session, topic="portal.ping", payload={"hello": "world"})
-            buffer = ""
-            async for chunk in response.aiter_text():
-                buffer += chunk
-                if f"id: {seq}" in buffer:
-                    break
+            async with asyncio.timeout(10):  # heartbeats keep the read alive: bound the wait
+                async for chunk in chunks:
+                    buffer += chunk
+                    if f"id: {seq}" in buffer:
+                        break
         assert '"hello": "world"' in buffer
     finally:
         server.should_exit = True

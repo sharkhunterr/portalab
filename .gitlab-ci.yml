@@ -99,6 +99,18 @@ api-drift:
   script:
     - npm run check:api-drift
 
+i18n-catalogs:
+  extends: .python
+  stage: validate
+  script:
+    - uv run portalab i18n check
+
+i18n-catalogs-frontend:
+  extends: .node
+  stage: validate
+  script:
+    - npm run i18n:check
+
 python-dependency-audit:
   extends: .python
   stage: validate

@@ -8,6 +8,7 @@ from portalab.capabilities import (
     confirmations,
     events,
     health,
+    i18n,
     identity_directory,
     observability,
     privacy_participants,
@@ -34,6 +35,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *health.SPECS,
     *observability.SPECS,
     events.STATS_SPEC,
+    *i18n.SPECS,
 )
 
 

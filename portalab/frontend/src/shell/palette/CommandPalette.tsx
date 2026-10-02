@@ -3,7 +3,7 @@ import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 
 import { useNavigate } from "react-router";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { useNavigationView } from "../nav/NavigationProvider";
-import { label, shellStrings } from "../strings";
+import { useShellStrings } from "../strings";
 import { type Command, fromNavigation, rank } from "./CommandRegistry";
 
 /**
@@ -22,13 +22,17 @@ export function CommandPalette({
   initialQuery?: string;
   actions: Record<string, () => void>;
 }) {
+  const shellStrings = useShellStrings();
   const { view } = useNavigationView();
   const navigate = useNavigate();
   const announce = useAnnounce();
   const ids = { input: useId(), list: useId() };
   const [query, setQuery] = useState(initialQuery);
   const [active, setActive] = useState(0);
-  const commands = useMemo(() => fromNavigation(view.commands, label, actions), [view.commands, actions]);
+  const commands = useMemo(
+    () => fromNavigation(view.commands, shellStrings.label, actions),
+    [view.commands, shellStrings.label, actions],
+  );
   const results = useMemo(() => rank(commands, query), [commands, query]);
 
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -39,10 +43,10 @@ export function CommandPalette({
       setActive(0);
     }
   }, [open, initialQuery]);
+  const { paletteResults, paletteEmpty } = shellStrings;
   useEffect(() => {
-    if (open)
-      announce(results.length ? shellStrings.paletteResults(results.length) : shellStrings.paletteEmpty);
-  }, [open, results.length, announce]);
+    if (open) announce(results.length ? paletteResults(results.length) : paletteEmpty);
+  }, [open, results.length, announce, paletteResults, paletteEmpty]);
 
   function execute(command: Command | undefined) {
     if (!command) return;

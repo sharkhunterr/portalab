@@ -2,11 +2,12 @@ import { useLocation } from "react-router";
 import { Button } from "../../design-system/components/Button";
 import { Menu } from "../../design-system/components/Overlays";
 import { usePalette } from "../palette/PaletteContext";
-import { shellStrings } from "../strings";
+import { useShellStrings } from "../strings";
 import { useSlots } from "./providers";
 
 /** Search entry (always present): the real search engine (008) when provided, else the command palette. */
 export function SearchEntry() {
+  const shellStrings = useShellStrings();
   const { search } = useSlots();
   const palette = usePalette();
   return (
@@ -23,6 +24,7 @@ export function SearchEntry() {
 
 /** Assistant entry (always present): degraded, but visible and explained, when unavailable. */
 export function AiEntry() {
+  const shellStrings = useShellStrings();
   const { ai } = useSlots();
   const location = useLocation();
   if (!ai?.available) {
@@ -46,6 +48,7 @@ export function AiEntry() {
 }
 
 export function NotificationEntry() {
+  const shellStrings = useShellStrings();
   const { notifications } = useSlots();
   if (!notifications) return null;
   return (
@@ -78,6 +81,7 @@ export function IdentityMenu({
   onSignOut: () => void;
   onNavigate: (to: string) => void;
 }) {
+  const shellStrings = useShellStrings();
   return (
     <Menu
       label={shellStrings.account}
@@ -85,12 +89,12 @@ export function IdentityMenu({
       items={[
         {
           key: "account",
-          label: shellStrings.labels["nav.account"] ?? "Account",
+          label: shellStrings.label("nav.account"),
           onSelect: () => onNavigate("/account"),
         },
         {
           key: "appearance",
-          label: shellStrings.labels["nav.appearance"] ?? "Appearance",
+          label: shellStrings.label("nav.appearance"),
           onSelect: () => onNavigate("/settings/appearance"),
         },
         { key: "signout", label: shellStrings.signOut, onSelect: onSignOut },

@@ -12,7 +12,20 @@ export default defineConfig({
       "/readyz": "http://localhost:8080",
     },
   },
-  build: { outDir: "dist", sourcemap: true },
+  build: {
+    outDir: "dist",
+    sourcemap: true,
+    chunkSizeWarningLimit: 600, // the shared vendor chunk (React, Radix, TanStack, zod) is ~540 kB
+    rollupOptions: {
+      output: {
+        // third-party code in long-cached chunks, the i18n runtime (react-intl, formatjs) apart (spec 026)
+        manualChunks: (id) => {
+          if (!id.includes("/node_modules/")) return undefined;
+          return /node_modules\/(react-intl|intl-messageformat|@formatjs)\//.test(id) ? "intl" : "vendor";
+        },
+      },
+    },
+  },
   // pre-bundled up front so the dev server never reloads mid-session (stable a11y journeys)
   optimizeDeps: {
     include: [
@@ -22,9 +35,13 @@ export default defineConfig({
       "@radix-ui/react-slot",
       "@radix-ui/react-tabs",
       "@radix-ui/react-tooltip",
+      "@formatjs/icu-messageformat-parser",
+      "@formatjs/icu-messageformat-parser/printer.js",
       "@tanstack/react-query",
       "class-variance-authority",
+      "intl-messageformat",
       "openapi-fetch",
+      "react-intl",
       "zod",
     ],
   },

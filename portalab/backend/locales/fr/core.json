@@ -1,0 +1,10 @@
+{
+  "cancel": "Annuler",
+  "close": "Fermer",
+  "error.generic": "Une erreur est survenue.",
+  "items": "{count, plural, =0 {Aucun élément} one {# élément} other {# éléments}}",
+  "loading": "Chargement",
+  "notTranslated": "Non disponible dans votre langue — affiché en {language}.",
+  "retry": "Réessayer",
+  "save": "Enregistrer"
+}

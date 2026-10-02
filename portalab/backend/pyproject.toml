@@ -15,6 +15,8 @@ dependencies = [
     "cryptography>=43",
     "argon2-cffi>=23.1",
     "pillow>=11",
+    "babel>=2.16",
+    "tzdata>=2025.2",
 ]
 
 [project.scripts]

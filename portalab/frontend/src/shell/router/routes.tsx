@@ -22,6 +22,7 @@ const PrivacyAdmin = lazy(() => import("../../pages/admin/PrivacyAdminRoute"));
 const Audit = lazy(() => import("../../pages/admin/AuditRoute"));
 const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
+const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
 
 const h = (handle: RouteHandle) => handle;
@@ -37,6 +38,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         { index: true, element: <Home /> },
         { path: "account", element: <Account />, handle: h({ crumb: "Account" }) },
         { path: "settings/appearance", element: <Appearance />, handle: h({ crumb: "Appearance" }) },
+        { path: "settings/language", element: <Language />, handle: h({ crumb: "Language & region" }) },
         { path: "privacy", element: <Privacy />, handle: h({ crumb: "Privacy" }) },
         {
           path: "services",

@@ -25,6 +25,7 @@ from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.events.module import EventsModule
 from portalab.modules.events.publisher.publisher import EventStorePublisher
 from portalab.modules.health.module import HealthModule
+from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.observability.module import ObservabilityModule
@@ -90,6 +91,7 @@ class Platform:
     observability: ObservabilityModule
     ui: UiModule
     shell: ShellModule
+    i18n: I18nModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -154,6 +156,10 @@ def wire_platform(
     administration.registry.register_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     shell = ShellModule(database, events, authz.engine, capabilities)
     shell.register()
+    i18n = I18nModule(database, events, authz.audit, capabilities)
+    i18n.register()
+    for key, validator in i18n.validators.table().items():
+        administration.registry.register_validator(key, validator, owner="module:i18n")
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -192,6 +198,7 @@ def wire_platform(
         observability,
         ui,
         shell,
+        i18n,
         seeds,
     )
     from portalab.app.config_bindings import bind

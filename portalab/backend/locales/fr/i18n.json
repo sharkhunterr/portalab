@@ -1,0 +1,13 @@
+{
+  "auto": "Automatique",
+  "firstDayOfWeek": "Premier jour de la semaine",
+  "h12": "12 heures",
+  "h23": "24 heures",
+  "hourCycle": "Horloge",
+  "language": "Langue de l'interface",
+  "locale": "Formats (dates, nombres)",
+  "preview": "Aperçu : {date}",
+  "retained": "Votre choix ({language}) est conservé et s'appliquera de nouveau dès qu'il sera activé.",
+  "timeZone": "Fuseau horaire",
+  "title": "Langue et région"
+}

@@ -2,7 +2,7 @@ import { Component, type ErrorInfo, type ReactNode, Suspense } from "react";
 import { isRouteErrorResponse, Link, useMatches, useRouteError } from "react-router";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { ApiError } from "../../state/regions";
-import { shellStrings } from "../strings";
+import { useShellStrings } from "../strings";
 import type { RouteHandle } from "./handle";
 
 /**
@@ -23,6 +23,7 @@ export function stateFor(error: unknown, existenceSensitive: boolean): RouteStat
 }
 
 export function RouteStateView({ state, onRetry }: { state: RouteState; onRetry?: () => void }) {
+  const shellStrings = useShellStrings();
   if (state === "not-available") {
     return (
       <div>

@@ -38,6 +38,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
+        "key": "i18n.language",
+        "owner": "module:i18n",
+        "kind": "entry",
+        "label_key": "nav.language",
+        "icon": "globe",
+        "route": "/settings/language",
+        "group": "me",
+        "order_hint": 25,
+        "required_permission": "users.self.manage",
+    },
+    {
         "key": "privacy.center",
         "owner": "module:privacy",
         "kind": "entry",

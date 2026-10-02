@@ -9,7 +9,7 @@ import { RegionBoundary } from "./router/RouteBoundary";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
 import { AiEntry, HelpEntry, IdentityMenu, NotificationEntry, SearchEntry } from "./slots/Entries";
 import { GlobalStatusBanner } from "./status/GlobalStatusBanner";
-import { shellStrings } from "./strings";
+import { useShellStrings } from "./strings";
 
 /**
  * Persistent shell (spec 004 T017; R1, FR-001..004): one environment for every module — header (search,
@@ -32,6 +32,7 @@ export function AppShell({
   sidebarCollapsed = false,
   children,
 }: AppShellProps) {
+  const shellStrings = useShellStrings();
   const navigate = useNavigate();
   const [palette, setPalette] = useState<{ open: boolean; query: string }>({ open: false, query: "" });
   const [helpOpen, setHelpOpen] = useState(false);

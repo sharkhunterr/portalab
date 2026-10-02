@@ -211,6 +211,30 @@ def _cmd_audit_verify(args: argparse.Namespace) -> int:
     return asyncio.run(_audit_verify(args))
 
 
+def _cmd_i18n(args: argparse.Namespace) -> int:
+    """Catalog tooling (spec 026 T010): check ICU validity and parity, extract used keys, pseudo-locales."""
+    import json
+    from pathlib import Path
+
+    from portalab.modules.i18n.catalog.service import LOCALES_DIR
+    from portalab.modules.i18n.tools.check import check, extract, pseudo
+
+    locales = Path(args.locales) if args.locales else LOCALES_DIR
+    if args.i18n_command == "check":
+        problems = check(locales)
+        for problem in problems:
+            sys.stdout.write(f"{problem}\n")
+        sys.stdout.write(f"i18n check: {len(problems)} problem(s)\n")
+        return 1 if problems else 0
+    if args.i18n_command == "extract":
+        roots = [Path(p) for p in args.sources]
+        found = {ns: sorted(keys) for ns, keys in extract(roots).items()}
+        sys.stdout.write(json.dumps(found, indent=2, ensure_ascii=False) + "\n")
+        return 0
+    sys.stdout.write(json.dumps(pseudo(locales, args.code), indent=2, ensure_ascii=False) + "\n")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="portalab", description="Portalab — personal extensible portal")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -247,6 +271,21 @@ def build_parser() -> argparse.ArgumentParser:
     restore_cmd.add_argument("--pg-restore", default=None)
     restore_cmd.add_argument("--yes", action="store_true")
     restore_cmd.set_defaults(func=_cmd_restore)
+    i18n = sub.add_parser("i18n", help="translation catalog tooling").add_subparsers(
+        dest="i18n_command", required=True
+    )
+    for name, help_text in (
+        ("check", "validate catalogs (ICU syntax, placeholder parity, missing/unused keys)"),
+        ("extract", "list keys used in source files"),
+        ("pseudo", "print a pseudo-locale catalog (en-XA, ar-XB)"),
+    ):
+        command = i18n.add_parser(name, help=help_text)
+        command.add_argument("--locales", default=None)
+        if name == "extract":
+            command.add_argument("sources", nargs="+")
+        if name == "pseudo":
+            command.add_argument("--code", default="en-XA", choices=["en-XA", "ar-XB"])
+        command.set_defaults(func=_cmd_i18n)
     openapi = sub.add_parser("openapi", help="export the OpenAPI schema")
     openapi.add_argument("--output", "-o", default="-")
     openapi.set_defaults(func=_cmd_openapi)
