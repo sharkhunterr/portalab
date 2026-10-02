@@ -10,7 +10,7 @@
   },
   "overrides": [
     {
-      "includes": ["src/design-system/tokens.css"],
+      "includes": ["src/design-system/tokens/tokens.css"],
       "linter": {
         "rules": {
           "complexity": { "noImportantStyles": "off" }

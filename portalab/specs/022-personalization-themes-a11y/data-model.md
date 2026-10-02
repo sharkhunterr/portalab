@@ -19,3 +19,11 @@ Additional user key: `ui.campaignThemes` (`allow|ignore`, default `allow`) — c
 
 ## Retention / privacy
 Preferences are `preference` class personal data (erased/exported by 020's participant); themes are public configuration.
+
+## Implementation notes (2026-10-03)
+- `ui.themes` also stores `owner` (owner-tagged withdrawal, F20). Built-ins are seeded from
+  `modules/ui/themes/builtin/*.json` (kept identical to the frontend copies by a test).
+- User preference keys are declared at global scope with `user_overridable=True` (defaults = portal
+  defaults); `ui.theme` is checked by a dynamic validator against the enabled + allowed catalog.
+- UI events are derived from `admin.config_changed` by the `ui.preference_events` consumer; payload
+  `{setting, change_seq}` only.

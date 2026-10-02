@@ -1717,6 +1717,51 @@
         "title": "TestIn",
         "type": "object"
       },
+      "ThemeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "definition": {
+            "additionalProperties": true,
+            "title": "Definition",
+            "type": "object"
+          }
+        },
+        "required": [
+          "definition"
+        ],
+        "title": "ThemeIn",
+        "type": "object"
+      },
+      "ThemePatch": {
+        "additionalProperties": false,
+        "properties": {
+          "definition": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Definition"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          }
+        },
+        "title": "ThemePatch",
+        "type": "object"
+      },
       "ToggleIn": {
         "additionalProperties": false,
         "properties": {
@@ -3555,6 +3600,212 @@
         "summary": "Transfer Admin",
         "tags": [
           "identity-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/ui/themes": {
+      "get": {
+        "operationId": "all_themes_api_v1_admin_ui_themes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response All Themes Api V1 Admin Ui Themes Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "All Themes",
+        "tags": [
+          "ui"
+        ]
+      },
+      "post": {
+        "operationId": "register_theme_api_v1_admin_ui_themes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Register Theme Api V1 Admin Ui Themes Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Register Theme",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/admin/ui/themes/check": {
+      "post": {
+        "description": "Dry run: validate and compute the floor report without registering.",
+        "operationId": "check_theme_api_v1_admin_ui_themes_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Theme Api V1 Admin Ui Themes Check Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Check Theme",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/admin/ui/themes/{key}": {
+      "patch": {
+        "operationId": "update_theme_api_v1_admin_ui_themes__key__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Theme Api V1 Admin Ui Themes  Key  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Theme",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/admin/ui/themes/{key}/floor-report": {
+      "get": {
+        "operationId": "floor_api_v1_admin_ui_themes__key__floor_report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Floor Api V1 Admin Ui Themes  Key  Floor Report Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Floor",
+        "tags": [
+          "ui"
         ]
       }
     },
@@ -6806,6 +7057,29 @@
         "summary": "Subject History",
         "tags": [
           "events"
+        ]
+      }
+    },
+    "/api/v1/ui/themes": {
+      "get": {
+        "operationId": "themes_api_v1_ui_themes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Themes Api V1 Ui Themes Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Themes",
+        "tags": [
+          "ui"
         ]
       }
     },

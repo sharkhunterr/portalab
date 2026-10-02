@@ -1,0 +1,771 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "key": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,47}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "colorScheme": {
+      "type": "string",
+      "enum": [
+        "light",
+        "dark"
+      ]
+    },
+    "colors": {
+      "type": "object",
+      "properties": {
+        "surface": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "surfaceRaised": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "textMuted": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "border": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "accent": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "accentContrast": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "focus": {
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "surface",
+        "surfaceRaised",
+        "text",
+        "textMuted",
+        "border",
+        "accent",
+        "accentContrast",
+        "focus"
+      ],
+      "additionalProperties": false
+    },
+    "states": {
+      "type": "object",
+      "properties": {
+        "loading": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "available": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "partial": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "stale": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "unavailable": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "maintenance": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "unauthorized": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "no-data": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        },
+        "syncing": {
+          "type": "object",
+          "properties": {
+            "fg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "bg": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "spinner",
+                "check",
+                "half",
+                "clock",
+                "warning",
+                "blocked",
+                "wrench",
+                "lock",
+                "lines",
+                "sync"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9_.-]{0,127}$"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "display": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "block",
+                "none"
+              ]
+            }
+          },
+          "required": [
+            "fg",
+            "bg"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "loading",
+        "available",
+        "partial",
+        "stale",
+        "error",
+        "unavailable",
+        "maintenance",
+        "unauthorized",
+        "no-data",
+        "syncing"
+      ],
+      "additionalProperties": false
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "fontFamily": {
+          "type": "string",
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9 ,\"'-]+$"
+        },
+        "scale": {
+          "type": "object",
+          "properties": {
+            "sm": {
+              "type": "number",
+              "minimum": 0.75,
+              "maximum": 1.25
+            },
+            "md": {
+              "type": "number",
+              "minimum": 0.875,
+              "maximum": 1.5
+            },
+            "lg": {
+              "type": "number",
+              "maximum": 2.5
+            },
+            "xl": {
+              "type": "number",
+              "maximum": 3.5
+            }
+          },
+          "required": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "radii": {
+      "type": "object",
+      "properties": {
+        "sm": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "md": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        }
+      },
+      "required": [
+        "sm",
+        "md"
+      ],
+      "additionalProperties": false
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "fastMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "normalMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "fastMs",
+        "normalMs"
+      ],
+      "additionalProperties": false
+    },
+    "icons": {
+      "type": "object",
+      "properties": {
+        "set": {
+          "type": "string",
+          "enum": [
+            "default",
+            "outline"
+          ]
+        }
+      },
+      "required": [
+        "set"
+      ],
+      "additionalProperties": false
+    },
+    "background": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^asset:[a-z0-9][a-z0-9._/-]{0,127}$"
+            },
+            {
+              "type": "string",
+              "maxLength": 200000,
+              "pattern": "^data:image\\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$"
+            }
+          ]
+        },
+        "fallback": {
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "fallback"
+      ],
+      "additionalProperties": false
+    },
+    "sounds": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": [
+          "notification",
+          "alert",
+          "success"
+        ]
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^asset:[a-z0-9][a-z0-9._/-]{0,127}$"
+      },
+      "required": [
+        "notification",
+        "alert",
+        "success"
+      ]
+    },
+    "notification": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "enum": [
+            "top-end",
+            "top-start",
+            "bottom-end",
+            "bottom-start"
+          ]
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 60
+        },
+        "style": {
+          "type": "string",
+          "enum": [
+            "toast",
+            "banner"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "key",
+    "name",
+    "colorScheme",
+    "colors",
+    "states"
+  ],
+  "additionalProperties": false
+}

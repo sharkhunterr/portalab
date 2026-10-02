@@ -1,8 +1,7 @@
 @import "tailwindcss";
-@import "./design-system/tokens.css";
-@import "./design-system/themes/light.css";
-@import "./design-system/themes/dark.css";
+@import "./design-system/tokens/tokens.css";
 @import "./design-system/functional-state.css";
+@import "./design-system/components/components.css";
 @import "./features/auth/auth.css";
 
 /* Tailwind utilities resolve to design tokens, so utilities follow the active theme. */

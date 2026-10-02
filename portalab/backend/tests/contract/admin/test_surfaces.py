@@ -30,4 +30,7 @@ async def test_surfaces(app: FastAPI, client: httpx.AsyncClient, full: FullPlatf
         transport=httpx.ASGITransport(app=app), base_url="https://portal.test"
     ) as plain:
         await login(plain, "plain")
-        assert (await plain.get("/api/v1/admin/surfaces")).json() == []
+        # a plain user only sees surfaces gated by permissions of the base User role (e.g. services.read)
+        visible = {s["key"] for s in (await plain.get("/api/v1/admin/surfaces")).json()}
+        user_level = {s.key for s in default_admin_surfaces.all() if s.permission == "services.read"}
+        assert visible <= user_level

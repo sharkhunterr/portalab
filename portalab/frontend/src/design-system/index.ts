@@ -1,0 +1,21 @@
+/** Design system public surface (spec 022) — the only UI plugins may build on (023). */
+export { AnnounceProvider, useAnnounce } from "./a11y/Announce";
+export { normalize, type Shortcut, ShortcutRegistry, shortcuts } from "./a11y/KeyboardShortcuts";
+export { PreferencesProvider, usePreferences } from "./a11y/PreferencesProvider";
+export { DEFAULT_POLICY, DEFAULT_PREFERENCES, type UiPolicy, type UiPreferences } from "./a11y/preferences";
+export { Button, Link } from "./components/Button";
+export { Avatar, Badge, Card, EntityCard, Panel, Progress, Timeline } from "./components/Content";
+export { CheckboxField, SelectField, TextField } from "./components/Field";
+export { Container, Grid, List, Stack, Table, useBreakpoint } from "./components/Layout";
+export { Notification, NotificationArea, useNotify } from "./components/Notification";
+export { Dialog, Drawer, Menu, Popover, Tooltip } from "./components/Overlays";
+export { PolicyField } from "./components/PolicyField";
+export { Tabs } from "./components/Tabs";
+export { DirectionProvider, useDirection } from "./rtl/DirectionProvider";
+export { SoundService, sound } from "./sound/SoundService";
+export { FunctionalState } from "./state/FunctionalState";
+export { FUNCTIONAL_STATES, STATE_LABELS } from "./state/stateMap";
+export { BUILTIN_THEMES } from "./themes/builtin";
+export { floorReport } from "./themes/floor";
+export { parseTheme, type ThemeDefinition } from "./themes/schema";
+export { ThemeProvider, useTheme } from "./themes/ThemeProvider";

@@ -13,6 +13,21 @@ export default defineConfig({
     },
   },
   build: { outDir: "dist", sourcemap: true },
+  // pre-bundled up front so the dev server never reloads mid-session (stable a11y journeys)
+  optimizeDeps: {
+    include: [
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+      "@tanstack/react-query",
+      "class-variance-authority",
+      "openapi-fetch",
+      "zod",
+    ],
+  },
   test: {
     environment: "jsdom",
     globals: false,

@@ -1,0 +1,32 @@
+import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import { api } from "../../api/client";
+import { PreferencesProvider } from "../../design-system/a11y/PreferencesProvider";
+import { NotificationArea } from "../../design-system/components/Notification";
+import { ThemeProvider } from "../../design-system/themes/ThemeProvider";
+import { preferenceBackend } from "./backend";
+
+/** Signed-in presentation root: account preferences (synced), the allowed theme catalog, notifications. */
+function Themed({ children }: { children: ReactNode }) {
+  const catalog = useQuery({
+    queryKey: ["ui", "themes"],
+    queryFn: async () =>
+      (
+        (await api.GET("/api/v1/ui/themes")).data as unknown as { themes: Array<{ definition: unknown }> }
+      ).themes.map((t) => t.definition),
+    staleTime: 5 * 60_000,
+  });
+  return (
+    <ThemeProvider themes={catalog.data ?? []}>
+      <NotificationArea>{children}</NotificationArea>
+    </ThemeProvider>
+  );
+}
+
+export function AppearanceRoot({ children }: { children: ReactNode }) {
+  return (
+    <PreferencesProvider backend={preferenceBackend}>
+      <Themed>{children}</Themed>
+    </PreferencesProvider>
+  );
+}

@@ -29,6 +29,7 @@ from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
+from portalab.modules.ui.module import UiModule
 
 
 class DeferredAuthorizer:
@@ -86,6 +87,7 @@ class Platform:
     connectors: ConnectorsModule
     health: HealthModule
     observability: ObservabilityModule
+    ui: UiModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -145,6 +147,9 @@ def wire_platform(
     health.register_capabilities()
     observability = ObservabilityModule(database, events, authz.audit, capabilities)
     observability.register_capabilities()
+    ui = UiModule(database, events, authz.audit, capabilities)
+    ui.register()
+    administration.registry.register_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -173,7 +178,7 @@ def wire_platform(
         seeds.extend(health.register_jobs(jobs))
         seeds.extend(observability.register_jobs(jobs))
     platform = Platform(
-        authz, privacy, administration, identity, events_module, connectors, health, observability, seeds
+        authz, privacy, administration, identity, events_module, connectors, health, observability, ui, seeds
     )
     from portalab.app.config_bindings import bind
 

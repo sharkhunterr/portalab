@@ -1,6 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { AnnounceProvider } from "./design-system/a11y/Announce";
+import { DirectionProvider } from "./design-system/rtl/DirectionProvider";
+import { applyFirstPaint } from "./design-system/themes/firstPaint";
 import {
   ConfigEditor,
   ControlCenter,
@@ -9,6 +12,7 @@ import {
   ServicesAdmin,
   Toggles,
 } from "./features/admin";
+import { AppearanceRoot, AppearanceSettings } from "./features/appearance";
 import { AccountPage, AuthGate, SignOutButton } from "./features/auth";
 import { AuthzAdminPage, useHasPermission } from "./features/authz";
 import { AuditViewer, PoliciesAdmin, PrivacyCenter } from "./features/privacy";
@@ -52,19 +56,42 @@ if (!container) {
   throw new Error("missing #root element");
 }
 
-createRoot(container).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AuthGate>
-        {() => (
-          <AppShell navigation={<SignOutButton />}>
-            <AccountPage />
-            <PrivacyCenter />
-            <ServicesSection />
-            <AdminSections />
-          </AppShell>
-        )}
-      </AuthGate>
-    </QueryClientProvider>
-  </StrictMode>,
-);
+applyFirstPaint();
+
+async function renderGallery(): Promise<boolean> {
+  if (!import.meta.env.DEV || window.location.pathname !== "/dev/gallery") return false;
+  const { Gallery } = await import("./features/dev/gallery/Gallery");
+  createRoot(container as HTMLElement).render(
+    <StrictMode>
+      <Gallery />
+    </StrictMode>,
+  );
+  return true;
+}
+
+void renderGallery().then((gallery) => {
+  if (gallery) return;
+  createRoot(container as HTMLElement).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <DirectionProvider language="en">
+          <AnnounceProvider>
+            <AuthGate>
+              {() => (
+                <AppearanceRoot>
+                  <AppShell navigation={<SignOutButton />}>
+                    <AccountPage />
+                    <AppearanceSettings />
+                    <PrivacyCenter />
+                    <ServicesSection />
+                    <AdminSections />
+                  </AppShell>
+                </AppearanceRoot>
+              )}
+            </AuthGate>
+          </AnnounceProvider>
+        </DirectionProvider>
+      </QueryClientProvider>
+    </StrictMode>,
+  );
+});

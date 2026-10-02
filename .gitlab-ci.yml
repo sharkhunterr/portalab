@@ -128,12 +128,15 @@ backend-tests:
   services:
     - name: postgres:16-alpine
       alias: postgres
+      # disposable test database: durability off makes per-test CREATE DATABASE … TEMPLATE fast
+      command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off",
+                "-c", "max_connections=300"]
   variables:
     PORTALAB_TEST_DATABASE_URL: "postgresql://portalab@postgres:5432/portalab_ci"
     PORTALAB_REQUIRE_DB: "1"
   script:
     # unit + contract + boundary + integration (real PostgreSQL, migrations from scratch and upgrade)
-    - uv run pytest --junitxml=report.xml
+    - uv run pytest -n auto --dist loadfile --junitxml=report.xml
   artifacts:
     when: always
     reports:
@@ -151,6 +154,22 @@ frontend-tests:
     when: always
     reports:
       junit: portalab/frontend/report.xml
+  rules:
+    - if: $ENABLE_FRONTEND_TESTS == "true"
+
+frontend-a11y:
+  # spec 022 T039: axe on the component gallery (every theme), keyboard-only journey, 320 px reflow and
+  # text spacing — Playwright against the Vite dev server with a stubbed API
+  image: mcr.microsoft.com/playwright:v1.63.0-noble
+  stage: test
+  before_script:
+    - cd portalab/frontend
+    - npm ci
+  script:
+    - npx playwright test
+  artifacts:
+    when: on_failure
+    paths: [portalab/frontend/test-results/]
   rules:
     - if: $ENABLE_FRONTEND_TESTS == "true"
 

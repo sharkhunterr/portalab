@@ -25,10 +25,12 @@ plugins/{available,installed}/ · examples/plugins/
 
 ```bash
 # backend (Python 3.12, uv) — integration tests need PostgreSQL:
-#   docker run -d --name portalab-test-pg -e POSTGRES_USER=portalab -e POSTGRES_PASSWORD=portalab_test \
-#     -p 127.0.0.1:55432:5432 postgres:16-alpine
+#   docker run -d --name portalab-test-pg --tmpfs /var/lib/postgresql/data:rw,size=2g \
+#     -e POSTGRES_USER=portalab -e POSTGRES_PASSWORD=portalab_test -p 127.0.0.1:55432:5432 postgres:16-alpine \
+#     -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c max_connections=300   # disposable, in RAM
 #   export PORTALAB_TEST_DATABASE_URL=postgresql://portalab:portalab_test@127.0.0.1:55432/postgres
-cd backend && uv sync && uv run pytest
+cd backend && uv sync && uv run pytest -n auto --dist loadfile   # full suite in parallel (~1 min)
+uv run pytest tests/<area>/<module>                              # targeted run while developing
 uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run lint-imports --config importlinter.ini
 uv run portalab migrate | serve | worker | openapi -o openapi.json   # bootstrap settings via env/_FILE
 

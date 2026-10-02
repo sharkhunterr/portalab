@@ -97,3 +97,60 @@ body {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: var(--focus-ring-offset);
 }
+
+/* --- spec 022: user preferences applied on <html> after the theme (they always win) --------------- */
+:root {
+  --space-unit: 1; /* density multiplier (spacing only, never content) */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+
+[data-density="compact"] {
+  --space-unit: 0.75;
+}
+[data-density="spacious"] {
+  --space-unit: 1.35;
+}
+:root,
+[data-density] {
+  --space-1: calc(0.25rem * var(--space-unit));
+  --space-2: calc(0.5rem * var(--space-unit));
+  --space-3: calc(0.75rem * var(--space-unit));
+  --space-4: calc(1rem * var(--space-unit));
+  --space-6: calc(1.5rem * var(--space-unit));
+}
+
+/* Explicit or forced reduced motion: same effect as the OS setting (content is preserved). */
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* High contrast: thicker focus ring and visible borders whatever the theme. */
+[data-contrast="high"] {
+  --focus-ring-width: 4px;
+}
+[data-contrast="high"] .functional-state {
+  border-width: 2px;
+}
+
+/* WCAG 2.2 text spacing: layouts must tolerate user overrides of spacing without clipping. */
+.ds-reflow {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

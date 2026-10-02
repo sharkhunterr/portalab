@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "key": "high-contrast",
+  "name": "High contrast",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#000000",
+    "surfaceRaised": "#0a0a0a",
+    "text": "#ffffff",
+    "textMuted": "#f0f0f0",
+    "border": "#ffffff",
+    "accent": "#ffff00",
+    "accentContrast": "#000000",
+    "focus": "#00ffff"
+  },
+  "states": {
+    "loading": {
+      "fg": "#ffffff",
+      "bg": "#000000",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#7dff9a",
+      "bg": "#000000",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd54a",
+      "bg": "#000000",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#ffe680",
+      "bg": "#000000",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ff8a8a",
+      "bg": "#000000",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#ffb3c7",
+      "bg": "#000000",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#d2b8ff",
+      "bg": "#000000",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#ffa6d9",
+      "bg": "#000000",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#ffffff",
+      "bg": "#000000",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#8fd3ff",
+      "bg": "#000000",
+      "icon": "sync"
+    }
+  },
+  "motion": {
+    "fastMs": 0,
+    "normalMs": 0
+  }
+}

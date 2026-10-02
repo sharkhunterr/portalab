@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "key": "dark",
+  "name": "Dark",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#121418",
+    "surfaceRaised": "#1c1f26",
+    "text": "#eceef2",
+    "textMuted": "#b4bac6",
+    "border": "#3a404c",
+    "accent": "#8fb0ff",
+    "accentContrast": "#0b1020",
+    "focus": "#8fb0ff"
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#262b35",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#14291e",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2f2410",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2b2412",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#3a1418",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2d1a20",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#231a3a",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#331626",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#22262e",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#12273a",
+      "icon": "sync"
+    }
+  }
+}
