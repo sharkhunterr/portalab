@@ -25,6 +25,7 @@ PUBLIC = {
     "/api/v1/auth/register",
     "/api/v1/auth/verify",
     "/api/v1/auth/deletion/cancel",
+    "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
 }
 USER_ROLE = {
     key

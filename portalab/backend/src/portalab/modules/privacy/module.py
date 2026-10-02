@@ -4,6 +4,7 @@ aggregation guard; kernel retention targets and the privacy permissions are decl
 from datetime import timedelta
 from typing import Any
 
+from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.aggregation import CAPABILITY as AGGREGATION_GUARD
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditSink
@@ -55,6 +56,9 @@ class PrivacyModule:
 
     def register_capabilities(self) -> None:
         self.capabilities.provide(AGGREGATION_GUARD, self.guard, instance_ref="privacy", owner=OWNER)
+        default_admin_surfaces.register(
+            AdminSurface("privacy", "admin.surface.privacy", "/admin/privacy", "privacy.manage", OWNER)
+        )
 
     def register_jobs(self, registry: JobRegistry) -> list[Any]:
         async def purge(payload: dict[str, Any]) -> None:

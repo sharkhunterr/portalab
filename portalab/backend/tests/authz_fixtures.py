@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from sqlalchemy import text
@@ -18,6 +19,9 @@ from portalab.modules.authz.module import AuthzModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.settings import IdentityConfig
 from tests.identity_fakes import FAST_ARGON2
+
+if TYPE_CHECKING:
+    from portalab.modules.administration.module import AdministrationModule
 
 INSERT_USER = text(
     "INSERT INTO identity.users (id, login, display_name, display_name_key, state, transition_seq, "
@@ -89,3 +93,23 @@ def plugin(user_id: UUID) -> Principal:
 
 
 SYSTEM_ACTOR = Principal(channel="system")
+
+
+TEST_APPLICATION_KEY = b"test-only-application-key-0123456789abcdef"  # not a real secret
+
+
+def make_administration(platform: AuthzPlatform) -> "AdministrationModule":
+    from portalab.core.secrets import SecretBox
+    from portalab.modules.administration.module import AdministrationModule
+
+    administration = AdministrationModule(
+        platform.database,
+        platform.authz.engine.events,
+        platform.authz.audit,
+        platform.identity.capabilities,
+        platform.authz.engine,
+        SecretBox(TEST_APPLICATION_KEY),
+        clock=platform.authz.clock,
+    )
+    administration.register_capabilities()
+    return administration

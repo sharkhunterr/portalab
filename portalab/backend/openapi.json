@@ -122,6 +122,71 @@
         "title": "AuditPage",
         "type": "object"
       },
+      "ChangeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "maxLength": 128,
+            "minLength": 3,
+            "title": "Key",
+            "type": "string"
+          },
+          "scope": {
+            "default": "global",
+            "enum": [
+              "global",
+              "module",
+              "plugin"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "scope_ref": {
+            "default": "",
+            "maxLength": 64,
+            "title": "Scope Ref",
+            "type": "string"
+          },
+          "unset": {
+            "default": false,
+            "title": "Unset",
+            "type": "boolean"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "ChangeIn",
+        "type": "object"
+      },
+      "ChangesIn": {
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/ChangeIn"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "title": "Changes",
+            "type": "array"
+          },
+          "reason": {
+            "default": "",
+            "maxLength": 256,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "changes"
+        ],
+        "title": "ChangesIn",
+        "type": "object"
+      },
       "CredentialsConfirmation": {
         "additionalProperties": false,
         "properties": {
@@ -526,6 +591,29 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "ImportIn": {
+        "additionalProperties": false,
+        "properties": {
+          "accept_conflicts": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Accept Conflicts",
+            "type": "array"
+          },
+          "document": {
+            "additionalProperties": true,
+            "title": "Document",
+            "type": "object"
+          }
+        },
+        "required": [
+          "document"
+        ],
+        "title": "ImportIn",
+        "type": "object"
+      },
       "LoginRequest": {
         "additionalProperties": false,
         "properties": {
@@ -760,80 +848,6 @@
           "enabled"
         ],
         "title": "PermissionOut",
-        "type": "object"
-      },
-      "PolicyIn": {
-        "additionalProperties": false,
-        "properties": {
-          "datum_class": {
-            "maxLength": 64,
-            "minLength": 1,
-            "title": "Datum Class",
-            "type": "string"
-          },
-          "ends_at": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Ends At"
-          },
-          "level": {
-            "anyOf": [
-              {
-                "enum": [
-                  "public",
-                  "community",
-                  "leaderboard",
-                  "private"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Level"
-          },
-          "mode": {
-            "enum": [
-              "user_choice",
-              "force_visible",
-              "force_private"
-            ],
-            "title": "Mode",
-            "type": "string"
-          },
-          "reason": {
-            "maxLength": 256,
-            "minLength": 1,
-            "title": "Reason",
-            "type": "string"
-          },
-          "subject_user_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Subject User Id"
-          }
-        },
-        "required": [
-          "datum_class",
-          "mode",
-          "reason"
-        ],
-        "title": "PolicyIn",
         "type": "object"
       },
       "PolicyOut": {
@@ -1173,6 +1187,22 @@
         "title": "RegisterRequest",
         "type": "object"
       },
+      "ReopenIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ReopenIn",
+        "type": "object"
+      },
       "RoleAssignment": {
         "additionalProperties": false,
         "properties": {
@@ -1298,6 +1328,26 @@
           "expires_at"
         ],
         "title": "SessionInfo",
+        "type": "object"
+      },
+      "ToggleIn": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "reason": {
+            "default": "",
+            "maxLength": 256,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "ToggleIn",
         "type": "object"
       },
       "UserList": {
@@ -1482,6 +1532,175 @@
         ],
         "title": "VerifyRequest",
         "type": "object"
+      },
+      "WizardIn": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "login": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Login",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          },
+          "settings": {
+            "additionalProperties": true,
+            "title": "Settings",
+            "type": "object"
+          },
+          "steps": {
+            "additionalProperties": true,
+            "title": "Steps",
+            "type": "object"
+          }
+        },
+        "required": [
+          "login",
+          "password"
+        ],
+        "title": "WizardIn",
+        "type": "object"
+      },
+      "portalab__modules__administration__api__routes__PolicyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "bounds": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bounds"
+          },
+          "key": {
+            "maxLength": 128,
+            "minLength": 3,
+            "title": "Key",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "default",
+              "lock",
+              "bound"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "mode"
+        ],
+        "title": "PolicyIn",
+        "type": "object"
+      },
+      "portalab__modules__privacy__api__routes__PolicyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "datum_class": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Datum Class",
+            "type": "string"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "public",
+                  "community",
+                  "leaderboard",
+                  "private"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "mode": {
+            "enum": [
+              "user_choice",
+              "force_visible",
+              "force_private"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "subject_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject User Id"
+          }
+        },
+        "required": [
+          "datum_class",
+          "mode",
+          "reason"
+        ],
+        "title": "PolicyIn",
+        "type": "object"
       }
     }
   },
@@ -1491,6 +1710,500 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/admin/config": {
+      "get": {
+        "operationId": "get_config_api_v1_admin_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Config Api V1 Admin Config Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Config",
+        "tags": [
+          "administration"
+        ]
+      },
+      "put": {
+        "operationId": "apply_config_api_v1_admin_config_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Apply Config Api V1 Admin Config Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply Config",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/config/export": {
+      "post": {
+        "operationId": "export_config_api_v1_admin_config_export_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Export Config Api V1 Admin Config Export Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Export Config",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/config/import": {
+      "post": {
+        "operationId": "import_config_api_v1_admin_config_import_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Config Api V1 Admin Config Import Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import Config",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/config/validate": {
+      "post": {
+        "operationId": "validate_config_api_v1_admin_config_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Validate Config Api V1 Admin Config Validate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validate Config",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/first-run": {
+      "get": {
+        "operationId": "first_run_status_api_v1_admin_first_run_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response First Run Status Api V1 Admin First Run Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "First Run Status",
+        "tags": [
+          "administration"
+        ]
+      },
+      "post": {
+        "description": "Public only while the portal has no Admin; when reopened later, it needs ``configuration.manage``.",
+        "operationId": "first_run_api_v1_admin_first_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WizardIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response First Run Api V1 Admin First Run Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "410": {
+            "description": "completed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "First Run",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/first-run/reopen": {
+      "post": {
+        "operationId": "reopen_first_run_api_v1_admin_first_run_reopen_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReopenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reopen First Run",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/overview": {
+      "get": {
+        "operationId": "overview_api_v1_admin_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Overview Api V1 Admin Overview Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Overview",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/policies": {
+      "post": {
+        "operationId": "apply_policy_api_v1_admin_policies_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/portalab__modules__administration__api__routes__PolicyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Apply Policy Api V1 Admin Policies Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply Policy",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/policies/{policy_id}": {
+      "delete": {
+        "operationId": "remove_policy_api_v1_admin_policies__policy_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "policy_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Policy Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Policy",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/surfaces": {
+      "get": {
+        "operationId": "surfaces_api_v1_admin_surfaces_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "title": "Response Surfaces Api V1 Admin Surfaces Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Surfaces",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/toggles/{kind}/{ref}": {
+      "post": {
+        "operationId": "toggle_api_v1_admin_toggles__kind___ref__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "module",
+                "plugin",
+                "connector",
+                "service",
+                "automation"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Toggle Api V1 Admin Toggles  Kind   Ref  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Toggle",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
     "/api/v1/admin/transfer": {
       "post": {
         "operationId": "transfer_admin_api_v1_admin_transfer_post",
@@ -2681,6 +3394,72 @@
         ]
       }
     },
+    "/api/v1/me/preferences": {
+      "get": {
+        "operationId": "my_preferences_api_v1_me_preferences_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Preferences Api V1 Me Preferences Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Preferences",
+        "tags": [
+          "administration"
+        ]
+      },
+      "put": {
+        "operationId": "set_my_preferences_api_v1_me_preferences_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Body",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set My Preferences Api V1 Me Preferences Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set My Preferences",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
     "/api/v1/me/privacy": {
       "get": {
         "operationId": "my_privacy_api_v1_me_privacy_get",
@@ -2885,7 +3664,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PolicyIn"
+                "$ref": "#/components/schemas/portalab__modules__privacy__api__routes__PolicyIn"
               }
             }
           },

@@ -18,4 +18,7 @@
 | POST `/admin/policies`, DELETE `/admin/policies/{id}` | `configuration.manage` (sensitive) |
 | POST `/admin/toggles/{kind}/{ref}` | `modules.manage` / `plugins.manage` / `connectors.manage` (sensitive, audited) |
 | POST `/admin/config/export`, `/import` | `configuration.manage` (sensitive) |
-| POST `/admin/first-run` | only before completion; creates sole Admin via `IdentityBootstrap` |
+| GET/POST `/admin/first-run` | public until the sole Admin exists; once reopened (POST `/admin/first-run/reopen`, `configuration.manage`, audited) it runs as that Admin; 410 when completed |
+| GET `/admin/surfaces` | `users.self.manage` (lists only the surfaces the caller may use) |
+| GET `/admin/overview` | `users.self.manage`; panels/actions filtered by their own permissions |
+`PUT /admin/config` accepts `Idempotency-Key`; a retry with the same key applies nothing. CLI: `portalab backup --output DIR`, `portalab restore --input DIR --yes`, `portalab migrate --status`.

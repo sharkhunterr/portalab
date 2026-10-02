@@ -6,6 +6,8 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.administration import BOOTSTRAP_CAPABILITY as BOOTSTRAP
+from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.core.jobs.queue import enqueue
 from portalab.core.jobs.registry import JobRegistry
 from portalab.modules.identity.context import OWNER, IdentityContext
@@ -34,7 +36,7 @@ class IdentityModule:
     def __init__(self, ctx: IdentityContext, *, channel: VerificationChannel | None = None) -> None:
         self.ctx = ctx
         self.hasher = CredentialHasher(ctx.config.argon2_params)
-        self.sessions = SessionService(ctx.config)
+        self.sessions = SessionService(lambda: ctx.config)
         self.throttle = LoginThrottleService()
         self.accounts = AccountService(ctx)
         self.onboarding = OnboardingService(ctx)
@@ -53,6 +55,10 @@ class IdentityModule:
         register_directory(self.ctx.capabilities, self.ctx)
         register_participants(self.ctx.capabilities, self.ctx)
         register_visibility(self.ctx.capabilities, self.ctx)
+        self.ctx.capabilities.provide(BOOTSTRAP, self.bootstrap, instance_ref="identity", owner=OWNER)
+        default_admin_surfaces.register(
+            AdminSurface("users", "admin.surface.users", "/admin/users", "users.manage", OWNER)
+        )
 
     # --- jobs ----------------------------------------------------------------------------------------
     def register_jobs(self, registry: JobRegistry) -> None:

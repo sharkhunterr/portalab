@@ -37,6 +37,7 @@ def app(full: FullPlatform, heads: set[str]) -> FastAPI:
         identity=full.identity,
         authz=full.authz,
         privacy=full.privacy,
+        administration=full.administration,
         static_dir=None,
     )
 

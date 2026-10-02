@@ -21,6 +21,7 @@ async def schedule_sweeps(platform: Platform, stop: asyncio.Event) -> None:
     """Seed the periodic jobs; retried until the database is reachable (never fatal)."""
     while not stop.is_set():
         try:
+            await platform.refresh_config()
             await platform.seed_periodic_jobs()
             return
         except Exception:
@@ -34,7 +35,11 @@ async def run_worker(settings: BootstrapSettings) -> None:
     database = Database.from_url(settings.database_url.reveal())
     capabilities = new_registry()
     platform = wire_platform(
-        database, data_dir=settings.data_dir, capabilities=capabilities, jobs=default_registry
+        database,
+        data_dir=settings.data_dir,
+        capabilities=capabilities,
+        secret_key=settings.secret_key,
+        jobs=default_registry,
     )
     stop = asyncio.Event()
     loop = asyncio.get_running_loop()

@@ -1,5 +1,8 @@
 """Authorization module facade: engine, catalog, grants, Admin authority, audit store, confirmations."""
 
+from portalab.capabilities.administration import AUDIT_STATUS_CAPABILITY as AUDIT_STATUS
+from portalab.capabilities.administration import PLUGIN_PERMISSIONS_CAPABILITY as PLUGIN_PERMISSIONS
+from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
@@ -55,6 +58,17 @@ class AuthzModule:
             USER_GRANTS, UserGrantsProvider(self.grants), instance_ref="authz", owner=OWNER
         )
         self.capabilities.provide(CONFIRMATIONS, self.confirmations, instance_ref="authz", owner=OWNER)
+        self.capabilities.provide(
+            PLUGIN_PERMISSIONS, _PluginPermissions(self), instance_ref="authz", owner=OWNER
+        )
+        self.capabilities.provide(AUDIT_STATUS, _AuditStatus(self), instance_ref="authz", owner=OWNER)
+        for key, route, permission in (
+            ("roles", "/admin/roles", "users.roles.manage"),
+            ("audit", "/admin/audit", "audit.read"),
+        ):
+            default_admin_surfaces.register(
+                AdminSurface(key, f"admin.surface.{key}", route, permission, OWNER)
+            )
 
     async def maintain_audit_partitions(self, retention_months: int | None) -> dict[str, list[str]]:
         """Create upcoming audit partitions, drop expired ones (spec 021 T019)."""
@@ -69,3 +83,37 @@ class AuthzModule:
         from portalab.modules.authz.audit import checkpoints
 
         return await checkpoints.create_checkpoint(self.database, self.events, clock=self.clock)
+
+
+class _PluginPermissions:
+    def __init__(self, module: AuthzModule) -> None:
+        self.module = module
+
+    async def set_enabled(self, plugin_id: str, enabled: bool) -> int:
+        from portalab.modules.authz.catalog.declare import set_plugin_permissions_enabled
+
+        async with self.module.database.unit_of_work() as uow:
+            return await set_plugin_permissions_enabled(uow.session, plugin_id, enabled)
+
+
+class _AuditStatus:
+    def __init__(self, module: AuthzModule) -> None:
+        self.module = module
+
+    async def status(self) -> dict[str, object]:
+        from sqlalchemy import func, select
+
+        from portalab.modules.authz.models import AuditCheckpoint, AuditEntry
+
+        async with self.module.database.session() as session:
+            last = (
+                await session.execute(
+                    select(AuditCheckpoint).order_by(AuditCheckpoint.to_seq.desc()).limit(1)
+                )
+            ).scalar_one_or_none()
+            newest = await session.scalar(select(func.max(AuditEntry.seq)))
+        return {
+            "last_checkpoint_seq": last.to_seq if last else None,
+            "last_checkpoint_at": last.created_at.isoformat() if last else None,
+            "unsealed_entries": (newest or 0) - (last.to_seq if last else 0),
+        }

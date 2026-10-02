@@ -18,6 +18,8 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, OutboxEventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
+from portalab.core.secrets import SecretBox
+from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
@@ -73,6 +75,7 @@ def wire_identity(context: IdentityContext, *, jobs: JobRegistry | None = None) 
 class Platform:
     authz: AuthzModule
     privacy: PrivacyModule
+    administration: AdministrationModule
     identity: IdentityModule
     seeds: list[Callable[[], Awaitable[None]]]
 
@@ -80,12 +83,18 @@ class Platform:
         for seed in self.seeds:
             await seed()
 
+    async def refresh_config(self) -> bool:
+        from portalab.app.config_bindings import safe_refresh
+
+        return await safe_refresh(self)
+
 
 def wire_platform(
     database: Database,
     *,
     data_dir: Path,
     capabilities: CapabilityRegistry,
+    secret_key: bytes,
     jobs: JobRegistry | None = None,
 ) -> Platform:
     """Production wiring shared by ``serve``, ``worker`` and the CLI."""
@@ -93,6 +102,10 @@ def wire_platform(
     authz = wire_authz(database, events, capabilities)
     privacy = PrivacyModule(database, events, authz.audit, capabilities)
     privacy.register_capabilities()
+    administration = AdministrationModule(
+        database, events, authz.audit, capabilities, authz.engine, SecretBox(secret_key)
+    )
+    administration.register_capabilities()
     context = default_identity_context(
         database,
         data_dir=data_dir,
@@ -127,4 +140,8 @@ def wire_platform(
             )
         )
         seeds.append(identity.ensure_sweeps_scheduled)
-    return Platform(authz, privacy, identity, seeds)
+    platform = Platform(authz, privacy, administration, identity, seeds)
+    from portalab.app.config_bindings import bind
+
+    bind(platform)
+    return platform

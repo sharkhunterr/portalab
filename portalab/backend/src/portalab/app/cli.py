@@ -49,6 +49,8 @@ def _cmd_migrate(args: argparse.Namespace) -> int:
 
     settings = load_settings()
     configure_logging(settings.log_level)
+    if args.status:
+        return asyncio.run(_migration_status(settings.database_url.reveal()))
     upgrade(settings.database_url.reveal(), args.revision)
     log.info("migrations applied", extra={"fields": {"revision": args.revision}})
     if args.revision == "heads":
@@ -69,6 +71,57 @@ async def _sync_permission_catalog(url: str) -> int:
         return await CatalogSync(database).sync()
     finally:
         await database.dispose()
+
+
+async def _migration_status(url: str) -> int:
+    from portalab.app.migrations import current_heads, expected_heads
+    from portalab.core.db import Database
+
+    database = Database.from_url(url)
+    try:
+        current = await current_heads(database)
+    finally:
+        await database.dispose()
+    expected = expected_heads(url)
+    sys.stdout.write(f"current={sorted(current)}\nexpected={sorted(expected)}\n")
+    up_to_date = current == expected
+    sys.stdout.write("up to date\n" if up_to_date else "migrations pending: run `portalab migrate`\n")
+    return 0 if up_to_date else 1
+
+
+def _cmd_backup(args: argparse.Namespace) -> int:
+    from portalab.app.migrations import expected_heads
+    from portalab.app.operations import OperationError, backup
+
+    settings = load_settings()
+    url = settings.database_url.reveal()
+    try:
+        folder = backup(
+            url, settings.data_dir, Path(args.output), heads=expected_heads(url), pg_dump=args.pg_dump
+        )
+    except OperationError as exc:
+        sys.stderr.write(f"backup failed: {exc}\n")
+        return 5
+    sys.stdout.write(f"backup written to {folder}\n")
+    return 0
+
+
+def _cmd_restore(args: argparse.Namespace) -> int:
+    from portalab.app.operations import OperationError, restore
+
+    if not args.yes:
+        sys.stderr.write("restore replaces the database and DATA_DIR: re-run with --yes to confirm\n")
+        return 2
+    settings = load_settings()
+    try:
+        restore(
+            settings.database_url.reveal(), settings.data_dir, Path(args.input), pg_restore=args.pg_restore
+        )
+    except (OperationError, OSError) as exc:
+        sys.stderr.write(f"restore failed: {exc}\n")
+        return 5
+    sys.stdout.write("restore completed; run `portalab migrate` if the backup is older than this release\n")
+    return 0
 
 
 def _cmd_openapi(args: argparse.Namespace) -> int:
@@ -104,7 +157,11 @@ async def _bootstrap_admin(args: argparse.Namespace, password: str) -> str:
     import_all_models()
     database = Database.from_url(settings.database_url.reveal())
     try:
-        module = wire_platform(database, data_dir=settings.data_dir, capabilities=new_registry()).identity
+        platform = wire_platform(
+            database, data_dir=settings.data_dir, capabilities=new_registry(), secret_key=settings.secret_key
+        )
+        await platform.refresh_config()
+        module = platform.identity
         user_id = await module.bootstrap.create_first_admin(
             login=args.login, password=password, display_name=args.display_name, email=args.email
         )
@@ -161,6 +218,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("worker", help="run the background job worker").set_defaults(func=_cmd_worker)
     migrate = sub.add_parser("migrate", help="apply database migrations")
     migrate.add_argument("revision", nargs="?", default="heads")
+    migrate.add_argument("--status", action="store_true", help="only report whether migrations are pending")
     migrate.set_defaults(func=_cmd_migrate)
     admin = sub.add_parser("admin", help="administration commands").add_subparsers(
         dest="admin_command", required=True
@@ -180,6 +238,15 @@ def build_parser() -> argparse.ArgumentParser:
     audit_verify.add_argument("--from", dest="from_seq", type=int, default=None)
     audit_verify.add_argument("--to", dest="to_seq", type=int, default=None)
     audit_verify.set_defaults(func=_cmd_audit_verify)
+    backup_cmd = sub.add_parser("backup", help="back up the database and DATA_DIR (operator command)")
+    backup_cmd.add_argument("--output", required=True)
+    backup_cmd.add_argument("--pg-dump", default=None)
+    backup_cmd.set_defaults(func=_cmd_backup)
+    restore_cmd = sub.add_parser("restore", help="restore a backup (replaces data; operator command)")
+    restore_cmd.add_argument("--input", required=True)
+    restore_cmd.add_argument("--pg-restore", default=None)
+    restore_cmd.add_argument("--yes", action="store_true")
+    restore_cmd.set_defaults(func=_cmd_restore)
     openapi = sub.add_parser("openapi", help="export the OpenAPI schema")
     openapi.add_argument("--output", "-o", default="-")
     openapi.set_defaults(func=_cmd_openapi)

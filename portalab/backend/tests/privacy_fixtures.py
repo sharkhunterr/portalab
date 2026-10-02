@@ -4,16 +4,18 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from portalab.core.time import Clock
+from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.identity.services import (
     visibility as _identity_visibility,  # noqa: F401 — profile_field
 )
 from portalab.modules.privacy.module import PrivacyModule
-from tests.authz_fixtures import AuthzPlatform, make_platform
+from tests.authz_fixtures import AuthzPlatform, make_administration, make_platform
 
 
 @dataclass
 class FullPlatform(AuthzPlatform):
     privacy: PrivacyModule
+    administration: AdministrationModule
 
 
 def make_full_platform(database: object, blob_root: Path, clock: Clock | None = None) -> FullPlatform:
@@ -23,4 +25,4 @@ def make_full_platform(database: object, blob_root: Path, clock: Clock | None = 
     )
     privacy.register_capabilities()
     base.identity.visibility = privacy.filter  # identity's module is wired by create_app(identity=...)
-    return FullPlatform(base.authz, base.identity, privacy)
+    return FullPlatform(base.authz, base.identity, privacy, make_administration(base))

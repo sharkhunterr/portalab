@@ -9,6 +9,7 @@ import hashlib
 import hmac
 import ipaddress
 import secrets
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
@@ -66,8 +67,14 @@ class IssuedSession:
 
 
 class SessionService:
-    def __init__(self, config: IdentityConfig) -> None:
-        self.config = config
+    """Reads the identity settings at each call when given a provider (live configuration, spec 020)."""
+
+    def __init__(self, config: IdentityConfig | Callable[[], IdentityConfig]) -> None:
+        self._config = config
+
+    @property
+    def config(self) -> IdentityConfig:
+        return self._config() if callable(self._config) else self._config
 
     def _expiry(self, created_at: datetime, last_seen_at: datetime) -> datetime:
         idle = last_seen_at + timedelta(minutes=self.config.session_idle_minutes)

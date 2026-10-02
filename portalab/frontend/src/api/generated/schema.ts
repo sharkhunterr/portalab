@@ -4,6 +4,198 @@
  */
 
 export interface paths {
+    "/api/v1/admin/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Config */
+        get: operations["get_config_api_v1_admin_config_get"];
+        /** Apply Config */
+        put: operations["apply_config_api_v1_admin_config_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/config/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Export Config */
+        post: operations["export_config_api_v1_admin_config_export_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/config/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Config */
+        post: operations["import_config_api_v1_admin_config_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/config/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate Config */
+        post: operations["validate_config_api_v1_admin_config_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/first-run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** First Run Status */
+        get: operations["first_run_status_api_v1_admin_first_run_get"];
+        put?: never;
+        /**
+         * First Run
+         * @description Public only while the portal has no Admin; when reopened later, it needs ``configuration.manage``.
+         */
+        post: operations["first_run_api_v1_admin_first_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/first-run/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen First Run */
+        post: operations["reopen_first_run_api_v1_admin_first_run_reopen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_api_v1_admin_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply Policy */
+        post: operations["apply_policy_api_v1_admin_policies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/policies/{policy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Policy */
+        delete: operations["remove_policy_api_v1_admin_policies__policy_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surfaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Surfaces */
+        get: operations["surfaces_api_v1_admin_surfaces_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/toggles/{kind}/{ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Toggle */
+        post: operations["toggle_api_v1_admin_toggles__kind___ref__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/transfer": {
         parameters: {
             query?: never;
@@ -362,6 +554,24 @@ export interface paths {
         /** My Permissions */
         get: operations["my_permissions_api_v1_me_permissions_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Preferences */
+        get: operations["my_preferences_api_v1_me_preferences_get"];
+        /** Set My Preferences */
+        put: operations["set_my_preferences_api_v1_me_preferences_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -836,6 +1046,39 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** ChangeIn */
+        ChangeIn: {
+            /** Key */
+            key: string;
+            /**
+             * Scope
+             * @default global
+             * @enum {string}
+             */
+            scope: "global" | "module" | "plugin";
+            /**
+             * Scope Ref
+             * @default
+             */
+            scope_ref: string;
+            /**
+             * Unset
+             * @default false
+             */
+            unset: boolean;
+            /** Value */
+            value?: unknown;
+        };
+        /** ChangesIn */
+        ChangesIn: {
+            /** Changes */
+            changes: components["schemas"]["ChangeIn"][];
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+        };
         /** CredentialsConfirmation */
         CredentialsConfirmation: {
             /** Login */
@@ -991,6 +1234,15 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** ImportIn */
+        ImportIn: {
+            /** Accept Conflicts */
+            accept_conflicts?: string[];
+            /** Document */
+            document: {
+                [key: string]: unknown;
+            };
+        };
         /** LoginRequest */
         LoginRequest: {
             /** Login */
@@ -1064,24 +1316,6 @@ export interface components {
             sensitive: boolean;
             /** User Grantable */
             user_grantable: boolean;
-        };
-        /** PolicyIn */
-        PolicyIn: {
-            /** Datum Class */
-            datum_class: string;
-            /** Ends At */
-            ends_at?: string | null;
-            /** Level */
-            level?: ("public" | "community" | "leaderboard" | "private") | null;
-            /**
-             * Mode
-             * @enum {string}
-             */
-            mode: "user_choice" | "force_visible" | "force_private";
-            /** Reason */
-            reason: string;
-            /** Subject User Id */
-            subject_user_id?: string | null;
         };
         /** PolicyOut */
         PolicyOut: {
@@ -1201,6 +1435,11 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** ReopenIn */
+        ReopenIn: {
+            /** Reason */
+            reason: string;
+        };
         /** RoleAssignment */
         RoleAssignment: {
             /** Role Key */
@@ -1250,6 +1489,16 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+        };
+        /** ToggleIn */
+        ToggleIn: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
         };
         /** UserList */
         UserList: {
@@ -1314,6 +1563,57 @@ export interface components {
             /** Token */
             token: string;
         };
+        /** WizardIn */
+        WizardIn: {
+            /** Display Name */
+            display_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Login */
+            login: string;
+            /** Password */
+            password: string;
+            /** Settings */
+            settings?: {
+                [key: string]: unknown;
+            };
+            /** Steps */
+            steps?: {
+                [key: string]: unknown;
+            };
+        };
+        /** PolicyIn */
+        portalab__modules__administration__api__routes__PolicyIn: {
+            /** Bounds */
+            bounds?: {
+                [key: string]: unknown;
+            } | null;
+            /** Key */
+            key: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "default" | "lock" | "bound";
+        };
+        /** PolicyIn */
+        portalab__modules__privacy__api__routes__PolicyIn: {
+            /** Datum Class */
+            datum_class: string;
+            /** Ends At */
+            ends_at?: string | null;
+            /** Level */
+            level?: ("public" | "community" | "leaderboard" | "private") | null;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "user_choice" | "force_visible" | "force_private";
+            /** Reason */
+            reason: string;
+            /** Subject User Id */
+            subject_user_id?: string | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -1323,6 +1623,398 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_config_api_v1_admin_config_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    apply_config_api_v1_admin_config_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_config_api_v1_admin_config_export_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    import_config_api_v1_admin_config_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_config_api_v1_admin_config_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    first_run_status_api_v1_admin_first_run_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    first_run_api_v1_admin_first_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WizardIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description completed */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_first_run_api_v1_admin_first_run_reopen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReopenIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_api_v1_admin_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    apply_policy_api_v1_admin_policies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__administration__api__routes__PolicyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_policy_api_v1_admin_policies__policy_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    surfaces_api_v1_admin_surfaces_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    }[];
+                };
+            };
+        };
+    };
+    toggle_api_v1_admin_toggles__kind___ref__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "module" | "plugin" | "connector" | "service" | "automation";
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToggleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     transfer_admin_api_v1_admin_transfer_post: {
         parameters: {
             query?: never;
@@ -2116,6 +2808,65 @@ export interface operations {
             };
         };
     };
+    my_preferences_api_v1_me_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    set_my_preferences_api_v1_me_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_privacy_api_v1_me_privacy_get: {
         parameters: {
             query?: never;
@@ -2278,7 +3029,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PolicyIn"];
+                "application/json": components["schemas"]["portalab__modules__privacy__api__routes__PolicyIn"];
             };
         };
         responses: {

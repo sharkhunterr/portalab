@@ -10,7 +10,7 @@ from fastapi import FastAPI
 
 from portalab.core.db import Database
 from portalab.core.time import FixedClock
-from tests.authz_fixtures import AuthzPlatform, make_platform
+from tests.authz_fixtures import AuthzPlatform, make_administration, make_platform
 
 NOW = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)
 
@@ -36,12 +36,14 @@ def app(platform: AuthzPlatform, heads: set[str]) -> FastAPI:
         platform.database, platform.authz.engine.events, platform.authz.audit, platform.identity.capabilities
     )
     privacy.register_capabilities()
+    administration = make_administration(platform)
     return create_app(
         database=platform.database,
         migration_heads=heads,
         identity=platform.identity,
         authz=platform.authz,
         privacy=privacy,
+        administration=administration,
         static_dir=None,
     )
 

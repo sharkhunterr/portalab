@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { stateForError } from "../../state/regions";
+import { FirstRunWizard } from "../admin/FirstRunWizard";
 import { LoginForm } from "./LoginForm";
 import { authStrings as t } from "./strings";
 import { type Me, useLogout, useMe } from "./useAuth";
@@ -18,6 +19,7 @@ export function AuthGate({
   location?: Pick<Location, "pathname" | "search">;
 }) {
   const me = useMe();
+  if (location?.pathname === "/setup") return <FirstRunWizard />;
   if (location?.pathname === "/verify") {
     const token = new URLSearchParams(location.search).get("token") ?? "";
     return <VerifyForm initialToken={token} />;

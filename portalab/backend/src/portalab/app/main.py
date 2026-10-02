@@ -1,6 +1,7 @@
 """ASGI application factory — the composition root (plan §1, contracts/api-conventions.md)."""
 
 import re
+import secrets
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
@@ -39,6 +40,8 @@ from portalab.core.errors import (
 )
 from portalab.core.logging import correlation_scope, get_correlation_id, get_logger
 from portalab.core.settings import BootstrapSettings
+from portalab.modules.administration.api import routers as admin_routers
+from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.api import routers as authz_routers
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.identity.api import routers as identity_routers
@@ -51,6 +54,7 @@ from portalab.modules.privacy.settings import SecurityConfig
 CORRELATION_HEADER = "X-Correlation-Id"
 _CORRELATION_RE = re.compile(r"^[A-Za-z0-9._\-]{1,64}$")
 API_PREFIX = "/api/v1"
+_EPHEMERAL_KEY = secrets.token_bytes(32)  # only when no bootstrap settings (tests, `portalab openapi`)
 DEFAULT_STATIC_DIR = BACKEND_DIR / "static"
 
 log = get_logger("portalab.app")
@@ -73,6 +77,7 @@ def create_app(
     capabilities: CapabilityRegistry | None = None,
     authz: AuthzModule | None = None,
     privacy: PrivacyModule | None = None,
+    administration: AdministrationModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -87,7 +92,10 @@ def create_app(
             db,
             data_dir=settings.data_dir if settings else Path("/var/lib/portalab"),
             capabilities=app.state.capabilities,
+            secret_key=settings.secret_key if settings else _EPHEMERAL_KEY,
         )
+        app.state.platform = platform
+        app.state.administration_module = platform.administration
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -99,6 +107,8 @@ def create_app(
         if owns_database and settings is not None:
             app.state.database = Database.from_url(settings.database_url.reveal())
             wire_modules(app, app.state.database)
+        if app.state.platform is not None:
+            await app.state.platform.refresh_config()
         try:
             yield
         finally:
@@ -121,6 +131,8 @@ def create_app(
     app.state.capabilities = identity.capabilities if identity else (capabilities or new_registry())
     app.state.authz_module = authz
     app.state.privacy_module = privacy
+    app.state.administration_module = administration
+    app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
     if database is not None:
@@ -198,7 +210,7 @@ def create_app(
     )
     app.include_router(health_router)
     app.include_router(stream_router)
-    for router in [*identity_routers(), *authz_routers(), *privacy_routers()]:
+    for router in [*identity_routers(), *authz_routers(), *privacy_routers(), *admin_routers()]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None
     if spa is not None:

@@ -21,5 +21,17 @@
 ## Events
 `admin.config_changed`, `admin.policy_changed`, `admin.module_toggled|plugin_toggled|connector_toggled`, `admin.firstrun_completed`, `admin.import_performed|export_performed`. Dedup `(key, scope, scope_ref, change_seq)`.
 
+## Implementation notes (2026-10-02)
+- `config.settings.scope_ref` is `''` for global values (part of the unique key); user-scope rows hold the user
+  id and are erased/exported by Administration's preference participants.
+- `config.setting_history.scope_ref_hash`: user refs are SHA-256 hashed (append-only table, no PII); other
+  scopes keep the module/plugin name.
+- Allowed scopes per key: `global` always; `module`/`plugin` when declared at that scope; `user` when declared
+  `user` or `user_overridable`. Policies (`default|lock|bound`) constrain the user tier only.
+- Modules keep reading their config dataclasses; `app/config_bindings.py` refreshes them from the store at
+  start-up and on `admin.config_changed` (Argon2 parameters apply after a restart).
+- Contribution points live in `portalab.capabilities.administration` (panels, required actions, first-run steps,
+  `identity.bootstrap`, `authz.plugin_permissions`, toggle hooks, `audit.status`, admin surfaces).
+
 ## Lifecycle / privacy
 Settings are never hard-deleted for disabled plugins; user-scope values removed by the user's erasure participant; sensitive values encrypted; history redacted.

@@ -2,7 +2,9 @@
 
 from portalab.capabilities import (
     admin_authority,
+    administration,
     aggregation,
+    config,
     confirmations,
     identity_directory,
     privacy_participants,
@@ -22,6 +24,10 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     service_data.SPEC,
     visibility.PREFERENCE_SPEC,
     aggregation.SPEC,
+    config.SPEC,
+    config.LOCALE_SPEC,
+    config.I18N_SPEC,
+    *administration.SPECS,
 )
 
 
