@@ -12,7 +12,7 @@ from fastapi.routing import APIRoute
 
 from portalab.app.main import create_app
 from portalab.app.security import api_routes, public, require, route_access
-from portalab.core.authz_port import Principal, ResourceRef
+from portalab.core.authz_port import DenyAllAuthorizer, Principal, ResourceRef
 from portalab.core.db import Database
 
 ALLOW_LISTED = {
@@ -88,7 +88,12 @@ async def test_every_non_public_route_is_denied_by_default(
 ) -> None:
     principal = Principal(user_id=uuid4()) if authenticated else Principal()
     app = _with_probe_routes(
-        create_app(database=database, migration_heads=heads, principal_resolver=FixedPrincipal(principal))
+        create_app(
+            database=database,
+            migration_heads=heads,
+            principal_resolver=FixedPrincipal(principal),
+            authorizer=DenyAllAuthorizer(),  # structure test; real grants: tests/security/authz matrix
+        )
     )
     expected = 403 if authenticated else 401
     checked = 0

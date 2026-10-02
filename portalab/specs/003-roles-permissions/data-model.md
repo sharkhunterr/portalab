@@ -29,5 +29,14 @@ One row (`id=1`, `current_admin_user_id`, `version`) used as the lock target for
 ## Events (via `EventPublisher`)
 `permission.role_assigned|role_revoked|group_changed|permission_granted|permission_revoked|policy_changed|admin_transfer_attempted|denied`. Dedup key: `(holder, permission/role, change_seq)`.
 
+## Implementation notes (2026-10-02)
+- `authz.permissions` also carries `user_grantable` (entitlement permissions grantable to one user, F15).
+- `authz.grants.holder_kind` also accepts `user` (entitlements only, never reserved); `scope_ref` is `''` when
+  unused (part of the unique key); `source` records where a grant came from (`default|admin|marketplace|…`).
+- Every account implicitly holds the base `user` role (no row); the Admin is "all enabled permissions minus
+  explicit denies"; the single-Admin index is `UNIQUE ((true)) WHERE role_id = <admin> AND revoked_at IS NULL`.
+- `audit.audit_entries.actor_kind` also accepts `anonymous` (e.g. failed sign-ins).
+- FKs to `identity.users(id)` are created by the migrations only (models do not import another module).
+
 ## Lifecycle / retention / privacy
 Roles/groups: soft-retire (never hard-delete while assigned). Audit: append-only, retention policy in step 3, `actor_user_id` references the user id so tombstoning keeps integrity (context never holds PII bodies). Grants/assignments reference ids only.

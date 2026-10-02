@@ -223,6 +223,207 @@
         "title": "FieldUpdateBody",
         "type": "object"
       },
+      "GrantIn": {
+        "additionalProperties": false,
+        "properties": {
+          "effect": {
+            "default": "allow",
+            "enum": [
+              "allow",
+              "deny"
+            ],
+            "title": "Effect",
+            "type": "string"
+          },
+          "permission_key": {
+            "maxLength": 128,
+            "minLength": 3,
+            "title": "Permission Key",
+            "type": "string"
+          },
+          "scope_kind": {
+            "default": "global",
+            "enum": [
+              "global",
+              "self",
+              "owned",
+              "module",
+              "service",
+              "plugin"
+            ],
+            "title": "Scope Kind",
+            "type": "string"
+          },
+          "scope_ref": {
+            "default": "",
+            "maxLength": 128,
+            "title": "Scope Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "permission_key"
+        ],
+        "title": "GrantIn",
+        "type": "object"
+      },
+      "GrantOut": {
+        "properties": {
+          "effect": {
+            "title": "Effect",
+            "type": "string"
+          },
+          "holder_id": {
+            "format": "uuid",
+            "title": "Holder Id",
+            "type": "string"
+          },
+          "holder_kind": {
+            "title": "Holder Kind",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "permission_key": {
+            "title": "Permission Key",
+            "type": "string"
+          },
+          "scope_kind": {
+            "title": "Scope Kind",
+            "type": "string"
+          },
+          "scope_ref": {
+            "title": "Scope Ref",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "holder_kind",
+          "holder_id",
+          "permission_key",
+          "effect",
+          "scope_kind",
+          "scope_ref",
+          "source"
+        ],
+        "title": "GrantOut",
+        "type": "object"
+      },
+      "GroupCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "default": "",
+            "maxLength": 512,
+            "title": "Description",
+            "type": "string"
+          },
+          "key": {
+            "maxLength": 41,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]+$",
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ],
+        "title": "GroupCreate",
+        "type": "object"
+      },
+      "GroupMembership": {
+        "additionalProperties": false,
+        "properties": {
+          "group_key": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Group Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group_key"
+        ],
+        "title": "GroupMembership",
+        "type": "object"
+      },
+      "GroupOut": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description"
+        ],
+        "title": "GroupOut",
+        "type": "object"
+      },
+      "GroupPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "GroupPatch",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -358,6 +559,30 @@
         "title": "Me",
         "type": "object"
       },
+      "MyPermissions": {
+        "properties": {
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Permissions",
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "permissions",
+          "roles"
+        ],
+        "title": "MyPermissions",
+        "type": "object"
+      },
       "OnboardingStep": {
         "properties": {
           "completed_at": {
@@ -398,6 +623,54 @@
           "password"
         ],
         "title": "PasswordConfirmation",
+        "type": "object"
+      },
+      "PermissionOut": {
+        "properties": {
+          "declared_by": {
+            "title": "Declared By",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "requires_confirmation": {
+            "title": "Requires Confirmation",
+            "type": "boolean"
+          },
+          "reserved": {
+            "title": "Reserved",
+            "type": "boolean"
+          },
+          "sensitive": {
+            "title": "Sensitive",
+            "type": "boolean"
+          },
+          "user_grantable": {
+            "title": "User Grantable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "description",
+          "declared_by",
+          "sensitive",
+          "reserved",
+          "requires_confirmation",
+          "user_grantable",
+          "enabled"
+        ],
+        "title": "PermissionOut",
         "type": "object"
       },
       "ProfileFieldOut": {
@@ -549,6 +822,96 @@
           "password"
         ],
         "title": "RegisterRequest",
+        "type": "object"
+      },
+      "RoleAssignment": {
+        "additionalProperties": false,
+        "properties": {
+          "role_key": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Role Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role_key"
+        ],
+        "title": "RoleAssignment",
+        "type": "object"
+      },
+      "RoleCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "maxLength": 41,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]+$",
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ],
+        "title": "RoleCreate",
+        "type": "object"
+      },
+      "RoleOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "system": {
+            "title": "System",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "kind",
+          "system"
+        ],
+        "title": "RoleOut",
+        "type": "object"
+      },
+      "RolePatch": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "RolePatch",
         "type": "object"
       },
       "SessionInfo": {
@@ -996,6 +1359,284 @@
         ]
       }
     },
+    "/api/v1/grants/{grant_id}": {
+      "delete": {
+        "operationId": "remove_grant_api_v1_grants__grant_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "grant_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Grant Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Grant",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/groups": {
+      "get": {
+        "operationId": "list_groups_api_v1_groups_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GroupOut"
+                  },
+                  "title": "Response List Groups Api V1 Groups Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Groups",
+        "tags": [
+          "authz"
+        ]
+      },
+      "post": {
+        "operationId": "create_group_api_v1_groups_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Group",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/groups/{group_id}": {
+      "delete": {
+        "operationId": "delete_group_api_v1_groups__group_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Group",
+        "tags": [
+          "authz"
+        ]
+      },
+      "patch": {
+        "operationId": "update_group_api_v1_groups__group_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Group",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/groups/{group_id}/grants": {
+      "get": {
+        "operationId": "group_grants_api_v1_groups__group_id__grants_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GrantOut"
+                  },
+                  "title": "Response Group Grants Api V1 Groups  Group Id  Grants Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Group Grants",
+        "tags": [
+          "authz"
+        ]
+      },
+      "post": {
+        "operationId": "add_group_grant_api_v1_groups__group_id__grants_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Group Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "authz.reserved_permission"
+          }
+        },
+        "summary": "Add Group Grant",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "operationId": "me_api_v1_me_get",
@@ -1327,6 +1968,27 @@
         ]
       }
     },
+    "/api/v1/me/permissions": {
+      "get": {
+        "operationId": "my_permissions_api_v1_me_permissions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPermissions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Permissions",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
     "/api/v1/me/profile": {
       "patch": {
         "operationId": "update_profile_api_v1_me_profile_patch",
@@ -1368,6 +2030,273 @@
         "summary": "Update Profile",
         "tags": [
           "identity"
+        ]
+      }
+    },
+    "/api/v1/permissions": {
+      "get": {
+        "operationId": "list_permissions_api_v1_permissions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionOut"
+                  },
+                  "title": "Response List Permissions Api V1 Permissions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Permissions",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "operationId": "list_roles_api_v1_roles_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RoleOut"
+                  },
+                  "title": "Response List Roles Api V1 Roles Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Roles",
+        "tags": [
+          "authz"
+        ]
+      },
+      "post": {
+        "operationId": "create_role_api_v1_roles_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Role",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/roles/{role_id}": {
+      "delete": {
+        "operationId": "delete_role_api_v1_roles__role_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Role Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Role",
+        "tags": [
+          "authz"
+        ]
+      },
+      "patch": {
+        "operationId": "rename_role_api_v1_roles__role_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Role Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Role",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/roles/{role_id}/grants": {
+      "get": {
+        "operationId": "role_grants_api_v1_roles__role_id__grants_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Role Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GrantOut"
+                  },
+                  "title": "Response Role Grants Api V1 Roles  Role Id  Grants Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Role Grants",
+        "tags": [
+          "authz"
+        ]
+      },
+      "post": {
+        "operationId": "add_role_grant_api_v1_roles__role_id__grants_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Role Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "authz.reserved_permission"
+          }
+        },
+        "summary": "Add Role Grant",
+        "tags": [
+          "authz"
         ]
       }
     },
@@ -1649,6 +2578,142 @@
         ]
       }
     },
+    "/api/v1/users/{user_id}/groups": {
+      "get": {
+        "operationId": "user_groups_api_v1_users__user_id__groups_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GroupOut"
+                  },
+                  "title": "Response User Groups Api V1 Users  User Id  Groups Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "User Groups",
+        "tags": [
+          "authz"
+        ]
+      },
+      "post": {
+        "operationId": "add_member_api_v1_users__user_id__groups_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMembership"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Member",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/groups/{group_key}": {
+      "delete": {
+        "operationId": "remove_member_api_v1_users__user_id__groups__group_key__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "group_key",
+            "required": true,
+            "schema": {
+              "title": "Group Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Member",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
     "/api/v1/users/{user_id}/profile": {
       "get": {
         "operationId": "user_profile_api_v1_users__user_id__profile_get",
@@ -1735,6 +2800,148 @@
         "summary": "Reactivate User",
         "tags": [
           "identity-admin"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/roles": {
+      "get": {
+        "operationId": "user_roles_api_v1_users__user_id__roles_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RoleOut"
+                  },
+                  "title": "Response User Roles Api V1 Users  User Id  Roles Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "User Roles",
+        "tags": [
+          "authz"
+        ]
+      },
+      "post": {
+        "operationId": "assign_role_api_v1_users__user_id__roles_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleAssignment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "authz.sole_admin_protected"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assign Role",
+        "tags": [
+          "authz"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/roles/{role_key}": {
+      "delete": {
+        "operationId": "revoke_role_api_v1_users__user_id__roles__role_key__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "role_key",
+            "required": true,
+            "schema": {
+              "title": "Role Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "authz.sole_admin_protected"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke Role",
+        "tags": [
+          "authz"
         ]
       }
     },

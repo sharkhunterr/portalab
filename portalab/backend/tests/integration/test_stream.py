@@ -14,7 +14,7 @@ from fastapi import Request
 
 from portalab.app.main import create_app
 from portalab.app.stream import StreamOptions, event_stream
-from portalab.core.authz_port import Principal, ResourceRef
+from portalab.core.authz_port import DenyAllAuthorizer, Principal, ResourceRef
 from portalab.core.db import Database
 from portalab.core.live import publish_live
 
@@ -86,7 +86,10 @@ def _parse(frame: str) -> dict[str, str]:
 async def test_stream_requires_authorization(database: Database, heads: set[str]) -> None:
     for principal, expected in ((Principal(), 401), (Principal(user_id=ALICE), 403)):
         app = create_app(
-            database=database, migration_heads=heads, principal_resolver=FixedPrincipal(principal)
+            database=database,
+            migration_heads=heads,
+            principal_resolver=FixedPrincipal(principal),
+            authorizer=DenyAllAuthorizer(),  # holders of stream.subscribe: see the authz permission matrix
         )
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as client:
             assert (await client.get("/api/v1/stream")).status_code == expected

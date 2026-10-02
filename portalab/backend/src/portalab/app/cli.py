@@ -51,7 +51,24 @@ def _cmd_migrate(args: argparse.Namespace) -> int:
     configure_logging(settings.log_level)
     upgrade(settings.database_url.reveal(), args.revision)
     log.info("migrations applied", extra={"fields": {"revision": args.revision}})
+    if args.revision == "heads":
+        created = asyncio.run(_sync_permission_catalog(settings.database_url.reveal()))
+        log.info("permission catalog synchronised", extra={"fields": {"created": created}})
     return 0
+
+
+async def _sync_permission_catalog(url: str) -> int:
+    from portalab.app.composition import import_all_models
+    from portalab.core.db import Database
+    from portalab.modules.authz.catalog import core_permissions  # noqa: F401 — declares the core catalog
+    from portalab.modules.authz.catalog.sync import CatalogSync
+
+    import_all_models()
+    database = Database.from_url(url)
+    try:
+        return await CatalogSync(database).sync()
+    finally:
+        await database.dispose()
 
 
 def _cmd_openapi(args: argparse.Namespace) -> int:
@@ -79,23 +96,15 @@ def _read_password(path: str | None) -> str:
 
 async def _bootstrap_admin(args: argparse.Namespace, password: str) -> str:
     from portalab.app.composition import import_all_models
-    from portalab.app.wiring import default_identity_context, wire_identity
+    from portalab.app.wiring import wire_platform
     from portalab.capabilities.catalog import new_registry
-    from portalab.core.authz_port import DenyAllAuthorizer
     from portalab.core.db import Database
 
     settings = load_settings()
     import_all_models()
     database = Database.from_url(settings.database_url.reveal())
     try:
-        module = wire_identity(
-            default_identity_context(
-                database,
-                data_dir=settings.data_dir,
-                capabilities=new_registry(),
-                authorizer=DenyAllAuthorizer(),
-            )
-        )
+        module = wire_platform(database, data_dir=settings.data_dir, capabilities=new_registry()).identity
         user_id = await module.bootstrap.create_first_admin(
             login=args.login, password=password, display_name=args.display_name, email=args.email
         )

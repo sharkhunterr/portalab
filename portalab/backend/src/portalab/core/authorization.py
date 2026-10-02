@@ -8,7 +8,9 @@ Authentication (who is the caller) comes from the :class:`PrincipalResolver` ins
 — visibility (spec 021) is applied to the data after ``require()`` allowed the action.
 """
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import Any, Protocol
 
 from fastapi import Depends, Request
@@ -16,9 +18,27 @@ from fastapi.routing import APIRoute, iter_route_contexts
 from starlette.routing import BaseRoute
 
 from portalab.core.authz_port import ANONYMOUS, Authorizer, Principal, ResourceRef
-from portalab.core.errors import Forbidden, Unauthorized
+from portalab.core.errors import Forbidden, NotFound, Unauthorized
 
 PUBLIC_MARKER = "__portalab_public__"
+
+_request_memo: ContextVar[dict[Any, Any] | None] = ContextVar("portalab_authz_memo", default=None)
+
+
+@contextmanager
+def authorization_scope() -> Iterator[dict[Any, Any]]:
+    """Per-request memo for the authorization engine (no cross-request cache, spec 003 R6)."""
+    memo: dict[Any, Any] = {}
+    token = _request_memo.set(memo)
+    try:
+        yield memo
+    finally:
+        _request_memo.reset(token)
+
+
+def request_memo() -> dict[Any, Any] | None:
+    """The memo of the current request, or ``None`` outside a request (jobs, CLI)."""
+    return _request_memo.get()
 
 
 class PrincipalResolver(Protocol):
@@ -42,10 +62,15 @@ class RequirePermission:
     """FastAPI dependency: the caller must hold ``permission`` (optionally on a resource)."""
 
     def __init__(
-        self, permission: str, resource: Callable[[Request], ResourceRef | None] | None = None
+        self,
+        permission: str,
+        resource: Callable[[Request], ResourceRef | None] | None = None,
+        *,
+        hide_existence: bool = False,
     ) -> None:
         self.permission = permission
         self._resource = resource
+        self.hide_existence = hide_existence
 
     async def __call__(self, request: Request) -> Principal:
         principal = await current_principal(request)
@@ -55,12 +80,23 @@ class RequirePermission:
         authorizer: Authorizer = request.app.state.authorizer
         if await authorizer.is_allowed(principal, self.permission, resource):
             return principal
+        if self.hide_existence:
+            raise NotFound()  # where existence itself is sensitive (CANONICAL_DECISIONS OQ-19)
         raise Forbidden()
 
 
-def require(permission: str, resource: Callable[[Request], ResourceRef | None] | None = None) -> Any:
-    """``Depends(...)`` declaring the permission a route needs."""
-    return Depends(RequirePermission(permission, resource))
+def require(
+    permission: str,
+    resource: Callable[[Request], ResourceRef | None] | None = None,
+    *,
+    hide_existence: bool = False,
+) -> Any:
+    """``Depends(...)`` declaring the permission a route needs.
+
+    Ordering rule: authorize first, then filter by visibility (spec 021) — ``require()`` never reads or
+    changes privacy preferences.
+    """
+    return Depends(RequirePermission(permission, resource, hide_existence=hide_existence))
 
 
 async def current_principal(request: Request) -> Principal:

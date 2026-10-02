@@ -74,8 +74,18 @@ def _diff(connection: Connection) -> list[object]:
     return [
         diff
         for diff in compare_metadata(context, metadatas)  # type: ignore[arg-type]
-        if not (isinstance(diff, tuple) and diff[0] == "remove_table")
+        if not (isinstance(diff, tuple) and diff[0] == "remove_table") and not _db_only_users_fk(diff)
     ]
+
+
+def _db_only_users_fk(diff: object) -> bool:
+    """Other modules reference ``identity.users(id)`` through migration-created FKs only (no cross-module
+    model import), so the models legitimately lack them."""
+    if not (isinstance(diff, tuple) and diff[0] == "remove_fk"):
+        return False
+    constraint = diff[1]
+    referred = constraint.referred_table
+    return (referred.schema, referred.name) == ("identity", "users") and constraint.table.schema != "identity"
 
 
 async def test_models_and_migrations_are_in_sync(database: Database) -> None:

@@ -20,11 +20,19 @@ Called at import time by core/modules/plugins; idempotent upsert; reserved ⇒ A
 ## `ConfirmationService`
 `issue(principal, permission, resource, payload) -> token` · `consume(token, principal, permission, resource, payload) -> bool` (single use, short TTL).
 
+## `authz.user_grants` capability (F15; consumed by 015 / 023)
+`grant(user_id, permission_key, scope_kind="global", scope_ref="", source)` idempotent · `revoke(...) -> bool`.
+Only permissions declared `user_grantable` (e.g. `plugin:<key>.use`); reserved permissions never.
+
+## Reserved set (core catalog)
+`users.admin.transfer`, `users.roles.manage`, `security.manage` — Admin only, never granted elsewhere.
+
 ## HTTP (`/api/v1`)
 | Path | Permission |
 |---|---|
 | GET `/permissions` (catalog) | `users.roles.manage` |
 | GET/POST/PATCH `/roles`, `/groups`, grants | `users.roles.manage` (sensitive, audited; reserved perms refused for non-Admin roles) |
 | POST/DELETE `/users/{id}/roles`, `/users/{id}/groups` | `users.roles.manage` |
-| GET `/me/permissions` | self (effective set for UI hints; never the authority) |
+| GET `/me/permissions` | `users.self.manage` (effective set for UI hints; never the authority) |
+| DELETE `/grants/{id}` · DELETE `/users/{id}/roles/{role_key}` · DELETE `/users/{id}/groups/{group_key}` | `users.roles.manage` |
 Error codes: `authz.forbidden`, `authz.reserved_permission`, `authz.sole_admin_protected`, `authz.confirmation_required`.

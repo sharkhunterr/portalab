@@ -5,9 +5,8 @@ import contextlib
 import signal
 
 from portalab.app.composition import import_all_models
-from portalab.app.wiring import default_identity_context, wire_identity
+from portalab.app.wiring import wire_platform
 from portalab.capabilities.catalog import new_registry
-from portalab.core.authz_port import DenyAllAuthorizer
 from portalab.core.db import Database
 from portalab.core.jobs.registry import default_registry
 from portalab.core.jobs.worker import Worker
@@ -35,12 +34,9 @@ async def run_worker(settings: BootstrapSettings) -> None:
     import_all_models()
     database = Database.from_url(settings.database_url.reveal())
     capabilities = new_registry()
-    identity = wire_identity(
-        default_identity_context(
-            database, data_dir=settings.data_dir, capabilities=capabilities, authorizer=DenyAllAuthorizer()
-        ),
-        jobs=default_registry,
-    )
+    identity = wire_platform(
+        database, data_dir=settings.data_dir, capabilities=capabilities, jobs=default_registry
+    ).identity
     stop = asyncio.Event()
     loop = asyncio.get_running_loop()
     for signum in (signal.SIGTERM, signal.SIGINT):

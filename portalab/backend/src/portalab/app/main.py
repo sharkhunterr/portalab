@@ -21,10 +21,11 @@ from portalab.app.security import PrincipalResolver, enforce_default_deny
 from portalab.app.spa import SPAStaticFiles, spa_directory
 from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
-from portalab.app.wiring import default_identity_context, wire_identity
+from portalab.app.wiring import DeferredAuthorizer, wire_identity, wire_platform
 from portalab.capabilities.catalog import new_registry
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.core.authz_port import Authorizer, DenyAllAuthorizer
+from portalab.core.authorization import authorization_scope
+from portalab.core.authz_port import Authorizer
 from portalab.core.db import Database
 from portalab.core.errors import (
     PROBLEM_CONTENT_TYPE,
@@ -38,6 +39,8 @@ from portalab.core.errors import (
 )
 from portalab.core.logging import correlation_scope, get_correlation_id, get_logger
 from portalab.core.settings import BootstrapSettings
+from portalab.modules.authz.api import routers as authz_routers
+from portalab.modules.authz.module import AuthzModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
@@ -65,19 +68,25 @@ def create_app(
     static_dir: Path | None = DEFAULT_STATIC_DIR,
     identity: IdentityContext | None = None,
     capabilities: CapabilityRegistry | None = None,
+    authz: AuthzModule | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
 
     owns_database = database is None and settings is not None
 
     def wire_modules(app: FastAPI, db: Database) -> None:
-        context = identity or default_identity_context(
+        if identity is not None:  # tests wire their own identity context (and optionally an authz module)
+            app.state.identity_module = wire_identity(identity)
+            return
+        platform = wire_platform(
             db,
             data_dir=settings.data_dir if settings else Path("/var/lib/portalab"),
             capabilities=app.state.capabilities,
-            authorizer=app.state.authorizer,
         )
-        app.state.identity_module = wire_identity(context)
+        app.state.authz_module = platform.authz
+        app.state.identity_module = platform.identity
+        if isinstance(app.state.authorizer, DeferredAuthorizer):
+            app.state.authorizer.target = platform.authz.engine
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -100,8 +109,11 @@ def create_app(
         openapi_url=None,  # schema exported by `portalab openapi`; the portal is authenticated-only (CD-025)
     )
     app.state.database = database
-    app.state.authorizer = authorizer or (identity.authorizer if identity else DenyAllAuthorizer())
+    if authorizer is None:
+        authorizer = authz.engine if authz else identity.authorizer if identity else DeferredAuthorizer()
+    app.state.authorizer = authorizer
     app.state.capabilities = identity.capabilities if identity else (capabilities or new_registry())
+    app.state.authz_module = authz
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
     if database is not None:
@@ -119,7 +131,7 @@ def create_app(
         incoming = request.headers.get(CORRELATION_HEADER)
         valid = incoming if incoming and _CORRELATION_RE.fullmatch(incoming) else None
         started = time.perf_counter()
-        with correlation_scope(valid) as correlation_id:
+        with correlation_scope(valid) as correlation_id, authorization_scope():
             try:
                 response = await call_next(request)
             except Exception as exc:  # last-resort guard: never leak internals
@@ -172,7 +184,7 @@ def create_app(
 
     app.include_router(health_router)
     app.include_router(stream_router)
-    for router in identity_routers():
+    for router in [*identity_routers(), *authz_routers()]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None
     if spa is not None:
