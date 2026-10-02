@@ -1,13 +1,21 @@
 """Administration module facade (spec 020): configuration store and policies, preferences facade and read
 ports, toggles, import/export, first-run wizard, Control Center, admin surfaces."""
 
-from portalab.capabilities.administration import PANEL_CAPABILITY, AdminSurface, default_admin_surfaces
+from typing import Any
+
+from portalab.capabilities.administration import (
+    CONFIG_WRITER_CAPABILITY,
+    EXTENSION_STATE_CAPABILITY,
+    PANEL_CAPABILITY,
+    AdminSurface,
+    default_admin_surfaces,
+)
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.config import I18N_POLICY_READER, LOCALE_READER
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditSink
-from portalab.core.authz_port import Authorizer
+from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.secrets import SecretBox
@@ -20,7 +28,7 @@ from portalab.modules.administration.config.ports import (
     ConfigUserLocalePreferenceReader,
 )
 from portalab.modules.administration.config.registry import SettingRegistry
-from portalab.modules.administration.config.service import ConfigService
+from portalab.modules.administration.config.service import Change, ConfigService
 from portalab.modules.administration.config.user_prefs import (
     PreferenceErasureParticipant,
     PreferenceExportContributor,
@@ -35,6 +43,24 @@ from portalab.modules.administration.policies.service import PolicyService
 from portalab.modules.administration.toggles.service import ToggleService
 
 OWNER = "module:administration"
+
+
+class _ExtensionState:
+    def __init__(self, toggles: Any) -> None:
+        self.toggles = toggles
+
+    async def enabled(self, kind: str, ref: str) -> bool:
+        return bool(await self.toggles.is_enabled(kind, ref))
+
+
+class _ConfigWriter:
+    def __init__(self, config: Any) -> None:
+        self.config = config
+
+    async def set_global(self, actor: Principal, key: str, value: Any, *, reason: str = "") -> None:
+        await self.config.apply(
+            [Change(key, value)], actor, admin_change=True, reason=reason or "admin change"
+        )
 
 
 class AdministrationModule:
@@ -65,6 +91,15 @@ class AdministrationModule:
     def register_capabilities(self) -> None:
         provide = self.capabilities.provide
         provide(CONFIG, self.config, instance_ref="administration", owner=OWNER)
+        provide(
+            EXTENSION_STATE_CAPABILITY,
+            _ExtensionState(self.toggles),
+            instance_ref="administration",
+            owner=OWNER,
+        )
+        provide(
+            CONFIG_WRITER_CAPABILITY, _ConfigWriter(self.config), instance_ref="administration", owner=OWNER
+        )
         provide(
             LOCALE_READER,
             ConfigUserLocalePreferenceReader(self.config),

@@ -1,0 +1,57 @@
+/** Shell strings (spec 004) — default English, replaced by i18n catalogs (026). Navigation labels come as
+ * keys from the server (``label_key``) and resolve here until the catalogs land. */
+export const shellStrings = {
+  brand: "Portalab",
+  skip: "Skip to content",
+  mainNav: "Main navigation",
+  breadcrumb: "Breadcrumb",
+  related: "Related",
+  menu: "Menu",
+  closeMenu: "Close menu",
+  search: "Search",
+  searchPlaceholder: "Search or jump to…",
+  assistant: "Assistant",
+  assistantUnavailable: "The assistant is not available right now.",
+  notifications: "Notifications",
+  account: "Account",
+  signOut: "Sign out",
+  palette: "Command palette",
+  paletteInput: "Type a command or a destination",
+  paletteEmpty: "No matching command.",
+  paletteResults: (count: number) => `${count} result${count === 1 ? "" : "s"}`,
+  shortcutsTitle: "Keyboard shortcuts",
+  degraded: (count: number) =>
+    `${count} services are degraded or unavailable. Navigation and search still work.`,
+  notAvailable: "This page is not available.",
+  notAvailableDetail: "It may not exist, or you may not have access to it.",
+  unauthorized: "You do not have access to this page.",
+  routeError: "This page could not be loaded.",
+  retry: "Retry",
+  goHome: "Go to the home page",
+  homeTitle: "Welcome",
+  homeEmpty: "Your dashboard arrives with the next release. Meanwhile:",
+  navDegraded: "Navigation is limited right now.",
+  labels: {
+    "nav.home": "Home",
+    "nav.account": "Account",
+    "nav.appearance": "Appearance",
+    "nav.privacy": "Privacy",
+    "nav.services": "Services",
+    "nav.shortcuts": "Keyboard shortcuts",
+    "nav.admin.control_center": "Control Center",
+    "nav.admin.configuration": "Configuration",
+    "nav.admin.services": "Manage services",
+    "nav.admin.roles": "Roles & permissions",
+    "nav.admin.privacy": "Privacy policies",
+    "nav.admin.audit": "Audit",
+    "nav.admin.events": "Events",
+    "nav.admin.observability": "Observability",
+    "nav.group.main": "Portal",
+    "nav.group.me": "My account",
+    "nav.group.admin": "Administration",
+  } as Record<string, string>,
+} as const;
+
+export function label(key: string): string {
+  return shellStrings.labels[key] ?? key;
+}

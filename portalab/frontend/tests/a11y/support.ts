@@ -1,7 +1,46 @@
 import type { Page } from "@playwright/test";
 
 /** Minimal API stub for journeys: an account that can sign in, with its permissions and preferences. */
-export async function stubApi(page: Page): Promise<{ saved: Record<string, unknown> }> {
+export const NAVIGATION = {
+  version: "v1",
+  degraded: false,
+  groups: [
+    {
+      key: "main",
+      label_key: "nav.group.main",
+      entries: [
+        { key: "shell.home", label_key: "nav.home", route: "/" },
+        { key: "health.services", label_key: "nav.services", route: "/services" },
+      ],
+    },
+    {
+      key: "me",
+      label_key: "nav.group.me",
+      entries: [
+        { key: "identity.account", label_key: "nav.account", route: "/account" },
+        { key: "ui.appearance", label_key: "nav.appearance", route: "/settings/appearance" },
+      ],
+    },
+  ],
+  commands: [
+    { key: "health.services", label_key: "nav.services", route: "/services", kind: "navigate" },
+    { key: "identity.account", label_key: "nav.account", route: "/account", kind: "navigate" },
+    { key: "ui.appearance", label_key: "nav.appearance", route: "/settings/appearance", kind: "navigate" },
+    {
+      key: "shell.shortcuts_help",
+      label_key: "nav.shortcuts",
+      kind: "action",
+      action_id: "shell.show_shortcuts",
+    },
+  ],
+  related: {},
+  crumbs: {},
+};
+
+export async function stubApi(
+  page: Page,
+  options: { failing?: string[] } = {},
+): Promise<{ saved: Record<string, unknown> }> {
   let signedIn = false;
   const saved: Record<string, unknown> = {};
   const me = {
@@ -32,6 +71,19 @@ export async function stubApi(page: Page): Promise<{ saved: Record<string, unkno
     if (url.pathname === "/api/v1/me") return json(200, me);
     if (url.pathname === "/api/v1/me/permissions")
       return json(200, { permissions: ["users.self.manage"], roles: ["user"] });
+    if (url.pathname === "/api/v1/me/navigation") return json(200, NAVIGATION);
+    if (url.pathname === "/api/v1/services/health") {
+      const failing = options.failing ?? [];
+      return json(200, {
+        items: ["Media", "Books", "Music"].map((name, index) => ({
+          id: `s${index}`,
+          name,
+          connector: "fake",
+          state: failing.includes(name) ? "unavailable" : "operational",
+          availability: 1,
+        })),
+      });
+    }
     if (url.pathname === "/api/v1/me/preferences") {
       if (method === "PUT") Object.assign(saved, route.request().postDataJSON());
       return json(200, { preferences: [] });

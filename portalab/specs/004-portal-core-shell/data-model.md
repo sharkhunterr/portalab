@@ -20,3 +20,9 @@ Consumes: `permission.role_assigned|role_revoked|group_changed|permission_grante
 
 ## Privacy
 No personal data stored; navigation views are computed per request/session and not logged with identifiers.
+
+## Implementation notes (2026-10-03)
+- `shell.epochs(name, value, updated_at)` stores the `permission` / `module` epochs shared by all processes
+  (the epoch consumer runs in the worker; the API reads them per request as part of the cache key).
+- `contribution_errors` also keeps a redacted `detail`; unique per `(owner, key, reason)`.
+- `NavigationView` also carries `related` (route → links), `crumbs` (route → parent) and `degraded`.

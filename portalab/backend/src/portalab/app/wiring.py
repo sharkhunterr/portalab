@@ -29,6 +29,7 @@ from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
+from portalab.modules.shell.module import ShellModule
 from portalab.modules.ui.module import UiModule
 
 
@@ -88,6 +89,7 @@ class Platform:
     health: HealthModule
     observability: ObservabilityModule
     ui: UiModule
+    shell: ShellModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -150,6 +152,8 @@ def wire_platform(
     ui = UiModule(database, events, authz.audit, capabilities)
     ui.register()
     administration.registry.register_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
+    shell = ShellModule(database, events, authz.engine, capabilities)
+    shell.register()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -178,7 +182,17 @@ def wire_platform(
         seeds.extend(health.register_jobs(jobs))
         seeds.extend(observability.register_jobs(jobs))
     platform = Platform(
-        authz, privacy, administration, identity, events_module, connectors, health, observability, ui, seeds
+        authz,
+        privacy,
+        administration,
+        identity,
+        events_module,
+        connectors,
+        health,
+        observability,
+        ui,
+        shell,
+        seeds,
     )
     from portalab.app.config_bindings import bind
 

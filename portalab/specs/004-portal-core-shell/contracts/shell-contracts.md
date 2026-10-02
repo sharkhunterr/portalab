@@ -23,3 +23,10 @@ Problem codes: `navigation.contribution_invalid`, `route.unavailable`, `route.un
 
 ## Extension point (023)
 Plugins call `core.navigation.register_contribution` only through the plugin host; enrichment of existing modules requires the target to declare an `extension_slot`.
+
+## Implementation notes (2026-10-03)
+- Live updates use the kernel stream `GET /api/v1/stream` (topic `navigation.changed`, payload `{version}`)
+  instead of a second `/me/stream` endpoint. `GET /me/navigation` requires `users.self.manage` (every account).
+- New capabilities used by the shell: `admin.extension_state` (module/plugin enablement) and
+  `admin.config_writer` (audited admin layout change), both provided by Administration (020).
+- Frontend slot contracts: `ShellSlotsProvider` with `search`, `ai`, `notifications`, `help` (`HelpResolver`, 011).

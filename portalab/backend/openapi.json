@@ -713,6 +713,43 @@
         "title": "ImportIn",
         "type": "object"
       },
+      "Layout": {
+        "additionalProperties": false,
+        "properties": {
+          "group_order": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Group Order",
+            "type": "array"
+          },
+          "groups_of": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Groups Of",
+            "type": "object"
+          },
+          "order": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Order",
+            "type": "object"
+          },
+          "pinned": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Pinned",
+            "type": "array"
+          }
+        },
+        "title": "Layout",
+        "type": "object"
+      },
       "LoginRequest": {
         "additionalProperties": false,
         "properties": {
@@ -3468,6 +3505,93 @@
         ]
       }
     },
+    "/api/v1/admin/shell/contribution-errors": {
+      "get": {
+        "operationId": "contribution_errors_api_v1_admin_shell_contribution_errors_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Contribution Errors Api V1 Admin Shell Contribution Errors Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Contribution Errors",
+        "tags": [
+          "shell"
+        ]
+      }
+    },
+    "/api/v1/admin/shell/layout": {
+      "get": {
+        "operationId": "get_layout_api_v1_admin_shell_layout_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Layout Api V1 Admin Shell Layout Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Layout",
+        "tags": [
+          "shell"
+        ]
+      },
+      "put": {
+        "operationId": "put_layout_api_v1_admin_shell_layout_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Layout"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Put Layout Api V1 Admin Shell Layout Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Layout",
+        "tags": [
+          "shell"
+        ]
+      }
+    },
     "/api/v1/admin/surfaces": {
       "get": {
         "operationId": "surfaces_api_v1_admin_surfaces_get",
@@ -5396,6 +5520,25 @@
         "summary": "My History",
         "tags": [
           "events"
+        ]
+      }
+    },
+    "/api/v1/me/navigation": {
+      "get": {
+        "operationId": "my_navigation_api_v1_me_navigation_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Navigation",
+        "tags": [
+          "shell"
         ]
       }
     },

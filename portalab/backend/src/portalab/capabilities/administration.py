@@ -17,6 +17,8 @@ BOOTSTRAP_CAPABILITY = "identity.bootstrap"
 PLUGIN_PERMISSIONS_CAPABILITY = "authz.plugin_permissions"
 TOGGLE_HOOK_CAPABILITY = "admin.toggle_hook"
 AUDIT_STATUS_CAPABILITY = "audit.status"
+EXTENSION_STATE_CAPABILITY = "admin.extension_state"
+CONFIG_WRITER_CAPABILITY = "admin.config_writer"
 
 PanelState = Literal["available", "partial", "stale", "unavailable", "no-data"]
 
@@ -81,6 +83,20 @@ class AuditStatus(Protocol):
     async def status(self) -> Mapping[str, Any]: ...
 
 
+@runtime_checkable
+class ExtensionState(Protocol):
+    """Whether a module/plugin/connector/service is enabled (020 toggles; enabled when never toggled)."""
+
+    async def enabled(self, kind: str, ref: str) -> bool: ...
+
+
+@runtime_checkable
+class ConfigWriter(Protocol):
+    """Validated, audited global setting change on behalf of an actor (020 ``ConfigService.apply``)."""
+
+    async def set_global(self, actor: Principal, key: str, value: Any, *, reason: str = "") -> None: ...
+
+
 @dataclass(frozen=True, slots=True)
 class AdminSurface:
     key: str
@@ -131,4 +147,6 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(PLUGIN_PERMISSIONS_CAPABILITY, PluginPermissions, False, "Enable/withdraw a plugin's permissions"),
     _spec(TOGGLE_HOOK_CAPABILITY, ToggleHook, True, "Compatibility check before enabling an extension"),
     _spec(AUDIT_STATUS_CAPABILITY, AuditStatus, False, "Audit chain status for the Control Center"),
+    _spec(EXTENSION_STATE_CAPABILITY, ExtensionState, False, "Enablement of modules/plugins (020 toggles)"),
+    _spec(CONFIG_WRITER_CAPABILITY, ConfigWriter, False, "Audited global setting changes (020)"),
 )

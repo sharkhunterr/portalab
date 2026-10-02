@@ -1,0 +1,86 @@
+/* Shell layout (spec 004): logical properties, tokens only, reflows at 320 px. */
+.shell-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+.shell-brand {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+.shell-body {
+  display: flex;
+  min-height: calc(100vh - 4rem);
+}
+.shell-sidebar {
+  flex: none;
+  inline-size: 14rem;
+  padding: var(--space-4);
+  border-inline-end: 1px solid var(--color-border);
+}
+.shell-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+}
+.shell-nav__group {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-block: var(--space-3) var(--space-1);
+}
+.shell-nav__link {
+  display: block;
+  min-height: var(--target-min);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.shell-nav__link[aria-current="page"] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 600;
+}
+.shell-breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  list-style: none;
+}
+.shell-breadcrumbs li + li::before {
+  content: "/";
+  margin-inline-end: var(--space-2);
+  color: var(--color-text-muted);
+}
+.shell-banner {
+  padding: var(--space-2) var(--space-4);
+}
+.shell-palette__input {
+  inline-size: 100%;
+  min-height: 2.5rem;
+  padding: var(--space-2);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.shell-palette__option {
+  min-height: var(--target-min);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.shell-palette__option[aria-selected="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.shell-related {
+  margin-block-start: var(--space-6);
+}

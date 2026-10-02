@@ -14,6 +14,10 @@ test("keyboard-only: sign in, reach and change appearance settings", async ({ pa
   await page.keyboard.press("Tab");
   await page.keyboard.type("correct horse battery");
   await page.keyboard.press("Enter");
+  await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+  await page.keyboard.press("Control+k"); // command palette → appearance settings, keyboard only
+  await page.keyboard.type("appear");
+  await page.keyboard.press("Enter");
   const theme = page.getByLabel("Theme", { exact: true });
   await expect(theme).toBeVisible();
   for (let i = 0; i < 60 && !(await theme.evaluate((el) => el === document.activeElement)); i += 1) {

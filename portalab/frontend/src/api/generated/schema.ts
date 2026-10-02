@@ -400,6 +400,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/shell/contribution-errors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contribution Errors */
+        get: operations["contribution_errors_api_v1_admin_shell_contribution_errors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/shell/layout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Layout */
+        get: operations["get_layout_api_v1_admin_shell_layout_get"];
+        /** Put Layout */
+        put: operations["put_layout_api_v1_admin_shell_layout_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/surfaces": {
         parameters: {
             query?: never;
@@ -967,6 +1002,23 @@ export interface paths {
         };
         /** My History */
         get: operations["my_history_api_v1_me_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/navigation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Navigation */
+        get: operations["my_navigation_api_v1_me_navigation_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2051,6 +2103,21 @@ export interface components {
             document: {
                 [key: string]: unknown;
             };
+        };
+        /** Layout */
+        Layout: {
+            /** Group Order */
+            group_order?: string[];
+            /** Groups Of */
+            groups_of?: {
+                [key: string]: string;
+            };
+            /** Order */
+            order?: {
+                [key: string]: number;
+            };
+            /** Pinned */
+            pinned?: string[];
         };
         /** LoginRequest */
         LoginRequest: {
@@ -3374,6 +3441,85 @@ export interface operations {
             };
         };
     };
+    contribution_errors_api_v1_admin_shell_contribution_errors_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    get_layout_api_v1_admin_shell_layout_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    put_layout_api_v1_admin_shell_layout_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Layout"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     surfaces_api_v1_admin_surfaces_get: {
         parameters: {
             query?: never;
@@ -4685,6 +4831,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_navigation_api_v1_me_navigation_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };
