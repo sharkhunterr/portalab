@@ -84,6 +84,74 @@ export async function stubApi(
         })),
       });
     }
+    if (url.pathname === "/api/v1/palette/resolve") {
+      const route = url.searchParams.get("route") ?? "/";
+      const q = url.searchParams.get("q") ?? "";
+      return json(200, {
+        destinations: [],
+        actions: route.startsWith("/services")
+          ? [
+              {
+                id: "health.restart",
+                label: "Restart service",
+                kind: "navigate",
+                route: "/services",
+                action_id: null,
+                sensitivity: "destructive",
+                confirmation_required: true,
+                keywords: ["restart"],
+              },
+            ]
+          : [],
+        object: q === "#42" ? { kind: "services", id: "s1", title: "Media", route: "/services" } : null,
+        intent: null,
+        suggestions: [],
+        assistant: "unavailable",
+      });
+    }
+    if (url.pathname === "/api/v1/search/suggest") {
+      const q = (url.searchParams.get("q") ?? "").toLowerCase();
+      return json(200, {
+        items: "media".startsWith(q)
+          ? [{ kind: "services", id: "s0", title: "Media server", url_ref: "/services" }]
+          : [],
+      });
+    }
+    if (url.pathname === "/api/v1/search" && method === "POST") {
+      const q = String((route.request().postDataJSON() as { q?: string }).q ?? "");
+      return json(200, {
+        request_id: "r",
+        took_ms: 1,
+        semantic: "unavailable",
+        total: 1,
+        groups: [
+          {
+            kind: "services",
+            label_key: "search.kind.services",
+            state: "ok",
+            next_cursor: null,
+            facets: [],
+            items: [
+              {
+                kind: "services",
+                id: "s0",
+                title: `Media server (${q})`,
+                url_ref: "/services",
+                snippet: [
+                  { text: "Media", hit: true },
+                  { text: " server", hit: false },
+                ],
+                language: null,
+                matched_by: "exact",
+                score: 1,
+                facets: {},
+              },
+            ],
+          },
+        ],
+      });
+    }
+    if (url.pathname === "/api/v1/me/search-history") return json(200, []);
     if (url.pathname === "/api/v1/me/preferences") {
       if (method === "PUT") Object.assign(saved, route.request().postDataJSON());
       return json(200, { preferences: [] });

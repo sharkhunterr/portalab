@@ -11,7 +11,9 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
+import portalab.app.main  # noqa: F401 — imports every module, so their permissions are declared
 from portalab.app.security import api_routes, route_access
+from portalab.core.permissions import default_permissions
 from portalab.modules.authz.catalog.core_permissions import CORE_PERMISSIONS
 from tests.integration.identity.helpers import create_user, login, module_of
 
@@ -32,6 +34,10 @@ USER_ROLE = {
     key
     for key, _d, _s, _r, _c, roles in CORE_PERMISSIONS
     if any((role if isinstance(role, str) else role[0]) == "user" for role in roles)
+} | {  # module-declared permissions granted to the User role by default (e.g. search.use, spec 008)
+    declaration.key
+    for declaration in default_permissions.all()
+    if any(grant.role == "user" for grant in declaration.default_grants)
 }
 SAMPLE_ID = "00000000-0000-7000-8000-000000000000"
 

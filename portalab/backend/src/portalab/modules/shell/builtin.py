@@ -60,6 +60,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
+        "key": "search.page",
+        "owner": "module:search",
+        "kind": "entry",
+        "label_key": "nav.search",
+        "icon": "search",
+        "route": "/search",
+        "group": "main",
+        "order_hint": 15,
+        "required_permission": "search.use",
+    },
+    {
         "key": "health.services",
         "owner": "module:health",
         "kind": "entry",

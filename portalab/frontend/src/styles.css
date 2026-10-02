@@ -3,6 +3,7 @@
 @import "./design-system/functional-state.css";
 @import "./design-system/components/components.css";
 @import "./features/auth/auth.css";
+@import "./features/search/search.css";
 @import "./shell/shell.css";
 
 /* Tailwind utilities resolve to design tokens, so utilities follow the active theme. */

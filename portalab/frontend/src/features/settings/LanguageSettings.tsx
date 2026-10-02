@@ -28,7 +28,7 @@ interface PreferenceView {
 }
 
 const LOCALES = ["en-US", "en-GB", "fr-FR", "fr-CA", "de-DE", "es-ES", "it-IT", "nl-NL", "pt-BR", "ja-JP"];
-const DAYS = [1, 2, 3, 4, 5, 6, 7];
+const DAYS = [0, 1, 2, 3, 4, 5, 6]; // i18n.firstDayOfWeek: 0 = Monday … 6 = Sunday
 
 function zones(): string[] {
   const intl = Intl as unknown as { supportedValuesOf?: (key: string) => string[] };
@@ -84,7 +84,7 @@ export function LanguageSettings() {
   const set = (key: string) => (next: string) => save.mutate({ [key]: next === "" ? null : next });
   const dayName = (day: number) =>
     new Intl.DateTimeFormat(ctx.locale, { weekday: "long", timeZone: "UTC" }).format(
-      new Date(Date.UTC(2024, 0, day)), // 2024-01-01 is a Monday
+      new Date(Date.UTC(2024, 0, day + 1)), // 2024-01-01 is a Monday
     );
   return (
     <section aria-labelledby={headingId} className="account-page">

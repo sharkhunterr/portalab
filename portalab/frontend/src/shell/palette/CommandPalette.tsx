@@ -1,10 +1,13 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useAnnounce } from "../../design-system/a11y/Announce";
+import { Button } from "../../design-system/components/Button";
+import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { useShellStrings } from "../strings";
 import { type Command, fromNavigation, rank } from "./CommandRegistry";
+import { useSearchCommands } from "./providers/search";
 
 /**
  * Command palette (spec 004 T028; FR-019/020): opens from any page (Mod+K), lists only permitted commands,
@@ -23,6 +26,7 @@ export function CommandPalette({
   actions: Record<string, () => void>;
 }) {
   const shellStrings = useShellStrings();
+  const t = useT();
   const { view } = useNavigationView();
   const navigate = useNavigate();
   const announce = useAnnounce();
@@ -33,7 +37,14 @@ export function CommandPalette({
     () => fromNavigation(view.commands, shellStrings.label, actions),
     [view.commands, shellStrings.label, actions],
   );
-  const results = useMemo(() => rank(commands, query), [commands, query]);
+  const location = useLocation();
+  const searched = useSearchCommands(query, location.pathname, open);
+  const results = useMemo(() => {
+    const local = rank(commands, query);
+    const seen = new Set(local.map((c) => c.route).filter(Boolean));
+    return [...local, ...searched.filter((c) => !c.route || !seen.has(c.route))].slice(0, 30);
+  }, [commands, query, searched]);
+  const [pending, setPending] = useState<Command | null>(null);
 
   const returnFocus = useRef<HTMLElement | null>(null);
   useEffect(() => {
@@ -41,6 +52,7 @@ export function CommandPalette({
       returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setQuery(initialQuery);
       setActive(0);
+      setPending(null);
     }
   }, [open, initialQuery]);
   const { paletteResults, paletteEmpty } = shellStrings;
@@ -48,8 +60,15 @@ export function CommandPalette({
     if (open) announce(results.length ? paletteResults(results.length) : paletteEmpty);
   }, [open, results.length, announce, paletteResults, paletteEmpty]);
 
-  function execute(command: Command | undefined) {
+  function execute(command: Command | undefined, confirmed = false) {
     if (!command) return;
+    if (command.sensitive && !confirmed) {
+      // sensitive actions need an explicit second step; the owning endpoint confirms and audits (008 R12)
+      setPending(command);
+      announce(t("search:palette.confirm"));
+      return;
+    }
+    setPending(null);
     onOpenChange(false);
     if (command.run) command.run();
     else if (command.route) navigate(command.route);
@@ -64,7 +83,8 @@ export function CommandPalette({
       setActive((index) => Math.max(index - 1, 0));
     } else if (event.key === "Enter") {
       event.preventDefault();
-      execute(results[active]);
+      if (pending) execute(pending, true);
+      else execute(results[active]);
     }
   }
 
@@ -75,6 +95,12 @@ export function CommandPalette({
         <DialogPrimitive.Content
           className="ds-dialog shell-palette"
           aria-describedby={undefined}
+          onEscapeKeyDown={(event) => {
+            if (pending) {
+              event.preventDefault(); // Escape first cancels a pending confirmation, then closes
+              setPending(null);
+            }
+          }}
           onCloseAutoFocus={(event) => {
             // opened from a shortcut or a slot (no Radix trigger): give focus back to where it was
             if (returnFocus.current?.isConnected) {
@@ -126,6 +152,19 @@ export function CommandPalette({
             ))}
           </div>
           {results.length === 0 ? <p>{shellStrings.paletteEmpty}</p> : null}
+          {pending ? (
+            <div role="alert" className="shell-palette__confirm">
+              <p>
+                {pending.label} — {t("search:palette.confirm")}
+              </p>
+              <div className="ds-stack ds-stack--row">
+                <Button onClick={() => execute(pending, true)}>{pending.label}</Button>
+                <Button variant="secondary" onClick={() => setPending(null)}>
+                  {t("core:cancel")}
+                </Button>
+              </div>
+            </div>
+          ) : null}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

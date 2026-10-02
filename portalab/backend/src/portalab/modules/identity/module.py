@@ -13,6 +13,7 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.modules.identity import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.identity.context import OWNER, IdentityContext
 from portalab.modules.identity.jobs import dormancy, finalize_deletion, sessions_prune, verification_expiry
+from portalab.modules.identity.search_provider import register_search
 from portalab.modules.identity.services.account_service import AccountService
 from portalab.modules.identity.services.admin_ops import AdminOperations
 from portalab.modules.identity.services.auth import AuthService, LocalAuthProvider
@@ -56,6 +57,7 @@ class IdentityModule:
         register_directory(self.ctx.capabilities, self.ctx)
         register_participants(self.ctx.capabilities, self.ctx)
         register_visibility(self.ctx.capabilities, self.ctx)
+        register_search(self.ctx)
         self.ctx.capabilities.provide(BOOTSTRAP, self.bootstrap, instance_ref="identity", owner=OWNER)
         default_admin_surfaces.register(
             AdminSurface("users", "admin.surface.users", "/admin/users", "users.manage", OWNER)

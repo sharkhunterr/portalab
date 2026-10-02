@@ -14,6 +14,7 @@ from portalab.modules.administration.config.service import ConfigService
 from portalab.modules.connectors.settings import SETTINGS as CONNECTORS_FIELDS
 from portalab.modules.health.settings import SETTINGS as HEALTH_FIELDS
 from portalab.modules.observability.settings import SETTINGS as OBSERVABILITY_FIELDS
+from portalab.modules.search.settings import SETTINGS as SEARCH_FIELDS
 
 log = get_logger("portalab.config")
 
@@ -75,6 +76,9 @@ async def refresh(platform: Any) -> None:
     observability = getattr(platform, "observability", None)
     if observability is not None:
         observability.config = replace(observability.config, **await _values(config, OBSERVABILITY_FIELDS))
+    search = getattr(platform, "search", None)
+    if search is not None:
+        search.config = replace(search.config, **await _values(config, SEARCH_FIELDS))
 
 
 async def safe_refresh(platform: Any) -> bool:
@@ -91,5 +95,5 @@ def bind(platform: Any) -> None:
     async def on_change(keys: set[str]) -> None:
         await safe_refresh(platform)
 
-    for prefix in ("identity.", "privacy.", "authz.", "connectors.", "health.", "observability."):
+    for prefix in ("identity.", "privacy.", "authz.", "connectors.", "health.", "observability.", "search."):
         platform.administration.config.on_change(prefix, on_change)

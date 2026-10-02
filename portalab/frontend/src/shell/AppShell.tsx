@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { Dialog } from "../design-system/components/Overlays";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { ResponsiveNav } from "./nav/ResponsiveNav";
@@ -34,6 +34,7 @@ export function AppShell({
 }: AppShellProps) {
   const shellStrings = useShellStrings();
   const navigate = useNavigate();
+  const location = useLocation();
   const [palette, setPalette] = useState<{ open: boolean; query: string }>({ open: false, query: "" });
   const [helpOpen, setHelpOpen] = useState(false);
   const control = useMemo(
@@ -101,7 +102,7 @@ export function AppShell({
         <ResponsiveNav collapsed={sidebarCollapsed} />
         <main id="main-content" tabIndex={-1} className="shell-main ds-reflow">
           <Breadcrumbs />
-          <RegionBoundary>{children ?? <Outlet />}</RegionBoundary>
+          <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
           <RelatedLinks />
         </main>
       </div>

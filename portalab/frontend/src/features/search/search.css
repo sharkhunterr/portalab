@@ -1,0 +1,92 @@
+/* Global search (spec 008): results and the assistant analysis side by side, stacked on small screens;
+   logical properties only (RTL), tokens only. */
+.search-form {
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.search-layout {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 64rem) {
+  .search-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+  }
+}
+
+.search-filters {
+  border: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.search-filters__group {
+  border: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.search-group {
+  margin-block: var(--space-4);
+}
+
+.search-group__count {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.search-group__items {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.search-result__title {
+  font-weight: 600;
+}
+
+.search-result__snippet {
+  margin: 0;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.search-result__snippet mark {
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.search-result__badge,
+.search-assist__note {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.search-result__badge {
+  margin-inline-start: var(--space-2);
+}
+
+/* the analysis is visually distinct from real results (FR-005) */
+.search-assist {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-surface-raised);
+  align-self: start;
+}
+
+.search-notice {
+  color: var(--color-text-muted);
+}
+
+.shell-palette__confirm {
+  border-block-start: 1px solid var(--color-border);
+  padding-block: var(--space-2);
+}

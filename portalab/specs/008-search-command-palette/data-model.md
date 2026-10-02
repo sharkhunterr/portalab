@@ -21,3 +21,19 @@ Global: `search.providerTimeoutMs` (1500), `search.maxResultsPerGroup` (10), `se
 ## Events (via 007)
 Produced: `search.performed` (aggregate counts, no query text), `search.provider_failed` (diagnostic, deduped per minute window). Consumed: provider-domain `*.created|updated|deleted|visibility_changed` only through the provider's own indexing job (no generic wildcard consumer).
 Dedup: `(user_id, request_id)` for `search.performed`.
+
+## Implementation notes (2026-10-03)
+- `search.history` also stores `normalized_query` (dedup key, unique with `user_id`) and `count`; all text
+  columns are personal data class `activity` with empty tombstones; FK to `identity.users` (cascade) is
+  migration-only. Export/erasure through the module's own privacy participants (`search.history`).
+- `search.index_state` additionally keeps `last_indexed_at` and `updated_at`.
+- `search.embeddings` is created by the migration **only when pgvector is available** (`DO` block) and is
+  not ORM-mapped; column `embedding` (untyped `vector`), plus `model_id`.
+- Extra setting `search.rateLimitPerMinute` (60) for the per-user search limiter (429
+  `search.rate_limited`).
+- Snippets are structured segments `{text, hit}` (plain text + highlight flag), never markup.
+- Providers delivered here: `navigation` and `services` (in `modules/search/providers`, through the
+  `connectors.directory` capability) and `users` (owned by identity, `modules/identity/search_provider.py`,
+  display names of active accounts only). Other domains register their own provider through
+  `portalab.capabilities.search` (owner-tagged `SearchRegistry`, `default_search`).
+- Navigation entry `search.page` (`/search`, `search.use`) added to the shell builtins.

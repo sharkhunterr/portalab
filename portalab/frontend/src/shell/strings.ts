@@ -40,6 +40,7 @@ export const shellStrings = {
     "nav.account": "Account",
     "nav.appearance": "Appearance",
     "nav.language": "Language & region",
+    "nav.search": "Search",
     "nav.privacy": "Privacy",
     "nav.services": "Services",
     "nav.shortcuts": "Keyboard shortcuts",

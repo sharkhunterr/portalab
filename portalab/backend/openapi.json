@@ -93,6 +93,51 @@
         "title": "AdminTransferRequest",
         "type": "object"
       },
+      "AssistIn": {
+        "additionalProperties": false,
+        "properties": {
+          "q": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Q",
+            "type": "string"
+          },
+          "refs": {
+            "items": {
+              "$ref": "#/components/schemas/AssistRefIn"
+            },
+            "maxItems": 50,
+            "title": "Refs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "title": "AssistIn",
+        "type": "object"
+      },
+      "AssistRefIn": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "maxLength": 96,
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "title": "AssistRefIn",
+        "type": "object"
+      },
       "AuditPage": {
         "properties": {
           "items": {
@@ -1394,6 +1439,28 @@
         "title": "RegisterRequest",
         "type": "object"
       },
+      "ReindexIn": {
+        "additionalProperties": false,
+        "properties": {
+          "kinds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kinds"
+          }
+        },
+        "title": "ReindexIn",
+        "type": "object"
+      },
       "ReopenIn": {
         "additionalProperties": false,
         "properties": {
@@ -1601,6 +1668,331 @@
           "name"
         ],
         "title": "RolePatch",
+        "type": "object"
+      },
+      "SearchFacetOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_key": {
+            "title": "Label Key",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "label_key",
+          "kind",
+          "values",
+          "counts"
+        ],
+        "title": "SearchFacetOut",
+        "type": "object"
+      },
+      "SearchGroupOut": {
+        "properties": {
+          "facets": {
+            "items": {
+              "$ref": "#/components/schemas/SearchFacetOut"
+            },
+            "title": "Facets",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SearchItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_key": {
+            "title": "Label Key",
+            "type": "string"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "partial",
+              "unavailable"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "label_key",
+          "state",
+          "items",
+          "next_cursor",
+          "facets"
+        ],
+        "title": "SearchGroupOut",
+        "type": "object"
+      },
+      "SearchHistoryOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "filters": {
+            "additionalProperties": true,
+            "title": "Filters",
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "performed_at": {
+            "title": "Performed At",
+            "type": "string"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "query",
+          "mode",
+          "filters",
+          "count",
+          "performed_at"
+        ],
+        "title": "SearchHistoryOut",
+        "type": "object"
+      },
+      "SearchIn": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          },
+          "filters": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "maxProperties": 10,
+            "title": "Filters",
+            "type": "object"
+          },
+          "kinds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kinds"
+          },
+          "mode": {
+            "default": "mixed",
+            "enum": [
+              "exact",
+              "semantic",
+              "mixed"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "q": {
+            "default": "",
+            "maxLength": 4096,
+            "title": "Q",
+            "type": "string"
+          }
+        },
+        "title": "SearchIn",
+        "type": "object"
+      },
+      "SearchItemOut": {
+        "properties": {
+          "facets": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Facets",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "matched_by": {
+            "enum": [
+              "exact",
+              "semantic"
+            ],
+            "title": "Matched By",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "snippet": {
+            "items": {
+              "$ref": "#/components/schemas/SearchSegmentOut"
+            },
+            "title": "Snippet",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url_ref": {
+            "title": "Url Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "title",
+          "url_ref",
+          "snippet",
+          "language",
+          "matched_by",
+          "score",
+          "facets"
+        ],
+        "title": "SearchItemOut",
+        "type": "object"
+      },
+      "SearchOut": {
+        "properties": {
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/SearchGroupOut"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "semantic": {
+            "enum": [
+              "ok",
+              "unavailable",
+              "off"
+            ],
+            "title": "Semantic",
+            "type": "string"
+          },
+          "took_ms": {
+            "title": "Took Ms",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "request_id",
+          "groups",
+          "took_ms",
+          "total",
+          "semantic"
+        ],
+        "title": "SearchOut",
+        "type": "object"
+      },
+      "SearchSegmentOut": {
+        "properties": {
+          "hit": {
+            "title": "Hit",
+            "type": "boolean"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "hit"
+        ],
+        "title": "SearchSegmentOut",
         "type": "object"
       },
       "ServiceIn": {
@@ -3680,6 +4072,72 @@
         "summary": "Replay",
         "tags": [
           "events"
+        ]
+      }
+    },
+    "/api/v1/admin/search/reindex": {
+      "post": {
+        "operationId": "reindex_api_v1_admin_search_reindex_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReindexIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reindex Api V1 Admin Search Reindex Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reindex",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/api/v1/admin/search/status": {
+      "get": {
+        "operationId": "admin_status_api_v1_admin_search_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Admin Status Api V1 Admin Search Status Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Admin Status",
+        "tags": [
+          "search"
         ]
       }
     },
@@ -6171,6 +6629,143 @@
         ]
       }
     },
+    "/api/v1/me/search-history": {
+      "delete": {
+        "operationId": "clear_history_api_v1_me_search_history_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Clear History",
+        "tags": [
+          "search"
+        ]
+      },
+      "get": {
+        "operationId": "history_api_v1_me_search_history_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SearchHistoryOut"
+                  },
+                  "title": "Response History Api V1 Me Search History Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "History",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/api/v1/me/search-history/{entry_id}": {
+      "delete": {
+        "operationId": "delete_history_entry_api_v1_me_search_history__entry_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete History Entry",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/api/v1/palette/resolve": {
+      "get": {
+        "operationId": "palette_api_v1_palette_resolve_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 512,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "route",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 256,
+                  "pattern": "^/[A-Za-z0-9/_:.\\-]*$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Route"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Palette Api V1 Palette Resolve Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Palette",
+        "tags": [
+          "search"
+        ]
+      }
+    },
     "/api/v1/permissions": {
       "get": {
         "operationId": "list_permissions_api_v1_permissions_get",
@@ -6567,6 +7162,127 @@
         "summary": "Add Role Grant",
         "tags": [
           "authz"
+        ]
+      }
+    },
+    "/api/v1/search": {
+      "post": {
+        "operationId": "search_api_v1_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/api/v1/search/assist": {
+      "post": {
+        "operationId": "assist_api_v1_search_assist_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assist",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/api/v1/search/suggest": {
+      "get": {
+        "operationId": "suggest_api_v1_search_suggest_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 4096,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Suggest Api V1 Search Suggest Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Suggest",
+        "tags": [
+          "search"
         ]
       }
     },

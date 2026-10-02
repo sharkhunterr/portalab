@@ -62,15 +62,22 @@ interface BoundaryState {
   error: unknown;
 }
 
-/** Region boundary + suspense for lazy pages: a failure stays inside the page area. */
+/**
+ * Region boundary + suspense for lazy pages: a failure stays inside the page area, and is cleared when
+ * ``resetKey`` changes (navigating to another page never keeps the previous page's error).
+ */
 export class RegionBoundary extends Component<
-  { children: ReactNode; existenceSensitive?: boolean },
+  { children: ReactNode; existenceSensitive?: boolean; resetKey?: string },
   BoundaryState
 > {
   override state: BoundaryState = { error: null };
 
   static getDerivedStateFromError(error: unknown): BoundaryState {
     return { error };
+  }
+
+  override componentDidUpdate(previous: { resetKey?: string }): void {
+    if (this.state.error && previous.resetKey !== this.props.resetKey) this.setState({ error: null });
   }
 
   override componentDidCatch(_error: Error, _info: ErrorInfo): void {

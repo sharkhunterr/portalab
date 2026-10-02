@@ -22,6 +22,7 @@ const PrivacyAdmin = lazy(() => import("../../pages/admin/PrivacyAdminRoute"));
 const Audit = lazy(() => import("../../pages/admin/AuditRoute"));
 const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
+const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
 
@@ -36,6 +37,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
       handle: h({ crumb: "Home" }),
       children: [
         { index: true, element: <Home /> },
+        {
+          path: "search",
+          element: <Search />,
+          handle: h({ crumb: "Search", requiredPermission: "search.use" }),
+        },
         { path: "account", element: <Account />, handle: h({ crumb: "Account" }) },
         { path: "settings/appearance", element: <Appearance />, handle: h({ crumb: "Appearance" }) },
         { path: "settings/language", element: <Language />, handle: h({ crumb: "Language & region" }) },

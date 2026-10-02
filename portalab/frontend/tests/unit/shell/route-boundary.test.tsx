@@ -54,6 +54,26 @@ describe("route states", () => {
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 
+  it("clears the error when the user navigates to another page", () => {
+    const view = render(
+      <MemoryRouter>
+        <RegionBoundary resetKey="/services/s1">
+          <Boom error={new Error("render failure")} />
+        </RegionBoundary>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    view.rerender(
+      <MemoryRouter>
+        <RegionBoundary resetKey="/search">
+          <p>Search page</p>
+        </RegionBoundary>
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("Search page")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+  });
+
   it("renders every route state with a functional state", () => {
     for (const state of ["unauthorized", "unavailable", "error"] as const) {
       const { container, unmount } = render(
