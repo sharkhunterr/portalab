@@ -44,6 +44,8 @@ from portalab.modules.administration.api import routers as admin_routers
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.api import routers as authz_routers
 from portalab.modules.authz.module import AuthzModule
+from portalab.modules.connectors.api import routers as connectors_routers
+from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.events.api import routers as events_routers
 from portalab.modules.events.module import EventsModule
 from portalab.modules.identity.api import routers as identity_routers
@@ -81,6 +83,7 @@ def create_app(
     privacy: PrivacyModule | None = None,
     administration: AdministrationModule | None = None,
     events: EventsModule | None = None,
+    connectors: ConnectorsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -100,6 +103,7 @@ def create_app(
         app.state.platform = platform
         app.state.administration_module = platform.administration
         app.state.events_module = platform.events
+        app.state.connectors_module = platform.connectors
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -113,6 +117,7 @@ def create_app(
             wire_modules(app, app.state.database)
         if app.state.platform is not None:
             await app.state.platform.refresh_config()
+            await app.state.platform.start_services()
         try:
             yield
         finally:
@@ -137,6 +142,7 @@ def create_app(
     app.state.privacy_module = privacy
     app.state.administration_module = administration
     app.state.events_module = events
+    app.state.connectors_module = connectors
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -221,6 +227,7 @@ def create_app(
         *privacy_routers(),
         *admin_routers(),
         *events_routers(),
+        *connectors_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

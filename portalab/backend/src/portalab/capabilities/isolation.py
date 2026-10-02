@@ -75,6 +75,10 @@ class ProviderGuard:
             return Stale(value=value, as_of=as_of, reason=failure.state, provenance=provenance)
         return failure
 
+    def fallback[T](self, cache_key: str | None, failure: CapabilityResult[T]) -> CapabilityResult[T]:
+        """Last-known data as :class:`Stale` (or ``failure`` when nothing is cached), without calling."""
+        return self._fallback(cache_key, failure)
+
     async def call[T](
         self,
         operation: Callable[[], Awaitable[Any]],

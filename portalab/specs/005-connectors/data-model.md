@@ -26,3 +26,17 @@
 
 ## Lifecycle / privacy
 Disabling/disconnecting keeps all rows; purge is a separate 021 action (`services.purge`). Service config may hold hostnames (technical), never user PII. Sync history retention via 021 engine (technical class).
+
+## Implementation notes (2026-10-02)
+- `services` also stores `state_seq` (event dedup `(service_id, to_state, state_seq)`) and `state_reason`
+  (redacted); credentials are one `SecretBox` token per secret field bound to `connectors.service:<id>:<field>`,
+  erased on disconnect. "Syncing" is never persisted as a service state: it is `sync_state.status = running`
+  (exposed as `display_state`), keeping sync state apart from health.
+- `sync_runs` rows are written once when a run ends; UPDATE/TRUNCATE are rejected by trigger and only the
+  021 retention window (`technical` class) deletes. `sync_state.cursor` is keyed by capability.
+- `discovery_candidates` also stores `service_id` once confirmed; `(connector_key, target)` is unique so a
+  declined candidate is re-offered by a later discovery of the same target.
+- Contracts live in `portalab.capabilities` (`connector_sdk`, `connector_http`, `record_sink`,
+  `record_sink_testkit`, `automation_actions`) so connector packages and plugins never import the module.
+- Field priorities are read from `media.fieldPriority.<kind>.<field>` (024, CD-026) — no
+  `connectors.fieldPriority` setting is declared (F7).

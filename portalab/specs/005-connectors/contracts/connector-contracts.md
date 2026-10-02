@@ -29,3 +29,16 @@ Timeouts, max response size, same-host redirect policy, retry/backoff, correlati
 | GET `/services/{id}/sync-runs` | `services.read` |
 | POST `/connectors/{key}/discover`, `/discovery/{id}/confirm|decline` | `services.manage` |
 Problem codes: `connector.incompatible`, `connector.test_failed`, `service.sync_in_progress`, `service.disabled`.
+
+## Implementation notes (2026-10-02)
+- Extra routes: `POST /connectors/{key}/test` (draft test before saving), `GET /discovery` (candidates).
+- `GET /services[/{id}]` returns configuration only to holders of `services.manage` or `infrastructure.read`;
+  `services.read` alone sees name, state, health and last sync.
+- `POST /services/{id}/sync` and `/resync` enqueue a `connectors.sync_service` job (202); a full resync first
+  answers 409 `authz.confirmation_required` with a single-use `confirmation` bound to the request body.
+- Enabling runs the compatibility check and the connection test; failures answer 409
+  `connector.incompatible` / `connector.test_failed` and leave the state unchanged.
+- Connector-provided capability methods are called through the 001 isolation wrapper and return
+  `CapabilityResult` (`Available`, `Stale`, `Unavailable`, …).
+- Automation action types `connector.sync` and `connector.action` (permission `services.manage`) are declared
+  in `portalab.capabilities.automation_actions` for spec 019.

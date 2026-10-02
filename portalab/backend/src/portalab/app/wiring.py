@@ -21,6 +21,7 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.secrets import SecretBox
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.module import AuthzModule
+from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.events.module import EventsModule
 from portalab.modules.events.publisher.publisher import EventStorePublisher
 from portalab.modules.identity.context import IdentityContext
@@ -80,6 +81,7 @@ class Platform:
     administration: AdministrationModule
     identity: IdentityModule
     events: EventsModule
+    connectors: ConnectorsModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -90,6 +92,14 @@ class Platform:
         from portalab.app.config_bindings import safe_refresh
 
         return await safe_refresh(self)
+
+    async def start_services(self) -> bool:
+        """Provide the capabilities of the enabled services in this process (spec 005)."""
+        try:
+            await self.connectors.start()
+        except Exception:
+            return False
+        return True
 
 
 def wire_platform(
@@ -123,6 +133,10 @@ def wire_platform(
         database, authz.audit, capabilities, visibility=privacy.filter, publisher=events
     )
     events_module.register()
+    connectors = ConnectorsModule(
+        database, events, authz.audit, capabilities, SecretBox(secret_key), authorizer=authz.engine
+    )
+    connectors.register_capabilities()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -147,7 +161,8 @@ def wire_platform(
             )
         )
         seeds.append(identity.ensure_sweeps_scheduled)
-    platform = Platform(authz, privacy, administration, identity, events_module, seeds)
+        seeds.append(connectors.register_jobs(jobs))
+    platform = Platform(authz, privacy, administration, identity, events_module, connectors, seeds)
     from portalab.app.config_bindings import bind
 
     bind(platform)

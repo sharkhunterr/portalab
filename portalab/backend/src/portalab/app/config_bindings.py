@@ -11,6 +11,7 @@ from typing import Any
 
 from portalab.core.logging import get_logger
 from portalab.modules.administration.config.service import ConfigService
+from portalab.modules.connectors.settings import SETTINGS as CONNECTORS_FIELDS
 
 log = get_logger("portalab.config")
 
@@ -63,6 +64,10 @@ async def refresh(platform: Any) -> None:
     authz.confirmations.ttl = timedelta(seconds=authz.config.confirmation_ttl_seconds)
     authz.audit.max_context_bytes = authz.config.audit_context_max_bytes
 
+    connectors = getattr(platform, "connectors", None)
+    if connectors is not None:
+        connectors.config = replace(connectors.config, **await _values(config, CONNECTORS_FIELDS))
+
 
 async def safe_refresh(platform: Any) -> bool:
     """Refresh, tolerating an unmigrated or unreachable database (code defaults stay in force)."""
@@ -78,5 +83,5 @@ def bind(platform: Any) -> None:
     async def on_change(keys: set[str]) -> None:
         await safe_refresh(platform)
 
-    for prefix in ("identity.", "privacy.", "authz."):
+    for prefix in ("identity.", "privacy.", "authz.", "connectors."):
         platform.administration.config.on_change(prefix, on_change)
