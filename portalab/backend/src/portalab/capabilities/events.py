@@ -10,11 +10,12 @@ import re
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, runtime_checkable
 from uuid import UUID
 
 from pydantic import BaseModel
 
+from portalab.capabilities.registry import CapabilitySpec
 from portalab.core.privacy_registry import looks_personal
 
 RetentionClass = Literal["business", "technical"]
@@ -181,3 +182,31 @@ def consumer(
         return handler
 
     return decorate
+
+
+# --- operational statistics (consumed by Observability 025) --------------------------------------------
+STATS_CAPABILITY = "events.stats"
+
+
+@dataclass(frozen=True, slots=True)
+class EventStatsSnapshot:
+    head_seq: int
+    lag_by_consumer: Mapping[str, int]
+    dead_letters: int
+    failed_deliveries: int
+    quarantined: int
+    oldest_failure_age_seconds: float | None
+
+
+@runtime_checkable
+class EventStats(Protocol):
+    async def snapshot(self) -> EventStatsSnapshot: ...
+
+
+STATS_SPEC = CapabilitySpec(
+    name=STATS_CAPABILITY,
+    version="1.0",
+    protocol=EventStats,
+    multi_provider=False,
+    description="Event pipeline statistics: consumer lag, dead letters, quarantine (007).",
+)

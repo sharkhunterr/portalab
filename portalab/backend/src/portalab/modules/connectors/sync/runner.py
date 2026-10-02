@@ -25,6 +25,7 @@ from portalab.capabilities.record_sink import RecordSink, ServiceRef, SinkRegist
 from portalab.core.authz_port import Principal
 from portalab.core.ids import new_id
 from portalab.core.logging import redact_text
+from portalab.core.metrics import default_metrics
 from portalab.core.time import utc_now
 from portalab.modules.connectors.models import Service, ServiceCapability, SyncRun, SyncState
 from portalab.modules.connectors.observability import log, metric_part, metrics
@@ -213,6 +214,12 @@ class SyncRunner:
         await self._finish(row, outcome, started, actor)
         metrics.gauge(
             f"connectors.sync.duration_seconds.{metric_part(str(service_id))}", time.monotonic() - clock_start
+        )
+        default_metrics.histogram(
+            "connectors",
+            "sync.duration",
+            (time.monotonic() - clock_start) * 1000,
+            {"service": str(service_id)},
         )
         metrics.increment(f"connectors.sync.{outcome.status}")
         return outcome

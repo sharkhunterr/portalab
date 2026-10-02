@@ -26,3 +26,17 @@
 
 ## Retention / privacy
 Samples days, rollups months, errors until resolved + retention window (all config, technical class via 021); contexts redacted, secrets never stored; `user_ref` is an id and removed/nulled by erasure participant; no AI content.
+
+## Implementation notes (2026-10-02)
+- `component_health` also stores `owner` and `seq` (event dedup `(component, axis, to_state, seq)`); `reason`
+  holds per-check results and the list of `unobserved` axes (an axis without checks is `unknown` but not
+  reported as a problem). `metric_samples` are minute aggregates (`kind`, `count`, `sum`, `max`, `p95`);
+  `rollups` add `labels`/`labels_key` (unique bucket per metric+labels); `errors` add `error_type`,
+  `resolved_at`; `anomalies` add `last_seen_at`, `occurrences`, `escalation_attempts`.
+- Kernel hooks live in `portalab.core.metrics` (`default_metrics`, `Timer`, `phase_scope`, `record_request`)
+  and are retrofitted into the job worker, `ConnectorHttpClient` and the HTTP middleware; the API process
+  flushes its own queue every 30 s, the worker through the `observability.collect` job.
+- Contribution model (`declare_observable`, checks, diagnostics, `report_ai_call`, ports) lives in
+  `portalab.capabilities.observability`; event statistics come from the new `events.stats` capability
+  (007), services from `connectors.directory` / `health.service_state`. The `support.incidents` port gained
+  `create` and `attach` for escalation.

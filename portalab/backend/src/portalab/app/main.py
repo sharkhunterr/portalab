@@ -1,5 +1,7 @@
 """ASGI application factory — the composition root (plan §1, contracts/api-conventions.md)."""
 
+import asyncio
+import contextlib
 import re
 import secrets
 import time
@@ -39,6 +41,7 @@ from portalab.core.errors import (
     to_problem,
 )
 from portalab.core.logging import correlation_scope, get_correlation_id, get_logger
+from portalab.core.metrics import default_metrics, phase_scope, record_request
 from portalab.core.settings import BootstrapSettings
 from portalab.modules.administration.api import routers as admin_routers
 from portalab.modules.administration.module import AdministrationModule
@@ -53,6 +56,8 @@ from portalab.modules.health.module import HealthModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
+from portalab.modules.observability.api import routers as observability_routers
+from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.api import routers as privacy_routers
 from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.privacy.settings import SecurityConfig
@@ -64,6 +69,14 @@ _EPHEMERAL_KEY = secrets.token_bytes(32)  # only when no bootstrap settings (tes
 DEFAULT_STATIC_DIR = BACKEND_DIR / "static"
 
 log = get_logger("portalab.app")
+
+
+async def _flush_loop(observability: ObservabilityModule, interval: float = 30.0) -> None:
+    """Drain this process's observability hooks periodically (the worker flushes its own, R4)."""
+    while True:
+        await asyncio.sleep(interval)
+        with contextlib.suppress(Exception):
+            await observability.collector.flush()
 
 
 def _problem_response(problem: dict[str, Any]) -> JSONResponse:
@@ -87,6 +100,7 @@ def create_app(
     events: EventsModule | None = None,
     connectors: ConnectorsModule | None = None,
     health: HealthModule | None = None,
+    observability: ObservabilityModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -108,6 +122,7 @@ def create_app(
         app.state.events_module = platform.events
         app.state.connectors_module = platform.connectors
         app.state.health_module = platform.health
+        app.state.observability_module = platform.observability
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -122,9 +137,18 @@ def create_app(
         if app.state.platform is not None:
             await app.state.platform.refresh_config()
             await app.state.platform.start_services()
+        flusher = (
+            asyncio.create_task(_flush_loop(app.state.platform.observability))
+            if app.state.platform is not None
+            else None
+        )
         try:
             yield
         finally:
+            if flusher is not None:
+                flusher.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await flusher
             if owns_database and app.state.database is not None:
                 await app.state.database.dispose()
 
@@ -148,6 +172,7 @@ def create_app(
     app.state.events_module = events
     app.state.connectors_module = connectors
     app.state.health_module = health
+    app.state.observability_module = observability
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -166,15 +191,27 @@ def create_app(
         incoming = request.headers.get(CORRELATION_HEADER)
         valid = incoming if incoming and _CORRELATION_RE.fullmatch(incoming) else None
         started = time.perf_counter()
-        with correlation_scope(valid) as correlation_id, authorization_scope():
+        with correlation_scope(valid) as correlation_id, authorization_scope(), phase_scope() as phases:
             try:
                 response = await call_next(request)
             except Exception as exc:  # last-resort guard: never leak internals
+                default_metrics.error(
+                    "portal", "unhandled_request_error", exc, context={"method": request.method}
+                )
                 log.exception("unhandled error", extra={"fields": {"path": request.url.path}})
                 response = _problem_response(
                     internal_error_problem(exc, correlation_id=correlation_id, instance=request.url.path)
                 )
             response.headers[CORRELATION_HEADER] = correlation_id
+            route = getattr(request.scope.get("route"), "path", "unmatched")
+            record_request(
+                "portal",
+                "http.request",
+                time.perf_counter() - started,
+                phases,
+                {"route": route, "method": request.method, "status": response.status_code // 100 * 100},
+                timed_out=response.status_code == 504,
+            )
             log.info(
                 "request",
                 extra={
@@ -234,6 +271,7 @@ def create_app(
         *events_routers(),
         *health_routers(),  # before connectors: /services/health must not match /services/{id}
         *connectors_routers(),
+        *observability_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

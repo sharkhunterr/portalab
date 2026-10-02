@@ -26,6 +26,7 @@ PUBLIC = {
     "/api/v1/auth/verify",
     "/api/v1/auth/deletion/cancel",
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
+    "/metrics",  # spec 025: disabled by default; own token/permission check
 }
 USER_ROLE = {
     key

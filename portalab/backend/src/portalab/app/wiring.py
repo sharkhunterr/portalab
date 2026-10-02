@@ -27,6 +27,7 @@ from portalab.modules.events.publisher.publisher import EventStorePublisher
 from portalab.modules.health.module import HealthModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
+from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
 
 
@@ -84,6 +85,7 @@ class Platform:
     events: EventsModule
     connectors: ConnectorsModule
     health: HealthModule
+    observability: ObservabilityModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -141,6 +143,8 @@ def wire_platform(
     connectors.register_capabilities()
     health = HealthModule(database, events, authz.audit, capabilities)
     health.register_capabilities()
+    observability = ObservabilityModule(database, events, authz.audit, capabilities)
+    observability.register_capabilities()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -167,7 +171,10 @@ def wire_platform(
         seeds.append(identity.ensure_sweeps_scheduled)
         seeds.append(connectors.register_jobs(jobs))
         seeds.extend(health.register_jobs(jobs))
-    platform = Platform(authz, privacy, administration, identity, events_module, connectors, health, seeds)
+        seeds.extend(observability.register_jobs(jobs))
+    platform = Platform(
+        authz, privacy, administration, identity, events_module, connectors, health, observability, seeds
+    )
     from portalab.app.config_bindings import bind
 
     bind(platform)

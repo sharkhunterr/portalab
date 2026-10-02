@@ -123,9 +123,19 @@ class IncidentRef:
 
 @runtime_checkable
 class Incidents(Protocol):
+    """Support's incident lifecycle (016): create → notify → track → resolve stays there."""
+
     async def open_for_service(self, service_id: str) -> list[IncidentRef]: ...
 
     async def link(self, service_id: str, incident_id: str) -> None: ...
+
+    async def create(
+        self, *, title: str, source: str, severity: str, evidence: Mapping[str, Any]
+    ) -> IncidentRef: ...
+
+    async def attach(self, incident_id: str, evidence: Mapping[str, Any]) -> IncidentRef | None:
+        """Add evidence to an incident; ``None`` when it is no longer open."""
+        ...
 
 
 @dataclass(frozen=True, slots=True)

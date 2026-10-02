@@ -21,6 +21,12 @@ class _Incidents:
     async def link(self, service_id: str, incident_id: str) -> None:
         self.linked.append((service_id, incident_id))
 
+    async def create(self, *, title: str, source: str, severity: str, evidence: Any) -> IncidentRef:
+        raise NotImplementedError
+
+    async def attach(self, incident_id: str, evidence: Any) -> IncidentRef | None:
+        return None
+
 
 async def test_sections_are_independent_and_distinct(hl: HealthHarness, clock: FixedClock) -> None:
     service_id = await hl.service()

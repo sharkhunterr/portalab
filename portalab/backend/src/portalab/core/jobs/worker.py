@@ -7,11 +7,13 @@ import asyncio
 import contextlib
 import os
 import socket
+import time
 
 from portalab.core.db import Database
 from portalab.core.jobs.queue import DEFAULT_LOCK_SECONDS, DEFAULT_QUEUE, ClaimedJob, claim, fail, succeed
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.logging import correlation_scope, get_logger
+from portalab.core.metrics import default_metrics, phase_scope, record_request
 from portalab.core.time import Clock
 
 log = get_logger("portalab.worker")
@@ -70,13 +72,20 @@ class Worker:
                     self.database, job.id, worker_id=self.worker_id, error="no handler", clock=self.clock
                 )
                 return
+            started = time.monotonic()
+            labels = {"kind": job.kind}
             try:
-                await asyncio.wait_for(handler.func(job.payload), timeout=handler.timeout_seconds)
+                with phase_scope() as phases:
+                    await asyncio.wait_for(handler.func(job.payload), timeout=handler.timeout_seconds)
             except TimeoutError:
                 log.warning("job timed out", extra={"fields": context})
+                record_request("jobs", "job.run", time.monotonic() - started, {}, labels, timed_out=True)
+                default_metrics.counter("jobs", "job.timeout", labels=labels)
                 await fail(self.database, job.id, worker_id=self.worker_id, error="timeout", clock=self.clock)
             except Exception as exc:
                 log.warning("job failed", extra={"fields": {**context, "error": type(exc).__name__}})
+                default_metrics.counter("jobs", "job.failed", labels=labels)
+                default_metrics.error("jobs", "job_failed", exc, context={"kind": job.kind})
                 await fail(
                     self.database,
                     job.id,
@@ -85,6 +94,8 @@ class Worker:
                     clock=self.clock,
                 )
             else:
+                record_request("jobs", "job.run", time.monotonic() - started, phases, labels)
+                default_metrics.counter("jobs", "job.succeeded", labels=labels)
                 await succeed(self.database, job.id, worker_id=self.worker_id, clock=self.clock)
 
     async def run_forever(self, stop: asyncio.Event) -> None:

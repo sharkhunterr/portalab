@@ -1,6 +1,7 @@
 """Events module facade (spec 007): store-backed publisher, dispatcher, quarantine, history, replay."""
 
 from portalab.capabilities.events import (
+    STATS_CAPABILITY,
     ConsumerRegistry,
     EventTypeRegistry,
     default_consumers,
@@ -23,6 +24,7 @@ from portalab.modules.events.quarantine.service import QuarantineService
 from portalab.modules.events.replay.service import ReplayService
 from portalab.modules.events.retention import register_targets
 from portalab.modules.events.settings import EventsConfig
+from portalab.modules.events.stats import EventStatsProvider
 
 OWNER = "module:events"
 
@@ -53,8 +55,11 @@ class EventsModule:
         self.quarantine = QuarantineService(database, audit, clock=clock)
         self.history = HistoryQuery(database, visibility, event_types=event_types)
         self.replay = ReplayService(database, self.publisher, audit, consumers=consumers, clock=clock)
+        self.stats = EventStatsProvider(database, consumers, clock=clock)
 
     def register(self) -> None:
         if self.consumers.get(LIVE) is None:
             self.consumers.register(live_consumer(self.database, self.event_types))
         register_targets(lambda: self.config)
+        if not self.capabilities.system_providers(STATS_CAPABILITY):
+            self.capabilities.provide(STATS_CAPABILITY, self.stats, instance_ref="events", owner=OWNER)

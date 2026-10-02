@@ -25,4 +25,5 @@ def test_openapi_matches_committed_snapshot() -> None:
 def test_every_operation_is_versioned_or_health() -> None:
     schema = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
     for path in schema["paths"]:
-        assert path.startswith("/api/v1/") or path in {"/healthz", "/readyz"}, path
+        # operational endpoints: probes and the optional Prometheus-format metrics (spec 025)
+        assert path.startswith("/api/v1/") or path in {"/healthz", "/readyz", "/metrics"}, path

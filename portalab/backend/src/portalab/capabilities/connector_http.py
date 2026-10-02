@@ -15,6 +15,7 @@ from urllib.parse import urljoin, urlsplit
 import httpx
 
 from portalab.core.logging import get_correlation_id, redact_text, register_secret_value
+from portalab.core.metrics import Timer
 
 IDEMPOTENT = frozenset({"GET", "HEAD", "OPTIONS"})
 
@@ -88,7 +89,8 @@ class ConnectorHttpClient:
         last_error: Exception | None = None
         for attempt in range(attempts):
             try:
-                response = await self._send(method, url, headers, kwargs, redirects=5)
+                with Timer("external_wait", "connectors", "http.request", {"method": method}):
+                    response = await self._send(method, url, headers, kwargs, redirects=5)
                 if response.status_code >= 500 and attempt < attempts - 1:
                     await asyncio.sleep(self.backoff * 2**attempt)
                     continue
