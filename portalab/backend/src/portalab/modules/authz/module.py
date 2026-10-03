@@ -1,11 +1,14 @@
 """Authorization module facade: engine, catalog, grants, Admin authority, audit store, confirmations."""
 
+from uuid import UUID
+
 from portalab.capabilities.administration import AUDIT_STATUS_CAPABILITY as AUDIT_STATUS
 from portalab.capabilities.administration import PLUGIN_PERMISSIONS_CAPABILITY as PLUGIN_PERMISSIONS
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
+from portalab.capabilities.user_grants import ROLES_CAPABILITY as ROLES
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.permissions import PermissionRegistry, default_permissions
@@ -59,6 +62,7 @@ class AuthzModule:
             USER_GRANTS, UserGrantsProvider(self.grants), instance_ref="authz", owner=OWNER
         )
         self.capabilities.provide(CONFIRMATIONS, self.confirmations, instance_ref="authz", owner=OWNER)
+        self.capabilities.provide(ROLES, _UserRoles(self), instance_ref="authz", owner=OWNER)
         self.capabilities.provide(
             PLUGIN_PERMISSIONS, _PluginPermissions(self), instance_ref="authz", owner=OWNER
         )
@@ -118,3 +122,11 @@ class _AuditStatus:
             "last_checkpoint_at": last.created_at.isoformat() if last else None,
             "unsealed_entries": (newest or 0) - (last.to_seq if last else 0),
         }
+
+
+class _UserRoles:
+    def __init__(self, module: "AuthzModule") -> None:
+        self.module = module
+
+    async def roles_of(self, user_id: UUID) -> frozenset[str]:
+        return frozenset({"user", *(role.key for role in await self.module.grants.user_roles(user_id))})

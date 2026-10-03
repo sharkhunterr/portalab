@@ -8,7 +8,7 @@ import { RouteErrorElement } from "./RouteBoundary";
  * shell. Handles carry breadcrumb labels and existence sensitivity; permissions stay a UI hint (the API
  * decides). Unknown paths render "not available".
  */
-const Home = lazy(() => import("../../pages/HomePage"));
+const Home = lazy(() => import("../../features/dashboard/DashboardPage"));
 const Account = lazy(() => import("../../pages/AccountRoute"));
 const Appearance = lazy(() => import("../../pages/AppearanceRoute"));
 const Privacy = lazy(() => import("../../pages/PrivacyRoute"));

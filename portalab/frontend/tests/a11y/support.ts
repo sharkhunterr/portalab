@@ -37,10 +37,73 @@ export const NAVIGATION = {
   crumbs: {},
 };
 
+/** A server-side dashboard shared by every page/context of a test (persistence across devices). */
+export interface DashboardStore {
+  version: number;
+  instances: Array<Record<string, unknown>>;
+}
+
+const WIDGET_META = (title: string, extra: Record<string, unknown> = {}) => ({
+  title_key: title,
+  description_key: null,
+  icon: null,
+  component_id: null,
+  template: "stat",
+  refresh_mode: "on_view",
+  refresh_interval_s: null,
+  min_w: 2,
+  min_h: 1,
+  max_w: 12,
+  max_h: 4,
+  multiple: false,
+  config_schema: { type: "object", properties: {} },
+  ...extra,
+});
+
+export const CATALOG = [
+  { key: "t.weather", placed: false, widget: WIDGET_META("Weather") },
+  { key: "t.notes", placed: false, widget: WIDGET_META("Notes") },
+];
+
+export function newDashboard(): DashboardStore {
+  const make = (key: string, title: string, position: number) => ({
+    id: `00000000-0000-7000-8000-00000000000${position + 1}`,
+    widget_key: key,
+    status: "active",
+    position,
+    w: 6,
+    h: 2,
+    config: {},
+    policy: "free",
+    locked: false,
+    mandatory: false,
+    removable: true,
+    hideable: true,
+    available: true,
+    widget: WIDGET_META(title),
+  });
+  return {
+    version: 1,
+    instances: [make("t.welcome", "Welcome", 0), make("t.services", "Services status", 1)],
+  };
+}
+
+function reorder(store: DashboardStore, id: string, position: number) {
+  const items = [...store.instances].sort((a, b) => Number(a.position) - Number(b.position));
+  const index = items.findIndex((i) => i.id === id);
+  const [item] = items.splice(index, 1);
+  if (item) items.splice(Math.max(0, Math.min(position, items.length)), 0, item);
+  items.forEach((i, n) => {
+    i.position = n;
+  });
+  store.instances = items;
+}
+
 export async function stubApi(
   page: Page,
-  options: { failing?: string[] } = {},
+  options: { failing?: string[]; dashboard?: DashboardStore } = {},
 ): Promise<{ saved: Record<string, unknown> }> {
+  const dashboard = options.dashboard ?? newDashboard();
   let signedIn = false;
   const saved: Record<string, unknown> = {};
   const me = {
@@ -84,6 +147,52 @@ export async function stubApi(
         })),
       });
     }
+    if (url.pathname === "/api/v1/dashboard")
+      return json(200, { layout_version: dashboard.version, instances: dashboard.instances });
+    if (url.pathname === "/api/v1/dashboard/catalog")
+      return json(
+        200,
+        CATALOG.map((c) => ({
+          ...c,
+          placed: dashboard.instances.some((i) => i.widget_key === c.key && i.status === "active"),
+        })),
+      );
+    if (url.pathname === "/api/v1/dashboard/since-last-login")
+      return json(200, { since: "2026-10-01T00:00:00Z", items: [], unavailable: [] });
+    if (url.pathname === "/api/v1/dashboard/widgets" && method === "POST") {
+      const key = String((route.request().postDataJSON() as { widget_key: string }).widget_key);
+      const entry = CATALOG.find((c) => c.key === key);
+      dashboard.instances.push({
+        ...(dashboard.instances[0] as Record<string, unknown>),
+        id: `00000000-0000-7000-8000-0000000000${10 + dashboard.instances.length}`,
+        widget_key: key,
+        position: dashboard.instances.length,
+        w: 4,
+        widget: entry?.widget,
+      });
+      dashboard.version += 1;
+      return json(201, { layout_version: dashboard.version, id: null });
+    }
+    const instanceMatch = /^\/api\/v1\/dashboard\/widgets\/([^/]+)$/.exec(url.pathname);
+    if (instanceMatch && method === "PATCH") {
+      const body = route.request().postDataJSON() as Record<string, unknown>;
+      const item = dashboard.instances.find((i) => i.id === instanceMatch[1]);
+      if (item) {
+        if (typeof body.position === "number") reorder(dashboard, String(item.id), body.position);
+        for (const field of ["w", "h", "status"]) if (body[field] !== undefined) item[field] = body[field];
+      }
+      dashboard.version += 1;
+      return json(200, { layout_version: dashboard.version, id: instanceMatch[1] });
+    }
+    if (/^\/api\/v1\/widgets\/[^/]+\/data$/.test(url.pathname))
+      return json(200, {
+        state: "available",
+        as_of: null,
+        stale_after_s: null,
+        data: { value: 7, label: "items" },
+        partial_reasons: [],
+        config_invalid: false,
+      });
     if (url.pathname === "/api/v1/palette/resolve") {
       const route = url.searchParams.get("route") ?? "/";
       const q = url.searchParams.get("q") ?? "";

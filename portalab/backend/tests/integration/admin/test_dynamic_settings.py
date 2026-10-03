@@ -14,21 +14,21 @@ OWNER = "test:dynamic"
 async def test_dynamic_validator_and_plugin_settings(full: FullPlatform) -> None:
     registry = full.administration.registry
     default_catalog.declare(
-        scope="global", key="dashboard.widgetPolicies", schema=dict[str, str], default={}, owner=OWNER
+        scope="global", key="testkit.widgetPolicies", schema=dict[str, str], default={}, owner=OWNER
     )
     known_widgets = {"services.status", "media.recent"}
 
     async def validate(value: dict[str, str]) -> list[str]:
         return [f"unknown widget {key}" for key in value if key not in known_widgets]
 
-    registry.register_validator("dashboard.widgetPolicies", validate, owner=OWNER)
+    registry.register_validator("testkit.widgetPolicies", validate, owner=OWNER)
     admin = user(await insert_user(full.database))
     try:
         await full.administration.config.set(
-            "dashboard.widgetPolicies", {"media.recent": "pinned"}, actor=admin
+            "testkit.widgetPolicies", {"media.recent": "pinned"}, actor=admin
         )
         with pytest.raises(ValidationFailed, match="unknown widget"):
-            await full.administration.config.set("dashboard.widgetPolicies", {"ghost": "pinned"}, actor=admin)
+            await full.administration.config.set("testkit.widgetPolicies", {"ghost": "pinned"}, actor=admin)
         keys = registry.declare_plugin_settings(
             "weather", [{"key": "units", "type": "string", "default": "metric"}]
         )

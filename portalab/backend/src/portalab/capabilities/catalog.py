@@ -6,6 +6,7 @@ from portalab.capabilities import (
     aggregation,
     config,
     confirmations,
+    dashboard,
     events,
     health,
     i18n,
@@ -25,6 +26,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     privacy_participants.ERASURE_SPEC,
     privacy_participants.EXPORT_SPEC,
     user_grants.SPEC,
+    user_grants.ROLES_SPEC,
     confirmations.SPEC,
     service_data.SPEC,
     visibility.PREFERENCE_SPEC,
@@ -38,6 +40,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     events.STATS_SPEC,
     *i18n.SPECS,
     *search.SPECS,
+    *dashboard.SPECS,
 )
 
 

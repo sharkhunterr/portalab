@@ -18,7 +18,10 @@ async function signIn(page: Page) {
 
 test("palette: context actions, inline results, confirmation, keyboard only", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("link", { name: "Services" }).click();
+  await page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Services" })
+    .click();
   await page.goto("/services/s1");
   const trigger = page.getByRole("button", { name: /Search/ });
   await trigger.focus();

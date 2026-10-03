@@ -14,7 +14,10 @@ test("degraded mode keeps the shell usable", async ({ page }) => {
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
   await expect(page.getByText(/2 services are degraded or unavailable/)).toBeVisible();
-  await page.getByRole("link", { name: "Services" }).click();
+  await page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Services" })
+    .click();
   await expect(page).toHaveURL(/\/services$/);
   await page.keyboard.press("Control+k");
   await expect(page.getByRole("combobox")).toBeVisible();

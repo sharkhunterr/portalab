@@ -17,6 +17,7 @@ dependencies = [
     "pillow>=11",
     "babel>=2.16",
     "tzdata>=2025.2",
+    "jsonschema>=4.23",
 ]
 
 [project.scripts]
@@ -30,6 +31,7 @@ dev = [
     "mypy>=1.11",
     "import-linter>=2.1",
     "pytest-xdist>=3.8.0",
+    "types-jsonschema>=4.26.0.20260518",
 ]
 
 [build-system]

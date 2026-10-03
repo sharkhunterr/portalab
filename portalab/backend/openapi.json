@@ -20,6 +20,53 @@
         "title": "Accepted",
         "type": "object"
       },
+      "AddWidgetIn": {
+        "additionalProperties": false,
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "title": "Config",
+            "type": "object"
+          },
+          "h": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "H"
+          },
+          "w": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "W"
+          },
+          "widget_key": {
+            "maxLength": 96,
+            "minLength": 3,
+            "title": "Widget Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "widget_key"
+        ],
+        "title": "AddWidgetIn",
+        "type": "object"
+      },
       "AdminCreateUser": {
         "additionalProperties": false,
         "properties": {
@@ -198,6 +245,28 @@
         "title": "CapabilityPatch",
         "type": "object"
       },
+      "CatalogEntryOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "placed": {
+            "title": "Placed",
+            "type": "boolean"
+          },
+          "widget": {
+            "$ref": "#/components/schemas/WidgetMeta"
+          }
+        },
+        "required": [
+          "key",
+          "placed",
+          "widget"
+        ],
+        "title": "CatalogEntryOut",
+        "type": "object"
+      },
       "ChangeIn": {
         "additionalProperties": false,
         "properties": {
@@ -236,6 +305,64 @@
           "key"
         ],
         "title": "ChangeIn",
+        "type": "object"
+      },
+      "ChangeItemOut": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "occurred_at": {
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "priority": {
+            "title": "Priority",
+            "type": "integer"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "title_args": {
+            "additionalProperties": true,
+            "title": "Title Args",
+            "type": "object"
+          },
+          "title_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title Key"
+          }
+        },
+        "required": [
+          "kind",
+          "occurred_at",
+          "ref",
+          "title",
+          "title_key",
+          "title_args",
+          "priority"
+        ],
+        "title": "ChangeItemOut",
         "type": "object"
       },
       "ChangesIn": {
@@ -312,6 +439,124 @@
           "password"
         ],
         "title": "CredentialsConfirmation",
+        "type": "object"
+      },
+      "DashboardInstanceOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "config": {
+            "additionalProperties": true,
+            "title": "Config",
+            "type": "object"
+          },
+          "h": {
+            "title": "H",
+            "type": "integer"
+          },
+          "hideable": {
+            "title": "Hideable",
+            "type": "boolean"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "mandatory": {
+            "title": "Mandatory",
+            "type": "boolean"
+          },
+          "policy": {
+            "title": "Policy",
+            "type": "string"
+          },
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "removable": {
+            "title": "Removable",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "hidden"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "w": {
+            "title": "W",
+            "type": "integer"
+          },
+          "widget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WidgetMeta"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "widget_key": {
+            "title": "Widget Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "widget_key",
+          "status",
+          "position",
+          "w",
+          "h",
+          "config",
+          "policy",
+          "locked",
+          "mandatory",
+          "removable",
+          "hideable",
+          "available",
+          "widget"
+        ],
+        "title": "DashboardInstanceOut",
+        "type": "object"
+      },
+      "DashboardOut": {
+        "properties": {
+          "instances": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardInstanceOut"
+            },
+            "title": "Instances",
+            "type": "array"
+          },
+          "layout_version": {
+            "title": "Layout Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "layout_version",
+          "instances"
+        ],
+        "title": "DashboardOut",
         "type": "object"
       },
       "DatumOut": {
@@ -842,6 +1087,66 @@
         "title": "Layout",
         "type": "object"
       },
+      "LayoutIn": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LayoutItemIn"
+            },
+            "maxItems": 100,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "LayoutIn",
+        "type": "object"
+      },
+      "LayoutItemIn": {
+        "additionalProperties": false,
+        "properties": {
+          "h": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "H",
+            "type": "integer"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "w": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "W",
+            "type": "integer"
+          },
+          "widget_key": {
+            "maxLength": 96,
+            "minLength": 3,
+            "title": "Widget Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "widget_key",
+          "w",
+          "h"
+        ],
+        "title": "LayoutItemIn",
+        "type": "object"
+      },
       "LoginRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1052,6 +1357,79 @@
           "password"
         ],
         "title": "PasswordConfirmation",
+        "type": "object"
+      },
+      "PatchWidgetIn": {
+        "additionalProperties": false,
+        "properties": {
+          "config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config"
+          },
+          "h": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "H"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "active",
+                  "hidden"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "w": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "W"
+          }
+        },
+        "title": "PatchWidgetIn",
         "type": "object"
       },
       "PermissionOut": {
@@ -1995,6 +2373,24 @@
         "title": "SearchSegmentOut",
         "type": "object"
       },
+      "SeenIn": {
+        "additionalProperties": false,
+        "properties": {
+          "until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          }
+        },
+        "title": "SeenIn",
+        "type": "object"
+      },
       "ServiceIn": {
         "additionalProperties": false,
         "properties": {
@@ -2158,6 +2554,35 @@
           "expires_at"
         ],
         "title": "SessionInfo",
+        "type": "object"
+      },
+      "SummaryOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ChangeItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "since": {
+            "title": "Since",
+            "type": "string"
+          },
+          "unavailable": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unavailable",
+            "type": "array"
+          }
+        },
+        "required": [
+          "since",
+          "items",
+          "unavailable"
+        ],
+        "title": "SummaryOut",
         "type": "object"
       },
       "TestIn": {
@@ -2439,6 +2864,212 @@
           "token"
         ],
         "title": "VerifyRequest",
+        "type": "object"
+      },
+      "VersionOut": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "layout_version": {
+            "title": "Layout Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "layout_version"
+        ],
+        "title": "VersionOut",
+        "type": "object"
+      },
+      "WidgetMeta": {
+        "properties": {
+          "component_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Component Id"
+          },
+          "config_schema": {
+            "additionalProperties": true,
+            "title": "Config Schema",
+            "type": "object"
+          },
+          "description_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description Key"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "max_h": {
+            "title": "Max H",
+            "type": "integer"
+          },
+          "max_w": {
+            "title": "Max W",
+            "type": "integer"
+          },
+          "min_h": {
+            "title": "Min H",
+            "type": "integer"
+          },
+          "min_w": {
+            "title": "Min W",
+            "type": "integer"
+          },
+          "multiple": {
+            "title": "Multiple",
+            "type": "boolean"
+          },
+          "refresh_interval_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Interval S"
+          },
+          "refresh_mode": {
+            "title": "Refresh Mode",
+            "type": "string"
+          },
+          "template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template"
+          },
+          "title_key": {
+            "title": "Title Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title_key",
+          "description_key",
+          "icon",
+          "component_id",
+          "template",
+          "refresh_mode",
+          "refresh_interval_s",
+          "min_w",
+          "min_h",
+          "max_w",
+          "max_h",
+          "multiple",
+          "config_schema"
+        ],
+        "title": "WidgetMeta",
+        "type": "object"
+      },
+      "WidgetPayloadOut": {
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "config_invalid": {
+            "title": "Config Invalid",
+            "type": "boolean"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "partial_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Partial Reasons",
+            "type": "array"
+          },
+          "stale_after_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stale After S"
+          },
+          "state": {
+            "enum": [
+              "available",
+              "partial",
+              "stale",
+              "unavailable",
+              "error",
+              "unauthorized",
+              "no-data"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "as_of",
+          "stale_after_s",
+          "data",
+          "partial_reasons",
+          "config_invalid"
+        ],
+        "title": "WidgetPayloadOut",
         "type": "object"
       },
       "WindowIn": {
@@ -2933,6 +3564,144 @@
         "summary": "Validate Config",
         "tags": [
           "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/dashboard/policies": {
+      "get": {
+        "operationId": "get_policies_api_v1_admin_dashboard_policies_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Policies Api V1 Admin Dashboard Policies Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Policies",
+        "tags": [
+          "dashboard"
+        ]
+      },
+      "put": {
+        "operationId": "put_policies_api_v1_admin_dashboard_policies_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "title": "Body",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Put Policies Api V1 Admin Dashboard Policies Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Policies",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/admin/dashboard/starter": {
+      "get": {
+        "operationId": "get_starter_api_v1_admin_dashboard_starter_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Starter Api V1 Admin Dashboard Starter Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Starter",
+        "tags": [
+          "dashboard"
+        ]
+      },
+      "put": {
+        "operationId": "put_starter_api_v1_admin_dashboard_starter_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "title": "Body",
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Put Starter Api V1 Admin Dashboard Starter Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Starter",
+        "tags": [
+          "dashboard"
         ]
       }
     },
@@ -5220,6 +5989,391 @@
         "summary": "Test Draft",
         "tags": [
           "connectors"
+        ]
+      }
+    },
+    "/api/v1/dashboard": {
+      "get": {
+        "operationId": "dashboard_api_v1_dashboard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Dashboard",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/catalog": {
+      "get": {
+        "operationId": "catalog_api_v1_dashboard_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogEntryOut"
+                  },
+                  "title": "Response Catalog Api V1 Dashboard Catalog Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Catalog",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/layout": {
+      "put": {
+        "operationId": "put_layout_api_v1_dashboard_layout_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayoutIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Layout",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/since-last-login": {
+      "get": {
+        "operationId": "since_last_login_api_v1_dashboard_since_last_login_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Since Last Login",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/since-last-login/seen": {
+      "post": {
+        "operationId": "summary_seen_api_v1_dashboard_since_last_login_seen_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Summary Seen Api V1 Dashboard Since Last Login Seen Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Summary Seen",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/starter": {
+      "post": {
+        "operationId": "apply_starter_api_v1_dashboard_starter_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Apply Starter Api V1 Dashboard Starter Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Apply Starter",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/widgets": {
+      "post": {
+        "operationId": "add_widget_api_v1_dashboard_widgets_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWidgetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Widget",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/widgets/{instance_id}": {
+      "delete": {
+        "operationId": "delete_widget_api_v1_dashboard_widgets__instance_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "instance_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Instance Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Widget",
+        "tags": [
+          "dashboard"
+        ]
+      },
+      "patch": {
+        "operationId": "patch_widget_api_v1_dashboard_widgets__instance_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "instance_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Instance Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchWidgetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Patch Widget",
+        "tags": [
+          "dashboard"
         ]
       }
     },
@@ -9000,6 +10154,66 @@
         "summary": "Reissue Verification",
         "tags": [
           "identity-admin"
+        ]
+      }
+    },
+    "/api/v1/widgets/{key}/data": {
+      "get": {
+        "operationId": "widget_data_api_v1_widgets__key__data_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "maxLength": 96,
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "instance",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Instance"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WidgetPayloadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Widget Data",
+        "tags": [
+          "dashboard"
         ]
       }
     },

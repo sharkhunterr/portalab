@@ -1,0 +1,592 @@
+"""``DashboardService`` (T018, T023, T026): the user's widget instances — add, hide, remove, reorder, resize,
+configure — validated against the widget registry and **enforced against the policy server-side** on every
+write (mandatory cannot be hidden/removed; locked cannot be moved/resized/reconfigured; disabled or
+unpermitted widgets cannot be added). Optimistic concurrency through ``layout_version`` (``If-Match``).
+The starter dashboard is applied once, permission- and policy-filtered (idempotent via
+``starter_applied_at``)."""
+
+import hashlib
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, field
+from typing import Any
+from uuid import UUID
+
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from portalab.capabilities.dashboard import RegisteredWidget, WidgetDefinition, WidgetRegistry
+from portalab.core.authz_port import Principal
+from portalab.core.db import Database
+from portalab.core.errors import Conflict, NotFound, ValidationFailed
+from portalab.core.event_port import EventPublisher
+from portalab.core.time import Clock, utc_now
+from portalab.modules.dashboard.conditions.evaluator import ConditionEvaluator, parse_condition
+from portalab.modules.dashboard.gateway.gateway import WidgetGateway, config_errors
+from portalab.modules.dashboard.models import UserDashboard, WidgetInstance
+from portalab.modules.dashboard.observability import log, metrics
+from portalab.modules.dashboard.overlay.overlay import (
+    EffectiveInstance,
+    Overlay,
+    StoredInstance,
+    effective,
+    policy_class,
+)
+from portalab.modules.dashboard.settings import DashboardConfig
+
+
+class PolicyLocked(Conflict):
+    default_code = "dashboard.policy_locked"
+    default_title = "Locked by your administrator"
+
+
+class WidgetUnavailableError(ValidationFailed):
+    default_code = "dashboard.widget_unavailable"
+    default_title = "Widget not available"
+
+
+class ConfigInvalid(ValidationFailed):
+    default_code = "dashboard.config_invalid"
+    default_title = "Invalid widget settings"
+
+
+class VersionConflict(Conflict):
+    default_code = "dashboard.version_conflict"
+    default_title = "The dashboard changed meanwhile"
+
+
+class WidgetExists(Conflict):
+    default_code = "dashboard.widget_exists"
+    default_title = "This widget is already on your dashboard"
+
+
+@dataclass
+class DashboardView:
+    instances: list[EffectiveInstance]
+    layout_version: int
+    diagnostics: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True, slots=True)
+class LayoutItem:
+    id: UUID | None
+    widget_key: str
+    w: int
+    h: int
+
+
+def _stored(row: WidgetInstance) -> StoredInstance:
+    return StoredInstance(
+        row.id, row.widget_key, row.status, row.position, row.w, row.h, row.config, row.origin
+    )
+
+
+def _user(principal: Principal) -> UUID:
+    user = principal.acting_for or principal.user_id
+    if user is None:
+        raise NotFound()
+    return user
+
+
+class DashboardService:
+    def __init__(
+        self,
+        database: Database,
+        events: EventPublisher,
+        registry: WidgetRegistry,
+        gateway: WidgetGateway,
+        conditions: ConditionEvaluator,
+        config: Callable[[], DashboardConfig],
+        *,
+        clock: Clock | None = None,
+    ) -> None:
+        self.database = database
+        self.events = events
+        self.registry = registry
+        self.gateway = gateway
+        self.conditions = conditions
+        self.config = config
+        self.clock = clock
+
+    # --- reading -------------------------------------------------------------------------------------
+    async def _allowed_and_conditions(
+        self, principal: Principal, widgets: Sequence[RegisteredWidget]
+    ) -> tuple[dict[str, bool], dict[str, bool], list[str]]:
+        policies = self.config().widget_policies
+        allowed: dict[str, bool] = {}
+        conditions: dict[str, bool] = {}
+        diagnostics: list[str] = []
+        for widget in widgets:
+            key = widget.definition.key
+            allowed[key] = await self.gateway.allowed(widget, principal)
+            wanted = list(widget.definition.conditions)
+            if policy_class(policies, key) == "conditional":
+                parsed = parse_condition((policies.get(key) or {}).get("condition"))
+                if parsed is None:
+                    conditions[key] = False
+                    diagnostics.append(f"{key}: conditional policy without a valid condition")
+                    continue
+                wanted.append(parsed)
+            if wanted:
+                evaluation = await self.conditions.evaluate_all(wanted, principal)
+                conditions[key] = evaluation.passed
+                diagnostics.extend(f"{key}: {d}" for d in evaluation.diagnostics)
+        return allowed, conditions, diagnostics
+
+    async def _overlay(
+        self, session: AsyncSession, principal: Principal
+    ) -> tuple[Overlay, UserDashboard | None]:
+        user = _user(principal)
+        board = await session.get(UserDashboard, user)
+        rows = (
+            (await session.execute(select(WidgetInstance).where(WidgetInstance.user_id == user)))
+            .scalars()
+            .all()
+        )
+        widgets = self.registry.widgets()
+        allowed, conditions, diagnostics = await self._allowed_and_conditions(principal, widgets)
+        definitions: dict[str, WidgetDefinition] = {w.definition.key: w.definition for w in widgets}
+        overlay = effective(
+            [_stored(row) for row in rows],
+            self.config().widget_policies,
+            definitions,
+            allowed,
+            conditions,
+            starter_applied=board is not None and board.starter_applied_at is not None,
+        )
+        overlay.diagnostics.extend(diagnostics)
+        return overlay, board
+
+    async def view(self, principal: Principal) -> DashboardView:
+        board_exists = await self._has_board(principal)
+        if not board_exists:
+            await self.apply_starter(principal)
+        async with self.database.session() as session:
+            overlay, board = await self._overlay(session, principal)
+        return DashboardView(overlay.instances, board.layout_version if board else 0, overlay.diagnostics)
+
+    async def _has_board(self, principal: Principal) -> bool:
+        async with self.database.session() as session:
+            return await session.get(UserDashboard, _user(principal)) is not None
+
+    async def catalog(self, principal: Principal) -> list[tuple[WidgetDefinition, bool]]:
+        """Widgets the user may add: permitted, enabled, entitled, not disabled, condition holding.
+        The flag says whether an instance is already placed (single-instance widgets)."""
+        policies = self.config().widget_policies
+        widgets = self.registry.widgets()
+        allowed, conditions, _ = await self._allowed_and_conditions(principal, widgets)
+        async with self.database.session() as session:
+            placed = set(
+                (
+                    await session.execute(
+                        select(WidgetInstance.widget_key).where(
+                            WidgetInstance.user_id == _user(principal), WidgetInstance.status == "active"
+                        )
+                    )
+                ).scalars()
+            )
+        out = []
+        for widget in widgets:
+            key = widget.definition.key
+            if (
+                not allowed.get(key)
+                or policy_class(policies, key) == "disabled"
+                or not conditions.get(key, True)
+            ):
+                continue
+            out.append((widget.definition, key in placed))
+        return out
+
+    # --- writing -------------------------------------------------------------------------------------
+    async def _board_for_update(
+        self, session: AsyncSession, user: UUID, if_match: int | None
+    ) -> UserDashboard:
+        board = await session.get(UserDashboard, user, with_for_update=True)
+        if board is None:
+            board = UserDashboard(user_id=user, layout_version=0, updated_at=utc_now(self.clock))
+            session.add(board)
+            await session.flush()
+        if if_match is not None and if_match != board.layout_version:
+            raise VersionConflict(
+                "Your dashboard changed on another device; reload it.",
+                extensions={"layout_version": board.layout_version},
+            )
+        return board
+
+    async def _bump(self, session: AsyncSession, board: UserDashboard, principal: Principal) -> int:
+        board.layout_version += 1
+        board.updated_at = utc_now(self.clock)
+        counts = (
+            (
+                await session.execute(
+                    select(WidgetInstance.status).where(WidgetInstance.user_id == board.user_id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        user_ref = hashlib.sha256(str(board.user_id).encode()).hexdigest()[:20]
+        await self.events.publish(
+            session,
+            "dashboard.layout_changed",
+            {
+                "layout_version": board.layout_version,
+                "widgets": len(counts),
+                "active": sum(1 for status in counts if status == "active"),
+            },
+            occurred_at=board.updated_at,
+            actor=principal,
+            source="dashboard",
+            dedup_key=f"dashboard.layout:{user_ref}:{board.layout_version}",
+        )
+        return board.layout_version
+
+    async def _addable(self, principal: Principal, key: str) -> RegisteredWidget:
+        widget = self.registry.get(key)
+        policies = self.config().widget_policies
+        if widget is None or policy_class(policies, key) == "disabled":
+            raise WidgetUnavailableError("This widget is not available.")
+        allowed, conditions, _ = await self._allowed_and_conditions(principal, [widget])
+        if not allowed.get(key) or not conditions.get(key, True):
+            raise WidgetUnavailableError("This widget is not available.")
+        return widget
+
+    def _check_config(self, widget: RegisteredWidget, config: Mapping[str, Any]) -> dict[str, Any]:
+        merged = {**widget.definition.config_defaults, **config}
+        errors = config_errors(widget, merged)
+        if errors:
+            raise ConfigInvalid("These widget settings are not valid.", extensions={"errors": errors[:5]})
+        return merged
+
+    async def add(
+        self,
+        principal: Principal,
+        key: str,
+        *,
+        config: Mapping[str, Any] | None = None,
+        w: int | None = None,
+        h: int | None = None,
+        if_match: int | None = None,
+    ) -> tuple[UUID, int]:
+        widget = await self._addable(principal, key)
+        user = _user(principal)
+        policies = self.config().widget_policies
+        locked = policy_class(policies, key) == "locked"
+        values = self._check_config(widget, {} if locked else (config or {}))
+        size = (
+            widget.definition.size.default
+            if locked
+            else widget.definition.size.clamp(
+                w or widget.definition.size.default.w, h or widget.definition.size.default.h
+            )
+        )
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            existing = (
+                (
+                    await session.execute(
+                        select(WidgetInstance).where(
+                            WidgetInstance.user_id == user, WidgetInstance.widget_key == key
+                        )
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            hidden = next((row for row in existing if row.status == "hidden"), None)
+            if hidden is not None and not widget.definition.multiple:
+                hidden.status = "active"  # re-adding a hidden widget restores its configuration
+                hidden.updated_at = now
+                version = await self._bump(session, board, principal)
+                return hidden.id, version
+            if existing and not widget.definition.multiple:
+                raise WidgetExists("This widget is already on your dashboard.")
+            position = await self._next_position(session, user)
+            row = WidgetInstance(
+                user_id=user,
+                widget_key=key,
+                status="active",
+                position=position,
+                w=size.w,
+                h=size.h,
+                config=values,
+                config_schema_version=widget.definition.schema_version,
+                origin="user",
+                created_at=now,
+                updated_at=now,
+            )
+            session.add(row)
+            await session.flush()
+            version = await self._bump(session, board, principal)
+            return row.id, version
+
+    async def _next_position(self, session: AsyncSession, user: UUID) -> int:
+        positions = (
+            (await session.execute(select(WidgetInstance.position).where(WidgetInstance.user_id == user)))
+            .scalars()
+            .all()
+        )
+        return max(positions, default=-1) + 1
+
+    async def _owned(self, session: AsyncSession, user: UUID, instance_id: UUID) -> WidgetInstance:
+        row = await session.get(WidgetInstance, instance_id, with_for_update=True)
+        if row is None or row.user_id != user:
+            raise NotFound("This widget is not on your dashboard.", code="dashboard.instance_not_found")
+        return row
+
+    async def update(
+        self,
+        principal: Principal,
+        instance_id: UUID,
+        *,
+        status: str | None = None,
+        position: int | None = None,
+        w: int | None = None,
+        h: int | None = None,
+        config: Mapping[str, Any] | None = None,
+        if_match: int | None = None,
+    ) -> int:
+        user = _user(principal)
+        policies = self.config().widget_policies
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            row = await self._owned(session, user, instance_id)
+            cls = policy_class(policies, row.widget_key)
+            widget = self.registry.get(row.widget_key)
+            if status is not None:
+                if status not in ("active", "hidden"):
+                    raise ValidationFailed("Unknown status.", code="dashboard.invalid_status")
+                if status == "hidden" and cls == "mandatory":
+                    raise PolicyLocked("This widget is required by your administrator.")
+                if status == "active" and widget is None:
+                    raise WidgetUnavailableError("This widget is not available.")
+                row.status = status
+            if cls in ("locked",) and any(v is not None for v in (position, w, h, config)):
+                raise PolicyLocked("This widget is locked by your administrator.")
+            if position is not None:
+                await self._move(session, user, row, position)
+            if w is not None or h is not None:
+                if widget is None:
+                    raise WidgetUnavailableError("This widget is not available.")
+                size = widget.definition.size.clamp(w or row.w, h or row.h)
+                row.w, row.h = size.w, size.h
+            if config is not None:
+                if widget is None:
+                    raise WidgetUnavailableError("This widget is not available.")
+                row.config = self._check_config(widget, config)
+                row.config_schema_version = widget.definition.schema_version
+            row.updated_at = utc_now(self.clock)
+            return await self._bump(session, board, principal)
+
+    async def _move(self, session: AsyncSession, user: UUID, row: WidgetInstance, position: int) -> None:
+        rows = list(
+            (
+                await session.execute(
+                    select(WidgetInstance)
+                    .where(WidgetInstance.user_id == user)
+                    .order_by(WidgetInstance.position, WidgetInstance.id)
+                    .with_for_update()
+                )
+            ).scalars()
+        )
+        rows.remove(row)
+        rows.insert(max(0, min(position, len(rows))), row)
+        await self._check_locked_order(rows)
+        for index, item in enumerate(rows):
+            item.position = index
+
+    async def _check_locked_order(self, ordered: Sequence[WidgetInstance]) -> None:
+        policies = self.config().widget_policies
+        for index, item in enumerate(ordered):
+            if policy_class(policies, item.widget_key) == "locked" and item.position != index:
+                raise PolicyLocked("A locked widget cannot be moved.")
+
+    async def remove(self, principal: Principal, instance_id: UUID, *, if_match: int | None = None) -> int:
+        user = _user(principal)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            row = await self._owned(session, user, instance_id)
+            if policy_class(self.config().widget_policies, row.widget_key) == "mandatory":
+                raise PolicyLocked("This widget is required by your administrator.")
+            await session.delete(row)  # removal discards the configuration (hide keeps it)
+            await session.flush()
+            return await self._bump(session, board, principal)
+
+    async def layout(self, principal: Principal, items: Sequence[LayoutItem], *, if_match: int | None) -> int:
+        """Atomic reorder/resize: ``items`` is the full order; unknown ids are refused; synthesized policy
+        widgets (``id`` null) are materialized."""
+        user = _user(principal)
+        policies = self.config().widget_policies
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            rows = {
+                row.id: row
+                for row in (
+                    await session.execute(
+                        select(WidgetInstance).where(WidgetInstance.user_id == user).with_for_update()
+                    )
+                ).scalars()
+            }
+            ordered: list[WidgetInstance] = []
+            for item in items:
+                widget = self.registry.get(item.widget_key)
+                if item.id is None:
+                    if widget is None or policy_class(policies, item.widget_key) not in (
+                        "mandatory",
+                        "default",
+                    ):
+                        raise WidgetUnavailableError("This widget is not available.")
+                    size = widget.definition.size.default
+                    row = WidgetInstance(
+                        user_id=user,
+                        widget_key=item.widget_key,
+                        status="active",
+                        position=len(ordered),
+                        w=size.w,
+                        h=size.h,
+                        config=dict(widget.definition.config_defaults),
+                        config_schema_version=widget.definition.schema_version,
+                        origin="policy_default",
+                        created_at=now,
+                        updated_at=now,
+                    )
+                    session.add(row)
+                else:
+                    found = rows.pop(item.id, None)
+                    if found is None:
+                        raise NotFound(
+                            "This widget is not on your dashboard.", code="dashboard.instance_not_found"
+                        )
+                    row = found
+                locked = policy_class(policies, row.widget_key) == "locked"
+                if widget is not None and not locked:
+                    size = widget.definition.size.clamp(item.w, item.h)
+                    row.w, row.h = size.w, size.h
+                elif locked and (item.w, item.h) != (row.w, row.h):
+                    raise PolicyLocked("A locked widget cannot be resized.")
+                row.updated_at = now
+                ordered.append(row)
+            # rows not listed (e.g. hidden ones the client did not send) keep their relative order at the end
+            ordered.extend(sorted(rows.values(), key=lambda r: r.position))
+            await self._check_locked_order(ordered)
+            for index, row in enumerate(ordered):
+                row.position = index
+            await session.flush()
+            return await self._bump(session, board, principal)
+
+    # --- starter -------------------------------------------------------------------------------------
+    async def apply_starter(self, principal: Principal) -> bool:
+        """Apply the starter layout once (idempotent); filtered by permission, policy and availability. A
+        failing widget definition never blocks the others."""
+        user = _user(principal)
+        layout = self.config().starter_layout
+        policies = self.config().widget_policies
+        widgets = {w.definition.key: w for w in self.registry.widgets()}
+        chosen: list[tuple[RegisteredWidget, int, int]] = []
+        roles_ok = await self._roles(principal)
+        for entry in layout:
+            try:
+                key = str(entry.get("widget_key", ""))
+                widget = widgets.get(key)
+                roles = entry.get("roles")
+                if widget is None or policy_class(policies, key) == "disabled":
+                    continue
+                if roles and not (set(roles) & roles_ok):
+                    continue
+                if not await self.gateway.allowed(widget, principal):
+                    continue
+                size = widget.definition.size.clamp(int(entry.get("w", 0) or 0), int(entry.get("h", 0) or 0))
+                chosen.append((widget, size.w, size.h))
+            except Exception:
+                log.warning("starter entry skipped")
+        for key, widget in sorted(widgets.items()):
+            if (
+                policy_class(policies, key) == "default"
+                and all(c[0].definition.key != key for c in chosen)
+                and await self.gateway.allowed(widget, principal)
+            ):
+                chosen.append((widget, widget.definition.size.default.w, widget.definition.size.default.h))
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await session.get(UserDashboard, user, with_for_update=True)
+            if board is not None and board.starter_applied_at is not None:
+                return False
+            if board is None:
+                board = UserDashboard(user_id=user, layout_version=0, updated_at=now)
+                session.add(board)
+                await session.flush()
+            existing = set(
+                (
+                    await session.execute(
+                        select(WidgetInstance.widget_key).where(WidgetInstance.user_id == user)
+                    )
+                ).scalars()
+            )
+            position = await self._next_position(session, user)
+            for widget, w, h in chosen:
+                if widget.definition.key in existing:
+                    continue
+                session.add(
+                    WidgetInstance(
+                        user_id=user,
+                        widget_key=widget.definition.key,
+                        status="active",
+                        position=position,
+                        w=w,
+                        h=h,
+                        config=dict(widget.definition.config_defaults),
+                        config_schema_version=widget.definition.schema_version,
+                        origin="starter",
+                        created_at=now,
+                        updated_at=now,
+                    )
+                )
+                position += 1
+            board.starter_applied_at = now
+            await session.flush()
+            await self._bump(session, board, principal)
+            await self.events.publish(
+                session,
+                "dashboard.starter_applied",
+                {"widgets": len(chosen)},
+                occurred_at=now,
+                actor=principal,
+                source="dashboard",
+                dedup_key=f"dashboard.starter:{hashlib.sha256(str(user).encode()).hexdigest()[:20]}",
+            )
+        metrics.increment("dashboard.starter_applied")
+        return True
+
+    async def _roles(self, principal: Principal) -> set[str]:
+        from portalab.capabilities.user_grants import ROLES_CAPABILITY
+
+        try:
+            providers = self.conditions.capabilities.system_providers(ROLES_CAPABILITY)
+            user = principal.acting_for or principal.user_id
+            if providers and user is not None:
+                return set(await providers[0].provider.roles_of(user))
+        except Exception:
+            log.warning("roles unavailable for the starter dashboard")
+        return {"user"}
+
+    async def stored_config(self, principal: Principal, instance_id: UUID) -> tuple[str, dict[str, Any]]:
+        async with self.database.session() as session:
+            row = await session.get(WidgetInstance, instance_id)
+            if row is None or row.user_id != _user(principal):
+                raise NotFound("This widget is not on your dashboard.", code="dashboard.instance_not_found")
+            config: dict[str, Any] = dict(row.config)
+            locked = self.config().widget_policies.get(row.widget_key) or {}
+            if locked.get("class") == "locked" and isinstance(locked.get("lockedConfig"), Mapping):
+                config.update(locked["lockedConfig"])
+            return row.widget_key, config
+
+    async def erase(self, user: UUID) -> None:
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(delete(WidgetInstance).where(WidgetInstance.user_id == user))
+            await uow.session.execute(delete(UserDashboard).where(UserDashboard.user_id == user))

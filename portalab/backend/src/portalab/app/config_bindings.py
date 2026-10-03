@@ -12,6 +12,7 @@ from typing import Any
 from portalab.core.logging import get_logger
 from portalab.modules.administration.config.service import ConfigService
 from portalab.modules.connectors.settings import SETTINGS as CONNECTORS_FIELDS
+from portalab.modules.dashboard.settings import SETTINGS as DASHBOARD_FIELDS
 from portalab.modules.health.settings import SETTINGS as HEALTH_FIELDS
 from portalab.modules.observability.settings import SETTINGS as OBSERVABILITY_FIELDS
 from portalab.modules.search.settings import SETTINGS as SEARCH_FIELDS
@@ -76,6 +77,9 @@ async def refresh(platform: Any) -> None:
     observability = getattr(platform, "observability", None)
     if observability is not None:
         observability.config = replace(observability.config, **await _values(config, OBSERVABILITY_FIELDS))
+    dashboard = getattr(platform, "dashboard", None)
+    if dashboard is not None:
+        dashboard.config = replace(dashboard.config, **await _values(config, DASHBOARD_FIELDS))
     search = getattr(platform, "search", None)
     if search is not None:
         search.config = replace(search.config, **await _values(config, SEARCH_FIELDS))
@@ -95,5 +99,14 @@ def bind(platform: Any) -> None:
     async def on_change(keys: set[str]) -> None:
         await safe_refresh(platform)
 
-    for prefix in ("identity.", "privacy.", "authz.", "connectors.", "health.", "observability.", "search."):
+    for prefix in (
+        "identity.",
+        "privacy.",
+        "authz.",
+        "connectors.",
+        "health.",
+        "observability.",
+        "search.",
+        "dashboard.",
+    ):
         platform.administration.config.on_change(prefix, on_change)

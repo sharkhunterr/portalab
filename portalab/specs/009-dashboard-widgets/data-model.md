@@ -22,3 +22,22 @@ Produced: `dashboard.layout_changed` (user, counts only; dedup `(user_id, layout
 
 ## Privacy / retention
 Instances are user preference data (export/erase via 020 participant). The summary is computed on demand and not persisted beyond `last_summary_seen_at`.
+
+## Implementation notes (2026-10-03)
+- `user_dashboards.starter_applied_at` / `last_summary_seen_at` are personal data class `activity`;
+  `widget_instances.widget_key` / `config` class `preference` (empty tombstones). FKs to `identity.users`
+  (cascade) are migration-only. Export/erasure through the module's own privacy participant `dashboard`.
+- Widget-instance uniqueness is enforced by the service (single-instance widgets: re-adding a hidden one
+  reactivates it with its config; an active one ⇒ 409 `dashboard.widget_exists`), not by a DB constraint.
+- Policy-locked writes answer **409** `dashboard.policy_locked`; unavailable/unpermitted widgets 422
+  `dashboard.widget_unavailable`; invalid configuration 422 `dashboard.config_invalid`.
+- The starter is applied on the first `GET /dashboard` (idempotent) and by `POST /dashboard/starter`; the
+  SPA then completes the 002 onboarding step `dashboard` (no separate onboarding screen exists yet).
+- "Since last login": the boundary moves only on `seen` (never backwards); the inactivity-gap setting is
+  declared but not yet used for automatic advancing.
+- Config validation uses JSON Schema (`jsonschema`, Draft 2020-12); plugin widget string settings are
+  hardened (no `<`/`>`, max length 200).
+- New read port `authz.user_roles` (`roles_of(user_id)`, provided by authz) for the `role_in` condition;
+  `marketplace.entitlements` (`owns(user, product)`) is declared here and stays unprovided until 015
+  (widget products are then hidden for everyone).
+- The 004 placeholder home page is replaced by the dashboard.

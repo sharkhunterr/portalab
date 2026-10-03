@@ -10,6 +10,7 @@ from uuid import UUID
 from portalab.capabilities.registry import CapabilitySpec
 
 CAPABILITY = "authz.user_grants"
+ROLES_CAPABILITY = "authz.user_roles"
 
 
 @runtime_checkable
@@ -35,4 +36,20 @@ SPEC = CapabilitySpec(
     protocol=UserGrants,
     multi_provider=False,
     description="Per-user entitlement grants (allow-listed permissions only).",
+)
+
+
+@runtime_checkable
+class UserRoles(Protocol):
+    """Role keys held by a user, including the implicit ``user`` role (read-only; spec 009 ``role_in``)."""
+
+    async def roles_of(self, user_id: UUID) -> frozenset[str]: ...
+
+
+ROLES_SPEC = CapabilitySpec(
+    name=ROLES_CAPABILITY,
+    version="1.0",
+    protocol=UserRoles,
+    multi_provider=False,
+    description="Role keys of a user (for closed-set display conditions; never an authorization check).",
 )

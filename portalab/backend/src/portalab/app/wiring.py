@@ -22,6 +22,7 @@ from portalab.core.secrets import SecretBox
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.connectors.module import ConnectorsModule
+from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.events.module import EventsModule
 from portalab.modules.events.publisher.publisher import EventStorePublisher
 from portalab.modules.health.module import HealthModule
@@ -94,6 +95,7 @@ class Platform:
     shell: ShellModule
     i18n: I18nModule
     search: SearchModule
+    dashboard: DashboardModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -164,6 +166,10 @@ def wire_platform(
         administration.registry.register_validator(key, validator, owner="module:i18n")
     search = SearchModule(database, events, authz.audit, capabilities, authz.engine)
     search.register()
+    dashboard = DashboardModule(database, events, authz.audit, capabilities, authz.engine)
+    dashboard.register()
+    for key, validator in dashboard.validators.table().items():
+        administration.registry.register_validator(key, validator, owner="module:dashboard")
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -205,6 +211,7 @@ def wire_platform(
         shell,
         i18n,
         search,
+        dashboard,
         seeds,
     )
     from portalab.app.config_bindings import bind
