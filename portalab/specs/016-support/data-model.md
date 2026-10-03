@@ -32,3 +32,18 @@ Produced: `incident.created|updated|resolved` (dedup `(incident_id, update_seq)`
 
 ## Privacy / retention
 Personal data: ticket text/comments (`content`), requester/assignee refs, attachments; private custom fields; internal notes staff-only. Retention by 021 (`support.ticketRetentionMonths`); history append-only; erasure tombstones requester and removes attachments/private fields per participant.
+
+## Implementation notes — Slice A (2026-10-03)
+- `support.incident_services` is mapped as `IncidentServiceLink`; `incident_updates` also records the
+  `severity` at each step (the timeline shows severity changes); `incidents` keeps `summary` (public text),
+  `updated_at` and `version` (optimistic concurrency, `If-Match`). Number = sequence `incident_number_seq`.
+- Sources: `manual | observability | health | automation`. 025 escalations without an explicit
+  `dedup_key` are deduplicated on `anomaly:<anomaly_id>`.
+- The `support.incidents` port keeps its declaration in `capabilities/health.py` (declared with 006) and
+  is extended additively (`service_ids`, `dedup_key`, `summary`, `get`); severity accepts 025's
+  `info|warning|critical` (mapped to `minor|major|critical`).
+- Incidents hold no personal data besides staff author ids (pseudonymous, kept after erasure): no
+  export/erasure participant in Slice A. Notification category `support.incident` is used through the
+  `notifications.send` port declared here (unprovided until 010); registration of the category with 010
+  happens when 010 lands.
+- T038/T039 (shared upload helper, automation-callable create + 019 action types) are Slice B / later.

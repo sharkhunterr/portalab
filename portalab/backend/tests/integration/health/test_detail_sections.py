@@ -18,6 +18,9 @@ class _Incidents:
     async def open_for_service(self, service_id: str) -> list[IncidentRef]:
         return [IncidentRef("inc-1", "Disk failure", "investigating", datetime(2026, 10, 1, tzinfo=UTC))]
 
+    async def get(self, incident_id: str) -> IncidentRef | None:
+        return None
+
     async def link(self, service_id: str, incident_id: str) -> None:
         self.linked.append((service_id, incident_id))
 

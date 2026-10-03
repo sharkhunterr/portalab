@@ -16,6 +16,7 @@ from portalab.modules.dashboard.settings import SETTINGS as DASHBOARD_FIELDS
 from portalab.modules.health.settings import SETTINGS as HEALTH_FIELDS
 from portalab.modules.observability.settings import SETTINGS as OBSERVABILITY_FIELDS
 from portalab.modules.search.settings import SETTINGS as SEARCH_FIELDS
+from portalab.modules.support.settings import SETTINGS as SUPPORT_FIELDS
 
 log = get_logger("portalab.config")
 
@@ -80,6 +81,9 @@ async def refresh(platform: Any) -> None:
     dashboard = getattr(platform, "dashboard", None)
     if dashboard is not None:
         dashboard.config = replace(dashboard.config, **await _values(config, DASHBOARD_FIELDS))
+    support = getattr(platform, "support", None)
+    if support is not None:
+        support.config = replace(support.config, **await _values(config, SUPPORT_FIELDS))
     search = getattr(platform, "search", None)
     if search is not None:
         search.config = replace(search.config, **await _values(config, SEARCH_FIELDS))
@@ -108,5 +112,6 @@ def bind(platform: Any) -> None:
         "observability.",
         "search.",
         "dashboard.",
+        "support.",
     ):
         platform.administration.config.on_change(prefix, on_change)

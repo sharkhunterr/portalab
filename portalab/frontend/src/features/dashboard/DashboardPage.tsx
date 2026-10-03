@@ -6,6 +6,7 @@ import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Button } from "../../design-system/components/Button";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
+import { IncidentBanner } from "../support/incidents/IncidentBanner";
 import { type Change, DASHBOARD_KEY, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
@@ -70,6 +71,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
         </Button>
         {editing ? <CatalogDrawer apply={apply} /> : null}
       </div>
+      <IncidentBanner />
       <SinceLastLoginCard />
       {dashboard.isPending ? <FunctionalState state="loading" /> : null}
       {dashboard.isError ? <FunctionalState state="error" onRetry={() => dashboard.refetch()} /> : null}

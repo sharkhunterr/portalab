@@ -33,6 +33,7 @@ from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.module import ShellModule
+from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.module import UiModule
 
 
@@ -96,6 +97,7 @@ class Platform:
     i18n: I18nModule
     search: SearchModule
     dashboard: DashboardModule
+    support: SupportModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -164,6 +166,8 @@ def wire_platform(
     i18n.register()
     for key, validator in i18n.validators.table().items():
         administration.registry.register_validator(key, validator, owner="module:i18n")
+    support = SupportModule(database, events, authz.audit, capabilities, authz.engine)
+    support.register()
     search = SearchModule(database, events, authz.audit, capabilities, authz.engine)
     search.register()
     dashboard = DashboardModule(database, events, authz.audit, capabilities, authz.engine)
@@ -212,6 +216,7 @@ def wire_platform(
         i18n,
         search,
         dashboard,
+        support,
         seeds,
     )
     from portalab.app.config_bindings import bind

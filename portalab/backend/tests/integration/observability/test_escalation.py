@@ -20,6 +20,9 @@ class Support:
     async def open_for_service(self, service_id: str) -> list[IncidentRef]:
         return []
 
+    async def get(self, incident_id: str) -> IncidentRef | None:
+        return None
+
     async def link(self, service_id: str, incident_id: str) -> None:
         return None
 

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useId, useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../api/client";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { DataRegion } from "../../state/regions";
@@ -139,6 +140,17 @@ function SectionBody({ name, data }: { name: string; data: unknown }): ReactNode
         <ul>
           {(value as unknown as Array<{ code: string; count: number; message: string }>).map((e) => (
             <li key={e.code}>{s.error(e.code, e.count, e.message)}</li>
+          ))}
+        </ul>
+      );
+    case "incidents":
+      // incidents live in Support (016): link to their page
+      return (
+        <ul>
+          {(value as unknown as Array<{ id: string; title: string; status: string }>).map((i) => (
+            <li key={i.id}>
+              <Link to={`/incidents/${i.id}`}>{i.title}</Link> ({i.status})
+            </li>
           ))}
         </ul>
       );

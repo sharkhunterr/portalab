@@ -69,6 +69,8 @@ from portalab.modules.search.api import routers as search_routers
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.api import routers as shell_routers
 from portalab.modules.shell.module import ShellModule
+from portalab.modules.support.api import routers as support_routers
+from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.api import routers as ui_routers
 from portalab.modules.ui.module import UiModule
 
@@ -116,6 +118,7 @@ def create_app(
     i18n: I18nModule | None = None,
     search: SearchModule | None = None,
     dashboard: DashboardModule | None = None,
+    support: SupportModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -143,6 +146,7 @@ def create_app(
         app.state.i18n_module = platform.i18n
         app.state.search_module = platform.search
         app.state.dashboard_module = platform.dashboard
+        app.state.support_module = platform.support
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -198,6 +202,7 @@ def create_app(
     app.state.i18n_module = i18n
     app.state.search_module = search
     app.state.dashboard_module = dashboard
+    app.state.support_module = support
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -302,6 +307,7 @@ def create_app(
         *i18n_routers(),
         *search_routers(),
         *dashboard_routers(),
+        *support_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

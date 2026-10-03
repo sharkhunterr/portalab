@@ -250,6 +250,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Incident */
+        post: operations["create_incident_api_v1_admin_incidents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/incidents/{incident_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Patch Incident */
+        patch: operations["patch_incident_api_v1_admin_incidents__incident_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/incidents/{incident_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Incident */
+        post: operations["resolve_incident_api_v1_admin_incidents__incident_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/incidents/{incident_id}/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Update */
+        post: operations["add_update_api_v1_admin_incidents__incident_id__updates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/observability/anomalies": {
         parameters: {
             query?: never;
@@ -1155,6 +1223,40 @@ export interface paths {
         };
         /** Languages */
         get: operations["languages_api_v1_i18n_languages_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Incidents */
+        get: operations["list_incidents_api_v1_incidents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incidents/{incident_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Incident */
+        get: operations["get_incident_api_v1_incidents__incident_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2647,6 +2749,96 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** IncidentIn */
+        IncidentIn: {
+            /** Service Ids */
+            service_ids?: string[];
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "minor" | "major" | "critical";
+            /**
+             * Summary
+             * @default
+             */
+            summary: string;
+            /** Title */
+            title: string;
+        };
+        /** IncidentOut */
+        IncidentOut: {
+            /** Created At */
+            created_at: string;
+            /** Evidence */
+            evidence: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reference */
+            reference: string;
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Services */
+            services: components["schemas"]["ServiceOut"][];
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "minor" | "major" | "critical";
+            /** Source */
+            source: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "investigating" | "identified" | "monitoring" | "resolved";
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+            /** Updated At */
+            updated_at: string;
+            /** Updates */
+            updates: components["schemas"]["IncidentUpdateOut"][];
+            /** Version */
+            version: number;
+        };
+        /** IncidentPatchIn */
+        IncidentPatchIn: {
+            /** Service Ids */
+            service_ids?: string[] | null;
+            /** Severity */
+            severity?: ("minor" | "major" | "critical") | null;
+            /** Summary */
+            summary?: string | null;
+            /** Title */
+            title?: string | null;
+        };
+        /** IncidentUpdateIn */
+        IncidentUpdateIn: {
+            /** Message */
+            message: string;
+            /** State */
+            state?: ("investigating" | "identified" | "monitoring") | null;
+        };
+        /** IncidentUpdateOut */
+        IncidentUpdateOut: {
+            /** At */
+            at: string;
+            /** Author User Id */
+            author_user_id: string | null;
+            /** Message */
+            message: string;
+            /** Seq */
+            seq: number;
+            /** Severity */
+            severity: string;
+            /** State */
+            state: string;
+        };
         /** Layout */
         Layout: {
             /** Group Order */
@@ -2915,11 +3107,6 @@ export interface components {
             /** To Occurred At */
             to_occurred_at?: string | null;
         };
-        /** ResolveIn */
-        ResolveIn: {
-            /** Resolution */
-            resolution: string;
-        };
         /** ResyncIn */
         ResyncIn: {
             /**
@@ -3113,6 +3300,13 @@ export interface components {
             };
             /** Sync Interval Seconds */
             sync_interval_seconds?: number | null;
+        };
+        /** ServiceOut */
+        ServiceOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** ServicePatch */
         ServicePatch: {
@@ -3387,6 +3581,11 @@ export interface components {
              */
             mode: "default" | "lock" | "bound";
         };
+        /** ResolveIn */
+        portalab__modules__observability__api__routes__ResolveIn: {
+            /** Resolution */
+            resolution: string;
+        };
         /** PolicyIn */
         portalab__modules__privacy__api__routes__PolicyIn: {
             /** Datum Class */
@@ -3404,6 +3603,14 @@ export interface components {
             reason: string;
             /** Subject User Id */
             subject_user_id?: string | null;
+        };
+        /** ResolveIn */
+        portalab__modules__support__api__incidents__ResolveIn: {
+            /**
+             * Message
+             * @default
+             */
+            message: string;
         };
     };
     responses: never;
@@ -4003,6 +4210,150 @@ export interface operations {
             };
         };
     };
+    create_incident_api_v1_admin_incidents_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_incident_api_v1_admin_incidents__incident_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string | null;
+            };
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentPatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_incident_api_v1_admin_incidents__incident_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string | null;
+            };
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__support__api__incidents__ResolveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_update_api_v1_admin_incidents__incident_id__updates_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string | null;
+            };
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     anomalies_api_v1_admin_observability_anomalies_get: {
         parameters: {
             query?: {
@@ -4182,7 +4533,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ResolveIn"];
+                "application/json": components["schemas"]["portalab__modules__observability__api__routes__ResolveIn"];
             };
         };
         responses: {
@@ -5856,6 +6207,69 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    list_incidents_api_v1_incidents_get: {
+        parameters: {
+            query?: {
+                state?: ("open" | "investigating" | "identified" | "monitoring" | "resolved") | null;
+                service?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_incident_api_v1_incidents__incident_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

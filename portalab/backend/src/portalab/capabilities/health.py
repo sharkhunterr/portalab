@@ -7,7 +7,7 @@ Connector-provided capabilities are bound to one service (the provider instance 
 :class:`~portalab.capabilities.results.CapabilityResult` values.
 """
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal, Protocol, runtime_checkable
@@ -130,12 +130,25 @@ class Incidents(Protocol):
     async def link(self, service_id: str, incident_id: str) -> None: ...
 
     async def create(
-        self, *, title: str, source: str, severity: str, evidence: Mapping[str, Any]
-    ) -> IncidentRef: ...
+        self,
+        *,
+        title: str,
+        source: str,
+        severity: str,
+        evidence: Mapping[str, Any],
+        service_ids: Sequence[str] = (),
+        dedup_key: str | None = None,
+        summary: str | None = None,
+    ) -> IncidentRef:
+        """Idempotent per ``(source, dedup_key)`` (016): a repeated escalation returns the same incident.
+        ``severity`` accepts ``minor|major|critical`` (or 025's ``info|warning|critical``)."""
+        ...
 
     async def attach(self, incident_id: str, evidence: Mapping[str, Any]) -> IncidentRef | None:
         """Add evidence to an incident; ``None`` when it is no longer open."""
         ...
+
+    async def get(self, incident_id: str) -> IncidentRef | None: ...
 
 
 @dataclass(frozen=True, slots=True)

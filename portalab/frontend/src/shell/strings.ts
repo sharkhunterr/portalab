@@ -41,6 +41,8 @@ export const shellStrings = {
     "nav.appearance": "Appearance",
     "nav.language": "Language & region",
     "nav.search": "Search",
+    "nav.incidents": "Incidents",
+    "nav.admin.incidents": "Incident console",
     "nav.privacy": "Privacy",
     "nav.services": "Services",
     "nav.shortcuts": "Keyboard shortcuts",

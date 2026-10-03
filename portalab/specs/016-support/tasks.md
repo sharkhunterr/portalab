@@ -9,30 +9,30 @@ Abbrev: **`SP/`** = `backend/src/portalab/modules/support`, **`CAP/`** = `backen
 Prerequisites (not implemented here): `D-001` kernel/blobstore/jobs · `D-002/003` principal/authz (roles `support`, `moderator`) + `AuditSink`/`ConfirmationService` · `D-006` health (port consumer) · `D-025` observability (port consumer) · `D-007` events · `D-010` notification categories · `D-020` settings · `D-021` retention/erasure · `D-022/004` UI. Later/stubbed: `support.knowledge` (011), AI executor (018), `gamification.grant_contribution` (013), `community.proposals.create` (012; kinds `feature|project`, the funding lifecycle is registered by 012 in 015).
 
 ## Phase 1: Setup (Slice A)
-- [ ] T001 Create `CAP/__init__.py`, `SP/{incidents,tickets,workflow,attachments,precheck,diagnosis,feedback,conversion,admin,providers,api,models}/__init__.py`, `backend/migrations/support/versions/`, `FS/{incidents,tickets,staff,diagnosis,feedback,admin}/`, `backend/tests/{unit,integration,contract,security}/support/`, `frontend/tests/{unit,e2e}/support/`
-- [ ] T002 [P] Declare settings (`support.attachments.maxBytes|maxPerPost|allowedTypes`, `support.ticketRetentionMonths`, `support.reopenWindowDays`, `support.draftTtlMinutes`, `support.incident.precheckMatchMode`) in `SP/settings.py`; declare permissions `tickets.create|comment|manage`, `incidents.read|manage`, `feedback.submit|read|convert|convert.contribution`, `support.configure` with default role grants (user/support/moderator/admin) in `SP/permissions.py`
-- [ ] T003 [P] Declare notification categories `support.assignment|ticket_status|incident|feedback` (010), register retention targets and the 020/021 export+erasure participant `SP/privacy.py` (classify ticket text/comments/attachments, private fields)
+- [X] T001 Create `CAP/__init__.py`, `SP/{incidents,tickets,workflow,attachments,precheck,diagnosis,feedback,conversion,admin,providers,api,models}/__init__.py`, `backend/migrations/support/versions/`, `FS/{incidents,tickets,staff,diagnosis,feedback,admin}/`, `backend/tests/{unit,integration,contract,security}/support/`, `frontend/tests/{unit,e2e}/support/`
+- [X] T002 [P] Declare settings (`support.attachments.maxBytes|maxPerPost|allowedTypes`, `support.ticketRetentionMonths`, `support.reopenWindowDays`, `support.draftTtlMinutes`, `support.incident.precheckMatchMode`) in `SP/settings.py`; declare permissions `tickets.create|comment|manage`, `incidents.read|manage`, `feedback.submit|read|convert|convert.contribution`, `support.configure` with default role grants (user/support/moderator/admin) in `SP/permissions.py`
+- [X] T003 [P] Declare notification categories `support.assignment|ticket_status|incident|feedback` (010), register retention targets and the 020/021 export+erasure participant `SP/privacy.py` (classify ticket text/comments/attachments, private fields)
 
 ## Phase 2: Foundational — schema & port contracts (Slice A)
 ### Tests first
-- [ ] T004 [P] Write `backend/tests/contract/support/test_incidents_port.py`: `support.incidents` conformance kit used by 006/025 fakes — `create` idempotent per `(source, dedup_key)`, `attach`, `link`, `open_for_service`, `get` permission-bounded
-- [ ] T005 [P] Write `backend/tests/integration/support/test_schema_incidents.py`: incident tables, append-only `incident_updates` (trigger), unique `(source, dedup_key)`, FKs only intra-module/`identity.users(id)`
+- [X] T004 [P] Write `backend/tests/contract/support/test_incidents_port.py`: `support.incidents` conformance kit used by 006/025 fakes — `create` idempotent per `(source, dedup_key)`, `attach`, `link`, `open_for_service`, `get` permission-bounded
+- [X] T005 [P] Write `backend/tests/integration/support/test_schema_incidents.py`: incident tables, append-only `incident_updates` (trigger), unique `(source, dedup_key)`, FKs only intra-module/`identity.users(id)`
 ### Implementation
-- [ ] T006 Implement `CAP/` port Protocols (`support.incidents`, `support.tickets`, `support.knowledge`, conversion target ports, `AttachmentScanner`, `DiagnosisFlow` tool contracts) with in-memory fakes
-- [ ] T007 Implement `SP/models` + Alembic revision for schema `support` (incident tables first; ticket/feedback tables in a second revision for Slice B)
+- [X] T006 Implement `CAP/` port Protocols (`support.incidents`, `support.tickets`, `support.knowledge`, conversion target ports, `AttachmentScanner`, `DiagnosisFlow` tool contracts) with in-memory fakes
+- [X] T007 Implement `SP/models` + Alembic revision for schema `support` (incident tables first; ticket/feedback tables in a second revision for Slice B)
 
 ## Phase 3: US3 — Incidents distinct from tickets, surfaced to reduce duplicates (P1) 🎯 MVP (Slice A)
 **Independent test**: open an incident, see it surfaced when starting a related ticket, confirm lifecycles are independent.
-- [ ] T008 [P] [US3] Write `backend/tests/integration/support/test_incident_lifecycle.py`: `investigating → identified → monitoring → resolved` with append-only timeline; resolve independent of any ticket; severity change audited; duplicate create returns existing; critical resolve/severity sensitive + audited
-- [ ] T009 [P] [US3] Write `backend/tests/integration/support/test_incident_surfacing.py`: users see only permitted affected services; open incident surfaced by precheck for matching service/text; Observability escalation through the port after validation creates one incident; 006 `open_for_service` returns it
-- [ ] T010 [US3] Implement `SP/incidents/service.py` (lifecycle, updates, services, evidence, dedup) and the `support.incidents` port implementation registered in the capability registry
-- [ ] T011 [US3] Implement routers `GET /incidents[/{id}]`, admin `POST /admin/incidents`, `POST …/{id}/updates`, `PATCH …/{id}`, `POST …/{id}/resolve` (`incidents.manage`, audited) and emit `incident.created|updated|resolved` events (dedup `(incident_id, update_seq)`)
-- [ ] T012 [US3] Implement notification fan-out through the `notifications.send` port (stub until 010 lands at roadmap step 15) (`support.incident`, audience = users permitted on affected services, critical ⇒ alert) in `SP/incidents/notify.py` and dashboard widget `support.open_incidents` (009) + search provider `incidents` (008)
-- [ ] T013 [US3] Implement frontend `FS/incidents/IncidentBanner.tsx`, `IncidentsPage.tsx`, admin `IncidentConsole.tsx` (timeline editor, severity/state/services); wire 006 service-page incidents section to the port
+- [X] T008 [P] [US3] Write `backend/tests/integration/support/test_incident_lifecycle.py`: `investigating → identified → monitoring → resolved` with append-only timeline; resolve independent of any ticket; severity change audited; duplicate create returns existing; critical resolve/severity sensitive + audited
+- [X] T009 [P] [US3] Write `backend/tests/integration/support/test_incident_surfacing.py`: users see only permitted affected services; open incident surfaced by precheck for matching service/text; Observability escalation through the port after validation creates one incident; 006 `open_for_service` returns it
+- [X] T010 [US3] Implement `SP/incidents/service.py` (lifecycle, updates, services, evidence, dedup) and the `support.incidents` port implementation registered in the capability registry
+- [X] T011 [US3] Implement routers `GET /incidents[/{id}]`, admin `POST /admin/incidents`, `POST …/{id}/updates`, `PATCH …/{id}`, `POST …/{id}/resolve` (`incidents.manage`, audited) and emit `incident.created|updated|resolved` events (dedup `(incident_id, update_seq)`)
+- [X] T012 [US3] Implement notification fan-out through the `notifications.send` port (stub until 010 lands at roadmap step 15) (`support.incident`, audience = users permitted on affected services, critical ⇒ alert) in `SP/incidents/notify.py` and dashboard widget `support.open_incidents` (009) + search provider `incidents` (008)
+- [X] T013 [US3] Implement frontend `FS/incidents/IncidentBanner.tsx`, `IncidentsPage.tsx`, admin `IncidentConsole.tsx` (timeline editor, severity/state/services); wire 006 service-page incidents section to the port
 
 ## Phase 4: Slice A closure
-- [ ] T014 [P] Write `backend/tests/security/support/test_incident_security.py`: only `incidents.manage` can mutate; public summary never leaks internal evidence/service names the viewer cannot see; XSS-safe rendering
-- [ ] T015 Wire cross-spec contract tests: 006 `IncidentLinkService` and 025 escalation against the real port implementation; record Slice A completion in `docs/support.md` (incident section)
+- [X] T014 [P] Write `backend/tests/security/support/test_incident_security.py`: only `incidents.manage` can mutate; public summary never leaks internal evidence/service names the viewer cannot see; XSS-safe rendering
+- [X] T015 Wire cross-spec contract tests: 006 `IncidentLinkService` and 025 escalation against the real port implementation; record Slice A completion in `docs/support.md` (incident section)
 
 ## Phase 5: Foundational — tickets (Slice B)
 ### Tests first

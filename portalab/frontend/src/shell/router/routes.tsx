@@ -22,6 +22,8 @@ const PrivacyAdmin = lazy(() => import("../../pages/admin/PrivacyAdminRoute"));
 const Audit = lazy(() => import("../../pages/admin/AuditRoute"));
 const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
+const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
+const IncidentConsole = lazy(() => import("../../features/support/incidents/IncidentConsole"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -37,6 +39,18 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
       handle: h({ crumb: "Home" }),
       children: [
         { index: true, element: <Home /> },
+        {
+          path: "incidents",
+          handle: h({ crumb: "Incidents", requiredPermission: "incidents.read" }),
+          children: [
+            { index: true, element: <Incidents /> },
+            {
+              path: ":incidentId",
+              element: <Incidents />,
+              handle: h({ crumb: "Incident", existenceSensitive: true }),
+            },
+          ],
+        },
         {
           path: "search",
           element: <Search />,
@@ -63,6 +77,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Administration" }),
           children: [
             { index: true, element: <ControlCenter /> },
+            { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },
             { path: "configuration", element: <Configuration />, handle: h({ crumb: "Configuration" }) },
             { path: "services", element: <ServicesAdmin />, handle: h({ crumb: "Services" }) },
             { path: "roles", element: <Roles />, handle: h({ crumb: "Roles & permissions" }) },
