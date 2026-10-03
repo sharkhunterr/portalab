@@ -1,0 +1,80 @@
+# Sample plugin (spec 023 T034): declarative contributions (Tier 1) plus a small code part (Tier 2) that
+# reaches every official extension point. Validate with `portalab plugin validate examples/plugins/hello`.
+schema_version = 1
+key = "hello"
+name = "Hello"
+description = "Greets members; a reference for plugin authors."
+version = "1.0.0"
+scope = "portal"
+maturity = "beta"
+requires_portal = ">=0.1"
+entry_point = "hello_plugin:register"
+migrations = "migrations"
+requires_capabilities = [{ name = "identity.directory", range = ">=1.0" }]
+extension_points = [
+  "nav", "page", "widget", "action", "search", "calendar", "statistics", "automation_action",
+  "automation_trigger", "ai_tool", "notification_category", "theme", "i18n", "permission", "setting",
+  "event_type", "capability", "product_type", "media_type", "profile_section", "discovery_shelf",
+  "connector", "route",
+]
+capabilities_provided = ["plugin.hello.greeter"]
+permissions = [{ name = "view", description = "See the Hello plugin" }]
+settings = [{ name = "greeting", type = "string", default = "Hello", description = "The greeting word" }]
+
+[events]
+produces = ["greeted"]
+consumes = ["user.verified"]
+
+[personal_data]
+enabled = false
+
+[ui]
+nav = [{ key = "home", label_key = "plugin.hello:nav.home", route = "/plugins/hello/main", permission = "plugin:hello.view" }]
+notification_categories = [{ name = "news", label_key = "plugin.hello:category.news" }]
+widgets = [{ key = "welcome", title_key = "plugin.hello:widget.welcome", permission = "plugin:hello.view", template = "stat", data = { value = 1, label = "greetings" } }]
+
+[[ui.pages]]
+key = "main"
+title_key = "plugin.hello:page.title"
+permission = "plugin:hello.view"
+blocks = [
+  { kind = "markdown", text = "# Hello\n\nA **declarative** page: no plugin JavaScript runs here." },
+  { kind = "stat", title_key = "plugin.hello:page.count", data = "greetings/count" },
+  { kind = "form", title_key = "plugin.hello:page.form", action = "greet", schema = { type = "object", properties = { name = { type = "string", maxLength = 40 } }, required = ["name"] } },
+]
+
+[[ui.statistics]]
+key = "plugin_hello.greetings"
+title_key = "plugin.hello:stat.greetings"
+domain = "plugin_hello"
+scope = "community"
+event_types = ["plugin.hello.greeted"]
+measure = { kind = "count" }
+viz = { type = "bar" }
+required_permission = "statistics.read"
+hideable = true
+
+[[ui.themes]]
+schemaVersion = 1
+key = "hello-dusk"
+name = "Hello dusk"
+colorScheme = "light"
+colors = { surface = "#ffffff", surfaceRaised = "#f4f5f7", text = "#16181d", textMuted = "#4a4f5a", border = "#c9cdd4", accent = "#5b2bd1", accentContrast = "#ffffff", focus = "#5b2bd1" }
+
+[i18n.en."plugin.hello"]
+"nav.home" = "Hello"
+"page.title" = "Hello"
+"page.count" = "Greetings"
+"page.form" = "Greet someone"
+"widget.welcome" = "Hello"
+"category.news" = "Hello news"
+"stat.greetings" = "Greetings"
+
+[i18n.fr."plugin.hello"]
+"nav.home" = "Bonjour"
+"page.title" = "Bonjour"
+"page.count" = "Salutations"
+"page.form" = "Saluer quelqu'un"
+"widget.welcome" = "Bonjour"
+"category.news" = "Nouvelles de Bonjour"
+"stat.greetings" = "Salutations"

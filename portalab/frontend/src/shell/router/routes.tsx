@@ -67,6 +67,9 @@ const Catalog = lazy(() => import("../../features/marketplace/catalog/CatalogPag
 const ProductRoute = lazy(() => import("../../features/marketplace/product/ProductRoute"));
 const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
+const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
+const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAdmin"));
+const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -95,6 +98,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
+        {
+          path: "plugins/:pluginKey/:pageKey",
+          element: <PluginPage />,
+          handle: h({ crumb: "Plugin", existenceSensitive: true }),
+        },
         {
           path: "marketplace",
           handle: h({ crumb: "Marketplace", requiredPermission: "marketplace.read" }),
@@ -307,6 +315,8 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
             { path: "marketplace", element: <MarketplaceAdmin />, handle: h({ crumb: "Marketplace" }) },
+            { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
+            { path: "modules", element: <ModulesAdmin />, handle: h({ crumb: "Modules" }) },
             {
               path: "community/moderation",
               element: <ModerationQueue />,

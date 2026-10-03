@@ -12,6 +12,7 @@ from portalab.capabilities.administration import (
 )
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.config import I18N_POLICY_READER, LOCALE_READER
+from portalab.capabilities.plugins import TOGGLE_WRITER
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditSink
@@ -106,6 +107,7 @@ class AdministrationModule:
         provide(
             CONFIG_WRITER_CAPABILITY, _ConfigWriter(self.config), instance_ref="administration", owner=OWNER
         )
+        provide(TOGGLE_WRITER, self.toggles, instance_ref="administration", owner=OWNER)
         provide(
             LOCALE_READER,
             ConfigUserLocalePreferenceReader(self.config),

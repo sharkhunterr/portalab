@@ -19,6 +19,7 @@ from portalab.capabilities.observability import (
     ObservedComponent,
     default_observables,
 )
+from portalab.capabilities.plugins import I18N_CATALOGS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
 from portalab.core.audit_port import AuditSink
@@ -90,6 +91,7 @@ class I18nModule:
             (FORMATTER, self.formatter),
             (TIME, self.time),
             (CONTENT, self.content),
+            (I18N_CATALOGS, self.plugins),
         ):
             if not self.capabilities.system_providers(name):
                 self.capabilities.provide(name, provider, instance_ref="i18n", owner=OWNER)

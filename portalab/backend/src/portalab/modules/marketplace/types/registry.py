@@ -16,6 +16,7 @@ from portalab.capabilities.marketplace import (
     ProductTypeRegistry,
 )
 from portalab.capabilities.media_core import QUOTA
+from portalab.capabilities.plugins import EXTENSION_ACTIVATION
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import CAPABILITY as THEMES
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
@@ -65,12 +66,30 @@ class ThemeHandler(Owned):
 
 
 class ExtensionHandler(Owned):
-    """``feature``/``plugin``: needs the owner's configuration when the product says so (023 later)."""
+    """``feature``/``plugin``: needs the owner's configuration when the product says so; a plugin product
+    is activated for its owner through 023's ``ExtensionActivation`` (grants ``plugin:<key>.use``)."""
+
+    def __init__(self, capabilities: CapabilityRegistry | None = None) -> None:
+        self.capabilities = capabilities
+
+    def _activation(self) -> Any | None:
+        return _port(self.capabilities, EXTENSION_ACTIVATION) if self.capabilities is not None else None
 
     async def activate(self, ownership: OwnershipView) -> ActivationResult:
         if ownership.payload.get("config_required") and not ownership.configuration:
             return ActivationResult("needs_configuration")
-        return ActivationResult("active")
+        activation = self._activation()
+        extension = str(ownership.payload.get("extension", ""))
+        if activation is None or not extension:
+            return ActivationResult("active")
+        status = await activation.activate_for_user(extension, ownership.user_id)
+        return ActivationResult(status)
+
+    async def deactivate(self, ownership: OwnershipView) -> None:
+        activation = self._activation()
+        extension = str(ownership.payload.get("extension", ""))
+        if activation is not None and extension:
+            await activation.deactivate_for_user(extension, ownership.user_id)
 
 
 class AccessHandler(Owned):
@@ -154,7 +173,7 @@ def register_builtin_types(
         ("title", owned, ("label",)),
         ("effect", owned, ("effect",)),
         ("feature", ExtensionHandler(), ("extension", "config_required")),
-        ("plugin", ExtensionHandler(), ("extension", "config_required")),
+        ("plugin", ExtensionHandler(capabilities), ("extension", "config_required")),
         ("access", AccessHandler(capabilities, permissions, config), ("permission",)),
         ("quota", QuotaHandler(capabilities, config), ("kind", "units")),
     ):

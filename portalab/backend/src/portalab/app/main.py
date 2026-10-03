@@ -84,6 +84,8 @@ from portalab.modules.notifications.api import routers as notifications_routers
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.observability.api import routers as observability_routers
 from portalab.modules.observability.module import ObservabilityModule
+from portalab.modules.plugins.api import routers as plugins_routers
+from portalab.modules.plugins.module import PluginsModule
 from portalab.modules.privacy.api import routers as privacy_routers
 from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.privacy.settings import SecurityConfig
@@ -158,6 +160,7 @@ def create_app(
     automations: AutomationsModule | None = None,
     community: CommunityModule | None = None,
     marketplace: MarketplaceModule | None = None,
+    plugins: PluginsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -199,6 +202,7 @@ def create_app(
         app.state.automations_module = platform.automations
         app.state.community_module = platform.community
         app.state.marketplace_module = platform.marketplace
+        app.state.plugins_module = platform.plugins
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -268,6 +272,7 @@ def create_app(
     app.state.automations_module = automations
     app.state.community_module = community
     app.state.marketplace_module = marketplace
+    app.state.plugins_module = plugins
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -386,6 +391,7 @@ def create_app(
         *automations_routers(),
         *community_routers(),
         *marketplace_routers(),
+        *plugins_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

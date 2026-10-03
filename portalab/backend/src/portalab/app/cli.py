@@ -294,6 +294,9 @@ def build_parser() -> argparse.ArgumentParser:
     economy.add_parser("verify", help="recompute balances from the ledger").set_defaults(
         func=_cmd_economy_verify
     )
+    from portalab.app.plugin_cli import add_parser as add_plugin_parser
+
+    add_plugin_parser(sub)
     backup_cmd = sub.add_parser("backup", help="back up the database and DATA_DIR (operator command)")
     backup_cmd.add_argument("--output", required=True)
     backup_cmd.add_argument("--pg-dump", default=None)

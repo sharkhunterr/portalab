@@ -23,6 +23,7 @@ dependencies = [
     "mdit-py-plugins>=0.6.1",
     "nh3>=0.3.7",
     "diff-match-patch>=20241021",
+    "packaging>=24",
 ]
 
 [project.scripts]

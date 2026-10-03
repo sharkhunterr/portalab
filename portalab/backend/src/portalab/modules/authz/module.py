@@ -100,6 +100,9 @@ class _PluginPermissions:
     async def set_enabled(self, plugin_id: str, enabled: bool) -> int:
         from portalab.modules.authz.catalog.declare import set_plugin_permissions_enabled
 
+        if enabled:  # a plugin may have declared new permissions since the last sync (023)
+            self.module.catalog.invalidate()
+            await self.module.catalog.sync()
         async with self.module.database.unit_of_work() as uow:
             return await set_plugin_permissions_enabled(uow.session, plugin_id, enabled)
 

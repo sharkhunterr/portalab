@@ -6,6 +6,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.plugins import THEME_REGISTRY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import CAPABILITY as THEME_CATALOG
 from portalab.core.audit_port import AuditSink
@@ -42,6 +43,8 @@ class UiModule:
     def register(self) -> None:
         if not self.capabilities.system_providers(THEME_CATALOG):
             self.capabilities.provide(THEME_CATALOG, self.themes, instance_ref="ui", owner="module:ui")
+        if not self.capabilities.system_providers(THEME_REGISTRY):
+            self.capabilities.provide(THEME_REGISTRY, self.themes, instance_ref="ui", owner="module:ui")
         if self.event_types.get("theme.changed") is None:
             register_event_types(self.event_types)
         if self.consumers.get(CONSUMER) is None:

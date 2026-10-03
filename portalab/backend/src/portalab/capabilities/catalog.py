@@ -21,6 +21,7 @@ from portalab.capabilities import (
     media_core,
     notifications,
     observability,
+    plugins,
     privacy_participants,
     search,
     service_data,
@@ -66,6 +67,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *ai.SPECS,
     *economy.SPECS,
     *marketplace.SPECS,
+    *plugins.SPECS,
     *campaigns.SPECS,
     themes.SPEC,
 )
