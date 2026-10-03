@@ -31,6 +31,7 @@ from portalab.modules.health.module import HealthModule
 from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
+from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.search.module import SearchModule
@@ -102,6 +103,7 @@ class Platform:
     dashboard: DashboardModule
     support: SupportModule
     statistics: StatisticsModule
+    notifications: NotificationsModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -170,6 +172,8 @@ def wire_platform(
     i18n.register()
     for key, validator in i18n.validators.table().items():
         administration.registry.register_validator(key, validator, owner="module:i18n")
+    notifications = NotificationsModule(database, events, authz.audit, capabilities, authz.engine)
+    notifications.register()
     support = SupportModule(database, events, authz.audit, capabilities, authz.engine)
     support.register()
     statistics = StatisticsModule(
@@ -217,6 +221,7 @@ def wire_platform(
         seeds.extend(observability.register_jobs(jobs))
         seeds.extend(search.register_jobs(jobs))
         seeds.extend(statistics.register_jobs(jobs))
+        seeds.extend(notifications.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -233,6 +238,7 @@ def wire_platform(
         dashboard,
         support,
         statistics,
+        notifications,
         seeds,
     )
     from portalab.app.config_bindings import bind

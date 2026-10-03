@@ -5,12 +5,15 @@ only the ``active`` state qualifies. Tombstoned users return an anonymized summa
 """
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Literal, Protocol, runtime_checkable
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilitySpec
 
 CAPABILITY = "identity.directory"
+CONTACT = "identity.contact"
+VERIFICATION_CHANNEL = "identity.verification_channel"
 
 AccountState = Literal[
     "pending_verification", "active", "inactive", "suspended", "pending_deletion", "deleted"
@@ -41,4 +44,37 @@ SPEC = CapabilitySpec(
     protocol=IdentityDirectory,
     multi_provider=False,
     description="User summaries and active-account eligibility (owned by identity).",
+)
+
+
+@runtime_checkable
+class ContactReader(Protocol):
+    """Contact data for system delivery (Notifications 010): never exposed to other users."""
+
+    async def email_of(self, user_id: UUID) -> str | None: ...
+
+    async def active_user_ids(self) -> list[UUID]: ...
+
+
+@runtime_checkable
+class VerificationChannel(Protocol):
+    """How a verification/invitation token reaches a person (implemented by Notifications' email channel);
+    without a provider, the Admin hands the token over (spec 002 baseline)."""
+
+    async def deliver(self, user_id: UUID, token: str, expires_at: datetime) -> None: ...
+
+
+CONTACT_SPEC = CapabilitySpec(
+    name=CONTACT,
+    version="1.0",
+    protocol=ContactReader,
+    multi_provider=False,
+    description="E-mail address and active accounts for system delivery (owned by identity).",
+)
+VERIFICATION_SPEC = CapabilitySpec(
+    name=VERIFICATION_CHANNEL,
+    version="1.0",
+    protocol=VerificationChannel,
+    multi_provider=False,
+    description="Delivers verification and invitation tokens (e-mail by Notifications 010).",
 )

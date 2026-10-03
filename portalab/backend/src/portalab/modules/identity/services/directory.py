@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from portalab.capabilities.identity_directory import CAPABILITY, UserSummary
+from portalab.capabilities.identity_directory import CAPABILITY, CONTACT, UserSummary
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.identity.context import OWNER, IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState, is_active_account
@@ -45,5 +45,28 @@ class IdentityDirectoryService:
         return found is not None
 
 
+class IdentityContactService:
+    """``identity.contact``: the e-mail address for system delivery only, and the active accounts."""
+
+    def __init__(self, ctx: IdentityContext) -> None:
+        self.ctx = ctx
+
+    async def email_of(self, user_id: UUID) -> str | None:
+        async with self.ctx.database.session() as session:
+            row = (
+                await session.execute(select(User.email, User.state).where(User.id == user_id))
+            ).one_or_none()
+        if row is None or not is_active_account(AccountState(row.state)):
+            return None
+        return str(row.email) if row.email else None
+
+    async def active_user_ids(self) -> list[UUID]:
+        async with self.ctx.database.session() as session:
+            rows = await session.execute(select(User.id).where(User.state == AccountState.ACTIVE.value))
+            return [row[0] for row in rows]
+
+
 def register_directory(registry: CapabilityRegistry, ctx: IdentityContext) -> None:
     registry.provide(CAPABILITY, IdentityDirectoryService(ctx), instance_ref="identity", owner=OWNER)
+    if not registry.system_providers(CONTACT):
+        registry.provide(CONTACT, IdentityContactService(ctx), instance_ref="identity", owner=OWNER)

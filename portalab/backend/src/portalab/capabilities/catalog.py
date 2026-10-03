@@ -11,6 +11,7 @@ from portalab.capabilities import (
     health,
     i18n,
     identity_directory,
+    notifications,
     observability,
     privacy_participants,
     search,
@@ -25,6 +26,8 @@ from portalab.capabilities.registry import CapabilityRegistry, CapabilitySpec
 KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     admin_authority.SPEC,
     identity_directory.SPEC,
+    identity_directory.CONTACT_SPEC,
+    identity_directory.VERIFICATION_SPEC,
     privacy_participants.ERASURE_SPEC,
     privacy_participants.EXPORT_SPEC,
     user_grants.SPEC,
@@ -44,6 +47,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *search.SPECS,
     *dashboard.SPECS,
     *support.SPECS,
+    *notifications.SPECS,
     *statistics.SPECS,
 )
 

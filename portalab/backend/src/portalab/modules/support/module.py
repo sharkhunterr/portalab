@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.health import INCIDENTS, SERVICE_DIRECTORY
+from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -29,7 +30,7 @@ from portalab.modules.support.incidents.integrations import (
     IncidentSearchProvider,
     OpenIncidentsWidget,
 )
-from portalab.modules.support.incidents.notify import IncidentNotifier
+from portalab.modules.support.incidents.notify import CATEGORY, IncidentNotifier
 from portalab.modules.support.incidents.port import IncidentsPort
 from portalab.modules.support.incidents.service import OPEN_STATES, IncidentService
 from portalab.modules.support.models import Incident
@@ -70,6 +71,14 @@ class SupportModule:
         if not self.capabilities.system_providers(INCIDENTS):
             self.capabilities.provide(INCIDENTS, self.port, instance_ref="support", owner=OWNER)
         register_event_types(self.event_types)
+        if default_categories.get(CATEGORY) is None:
+            declare_category(
+                CATEGORY,
+                OWNER,
+                "support:category.incident",
+                default_priority="high",
+                default_channels=("portal", "email"),
+            )
         if self.widgets.get(OPEN_INCIDENTS.key) is None:
             self.widgets.register(
                 OPEN_INCIDENTS, OpenIncidentsWidget(self.incidents, self.clock), owner=OWNER

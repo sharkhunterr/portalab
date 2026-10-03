@@ -29,3 +29,27 @@ Consumed: `maintenance.scheduled|rescheduled|started|ended|cancelled` (006, with
 
 ## Privacy / retention
 Inbox and deliveries are `activity` personal data (export/erasure participant); pending/undelivered follow 021 purge; email bodies purged after send; rendered content excluded from logs/events.
+
+## Implementation notes (2026-10-03)
+- Preferences are one user-overridable setting `notifications.preferences` (a `{category: {channel: bool}}`
+  dict, 020 config store) plus `notifications.email.digest`; there is no `notify.preferences` table. The
+  stored choice is kept when a policy disables a channel and applies again when the policy relaxes.
+- Admin policy per category is the global setting `notifications.categoryPolicy`
+  (`disabled_channels`, `mandatory_channels`, `locked`), edited through `PUT /admin/notifications/categories/{key}`.
+- `notify.categories` mirrors the in-memory owner-tagged registry at start-up (status `active`); the
+  registry stays the source of truth (`unregister(owner)` for 023's sweep).
+- Fan-out runs synchronously inside `send` (per recipient, each failure isolated); only e-mail goes through
+  jobs (`notifications.send_email`, backoff 30 s × 2ⁿ capped at 1 h, `email.maxAttempts`, then `failed` and a
+  content-free `notification.delivery_failed` event). The outbox stores the address **hash** only; the clear
+  address is read from identity (`identity.contact`) at send time; bodies are deleted once sent.
+- Rendering happens per recipient language with the 026 renderer: `template_key` = `namespace:key`, body =
+  `key.body` when present. Parameters are plain values (no markup); secret-looking keys are rejected.
+- Coalescing merges unread items with the same `(user, category, subject_ref)` within
+  `coalesceWindowSeconds` into one item with `count`; critical items are never coalesced.
+- The live ping `notification.created` carries ids/kind/priority only (never text).
+- `notifications.send` (v2) replaces the 016 slice A placeholder (`support` no longer declares it); 016 and
+  017 now send `CommunicationRequest`s in categories `support.incident` / `statistics.wrapped`.
+- Identity gained `identity.contact` (e-mail of active accounts, system use only) and the
+  `identity.verification_channel` capability; the e-mail `VerificationChannel` sends the token when e-mail
+  is enabled and the account has an address, else the Admin hand-off remains.
+- OQ-45..49 use the research defaults (R6–R9); product confirmation still open.

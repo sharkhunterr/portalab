@@ -13,9 +13,9 @@ from uuid import UUID
 
 from sqlalchemy import and_, delete, select
 
+from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.statistics import Period, StatResult, SubjectRef
-from portalab.capabilities.support import NOTIFY, Audience, Notification
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import NotFound, ValidationFailed
@@ -240,14 +240,15 @@ class WrappedService:
         try:
             await asyncio.wait_for(
                 providers[0].provider.send(
-                    Notification(
-                        "statistics.wrapped",
-                        "statistics:wrapped.ready",
-                        {"recap": definition.key},
-                        ref=f"/statistics/wrapped/{snapshot}",
-                    ),
-                    Audience("users.self.manage", ()),
-                    dedup_key=f"statistics.wrapped:{snapshot}:{user}",
+                    CommunicationRequest(
+                        category="statistics.wrapped",
+                        template_key="statistics:wrapped.ready",
+                        audience=Users((user,)),
+                        dedup_key=f"statistics.wrapped:{snapshot}",
+                        params={"recap": definition.key},
+                        source="module",
+                        action_url=f"/statistics/wrapped/{snapshot}",
+                    )
                 ),
                 timeout=5,
             )

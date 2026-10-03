@@ -27,6 +27,10 @@ const IncidentConsole = lazy(() => import("../../features/support/incidents/Inci
 const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
 const Wrapped = lazy(() => import("../../features/statistics/wrapped/WrappedStory"));
 const StatisticsAdmin = lazy(() => import("../../features/statistics/admin/DefinitionsAdmin"));
+const Notifications = lazy(() => import("../../features/notifications/center/NotificationCenter"));
+const NotificationSettings = lazy(
+  () => import("../../features/notifications/preferences/NotificationPreferences"),
+);
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -72,9 +76,15 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           element: <Search />,
           handle: h({ crumb: "Search", requiredPermission: "search.use" }),
         },
+        { path: "notifications", element: <Notifications />, handle: h({ crumb: "Notifications" }) },
         { path: "account", element: <Account />, handle: h({ crumb: "Account" }) },
         { path: "settings/appearance", element: <Appearance />, handle: h({ crumb: "Appearance" }) },
         { path: "settings/language", element: <Language />, handle: h({ crumb: "Language & region" }) },
+        {
+          path: "settings/notifications",
+          element: <NotificationSettings />,
+          handle: h({ crumb: "Notification preferences" }),
+        },
         { path: "privacy", element: <Privacy />, handle: h({ crumb: "Privacy" }) },
         {
           path: "services",

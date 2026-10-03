@@ -2,6 +2,7 @@ import core from "../../../backend/locales/en/core.json";
 import dashboard from "../../../backend/locales/en/dashboard.json";
 import i18n from "../../../backend/locales/en/i18n.json";
 import nav from "../../../backend/locales/en/nav.json";
+import notifications from "../../../backend/locales/en/notifications.json";
 import search from "../../../backend/locales/en/search.json";
 import shell from "../../../backend/locales/en/shell.json";
 import statistics from "../../../backend/locales/en/statistics.json";
@@ -16,6 +17,7 @@ export const BUNDLED: Record<string, Record<string, string>> = {
   dashboard,
   i18n,
   nav,
+  notifications,
   search,
   shell,
   statistics,

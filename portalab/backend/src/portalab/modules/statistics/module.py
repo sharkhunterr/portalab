@@ -19,6 +19,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -124,6 +125,13 @@ class StatisticsModule:
 
     def register(self) -> None:
         register_event_types(self.event_types)
+        if default_categories.get("statistics.wrapped") is None:
+            declare_category(
+                "statistics.wrapped",
+                OWNER,
+                "statistics:category.wrapped",
+                default_channels=("portal", "email"),
+            )
         if not self.packs.packs() or not any(owner == OWNER for owner, *_ in self.packs.packs()):
             register_builtin(self.packs)
         if not self.capabilities.system_providers(PROVIDER):

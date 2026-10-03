@@ -14,6 +14,7 @@
   "admin.status": "État",
   "admin.title": "Définitions des statistiques",
   "admin.version": "Active / dernière",
+  "category.wrapped": "Bilans",
   "empty": "Aucune statistique n’est encore disponible.",
   "hidden": "Statistiques masquées",
   "hide": "Masquer",

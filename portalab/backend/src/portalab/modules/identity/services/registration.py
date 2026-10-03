@@ -11,7 +11,7 @@ once to the Admin); Notifications (010) adds e-mail delivery later.
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import UUID
 
 from sqlalchemy import select, update
@@ -63,6 +63,24 @@ class AdminHandoffChannel:
         return None
 
 
+class CapabilityChannel:
+    """Delivers through the ``identity.verification_channel`` provider when one exists (e-mail, 010),
+    else falls back to the Admin hand-off. Resolved at each delivery (providers may arrive later)."""
+
+    def __init__(self, capabilities: Any) -> None:
+        self.capabilities = capabilities
+
+    async def deliver(self, user_id: UUID, token: str, expires_at: datetime) -> None:
+        from portalab.capabilities.identity_directory import VERIFICATION_CHANNEL
+
+        try:
+            providers = self.capabilities.system_providers(VERIFICATION_CHANNEL)
+        except Exception:
+            providers = []
+        if providers:
+            await providers[0].provider.deliver(user_id, token, expires_at)
+
+
 @dataclass(frozen=True, slots=True)
 class IssuedToken:
     user_id: UUID
@@ -83,7 +101,7 @@ class RegistrationService:
         self.accounts = accounts
         self.hasher = hasher
         self.onboarding = onboarding
-        self.channel = channel or AdminHandoffChannel()
+        self.channel = channel or CapabilityChannel(ctx.capabilities)
 
     async def _issue(self, session: AsyncSession, user_id: UUID, now: datetime) -> IssuedToken:
         await session.execute(

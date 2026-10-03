@@ -18,6 +18,7 @@ dependencies = [
     "babel>=2.16",
     "tzdata>=2025.2",
     "jsonschema>=4.23",
+    "aiosmtplib>=3.0",
 ]
 
 [project.scripts]
@@ -32,6 +33,7 @@ dev = [
     "import-linter>=2.1",
     "pytest-xdist>=3.8.0",
     "types-jsonschema>=4.26.0.20260518",
+    "aiosmtpd>=1.4",
 ]
 
 [build-system]

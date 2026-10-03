@@ -1,4 +1,5 @@
 {
+  "category.incident": "Incidents",
   "console.conflict": "This incident changed meanwhile; it has been reloaded.",
   "console.declare": "Declare an incident",
   "console.message": "Public update",

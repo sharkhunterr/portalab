@@ -4,13 +4,15 @@ surfaced for its service (006 ``open_for_service`` through the real port, the 00
 the open-incidents widget and the incidents search provider follow the same rule; notifications go
 through the port when present."""
 
+from uuid import uuid4
+
 import httpx
 import pytest
 from fastapi import FastAPI
 
 from portalab.capabilities.i18n import LocaleContext
+from portalab.capabilities.notifications import NOTIFY, CommunicationRef, CommunicationRequest, WithPermission
 from portalab.capabilities.search import ParsedQuery
-from portalab.capabilities.support import NOTIFY
 from portalab.core.authz_port import Principal
 from tests.authz_fixtures import make_admin
 from tests.integration.identity.helpers import create_user, login, module_of
@@ -21,10 +23,11 @@ pytestmark = pytest.mark.integration
 
 class Notifier:
     def __init__(self) -> None:
-        self.sent: list[tuple[object, object, str]] = []
+        self.sent: list[CommunicationRequest] = []
 
-    async def send(self, notification: object, audience: object, *, dedup_key: str) -> None:
-        self.sent.append((notification, audience, dedup_key))
+    async def send(self, request: CommunicationRequest, *, caller: object = None) -> CommunicationRef:
+        self.sent.append(request)
+        return CommunicationRef(uuid4(), True, 1)
 
 
 async def test_visibility_and_surfacing(
@@ -44,8 +47,13 @@ async def test_visibility_and_surfacing(
         )
     ).json()
     await support.module.notifier.drain()
-    [(notification, audience, key)] = notifier.sent
-    assert notification.urgent and audience.service_ids == ("s2", "s9") and key.endswith(":created:critical")  # type: ignore[attr-defined]
+    [request] = notifier.sent
+    assert (
+        request.kind == "alert"
+        and request.priority == "critical"
+        and request.dedup_key.endswith(":created:critical")
+    )
+    assert isinstance(request.audience, WithPermission) and request.audience.service_ids == ("s2", "s9")
     assert created["evidence"] == [] and {s["id"] for s in created["services"]} == {"s2", "s9"}
 
     alex = await create_user(module_of(app), "alex")
