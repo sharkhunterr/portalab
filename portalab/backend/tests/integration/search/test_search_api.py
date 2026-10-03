@@ -25,7 +25,7 @@ async def test_grouped_results_without_ai(
     await signed_in(app, client)
     body = (await client.post("/api/v1/search", json={"q": "elodie"})).json()
     groups = {g["kind"]: g for g in body["groups"]}
-    assert set(groups) == {"navigation", "services", "users"}
+    assert set(groups) == {"navigation", "services", "users", "media"}
     assert all(g["state"] == "ok" for g in groups.values())
     [hit] = groups["users"]["items"]
     assert hit["title"] == "Élodie Durand" and hit["url_ref"].startswith("/users/")

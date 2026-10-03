@@ -110,16 +110,19 @@ def test_module_packages_are_flat_and_named_once() -> None:
         assert Path(BACKEND_DIR / "src" / "portalab" / "modules" / name / "__init__.py").exists()
 
 
-IDENTITY_ONLY_LIBRARIES = ("argon2", "PIL")
+LIBRARY_OWNERS = {
+    "argon2": ("portalab.modules.identity",),
+    "PIL": ("portalab.modules.identity", "portalab.modules.media"),  # avatars (002), posters (024 R11)
+}
 
 
 def test_password_hashing_and_imaging_stay_in_identity() -> None:
-    """Spec 002 T002: argon2 and Pillow are allowed for ``modules.identity`` only."""
+    """Spec 002 T002: argon2 is for ``modules.identity`` only; Pillow for identity and media images (024)."""
     graph = grimp.build_graph("portalab", include_external_packages=True)
     offenders = [
         f"{importer} -> {library}"
-        for library in IDENTITY_ONLY_LIBRARIES
+        for library, owners in LIBRARY_OWNERS.items()
         for importer in graph.find_modules_that_directly_import(library)
-        if not importer.startswith("portalab.modules.identity")
+        if not importer.startswith(owners)
     ]
     assert offenders == []

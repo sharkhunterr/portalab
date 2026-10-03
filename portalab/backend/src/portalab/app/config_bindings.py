@@ -84,6 +84,9 @@ async def refresh(platform: Any) -> None:
     notifications = getattr(platform, "notifications", None)
     if notifications is not None:
         await notifications.refresh_config()
+    media = getattr(platform, "media", None)
+    if media is not None:
+        await media.refresh_config()
     statistics = getattr(platform, "statistics", None)
     if statistics is not None:
         await statistics.refresh_config()
@@ -121,5 +124,6 @@ def bind(platform: Any) -> None:
         "support.",
         "statistics.",
         "notifications.",
+        "media.",
     ):
         platform.administration.config.on_change(prefix, on_change)

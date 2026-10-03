@@ -34,7 +34,7 @@ async def test_default_roles_apply_to_every_account(
 ) -> None:
     member = await insert_user(platform.database)
     assert await engine.is_allowed(user(member), "tickets.comment")
-    assert not await engine.is_allowed(user(member), "media.request")
+    assert not await engine.is_allowed(user(member), "media.manage")  # media.request is a default grant (024)
 
 
 async def test_entitlement_grants_through_the_capability(

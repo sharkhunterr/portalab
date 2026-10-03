@@ -1,0 +1,45 @@
+{
+  "domain": "playback",
+  "definitions": [
+    {
+      "key": "playback.my_finished",
+      "title_key": "media:stat.my_finished.title",
+      "description_key": "media:stat.my_finished.description",
+      "domain": "playback",
+      "scope": "personal",
+      "event_types": [
+        "media.playback_finished"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.read",
+      "hideable": true,
+      "dimensions": [
+        "kind"
+      ]
+    },
+    {
+      "key": "playback.community_viewers",
+      "title_key": "media:stat.community_viewers.title",
+      "description_key": "media:stat.community_viewers.description",
+      "domain": "playback",
+      "scope": "community",
+      "event_types": [
+        "media.playback_finished"
+      ],
+      "measure": {
+        "kind": "distinct_count",
+        "field": "subject"
+      },
+      "viz": {
+        "type": "line"
+      },
+      "required_permission": "media.read",
+      "hideable": true
+    }
+  ]
+}

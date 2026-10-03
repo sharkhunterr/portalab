@@ -60,6 +60,8 @@ from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
+from portalab.modules.media.api import routers as media_routers
+from portalab.modules.media.module import MediaModule
 from portalab.modules.notifications.api import routers as notifications_routers
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.observability.api import routers as observability_routers
@@ -125,6 +127,7 @@ def create_app(
     support: SupportModule | None = None,
     statistics: StatisticsModule | None = None,
     notifications: NotificationsModule | None = None,
+    media: MediaModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -155,6 +158,7 @@ def create_app(
         app.state.support_module = platform.support
         app.state.statistics_module = platform.statistics
         app.state.notifications_module = platform.notifications
+        app.state.media_module = platform.media
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -213,6 +217,7 @@ def create_app(
     app.state.support_module = support
     app.state.statistics_module = statistics
     app.state.notifications_module = notifications
+    app.state.media_module = media
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -320,6 +325,7 @@ def create_app(
         *support_routers(),
         *statistics_routers(),
         *notifications_routers(),
+        *media_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

@@ -37,15 +37,15 @@ def test_incompatible_reasons() -> None:
         manifest=Manifest(
             version="9.0",
             requires_portal=">=5",
-            requires_capabilities=("media.library",),
-            permissions=("media.read", "services.read"),
+            requires_capabilities=("future.library",),
+            permissions=("future.read", "services.read"),
         ),
     )
     result = checker().check(connector)
     assert not result.compatible
     assert any("requires portal >=5" in r for r in result.reasons)
-    assert any("media.library" in r for r in result.reasons)
-    assert any("media.read" in r for r in result.reasons) and not any(
+    assert any("future.library" in r for r in result.reasons)
+    assert any("future.read" in r for r in result.reasons) and not any(
         "services.read" in r for r in result.reasons
     )
 

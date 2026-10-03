@@ -1,0 +1,30 @@
+{
+  "domain": "gaming",
+  "definitions": [
+    {
+      "key": "gaming.my_games_started",
+      "title_key": "media:stat.my_games_started.title",
+      "description_key": "media:stat.my_games_started.description",
+      "domain": "gaming",
+      "scope": "personal",
+      "event_types": [
+        "media.playback_started"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.read",
+      "hideable": true,
+      "filter": [
+        {
+          "field": "kind",
+          "op": "eq",
+          "value": "game"
+        }
+      ]
+    }
+  ]
+}

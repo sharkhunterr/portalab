@@ -17,6 +17,8 @@ from portalab.capabilities.search import SearchRegistry
 from portalab.core.db import Database
 from portalab.core.time import FixedClock
 from portalab.modules.identity.search_provider import UsersSearchProvider
+from portalab.modules.media.catalog import CatalogQuery
+from portalab.modules.media.providers.search import MediaSearchProvider
 from portalab.modules.search.module import SearchModule
 from tests.integration.privacy.conftest import NOW
 from tests.privacy_fixtures import FullPlatform, make_full_platform
@@ -92,6 +94,10 @@ async def search(database: Database, tmp_path: Path, clock: FixedClock) -> Searc
     )
     module.register()
     registry.register(UsersSearchProvider(full.identity), owner="module:identity")
+    registry.register(
+        MediaSearchProvider(CatalogQuery(database, full.authz.engine), full.authz.engine),
+        owner="module:media",
+    )
     harness = SearchHarness(full, module, registry, navigation)
     capabilities.provide(SERVICE_DIRECTORY, harness.directory, instance_ref="test", owner="module:connectors")
     return harness

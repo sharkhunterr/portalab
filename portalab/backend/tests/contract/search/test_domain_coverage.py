@@ -13,7 +13,7 @@ EXPECTED = {
     "navigation": None,
     "services": None,
     "users": None,
-    "media": "024",
+    "media": None,
     "wiki": "011",
     "news": "009",
     "tickets": "016",

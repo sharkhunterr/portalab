@@ -1,6 +1,7 @@
 """Capability contracts known to the kernel, declared once into a fresh registry at start-up."""
 
 from portalab.capabilities import (
+    activity,
     admin_authority,
     administration,
     aggregation,
@@ -11,6 +12,8 @@ from portalab.capabilities import (
     health,
     i18n,
     identity_directory,
+    media,
+    media_core,
     notifications,
     observability,
     privacy_participants,
@@ -49,6 +52,9 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *support.SPECS,
     *notifications.SPECS,
     *statistics.SPECS,
+    *media.SPECS,
+    *media_core.SPECS,
+    activity.SPEC,
 )
 
 

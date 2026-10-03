@@ -1,0 +1,26 @@
+{
+  "domain": "media",
+  "definitions": [
+    {
+      "key": "media.catalog_added",
+      "title_key": "media:stat.catalog_added.title",
+      "description_key": "media:stat.catalog_added.description",
+      "domain": "media",
+      "scope": "global",
+      "event_types": [
+        "media.added"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.read",
+      "hideable": true,
+      "dimensions": [
+        "kind"
+      ]
+    }
+  ]
+}

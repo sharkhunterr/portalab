@@ -31,6 +31,12 @@ const Notifications = lazy(() => import("../../features/notifications/center/Not
 const NotificationSettings = lazy(
   () => import("../../features/notifications/preferences/NotificationPreferences"),
 );
+const MediaHome = lazy(() => import("../../features/media/home/MediaHome"));
+const MediaCatalog = lazy(() => import("../../features/media/catalog/CatalogPage"));
+const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"));
+const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
+const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
+const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -72,6 +78,24 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         {
+          path: "media",
+          handle: h({ crumb: "Media", requiredPermission: "media.read" }),
+          children: [
+            { index: true, element: <MediaHome /> },
+            { path: "browse", element: <MediaCatalog />, handle: h({ crumb: "Catalog" }) },
+            {
+              path: "requests",
+              element: <MediaRequests />,
+              handle: h({ crumb: "My requests", requiredPermission: "media.request" }),
+            },
+            {
+              path: ":objectId",
+              element: <MediaDetail />,
+              handle: h({ crumb: "Media", existenceSensitive: true }),
+            },
+          ],
+        },
+        {
           path: "search",
           element: <Search />,
           handle: h({ crumb: "Search", requiredPermission: "search.use" }),
@@ -84,6 +108,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           path: "settings/notifications",
           element: <NotificationSettings />,
           handle: h({ crumb: "Notification preferences" }),
+        },
+        {
+          path: "settings/media-accounts",
+          element: <MediaAccounts />,
+          handle: h({ crumb: "Media accounts" }),
         },
         { path: "privacy", element: <Privacy />, handle: h({ crumb: "Privacy" }) },
         {
@@ -108,6 +137,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <StatisticsAdmin />,
               handle: h({ crumb: "Statistic definitions" }),
             },
+            { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },
             { path: "configuration", element: <Configuration />, handle: h({ crumb: "Configuration" }) },
             { path: "services", element: <ServicesAdmin />, handle: h({ crumb: "Services" }) },

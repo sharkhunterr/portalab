@@ -1,0 +1,30 @@
+{
+  "domain": "reading",
+  "definitions": [
+    {
+      "key": "reading.my_books_finished",
+      "title_key": "media:stat.my_books_finished.title",
+      "description_key": "media:stat.my_books_finished.description",
+      "domain": "reading",
+      "scope": "personal",
+      "event_types": [
+        "media.playback_finished"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.read",
+      "hideable": true,
+      "filter": [
+        {
+          "field": "kind",
+          "op": "eq",
+          "value": "book"
+        }
+      ]
+    }
+  ]
+}

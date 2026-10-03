@@ -31,3 +31,21 @@ Produced: `media.added|updated|removed`, `media.availability_changed`, `media.me
 
 ## Privacy / retention
 `history_entries`, `user_progress`, `user_links`, `requests`(requester), sessions = personal data (`activity`/`media_history`); erased/anonymized by 020/021 participant (objects and aggregates unaffected); history retention per 021.
+
+## Implementation notes (2026-10-09)
+- `media.objects` materializes `title`, `sort_title`, `year` and `available` for browsing/filtering; the
+  effective fields and their provenance stay in `effective` / `field_provenance`.
+- `media.images` keeps the source ref of the stored poster (re-fetched only when the ref changes); images are
+  fetched by the `media.fetch_image` job through the service's `media.library` provider.
+- `media.user_links` is unique per `(service_id, external_user_id)` **and** per `(user_id, service_id)`;
+  only verified links attribute activity (verification by the service's `verify_user`, else an Admin).
+- `media.playback_sessions` adds `kind`, `max_position_s` (finished threshold), `last_event_at` (progress
+  throttle) and `ended`; sessions started while an account was unlinked stay unattributed.
+- `media.history_entries.event_id` is unique: replays and redeliveries are no-ops; `user_progress` is
+  recomputed from history after a merge/split.
+- `media.requests` adds `idempotency_key` (per user) and `counted` (`base|extra|none`); the request ledger
+  is append-only by code (no trigger) so account erasure can delete it.
+- Settings: `media.fieldPriority.<kind>.<field>` are declared for the baseline kinds and the fields
+  `title, overview, year, genres, image`; `media.finishedThreshold.<kind>` for kinds with a threshold.
+- New kernel capability `activity.attributes` (014 contract) with Media as first provider.
+- OQ-115..119 use the research defaults (R2, R3, R8, R9, R13); product confirmation still open.
