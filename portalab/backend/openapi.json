@@ -5011,6 +5011,500 @@
         "title": "ManualGrantIn",
         "type": "object"
       },
+      "MarketplaceAdminRefundIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "MarketplaceAdminRefundIn",
+        "type": "object"
+      },
+      "MarketplaceAuditPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "MarketplaceAuditPage",
+        "type": "object"
+      },
+      "MarketplaceCategoryIn": {
+        "properties": {
+          "key": {
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "title": "Key",
+            "type": "string"
+          },
+          "label_key": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Label Key",
+            "type": "string"
+          },
+          "position": {
+            "default": 0,
+            "title": "Position",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "label_key"
+        ],
+        "title": "MarketplaceCategoryIn",
+        "type": "object"
+      },
+      "MarketplaceCategoryOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label_key": {
+            "title": "Label Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label_key"
+        ],
+        "title": "MarketplaceCategoryOut",
+        "type": "object"
+      },
+      "MarketplaceCheckOut": {
+        "properties": {
+          "met": {
+            "title": "Met",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "met",
+          "reason"
+        ],
+        "title": "MarketplaceCheckOut",
+        "type": "object"
+      },
+      "MarketplaceConfigureIn": {
+        "properties": {
+          "configuration": {
+            "additionalProperties": true,
+            "title": "Configuration",
+            "type": "object"
+          }
+        },
+        "title": "MarketplaceConfigureIn",
+        "type": "object"
+      },
+      "MarketplaceConfirmIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          }
+        },
+        "title": "MarketplaceConfirmIn",
+        "type": "object"
+      },
+      "MarketplaceGrantIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "product": {
+            "maxLength": 96,
+            "title": "Product",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "product",
+          "reason"
+        ],
+        "title": "MarketplaceGrantIn",
+        "type": "object"
+      },
+      "MarketplaceOwnershipOut": {
+        "properties": {
+          "acquired_at": {
+            "format": "date-time",
+            "title": "Acquired At",
+            "type": "string"
+          },
+          "conditions_snapshot": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Conditions Snapshot",
+            "type": "array"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "price_paid": {
+            "title": "Price Paid",
+            "type": "integer"
+          },
+          "product_key": {
+            "title": "Product Key",
+            "type": "string"
+          },
+          "product_name": {
+            "title": "Product Name",
+            "type": "string"
+          },
+          "product_type": {
+            "title": "Product Type",
+            "type": "string"
+          },
+          "product_version": {
+            "title": "Product Version",
+            "type": "integer"
+          },
+          "refundable_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refundable Until"
+          },
+          "revoke_ground": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoke Ground"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "product_key",
+          "product_type",
+          "product_name",
+          "origin",
+          "state",
+          "price_paid",
+          "product_version",
+          "conditions_snapshot",
+          "refundable_until",
+          "acquired_at",
+          "expires_at",
+          "revoke_ground"
+        ],
+        "title": "MarketplaceOwnershipOut",
+        "type": "object"
+      },
+      "MarketplaceProductIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "definition": {
+            "additionalProperties": true,
+            "title": "Definition",
+            "type": "object"
+          }
+        },
+        "required": [
+          "definition"
+        ],
+        "title": "MarketplaceProductIn",
+        "type": "object"
+      },
+      "MarketplaceProductOut": {
+        "properties": {
+          "conditions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "config_required": {
+            "title": "Config Required",
+            "type": "boolean"
+          },
+          "descriptions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Descriptions",
+            "type": "object"
+          },
+          "eligibility": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MarketplaceCheckOut"
+            },
+            "title": "Eligibility",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "object"
+          },
+          "owned": {
+            "title": "Owned",
+            "type": "boolean"
+          },
+          "price_coins": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Coins"
+          },
+          "refund_policy": {
+            "additionalProperties": true,
+            "title": "Refund Policy",
+            "type": "object"
+          },
+          "repeatable": {
+            "title": "Repeatable",
+            "type": "boolean"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "type",
+          "state",
+          "version",
+          "name",
+          "names",
+          "descriptions",
+          "price_coins",
+          "conditions",
+          "refund_policy",
+          "config_required",
+          "repeatable",
+          "owned"
+        ],
+        "title": "MarketplaceProductOut",
+        "type": "object"
+      },
+      "MarketplaceRefundIn": {
+        "properties": {
+          "reason": {
+            "default": "Changed my mind",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "title": "MarketplaceRefundIn",
+        "type": "object"
+      },
+      "MarketplaceRevokeIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "ground": {
+            "enum": [
+              "abuse",
+              "grant_expired",
+              "refund",
+              "withdrawn_for_cause"
+            ],
+            "title": "Ground",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ground",
+          "reason"
+        ],
+        "title": "MarketplaceRevokeIn",
+        "type": "object"
+      },
       "McpAllowEntry": {
         "additionalProperties": false,
         "properties": {
@@ -15207,6 +15701,441 @@
         ]
       }
     },
+    "/api/v1/admin/marketplace/audit": {
+      "get": {
+        "operationId": "audit_api_v1_admin_marketplace_audit_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceAuditPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Audit",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/categories": {
+      "post": {
+        "operationId": "add_category_api_v1_admin_marketplace_categories_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceCategoryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Add Category Api V1 Admin Marketplace Categories Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Category",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/grants": {
+      "post": {
+        "operationId": "grant_api_v1_admin_marketplace_grants_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceGrantIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Grant",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/ownerships/{ownership_id}/refund": {
+      "post": {
+        "operationId": "admin_refund_api_v1_admin_marketplace_ownerships__ownership_id__refund_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ownership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ownership Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceAdminRefundIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Admin Refund",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/ownerships/{ownership_id}/revoke": {
+      "post": {
+        "operationId": "revoke_api_v1_admin_marketplace_ownerships__ownership_id__revoke_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ownership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ownership Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceRevokeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/products": {
+      "get": {
+        "operationId": "admin_products_api_v1_admin_marketplace_products_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceProductOut"
+                  },
+                  "title": "Response Admin Products Api V1 Admin Marketplace Products Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Admin Products",
+        "tags": [
+          "marketplace-admin"
+        ]
+      },
+      "post": {
+        "operationId": "create_product_api_v1_admin_marketplace_products_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceProductIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Product",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/products/{key}": {
+      "put": {
+        "operationId": "revise_product_api_v1_admin_marketplace_products__key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceProductIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revise Product",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/products/{key}/{transition}": {
+      "post": {
+        "operationId": "move_product_api_v1_admin_marketplace_products__key___transition__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "transition",
+            "required": true,
+            "schema": {
+              "enum": [
+                "publish",
+                "unavailable",
+                "archive"
+              ],
+              "title": "Transition",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Move Product",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
     "/api/v1/admin/media/links/{link_id}/verify": {
       "post": {
         "operationId": "admin_verify_link_api_v1_admin_media_links__link_id__verify_post",
@@ -22866,6 +23795,220 @@
         ]
       }
     },
+    "/api/v1/marketplace/categories": {
+      "get": {
+        "operationId": "categories_api_v1_marketplace_categories_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceCategoryOut"
+                  },
+                  "title": "Response Categories Api V1 Marketplace Categories Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Categories",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/v1/marketplace/products": {
+      "get": {
+        "operationId": "products_api_v1_marketplace_products_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 96,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceProductOut"
+                  },
+                  "title": "Response Products Api V1 Marketplace Products Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Products",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/v1/marketplace/products/{key}": {
+      "get": {
+        "operationId": "product_detail_api_v1_marketplace_products__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Product Detail",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/v1/marketplace/products/{key}/acquire": {
+      "post": {
+        "operationId": "acquire_api_v1_marketplace_products__key__acquire_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Acquire",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "operationId": "me_api_v1_me_get",
@@ -23465,6 +24608,162 @@
         "summary": "My Position",
         "tags": [
           "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/marketplace/owned": {
+      "get": {
+        "operationId": "owned_api_v1_me_marketplace_owned_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                  },
+                  "title": "Response Owned Api V1 Me Marketplace Owned Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Owned",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/v1/me/marketplace/owned/{ownership_id}/configure": {
+      "post": {
+        "operationId": "configure_api_v1_me_marketplace_owned__ownership_id__configure_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ownership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ownership Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceConfigureIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Configure",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/v1/me/marketplace/owned/{ownership_id}/refund": {
+      "post": {
+        "operationId": "refund_api_v1_me_marketplace_owned__ownership_id__refund_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ownership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ownership Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceRefundIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refund",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/v1/me/marketplace/purchases": {
+      "get": {
+        "operationId": "purchases_api_v1_me_marketplace_purchases_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceOwnershipOut"
+                  },
+                  "title": "Response Purchases Api V1 Me Marketplace Purchases Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Purchases",
+        "tags": [
+          "marketplace"
         ]
       }
     },

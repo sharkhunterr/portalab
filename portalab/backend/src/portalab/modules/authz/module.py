@@ -2,6 +2,7 @@
 
 from uuid import UUID
 
+from portalab.capabilities.administration import AUDIT_QUERY_CAPABILITY as AUDIT_QUERY
 from portalab.capabilities.administration import AUDIT_STATUS_CAPABILITY as AUDIT_STATUS
 from portalab.capabilities.administration import PLUGIN_PERMISSIONS_CAPABILITY as PLUGIN_PERMISSIONS
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
@@ -9,6 +10,7 @@ from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.capabilities.user_grants import ROLES_CAPABILITY as ROLES
+from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.permissions import PermissionRegistry, default_permissions
@@ -67,6 +69,7 @@ class AuthzModule:
             PLUGIN_PERMISSIONS, _PluginPermissions(self), instance_ref="authz", owner=OWNER
         )
         self.capabilities.provide(AUDIT_STATUS, _AuditStatus(self), instance_ref="authz", owner=OWNER)
+        self.capabilities.provide(AUDIT_QUERY, _AuditActions(self), instance_ref="authz", owner=OWNER)
         for key, route, permission in (
             ("roles", "/admin/roles", "users.roles.manage"),
             ("audit", "/admin/audit", "audit.read"),
@@ -99,6 +102,23 @@ class _PluginPermissions:
 
         async with self.module.database.unit_of_work() as uow:
             return await set_plugin_permissions_enabled(uow.session, plugin_id, enabled)
+
+
+class _AuditActions:
+    """``audit.query``: one action family, for an owner module's audit view (e.g. Marketplace)."""
+
+    def __init__(self, module: "AuthzModule") -> None:
+        self.module = module
+
+    async def search_actions(
+        self, viewer: Principal, action_prefix: str, *, limit: int = 50, cursor: str | None = None
+    ) -> tuple[list[dict[str, object]], str | None]:
+        from portalab.modules.authz.audit.query import AuditFilters
+
+        items, next_cursor = await self.module.audit_query.search(
+            viewer, AuditFilters(action=action_prefix), limit=limit, cursor=cursor
+        )
+        return list(items), next_cursor
 
 
 class _AuditStatus:

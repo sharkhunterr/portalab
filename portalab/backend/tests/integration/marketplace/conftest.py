@@ -14,8 +14,11 @@ from sqlalchemy import text
 
 from portalab.capabilities.ai import AIToolRegistry
 from portalab.capabilities.automation_actions import ActionRegistry
+from portalab.capabilities.community import SectionRegistry
 from portalab.capabilities.dashboard import WidgetRegistry
+from portalab.capabilities.marketplace import ProductTypeRegistry
 from portalab.capabilities.observability import ObservableRegistry
+from portalab.capabilities.search import SearchRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import FixedClock
@@ -113,6 +116,11 @@ async def harness(database: Database, tmp_path: Path, clock: FixedClock) -> MkHa
         clock=clock,
         event_types=ev.types,
         observables=ObservableRegistry(),
+        product_types=ProductTypeRegistry(),
+        widgets=WidgetRegistry(),
+        search=SearchRegistry(),
+        tools=AIToolRegistry(),
+        sections=SectionRegistry(),
     )
     module.register()
     return MkHarness(ev, module, economy, clock)
@@ -155,3 +163,55 @@ async def mk(harness: MkHarness, app: FastAPI) -> MkHarness:
     }
     await make_admin(harness.ev.full, harness.people["boss"])
     return harness
+
+
+@dataclass
+class FakeQuota:
+    """024 ``RequestQuotaService`` as Marketplace sees it: extra units only, consumption elsewhere."""
+
+    units: dict[UUID, int] = field(default_factory=dict)
+    seen: set[str] = field(default_factory=set)
+
+    async def available(self, user: UUID) -> dict[str, int]:
+        return {"base_limit": 5, "base_used": 0, "base_remaining": 5, "extra_units": self.units.get(user, 0)}
+
+    async def add_units(self, user: UUID, units: int, source_ref: str, idempotency_key: str) -> int:
+        if idempotency_key not in self.seen:
+            self.seen.add(idempotency_key)
+            self.units[user] = self.units.get(user, 0) + units
+        return self.units[user]
+
+    async def remove_units(self, user: UUID, units: int, source_ref: str, idempotency_key: str) -> int:
+        if idempotency_key not in self.seen:
+            self.seen.add(idempotency_key)
+            self.units[user] = max(0, self.units.get(user, 0) - units)
+        return self.units[user]
+
+
+def product_def(key: str, kind: str = "badge", **version: Any) -> dict[str, Any]:
+    payload = {
+        "badge": {"label": "Night owl"},
+        "widget": {"widget": "test.widget"},
+        "quota": {"kind": "media_requests", "units": 3},
+    }
+    body: dict[str, Any] = {
+        "names": {"en": key.replace("_", " ").title(), "fr": key},
+        "payload": payload.get(kind, {}),
+    }
+    body.update(version)
+    return {"key": key, "type": kind, "version": body}
+
+
+async def published(mk: "MkHarness", key: str, kind: str = "badge", **version: Any) -> str:
+    await mk.module.catalog.create(mk.p("boss"), product_def(key, kind, **version))
+    await mk.module.catalog.move(mk.p("boss"), key, "available")
+    return key
+
+
+async def confirmed(
+    client: httpx.AsyncClient, method: str, path: str, body: dict[str, Any]
+) -> httpx.Response:
+    first = await client.request(method, path, json=body)
+    if first.status_code != 409 or first.json().get("code") != "authz.confirmation_required":
+        return first
+    return await client.request(method, path, json={**body, "confirmation": first.json()["confirmation"]})

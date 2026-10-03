@@ -23,6 +23,9 @@ class MarketplaceConfig:
     access_allowed_permissions: list[str] = field(default_factory=list)
     quota_kinds: list[str] = field(default_factory=lambda: ["media_requests"])
     activation_retry_minutes: int = 15
+    refund_defaults: dict[str, Any] = field(
+        default_factory=dict
+    )  # {type: {refundable, window_days, percent}}
 
 
 SETTINGS: dict[str, str] = {
@@ -32,6 +35,7 @@ SETTINGS: dict[str, str] = {
     "access_allowed_permissions": "marketplace.access.allowedPermissions",
     "quota_kinds": "marketplace.quota.kinds",
     "activation_retry_minutes": "marketplace.activationRetryMinutes",
+    "refund_defaults": "marketplace.refundDefaults",
 }
 _DESCRIPTIONS = {
     "funding_min_amount": "Smallest Coins amount one funding may reserve.",
@@ -40,6 +44,7 @@ _DESCRIPTIONS = {
     "access_allowed_permissions": "Permissions an access product may grant (never Admin-reserved ones).",
     "quota_kinds": "Quota kinds products may credit (e.g. media requests).",
     "activation_retry_minutes": "Minutes between retries of a failed product activation.",
+    "refund_defaults": "Refund policy per product type, used when a product does not set its own.",
 }
 
 
@@ -51,6 +56,7 @@ def declare_marketplace_settings(catalog: SettingCatalog = default_catalog) -> N
         "funding_default_rules": dict[str, Any],
         "access_allowed_permissions": list[str],
         "quota_kinds": list[str],
+        "refund_defaults": dict[str, Any],
     }
     for name, key in SETTINGS.items():
         if key not in known:

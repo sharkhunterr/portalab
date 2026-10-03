@@ -213,6 +213,8 @@ async def co(harness: CoHarness, app: FastAPI) -> CoHarness:
 
 def with_marketplace(co: CoHarness) -> Any:
     """Adds the real 015 lifecycle (``marketplace.project_lifecycle``) to the community harness."""
+    from portalab.capabilities.ai import AIToolRegistry
+    from portalab.capabilities.marketplace import ProductTypeRegistry
     from portalab.capabilities.observability import ObservableRegistry as Observables
     from portalab.modules.marketplace.module import MarketplaceModule
 
@@ -225,6 +227,11 @@ def with_marketplace(co: CoHarness) -> Any:
         clock=co.clock,
         event_types=co.ev.types,
         observables=Observables(),
+        product_types=ProductTypeRegistry(),
+        widgets=WidgetRegistry(),
+        search=SearchRegistry(),
+        tools=AIToolRegistry(),
+        sections=SectionRegistry(),
     )
     module.register()
     return module

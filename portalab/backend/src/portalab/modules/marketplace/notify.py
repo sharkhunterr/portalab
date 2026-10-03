@@ -37,3 +37,26 @@ async def notify_funders(
         )
     except Exception:
         log.warning("project notification not sent")
+
+
+async def notify_owner(
+    capabilities: CapabilityRegistry, user: UUID, kind: str, product: str, dedup: str
+) -> None:
+    """``marketplace.purchase`` / ``marketplace.refund`` to the owner (never blocks the operation)."""
+    try:
+        providers = capabilities.system_providers(NOTIFY)
+        if not providers:
+            return
+        await providers[0].provider.send(
+            CommunicationRequest(
+                category=f"marketplace.{kind}",
+                template_key=f"marketplace:notify.{kind}",
+                audience=Users((user,)),
+                dedup_key=dedup,
+                params={"product": product[:120]},
+                subject_ref=f"product:{product}",
+                action_url="/marketplace/owned",
+            )
+        )
+    except Exception:
+        log.warning("marketplace notification not sent")

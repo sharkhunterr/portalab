@@ -72,6 +72,28 @@ async def _confirm(
         raise Forbidden("The confirmation is invalid or expired.", code="authz.confirmation_invalid")
 
 
+async def _confirm_generic(
+    module: Any,
+    principal: Principal,
+    permission: str,
+    resource: str,
+    payload: dict[str, Any],
+    token: str | None,
+) -> None:
+    """A confirmation for a sensitive Marketplace action (publish, price change, grant, revoke, refund)."""
+    providers = module.capabilities.system_providers(CONFIRMATIONS)
+    if not providers:
+        raise Unavailable("Confirmations are not available.", code="authz.unavailable")
+    confirmations = providers[0].provider
+    kind, _, ref = resource.partition(":")
+    target = ResourceRef(kind, ref)
+    if token is None:
+        issued = await confirmations.issue(principal, permission, target, payload)
+        raise ConfirmationRequired("Confirm this sensitive change.", extensions={"confirmation": issued})
+    if not await confirmations.consume(token, principal, permission, target, payload):
+        raise Forbidden("The confirmation is invalid or expired.", code="authz.confirmation_invalid")
+
+
 async def _move(
     module: Any, principal: Principal, project_id: UUID, target: str, body: ProjectTransitionIn, **extra: Any
 ) -> ProjectOut:

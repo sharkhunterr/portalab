@@ -107,7 +107,13 @@ class EconomyServiceImpl:
         return transaction
 
     async def refund(
-        self, transaction_id: UUID, *, reason: str, idempotency_key: str, session: Any | None = None
+        self,
+        transaction_id: UUID,
+        *,
+        reason: str,
+        idempotency_key: str,
+        session: Any | None = None,
+        amount: int | None = None,
     ) -> Transaction:
         async def work(active: AsyncSession) -> Transaction:
             original = await active.get(LedgerTransaction, transaction_id)
@@ -134,6 +140,10 @@ class EconomyServiceImpl:
             remaining = -original.delta - refunded
             if remaining <= 0:
                 raise Conflict("This spending was already refunded.", code="economy.already_refunded")
+            if amount is not None:
+                if amount <= 0:
+                    raise ValidationFailed("Refund a positive amount.", code="economy.invalid_amount")
+                remaining = min(remaining, amount)
             recorded = await self.writer.record(
                 active,
                 Entry(

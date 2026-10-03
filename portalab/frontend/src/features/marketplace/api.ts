@@ -70,3 +70,88 @@ export function useProjectAdmin() {
     onSuccess: () => client.invalidateQueries({ queryKey: KEY }),
   });
 }
+
+// --- slice B: catalog ------------------------------------------------------------------------------------
+export type Product = components["schemas"]["MarketplaceProductOut"];
+export type OwnershipRow = components["schemas"]["MarketplaceOwnershipOut"];
+export type Category = components["schemas"]["MarketplaceCategoryOut"];
+
+export function useCategories() {
+  return useQuery({
+    queryKey: [...KEY, "categories"],
+    queryFn: async () => ((await api.GET("/api/v1/marketplace/categories")).data ?? []) as Category[],
+  });
+}
+
+export function useProducts(filters: { category?: string; q?: string }) {
+  return useQuery({
+    queryKey: [...KEY, "products", filters],
+    queryFn: async () =>
+      ((
+        await api.GET("/api/v1/marketplace/products", {
+          params: {
+            query: {
+              ...(filters.category ? { category: filters.category } : {}),
+              ...(filters.q ? { q: filters.q } : {}),
+            },
+          },
+        })
+      ).data ?? []) as Product[],
+  });
+}
+
+export function useProduct(key: string) {
+  return useQuery({
+    queryKey: [...KEY, "product", key],
+    retry: false,
+    queryFn: async () =>
+      (await api.GET("/api/v1/marketplace/products/{key}", { params: { path: { key } } })).data as Product,
+  });
+}
+
+export function useAcquire(key: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (requestKey: string) =>
+      (
+        await api.POST("/api/v1/marketplace/products/{key}/acquire", {
+          params: { path: { key }, header: { "Idempotency-Key": requestKey } },
+        })
+      ).data as OwnershipRow,
+    onSuccess: () => client.invalidateQueries({ queryKey: KEY }),
+  });
+}
+
+export function usePurchases() {
+  return useQuery({
+    queryKey: [...KEY, "purchases"],
+    queryFn: async () => ((await api.GET("/api/v1/me/marketplace/purchases")).data ?? []) as OwnershipRow[],
+  });
+}
+
+export function useOwnedActions() {
+  const client = useQueryClient();
+  const refresh = () => client.invalidateQueries({ queryKey: KEY });
+  return {
+    configure: useMutation({
+      mutationFn: async ({ id, configuration }: { id: string; configuration: Record<string, unknown> }) =>
+        (
+          await api.POST("/api/v1/me/marketplace/owned/{ownership_id}/configure", {
+            params: { path: { ownership_id: id } },
+            body: { configuration },
+          })
+        ).data,
+      onSuccess: refresh,
+    }),
+    refund: useMutation({
+      mutationFn: async ({ id, reason }: { id: string; reason: string }) =>
+        (
+          await api.POST("/api/v1/me/marketplace/owned/{ownership_id}/refund", {
+            params: { path: { ownership_id: id } },
+            body: { reason },
+          })
+        ).data,
+      onSuccess: refresh,
+    }),
+  };
+}

@@ -69,7 +69,7 @@ Problem codes: `project.funding_closed`, `project.acknowledgement_required`, `pr
 `project.rules_frozen`, `project.invalid_rules`, `project.invalid_transition`, `project.version_conflict`,
 `economy.insufficient_coins`.
 
-## Recorded deviations (slice A)
+## Recorded deviations
 
 * Project reads use `marketplace.read` (granted to users) instead of the contract's `community.read`, which
   belongs to the Community module.
@@ -78,7 +78,77 @@ Problem codes: `project.funding_closed`, `project.acknowledgement_required`, `pr
   tranche at funding time.
 * Fundings have no retention target: they reference ledger reservations (integrity) and are anonymized at
   deletion (R6).
+* 013 follow-ups delivered with 015: `EconomyService.refund(..., amount=)` (partial refunds) and
+  `EconomyService.reservations(ids)` (reconciliation).
+* The Marketplace audit view reads the 003 audit through a new `audit.query` capability (action family
+  `marketplace.`).
+* Media (024) has no request ordering function; the "no paid priority" guarantee is enforced by the
+  schema guard and a structural test (no priority-like column in Media requests or Marketplace tables).
 
 ## Catalog (slice B)
 
-Delivered at roadmap step 26.
+Products are bought with **Coins only** — there is no payment, currency or card anywhere (guarded by
+`tests/security/marketplace/test_no_real_money.py`); Coins come from earning.
+
+### Product types
+
+`register_product_type(ProductType(key, owner, handler, refundable_by_default, payload_fields))` — the
+registry is owner-tagged (`unregister(owner)`; plugin types are namespaced `plugin:<key>.<type>`). Built-in
+types and their activation:
+
+| Type | Payload | Activation |
+|---|---|---|
+| `widget` | `widget` | ownership read by 009 (`marketplace.entitlements`); unknown widget ⇒ incompatible |
+| `theme` | `theme` | must exist in the 022 catalog |
+| `statistic` | `statistic` | read by 017 `product_owned` unlocks |
+| `badge`, `title`, `effect` | `label`, `icon` / `effect` | shown in the `cosmetics` profile section (012) |
+| `feature`, `plugin` | `extension`, `config_required` | `needs_configuration` until the owner configures; portal-level code is installed by the Admin when publishing (023 activation later) |
+| `access` | `permission` | a per-user grant (003), only for permissions in `marketplace.access.allowedPermissions` and never Admin-reserved; removed on revoke |
+| `quota` | `kind`, `units` | units credited through Media's `RequestQuotaService` (024); Marketplace never measures or consumes quota |
+
+Nothing can buy priority: any priority-like key (`priority`, `queue`, `boost`, `skip`, `rank`…) in a
+product definition is rejected (`marketplace.priority_forbidden`).
+
+### Versions and states
+
+```json
+{"key": "night_owl", "type": "badge", "category": "cosmetics", "repeatable": false,
+ "version": {"price_coins": 50, "conditions": [{"kind": "min_level", "level": 3}],
+             "refund_policy": {"refundable": true, "window_days": 7, "percent": 100},
+             "names": {"en": "Night owl", "fr": "Oiseau de nuit"}, "payload": {"label": "Night owl"}}}
+```
+
+Every change of price, conditions, refund policy, texts or payload is a **new version** (append-only); an
+ownership keeps its snapshot (version, price paid, conditions). States `draft → available ⇄ unavailable →
+archived`: archived products are hidden from new purchases and stay with their owners. Publishing and
+revising a published product are sensitive (confirmation) and audited. Refund defaults per type come from
+`marketplace.refundDefaults`; otherwise plugins, access and quota are non-refundable, the rest
+refundable for 7 days at 100 %.
+
+### Conditions and acquisition
+
+Conditions form a closed set combined with **AND**: `min_level`, `achievement`, `campaign_active`, `role`
+(plus the Coins price). The product page lists each one by name, met or not; an unavailable port fails
+closed (`unavailable`). `POST /api/v1/marketplace/products/{key}/acquire` (`Idempotency-Key`) runs in one
+unit of work: eligibility, the once-only check for permanent products (`repeatable` opt-in), the 013 spend
+and the ownership row with its snapshot, then `marketplace.purchase`. Activation runs after the commit
+and never undoes the ownership (`needs_configuration`, or `activation_failed` retried every
+`marketplace.activationRetryMinutes`).
+
+### Refunds, grants and revocation
+
+* Refund within the policy (owner) or by an administrator (`marketplace.refund`, any time, confirmed): a
+  new `refund` ledger transaction reversing the purchase (partial percentages supported), an append-only
+  refund row, the ownership `refunded` and deactivated. Quota units already used make it non-refundable.
+* Grants (`marketplace.grant`, confirmed, audited): `origin=grant`, optional expiry (a job expires them).
+* Revocation (`marketplace.revoke`, confirmed, audited): ground `abuse | grant_expired | refund |
+  withdrawn_for_cause` and a reason; a Coins purchase is refunded per its policy unless the ground is
+  `abuse`; the member is notified; history is never rewritten.
+* `GET /api/v1/admin/marketplace/audit` (`marketplace.audit`) lists the marketplace audit trail.
+
+### Integrations
+
+`marketplace.entitlements` (`owns`, `owned_by_type`), search kind `product`, dashboard widget
+`marketplace.featured`, AI tool `marketplace.catalog` (read-only), statistics pack `marketplace`
+(`marketplace.coins_spent`, `marketplace.purchases`), notifications `marketplace.purchase|refund|
+revocation`, profile section `cosmetics`.

@@ -63,6 +63,10 @@ const ModerationQueue = lazy(() => import("../../features/community/projects/Mod
 const Projects = lazy(() => import("../../features/marketplace/projects/ProjectsPage"));
 const Project = lazy(() => import("../../features/marketplace/projects/ProjectRoute"));
 const ProjectConsole = lazy(() => import("../../features/marketplace/admin/ProjectConsole"));
+const Catalog = lazy(() => import("../../features/marketplace/catalog/CatalogPage"));
+const ProductRoute = lazy(() => import("../../features/marketplace/product/ProductRoute"));
+const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
+const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -91,6 +95,19 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
+        {
+          path: "marketplace",
+          handle: h({ crumb: "Marketplace", requiredPermission: "marketplace.read" }),
+          children: [
+            { index: true, element: <Catalog /> },
+            { path: "owned", element: <Owned />, handle: h({ crumb: "My products" }) },
+            {
+              path: "products/:key",
+              element: <ProductRoute />,
+              handle: h({ crumb: "Product", existenceSensitive: true }),
+            },
+          ],
+        },
         {
           path: "projects",
           handle: h({ crumb: "Projects", requiredPermission: "marketplace.read" }),
@@ -289,6 +306,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
+            { path: "marketplace", element: <MarketplaceAdmin />, handle: h({ crumb: "Marketplace" }) },
             {
               path: "community/moderation",
               element: <ModerationQueue />,

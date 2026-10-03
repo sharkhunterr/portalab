@@ -5,6 +5,8 @@ from fastapi import APIRouter
 
 def routers() -> list[APIRouter]:
     from portalab.modules.marketplace.api.admin import router as admin
+    from portalab.modules.marketplace.api.catalog import router as catalog
+    from portalab.modules.marketplace.api.catalog_admin import router as catalog_admin
     from portalab.modules.marketplace.api.projects import router as projects
 
-    return [projects, admin]
+    return [projects, admin, catalog, catalog_admin]

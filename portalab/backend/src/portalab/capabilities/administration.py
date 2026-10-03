@@ -19,6 +19,7 @@ TOGGLE_HOOK_CAPABILITY = "admin.toggle_hook"
 AUDIT_STATUS_CAPABILITY = "audit.status"
 EXTENSION_STATE_CAPABILITY = "admin.extension_state"
 CONFIG_WRITER_CAPABILITY = "admin.config_writer"
+AUDIT_QUERY_CAPABILITY = "audit.query"
 
 PanelState = Literal["available", "partial", "stale", "unavailable", "no-data"]
 
@@ -137,6 +138,16 @@ register_admin_surface: Callable[[AdminSurface], AdminSurface] = default_admin_s
 DynamicValidator = Callable[[Any], Awaitable[list[str]]]
 
 
+@runtime_checkable
+class AuditQueryPort(Protocol):
+    """Audit entries of one action family (e.g. ``marketplace.``) for an owner's own audit view; the
+    caller has already checked its domain permission. Reading is itself audited."""
+
+    async def search_actions(
+        self, viewer: Principal, action_prefix: str, *, limit: int = 50, cursor: str | None = None
+    ) -> tuple[list[dict[str, Any]], str | None]: ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -153,4 +164,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(AUDIT_STATUS_CAPABILITY, AuditStatus, False, "Audit chain status for the Control Center"),
     _spec(EXTENSION_STATE_CAPABILITY, ExtensionState, False, "Enablement of modules/plugins (020 toggles)"),
     _spec(CONFIG_WRITER_CAPABILITY, ConfigWriter, False, "Audited global setting changes (020)"),
+    _spec(AUDIT_QUERY_CAPABILITY, AuditQueryPort, False, "Owner-scoped audit reads (003)"),
 )

@@ -117,8 +117,16 @@ class EconomyService(Protocol):
     ) -> Transaction: ...
 
     async def refund(
-        self, transaction_id: UUID, *, reason: str, idempotency_key: str, session: Any | None = None
-    ) -> Transaction: ...
+        self,
+        transaction_id: UUID,
+        *,
+        reason: str,
+        idempotency_key: str,
+        session: Any | None = None,
+        amount: int | None = None,
+    ) -> Transaction:
+        """A new ``refund`` transaction reversing a spend — all that remains of it, or ``amount`` of it."""
+        ...
 
     async def balance(self, user: UUID, value: Value) -> int: ...
 

@@ -1,0 +1,42 @@
+{
+  "domain": "marketplace",
+  "definitions": [
+    {
+      "key": "marketplace.coins_spent",
+      "title_key": "marketplace:stat.coins_spent.title",
+      "description_key": "marketplace:stat.coins_spent.description",
+      "domain": "marketplace",
+      "scope": "personal",
+      "event_types": [
+        "marketplace.purchase"
+      ],
+      "measure": {
+        "kind": "sum",
+        "field": "price"
+      },
+      "viz": {
+        "type": "line"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    },
+    {
+      "key": "marketplace.purchases",
+      "title_key": "marketplace:stat.purchases.title",
+      "description_key": "marketplace:stat.purchases.description",
+      "domain": "marketplace",
+      "scope": "community",
+      "event_types": [
+        "marketplace.purchase"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    }
+  ]
+}

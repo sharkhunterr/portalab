@@ -4,11 +4,14 @@ Slice A — the **community funding lifecycle** (CD-008): Community (012) regist
 and reads its state through ``ProjectLifecycle``; Marketplace owns the state machine, the per-project
 funding rules and the Coins *reserved* by funders (held by the 013 ledger, never by Marketplace).
 
-Slice B adds the catalog (``marketplace.entitlements``, already declared for 009 widget products).
+Slice B — the catalog: an owner-tagged **product type registry** (``register_product_type``) where each
+type brings an ``ActivationHandler`` run after acquisition; ownership is read by other modules through
+``marketplace.entitlements`` (declared with 009 widget products).
 """
 
-from dataclasses import dataclass
-from typing import Literal, Protocol, runtime_checkable
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Any, Literal, Protocol, runtime_checkable
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilitySpec
@@ -73,3 +76,79 @@ LIFECYCLE_SPEC = CapabilitySpec(
     description="Community project lifecycle and funding summary (Marketplace 015)",
 )
 SPECS: tuple[CapabilitySpec, ...] = (LIFECYCLE_SPEC,)
+
+
+# --- slice B: product types and activation ------------------------------------------------------------
+ActivationState = Literal["active", "needs_configuration", "failed", "incompatible"]
+
+
+@dataclass(frozen=True, slots=True)
+class OwnershipView:
+    """What an activation handler sees of one ownership."""
+
+    id: UUID
+    user_id: UUID
+    product_key: str
+    product_type: str
+    payload: Mapping[str, Any] = field(default_factory=dict)  # the product version's type-specific data
+    configuration: Mapping[str, Any] = field(default_factory=dict)  # set by the owner when required
+
+
+@dataclass(frozen=True, slots=True)
+class ActivationResult:
+    state: ActivationState
+    detail: str = ""
+
+
+@runtime_checkable
+class ActivationHandler(Protocol):
+    async def activate(self, ownership: OwnershipView) -> ActivationResult: ...
+
+    async def deactivate(self, ownership: OwnershipView) -> None: ...
+
+
+@dataclass(frozen=True, slots=True)
+class ProductType:
+    key: str
+    owner: str
+    handler: ActivationHandler = field(compare=False)
+    refundable_by_default: bool = True
+    payload_fields: tuple[str, ...] = ()  # allowed keys of a version's ``payload`` (closed set)
+    label_key: str = ""
+
+
+class ProductTypeRegistry:
+    def __init__(self) -> None:
+        self._types: dict[str, ProductType] = {}
+
+    def register(self, product_type: ProductType) -> ProductType:
+        existing = self._types.get(product_type.key)
+        if existing is not None and existing.owner != product_type.owner:
+            raise ValueError(f"product type {product_type.key!r} is already registered by {existing.owner}")
+        if product_type.owner.startswith("plugin:") and not product_type.key.startswith(
+            f"plugin:{product_type.owner.removeprefix('plugin:')}"
+        ):
+            raise ValueError("plugin product types are namespaced 'plugin:<key>.<type>'")
+        self._types[product_type.key] = product_type
+        return product_type
+
+    def get(self, key: str) -> ProductType | None:
+        return self._types.get(key)
+
+    def all(self) -> list[ProductType]:
+        return [self._types[k] for k in sorted(self._types)]
+
+    def unregister(self, owner: str) -> int:
+        doomed = [k for k, t in self._types.items() if t.owner == owner]
+        for key in doomed:
+            del self._types[key]
+        return len(doomed)
+
+
+default_product_types = ProductTypeRegistry()
+
+
+def register_product_type(
+    product_type: ProductType, registry: ProductTypeRegistry = default_product_types
+) -> ProductType:
+    return registry.register(product_type)
