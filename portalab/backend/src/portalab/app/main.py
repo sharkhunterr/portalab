@@ -74,6 +74,8 @@ from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
+from portalab.modules.marketplace.api import routers as marketplace_routers
+from portalab.modules.marketplace.module import MarketplaceModule
 from portalab.modules.media.api import routers as media_routers
 from portalab.modules.media.module import MediaModule
 from portalab.modules.news.api import routers as news_routers
@@ -155,6 +157,7 @@ def create_app(
     campaigns: CampaignsModule | None = None,
     automations: AutomationsModule | None = None,
     community: CommunityModule | None = None,
+    marketplace: MarketplaceModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -195,6 +198,7 @@ def create_app(
         app.state.campaigns_module = platform.campaigns
         app.state.automations_module = platform.automations
         app.state.community_module = platform.community
+        app.state.marketplace_module = platform.marketplace
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -263,6 +267,7 @@ def create_app(
     app.state.campaigns_module = campaigns
     app.state.automations_module = automations
     app.state.community_module = community
+    app.state.marketplace_module = marketplace
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -380,6 +385,7 @@ def create_app(
         *campaigns_routers(),
         *automations_routers(),
         *community_routers(),
+        *marketplace_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

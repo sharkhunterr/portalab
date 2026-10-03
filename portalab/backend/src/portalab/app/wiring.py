@@ -38,6 +38,7 @@ from portalab.modules.health.module import HealthModule
 from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
+from portalab.modules.marketplace.module import MarketplaceModule
 from portalab.modules.media.module import MediaModule
 from portalab.modules.news.module import NewsModule
 from portalab.modules.notifications.module import NotificationsModule
@@ -124,6 +125,7 @@ class Platform:
     campaigns: CampaignsModule
     automations: AutomationsModule
     community: CommunityModule
+    marketplace: MarketplaceModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -244,6 +246,8 @@ def wire_platform(
         database, events, authz.audit, capabilities, authz.engine, visibility=privacy.filter
     )
     community.register()
+    marketplace = MarketplaceModule(database, events, authz.audit, capabilities, authz.engine)
+    marketplace.register()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -283,6 +287,7 @@ def wire_platform(
         seeds.extend(campaigns.register_jobs(jobs))
         seeds.extend(automations.register_jobs(jobs))
         seeds.extend(community.register_jobs(jobs))
+        seeds.extend(marketplace.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -310,6 +315,7 @@ def wire_platform(
         campaigns,
         automations,
         community,
+        marketplace,
         seeds,
     )
     from portalab.app.config_bindings import bind

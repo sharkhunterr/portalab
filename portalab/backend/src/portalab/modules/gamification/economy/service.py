@@ -7,7 +7,7 @@ A refund or a release is a new transaction referencing the original; Coins can n
 and values are never converted into one another."""
 
 import base64
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from contextlib import asynccontextmanager
 from typing import Any, TypeVar
 from uuid import UUID
@@ -247,6 +247,16 @@ class EconomyServiceImpl:
         return await self._resolve(reservation_id, "consumed", "reserve_consume", None, session)
 
     # --- reads -------------------------------------------------------------------------------------------
+    async def reservations(self, ids: Sequence[UUID]) -> list[Reservation]:
+        """Current state of the given reservations (unknown ids are skipped) — for reconciliation."""
+        if not ids:
+            return []
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(select(ReservationRow).where(ReservationRow.id.in_(list(ids))))
+            ).scalars()
+            return [_reservation(r) for r in rows]
+
     async def balance(self, user: UUID, value: Value) -> int:
         async with self.database.session() as session:
             amount = await session.scalar(

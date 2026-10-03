@@ -1,6 +1,6 @@
 """Built-in profile sections (T007): ``identity`` (002, datum ``member_listing``), ``progression`` and
 ``achievements`` (013 ``ProgressionReader``, datum ``progression``), ``activity`` (the member's feed
-entries, datum ``community_activity``) and ``projects`` (datum ``projects``; empty until slice D)."""
+entries, datum ``community_activity``) and ``projects`` (the member's open proposals, datum ``projects``)."""
 
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -27,6 +27,7 @@ def register_builtin_sections(
     capabilities: CapabilityRegistry,
     feed: FeedService,
     names: Callable[[UUID], Awaitable[str | None]],
+    proposals: Any = None,
 ) -> None:
     async def identity(owner: UUID, viewer: Principal) -> SectionResult:
         name = await names(owner)
@@ -80,7 +81,13 @@ def register_builtin_sections(
         )
 
     async def projects(owner: UUID, viewer: Principal) -> SectionResult:
-        return SectionResult("no-data", {"items": []})  # proposals arrive with slice D (015)
+        if proposals is None:
+            return SectionResult("no-data", {"items": []})
+        items = [
+            {"id": str(p.id), "title": p.title, "kind": p.kind, "url": f"/community/proposals/{p.id}"}
+            for p in await proposals.by_member(owner)
+        ]
+        return SectionResult("available" if items else "no-data", {"items": items})
 
     for key, datum, provider, order in (
         ("identity", MEMBER_LISTING, identity, 10),

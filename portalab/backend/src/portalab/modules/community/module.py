@@ -25,6 +25,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -36,6 +37,7 @@ from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPOR
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
 from portalab.capabilities.search import SearchRegistry, default_search
+from portalab.capabilities.support import PROPOSALS
 from portalab.capabilities.visibility import PREFERENCE_CAPABILITY
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer
@@ -53,17 +55,28 @@ from portalab.modules.community.events.service import CommunityEvents
 from portalab.modules.community.events.types import register_event_types
 from portalab.modules.community.feed.projector import CONSUMER, FeedProjector
 from portalab.modules.community.feed.service import FeedService
-from portalab.modules.community.integrations import ACTIVITY_WIDGET, ActivityWidget
+from portalab.modules.community.integrations import (
+    ACTIVITY_WIDGET,
+    PROJECTS_WIDGET,
+    ActivityWidget,
+    ProjectsWidget,
+)
 from portalab.modules.community.leaderboards.view import LeaderboardsView
 from portalab.modules.community.members.service import Members
 from portalab.modules.community.models import FeedEntry
 from portalab.modules.community.observability import log, metrics
+from portalab.modules.community.participation.service import Participations
 from portalab.modules.community.preferences import CLASSES, CommunityPreferences
 from portalab.modules.community.privacy.participant import CommunityParticipant
 from portalab.modules.community.profiles.assembler import ProfileAssembler
 from portalab.modules.community.profiles.builtin import register_builtin_sections
+from portalab.modules.community.proposals.lifecycle import CATEGORY, StatusNotifier
+from portalab.modules.community.proposals.lifecycle import CONSUMER as STATUS_CONSUMER
+from portalab.modules.community.proposals.service import ProposalCreatorAdapter, Proposals
+from portalab.modules.community.proposals.types import register_slice_d_types
 from portalab.modules.community.quests.view import QuestsView
 from portalab.modules.community.settings import SETTINGS, CommunityConfig
+from portalab.modules.community.votes.service import Votes
 
 OWNER = "module:community"
 INSTANCE = "community"
@@ -112,6 +125,11 @@ class CommunityModule:
         self.leaderboards = LeaderboardsView(capabilities, self.display_name)
         self.achievements = AchievementsView(capabilities, self.visibility)
         self.quests = QuestsView(capabilities)
+        config = lambda: self.config  # noqa: E731
+        self.proposals = Proposals(database, events, audit, capabilities, authorizer, config, clock=clock)
+        self.votes = Votes(database, events, self.proposals, clock=clock)
+        self.participations = Participations(database, events, audit, self.proposals, config, clock=clock)
+        self.status_notifier = StatusNotifier(database, capabilities)
         self.events = CommunityEvents(database, audit, events, authorizer, capabilities, clock=clock)
 
     async def display_name(self, user: UUID) -> str | None:
@@ -121,16 +139,31 @@ class CommunityModule:
 
     def register(self) -> None:
         register_event_types(self.event_types)
+        register_slice_d_types(self.event_types)
         if self.consumers.get(CONSUMER) is None:
             self.consumers.register(self.projector.consumer())
-        register_builtin_sections(self.sections, self.capabilities, self.feed, self.display_name)
-        register_builtin_shelves(self.shelves, self.members, self.feed)
+        if self.consumers.get(STATUS_CONSUMER) is None:
+            self.consumers.register(self.status_notifier.consumer())
+        if not self.capabilities.system_providers(PROPOSALS):
+            self.capabilities.provide(
+                PROPOSALS, ProposalCreatorAdapter(self.proposals), instance_ref=INSTANCE, owner=OWNER
+            )
+        if default_categories.get(CATEGORY) is None:
+            declare_category(CATEGORY, OWNER, "community:category.project")
+        register_builtin_sections(
+            self.sections, self.capabilities, self.feed, self.display_name, self.proposals
+        )
+        register_builtin_shelves(self.shelves, self.members, self.feed, self.proposals)
         if self.search.provider("member") is None:
             self.search.register(MemberSearchProvider(self.members, self.authorizer), owner=OWNER)
         if self.calendar_sources.get(self.events.kind) is None:
             self.calendar_sources.register(self.events, owner=OWNER)
         if self.widgets.get(ACTIVITY_WIDGET.key) is None:
             self.widgets.register(ACTIVITY_WIDGET, ActivityWidget(self.feed, self.clock), owner=OWNER)
+        if self.widgets.get(PROJECTS_WIDGET.key) is None:
+            self.widgets.register(
+                PROJECTS_WIDGET, ProjectsWidget(self.proposals, self.votes, self.clock), owner=OWNER
+            )
         participant = CommunityParticipant(self.database)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == INSTANCE for p in self.capabilities.system_providers(capability)):

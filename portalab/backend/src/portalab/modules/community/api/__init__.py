@@ -7,6 +7,7 @@ def routers() -> list[APIRouter]:
     from portalab.modules.community.api.events import router as events
     from portalab.modules.community.api.leaderboards import router as leaderboards
     from portalab.modules.community.api.progress import router as progress
+    from portalab.modules.community.api.proposals import router as proposals
     from portalab.modules.community.api.public import router as public
 
-    return [public, events, leaderboards, progress]
+    return [public, events, leaderboards, progress, proposals]

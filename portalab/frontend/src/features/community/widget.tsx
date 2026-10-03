@@ -35,3 +35,29 @@ function ActivityWidget({ payload }: WidgetProps) {
 }
 
 registerWidgetComponent("community.activity", ActivityWidget);
+
+interface ProjectItem {
+  id: string;
+  title: string;
+  help_wanted: boolean;
+  votes: number;
+}
+
+/** Dashboard widget ``community.projects`` (spec 012 T024, REQ-018): proposals open for votes or help. */
+function ProjectsWidget({ payload }: WidgetProps) {
+  const t = useT();
+  const items = ((payload.data ?? {}) as { items?: ProjectItem[] }).items ?? [];
+  return (
+    <ul className="widget-list">
+      {items.map((item) => (
+        <li key={item.id}>
+          <Link to={`/community/proposals/${item.id}`}>{item.title}</Link> ·{" "}
+          {t("community:proposals.votes", { count: item.votes })}
+          {item.help_wanted ? ` · ${t("community:proposals.helpWanted")}` : ""}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+registerWidgetComponent("community.projects", ProjectsWidget);

@@ -143,6 +143,10 @@ class EconomyService(Protocol):
 
     async def consume(self, reservation_id: UUID, *, session: Any | None = None) -> Reservation: ...
 
+    async def reservations(self, ids: Sequence[UUID]) -> Sequence[Reservation]:
+        """Current state of reservations (for owners' reconciliation)."""
+        ...
+
 
 @runtime_checkable
 class RewardService(Protocol):

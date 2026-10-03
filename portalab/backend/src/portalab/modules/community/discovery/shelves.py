@@ -1,6 +1,7 @@
-"""Discovery shelves (T012; US8): built-in lists for a viewer — ``new_members``, ``recent_unlocks`` and
+"""Discovery shelves (T012; US8): built-in lists for a viewer — ``new_members``, ``recent_unlocks``,
 ``activity_highlights`` — each bound by the same visibility as its source surface (directory listing,
-feed). An empty shelf offers a next action. Projects needing votes or help join in slice D."""
+feed) — and ``projects`` (open proposals, those asking for help first). An empty shelf offers a next
+action."""
 
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -27,7 +28,9 @@ def _entry(item: FeedItem) -> dict[str, Any]:
     }
 
 
-def register_builtin_shelves(registry: ShelfRegistry, members: Members, feed: FeedService) -> None:
+def register_builtin_shelves(
+    registry: ShelfRegistry, members: Members, feed: FeedService, proposals: Any = None
+) -> None:
     async def new_members(viewer: Principal, limit: int) -> Sequence[Mapping[str, Any]]:
         page = await members.page(viewer, limit=limit, newest=True)
         return [
@@ -48,8 +51,23 @@ def register_builtin_shelves(registry: ShelfRegistry, members: Members, feed: Fe
         items, _ = await feed.page(viewer, limit=limit, exclude=UNLOCKS)
         return [_entry(i) for i in items]
 
+    async def projects(viewer: Principal, limit: int) -> Sequence[Mapping[str, Any]]:
+        if proposals is None:
+            return []
+        return [
+            {
+                "id": str(p.id),
+                "title": p.title,
+                "kind": p.kind,
+                "help_wanted": p.help_wanted,
+                "url": f"/community/proposals/{p.id}",
+            }
+            for p in await proposals.needing_support(limit)
+        ]
+
     for key, provider, order, action in (
         ("new_members", new_members, 10, "/community/members"),
+        ("projects", projects, 15, "/community/proposals"),
         ("recent_unlocks", recent_unlocks, 20, "/progression"),
         ("activity_highlights", highlights, 30, "/community/feed"),
     ):

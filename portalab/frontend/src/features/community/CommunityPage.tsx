@@ -8,12 +8,15 @@ import { Feed } from "./feed/Feed";
 import { LeaderboardPage } from "./leaderboards/LeaderboardPage";
 import { Directory } from "./members/Directory";
 import { ProfilePage } from "./profile/ProfilePage";
+import { ProposalDetail } from "./projects/ProposalDetail";
+import { ProposalList } from "./projects/ProposalList";
 import "./community.css";
 
 const TABS = [
   { to: "/community", key: "discover", end: true },
   { to: "/community/members", key: "members", end: true },
   { to: "/community/feed", key: "feed", end: true },
+  { to: "/community/proposals", key: "proposals", end: false },
   { to: "/community/leaderboards", key: "leaderboards", end: true },
   { to: "/community/achievements", key: "achievements", end: true },
   { to: "/community/events", key: "events", end: true },
@@ -23,11 +26,21 @@ const TABS = [
 export default function CommunityPage({
   view,
 }: {
-  view: "discover" | "members" | "profile" | "feed" | "leaderboards" | "achievements" | "events";
+  view:
+    | "discover"
+    | "members"
+    | "profile"
+    | "feed"
+    | "leaderboards"
+    | "achievements"
+    | "events"
+    | "proposals"
+    | "proposal";
 }) {
   const t = useT();
   const { memberId } = useParams();
   if (view === "profile" && memberId) return <ProfilePage />;
+  if (view === "proposal") return <ProposalDetail />;
   return (
     <div className="ds-stack">
       <h1>{t("community:title")}</h1>
@@ -50,6 +63,7 @@ export default function CommunityPage({
         </>
       ) : null}
       {view === "events" ? <EventList /> : null}
+      {view === "proposals" ? <ProposalList /> : null}
     </div>
   );
 }

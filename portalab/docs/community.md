@@ -91,10 +91,42 @@ until unlocked; another member's achievements (`GET /api/v1/community/achievemen
 unlocked ones only, and only when that member's `progression` visibility allows this viewer (404
 otherwise). Quests show the viewer's own progress only; challenges are flagged `time_boxed` with their end.
 
+## Proposals, votes and participation (slice D)
+
+* **Proposals** (`community.propose`, active accounts; optionally limited by
+  `community.proposals.allowedRoles`): moderation is on by default — a proposal stays
+  `pending_moderation`, visible to its proposer and moderators only, until a moderator approves it
+  (`community.moderate`, audited, `community.proposal_moderated`). The Markdown body is sanitized (011).
+  The proposer may edit until the proposal is open, withdraw it, and ask for help (`help_wanted`).
+  A `project` proposal registers its lifecycle in Marketplace (015) and shows the state and public funding
+  summary read from there; funding happens in Marketplace's flow (`/projects/{id}`). `project.created` is
+  emitted once, when the proposal becomes visible. Support (016) converts feedback through
+  `community.proposals.create`, keeping `provenance_ref` (idempotent).
+* **Votes** — one free up-vote of support per **active account** (an invariant, not a configurable
+  permission; allow-listed in the permission matrix), no minimum level; retract and re-cast while the
+  lifecycle accepts votes (idea, proposal, open; `community.voting_closed` otherwise). Counts are public;
+  who voted is private (each member sees their own vote). Voting never funds and funding is never a vote.
+* **Participation** (`community.participate`) as contributor, tester or helper. The proposer or a
+  moderator **recognizes** a participation once (`community.self_recognition`,
+  `community.already_recognized`; at most `community.recognition.maxPerDay` per recognizer and one per
+  recognizer → member pair every `community.recognition.pairCooldownDays` days —
+  `community.recognition_limit`). It emits `community.contribution_recognized` (dedup participation), with
+  the recognized member as actor, so a 013 reward rule credits **them**:
+
+```json
+{"event_type": "community.contribution_recognized", "grants": [{"value": "contribution", "amount": 10}]}
+```
+
+* Proposers, current voters and participants are notified of `project.status_changed`
+  (`community.project`, coalesced per project). Discovery shows `projects` (open proposals, those asking
+  for help first); the dashboard widget `community.projects` lists them too.
+* Erasure removes votes (counts decremented), withdraws participations and detaches the proposer; the
+  proposal content stays with the community.
+
 ## Settings
 
 `community.feed.eventTypes`, `community.feed.retentionDays`, `community.members.listingDefault`,
-`community.proposals.moderation`, `community.recognition.maxPerDay`,
+`community.proposals.moderation`, `community.proposals.allowedRoles`, `community.recognition.maxPerDay`,
 `community.recognition.pairCooldownDays`, `community.discovery.shelfSize`.
 
 ## API
@@ -107,6 +139,10 @@ otherwise). Quests show the viewer's own progress only; challenges are flagged `
 | `GET /api/v1/community/discovery` · `GET …/discovery/{shelf}` | `community.read` |
 | `GET /api/v1/community/events[?start&end]` · `GET …/events/{id}` | `community.read` + audience |
 | `POST /api/v1/community/events` · `PATCH …/{id}` · `POST …/{id}/cancel` | `community.events.manage` |
+| `GET|POST /api/v1/community/proposals` · `GET|PATCH …/{id}` · `POST …/{id}/withdraw` · `PUT …/{id}/help` | `community.read` / `community.propose` (slice D) |
+| `POST|DELETE /api/v1/community/proposals/{id}/vote` | active-account invariant (`community.read` + active account) |
+| `GET …/{id}/participations` · `POST|DELETE …/{id}/participation` · `POST …/participations/{pid}/recognize` | `community.read` / `community.participate` (proposer or moderator to recognize) |
+| `GET /api/v1/admin/community/moderation` · `POST …/moderation/proposals/{id}/approve|reject` | `community.moderate` (audited) |
 | `GET /api/v1/community/achievements[?member]` · `GET /api/v1/community/quests` | `community.read`; delegated to 013 (slice C) |
 | `GET /api/v1/community/leaderboards` · `GET …/leaderboards/{metric}?period` · `GET /api/v1/community/me/position` | `community.read`; delegated to 013 (slice B) |
 
@@ -117,4 +153,4 @@ otherwise). Quests show the viewer's own progress only; challenges are flagged `
 | A | 22 | directory, profiles, feed, discovery, community events, widget `community.activity` |
 | B | 23 | leaderboards view (013 slice B) |
 | C | 24 | achievements and quests display (013 slice C) |
-| D | 25 | proposals, votes, participation and recognition, lifecycle display (015) |
+| D | 25 | proposals, votes, participation and recognition, moderation, lifecycle display (015) |

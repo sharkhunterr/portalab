@@ -209,3 +209,22 @@ async def co(harness: CoHarness, app: FastAPI) -> CoHarness:
     admin = Principal(user_id=harness.people["boss"])
     await harness.ev.full.authz.grants.assign_role(admin, harness.people["mona"], "moderator")
     return harness
+
+
+def with_marketplace(co: CoHarness) -> Any:
+    """Adds the real 015 lifecycle (``marketplace.project_lifecycle``) to the community harness."""
+    from portalab.capabilities.observability import ObservableRegistry as Observables
+    from portalab.modules.marketplace.module import MarketplaceModule
+
+    module = MarketplaceModule(
+        co.database,
+        co.ev.publisher,
+        co.ev.full.authz.audit,
+        co.module.capabilities,
+        co.ev.full.authz.engine,
+        clock=co.clock,
+        event_types=co.ev.types,
+        observables=Observables(),
+    )
+    module.register()
+    return module

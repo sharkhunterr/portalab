@@ -16,6 +16,7 @@ from portalab.capabilities import (
     health,
     i18n,
     identity_directory,
+    marketplace,
     media,
     media_core,
     notifications,
@@ -64,6 +65,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *content.SPECS,
     *ai.SPECS,
     *economy.SPECS,
+    *marketplace.SPECS,
     *campaigns.SPECS,
     themes.SPEC,
 )

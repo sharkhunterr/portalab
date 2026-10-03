@@ -59,6 +59,10 @@ const Campaigns = lazy(() => import("../../features/campaigns/CampaignsPage"));
 const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
 const Progression = lazy(() => import("../../features/gamification/progression/ProgressionPage"));
 const Community = lazy(() => import("../../features/community/CommunityPage"));
+const ModerationQueue = lazy(() => import("../../features/community/projects/ModerationQueue"));
+const Projects = lazy(() => import("../../features/marketplace/projects/ProjectsPage"));
+const Project = lazy(() => import("../../features/marketplace/projects/ProjectRoute"));
+const ProjectConsole = lazy(() => import("../../features/marketplace/admin/ProjectConsole"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -88,6 +92,18 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
         {
+          path: "projects",
+          handle: h({ crumb: "Projects", requiredPermission: "marketplace.read" }),
+          children: [
+            { index: true, element: <Projects /> },
+            {
+              path: ":projectId",
+              element: <Project />,
+              handle: h({ crumb: "Project", existenceSensitive: true }),
+            },
+          ],
+        },
+        {
           path: "community",
           handle: h({ crumb: "Community", requiredPermission: "community.read" }),
           children: [
@@ -110,6 +126,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Achievements" }),
             },
             { path: "events", element: <Community view="events" />, handle: h({ crumb: "Events" }) },
+            { path: "proposals", element: <Community view="proposals" />, handle: h({ crumb: "Proposals" }) },
+            {
+              path: "proposals/:proposalId",
+              element: <Community view="proposal" />,
+              handle: h({ crumb: "Proposal", existenceSensitive: true }),
+            },
           ],
         },
         {
@@ -266,6 +288,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
+            { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
+            {
+              path: "community/moderation",
+              element: <ModerationQueue />,
+              handle: h({ crumb: "Moderation" }),
+            },
             { path: "automations/:id", element: <Automations />, handle: h({ crumb: "Automation" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },

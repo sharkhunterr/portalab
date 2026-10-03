@@ -1,0 +1,25 @@
+.project-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-timeline {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-timeline li[aria-current="step"] {
+  font-weight: 600;
+}
+
+.project-notice {
+  border-inline-start: 4px solid var(--color-border-strong, currentColor);
+  padding-inline-start: 0.75rem;
+}

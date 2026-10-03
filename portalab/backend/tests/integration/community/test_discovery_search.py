@@ -1,6 +1,6 @@
-"""012 T011 — discovery shelves (new members, recent unlocks, activity highlights) are bound by the same
-visibility as their source surface; an empty shelf offers a next action; unpermitted or private items never
-surface; one failing shelf degrades alone."""
+"""012 T011 — discovery shelves (new members, projects, recent unlocks, activity highlights) are bound by
+the same visibility as their source surface; an empty shelf offers a next action; unpermitted or private
+items never surface; one failing shelf degrades alone."""
 
 from datetime import timedelta
 
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.integration
 async def test_shelves(co: CoHarness, client: AsyncClient) -> None:
     await login(client, "ulrich")
     listed = (await client.get("/api/v1/community/discovery")).json()
-    assert [s["key"] for s in listed] == ["new_members", "recent_unlocks", "activity_highlights"]
+    assert [s["key"] for s in listed] == ["new_members", "projects", "recent_unlocks", "activity_highlights"]
     unlocks = (await client.get("/api/v1/community/discovery/recent_unlocks")).json()
     assert unlocks["state"] == "no-data" and unlocks["items"] == [] and unlocks["empty_action"]
 
