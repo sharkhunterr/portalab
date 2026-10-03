@@ -1,0 +1,28 @@
+{
+  "title": "Campaign ending soon",
+  "description": "Remind members a campaign ends soon.",
+  "definition": {
+    "name": "Campaign ending soon",
+    "trigger": {
+      "kind": "event",
+      "event_type": "campaign.ending_soon"
+    },
+    "steps": [
+      {
+        "id": "remind",
+        "action": "communication.produce",
+        "params": {
+          "category": "automations.message",
+          "template_key": "automations:notify.message",
+          "audience": {
+            "type": "all"
+          },
+          "dedup_key": "campaign-ending:${event.campaign}:${event.occurrence}",
+          "params": {
+            "text": "${event.campaign} ends soon"
+          }
+        }
+      }
+    ]
+  }
+}

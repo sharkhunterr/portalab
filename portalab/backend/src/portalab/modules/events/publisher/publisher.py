@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.core.authz_port import Principal
-from portalab.core.event_port import DEFAULT_SOURCE, PublishResult, SubjectRef
+from portalab.core.event_port import DEFAULT_SOURCE, PublishResult, SubjectRef, current_provenance
 from portalab.core.ids import new_id
 from portalab.core.logging import get_correlation_id
 from portalab.core.time import Clock, require_aware, utc_now
@@ -123,7 +123,7 @@ class EventStorePublisher:
                 subject_type=subject.kind if subject else None,
                 subject_id=subject.id if subject else None,
                 payload=checked.payload,
-                provenance=dict(provenance or {}),
+                provenance={**(current_provenance() or {}), **dict(provenance or {})},
                 correlation_id=get_correlation_id(),
                 visibility_class=registered.visibility_class,
             )

@@ -1,0 +1,33 @@
+{
+  "title": "Weekly digest",
+  "description": "Every Monday morning, invite members to read the news.",
+  "definition": {
+    "name": "Weekly digest",
+    "trigger": {
+      "kind": "recurring",
+      "schedule": {
+        "frequency": "weekly",
+        "weekday": 0,
+        "time": "09:00"
+      },
+      "timezone": "UTC"
+    },
+    "steps": [
+      {
+        "id": "digest",
+        "action": "communication.produce",
+        "params": {
+          "category": "automations.message",
+          "template_key": "automations:notify.message",
+          "audience": {
+            "type": "all"
+          },
+          "dedup_key": "weekly-digest:${automation.key}",
+          "params": {
+            "text": "This week's news is waiting for you."
+          }
+        }
+      }
+    ]
+  }
+}

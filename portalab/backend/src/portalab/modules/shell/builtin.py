@@ -258,6 +258,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "support.configure",
     },
     {
+        "key": "automations.admin",
+        "owner": "module:automations",
+        "kind": "entry",
+        "label_key": "nav.admin.automations",
+        "icon": "settings",
+        "route": "/admin/automations",
+        "group": "admin",
+        "order_hint": 47,
+        "required_permission": "automation.read",
+    },
+    {
         "key": "campaigns.list",
         "owner": "module:campaigns",
         "kind": "entry",

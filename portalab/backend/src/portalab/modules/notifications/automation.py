@@ -65,6 +65,8 @@ def register_action(send: Send, registry: ActionRegistry = default_actions) -> N
                 idempotency="dedup_key from the trigger: one communication per (source, dedup_key)",
                 run=run,
                 owner="module:notifications",
+                required=("category", "template_key", "audience", "dedup_key"),
+                ai_output_allowed=True,
                 params_schema={
                     "category": "string",
                     "template_key": "string",
@@ -72,6 +74,9 @@ def register_action(send: Send, registry: ActionRegistry = default_actions) -> N
                     "dedup_key": "string",
                     "kind": "notification|alert",
                     "priority": "low|normal|high|critical",
+                    "params": "object? (template values)",
+                    "action_url": "string? (in-portal route)",
+                    "rule": "string? (source reference)",
                 },
             )
         )

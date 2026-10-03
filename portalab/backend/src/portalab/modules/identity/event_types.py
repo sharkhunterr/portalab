@@ -7,7 +7,6 @@ OWNER = "module:identity"
 register_event_types(
     OWNER,
     "user.created",
-    "user.verified",
     "user.profile_updated",
     "user.deactivated",
     "user.reactivated",
@@ -22,6 +21,9 @@ register_event_types(
     "user.onboarding_completed",
     retention_class="business",
     visibility_class="private",
+)
+register_event_types(  # automations may welcome newly verified members (019)
+    OWNER, "user.verified", retention_class="business", visibility_class="private", automatable=True
 )
 register_event_types(
     OWNER, "user.signed_in", "user.signed_out", retention_class="technical", visibility_class="private"

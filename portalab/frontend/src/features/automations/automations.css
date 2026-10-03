@@ -1,0 +1,15 @@
+.automation-builder textarea,
+.automation-sample textarea {
+  inline-size: 100%;
+  font-family: monospace;
+}
+
+.automation-meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.automation-banner {
+  border-inline-start: 4px solid var(--color-border);
+  padding-inline-start: 0.5rem;
+}

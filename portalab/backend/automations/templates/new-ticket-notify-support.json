@@ -1,0 +1,29 @@
+{
+  "title": "New ticket to support",
+  "description": "Tell the support team when a ticket is opened.",
+  "definition": {
+    "name": "New tickets to support",
+    "trigger": {
+      "kind": "event",
+      "event_type": "ticket.created"
+    },
+    "steps": [
+      {
+        "id": "notify",
+        "action": "communication.produce",
+        "params": {
+          "category": "automations.message",
+          "template_key": "automations:notify.message",
+          "audience": {
+            "type": "permission",
+            "permission": "tickets.manage"
+          },
+          "dedup_key": "new-ticket:${event.ticket}",
+          "params": {
+            "text": "New ${event.type} ticket (${event.priority})"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "title": "Welcome on verification",
+  "description": "Welcome members when their account is verified.",
+  "definition": {
+    "name": "Welcome new members",
+    "trigger": {
+      "kind": "event",
+      "event_type": "user.verified"
+    },
+    "steps": [
+      {
+        "id": "welcome",
+        "action": "communication.produce",
+        "params": {
+          "category": "automations.message",
+          "template_key": "automations:notify.message",
+          "audience": {
+            "type": "users",
+            "ids": [
+              "${subject.id}"
+            ]
+          },
+          "dedup_key": "welcome:${subject.id}",
+          "params": {
+            "text": "Welcome to the portal!"
+          }
+        }
+      }
+    ]
+  }
+}

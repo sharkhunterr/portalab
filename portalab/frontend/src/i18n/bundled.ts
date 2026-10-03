@@ -1,4 +1,5 @@
 import ai from "../../../backend/locales/en/ai.json";
+import automations from "../../../backend/locales/en/automations.json";
 import calendar from "../../../backend/locales/en/calendar.json";
 import campaigns from "../../../backend/locales/en/campaigns.json";
 import content from "../../../backend/locales/en/content.json";
@@ -22,6 +23,7 @@ import wiki from "../../../backend/locales/en/wiki.json";
  */
 export const BUNDLED: Record<string, Record<string, string>> = {
   ai,
+  automations,
   calendar,
   campaigns,
   content,

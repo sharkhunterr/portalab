@@ -2,6 +2,7 @@
   "nav.account": "Account",
   "nav.admin.ai": "Assistant settings",
   "nav.admin.audit": "Audit",
+  "nav.admin.automations": "Automations",
   "nav.admin.campaigns": "Campaigns",
   "nav.admin.configuration": "Configuration",
   "nav.admin.control_center": "Control Center",

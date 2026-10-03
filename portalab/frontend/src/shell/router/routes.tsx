@@ -53,6 +53,7 @@ const FeedbackReview = lazy(() => import("../../features/support/feedback/Review
 const FeedbackPage = lazy(() => import("../../features/support/feedback/FeedbackPage"));
 const SupportDefinitions = lazy(() => import("../../features/support/admin/Definitions"));
 const AiAdmin = lazy(() => import("../../features/ai/admin/AiAdminPage"));
+const Automations = lazy(() => import("../../features/automations/AutomationsPage"));
 const CampaignConsole = lazy(() => import("../../features/campaigns/console/CampaignConsole"));
 const Campaigns = lazy(() => import("../../features/campaigns/CampaignsPage"));
 const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
@@ -238,6 +239,8 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant settings" }) },
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
+            { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
+            { path: "automations/:id", element: <Automations />, handle: h({ crumb: "Automation" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },

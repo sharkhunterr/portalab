@@ -7,6 +7,7 @@ available** — the facades other specs consume: ``search.assistant`` (008), ``s
 (016), ``ai.invoke`` (019) and, when configured, ``search.embedding`` (008). When the assistant is off or
 unconfigured they are withdrawn, so every consumer falls back to its classic path."""
 
+from collections.abc import Mapping
 from dataclasses import replace
 from datetime import timedelta
 from typing import Any
@@ -14,6 +15,7 @@ from typing import Any
 import httpx
 
 from portalab.capabilities.ai import INVOKE, AIToolRegistry, LLMProvider, default_ai_tools
+from portalab.capabilities.automation_actions import ActionRegistry, ActionType, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.i18n import RESOLVER
@@ -24,7 +26,7 @@ from portalab.capabilities.retention import RetentionTarget, default_retention_t
 from portalab.capabilities.search import ASSISTANT, EMBEDDING, SearchRegistry, default_search
 from portalab.capabilities.support import DIAGNOSIS
 from portalab.core.audit_port import AuditSink
-from portalab.core.authz_port import Authorizer
+from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
@@ -70,7 +72,9 @@ class AiModule:
         event_types: EventTypeRegistry = default_event_types,
         search: SearchRegistry = default_search,
         navigation: NavigationRegistry = default_navigation,
+        actions: ActionRegistry = default_actions,
     ) -> None:
+        self.actions = actions
         self.database = database
         self.capabilities = capabilities
         self.clock = clock
@@ -160,6 +164,28 @@ class AiModule:
             )
         )
         self.sync_facades()
+        if self.actions.get("ai.invoke") is None:
+            invoker = self.facades[INVOKE]
+
+            async def run(params: Mapping[str, Any], principal: Principal) -> Mapping[str, Any]:
+                text = await invoker.invoke(
+                    str(params["instruction"])[:4000],
+                    principal,
+                    max_tokens=int(params.get("max_tokens", 400)),
+                )
+                return {"text": text}
+
+            self.actions.register(
+                ActionType(
+                    key="ai.invoke",
+                    description="Draft, summarize or classify text with the assistant (assist only)",
+                    permission="ai.use",
+                    idempotency="no side effect: produces text for later steps",
+                    run=run,
+                    owner=OWNER,
+                    params_schema={"instruction": "string", "max_tokens": "integer?"},
+                )
+            )
 
     def sync_facades(self) -> None:
         """Facades exist only while the assistant can answer; consumers then use their classic paths."""

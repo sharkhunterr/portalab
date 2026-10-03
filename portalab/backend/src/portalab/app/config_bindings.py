@@ -84,7 +84,7 @@ async def refresh(platform: Any) -> None:
     notifications = getattr(platform, "notifications", None)
     if notifications is not None:
         await notifications.refresh_config()
-    for name in ("content", "wiki", "news", "calendar", "ai", "gamification", "campaigns"):
+    for name in ("content", "wiki", "news", "calendar", "ai", "gamification", "campaigns", "automations"):
         module = getattr(platform, name, None)
         if module is not None:
             await module.refresh_config()
@@ -136,5 +136,6 @@ def bind(platform: Any) -> None:
         "ai.",
         "economy.",
         "campaigns.",
+        "automations.",
     ):
         platform.administration.config.on_change(prefix, on_change)

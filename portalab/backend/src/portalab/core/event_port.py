@@ -9,7 +9,9 @@ The Events module (spec 007) provides the real implementation of :class:`EventPu
 history store, consumers) and drains this outbox; until then :class:`OutboxEventPublisher` is the adapter.
 """
 
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Protocol
@@ -29,6 +31,21 @@ from portalab.core.privacy_registry import pii
 from portalab.core.time import Clock, require_aware, utc_now
 
 DEFAULT_SOURCE = "portalab"
+_PROVENANCE: ContextVar[Mapping[str, Any] | None] = ContextVar("portalab_event_provenance", default=None)
+
+
+def current_provenance() -> Mapping[str, Any] | None:
+    """Provenance merged into every event published in this context (e.g. ``automation``, spec 019)."""
+    return _PROVENANCE.get()
+
+
+@contextmanager
+def provenance_scope(value: Mapping[str, Any]) -> Iterator[None]:
+    token = _PROVENANCE.set({**(_PROVENANCE.get() or {}), **value})
+    try:
+        yield
+    finally:
+        _PROVENANCE.reset(token)
 
 
 @dataclass(frozen=True, slots=True)

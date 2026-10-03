@@ -1,0 +1,33 @@
+{
+  "title": "Campaign start announcement",
+  "description": "Announce a campaign to everyone when it starts.",
+  "definition": {
+    "name": "Announce campaigns",
+    "trigger": {
+      "kind": "event",
+      "event_type": "campaign.started"
+    },
+    "steps": [
+      {
+        "id": "announce",
+        "action": "communication.produce",
+        "params": {
+          "category": "campaigns.announcement",
+          "template_key": "campaigns:notify.announcement",
+          "audience": {
+            "type": "all"
+          },
+          "dedup_key": "campaign-start:${event.campaign}:${event.occurrence}",
+          "params": {
+            "campaign": "${event.campaign}",
+            "message": ""
+          }
+        }
+      }
+    ],
+    "limits": {
+      "dedup_key": "${event.campaign}:${event.occurrence}",
+      "dedup_window_s": 86400
+    }
+  }
+}

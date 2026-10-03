@@ -1,0 +1,45 @@
+{
+  "title": "Incident for a service outage",
+  "description": "Declare an incident when a service becomes unavailable (approval-gated).",
+  "definition": {
+    "name": "Service outage incident",
+    "trigger": {
+      "kind": "event",
+      "event_type": "service.status_changed",
+      "filter": [
+        {
+          "field": "to_state",
+          "op": "in",
+          "value": [
+            "unavailable",
+            "error"
+          ]
+        }
+      ]
+    },
+    "steps": [
+      {
+        "id": "review",
+        "action": "approval.request",
+        "params": {
+          "summary": "Declare an incident for service ${event.service_id}?"
+        }
+      },
+      {
+        "id": "declare",
+        "action": "incident.create",
+        "params": {
+          "title": "Service ${event.service_id} unavailable",
+          "severity": "major",
+          "service_ids": [
+            "${event.service_id}"
+          ],
+          "dedup_key": "outage:${event.service_id}:${event.state_seq}"
+        }
+      }
+    ],
+    "limits": {
+      "cooldown_s": 3600
+    }
+  }
+}
