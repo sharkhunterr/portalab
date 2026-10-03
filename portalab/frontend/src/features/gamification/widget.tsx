@@ -2,6 +2,8 @@ import { Link } from "react-router";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
+import { toQuestItem } from "./api";
+import { QuestList } from "./quests/QuestList";
 
 /** Dashboard widget ``gamification.progress`` (spec 013 T030): level and the three values, separately. */
 function ProgressWidget({ payload }: WidgetProps) {
@@ -25,3 +27,11 @@ function ProgressWidget({ payload }: WidgetProps) {
 }
 
 registerWidgetComponent("gamification.progress", ProgressWidget);
+
+/** Dashboard widget ``gamification.daily_objectives`` (spec 013 T039): today's daily objectives. */
+function DailyObjectivesWidget({ payload }: WidgetProps) {
+  const items = ((payload.data ?? {}) as { items?: Parameters<typeof toQuestItem>[0][] }).items ?? [];
+  return <QuestList quests={items.map(toQuestItem)} />;
+}
+
+registerWidgetComponent("gamification.daily_objectives", DailyObjectivesWidget);

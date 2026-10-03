@@ -103,6 +103,39 @@ class ProgressWidget:
         )
 
 
+DAILY_WIDGET = WidgetDefinition(
+    key="gamification.daily_objectives",
+    owner=OWNER,
+    title_key="gamification:widget.daily.title",
+    description_key="gamification:widget.daily.description",
+    icon="target",
+    required_permission=READ,
+    size=SizeLimits(default=Size(4, 2), min=Size(3, 2), max=Size(6, 4)),
+    refresh=Refresh(mode="event", events=("quest.completed", "reward.granted")),
+    stale_after_s=900,
+    component_id="gamification.daily_objectives",
+)
+
+
+class DailyObjectivesWidget:
+    """Today's daily objectives of the viewer, with step progress (own data only)."""
+
+    def __init__(self, quests: Any, clock: Clock | None = None) -> None:
+        self.quests = quests
+        self.clock = clock
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        user = principal.acting_for or principal.user_id
+        if user is None:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        items = await self.quests.mine(user, kinds=("daily",))
+        if not items:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
+
+
 def progression_tool(progression: ProgressionService, clock: Clock | None = None) -> AITool:
     async def handler(principal: Principal, params: Mapping[str, Any]) -> ToolResult:
         user = principal.acting_for or principal.user_id
@@ -197,3 +230,21 @@ def register_actions(rewards: RewardServiceImpl, registry: ActionRegistry) -> No
                 params_schema={"user": "uuid", "achievement": "string"},
             )
         )
+
+
+class CatalogFacade:
+    """``economy.catalog`` (slice C): 013's own achievement and quest views for presentation surfaces."""
+
+    def __init__(self, achievements: Any, progression: ProgressionService, quests: Any) -> None:
+        self.achievements = achievements
+        self.progression = progression
+        self.quests = quests
+
+    async def achievements_of(self, user_id: UUID) -> list[dict[str, Any]]:
+        return list(await self.achievements.progress(user_id))
+
+    async def unlocked_of(self, user_id: UUID, limit: int = 50) -> list[dict[str, str]]:
+        return await self.progression.achievement_list(user_id, limit)
+
+    async def quests_of(self, user_id: UUID) -> list[dict[str, Any]]:
+        return list(await self.quests.mine(user_id))

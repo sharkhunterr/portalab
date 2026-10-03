@@ -13,6 +13,7 @@ OWN_TYPES = frozenset(
         "reward.granted",
         "user.level_up",
         "achievement.unlocked",
+        "quest.completed",
         "economy.coins_spent",
         "economy.coins_refunded",
         "economy.coins_destroyed",
@@ -38,6 +39,12 @@ class AchievementUnlocked(BaseModel):
     achievement: str
 
 
+class QuestCompleted(BaseModel):
+    quest: str
+    kind: str
+    period: str
+
+
 class CoinsMoved(BaseModel):
     amount: int
     source: str
@@ -57,6 +64,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
         ("reward.granted", RewardGranted, frozenset({"value", "amount", "source"}), "private"),
         ("user.level_up", LevelUp, frozenset({"level"}), "community"),
         ("achievement.unlocked", AchievementUnlocked, frozenset({"achievement"}), "community"),
+        ("quest.completed", QuestCompleted, frozenset({"quest", "kind"}), "community"),
         ("economy.coins_spent", CoinsMoved, frozenset({"amount", "source"}), "private"),
         ("economy.coins_refunded", CoinsMoved, frozenset({"amount", "source"}), "private"),
         ("economy.coins_destroyed", CoinsMoved, frozenset({"amount"}), "restricted"),
@@ -71,7 +79,8 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     schema=schema,
                     open_payload=False,
                     aggregatable=aggregatable,
-                    automatable=name in ("user.level_up", "achievement.unlocked", "reward.granted"),
+                    automatable=name
+                    in ("user.level_up", "achievement.unlocked", "quest.completed", "reward.granted"),
                     visibility_class=visibility,  # type: ignore[arg-type]
                 )
             )

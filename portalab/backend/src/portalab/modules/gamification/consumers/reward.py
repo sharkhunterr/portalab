@@ -78,6 +78,7 @@ class RewardPipeline:
         self.anomalies = anomalies
         self.achievements = achievements
         self.notifier = notifier
+        self.quests: Any = None  # slice C: set by the module (``Quests``)
         self.config = config
         self.clock = clock
 
@@ -92,7 +93,11 @@ class RewardPipeline:
         if envelope.type in OWN_TYPES:
             return outcome
         rules = await self.rules.in_force(envelope.type, envelope.occurred_at)
-        if not rules and not await self.achievements.tracks(envelope.type, envelope.occurred_at):
+        if (
+            not rules
+            and not await self.achievements.tracks(envelope.type, envelope.occurred_at)
+            and not (self.quests and await self.quests.tracks(envelope.type, envelope.occurred_at))
+        ):
             return outcome
         user = recipient(envelope)
         if user is None:
@@ -115,6 +120,8 @@ class RewardPipeline:
                 if matches(rule.definition.predicate, envelope.payload):
                     await self._apply(session, user, rule, envelope, outcome)
             outcome.notes.extend(await self.achievements.on_event(session, user, envelope))
+            if self.quests is not None:
+                outcome.notes.extend(await self.quests.on_event(session, user, envelope))
         for flag in outcome.flags:
             await self.anomalies.escalate(flag)
         await self.notifier.send(outcome.notes)

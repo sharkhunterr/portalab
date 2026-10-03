@@ -4,6 +4,7 @@ import { AchievementGrid } from "../achievements/Grid";
 import { useAchievements, useProgression } from "../api";
 import { History } from "../history/History";
 import { LeaderboardPanel } from "../leaderboards/LeaderboardPanel";
+import { QuestPanel } from "../quests/QuestPanel";
 import { ProgressionCard } from "./ProgressionCard";
 import "../gamification.css";
 
@@ -18,6 +19,7 @@ export default function ProgressionPage() {
       {progression.isError ? <FunctionalState state="unavailable" /> : null}
       {progression.data ? <ProgressionCard progression={progression.data} /> : null}
       {achievements.data?.length ? <AchievementGrid achievements={achievements.data} /> : null}
+      <QuestPanel />
       <LeaderboardPanel />
       <History />
     </div>

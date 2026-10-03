@@ -2070,6 +2070,28 @@
         "title": "ChannelStateOut",
         "type": "object"
       },
+      "CommunityCatalogOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "items"
+        ],
+        "title": "CommunityCatalogOut",
+        "type": "object"
+      },
       "CommunityEventOut": {
         "properties": {
           "all_day": {
@@ -6909,6 +6931,21 @@
           "job_id"
         ],
         "title": "PurgeOut",
+        "type": "object"
+      },
+      "QuestIn": {
+        "additionalProperties": false,
+        "properties": {
+          "definition": {
+            "additionalProperties": true,
+            "title": "Definition",
+            "type": "object"
+          }
+        },
+        "required": [
+          "definition"
+        ],
+        "title": "QuestIn",
         "type": "object"
       },
       "RegisterRequest": {
@@ -13319,6 +13356,119 @@
         ]
       }
     },
+    "/api/v1/admin/gamification/quests": {
+      "get": {
+        "operationId": "list_quests_api_v1_admin_gamification_quests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Quests Api V1 Admin Gamification Quests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Quests",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/quests/{key}": {
+      "delete": {
+        "operationId": "retire_quest_api_v1_admin_gamification_quests__key__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retire Quest",
+        "tags": [
+          "gamification-admin"
+        ]
+      },
+      "put": {
+        "operationId": "save_quest_api_v1_admin_gamification_quests__key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Quest Api V1 Admin Gamification Quests  Key  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Quest",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
     "/api/v1/admin/gamification/rules": {
       "get": {
         "operationId": "list_rules_api_v1_admin_gamification_rules_get",
@@ -18070,6 +18220,56 @@
         ]
       }
     },
+    "/api/v1/community/achievements": {
+      "get": {
+        "operationId": "community_achievements_api_v1_community_achievements_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "member",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCatalogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Community Achievements",
+        "tags": [
+          "community"
+        ]
+      }
+    },
     "/api/v1/community/discovery": {
       "get": {
         "operationId": "shelves_api_v1_community_discovery_get",
@@ -18765,6 +18965,27 @@
           }
         },
         "summary": "Profile Section",
+        "tags": [
+          "community"
+        ]
+      }
+    },
+    "/api/v1/community/quests": {
+      "get": {
+        "operationId": "community_quests_api_v1_community_quests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCatalogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Community Quests",
         "tags": [
           "community"
         ]
@@ -22211,6 +22432,32 @@
         ]
       }
     },
+    "/api/v1/me/quests": {
+      "get": {
+        "operationId": "my_quests_api_v1_me_quests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response My Quests Api V1 Me Quests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Quests",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
     "/api/v1/me/search-history": {
       "delete": {
         "operationId": "clear_history_api_v1_me_search_history_delete",
@@ -23275,6 +23522,32 @@
         "summary": "Remove Policy",
         "tags": [
           "privacy"
+        ]
+      }
+    },
+    "/api/v1/quests/catalog": {
+      "get": {
+        "operationId": "quest_catalog_api_v1_quests_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Quest Catalog Api V1 Quests Catalog Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Quest Catalog",
+        "tags": [
+          "gamification"
         ]
       }
     },

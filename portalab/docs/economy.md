@@ -111,6 +111,32 @@ own position. Erasure drops the user from every snapshot at once.
 `GET /api/v1/me/leaderboard-position?metric&period`. Presentation surfaces (Community 012) use the
 `economy.leaderboards` capability (`LeaderboardReader.board(viewer, metric, period)`).
 
+## Quests, daily objectives and challenges (slice C)
+
+```json
+{"kind": "daily", "label": "Listen today", "period": "day",
+ "steps": [{"kind": "event_count", "event_type": "media.played", "count": 1}],
+ "rewards": [{"value": "coins", "amount": 10}]}
+```
+
+* `quest` — steps over event counts, once (`period: none`) or each `week`;
+* `daily` — a daily objective (`period: day`, or `week` for weekly objectives), reset each period;
+* `challenge` — a **time-boxed quest** (OQ-62 default): a `window` (`starts_at`, `ends_at`) is required and
+  only events inside it count.
+
+Steps reuse the achievements' closed `event_count` criterion (with its `filter`). Periods are computed from
+the event's `occurred_at` in `economy.timezone` (local calendar days and ISO weeks — DST-safe), so replays
+and late events land in the period they happened in. Completion happens **once per (user, quest,
+period)**; rewards go through the ledger (`source_kind` = `quest|daily|challenge`, idempotency
+`quest:<user>:<key>:<period>:<value>`) and `quest.completed` (`quest`, `kind`, `period`; automatable,
+community visibility) is emitted with the same dedup. Campaign quests come from 014 (`DefinitionSource`
+offering `quests(at)`) and count only while the campaign is active.
+
+`GET /api/v1/me/quests` (own progress) · `GET /api/v1/quests/catalog` (`gamification.read`) ·
+`GET|PUT|DELETE /api/v1/admin/gamification/quests[/{key}]` (`gamification.manage`, audited). Widget
+`gamification.daily_objectives`. Presentation surfaces read `economy.catalog` (`achievements_of`,
+`unlocked_of`, `quests_of`).
+
 ## Privacy
 
 Progression is the datum class `progression` (default private; the owner chooses its visibility, 021):

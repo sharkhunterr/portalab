@@ -12,7 +12,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
-from portalab.capabilities.economy import ECONOMY, LEADERBOARDS, REWARDS
+from portalab.capabilities.economy import CATALOG, ECONOMY, LEADERBOARDS, REWARDS
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -49,7 +49,10 @@ from portalab.modules.gamification.consumers.reward import CONSUMER, RewardPipel
 from portalab.modules.gamification.economy.service import EconomyServiceImpl
 from portalab.modules.gamification.events import register_event_types
 from portalab.modules.gamification.integrations import (
+    DAILY_WIDGET,
     PROGRESS_WIDGET,
+    CatalogFacade,
+    DailyObjectivesWidget,
     ProgressionPreferences,
     ProgressWidget,
     register_actions,
@@ -68,6 +71,7 @@ from portalab.modules.gamification.notify import CATEGORIES, Notifier
 from portalab.modules.gamification.observability import log
 from portalab.modules.gamification.privacy.participant import GamificationParticipant
 from portalab.modules.gamification.progression.service import ProgressionService
+from portalab.modules.gamification.quests.service import Quests
 from portalab.modules.gamification.rules.store import RuleStore
 from portalab.modules.gamification.settings import SETTINGS, EconomyConfig
 from portalab.modules.gamification.verify.verifier import verify
@@ -146,6 +150,8 @@ class GamificationModule:
             config,
             clock=clock,
         )
+        self.quests = Quests(database, self.writer, events, audit, capabilities, config, clock=clock)
+        self.pipeline.quests = self.quests
         self.progression = ProgressionService(database, self.levels)
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock
@@ -161,6 +167,7 @@ class GamificationModule:
             (PROGRESSION, self.progression),
             (CONTRIBUTIONS, self.rewards),
             (LEADERBOARDS, self.leaderboards),
+            (CATALOG, CatalogFacade(self.achievements, self.progression, self.quests)),
         ):
             if not self.capabilities.system_providers(name):
                 self.capabilities.provide(name, provider, instance_ref=INSTANCE, owner=OWNER)
@@ -196,6 +203,8 @@ class GamificationModule:
         )
         if self.widgets.get(PROGRESS_WIDGET.key) is None:
             self.widgets.register(PROGRESS_WIDGET, ProgressWidget(self.progression, self.clock), owner=OWNER)
+        if self.widgets.get(DAILY_WIDGET.key) is None:
+            self.widgets.register(DAILY_WIDGET, DailyObjectivesWidget(self.quests, self.clock), owner=OWNER)
         register_tools(self.tools, self.progression, self.clock)
         register_actions(self.rewards, self.actions)
         self.observables.declare(

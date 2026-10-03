@@ -46,6 +46,7 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock
 from portalab.core.visibility_port import OwnerOnlyVisibility, VisibilityFilter
 from portalab.modules.community import permissions as _permissions  # noqa: F401 — declares permissions
+from portalab.modules.community.achievements.view import AchievementsView
 from portalab.modules.community.discovery.providers import MemberSearchProvider
 from portalab.modules.community.discovery.shelves import register_builtin_shelves
 from portalab.modules.community.events.service import CommunityEvents
@@ -61,6 +62,7 @@ from portalab.modules.community.preferences import CLASSES, CommunityPreferences
 from portalab.modules.community.privacy.participant import CommunityParticipant
 from portalab.modules.community.profiles.assembler import ProfileAssembler
 from portalab.modules.community.profiles.builtin import register_builtin_sections
+from portalab.modules.community.quests.view import QuestsView
 from portalab.modules.community.settings import SETTINGS, CommunityConfig
 
 OWNER = "module:community"
@@ -108,6 +110,8 @@ class CommunityModule:
         )
         self.profiles = ProfileAssembler(sections, self.visibility, authorizer)
         self.leaderboards = LeaderboardsView(capabilities, self.display_name)
+        self.achievements = AchievementsView(capabilities, self.visibility)
+        self.quests = QuestsView(capabilities)
         self.events = CommunityEvents(database, audit, events, authorizer, capabilities, clock=clock)
 
     async def display_name(self, user: UUID) -> str | None:

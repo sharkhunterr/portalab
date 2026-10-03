@@ -83,6 +83,14 @@ visibility all come from the `economy.leaderboards` provider; Community only add
 viewer's own position is always shown (`GET /api/v1/community/me/position`). When 013 is absent or failing
 the view answers `state: "unavailable"` and the page keeps working.
 
+## Achievements and quests (slice C)
+
+`/community/achievements` shows 013's achievements and the viewer's own quests through `economy.catalog` —
+Community stores no definition and no reward logic. Hidden achievements reveal nothing (not even a label)
+until unlocked; another member's achievements (`GET /api/v1/community/achievements?member=<id>`) list
+unlocked ones only, and only when that member's `progression` visibility allows this viewer (404
+otherwise). Quests show the viewer's own progress only; challenges are flagged `time_boxed` with their end.
+
 ## Settings
 
 `community.feed.eventTypes`, `community.feed.retentionDays`, `community.members.listingDefault`,
@@ -99,6 +107,7 @@ the view answers `state: "unavailable"` and the page keeps working.
 | `GET /api/v1/community/discovery` · `GET …/discovery/{shelf}` | `community.read` |
 | `GET /api/v1/community/events[?start&end]` · `GET …/events/{id}` | `community.read` + audience |
 | `POST /api/v1/community/events` · `PATCH …/{id}` · `POST …/{id}/cancel` | `community.events.manage` |
+| `GET /api/v1/community/achievements[?member]` · `GET /api/v1/community/quests` | `community.read`; delegated to 013 (slice C) |
 | `GET /api/v1/community/leaderboards` · `GET …/leaderboards/{metric}?period` · `GET /api/v1/community/me/position` | `community.read`; delegated to 013 (slice B) |
 
 ## Slice map

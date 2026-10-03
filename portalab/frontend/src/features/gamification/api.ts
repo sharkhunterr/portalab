@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import type { QuestItem } from "./quests/QuestList";
 
 /** Gamification & economy API hooks (spec 013): progression, history, achievements and administration. */
 export type Progression = components["schemas"]["ProgressionOut"];
@@ -213,5 +214,37 @@ export function useLeaderboard(metric: string, period: "all" | "month" | "week")
           params: { path: { metric }, query: { period } },
         })
       ).data as LeaderboardBoard,
+  });
+}
+
+interface QuestOut {
+  key: string;
+  kind: string;
+  label: string;
+  description?: string;
+  ends_at?: string | null;
+  completed_at?: string | null;
+  steps?: Array<{ current: number; target: number }>;
+  rewards?: Array<{ value: string; amount: number }>;
+}
+
+export function toQuestItem(quest: QuestOut): QuestItem {
+  return {
+    key: quest.key,
+    kind: quest.kind,
+    label: quest.label,
+    description: quest.description ?? null,
+    ends_at: quest.ends_at ?? null,
+    completed: Boolean(quest.completed_at),
+    steps: (quest.steps ?? []).map((s) => ({ current: s.current, target: s.target })),
+    rewards: quest.rewards ?? [],
+  };
+}
+
+export function useQuests() {
+  return useQuery({
+    queryKey: [...KEY, "quests"],
+    queryFn: async () =>
+      (((await api.GET("/api/v1/me/quests")).data ?? []) as unknown as QuestOut[]).map(toQuestItem),
   });
 }

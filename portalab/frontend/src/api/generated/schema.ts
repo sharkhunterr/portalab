@@ -869,6 +869,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/quests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Quests */
+        get: operations["list_quests_api_v1_admin_gamification_quests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gamification/quests/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save Quest */
+        put: operations["save_quest_api_v1_admin_gamification_quests__key__put"];
+        post?: never;
+        /** Retire Quest */
+        delete: operations["retire_quest_api_v1_admin_gamification_quests__key__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/rules": {
         parameters: {
             query?: never;
@@ -2485,6 +2520,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/community/achievements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Community Achievements */
+        get: operations["community_achievements_api_v1_community_achievements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/community/discovery": {
         parameters: {
             query?: never;
@@ -2683,6 +2735,23 @@ export interface paths {
         };
         /** Profile Section */
         get: operations["profile_section_api_v1_community_members__member_id__sections__name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/quests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Community Quests */
+        get: operations["community_quests_api_v1_community_quests_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3927,6 +3996,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/quests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Quests */
+        get: operations["my_quests_api_v1_me_quests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/search-history": {
         parameters: {
             query?: never;
@@ -4299,6 +4385,23 @@ export interface paths {
         post?: never;
         /** Remove Policy */
         delete: operations["remove_policy_api_v1_privacy_policies__policy_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quests/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Quest Catalog */
+        get: operations["quest_catalog_api_v1_quests_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6348,6 +6451,15 @@ export interface components {
             /** Mandatory */
             mandatory: boolean;
         };
+        /** CommunityCatalogOut */
+        CommunityCatalogOut: {
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** State */
+            state: string;
+        };
         /** CommunityEventOut */
         CommunityEventOut: {
             /** All Day */
@@ -8091,6 +8203,13 @@ export interface components {
             job_id: string;
             /** Service Id */
             service_id: string;
+        };
+        /** QuestIn */
+        QuestIn: {
+            /** Definition */
+            definition: {
+                [key: string]: unknown;
+            };
         };
         /** RegisterRequest */
         RegisterRequest: {
@@ -11328,6 +11447,94 @@ export interface operations {
             };
             /** @description authz.confirmation_required (carries `confirmation`) above the threshold */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_quests_api_v1_admin_gamification_quests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    save_quest_api_v1_admin_gamification_quests__key__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retire_quest_api_v1_admin_gamification_quests__key__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -14620,6 +14827,37 @@ export interface operations {
             };
         };
     };
+    community_achievements_api_v1_community_achievements_get: {
+        parameters: {
+            query?: {
+                member?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityCatalogOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     shelves_api_v1_community_discovery_get: {
         parameters: {
             query?: never;
@@ -15043,6 +15281,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    community_quests_api_v1_community_quests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityCatalogOut"];
                 };
             };
         };
@@ -17485,6 +17743,28 @@ export interface operations {
             };
         };
     };
+    my_quests_api_v1_me_quests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
     history_api_v1_me_search_history_get: {
         parameters: {
             query?: never;
@@ -18186,6 +18466,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quest_catalog_api_v1_quests_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
         };

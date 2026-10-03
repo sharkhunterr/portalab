@@ -1,5 +1,7 @@
 import { NavLink, useParams } from "react-router";
 import { useT } from "../../i18n/hooks/useT";
+import { QuestBoard } from "./achievements/QuestBoard";
+import { Showcase } from "./achievements/Showcase";
 import { DiscoveryHome } from "./discovery/DiscoveryHome";
 import { EventList } from "./events/EventList";
 import { Feed } from "./feed/Feed";
@@ -13,6 +15,7 @@ const TABS = [
   { to: "/community/members", key: "members", end: true },
   { to: "/community/feed", key: "feed", end: true },
   { to: "/community/leaderboards", key: "leaderboards", end: true },
+  { to: "/community/achievements", key: "achievements", end: true },
   { to: "/community/events", key: "events", end: true },
 ] as const;
 
@@ -20,7 +23,7 @@ const TABS = [
 export default function CommunityPage({
   view,
 }: {
-  view: "discover" | "members" | "profile" | "feed" | "leaderboards" | "events";
+  view: "discover" | "members" | "profile" | "feed" | "leaderboards" | "achievements" | "events";
 }) {
   const t = useT();
   const { memberId } = useParams();
@@ -40,6 +43,12 @@ export default function CommunityPage({
       {view === "members" ? <Directory /> : null}
       {view === "feed" ? <Feed /> : null}
       {view === "leaderboards" ? <LeaderboardPage /> : null}
+      {view === "achievements" ? (
+        <>
+          <Showcase />
+          <QuestBoard />
+        </>
+      ) : null}
       {view === "events" ? <EventList /> : null}
     </div>
   );

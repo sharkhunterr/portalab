@@ -201,6 +201,39 @@ async def retire_achievement(principal: Manager, key: str, module: Module) -> Re
     return Response(status_code=204)
 
 
+# --- quests (slice C) --------------------------------------------------------------------------------
+class QuestIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    definition: dict[str, Any]
+
+
+@router.get("/admin/gamification/quests")
+async def list_quests(_: Manager, module: Module) -> list[dict[str, Any]]:
+    return [
+        {
+            "key": q.key,
+            "version": q.version,
+            "definition": q.definition.model_dump(mode="json"),
+            "source": q.source_ref or "own",
+        }
+        for q in await module.quests.definitions(utc_now(module.clock))
+    ]
+
+
+@router.put("/admin/gamification/quests/{key}")
+async def save_quest(principal: Manager, key: str, body: QuestIn, module: Module) -> dict[str, Any]:
+    if not re.fullmatch(KEY, key) or len(key) > 96:
+        raise ValidationFailed("Invalid quest key.", code="economy.quest_invalid")
+    row = await module.quests.save(principal, key, body.definition)
+    return {"key": row.key, "version": row.version, "definition": row.definition}
+
+
+@router.delete("/admin/gamification/quests/{key}", status_code=204)
+async def retire_quest(principal: Manager, key: str, module: Module) -> Response:
+    await module.quests.retire(principal, key)
+    return Response(status_code=204)
+
+
 # --- manual grants -----------------------------------------------------------------------------------
 @router.post(
     "/admin/gamification/manual-grants",

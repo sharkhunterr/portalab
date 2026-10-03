@@ -104,6 +104,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <Community view="leaderboards" />,
               handle: h({ crumb: "Leaderboards" }),
             },
+            {
+              path: "achievements",
+              element: <Community view="achievements" />,
+              handle: h({ crumb: "Achievements" }),
+            },
             { path: "events", element: <Community view="events" />, handle: h({ crumb: "Events" }) },
           ],
         },

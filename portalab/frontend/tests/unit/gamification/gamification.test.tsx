@@ -51,6 +51,18 @@ describe("gamification", () => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/me/progression") return json(200, PROGRESSION);
       if (path === "/api/v1/me/achievements") return json(200, []);
+      if (path === "/api/v1/me/quests") {
+        return json(200, [
+          {
+            key: "daily_listen",
+            kind: "daily",
+            label: "Listen today",
+            completed_at: null,
+            steps: [{ current: 0, target: 1 }],
+            rewards: [{ value: "coins", amount: 10 }],
+          },
+        ]);
+      }
       if (path === "/api/v1/leaderboards/xp") {
         return json(200, { metric: "xp", period: "all", computed_at: null, entries: [], me: null });
       }
@@ -82,6 +94,9 @@ describe("gamification", () => {
     expect(await screen.findByText("Spent")).toBeTruthy();
     expect(screen.getByText("-10 Coins")).toBeTruthy();
     expect(await screen.findByText("You are not ranked yet.")).toBeTruthy();
+    expect(await screen.findByText("Listen today")).toBeTruthy();
+    expect(screen.getByText("Daily objective · In progress")).toBeTruthy();
+    expect(screen.getByText("+10 Coins")).toBeTruthy();
   });
 
   it("labels achievement states in text and keeps hidden ones hidden", () => {

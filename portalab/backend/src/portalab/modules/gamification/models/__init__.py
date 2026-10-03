@@ -263,3 +263,35 @@ class LeaderboardSnapshot(GamificationBase):
     entries: Mapped[list[list[Any]]] = mapped_column(
         JSONB, nullable=False, default=list, info=not_personal("user ids and scores, rebuilt by the job")
     )
+
+
+class Quest(GamificationBase):
+    """Slice C (R11): quests, daily objectives and challenges (a challenge is a time-boxed quest, OQ-62)."""
+
+    __tablename__ = "quests"
+    __table_args__ = (
+        CheckConstraint("status IN ('active', 'retired')", name="status"),
+        CheckConstraint("kind IN ('quest', 'daily', 'challenge')", name="kind"),
+    )
+
+    key: Mapped[str] = mapped_column(String(96), primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(10), nullable=False)
+    status: Mapped[str] = mapped_column(String(10), nullable=False)
+    effective_from: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    definition: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+
+
+class QuestProgress(GamificationBase):
+    """A user's progress on a quest for one period (``once``, a local day or an ISO week); completion
+    happens at most once per ``(user, quest, period)``."""
+
+    __tablename__ = "quest_progress"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    quest_key: Mapped[str] = mapped_column(String(160), primary_key=True)
+    period_key: Mapped[str] = mapped_column(String(16), primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    counts: Mapped[list[int]] = mapped_column(JSONB, nullable=False, default=list)
+    completed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

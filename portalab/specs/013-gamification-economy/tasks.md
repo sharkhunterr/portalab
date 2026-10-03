@@ -76,9 +76,9 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 - [X] T037 [US9] Implement `GM/leaderboards/{service,job}.py` (snapshots every `refreshMinutes`), routers `GET /leaderboards/{metric}`, `GET /me/leaderboard-position`, and `FG/leaderboards/Leaderboard.tsx` (accessible table, own-rank highlight, states)
 
 ## Phase 13: Slice C — Quests, daily objectives, challenges (step 24) — US3b
-- [ ] T038 [P] [US3] Write `backend/tests/integration/gamification/test_quests.py`: quest/daily/challenge criteria over counters; period keys in `economy.timezone` incl. DST; daily reset; completion once per `(user, quest, period)`; reward auto-granted via ledger; `quest.completed` emitted; campaign-linked quests respect campaign window (014 stub); duplicate/late events safe
-- [ ] T039 [US3] Implement `GM/quests/{evaluator,service}.py`, routers `GET /me/quests`, `GET /quests/catalog`, admin CRUD (`gamification.manage`), widget `gamification.daily_objectives` (009), and `FG/quests/QuestPanel.tsx`
-- [ ] T040 Run quests/leaderboard quickstart extensions; update `docs/economy.md`; record Slice B/C completion
+- [X] T038 [P] [US3] Write `backend/tests/integration/gamification/test_quests.py`: quest/daily/challenge criteria over counters; period keys in `economy.timezone` incl. DST; daily reset; completion once per `(user, quest, period)`; reward auto-granted via ledger; `quest.completed` emitted; campaign-linked quests respect campaign window (014 stub); duplicate/late events safe
+- [X] T039 [US3] Implement `GM/quests/{evaluator,service}.py`, routers `GET /me/quests`, `GET /quests/catalog`, admin CRUD (`gamification.manage`), widget `gamification.daily_objectives` (009), and `FG/quests/QuestPanel.tsx`
+- [X] T040 Run quests/leaderboard quickstart extensions; update `docs/economy.md`; record Slice B/C completion
 
 ## Dependencies & Order
 **Slice A**: Setup → Foundational → US6 (ledger/service) → US7 (rules/versioning/manual) → US1 (consumer) → US4 → US5 → US2 → US3a → US8 → closure. **Slice B** needs ledger + visibility (021). **Slice C** needs counters + economy tz + (optionally) 014 campaigns.

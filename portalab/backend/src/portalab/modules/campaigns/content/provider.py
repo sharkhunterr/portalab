@@ -35,6 +35,20 @@ class CampaignContent:
     async def quests_active_at(self, at: datetime) -> Sequence[ScopedDefinition]:
         return await self._scoped(at, "quests")
 
+    async def quests(self, at: datetime) -> Sequence[ExternalDefinition]:
+        """013 ``DefinitionSource`` (slice C): campaign quests and challenges, only while active."""
+        return [
+            ExternalDefinition(
+                item.key,
+                item.version,
+                item.definition,
+                item.active_from or at,
+                None,
+                f"campaign:{item.campaign}:{item.version}",
+            )
+            for item in await self.quests_active_at(at)
+        ]
+
     async def achievements(self, at: datetime) -> Sequence[ExternalDefinition]:
         """013 ``DefinitionSource``."""
         return [

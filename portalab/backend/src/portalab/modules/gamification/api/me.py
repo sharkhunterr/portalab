@@ -230,3 +230,14 @@ async def my_position(
         rank=view.me.rank if view.me else None,
         score=view.me.score if view.me else None,
     )
+
+
+# --- quests (slice C, T039) -----------------------------------------------------------------------------
+@router.get("/me/quests")
+async def my_quests(principal: Me, module: Module) -> list[dict[str, Any]]:
+    return await module.quests.mine(_me(principal))
+
+
+@router.get("/quests/catalog")
+async def quest_catalog(_: Reader, module: Module) -> list[dict[str, Any]]:
+    return await module.quests.catalog()

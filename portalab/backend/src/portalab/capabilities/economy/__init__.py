@@ -32,6 +32,7 @@ REWARDS = "economy.rewards"
 MODIFIERS = "economy.modifiers"
 DEFINITION_SOURCES = "economy.definition_sources"
 LEADERBOARDS = "economy.leaderboards"
+CATALOG = "economy.catalog"
 
 Value = Literal["xp", "contribution", "coins"]
 VALUES: tuple[Value, ...] = ("xp", "contribution", "coins")
@@ -190,6 +191,9 @@ class ExternalDefinition:
 
 @runtime_checkable
 class DefinitionSource(Protocol):
+    """Extra definitions from another module (014 campaigns). A source may also offer
+    ``async quests(at) -> Sequence[ExternalDefinition]`` (slice C), read when present."""
+
     async def achievements(self, at: datetime) -> Sequence[ExternalDefinition]: ...
 
 
@@ -240,6 +244,24 @@ class LeaderboardReader(Protocol):
     ) -> LeaderboardView: ...
 
 
+@runtime_checkable
+class GamificationCatalog(Protocol):
+    """Achievements and quests as 013 defines them, for presentation surfaces (Community 012 slice C).
+    Definitions and reward logic stay in 013; callers apply visibility before showing another member."""
+
+    async def achievements_of(self, user_id: UUID) -> Sequence[Mapping[str, Any]]:
+        """The user's own view: ``locked`` / ``unlocked`` with progress, ``hidden`` until unlocked."""
+        ...
+
+    async def unlocked_of(self, user_id: UUID, limit: int = 50) -> Sequence[Mapping[str, Any]]:
+        """Unlocked achievements only (key, label, date) — what others may see, visibility permitting."""
+        ...
+
+    async def quests_of(self, user_id: UUID) -> Sequence[Mapping[str, Any]]:
+        """The user's open quests, daily objectives and challenges for the current period, with progress."""
+        ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -252,4 +274,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(MODIFIERS, ModifierProvider, True, "Campaign reward modifiers (Campaigns 014)"),
     _spec(DEFINITION_SOURCES, DefinitionSource, True, "Extra achievement definitions (Campaigns 014)"),
     _spec(LEADERBOARDS, LeaderboardReader, False, "Visibility-bound leaderboards (Gamification 013)"),
+    _spec(CATALOG, GamificationCatalog, False, "Achievements and quests for presentation (Gamification 013)"),
 )
