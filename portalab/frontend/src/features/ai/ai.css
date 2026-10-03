@@ -1,0 +1,67 @@
+.ai-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ai-log {
+  display: grid;
+  gap: 0.75rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.ai-message {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--color-surface-raised);
+}
+
+.ai-message--user {
+  border-inline-start: 4px solid var(--color-border);
+}
+
+.ai-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+.ai-meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.ai-interpretation {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.ai-caveats {
+  border-inline-start: 4px solid var(--color-border);
+  padding-inline-start: 0.5rem;
+}
+
+.ai-source-list {
+  padding-inline-start: 1.5rem;
+}
+
+.ai-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ai-form textarea {
+  inline-size: 100%;
+}
+
+.ai-admin-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.ai-admin-table th,
+.ai-admin-table td {
+  text-align: start;
+  padding: 0.25rem 0.5rem;
+  border-block-end: 1px solid var(--color-border);
+}

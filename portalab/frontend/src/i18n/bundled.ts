@@ -1,3 +1,4 @@
+import ai from "../../../backend/locales/en/ai.json";
 import calendar from "../../../backend/locales/en/calendar.json";
 import content from "../../../backend/locales/en/content.json";
 import core from "../../../backend/locales/en/core.json";
@@ -18,6 +19,7 @@ import wiki from "../../../backend/locales/en/wiki.json";
  * loaded, and the strings used before the user's catalogs arrive. Same files as the backend's base bundles.
  */
 export const BUNDLED: Record<string, Record<string, string>> = {
+  ai,
   calendar,
   content,
   core,

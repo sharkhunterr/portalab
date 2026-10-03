@@ -5,6 +5,7 @@ from portalab.capabilities import (
     admin_authority,
     administration,
     aggregation,
+    ai,
     config,
     confirmations,
     content,
@@ -57,6 +58,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *media_core.SPECS,
     activity.SPEC,
     *content.SPECS,
+    *ai.SPECS,
 )
 
 

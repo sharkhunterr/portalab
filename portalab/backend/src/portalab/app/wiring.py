@@ -22,6 +22,7 @@ from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.secrets import SecretBox
 from portalab.modules.administration.module import AdministrationModule
+from portalab.modules.ai.module import AiModule
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.calendar.module import CalendarModule
 from portalab.modules.connectors.module import ConnectorsModule
@@ -114,6 +115,7 @@ class Platform:
     wiki: WikiModule
     news: NewsModule
     calendar: CalendarModule
+    ai: AiModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -220,6 +222,8 @@ def wire_platform(
     dashboard.register()
     for key, validator in dashboard.validators.table().items():
         administration.registry.register_validator(key, validator, owner="module:dashboard")
+    ai = AiModule(database, events, authz.audit, capabilities, authz.engine)
+    ai.register()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -254,6 +258,7 @@ def wire_platform(
         seeds.extend(support.register_jobs(jobs))
         seeds.extend(news.register_jobs(jobs))
         seeds.extend(calendar.register_jobs(jobs))
+        seeds.extend(ai.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -276,6 +281,7 @@ def wire_platform(
         wiki,
         news,
         calendar,
+        ai,
         seeds,
     )
     from portalab.app.config_bindings import bind

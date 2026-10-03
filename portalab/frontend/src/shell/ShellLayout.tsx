@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { AiPanel } from "../features/ai/panel/AiPanel";
+import { useAiAssistant } from "../features/ai/panel/useAiAssistant";
 import { useLogout, useMe } from "../features/auth/useAuth";
 import { useNotificationSummary } from "../features/notifications/bell/NotificationSlot";
 import { ToastRegion } from "../features/notifications/toasts/ToastRegion";
@@ -12,11 +14,16 @@ export function ShellLayout() {
   const logout = useLogout();
   const notifications = useNotificationSummary(); // 010 bell
   const help = useHelpSlot(); // 011 contextual help
-  const slots = useMemo(() => ({ notifications, help }), [notifications, help]);
+  const assistant = useAiAssistant(); // 018 assistant
+  const slots = useMemo(
+    () => ({ notifications, help, ai: assistant.slot }),
+    [notifications, help, assistant.slot],
+  );
   return (
     <ShellSlotsProvider value={slots}>
       <AppShell userName={me.data?.display_name ?? me.data?.login ?? ""} onSignOut={() => logout.mutate()} />
       <ToastRegion />
+      <AiPanel {...assistant.panel} />
     </ShellSlotsProvider>
   );
 }

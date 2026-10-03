@@ -45,6 +45,8 @@ from portalab.core.metrics import default_metrics, phase_scope, record_request
 from portalab.core.settings import BootstrapSettings
 from portalab.modules.administration.api import routers as admin_routers
 from portalab.modules.administration.module import AdministrationModule
+from portalab.modules.ai.api import routers as ai_routers
+from portalab.modules.ai.module import AiModule
 from portalab.modules.authz.api import routers as authz_routers
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.calendar.api import routers as calendar_routers
@@ -140,6 +142,7 @@ def create_app(
     wiki: WikiModule | None = None,
     news: NewsModule | None = None,
     calendar: CalendarModule | None = None,
+    ai: AiModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -175,6 +178,7 @@ def create_app(
         app.state.wiki_module = platform.wiki
         app.state.news_module = platform.news
         app.state.calendar_module = platform.calendar
+        app.state.ai_module = platform.ai
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -238,6 +242,7 @@ def create_app(
     app.state.wiki_module = wiki
     app.state.news_module = news
     app.state.calendar_module = calendar
+    app.state.ai_module = ai
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -350,6 +355,7 @@ def create_app(
         *wiki_routers(),
         *news_routers(),
         *calendar_routers(),
+        *ai_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

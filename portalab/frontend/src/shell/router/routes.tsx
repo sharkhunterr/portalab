@@ -52,6 +52,7 @@ const SupportQueue = lazy(() => import("../../features/support/staff/Queue"));
 const FeedbackReview = lazy(() => import("../../features/support/feedback/ReviewQueue"));
 const FeedbackPage = lazy(() => import("../../features/support/feedback/FeedbackPage"));
 const SupportDefinitions = lazy(() => import("../../features/support/admin/Definitions"));
+const AiAdmin = lazy(() => import("../../features/ai/admin/AiAdminPage"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -221,6 +222,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Statistic definitions" }),
             },
             { path: "support", element: <SupportDefinitions />, handle: h({ crumb: "Support settings" }) },
+            { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant settings" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },
