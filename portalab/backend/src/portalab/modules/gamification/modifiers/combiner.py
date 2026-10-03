@@ -11,6 +11,7 @@ from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.economy import MODIFIERS, Modifier, Value
+from portalab.capabilities.events import Envelope
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.gamification.observability import log, metrics
 
@@ -50,7 +51,7 @@ class ModifierCombiner:
         self.capabilities = capabilities
 
     async def modifiers(
-        self, user: UUID, event_type: str, value: Value, at: datetime
+        self, user: UUID, event: Envelope, value: Value, at: datetime
     ) -> tuple[list[Modifier], bool]:
         try:
             providers = self.capabilities.system_providers(MODIFIERS)
@@ -62,7 +63,7 @@ class ModifierCombiner:
             try:
                 found.extend(
                     await asyncio.wait_for(
-                        registration.provider.modifiers_for(user, event_type, value, at), PROVIDER_TIMEOUT
+                        registration.provider.modifiers_for(user, event, value, at), PROVIDER_TIMEOUT
                     )
                 )
             except Exception:
@@ -74,7 +75,7 @@ class ModifierCombiner:
         return found, unavailable
 
     async def combined(
-        self, user: UUID, event_type: str, value: Value, at: datetime, rule_multiplier: float, cap: float
+        self, user: UUID, event: Envelope, value: Value, at: datetime, rule_multiplier: float, cap: float
     ) -> Combined:
-        found, unavailable = await self.modifiers(user, event_type, value, at)
+        found, unavailable = await self.modifiers(user, event, value, at)
         return combine(rule_multiplier, found, cap, unavailable=unavailable)

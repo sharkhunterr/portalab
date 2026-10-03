@@ -12,6 +12,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.gamification.modifiers.combiner import ModifierCombiner, combine
 
 AT = datetime(2026, 10, 1, 12, tzinfo=UTC)
+EVENT = object()  # providers receive the occurrence; these fakes only look at the instant
 
 
 def test_multiplicative_and_capped() -> None:
@@ -53,8 +54,8 @@ async def test_provider_window_and_failure() -> None:
     user = uuid4()
     window = Window(AT, AT.replace(hour=13))
     combiner = ModifierCombiner(registry(window))
-    inside = await combiner.combined(user, "media.played", "xp", AT, 1.5, 5.0)
-    outside = await combiner.combined(user, "media.played", "xp", AT.replace(hour=14), 1.5, 5.0)
+    inside = await combiner.combined(user, EVENT, "xp", AT, 1.5, 5.0)  # type: ignore[arg-type]
+    outside = await combiner.combined(user, EVENT, "xp", AT.replace(hour=14), 1.5, 5.0)  # type: ignore[arg-type]
     assert inside.factor == 3.0 and outside.factor == 1.5
-    degraded = await ModifierCombiner(registry(Broken())).combined(user, "media.played", "xp", AT, 1.5, 5.0)
+    degraded = await ModifierCombiner(registry(Broken())).combined(user, EVENT, "xp", AT, 1.5, 5.0)  # type: ignore[arg-type]
     assert degraded.factor == 1.5 and degraded.unavailable and degraded.apply(10) == 15

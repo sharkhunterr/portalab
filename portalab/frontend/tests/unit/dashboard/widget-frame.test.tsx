@@ -114,6 +114,7 @@ function setup(dashboard: unknown, onWrite?: (request: Request) => Response | Pr
     requests.push(`${request.method} ${url.pathname}`);
     if (url.pathname === "/api/v1/dashboard") return json(200, dashboard);
     if (url.pathname === "/api/v1/incidents") return json(200, []);
+    if (url.pathname === "/api/v1/campaigns/active") return json(200, []);
     if (url.pathname === "/api/v1/dashboard/since-last-login")
       return json(200, { since: "2026-10-01T00:00:00Z", items: [], unavailable: [] });
     const widget = /^\/api\/v1\/widgets\/([^/]+)\/data$/.exec(url.pathname);

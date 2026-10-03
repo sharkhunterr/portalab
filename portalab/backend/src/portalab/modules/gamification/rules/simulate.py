@@ -4,12 +4,33 @@ applied modifiers and the cap — and **writes nothing**. Anti-abuse windows are
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from portalab.capabilities.events import EventTypeRegistry
+from portalab.capabilities.events import Envelope, EventTypeRegistry
 from portalab.modules.gamification.calculator.calculator import base_amounts
 from portalab.modules.gamification.modifiers.combiner import ModifierCombiner
 from portalab.modules.gamification.rules.definition import matches, parse_rule
+
+
+def envelope(event_type: str, payload: Mapping[str, Any], user: UUID, at: datetime) -> Envelope:
+    """A synthetic occurrence for the dry run (never stored)."""
+    return Envelope(
+        event_id=uuid4(),
+        seq=0,
+        type=event_type,
+        type_version=1,
+        occurred_at=at,
+        received_at=at,
+        source_system="simulation",
+        source_event_id=None,
+        actor_user_id=user,
+        actor_kind="user",
+        subject_type=None,
+        subject_id=None,
+        payload=dict(payload),
+        provenance={},
+        correlation_id=None,
+    )
 
 
 async def simulate(
@@ -34,7 +55,8 @@ async def simulate(
             continue
         grants = []
         for value, base in base_amounts(rule, payload):
-            combined = await combiner.combined(user, rule.event_type, value, at, rule.multiplier, cap)  # type: ignore[arg-type]
+            occurrence = envelope(rule.event_type, payload, user, at)
+            combined = await combiner.combined(user, occurrence, value, at, rule.multiplier, cap)  # type: ignore[arg-type]
             grants.append(
                 {
                     "value": value,

@@ -53,6 +53,8 @@ const FeedbackReview = lazy(() => import("../../features/support/feedback/Review
 const FeedbackPage = lazy(() => import("../../features/support/feedback/FeedbackPage"));
 const SupportDefinitions = lazy(() => import("../../features/support/admin/Definitions"));
 const AiAdmin = lazy(() => import("../../features/ai/admin/AiAdminPage"));
+const CampaignConsole = lazy(() => import("../../features/campaigns/console/CampaignConsole"));
+const Campaigns = lazy(() => import("../../features/campaigns/CampaignsPage"));
 const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
 const Progression = lazy(() => import("../../features/gamification/progression/ProgressionPage"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
@@ -83,6 +85,14 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
+        {
+          path: "campaigns",
+          handle: h({ crumb: "Campaigns", requiredPermission: "campaigns.read" }),
+          children: [
+            { index: true, element: <Campaigns /> },
+            { path: ":key", element: <Campaigns />, handle: h({ crumb: (params) => params.key ?? "" }) },
+          ],
+        },
         {
           path: "statistics",
           handle: h({ crumb: "Statistics", requiredPermission: "statistics.read" }),
@@ -227,6 +237,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "support", element: <SupportDefinitions />, handle: h({ crumb: "Support settings" }) },
             { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant settings" }) },
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
+            { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },

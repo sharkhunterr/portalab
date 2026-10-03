@@ -129,7 +129,7 @@ class RewardPipeline:
             key = f"rule:{envelope.event_id}:{rule.key}:{value}"
             combined = await self.combiner.combined(
                 user,
-                envelope.type,
+                envelope,
                 value,  # type: ignore[arg-type]
                 at,
                 rule.definition.multiplier,

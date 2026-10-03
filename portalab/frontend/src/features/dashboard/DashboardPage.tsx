@@ -15,6 +15,7 @@ import { GridCell, ResponsiveGrid } from "./grid/ResponsiveGrid";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import "./widgets/builtin";
 import "../gamification/widget";
+import { ActiveCampaignBanner } from "../campaigns/banner/ActiveCampaignBanner";
 
 const ONBOARDED = "portalab.onboarding.dashboard";
 
@@ -65,6 +66,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const hidden = instances.filter((i) => i.status === "hidden");
   return (
     <section aria-labelledby={headingId} className="dashboard-page">
+      <ActiveCampaignBanner />
       <div className="ds-stack ds-stack--row dashboard-page__header">
         <h2 id={headingId}>{t("dashboard:title")}</h2>
         <Button variant="secondary" aria-pressed={editing} onClick={() => setEditing((value) => !value)}>

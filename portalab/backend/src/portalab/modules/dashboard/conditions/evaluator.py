@@ -11,6 +11,7 @@ from portalab.capabilities.administration import EXTENSION_STATE_CAPABILITY
 from portalab.capabilities.dashboard import CONDITION_TYPES, Condition
 from portalab.capabilities.health import SERVICE_STATE
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.statistics import CAMPAIGNS
 from portalab.capabilities.user_grants import ROLES_CAPABILITY
 from portalab.core.authz_port import Authorizer, Principal
 
@@ -95,7 +96,10 @@ class ConditionEvaluator:
                     return True, None  # without toggles every installed module is enabled
                 return bool(await extensions.enabled("module", str(value))), None
             case "campaign_active":
-                return False, "campaigns are not available yet (spec 014)"
+                campaigns = self._provider(CAMPAIGNS)
+                if campaigns is None:
+                    return False, "campaigns are not available"
+                return bool(await campaigns.is_active(str(value))), None
             case "data_present":
                 if self.data_present is None or not isinstance(value, str):
                     return False, "data presence cannot be checked"

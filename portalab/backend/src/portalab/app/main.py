@@ -51,6 +51,8 @@ from portalab.modules.authz.api import routers as authz_routers
 from portalab.modules.authz.module import AuthzModule
 from portalab.modules.calendar.api import routers as calendar_routers
 from portalab.modules.calendar.module import CalendarModule
+from portalab.modules.campaigns.api import routers as campaigns_routers
+from portalab.modules.campaigns.module import CampaignsModule
 from portalab.modules.connectors.api import routers as connectors_routers
 from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.content.api import routers as content_routers
@@ -146,6 +148,7 @@ def create_app(
     calendar: CalendarModule | None = None,
     ai: AiModule | None = None,
     gamification: GamificationModule | None = None,
+    campaigns: CampaignsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -183,6 +186,7 @@ def create_app(
         app.state.calendar_module = platform.calendar
         app.state.ai_module = platform.ai
         app.state.gamification_module = platform.gamification
+        app.state.campaigns_module = platform.campaigns
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -248,6 +252,7 @@ def create_app(
     app.state.calendar_module = calendar
     app.state.ai_module = ai
     app.state.gamification_module = gamification
+    app.state.campaigns_module = campaigns
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -362,6 +367,7 @@ def create_app(
         *calendar_routers(),
         *ai_routers(),
         *gamification_routers(),
+        *campaigns_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

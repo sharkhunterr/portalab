@@ -202,6 +202,10 @@ class ThemeService:
         themes = [theme_out(row) for row in await self.all() if row.enabled and row.key in allowed]
         return {"themes": themes, "policy": policy}
 
+    async def allowed_keys(self) -> frozenset[str]:
+        """``ui.theme_catalog``: enabled themes the policy allows (campaign overlays, 014)."""
+        return frozenset(theme["key"] for theme in (await self.catalog())["themes"])
+
     async def choice_errors(self, value: Any) -> list[str]:
         """Dynamic validator of the ``ui.theme`` preference."""
         if value is None:

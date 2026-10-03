@@ -1,0 +1,21 @@
+.campaign-banner ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.campaign-console textarea {
+  inline-size: 100%;
+  font-family: monospace;
+}
+
+.campaign-timeline {
+  list-style: none;
+  padding: 0;
+  border-inline-start: 2px solid var(--color-border);
+}
+
+.campaign-timeline li {
+  padding-inline-start: 0.75rem;
+  margin-block-end: 0.5rem;
+}

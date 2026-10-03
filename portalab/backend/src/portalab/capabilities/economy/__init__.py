@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import Any, Literal, Protocol, runtime_checkable
 from uuid import UUID
 
+from portalab.capabilities.events import Envelope
 from portalab.capabilities.registry import CapabilitySpec
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Conflict
@@ -168,8 +169,10 @@ class Modifier:
 @runtime_checkable
 class ModifierProvider(Protocol):
     async def modifiers_for(
-        self, user: UUID, event_type: str, value: Value, at: datetime
-    ) -> Sequence[Modifier]: ...
+        self, user: UUID, event: Envelope, value: Value, at: datetime
+    ) -> Sequence[Modifier]:
+        """Factors valid at ``at`` (the occurrence time) for this user and event; never amounts."""
+        ...
 
 
 @dataclass(frozen=True, slots=True)

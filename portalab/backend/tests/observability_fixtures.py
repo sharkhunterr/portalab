@@ -7,6 +7,7 @@ from typing import Any
 
 from sqlalchemy import text
 
+from portalab.capabilities.events import ConsumerRegistry
 from portalab.capabilities.observability import ObservableRegistry
 from portalab.core.db import Database
 from portalab.core.metrics import MetricsRegistry
@@ -47,7 +48,10 @@ async def make_observability(
 ) -> ObsHarness:
     hl = await make_health(database, blob_root, clock)
     capabilities = hl.cn.full.identity.capabilities
-    events = EventsModule(database, hl.cn.full.authz.audit, capabilities, clock=clock)
+    # isolated consumers: modules wired by other tests (e.g. a ``*`` subscriber) must not join this one
+    events = EventsModule(
+        database, hl.cn.full.authz.audit, capabilities, clock=clock, consumers=ConsumerRegistry()
+    )
     events.register()
     hooks, registry = MetricsRegistry(), ObservableRegistry()
     module = ObservabilityModule(

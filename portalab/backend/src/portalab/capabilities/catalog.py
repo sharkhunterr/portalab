@@ -6,6 +6,7 @@ from portalab.capabilities import (
     administration,
     aggregation,
     ai,
+    campaigns,
     config,
     confirmations,
     content,
@@ -24,6 +25,7 @@ from portalab.capabilities import (
     service_data,
     statistics,
     support,
+    themes,
     user_grants,
     visibility,
 )
@@ -61,6 +63,8 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *content.SPECS,
     *ai.SPECS,
     *economy.SPECS,
+    *campaigns.SPECS,
+    themes.SPEC,
 )
 
 

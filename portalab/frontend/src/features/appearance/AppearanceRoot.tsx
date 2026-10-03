@@ -4,6 +4,7 @@ import { api } from "../../api/client";
 import { PreferencesProvider } from "../../design-system/a11y/PreferencesProvider";
 import { NotificationArea } from "../../design-system/components/Notification";
 import { ThemeProvider } from "../../design-system/themes/ThemeProvider";
+import { useCampaignOverlay } from "../campaigns/presentation/CampaignPresentationProvider";
 import { preferenceBackend } from "./backend";
 
 /** Signed-in presentation root: account preferences (synced), the allowed theme catalog, notifications. */
@@ -16,8 +17,9 @@ function Themed({ children }: { children: ReactNode }) {
       ).themes.map((t) => t.definition),
     staleTime: 5 * 60_000,
   });
+  const overlay = useCampaignOverlay(catalog.data ?? []); // 014 campaign theme, 022 keeps a11y above it
   return (
-    <ThemeProvider themes={catalog.data ?? []}>
+    <ThemeProvider themes={catalog.data ?? []} overlay={overlay}>
       <NotificationArea>{children}</NotificationArea>
     </ThemeProvider>
   );
