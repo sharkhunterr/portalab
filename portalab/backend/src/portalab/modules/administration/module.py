@@ -62,6 +62,12 @@ class _ConfigWriter:
             [Change(key, value)], actor, admin_change=True, reason=reason or "admin change"
         )
 
+    async def set_user(self, actor: Principal, key: str, value: Any) -> None:
+        user = actor.acting_for or actor.user_id
+        if user is None:
+            raise ValueError("a user setting needs a user")
+        await self.config.set(key, value, scope="user", scope_ref=str(user), actor=actor)
+
 
 class AdministrationModule:
     def __init__(

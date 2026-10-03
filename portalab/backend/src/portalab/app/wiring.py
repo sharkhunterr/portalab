@@ -5,6 +5,8 @@ and the ``authz.admin_authority`` capability — then identity (spec 002), which
 publisher is the kernel outbox until the Events module (spec 007) replaces it.
 """
 
+import hashlib
+import hmac
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import timedelta
@@ -33,6 +35,7 @@ from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.module import ShellModule
+from portalab.modules.statistics.module import StatisticsModule
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.module import UiModule
 
@@ -98,6 +101,7 @@ class Platform:
     search: SearchModule
     dashboard: DashboardModule
     support: SupportModule
+    statistics: StatisticsModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -168,6 +172,16 @@ def wire_platform(
         administration.registry.register_validator(key, validator, owner="module:i18n")
     support = SupportModule(database, events, authz.audit, capabilities, authz.engine)
     support.register()
+    statistics = StatisticsModule(
+        database,
+        events,
+        authz.audit,
+        capabilities,
+        authz.engine,
+        salt=hmac.new(secret_key, b"portalab.statistics.members", hashlib.sha256).digest(),
+        visibility=privacy.filter,
+    )
+    statistics.register()
     search = SearchModule(database, events, authz.audit, capabilities, authz.engine)
     search.register()
     dashboard = DashboardModule(database, events, authz.audit, capabilities, authz.engine)
@@ -202,6 +216,7 @@ def wire_platform(
         seeds.extend(health.register_jobs(jobs))
         seeds.extend(observability.register_jobs(jobs))
         seeds.extend(search.register_jobs(jobs))
+        seeds.extend(statistics.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -217,6 +232,7 @@ def wire_platform(
         search,
         dashboard,
         support,
+        statistics,
         seeds,
     )
     from portalab.app.config_bindings import bind

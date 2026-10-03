@@ -1,0 +1,51 @@
+/* Statistics (spec 017): cards in a responsive grid; charts use theme tokens; the data table is always one
+   click away; logical properties for RTL. */
+.statistics-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+
+.stat-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  padding: var(--space-4);
+  min-inline-size: 0;
+}
+
+.stat-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.stat-chart {
+  margin: 0;
+}
+
+.stat-chart__summary {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.stat-chart__trend {
+  color: var(--color-text-muted);
+}
+
+.stat-chart__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.stat-chart__table th,
+.stat-chart__table td {
+  text-align: start;
+  padding: var(--space-1, 0.25rem) var(--space-2);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.wrapped__value {
+  font-size: var(--font-size-lg);
+}

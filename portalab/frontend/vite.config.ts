@@ -21,6 +21,12 @@ export default defineConfig({
         // third-party code in long-cached chunks, the i18n runtime (react-intl, formatjs) apart (spec 026)
         manualChunks: (id) => {
           if (!id.includes("/node_modules/")) return undefined;
+          if (
+            /node_modules\/(recharts|d3-[a-z-]+|victory-vendor|decimal\.js-light|react-redux|@reduxjs|redux|reselect|immer|es-toolkit|eventemitter3)\//.test(
+              id,
+            )
+          )
+            return "charts";
           return /node_modules\/(react-intl|intl-messageformat|@formatjs)\//.test(id) ? "intl" : "vendor";
         },
       },

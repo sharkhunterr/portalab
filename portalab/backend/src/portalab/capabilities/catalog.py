@@ -15,6 +15,7 @@ from portalab.capabilities import (
     privacy_participants,
     search,
     service_data,
+    statistics,
     support,
     user_grants,
     visibility,
@@ -43,6 +44,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *search.SPECS,
     *dashboard.SPECS,
     *support.SPECS,
+    *statistics.SPECS,
 )
 
 

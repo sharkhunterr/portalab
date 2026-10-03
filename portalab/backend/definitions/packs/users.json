@@ -1,0 +1,27 @@
+{
+  "domain": "users",
+  "definitions": [
+    {
+      "key": "users.active_by_day",
+      "title_key": "statistics:stat.users_active.title",
+      "description_key": "statistics:stat.users_active.description",
+      "domain": "users",
+      "scope": "community",
+      "event_types": ["user.signed_in"],
+      "measure": {"kind": "distinct_count", "field": "actor"},
+      "viz": {"type": "line"},
+      "hideable": true
+    },
+    {
+      "key": "users.my_sign_ins",
+      "title_key": "statistics:stat.my_sign_ins.title",
+      "description_key": "statistics:stat.my_sign_ins.description",
+      "domain": "users",
+      "scope": "personal",
+      "event_types": ["user.signed_in"],
+      "measure": {"kind": "count"},
+      "viz": {"type": "bar"},
+      "hideable": true
+    }
+  ]
+}

@@ -96,6 +96,10 @@ class ConfigWriter(Protocol):
 
     async def set_global(self, actor: Principal, key: str, value: Any, *, reason: str = "") -> None: ...
 
+    async def set_user(self, actor: Principal, key: str, value: Any) -> None:
+        """A user-overridable setting for the acting user themself (validated like any change)."""
+        ...
+
 
 @dataclass(frozen=True, slots=True)
 class AdminSurface:

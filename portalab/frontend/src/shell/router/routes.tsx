@@ -24,6 +24,9 @@ const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
 const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
 const IncidentConsole = lazy(() => import("../../features/support/incidents/IncidentConsole"));
+const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
+const Wrapped = lazy(() => import("../../features/statistics/wrapped/WrappedStory"));
+const StatisticsAdmin = lazy(() => import("../../features/statistics/admin/DefinitionsAdmin"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -48,6 +51,19 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               path: ":incidentId",
               element: <Incidents />,
               handle: h({ crumb: "Incident", existenceSensitive: true }),
+            },
+          ],
+        },
+        {
+          path: "statistics",
+          handle: h({ crumb: "Statistics", requiredPermission: "statistics.read" }),
+          children: [
+            { index: true, element: <Statistics /> },
+            { path: "wrapped", element: <Wrapped />, handle: h({ crumb: "Recap" }) },
+            {
+              path: "wrapped/:snapshotId",
+              element: <Wrapped />,
+              handle: h({ crumb: "Recap", existenceSensitive: true }),
             },
           ],
         },
@@ -77,6 +93,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Administration" }),
           children: [
             { index: true, element: <ControlCenter /> },
+            {
+              path: "statistics",
+              element: <StatisticsAdmin />,
+              handle: h({ crumb: "Statistic definitions" }),
+            },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },
             { path: "configuration", element: <Configuration />, handle: h({ crumb: "Configuration" }) },
             { path: "services", element: <ServicesAdmin />, handle: h({ crumb: "Services" }) },

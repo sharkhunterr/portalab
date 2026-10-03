@@ -81,6 +81,9 @@ async def refresh(platform: Any) -> None:
     dashboard = getattr(platform, "dashboard", None)
     if dashboard is not None:
         dashboard.config = replace(dashboard.config, **await _values(config, DASHBOARD_FIELDS))
+    statistics = getattr(platform, "statistics", None)
+    if statistics is not None:
+        await statistics.refresh_config()
     support = getattr(platform, "support", None)
     if support is not None:
         support.config = replace(support.config, **await _values(config, SUPPORT_FIELDS))
@@ -113,5 +116,6 @@ def bind(platform: Any) -> None:
         "search.",
         "dashboard.",
         "support.",
+        "statistics.",
     ):
         platform.administration.config.on_change(prefix, on_change)

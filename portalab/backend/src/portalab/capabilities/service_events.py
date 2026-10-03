@@ -35,6 +35,7 @@ STATUS_CHANGED_TYPE = EventType(
     visibility_class="restricted",
     automatable=True,
     live_permission="services.read",
+    aggregatable=frozenset({"service_id", "dimension", "connector", "to_state"}),
     description="A service changed state (connection lifecycle or derived health).",
 )
 

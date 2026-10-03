@@ -69,6 +69,8 @@ from portalab.modules.search.api import routers as search_routers
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.api import routers as shell_routers
 from portalab.modules.shell.module import ShellModule
+from portalab.modules.statistics.api import routers as statistics_routers
+from portalab.modules.statistics.module import StatisticsModule
 from portalab.modules.support.api import routers as support_routers
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.api import routers as ui_routers
@@ -119,6 +121,7 @@ def create_app(
     search: SearchModule | None = None,
     dashboard: DashboardModule | None = None,
     support: SupportModule | None = None,
+    statistics: StatisticsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -147,6 +150,7 @@ def create_app(
         app.state.search_module = platform.search
         app.state.dashboard_module = platform.dashboard
         app.state.support_module = platform.support
+        app.state.statistics_module = platform.statistics
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -203,6 +207,7 @@ def create_app(
     app.state.search_module = search
     app.state.dashboard_module = dashboard
     app.state.support_module = support
+    app.state.statistics_module = statistics
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -308,6 +313,7 @@ def create_app(
         *search_routers(),
         *dashboard_routers(),
         *support_routers(),
+        *statistics_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

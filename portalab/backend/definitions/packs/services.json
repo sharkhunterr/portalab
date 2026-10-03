@@ -1,0 +1,19 @@
+{
+  "domain": "services",
+  "definitions": [
+    {
+      "key": "services.health_changes",
+      "title_key": "statistics:stat.health_changes.title",
+      "description_key": "statistics:stat.health_changes.description",
+      "domain": "services",
+      "scope": "global",
+      "event_types": ["service.status_changed"],
+      "filter": [{"field": "dimension", "op": "eq", "value": "health"}],
+      "measure": {"kind": "count"},
+      "dimensions": ["to_state"],
+      "viz": {"type": "bar"},
+      "required_permission": "services.read",
+      "hideable": true
+    }
+  ]
+}

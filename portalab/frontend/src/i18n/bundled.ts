@@ -4,6 +4,7 @@ import i18n from "../../../backend/locales/en/i18n.json";
 import nav from "../../../backend/locales/en/nav.json";
 import search from "../../../backend/locales/en/search.json";
 import shell from "../../../backend/locales/en/shell.json";
+import statistics from "../../../backend/locales/en/statistics.json";
 import support from "../../../backend/locales/en/support.json";
 
 /**
@@ -17,6 +18,7 @@ export const BUNDLED: Record<string, Record<string, string>> = {
   nav,
   search,
   shell,
+  statistics,
   support,
 };
 export const DEFAULT_NAMESPACES = Object.keys(BUNDLED);

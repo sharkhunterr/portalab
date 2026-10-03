@@ -96,7 +96,7 @@ class IncidentPatchIn(BaseModel):
     summary: str | None = Field(default=None, max_length=4000)
 
 
-class ResolveIn(BaseModel):
+class IncidentResolveIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     message: str = Field(default="", max_length=4000)
 
@@ -192,7 +192,7 @@ async def patch_incident(
 
 @router.post("/admin/incidents/{incident_id}/resolve", response_model=IncidentOut)
 async def resolve_incident(
-    principal: Manager, incident_id: UUID, body: ResolveIn, module: Module, if_match: IfMatch = None
+    principal: Manager, incident_id: UUID, body: IncidentResolveIn, module: Module, if_match: IfMatch = None
 ) -> IncidentOut:
     view = await module.incidents.resolve(
         principal, incident_id, message=body.message, if_match=version_of(if_match)

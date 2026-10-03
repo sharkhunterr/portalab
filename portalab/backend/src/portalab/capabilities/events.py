@@ -159,6 +159,14 @@ class ConsumerRegistry:
     def get(self, name: str) -> Consumer | None:
         return self._consumers.get(name)
 
+    def replace(self, consumer: Consumer) -> Consumer:
+        """Register or swap a consumer by name (projections whose definition changed); its cursor is kept."""
+        self._consumers[consumer.name] = consumer
+        return consumer
+
+    def remove(self, name: str) -> bool:
+        return self._consumers.pop(name, None) is not None
+
     def all(self) -> list[Consumer]:
         return [self._consumers[name] for name in sorted(self._consumers)]
 

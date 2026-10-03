@@ -608,6 +608,145 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/statistics/definitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Definitions */
+        get: operations["list_definitions_api_v1_admin_statistics_definitions_get"];
+        put?: never;
+        /** Create Definition */
+        post: operations["create_definition_api_v1_admin_statistics_definitions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/definitions/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Definition Versions */
+        get: operations["definition_versions_api_v1_admin_statistics_definitions__key__get"];
+        /** Update Definition */
+        put: operations["update_definition_api_v1_admin_statistics_definitions__key__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/definitions/{key}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate */
+        post: operations["activate_api_v1_admin_statistics_definitions__key__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/definitions/{key}/rebuild": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rebuild */
+        post: operations["rebuild_api_v1_admin_statistics_definitions__key__rebuild_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/definitions/{key}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retire */
+        post: operations["retire_api_v1_admin_statistics_definitions__key__retire_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_api_v1_admin_statistics_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/wrapped": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Wrapped Definitions */
+        get: operations["wrapped_definitions_api_v1_admin_statistics_wrapped_get"];
+        /** Put Wrapped */
+        put: operations["put_wrapped_api_v1_admin_statistics_wrapped_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/statistics/wrapped/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate Wrapped */
+        post: operations["generate_wrapped_api_v1_admin_statistics_wrapped_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/surfaces": {
         parameters: {
             query?: never;
@@ -1594,6 +1733,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/statistics/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Preferences */
+        get: operations["get_preferences_api_v1_me_statistics_preferences_get"];
+        /** Put Preferences */
+        put: operations["put_preferences_api_v1_me_statistics_preferences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/wrapped": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Wrapped */
+        get: operations["my_wrapped_api_v1_me_wrapped_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/wrapped/{snapshot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Wrapped One */
+        get: operations["my_wrapped_one_api_v1_me_wrapped__snapshot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/palette/resolve": {
         parameters: {
             query?: never;
@@ -2042,6 +2233,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/statistics/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catalog */
+        get: operations["catalog_api_v1_statistics_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/statistics/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Statistic */
+        get: operations["statistic_api_v1_statistics__key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stream": {
         parameters: {
             query?: never;
@@ -2293,6 +2518,23 @@ export interface paths {
         };
         /** Widget Data */
         get: operations["widget_data_api_v1_widgets__key__data_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wrapped/community/{period_start}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Community Wrapped */
+        get: operations["community_wrapped_api_v1_wrapped_community__period_start__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2817,6 +3059,14 @@ export interface components {
             /** Title */
             title?: string | null;
         };
+        /** IncidentResolveIn */
+        IncidentResolveIn: {
+            /**
+             * Message
+             * @default
+             */
+            message: string;
+        };
         /** IncidentUpdateIn */
         IncidentUpdateIn: {
             /** Message */
@@ -3107,6 +3357,11 @@ export interface components {
             /** To Occurred At */
             to_occurred_at?: string | null;
         };
+        /** ResolveIn */
+        ResolveIn: {
+            /** Resolution */
+            resolution: string;
+        };
         /** ResyncIn */
         ResyncIn: {
             /**
@@ -3344,6 +3599,110 @@ export interface components {
              */
             user_id: string;
         };
+        /** StatResultOut */
+        StatResultOut: {
+            /** As Of */
+            as_of: string | null;
+            /** Breakdown */
+            breakdown: {
+                [key: string]: unknown;
+            }[];
+            /** Definition Version */
+            definition_version: number | null;
+            /** Key */
+            key: string;
+            /** Period End */
+            period_end: string | null;
+            /** Period Start */
+            period_start: string | null;
+            /** Series */
+            series: {
+                [key: string]: unknown;
+            }[];
+            /** Source States */
+            source_states: {
+                [key: string]: string;
+            };
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "available" | "partial" | "stale" | "locked" | "unavailable" | "insufficient_data" | "no_data";
+            trend: components["schemas"]["StatisticsTrendOut"] | null;
+            /** Unlock Hint */
+            unlock_hint: string | null;
+            /** Value */
+            value: number | null;
+        };
+        /** StatisticConfirmIn */
+        StatisticConfirmIn: {
+            /** Confirmation */
+            confirmation?: string | null;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+            /** Version */
+            version?: number | null;
+        };
+        /** StatisticDefinitionIn */
+        StatisticDefinitionIn: {
+            /**
+             * Change Policy
+             * @default forward_only
+             * @enum {string}
+             */
+            change_policy: "forward_only" | "rebuild";
+            /** Definition */
+            definition: {
+                [key: string]: unknown;
+            };
+        };
+        /** StatisticsCatalogEntryOut */
+        StatisticsCatalogEntryOut: {
+            /** Description Key */
+            description_key: string | null;
+            /** Domain */
+            domain: string;
+            /** Hidden */
+            hidden: boolean;
+            /** Hideable */
+            hideable: boolean;
+            /** Key */
+            key: string;
+            /** Locked */
+            locked: boolean;
+            /** Period Options */
+            period_options: string[];
+            /** Scope */
+            scope: string;
+            /** Title Key */
+            title_key: string;
+            /** Unlock Hint */
+            unlock_hint: string | null;
+            /** Viz */
+            viz: string;
+        };
+        /** StatisticsPreferencesIn */
+        StatisticsPreferencesIn: {
+            /** Hidden */
+            hidden?: string[];
+        };
+        /** StatisticsTrendOut */
+        StatisticsTrendOut: {
+            /** Delta */
+            delta: number;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "up" | "down" | "flat";
+            /** Percent */
+            percent: number | null;
+            /** Previous Value */
+            previous_value: number;
+        };
         /** SummaryOut */
         SummaryOut: {
             /** Items */
@@ -3567,6 +3926,24 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WrappedDefinitionIn */
+        WrappedDefinitionIn: {
+            /** Key */
+            key: string;
+            /**
+             * Period Kind
+             * @enum {string}
+             */
+            period_kind: "month" | "quarter" | "year";
+            /** Stat Keys */
+            stat_keys: string[];
+            /**
+             * Status
+             * @default active
+             * @enum {string}
+             */
+            status: "draft" | "active" | "retired";
+        };
         /** PolicyIn */
         portalab__modules__administration__api__routes__PolicyIn: {
             /** Bounds */
@@ -3580,11 +3957,6 @@ export interface components {
              * @enum {string}
              */
             mode: "default" | "lock" | "bound";
-        };
-        /** ResolveIn */
-        portalab__modules__observability__api__routes__ResolveIn: {
-            /** Resolution */
-            resolution: string;
         };
         /** PolicyIn */
         portalab__modules__privacy__api__routes__PolicyIn: {
@@ -3603,14 +3975,6 @@ export interface components {
             reason: string;
             /** Subject User Id */
             subject_user_id?: string | null;
-        };
-        /** ResolveIn */
-        portalab__modules__support__api__incidents__ResolveIn: {
-            /**
-             * Message
-             * @default
-             */
-            message: string;
         };
     };
     responses: never;
@@ -4293,7 +4657,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["portalab__modules__support__api__incidents__ResolveIn"];
+                "application/json": components["schemas"]["IncidentResolveIn"];
             };
         };
         responses: {
@@ -4533,7 +4897,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["portalab__modules__observability__api__routes__ResolveIn"];
+                "application/json": components["schemas"]["ResolveIn"];
             };
         };
         responses: {
@@ -4910,6 +5274,341 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_definitions_api_v1_admin_statistics_definitions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    create_definition_api_v1_admin_statistics_definitions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatisticDefinitionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    definition_versions_api_v1_admin_statistics_definitions__key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_definition_api_v1_admin_statistics_definitions__key__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatisticDefinitionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_api_v1_admin_statistics_definitions__key__activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatisticConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rebuild_api_v1_admin_statistics_definitions__key__rebuild_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatisticConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retire_api_v1_admin_statistics_definitions__key__retire_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    status_api_v1_admin_statistics_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    wrapped_definitions_api_v1_admin_statistics_wrapped_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    put_wrapped_api_v1_admin_statistics_wrapped_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WrappedDefinitionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_wrapped_api_v1_admin_statistics_wrapped_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
                 };
             };
         };
@@ -6981,6 +7680,118 @@ export interface operations {
             };
         };
     };
+    get_preferences_api_v1_me_statistics_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string[];
+                    };
+                };
+            };
+        };
+    };
+    put_preferences_api_v1_me_statistics_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatisticsPreferencesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string[];
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_wrapped_api_v1_me_wrapped_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    my_wrapped_one_api_v1_me_wrapped__snapshot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     palette_api_v1_palette_resolve_get: {
         parameters: {
             query?: {
@@ -8032,6 +8843,65 @@ export interface operations {
             };
         };
     };
+    catalog_api_v1_statistics_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatisticsCatalogEntryOut"][];
+                };
+            };
+        };
+    };
+    statistic_api_v1_statistics__key__get: {
+        parameters: {
+            query?: {
+                period?: "day" | "week" | "month" | "quarter" | "year" | "last_n_days" | "custom";
+                days?: number | null;
+                start?: string | null;
+                end?: string | null;
+                anchor?: string | null;
+                subject?: string | null;
+                filter?: string[];
+            };
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatResultOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     stream_api_v1_stream_get: {
         parameters: {
             query?: never;
@@ -8650,6 +9520,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WidgetPayloadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    community_wrapped_api_v1_wrapped_community__period_start__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period_start: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
             /** @description Validation Error */

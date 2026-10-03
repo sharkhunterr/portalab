@@ -9,6 +9,7 @@
   "nav.admin.privacy": "Politiques de confidentialité",
   "nav.admin.roles": "Rôles et permissions",
   "nav.admin.services": "Gérer les services",
+  "nav.admin.statistics": "Définitions des statistiques",
   "nav.appearance": "Apparence",
   "nav.group.admin": "Administration",
   "nav.group.main": "Portail",
@@ -19,5 +20,6 @@
   "nav.privacy": "Confidentialité",
   "nav.search": "Recherche",
   "nav.services": "Services",
-  "nav.shortcuts": "Raccourcis clavier"
+  "nav.shortcuts": "Raccourcis clavier",
+  "nav.statistics": "Statistiques"
 }

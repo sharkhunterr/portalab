@@ -1259,6 +1259,19 @@
         "title": "IncidentPatchIn",
         "type": "object"
       },
+      "IncidentResolveIn": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "default": "",
+            "maxLength": 4000,
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "title": "IncidentResolveIn",
+        "type": "object"
+      },
       "IncidentUpdateIn": {
         "additionalProperties": false,
         "properties": {
@@ -2193,6 +2206,22 @@
         "title": "ReplayIn",
         "type": "object"
       },
+      "ResolveIn": {
+        "additionalProperties": false,
+        "properties": {
+          "resolution": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Resolution",
+            "type": "string"
+          }
+        },
+        "required": [
+          "resolution"
+        ],
+        "title": "ResolveIn",
+        "type": "object"
+      },
       "ResyncIn": {
         "additionalProperties": false,
         "properties": {
@@ -2842,6 +2871,337 @@
           "expires_at"
         ],
         "title": "SessionInfo",
+        "type": "object"
+      },
+      "StatResultOut": {
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "breakdown": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Breakdown",
+            "type": "array"
+          },
+          "definition_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Definition Version"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "series": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "source_states": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Source States",
+            "type": "object"
+          },
+          "state": {
+            "enum": [
+              "available",
+              "partial",
+              "stale",
+              "locked",
+              "unavailable",
+              "insufficient_data",
+              "no_data"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StatisticsTrendOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unlock_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unlock Hint"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "state",
+          "definition_version",
+          "as_of",
+          "value",
+          "series",
+          "breakdown",
+          "trend",
+          "unlock_hint",
+          "source_states",
+          "period_start",
+          "period_end"
+        ],
+        "title": "StatResultOut",
+        "type": "object"
+      },
+      "StatisticConfirmIn": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "reason": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Reason",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "StatisticConfirmIn",
+        "type": "object"
+      },
+      "StatisticDefinitionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "change_policy": {
+            "default": "forward_only",
+            "enum": [
+              "forward_only",
+              "rebuild"
+            ],
+            "title": "Change Policy",
+            "type": "string"
+          },
+          "definition": {
+            "additionalProperties": true,
+            "title": "Definition",
+            "type": "object"
+          }
+        },
+        "required": [
+          "definition"
+        ],
+        "title": "StatisticDefinitionIn",
+        "type": "object"
+      },
+      "StatisticsCatalogEntryOut": {
+        "properties": {
+          "description_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description Key"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "hideable": {
+            "title": "Hideable",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "period_options": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Period Options",
+            "type": "array"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "title_key": {
+            "title": "Title Key",
+            "type": "string"
+          },
+          "unlock_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unlock Hint"
+          },
+          "viz": {
+            "title": "Viz",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title_key",
+          "description_key",
+          "domain",
+          "scope",
+          "viz",
+          "hideable",
+          "locked",
+          "unlock_hint",
+          "period_options",
+          "hidden"
+        ],
+        "title": "StatisticsCatalogEntryOut",
+        "type": "object"
+      },
+      "StatisticsPreferencesIn": {
+        "additionalProperties": false,
+        "properties": {
+          "hidden": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 200,
+            "title": "Hidden",
+            "type": "array"
+          }
+        },
+        "title": "StatisticsPreferencesIn",
+        "type": "object"
+      },
+      "StatisticsTrendOut": {
+        "properties": {
+          "delta": {
+            "title": "Delta",
+            "type": "number"
+          },
+          "direction": {
+            "enum": [
+              "up",
+              "down",
+              "flat"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "previous_value": {
+            "title": "Previous Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "delta",
+          "direction",
+          "previous_value",
+          "percent"
+        ],
+        "title": "StatisticsTrendOut",
         "type": "object"
       },
       "SummaryOut": {
@@ -3543,6 +3903,51 @@
         "title": "WizardIn",
         "type": "object"
       },
+      "WrappedDefinitionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "pattern": "^[a-z][a-z0-9_.]{2,95}$",
+            "title": "Key",
+            "type": "string"
+          },
+          "period_kind": {
+            "enum": [
+              "month",
+              "quarter",
+              "year"
+            ],
+            "title": "Period Kind",
+            "type": "string"
+          },
+          "stat_keys": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Stat Keys",
+            "type": "array"
+          },
+          "status": {
+            "default": "active",
+            "enum": [
+              "draft",
+              "active",
+              "retired"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "period_kind",
+          "stat_keys"
+        ],
+        "title": "WrappedDefinitionIn",
+        "type": "object"
+      },
       "portalab__modules__administration__api__routes__PolicyIn": {
         "additionalProperties": false,
         "properties": {
@@ -3579,22 +3984,6 @@
           "mode"
         ],
         "title": "PolicyIn",
-        "type": "object"
-      },
-      "portalab__modules__observability__api__routes__ResolveIn": {
-        "additionalProperties": false,
-        "properties": {
-          "resolution": {
-            "maxLength": 2000,
-            "minLength": 1,
-            "title": "Resolution",
-            "type": "string"
-          }
-        },
-        "required": [
-          "resolution"
-        ],
-        "title": "ResolveIn",
         "type": "object"
       },
       "portalab__modules__privacy__api__routes__PolicyIn": {
@@ -3669,19 +4058,6 @@
           "reason"
         ],
         "title": "PolicyIn",
-        "type": "object"
-      },
-      "portalab__modules__support__api__incidents__ResolveIn": {
-        "additionalProperties": false,
-        "properties": {
-          "message": {
-            "default": "",
-            "maxLength": 4000,
-            "title": "Message",
-            "type": "string"
-          }
-        },
-        "title": "ResolveIn",
         "type": "object"
       }
     }
@@ -4657,7 +5033,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/portalab__modules__support__api__incidents__ResolveIn"
+                "$ref": "#/components/schemas/IncidentResolveIn"
               }
             }
           },
@@ -5069,7 +5445,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/portalab__modules__observability__api__routes__ResolveIn"
+                "$ref": "#/components/schemas/ResolveIn"
               }
             }
           },
@@ -5562,6 +5938,441 @@
         "summary": "Put Layout",
         "tags": [
           "shell"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/definitions": {
+      "get": {
+        "operationId": "list_definitions_api_v1_admin_statistics_definitions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Definitions Api V1 Admin Statistics Definitions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Definitions",
+        "tags": [
+          "statistics"
+        ]
+      },
+      "post": {
+        "operationId": "create_definition_api_v1_admin_statistics_definitions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticDefinitionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Definition Api V1 Admin Statistics Definitions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Definition",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/definitions/{key}": {
+      "get": {
+        "operationId": "definition_versions_api_v1_admin_statistics_definitions__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Definition Versions Api V1 Admin Statistics Definitions  Key  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Definition Versions",
+        "tags": [
+          "statistics"
+        ]
+      },
+      "put": {
+        "operationId": "update_definition_api_v1_admin_statistics_definitions__key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticDefinitionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Definition Api V1 Admin Statistics Definitions  Key  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Definition",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/definitions/{key}/activate": {
+      "post": {
+        "operationId": "activate_api_v1_admin_statistics_definitions__key__activate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Activate Api V1 Admin Statistics Definitions  Key  Activate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Activate",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/definitions/{key}/rebuild": {
+      "post": {
+        "operationId": "rebuild_api_v1_admin_statistics_definitions__key__rebuild_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Rebuild Api V1 Admin Statistics Definitions  Key  Rebuild Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rebuild",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/definitions/{key}/retire": {
+      "post": {
+        "operationId": "retire_api_v1_admin_statistics_definitions__key__retire_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Retire Api V1 Admin Statistics Definitions  Key  Retire Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retire",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/status": {
+      "get": {
+        "operationId": "status_api_v1_admin_statistics_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Status Api V1 Admin Statistics Status Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/wrapped": {
+      "get": {
+        "operationId": "wrapped_definitions_api_v1_admin_statistics_wrapped_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Wrapped Definitions Api V1 Admin Statistics Wrapped Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Wrapped Definitions",
+        "tags": [
+          "statistics"
+        ]
+      },
+      "put": {
+        "operationId": "put_wrapped_api_v1_admin_statistics_wrapped_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WrappedDefinitionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Put Wrapped Api V1 Admin Statistics Wrapped Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Wrapped",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/admin/statistics/wrapped/generate": {
+      "post": {
+        "operationId": "generate_wrapped_api_v1_admin_statistics_wrapped_generate_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Generate Wrapped Api V1 Admin Statistics Wrapped Generate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Generate Wrapped",
+        "tags": [
+          "statistics"
         ]
       }
     },
@@ -8544,6 +9355,151 @@
         ]
       }
     },
+    "/api/v1/me/statistics/preferences": {
+      "get": {
+        "operationId": "get_preferences_api_v1_me_statistics_preferences_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Response Get Preferences Api V1 Me Statistics Preferences Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Preferences",
+        "tags": [
+          "statistics"
+        ]
+      },
+      "put": {
+        "operationId": "put_preferences_api_v1_me_statistics_preferences_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticsPreferencesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Response Put Preferences Api V1 Me Statistics Preferences Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Preferences",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/me/wrapped": {
+      "get": {
+        "operationId": "my_wrapped_api_v1_me_wrapped_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response My Wrapped Api V1 Me Wrapped Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Wrapped",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/me/wrapped/{snapshot_id}": {
+      "get": {
+        "operationId": "my_wrapped_one_api_v1_me_wrapped__snapshot_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Wrapped One Api V1 Me Wrapped  Snapshot Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Wrapped One",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
     "/api/v1/palette/resolve": {
       "get": {
         "operationId": "palette_api_v1_palette_resolve_get",
@@ -10002,6 +10958,192 @@
         ]
       }
     },
+    "/api/v1/statistics/catalog": {
+      "get": {
+        "operationId": "catalog_api_v1_statistics_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StatisticsCatalogEntryOut"
+                  },
+                  "title": "Response Catalog Api V1 Statistics Catalog Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Catalog",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
+    "/api/v1/statistics/{key}": {
+      "get": {
+        "operationId": "statistic_api_v1_statistics__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "last_n_days",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "quarter",
+                "year",
+                "last_n_days",
+                "custom"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3660,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Days"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End"
+            }
+          },
+          {
+            "in": "query",
+            "name": "anchor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Anchor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "subject",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Subject"
+            }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10,
+              "title": "Filter",
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Statistic",
+        "tags": [
+          "statistics"
+        ]
+      }
+    },
     "/api/v1/stream": {
       "get": {
         "operationId": "stream_api_v1_stream_get",
@@ -10902,6 +12044,54 @@
         "summary": "Widget Data",
         "tags": [
           "dashboard"
+        ]
+      }
+    },
+    "/api/v1/wrapped/community/{period_start}": {
+      "get": {
+        "operationId": "community_wrapped_api_v1_wrapped_community__period_start__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_start",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Period Start",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Community Wrapped Api V1 Wrapped Community  Period Start  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Community Wrapped",
+        "tags": [
+          "statistics"
         ]
       }
     },
