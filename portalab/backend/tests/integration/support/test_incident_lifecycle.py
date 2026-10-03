@@ -32,8 +32,8 @@ async def test_schema(support: SupportHarness) -> None:
                 )
             ).scalars()
         )
-    assert tables == {"incidents", "incident_services", "incident_updates", "incident_evidence"}
-    assert foreign <= {"identity.users", "support.incidents"}
+    assert {"incidents", "incident_services", "incident_updates", "incident_evidence"} <= tables
+    assert all(f == "identity.users" or f.startswith("support.") for f in foreign)  # intra-module or users
 
 
 async def staff(app: FastAPI, client: httpx.AsyncClient, support: SupportHarness) -> None:

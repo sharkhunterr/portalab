@@ -17,7 +17,62 @@ class IncidentChanged(BaseModel):
     revision: int
 
 
+class TicketChanged(BaseModel):
+    ticket: str
+    seq: int
+    state: str
+    type: str
+    priority: Literal["low", "normal", "high", "urgent"]
+
+
+class FeedbackChanged(BaseModel):
+    feedback: str
+    kind: str
+    target: str
+
+
+TICKET_TYPES = (
+    "ticket.created",
+    "ticket.updated",
+    "ticket.assigned",
+    "ticket.state_changed",
+    "ticket.reopened",
+    "ticket.resolved",
+    "ticket.closed",
+)
+
+
 def register_event_types(registry: EventTypeRegistry) -> None:
+    for name in TICKET_TYPES:
+        if registry.get(name) is None:
+            registry.register(
+                EventType(
+                    name=name,
+                    owner=OWNER,
+                    schema=TicketChanged,
+                    open_payload=False,
+                    dedup_fields=("ticket", "seq"),
+                    retention_class="business",
+                    visibility_class="private",
+                    aggregatable=frozenset({"state", "type", "priority"}),
+                    automatable=True,
+                )
+            )
+    for name in ("feedback.submitted", "feedback.converted"):
+        if registry.get(name) is None:
+            registry.register(
+                EventType(
+                    name=name,
+                    owner=OWNER,
+                    schema=FeedbackChanged,
+                    open_payload=False,
+                    dedup_fields=("feedback", "target"),
+                    retention_class="business",
+                    visibility_class="restricted",
+                    aggregatable=frozenset({"kind", "target"}),
+                    automatable=True,
+                )
+            )
     for name in ("incident.created", "incident.updated", "incident.resolved"):
         if registry.get(name) is None:
             registry.register(

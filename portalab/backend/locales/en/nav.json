@@ -12,8 +12,11 @@
   "nav.admin.roles": "Roles & permissions",
   "nav.admin.services": "Manage services",
   "nav.admin.statistics": "Statistic definitions",
+  "nav.admin.support": "Support settings",
   "nav.appearance": "Appearance",
   "nav.calendar": "Calendar",
+  "nav.feedback": "Feedback",
+  "nav.feedback_review": "Feedback review",
   "nav.group.admin": "Administration",
   "nav.group.main": "Portal",
   "nav.group.me": "My account",
@@ -31,5 +34,7 @@
   "nav.services": "Services",
   "nav.shortcuts": "Keyboard shortcuts",
   "nav.statistics": "Statistics",
+  "nav.support": "Support",
+  "nav.support_queue": "Support queue",
   "nav.wiki": "Wiki"
 }

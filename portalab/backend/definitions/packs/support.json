@@ -1,0 +1,86 @@
+{
+  "domain": "support",
+  "definitions": [
+    {
+      "key": "support.tickets_opened",
+      "title_key": "support:stat.tickets_opened.title",
+      "description_key": "support:stat.tickets_opened.description",
+      "domain": "support",
+      "scope": "global",
+      "event_types": [
+        "ticket.created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "tickets.manage",
+      "hideable": true,
+      "dimensions": [
+        "type"
+      ]
+    },
+    {
+      "key": "support.tickets_resolved",
+      "title_key": "support:stat.tickets_resolved.title",
+      "description_key": "support:stat.tickets_resolved.description",
+      "domain": "support",
+      "scope": "global",
+      "event_types": [
+        "ticket.resolved"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "tickets.manage",
+      "hideable": true,
+      "dimensions": [
+        "type"
+      ]
+    },
+    {
+      "key": "support.my_tickets",
+      "title_key": "support:stat.my_tickets.title",
+      "description_key": "support:stat.my_tickets.description",
+      "domain": "support",
+      "scope": "personal",
+      "event_types": [
+        "ticket.created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "tickets.create",
+      "hideable": true
+    },
+    {
+      "key": "support.feedback_received",
+      "title_key": "support:stat.feedback_received.title",
+      "description_key": "support:stat.feedback_received.description",
+      "domain": "support",
+      "scope": "global",
+      "event_types": [
+        "feedback.submitted"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "feedback.read",
+      "hideable": true,
+      "dimensions": [
+        "kind"
+      ]
+    }
+  ]
+}

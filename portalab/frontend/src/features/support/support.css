@@ -1,0 +1,37 @@
+.support-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.support-meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.support-thread,
+.support-history {
+  list-style: none;
+  padding: 0;
+}
+
+.support-thread li[data-internal="true"] {
+  border-inline-start: 4px solid var(--color-border);
+  padding-inline-start: 0.5rem;
+  background: var(--color-surface-raised);
+}
+
+.support-actions,
+.support-filters {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.support-diagnosis li[data-kind="ai"] {
+  font-style: italic;
+}

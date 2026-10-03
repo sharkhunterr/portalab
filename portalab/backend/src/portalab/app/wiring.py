@@ -184,7 +184,7 @@ def wire_platform(
         administration.registry.register_validator(key, validator, owner="module:i18n")
     notifications = NotificationsModule(database, events, authz.audit, capabilities, authz.engine)
     notifications.register()
-    support = SupportModule(database, events, authz.audit, capabilities, authz.engine)
+    support = SupportModule(database, events, authz.audit, capabilities, authz.engine, blobs=context.blobs)
     support.register()
     statistics = StatisticsModule(
         database,
@@ -251,6 +251,7 @@ def wire_platform(
         seeds.extend(statistics.register_jobs(jobs))
         seeds.extend(notifications.register_jobs(jobs))
         seeds.extend(media.register_jobs(jobs))
+        seeds.extend(support.register_jobs(jobs))
         seeds.extend(news.register_jobs(jobs))
         seeds.extend(calendar.register_jobs(jobs))
     platform = Platform(

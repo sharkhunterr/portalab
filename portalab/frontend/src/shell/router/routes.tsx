@@ -45,6 +45,13 @@ const WikiPage = lazy(() => import("../../features/wiki/PageView"));
 const WikiEditor = lazy(() => import("../../features/wiki/PageEditor"));
 const WikiHistory = lazy(() => import("../../features/wiki/History"));
 const CalendarPage = lazy(() => import("../../features/calendar/CalendarPage"));
+const MyTickets = lazy(() => import("../../features/support/tickets/MyTickets"));
+const NewTicket = lazy(() => import("../../features/support/tickets/NewTicket"));
+const TicketPage = lazy(() => import("../../features/support/tickets/TicketPage"));
+const SupportQueue = lazy(() => import("../../features/support/staff/Queue"));
+const FeedbackReview = lazy(() => import("../../features/support/feedback/ReviewQueue"));
+const FeedbackPage = lazy(() => import("../../features/support/feedback/FeedbackPage"));
+const SupportDefinitions = lazy(() => import("../../features/support/admin/Definitions"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -144,6 +151,34 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Calendar", requiredPermission: "calendar.read" }),
         },
         {
+          path: "support",
+          handle: h({ crumb: "Support", requiredPermission: "tickets.create" }),
+          children: [
+            { index: true, element: <MyTickets /> },
+            { path: "new", element: <NewTicket />, handle: h({ crumb: "New ticket" }) },
+            {
+              path: "tickets/:ticketId",
+              element: <TicketPage />,
+              handle: h({ crumb: "Ticket", existenceSensitive: true }),
+            },
+            {
+              path: "queue",
+              element: <SupportQueue />,
+              handle: h({ crumb: "Queue", requiredPermission: "tickets.manage" }),
+            },
+            {
+              path: "feedback",
+              element: <FeedbackReview />,
+              handle: h({ crumb: "Feedback", requiredPermission: "feedback.read" }),
+            },
+          ],
+        },
+        {
+          path: "feedback",
+          element: <FeedbackPage />,
+          handle: h({ crumb: "Feedback", requiredPermission: "feedback.submit" }),
+        },
+        {
           path: "search",
           element: <Search />,
           handle: h({ crumb: "Search", requiredPermission: "search.use" }),
@@ -185,6 +220,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <StatisticsAdmin />,
               handle: h({ crumb: "Statistic definitions" }),
             },
+            { path: "support", element: <SupportDefinitions />, handle: h({ crumb: "Support settings" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },

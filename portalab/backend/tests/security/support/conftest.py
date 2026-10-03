@@ -8,4 +8,4 @@ from tests.integration.conftest import (  # noqa: F401 — fixtures
     migrated_db_url,
     migrated_template,
 )
-from tests.integration.support.conftest import app, client, clock, support  # noqa: F401 — fixtures
+from tests.integration.support.conftest import app, client, clock, people, support  # noqa: F401 — fixtures

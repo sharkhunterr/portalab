@@ -12,8 +12,11 @@
   "nav.admin.roles": "Rôles et permissions",
   "nav.admin.services": "Gérer les services",
   "nav.admin.statistics": "Définitions des statistiques",
+  "nav.admin.support": "Réglages du support",
   "nav.appearance": "Apparence",
   "nav.calendar": "Calendrier",
+  "nav.feedback": "Avis",
+  "nav.feedback_review": "Avis à traiter",
   "nav.group.admin": "Administration",
   "nav.group.main": "Portail",
   "nav.group.me": "Mon compte",
@@ -31,5 +34,7 @@
   "nav.services": "Services",
   "nav.shortcuts": "Raccourcis clavier",
   "nav.statistics": "Statistiques",
+  "nav.support": "Assistance",
+  "nav.support_queue": "File du support",
   "nav.wiki": "Wiki"
 }

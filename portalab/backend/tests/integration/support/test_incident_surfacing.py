@@ -4,14 +4,12 @@ surfaced for its service (006 ``open_for_service`` through the real port, the 00
 the open-incidents widget and the incidents search provider follow the same rule; notifications go
 through the port when present."""
 
-from uuid import uuid4
-
 import httpx
 import pytest
 from fastapi import FastAPI
 
 from portalab.capabilities.i18n import LocaleContext
-from portalab.capabilities.notifications import NOTIFY, CommunicationRef, CommunicationRequest, WithPermission
+from portalab.capabilities.notifications import WithPermission
 from portalab.capabilities.search import ParsedQuery
 from portalab.core.authz_port import Principal
 from tests.authz_fixtures import make_admin
@@ -21,22 +19,10 @@ from tests.integration.support.conftest import SupportHarness
 pytestmark = pytest.mark.integration
 
 
-class Notifier:
-    def __init__(self) -> None:
-        self.sent: list[CommunicationRequest] = []
-
-    async def send(self, request: CommunicationRequest, *, caller: object = None) -> CommunicationRef:
-        self.sent.append(request)
-        return CommunicationRef(uuid4(), True, 1)
-
-
 async def test_visibility_and_surfacing(
     app: FastAPI, client: httpx.AsyncClient, support: SupportHarness
 ) -> None:
-    notifier = Notifier()
-    support.full.identity.capabilities.provide(
-        NOTIFY, notifier, instance_ref="t", owner="module:notifications"
-    )
+    notifier = support.outbox  # the harness records ``notifications.send``
     boss = await create_user(module_of(app), "boss")
     await make_admin(support.full, boss)
     await login(client, "boss")

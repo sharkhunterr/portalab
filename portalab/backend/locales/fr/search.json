@@ -25,6 +25,7 @@
   "history.empty": "Aucune recherche récente.",
   "history.remove": "Retirer « {query} »",
   "history.title": "Recherches récentes",
+  "kind.feedback": "Avis",
   "kind.incidents": "Incidents",
   "kind.media": "Médias",
   "kind.navigation": "Pages",

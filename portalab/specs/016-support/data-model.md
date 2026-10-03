@@ -47,3 +47,19 @@ Personal data: ticket text/comments (`content`), requester/assignee refs, attach
   `notifications.send` port declared here (unprovided until 010); registration of the category with 010
   happens when 010 lands.
 - T038/T039 (shared upload helper, automation-callable create + 019 action types) are Slice B / later.
+
+## Implementation notes — Slice B (2026-10-11)
+- Revision `support_0002` adds the Slice B tables, the sequence `ticket_number_seq` (`T-000123`), append-only
+  triggers on `workflows` and `feedback_conversions`, and a guard on `ticket_history` that only allows
+  tombstoning an erased actor (`actor_id → NULL`).
+- `tickets` adds `workflow_key`, `resolved_at`; `source` also accepts `automation`; `attachments` adds
+  `private` (staff-only); `feedback_items` adds `kind` and `updated_at`; `ticket_drafts` adds `created_at`;
+  `diagnosis_runs.outcome` adds `running`; `ticket_history.kind` adds `attachment_added`;
+  `feedback_forms` adds `label`.
+- Baseline workflow/types/forms are seeded idempotently by the module (first use and worker start-up), not
+  by the migration (keeps one source of truth in code).
+- Field privacy uses `visibility: requester_and_staff | staff_only`.
+- Retention anonymizes (does not delete) closed tickets and old feedback because histories are append-only.
+- The diagnosis executor is the `support.diagnosis_executor` port (018 provides it); conversion targets are
+  `gamification.grant_contribution` (013) and `community.proposals.create` (012) — absent until those specs.
+- OQ-75..79 use the research defaults (R3, R5, R8, R9, R10).
