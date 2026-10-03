@@ -32,6 +32,7 @@ def app(platform: AuthzPlatform, heads: set[str]) -> FastAPI:
     from portalab.app.main import create_app
     from portalab.modules.events.module import EventsModule
     from portalab.modules.privacy.module import PrivacyModule
+    from portalab.modules.privacy.settings import SecurityConfig
 
     privacy = PrivacyModule(
         platform.database, platform.authz.engine.events, platform.authz.audit, platform.identity.capabilities
@@ -47,6 +48,10 @@ def app(platform: AuthzPlatform, heads: set[str]) -> FastAPI:
         administration=administration,
         events=EventsModule(platform.database, platform.authz.audit, platform.identity.capabilities),
         static_dir=None,
+        # the permission matrix sweeps every route in one minute: keep the limiter out of its way
+        security_config=SecurityConfig(
+            rate_limit_per_ip_per_minute=10_000, rate_limit_per_user_per_minute=10_000
+        ),
     )
 
 

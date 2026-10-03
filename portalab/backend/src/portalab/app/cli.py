@@ -211,6 +211,32 @@ def _cmd_audit_verify(args: argparse.Namespace) -> int:
     return asyncio.run(_audit_verify(args))
 
 
+async def _economy_verify() -> int:
+    from portalab.app.composition import import_all_models
+    from portalab.core.db import Database
+    from portalab.modules.gamification.verify.verifier import verify
+
+    settings = load_settings()
+    import_all_models()
+    database = Database.from_url(settings.database_url.reveal())
+    try:
+        report = await verify(database)
+    finally:
+        await database.dispose()
+    sys.stdout.write(f"checked={report.checked} drifts={len(report.drifts)}\n")
+    for drift in report.drifts:
+        sys.stdout.write(
+            f"DRIFT user={drift.user_id} value={drift.value} ledger={drift.ledger} balance={drift.balance}\n"
+        )
+    return 0 if report.ok else 4
+
+
+def _cmd_economy_verify(_: argparse.Namespace) -> int:
+    """Recompute balances from the economy ledger (spec 013 T011); exit code 4 when they drift."""
+    configure_logging(load_settings().log_level)
+    return asyncio.run(_economy_verify())
+
+
 def _cmd_i18n(args: argparse.Namespace) -> int:
     """Catalog tooling (spec 026 T010): check ICU validity and parity, extract used keys, pseudo-locales."""
     import json
@@ -262,6 +288,12 @@ def build_parser() -> argparse.ArgumentParser:
     audit_verify.add_argument("--from", dest="from_seq", type=int, default=None)
     audit_verify.add_argument("--to", dest="to_seq", type=int, default=None)
     audit_verify.set_defaults(func=_cmd_audit_verify)
+    economy = sub.add_parser("economy", help="economy ledger commands").add_subparsers(
+        dest="economy_command", required=True
+    )
+    economy.add_parser("verify", help="recompute balances from the ledger").set_defaults(
+        func=_cmd_economy_verify
+    )
     backup_cmd = sub.add_parser("backup", help="back up the database and DATA_DIR (operator command)")
     backup_cmd.add_argument("--output", required=True)
     backup_cmd.add_argument("--pg-dump", default=None)

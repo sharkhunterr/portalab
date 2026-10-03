@@ -59,6 +59,8 @@ from portalab.modules.dashboard.api import routers as dashboard_routers
 from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.events.api import routers as events_routers
 from portalab.modules.events.module import EventsModule
+from portalab.modules.gamification.api import routers as gamification_routers
+from portalab.modules.gamification.module import GamificationModule
 from portalab.modules.health.api import routers as health_routers
 from portalab.modules.health.module import HealthModule
 from portalab.modules.i18n.api import routers as i18n_routers
@@ -143,6 +145,7 @@ def create_app(
     news: NewsModule | None = None,
     calendar: CalendarModule | None = None,
     ai: AiModule | None = None,
+    gamification: GamificationModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -179,6 +182,7 @@ def create_app(
         app.state.news_module = platform.news
         app.state.calendar_module = platform.calendar
         app.state.ai_module = platform.ai
+        app.state.gamification_module = platform.gamification
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -243,6 +247,7 @@ def create_app(
     app.state.news_module = news
     app.state.calendar_module = calendar
     app.state.ai_module = ai
+    app.state.gamification_module = gamification
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -356,6 +361,7 @@ def create_app(
         *news_routers(),
         *calendar_routers(),
         *ai_routers(),
+        *gamification_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

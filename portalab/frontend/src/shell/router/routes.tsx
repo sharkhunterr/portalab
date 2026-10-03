@@ -53,6 +53,8 @@ const FeedbackReview = lazy(() => import("../../features/support/feedback/Review
 const FeedbackPage = lazy(() => import("../../features/support/feedback/FeedbackPage"));
 const SupportDefinitions = lazy(() => import("../../features/support/admin/Definitions"));
 const AiAdmin = lazy(() => import("../../features/ai/admin/AiAdminPage"));
+const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
+const Progression = lazy(() => import("../../features/gamification/progression/ProgressionPage"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -80,6 +82,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             },
           ],
         },
+        { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
         {
           path: "statistics",
           handle: h({ crumb: "Statistics", requiredPermission: "statistics.read" }),
@@ -223,6 +226,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             },
             { path: "support", element: <SupportDefinitions />, handle: h({ crumb: "Support settings" }) },
             { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant settings" }) },
+            { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },

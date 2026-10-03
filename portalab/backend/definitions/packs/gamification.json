@@ -1,0 +1,117 @@
+{
+  "domain": "gamification",
+  "definitions": [
+    {
+      "key": "gamification.xp_earned",
+      "title_key": "gamification:stat.xp_earned.title",
+      "description_key": "gamification:stat.xp_earned.description",
+      "domain": "gamification",
+      "scope": "personal",
+      "event_types": [
+        "reward.granted"
+      ],
+      "measure": {
+        "kind": "sum",
+        "field": "amount"
+      },
+      "viz": {
+        "type": "line"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "filter": [
+        {
+          "field": "value",
+          "op": "eq",
+          "value": "xp"
+        }
+      ]
+    },
+    {
+      "key": "gamification.coins_earned",
+      "title_key": "gamification:stat.coins_earned.title",
+      "description_key": "gamification:stat.coins_earned.description",
+      "domain": "gamification",
+      "scope": "personal",
+      "event_types": [
+        "reward.granted"
+      ],
+      "measure": {
+        "kind": "sum",
+        "field": "amount"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "filter": [
+        {
+          "field": "value",
+          "op": "eq",
+          "value": "coins"
+        }
+      ]
+    },
+    {
+      "key": "gamification.rewards_by_source",
+      "title_key": "gamification:stat.rewards_by_source.title",
+      "description_key": "gamification:stat.rewards_by_source.description",
+      "domain": "gamification",
+      "scope": "community",
+      "event_types": [
+        "reward.granted"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "dimensions": [
+        "source"
+      ]
+    },
+    {
+      "key": "gamification.level_ups",
+      "title_key": "gamification:stat.level_ups.title",
+      "description_key": "gamification:stat.level_ups.description",
+      "domain": "gamification",
+      "scope": "community",
+      "event_types": [
+        "user.level_up"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    },
+    {
+      "key": "gamification.achievements_unlocked",
+      "title_key": "gamification:stat.achievements_unlocked.title",
+      "description_key": "gamification:stat.achievements_unlocked.description",
+      "domain": "gamification",
+      "scope": "community",
+      "event_types": [
+        "achievement.unlocked"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "dimensions": [
+        "achievement"
+      ]
+    }
+  ]
+}

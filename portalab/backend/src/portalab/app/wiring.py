@@ -30,6 +30,7 @@ from portalab.modules.content.module import ContentModule
 from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.events.module import EventsModule
 from portalab.modules.events.publisher.publisher import EventStorePublisher
+from portalab.modules.gamification.module import GamificationModule
 from portalab.modules.health.module import HealthModule
 from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.context import IdentityContext
@@ -116,6 +117,7 @@ class Platform:
     news: NewsModule
     calendar: CalendarModule
     ai: AiModule
+    gamification: GamificationModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -224,6 +226,10 @@ def wire_platform(
         administration.registry.register_validator(key, validator, owner="module:dashboard")
     ai = AiModule(database, events, authz.audit, capabilities, authz.engine)
     ai.register()
+    gamification = GamificationModule(
+        database, events, authz.audit, capabilities, authz.engine, visibility=privacy.filter
+    )
+    gamification.register()
     seeds: list[Callable[[], Awaitable[None]]] = []
     if jobs is not None:
         seeds.extend(privacy.register_jobs(jobs))
@@ -259,6 +265,7 @@ def wire_platform(
         seeds.extend(news.register_jobs(jobs))
         seeds.extend(calendar.register_jobs(jobs))
         seeds.extend(ai.register_jobs(jobs))
+        seeds.extend(gamification.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -282,6 +289,7 @@ def wire_platform(
         news,
         calendar,
         ai,
+        gamification,
         seeds,
     )
     from portalab.app.config_bindings import bind

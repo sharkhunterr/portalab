@@ -14,6 +14,7 @@ import { WidgetFrame } from "./frame/WidgetFrame";
 import { GridCell, ResponsiveGrid } from "./grid/ResponsiveGrid";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import "./widgets/builtin";
+import "../gamification/widget";
 
 const ONBOARDED = "portalab.onboarding.dashboard";
 

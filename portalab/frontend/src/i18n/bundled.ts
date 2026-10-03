@@ -3,6 +3,7 @@ import calendar from "../../../backend/locales/en/calendar.json";
 import content from "../../../backend/locales/en/content.json";
 import core from "../../../backend/locales/en/core.json";
 import dashboard from "../../../backend/locales/en/dashboard.json";
+import gamification from "../../../backend/locales/en/gamification.json";
 import i18n from "../../../backend/locales/en/i18n.json";
 import media from "../../../backend/locales/en/media.json";
 import nav from "../../../backend/locales/en/nav.json";
@@ -24,6 +25,7 @@ export const BUNDLED: Record<string, Record<string, string>> = {
   content,
   core,
   dashboard,
+  gamification,
   i18n,
   media,
   nav,

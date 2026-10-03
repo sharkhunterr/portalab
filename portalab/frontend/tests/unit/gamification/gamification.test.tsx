@@ -1,0 +1,148 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
+import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, expect, it, vi } from "vitest";
+
+// 013 — progression shows XP/level, Contribution and Coins separately; achievements use text states and
+// keep hidden ones hidden; the manual grant asks for confirmation above the threshold; anomaly decisions
+// need a reason.
+
+const fake = vi.hoisted(() => ({
+  handler: (_: Request): Response | Promise<Response> => new Response(null),
+}));
+vi.mock("../../../src/api/client", async (importOriginal) => {
+  const { installFakeApi } = await import("../../support/fake-api");
+  const installed = installFakeApi();
+  Object.defineProperty(installed, "handler", { get: () => fake.handler });
+  return importOriginal();
+});
+
+import { AchievementGrid } from "../../../src/features/gamification/achievements/Grid";
+import { AnomalyQueue } from "../../../src/features/gamification/admin/AnomalyQueue";
+import { ManualGrant } from "../../../src/features/gamification/admin/ManualGrant";
+import ProgressionPage from "../../../src/features/gamification/progression/ProgressionPage";
+import { json } from "../../support/fake-api";
+
+const PROGRESSION = {
+  user_id: "u1",
+  xp: 150,
+  level: 2,
+  level_floor: 100,
+  next_level_at: 283,
+  contribution: 7,
+  coins: 40,
+  reserved_coins: 0,
+  achievements: 1,
+};
+
+function show(element: ReactNode) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={client}>
+      <RouterProvider router={createMemoryRouter([{ path: "/", element }])} />
+    </QueryClientProvider>,
+  );
+}
+
+describe("gamification", () => {
+  it("shows the three values separately with the derived level", async () => {
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/me/progression") return json(200, PROGRESSION);
+      if (path === "/api/v1/me/achievements") return json(200, []);
+      return json(200, {
+        items: [
+          {
+            id: "t1",
+            value: "coins",
+            delta: -10,
+            kind: "spend",
+            source_kind: "marketplace",
+            rule_key: null,
+            rule_version: null,
+            reason: "Poster",
+            reverses_transaction_id: null,
+            occurred_at: "2026-10-01T12:00:00Z",
+          },
+        ],
+        next_cursor: null,
+      });
+    };
+    show(<ProgressionPage />);
+    expect(await screen.findByRole("heading", { name: "Level 2" })).toBeTruthy();
+    expect(screen.getByText("133 XP to level 3")).toBeTruthy();
+    const values = Array.from(document.querySelectorAll(".gamification-values dt")).map(
+      (dt) => dt.textContent,
+    );
+    expect(values).toEqual(["XP", "Contribution", "Coins"]);
+    expect(await screen.findByText("Spent")).toBeTruthy();
+    expect(screen.getByText("-10 Coins")).toBeTruthy();
+  });
+
+  it("labels achievement states in text and keeps hidden ones hidden", () => {
+    show(
+      <AchievementGrid
+        achievements={[
+          { key: "a", state: "unlocked", label: "Rock fan", unlocked_at: "2026-10-01T12:00:00Z" },
+          { key: "b", state: "locked", label: "Veteran", progress: [{ current: 2, target: 5 }] },
+          { key: "c", state: "hidden" },
+        ]}
+      />,
+    );
+    expect(screen.getByText("Unlocked")).toBeTruthy();
+    expect(screen.getByText("Locked")).toBeTruthy();
+    expect(screen.getByText("2 / 5")).toBeTruthy();
+    expect(screen.getByText("Hidden achievement")).toBeTruthy();
+  });
+
+  it("confirms large manual grants", async () => {
+    const bodies: Array<Record<string, unknown>> = [];
+    fake.handler = async (request) => {
+      const body = (await request.json()) as Record<string, unknown>;
+      bodies.push(body);
+      return body.confirmation
+        ? json(200, { transaction: { id: "t" } })
+        : json(409, {
+            code: "authz.confirmation_required",
+            title: "Confirmation required",
+            confirmation: "tok",
+          });
+    };
+    show(<ManualGrant />);
+    fireEvent.change(screen.getByLabelText("User id"), { target: { value: "u1" } });
+    fireEvent.change(screen.getByLabelText("Amount"), { target: { value: "5000" } });
+    fireEvent.change(screen.getByLabelText("Reason"), { target: { value: "Event prize" } });
+    fireEvent.click(screen.getByRole("button", { name: "Grant" }));
+    expect(await screen.findByText("This amount needs a confirmation. Grant anyway?")).toBeTruthy();
+    fireEvent.click(screen.getAllByRole("button", { name: "Grant" })[1] as HTMLElement);
+    expect(await screen.findByRole("status")).toBeTruthy();
+    expect(bodies[1]).toMatchObject({ amount: 5000, confirmation: "tok" });
+  });
+
+  it("requires a reason for anomaly decisions", async () => {
+    const posts: string[] = [];
+    fake.handler = (request) => {
+      if (request.method === "POST") {
+        posts.push(new URL(request.url).pathname);
+        return json(200, { dropped: 1 });
+      }
+      return json(200, [
+        {
+          id: "f1",
+          user_id: "u1",
+          kind: "grants_per_hour",
+          window_start: "2026-10-01T12:00:00Z",
+          status: "open",
+          withheld: [],
+        },
+      ]);
+    };
+    show(<AnomalyQueue />);
+    const reject = await screen.findByRole("button", { name: "Reject" });
+    expect((reject as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Bot traffic" } });
+    fireEvent.click(reject);
+    await waitFor(() => expect(posts).toEqual(["/api/v1/admin/economy/anomalies/f1/reject"]));
+  });
+});
