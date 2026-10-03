@@ -246,3 +246,20 @@ class ProgressionPreference(GamificationBase):
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
     level: Mapped[str] = mapped_column(String(12), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class LeaderboardSnapshot(GamificationBase):
+    """Slice B (R13): a materialized ranking per ``(metric, period)``, rebuilt by the leaderboard job.
+    ``entries`` hold ``[user_id, score]`` pairs in rank order (ties: earliest attainment, then id);
+    visibility is applied at read time, never baked in."""
+
+    __tablename__ = "leaderboard_snapshots"
+    __table_args__ = (CheckConstraint("period IN ('all', 'month', 'week')", name="period"),)
+
+    metric: Mapped[str] = mapped_column(String(32), primary_key=True)
+    period: Mapped[str] = mapped_column(String(8), primary_key=True)
+    period_start: Mapped[datetime | None] = mapped_column(TZDateTime)
+    computed_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    entries: Mapped[list[list[Any]]] = mapped_column(
+        JSONB, nullable=False, default=list, info=not_personal("user ids and scores, rebuilt by the job")
+    )

@@ -53,6 +53,7 @@ from portalab.modules.community.events.types import register_event_types
 from portalab.modules.community.feed.projector import CONSUMER, FeedProjector
 from portalab.modules.community.feed.service import FeedService
 from portalab.modules.community.integrations import ACTIVITY_WIDGET, ActivityWidget
+from portalab.modules.community.leaderboards.view import LeaderboardsView
 from portalab.modules.community.members.service import Members
 from portalab.modules.community.models import FeedEntry
 from portalab.modules.community.observability import log, metrics
@@ -106,6 +107,7 @@ class CommunityModule:
             database, event_types, self.visibility, lambda: self.config, clock=clock
         )
         self.profiles = ProfileAssembler(sections, self.visibility, authorizer)
+        self.leaderboards = LeaderboardsView(capabilities, self.display_name)
         self.events = CommunityEvents(database, audit, events, authorizer, capabilities, clock=clock)
 
     async def display_name(self, user: UUID) -> str | None:

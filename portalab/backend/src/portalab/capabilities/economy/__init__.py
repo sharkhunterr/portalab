@@ -31,6 +31,7 @@ ECONOMY = "economy.service"
 REWARDS = "economy.rewards"
 MODIFIERS = "economy.modifiers"
 DEFINITION_SOURCES = "economy.definition_sources"
+LEADERBOARDS = "economy.leaderboards"
 
 Value = Literal["xp", "contribution", "coins"]
 VALUES: tuple[Value, ...] = ("xp", "contribution", "coins")
@@ -206,6 +207,39 @@ class Progress:
     extra: Mapping[str, Any] = field(default_factory=dict)
 
 
+LeaderboardPeriod = Literal["all", "month", "week"]
+PERIODS: tuple[LeaderboardPeriod, ...] = ("all", "month", "week")
+
+
+@dataclass(frozen=True, slots=True)
+class LeaderboardEntry:
+    rank: int  # among the members this viewer may see on leaderboards (no gap reveals a hidden member)
+    user_id: UUID
+    score: int
+    me: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class LeaderboardView:
+    metric: str
+    period: LeaderboardPeriod
+    computed_at: datetime | None
+    entries: tuple[LeaderboardEntry, ...]
+    me: LeaderboardEntry | None = None  # the viewer's own position, always (even when not listed)
+
+
+@runtime_checkable
+class LeaderboardReader(Protocol):
+    """Leaderboards (013 slice B) for presentation surfaces (Community 012, Dashboard): ranks honour each
+    member's 021 ``progression`` visibility on the leaderboard surface at read time."""
+
+    def metrics(self) -> Sequence[str]: ...
+
+    async def board(
+        self, viewer: Principal, metric: str, period: LeaderboardPeriod = "all", *, limit: int = 50
+    ) -> LeaderboardView: ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -217,4 +251,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(REWARDS, RewardService, False, "Bounded manual and automation grants (Gamification 013)"),
     _spec(MODIFIERS, ModifierProvider, True, "Campaign reward modifiers (Campaigns 014)"),
     _spec(DEFINITION_SOURCES, DefinitionSource, True, "Extra achievement definitions (Campaigns 014)"),
+    _spec(LEADERBOARDS, LeaderboardReader, False, "Visibility-bound leaderboards (Gamification 013)"),
 )

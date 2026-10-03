@@ -12,7 +12,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
-from portalab.capabilities.economy import ECONOMY, REWARDS
+from portalab.capabilities.economy import ECONOMY, LEADERBOARDS, REWARDS
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -58,6 +58,7 @@ from portalab.modules.gamification.integrations import (
 from portalab.modules.gamification.integrations import (
     PROGRESSION as PROGRESSION_DATUM,
 )
+from portalab.modules.gamification.leaderboards.service import LeaderboardService
 from portalab.modules.gamification.ledger.writer import LedgerWriter
 from portalab.modules.gamification.levels.service import LevelService
 from portalab.modules.gamification.manual.service import RewardServiceImpl
@@ -74,6 +75,7 @@ from portalab.modules.gamification.verify.verifier import verify
 OWNER = "module:gamification"
 INSTANCE = "gamification"
 PURGE_JOB = "gamification.purge"
+LEADERBOARD_JOB = "gamification.leaderboards"  # snapshots older than refreshMinutes are rebuilt
 
 
 class GamificationModule:
@@ -145,6 +147,9 @@ class GamificationModule:
             clock=clock,
         )
         self.progression = ProgressionService(database, self.levels)
+        self.leaderboards = LeaderboardService(
+            database, self.levels, self.visibility, capabilities, config, clock=clock
+        )
 
     def register(self) -> None:
         register_event_types(self.event_types)
@@ -155,10 +160,13 @@ class GamificationModule:
             (REWARDS, self.rewards),
             (PROGRESSION, self.progression),
             (CONTRIBUTIONS, self.rewards),
+            (LEADERBOARDS, self.leaderboards),
         ):
             if not self.capabilities.system_providers(name):
                 self.capabilities.provide(name, provider, instance_ref=INSTANCE, owner=OWNER)
-        participant = GamificationParticipant(self.database, self.writer, clock=self.clock)
+        participant = GamificationParticipant(
+            self.database, self.writer, clock=self.clock, leaderboards=self.leaderboards
+        )
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == INSTANCE for p in self.capabilities.system_providers(capability)):
                 self.capabilities.provide(capability, participant, instance_ref=INSTANCE, owner=OWNER)
@@ -204,9 +212,15 @@ class GamificationModule:
         async def purge() -> None:
             await self.purge()
 
+        async def leaderboards() -> None:
+            await self.leaderboards.refresh()
+
         return [
             self.start,
             register_periodic(jobs, self.database, PURGE_JOB, timedelta(hours=6), purge, owner=OWNER),
+            register_periodic(
+                jobs, self.database, LEADERBOARD_JOB, timedelta(minutes=5), leaderboards, owner=OWNER
+            ),
         ]
 
     async def start(self) -> None:

@@ -5,6 +5,7 @@ progress and withheld entries; ledger rows stay bound to the tombstoned user id 
 on retry. Export lists the user's own transactions and achievements."""
 
 from collections.abc import Sequence
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -27,10 +28,18 @@ from portalab.modules.gamification.models import (
 
 
 class GamificationParticipant:
-    def __init__(self, database: Database, writer: LedgerWriter, *, clock: Clock | None = None) -> None:
+    def __init__(
+        self,
+        database: Database,
+        writer: LedgerWriter,
+        *,
+        clock: Clock | None = None,
+        leaderboards: Any = None,
+    ) -> None:
         self.database = database
         self.writer = writer
         self.clock = clock
+        self.leaderboards = leaderboards  # drops the user from snapshots (slice B)
 
     async def export(self, user_id: UUID) -> Sequence[ExportRecord]:
         async with self.database.session() as session:
@@ -130,3 +139,5 @@ class GamificationParticipant:
                 AppliedEvent,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
+        if self.leaderboards is not None:
+            await self.leaderboards.forget(user_id)

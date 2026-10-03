@@ -2257,6 +2257,61 @@
         "title": "CommunityFeedPage",
         "type": "object"
       },
+      "CommunityLeaderboardOut": {
+        "properties": {
+          "computed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed At"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/CommunityRankOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "me": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommunityRankOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric",
+          "period",
+          "state",
+          "computed_at",
+          "entries",
+          "me"
+        ],
+        "title": "CommunityLeaderboardOut",
+        "type": "object"
+      },
       "CommunityMemberOut": {
         "properties": {
           "display_name": {
@@ -2310,6 +2365,53 @@
         "title": "CommunityMemberPage",
         "type": "object"
       },
+      "CommunityPositionOut": {
+        "properties": {
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric",
+          "period",
+          "state",
+          "rank",
+          "score"
+        ],
+        "title": "CommunityPositionOut",
+        "type": "object"
+      },
       "CommunityProfileOut": {
         "properties": {
           "display_name": {
@@ -2342,6 +2444,47 @@
           "sections"
         ],
         "title": "CommunityProfileOut",
+        "type": "object"
+      },
+      "CommunityRankOut": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "me": {
+            "title": "Me",
+            "type": "boolean"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rank",
+          "user_id",
+          "display_name",
+          "score",
+          "me"
+        ],
+        "title": "CommunityRankOut",
         "type": "object"
       },
       "CommunitySectionOut": {
@@ -4266,6 +4409,139 @@
           "h"
         ],
         "title": "LayoutItemIn",
+        "type": "object"
+      },
+      "LeaderboardEntryOut": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "me": {
+            "title": "Me",
+            "type": "boolean"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rank",
+          "user_id",
+          "display_name",
+          "score",
+          "me"
+        ],
+        "title": "LeaderboardEntryOut",
+        "type": "object"
+      },
+      "LeaderboardOut": {
+        "properties": {
+          "computed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed At"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/LeaderboardEntryOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "me": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LeaderboardEntryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric",
+          "period",
+          "computed_at",
+          "entries",
+          "me"
+        ],
+        "title": "LeaderboardOut",
+        "type": "object"
+      },
+      "LeaderboardPositionOut": {
+        "properties": {
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "metric",
+          "period",
+          "rank",
+          "score"
+        ],
+        "title": "LeaderboardPositionOut",
         "type": "object"
       },
       "LevelCurveIn": {
@@ -18169,6 +18445,158 @@
         ]
       }
     },
+    "/api/v1/community/leaderboards": {
+      "get": {
+        "operationId": "community_metrics_api_v1_community_leaderboards_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Community Metrics Api V1 Community Leaderboards Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Community Metrics",
+        "tags": [
+          "community"
+        ]
+      }
+    },
+    "/api/v1/community/leaderboards/{metric}": {
+      "get": {
+        "operationId": "community_leaderboard_api_v1_community_leaderboards__metric__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "metric",
+            "required": true,
+            "schema": {
+              "title": "Metric",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "month",
+                "week"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityLeaderboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Community Leaderboard",
+        "tags": [
+          "community"
+        ]
+      }
+    },
+    "/api/v1/community/me/position": {
+      "get": {
+        "operationId": "community_position_api_v1_community_me_position_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "metric",
+            "required": false,
+            "schema": {
+              "default": "xp",
+              "title": "Metric",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "month",
+                "week"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityPositionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Community Position",
+        "tags": [
+          "community"
+        ]
+      }
+    },
     "/api/v1/community/members": {
       "get": {
         "operationId": "members_api_v1_community_members_get",
@@ -19981,6 +20409,100 @@
         ]
       }
     },
+    "/api/v1/leaderboards": {
+      "get": {
+        "operationId": "leaderboard_metrics_api_v1_leaderboards_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Leaderboard Metrics Api V1 Leaderboards Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Leaderboard Metrics",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{metric}": {
+      "get": {
+        "operationId": "leaderboard_api_v1_leaderboards__metric__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "metric",
+            "required": true,
+            "schema": {
+              "title": "Metric",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "month",
+                "week"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Leaderboard",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
     "/api/v1/maintenance": {
       "get": {
         "operationId": "list_windows_api_v1_maintenance_get",
@@ -20681,6 +21203,64 @@
         "summary": "My History",
         "tags": [
           "events"
+        ]
+      }
+    },
+    "/api/v1/me/leaderboard-position": {
+      "get": {
+        "operationId": "my_position_api_v1_me_leaderboard_position_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "metric",
+            "required": false,
+            "schema": {
+              "default": "xp",
+              "title": "Metric",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "month",
+                "week"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderboardPositionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Position",
+        "tags": [
+          "gamification"
         ]
       }
     },

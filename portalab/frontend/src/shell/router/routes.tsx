@@ -99,6 +99,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Member", existenceSensitive: true }),
             },
             { path: "feed", element: <Community view="feed" />, handle: h({ crumb: "Activity" }) },
+            {
+              path: "leaderboards",
+              element: <Community view="leaderboards" />,
+              handle: h({ crumb: "Leaderboards" }),
+            },
             { path: "events", element: <Community view="events" />, handle: h({ crumb: "Events" }) },
           ],
         },

@@ -72,8 +72,8 @@ Prerequisites (not implemented here): `D-001` kernel/jobs/outbox · `D-002/003` 
 - [X] T035 Run `specs/013-gamification-economy/quickstart.md` steps 1–7 end-to-end; record deviations and open product confirmations (OQ-60..64 defaults, R2 boundary)
 
 ## Phase 12: Slice B — Leaderboards (step 23) — US9
-- [ ] T036 [P] [US9] Write `backend/tests/integration/gamification/test_leaderboards.py`: metrics (xp, level, contribution, achievements; Coins only when enabled); periods all-time/month/week from ledger windows; visibility/opt-out (021 levels: Public/Community/Leaderboards-only/Private) honored; viewer always sees own rank; ties deterministic; tombstoned users excluded; no private data exposed
-- [ ] T037 [US9] Implement `GM/leaderboards/{service,job}.py` (snapshots every `refreshMinutes`), routers `GET /leaderboards/{metric}`, `GET /me/leaderboard-position`, and `FG/leaderboards/Leaderboard.tsx` (accessible table, own-rank highlight, states)
+- [X] T036 [P] [US9] Write `backend/tests/integration/gamification/test_leaderboards.py`: metrics (xp, level, contribution, achievements; Coins only when enabled); periods all-time/month/week from ledger windows; visibility/opt-out (021 levels: Public/Community/Leaderboards-only/Private) honored; viewer always sees own rank; ties deterministic; tombstoned users excluded; no private data exposed
+- [X] T037 [US9] Implement `GM/leaderboards/{service,job}.py` (snapshots every `refreshMinutes`), routers `GET /leaderboards/{metric}`, `GET /me/leaderboard-position`, and `FG/leaderboards/Leaderboard.tsx` (accessible table, own-rank highlight, states)
 
 ## Phase 13: Slice C — Quests, daily objectives, challenges (step 24) — US3b
 - [ ] T038 [P] [US3] Write `backend/tests/integration/gamification/test_quests.py`: quest/daily/challenge criteria over counters; period keys in `economy.timezone` incl. DST; daily reset; completion once per `(user, quest, period)`; reward auto-granted via ledger; `quest.completed` emitted; campaign-linked quests respect campaign window (014 stub); duplicate/late events safe

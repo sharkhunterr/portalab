@@ -76,13 +76,20 @@ Markdown description (011 renderer), start/end or all-day, reference time zone a
 version. The 011 Calendar shows them through `CalendarSource(kind="community_event")`; reminders re-check
 the event at fire time, so a cancelled or no-longer-permitted event is never announced.
 
+## Leaderboards (slice B)
+
+`/community/leaderboards` presents 013's leaderboards: metrics, periods, ranking, opt-out (Private) and
+visibility all come from the `economy.leaderboards` provider; Community only adds display names. The
+viewer's own position is always shown (`GET /api/v1/community/me/position`). When 013 is absent or failing
+the view answers `state: "unavailable"` and the page keeps working.
+
 ## Settings
 
 `community.feed.eventTypes`, `community.feed.retentionDays`, `community.members.listingDefault`,
 `community.proposals.moderation`, `community.recognition.maxPerDay`,
 `community.recognition.pairCooldownDays`, `community.discovery.shelfSize`.
 
-## API (slice A)
+## API
 
 | Path | Access |
 |---|---|
@@ -92,6 +99,7 @@ the event at fire time, so a cancelled or no-longer-permitted event is never ann
 | `GET /api/v1/community/discovery` · `GET …/discovery/{shelf}` | `community.read` |
 | `GET /api/v1/community/events[?start&end]` · `GET …/events/{id}` | `community.read` + audience |
 | `POST /api/v1/community/events` · `PATCH …/{id}` · `POST …/{id}/cancel` | `community.events.manage` |
+| `GET /api/v1/community/leaderboards` · `GET …/leaderboards/{metric}?period` · `GET /api/v1/community/me/position` | `community.read`; delegated to 013 (slice B) |
 
 ## Slice map
 

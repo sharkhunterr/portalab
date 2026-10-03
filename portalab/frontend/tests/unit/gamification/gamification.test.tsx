@@ -51,6 +51,9 @@ describe("gamification", () => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/me/progression") return json(200, PROGRESSION);
       if (path === "/api/v1/me/achievements") return json(200, []);
+      if (path === "/api/v1/leaderboards/xp") {
+        return json(200, { metric: "xp", period: "all", computed_at: null, entries: [], me: null });
+      }
       return json(200, {
         items: [
           {
@@ -78,6 +81,7 @@ describe("gamification", () => {
     expect(values).toEqual(["XP", "Contribution", "Coins"]);
     expect(await screen.findByText("Spent")).toBeTruthy();
     expect(screen.getByText("-10 Coins")).toBeTruthy();
+    expect(await screen.findByText("You are not ranked yet.")).toBeTruthy();
   });
 
   it("labels achievement states in text and keeps hidden ones hidden", () => {

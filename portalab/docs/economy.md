@@ -93,6 +93,24 @@ unlocked. Campaign-scoped achievements come from `economy.definition_sources` pr
   permissions, idempotent, anomaly-guarded.
 * Contributions (016): `gamification.grant_contribution` grants `economy.contribution.amount` once per source.
 
+## Leaderboards (slice B)
+
+Metrics `xp`, `level`, `contribution`, `achievements` (`economy.leaderboards.metrics`), plus `coins` only when
+`economy.leaderboards.includeCoins` is on. Periods: `all` (balances), `month` and `week` (what was *earned*
+in the window — grants, manual grants and corrections — with period starts in `economy.timezone`);
+`level` is all-time only. A job materializes `gamification.leaderboard_snapshots` every
+`economy.leaderboards.refreshMinutes` (checked every 5 minutes; a missing or out-of-period snapshot is
+computed on first read). Only active accounts are ranked; ties go to the earliest attainment, then the id.
+
+Visibility is applied **at read time** on the 021 `progression` datum with the *leaderboard* surface:
+Public, Community and Leaderboards-only members appear, Private members do not — for Admins too. Ranks
+count only the members the viewer may see (no gap reveals a hidden member) and the viewer always gets their
+own position. Erasure drops the user from every snapshot at once.
+
+`GET /api/v1/leaderboards` (offered metrics) · `GET /api/v1/leaderboards/{metric}?period=all|month|week` ·
+`GET /api/v1/me/leaderboard-position?metric&period`. Presentation surfaces (Community 012) use the
+`economy.leaderboards` capability (`LeaderboardReader.board(viewer, metric, period)`).
+
 ## Privacy
 
 Progression is the datum class `progression` (default private; the owner chooses its visibility, 021):

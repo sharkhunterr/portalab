@@ -2589,6 +2589,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/community/leaderboards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Community Metrics */
+        get: operations["community_metrics_api_v1_community_leaderboards_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/leaderboards/{metric}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Community Leaderboard */
+        get: operations["community_leaderboard_api_v1_community_leaderboards__metric__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/me/position": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Community Position */
+        get: operations["community_position_api_v1_community_me_position_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/community/members": {
         parameters: {
             query?: never;
@@ -3205,6 +3256,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/leaderboards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Leaderboard Metrics */
+        get: operations["leaderboard_metrics_api_v1_leaderboards_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leaderboards/{metric}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Leaderboard */
+        get: operations["leaderboard_api_v1_leaderboards__metric__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maintenance": {
         parameters: {
             query?: never;
@@ -3423,6 +3508,23 @@ export interface paths {
         };
         /** My History */
         get: operations["my_history_api_v1_me_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/leaderboard-position": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Position */
+        get: operations["my_position_api_v1_me_leaderboard_position_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6326,6 +6428,20 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** CommunityLeaderboardOut */
+        CommunityLeaderboardOut: {
+            /** Computed At */
+            computed_at: string | null;
+            /** Entries */
+            entries: components["schemas"]["CommunityRankOut"][];
+            me: components["schemas"]["CommunityRankOut"] | null;
+            /** Metric */
+            metric: string;
+            /** Period */
+            period: string;
+            /** State */
+            state: string;
+        };
         /** CommunityMemberOut */
         CommunityMemberOut: {
             /** Display Name */
@@ -6348,6 +6464,19 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** CommunityPositionOut */
+        CommunityPositionOut: {
+            /** Metric */
+            metric: string;
+            /** Period */
+            period: string;
+            /** Rank */
+            rank: number | null;
+            /** Score */
+            score: number | null;
+            /** State */
+            state: string;
+        };
         /** CommunityProfileOut */
         CommunityProfileOut: {
             /** Display Name */
@@ -6359,6 +6488,22 @@ export interface components {
             id: string;
             /** Sections */
             sections: components["schemas"]["CommunitySectionOut"][];
+        };
+        /** CommunityRankOut */
+        CommunityRankOut: {
+            /** Display Name */
+            display_name: string | null;
+            /** Me */
+            me: boolean;
+            /** Rank */
+            rank: number;
+            /** Score */
+            score: number;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
         };
         /** CommunitySectionOut */
         CommunitySectionOut: {
@@ -7049,6 +7194,45 @@ export interface components {
             w: number;
             /** Widget Key */
             widget_key: string;
+        };
+        /** LeaderboardEntryOut */
+        LeaderboardEntryOut: {
+            /** Display Name */
+            display_name: string | null;
+            /** Me */
+            me: boolean;
+            /** Rank */
+            rank: number;
+            /** Score */
+            score: number;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** LeaderboardOut */
+        LeaderboardOut: {
+            /** Computed At */
+            computed_at: string | null;
+            /** Entries */
+            entries: components["schemas"]["LeaderboardEntryOut"][];
+            me: components["schemas"]["LeaderboardEntryOut"] | null;
+            /** Metric */
+            metric: string;
+            /** Period */
+            period: string;
+        };
+        /** LeaderboardPositionOut */
+        LeaderboardPositionOut: {
+            /** Metric */
+            metric: string;
+            /** Period */
+            period: string;
+            /** Rank */
+            rank: number | null;
+            /** Score */
+            score: number | null;
         };
         /** LevelCurveIn */
         LevelCurveIn: {
@@ -14681,6 +14865,92 @@ export interface operations {
             };
         };
     };
+    community_metrics_api_v1_community_leaderboards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    community_leaderboard_api_v1_community_leaderboards__metric__get: {
+        parameters: {
+            query?: {
+                period?: "all" | "month" | "week";
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                metric: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityLeaderboardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    community_position_api_v1_community_me_position_get: {
+        parameters: {
+            query?: {
+                metric?: string;
+                period?: "all" | "month" | "week";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityPositionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     members_api_v1_community_members_get: {
         parameters: {
             query?: {
@@ -15901,6 +16171,60 @@ export interface operations {
             };
         };
     };
+    leaderboard_metrics_api_v1_leaderboards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    leaderboard_api_v1_leaderboards__metric__get: {
+        parameters: {
+            query?: {
+                period?: "all" | "month" | "week";
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                metric: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_windows_api_v1_maintenance_get: {
         parameters: {
             query?: {
@@ -16412,6 +16736,38 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_position_api_v1_me_leaderboard_position_get: {
+        parameters: {
+            query?: {
+                metric?: string;
+                period?: "all" | "month" | "week";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardPositionOut"];
                 };
             };
             /** @description Validation Error */

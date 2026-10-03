@@ -201,3 +201,17 @@ export function useVerify() {
       (await api.GET("/api/v1/admin/economy/verify")).data as unknown as { ok: boolean; drifts: unknown[] },
   });
 }
+
+export type LeaderboardBoard = components["schemas"]["LeaderboardOut"];
+
+export function useLeaderboard(metric: string, period: "all" | "month" | "week") {
+  return useQuery({
+    queryKey: [...KEY, "leaderboard", metric, period],
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/leaderboards/{metric}", {
+          params: { path: { metric }, query: { period } },
+        })
+      ).data as LeaderboardBoard,
+  });
+}

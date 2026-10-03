@@ -99,3 +99,31 @@ describe("community", () => {
     expect(screen.getByText(/unlocked the achievement first-steps/)).toBeTruthy();
   });
 });
+
+describe("leaderboard table", () => {
+  it("highlights the viewer in text and states their position", async () => {
+    const { Leaderboard } = await import("../../../src/features/gamification/leaderboards/Leaderboard");
+    const me = { rank: 2, user_id: "u2", display_name: "Ulrich", score: 20, me: true };
+    render(
+      <RouterProvider
+        router={createMemoryRouter([
+          {
+            path: "/",
+            element: (
+              <Leaderboard
+                caption="Leaderboard"
+                rows={[{ rank: 1, user_id: "u1", display_name: "Ursula", score: 60, me: false }, me]}
+                me={me}
+                profileLinks
+              />
+            ),
+          },
+        ])}
+      />,
+    );
+    expect(screen.getByRole("table")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Ursula" }).getAttribute("href")).toBe("/community/members/u1");
+    expect(screen.getByText("Ulrich (you)")).toBeTruthy();
+    expect(screen.getByText("Your position: #2 (20)")).toBeTruthy();
+  });
+});

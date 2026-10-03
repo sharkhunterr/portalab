@@ -38,8 +38,8 @@ Prerequisites (not implemented here): `D-001` kernel · `D-002` directory + `is_
 - [X] T016 [P] Add `/community/*` routes to the permission-matrix test (voting route allow-listed as "Active account invariant"), regenerate OpenAPI client, write `docs/community.md` (non-goals, visibility model, section registry, slice map)
 
 ## Phase 6: US3 — Leaderboards respecting visibility (P2) — Slice B (step 23)
-- [ ] T017 [P] [US3] Write `backend/tests/integration/community/test_leaderboards_view.py` (fake/real 013 slice B): metrics/periods delegated to `LeaderboardService`; opt-out and visibility honored (Private/hidden users absent); viewer sees own position; no private data by permission alone; 013 down ⇒ `unavailable` state without breaking the page
-- [ ] T018 [US3] Implement `CO/leaderboards/view.py`, routers `GET /community/leaderboards/{metric}`, `GET /community/me/position`, and frontend `FC/leaderboards/LeaderboardPage.tsx` (accessible table, metric/period selectors, own-rank highlight)
+- [X] T017 [P] [US3] Write `backend/tests/integration/community/test_leaderboards_view.py` (fake/real 013 slice B): metrics/periods delegated to `LeaderboardService`; opt-out and visibility honored (Private/hidden users absent); viewer sees own position; no private data by permission alone; 013 down ⇒ `unavailable` state without breaking the page
+- [X] T018 [US3] Implement `CO/leaderboards/view.py`, routers `GET /community/leaderboards/{metric}`, `GET /community/me/position`, and frontend `FC/leaderboards/LeaderboardPage.tsx` (accessible table, metric/period selectors, own-rank highlight)
 
 ## Phase 7: US4 — Achievements, quests, challenges display — Slice C (step 24)
 - [ ] T019 [P] [US4] Write `backend/tests/integration/community/test_achievements_quests_view.py`: definitions and reward logic come from 013 (no re-definition); secret/hidden achievements revealed only after unlock; viewer sees others' unlocked achievements only per visibility; challenges rendered as time-boxed quests; progress shows only the viewer's own

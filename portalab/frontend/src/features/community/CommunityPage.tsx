@@ -3,6 +3,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { DiscoveryHome } from "./discovery/DiscoveryHome";
 import { EventList } from "./events/EventList";
 import { Feed } from "./feed/Feed";
+import { LeaderboardPage } from "./leaderboards/LeaderboardPage";
 import { Directory } from "./members/Directory";
 import { ProfilePage } from "./profile/ProfilePage";
 import "./community.css";
@@ -11,6 +12,7 @@ const TABS = [
   { to: "/community", key: "discover", end: true },
   { to: "/community/members", key: "members", end: true },
   { to: "/community/feed", key: "feed", end: true },
+  { to: "/community/leaderboards", key: "leaderboards", end: true },
   { to: "/community/events", key: "events", end: true },
 ] as const;
 
@@ -18,7 +20,7 @@ const TABS = [
 export default function CommunityPage({
   view,
 }: {
-  view: "discover" | "members" | "profile" | "feed" | "events";
+  view: "discover" | "members" | "profile" | "feed" | "leaderboards" | "events";
 }) {
   const t = useT();
   const { memberId } = useParams();
@@ -37,6 +39,7 @@ export default function CommunityPage({
       {view === "discover" ? <DiscoveryHome /> : null}
       {view === "members" ? <Directory /> : null}
       {view === "feed" ? <Feed /> : null}
+      {view === "leaderboards" ? <LeaderboardPage /> : null}
       {view === "events" ? <EventList /> : null}
     </div>
   );

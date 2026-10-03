@@ -6,10 +6,17 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
 
-from portalab.capabilities.economy import Progress, Transaction
+from portalab.capabilities.economy import (
+    LeaderboardEntry,
+    LeaderboardPeriod,
+    LeaderboardView,
+    Progress,
+    Transaction,
+)
+from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, Unavailable
@@ -150,3 +157,76 @@ async def user_progression(principal: Reader, user_id: UUID, module: Module) -> 
     if isinstance(shown, Redacted):
         raise NotFound("This progression is not visible.", code="gamification.not_visible")
     return progression_out(progress)
+
+
+# --- leaderboards (slice B, T037) -----------------------------------------------------------------------
+class LeaderboardEntryOut(BaseModel):
+    rank: int
+    user_id: UUID
+    display_name: str | None
+    score: int
+    me: bool
+
+
+class LeaderboardOut(BaseModel):
+    metric: str
+    period: str
+    computed_at: datetime | None
+    entries: list[LeaderboardEntryOut]
+    me: LeaderboardEntryOut | None
+
+
+class LeaderboardPositionOut(BaseModel):
+    metric: str
+    period: str
+    rank: int | None
+    score: int | None
+
+
+async def leaderboard_out(module: GamificationModule, view: LeaderboardView) -> LeaderboardOut:
+    providers = module.capabilities.system_providers(DIRECTORY)
+    directory = providers[0].provider if providers else None
+
+    async def entry(e: LeaderboardEntry) -> LeaderboardEntryOut:
+        summary = await directory.get_user_summary(e.user_id) if directory else None
+        name = summary.display_name if summary and not summary.anonymized else None
+        return LeaderboardEntryOut(rank=e.rank, user_id=e.user_id, display_name=name, score=e.score, me=e.me)
+
+    return LeaderboardOut(
+        metric=view.metric,
+        period=view.period,
+        computed_at=view.computed_at,
+        entries=[await entry(e) for e in view.entries],
+        me=await entry(view.me) if view.me else None,
+    )
+
+
+@router.get("/leaderboards", response_model=list[str])
+async def leaderboard_metrics(_: Reader, module: Module) -> list[str]:
+    return list(module.leaderboards.metrics())
+
+
+@router.get("/leaderboards/{metric}", response_model=LeaderboardOut)
+async def leaderboard(
+    principal: Reader,
+    metric: str,
+    module: Module,
+    period: LeaderboardPeriod = "all",
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> LeaderboardOut:
+    return await leaderboard_out(
+        module, await module.leaderboards.board(principal, metric, period, limit=limit)
+    )
+
+
+@router.get("/me/leaderboard-position", response_model=LeaderboardPositionOut)
+async def my_position(
+    principal: Me, module: Module, metric: str = "xp", period: LeaderboardPeriod = "all"
+) -> LeaderboardPositionOut:
+    view = await module.leaderboards.board(principal, metric, period, limit=1)
+    return LeaderboardPositionOut(
+        metric=metric,
+        period=period,
+        rank=view.me.rank if view.me else None,
+        score=view.me.score if view.me else None,
+    )
