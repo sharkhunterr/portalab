@@ -112,7 +112,8 @@ def test_module_packages_are_flat_and_named_once() -> None:
 
 LIBRARY_OWNERS = {
     "argon2": ("portalab.modules.identity",),
-    "PIL": ("portalab.modules.identity", "portalab.modules.media"),  # avatars (002), posters (024 R11)
+    # avatars (002), posters (024 R11), the shared upload helper (011 T007, reused by 016)
+    "PIL": ("portalab.modules.identity", "portalab.modules.media", "portalab.core.uploads"),
 }
 
 

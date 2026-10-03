@@ -1,0 +1,12 @@
+{
+  "diagram": "Diagram",
+  "editor.image": "Add an image",
+  "editor.preview": "Preview",
+  "editor.sensitiveWarning": "This text looks like it contains a password or a key. Remove it before saving.",
+  "editor.uploadFailed": "The image could not be uploaded.",
+  "editor.write": "Write",
+  "link.archived": "archived",
+  "link.deleted": "deleted",
+  "link.forbidden": "not available",
+  "link.unavailable": "unavailable"
+}

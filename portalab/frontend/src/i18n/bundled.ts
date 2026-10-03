@@ -1,29 +1,37 @@
+import calendar from "../../../backend/locales/en/calendar.json";
+import content from "../../../backend/locales/en/content.json";
 import core from "../../../backend/locales/en/core.json";
 import dashboard from "../../../backend/locales/en/dashboard.json";
 import i18n from "../../../backend/locales/en/i18n.json";
 import media from "../../../backend/locales/en/media.json";
 import nav from "../../../backend/locales/en/nav.json";
+import news from "../../../backend/locales/en/news.json";
 import notifications from "../../../backend/locales/en/notifications.json";
 import search from "../../../backend/locales/en/search.json";
 import shell from "../../../backend/locales/en/shell.json";
 import statistics from "../../../backend/locales/en/statistics.json";
 import support from "../../../backend/locales/en/support.json";
+import wiki from "../../../backend/locales/en/wiki.json";
 
 /**
  * English base bundles shipped with the SPA (spec 026): the last-resort fallback when a catalog cannot be
  * loaded, and the strings used before the user's catalogs arrive. Same files as the backend's base bundles.
  */
 export const BUNDLED: Record<string, Record<string, string>> = {
+  calendar,
+  content,
   core,
   dashboard,
   i18n,
   media,
   nav,
+  news,
   notifications,
   search,
   shell,
   statistics,
   support,
+  wiki,
 };
 export const DEFAULT_NAMESPACES = Object.keys(BUNDLED);
 

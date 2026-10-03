@@ -37,6 +37,14 @@ const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"))
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
+const NewsPage = lazy(() => import("../../features/news/NewsPage"));
+const Article = lazy(() => import("../../features/news/ArticlePage"));
+const NewsAdmin = lazy(() => import("../../features/news/NewsAdmin"));
+const WikiHome = lazy(() => import("../../features/wiki/WikiHome"));
+const WikiPage = lazy(() => import("../../features/wiki/PageView"));
+const WikiEditor = lazy(() => import("../../features/wiki/PageEditor"));
+const WikiHistory = lazy(() => import("../../features/wiki/History"));
+const CalendarPage = lazy(() => import("../../features/calendar/CalendarPage"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -96,6 +104,46 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         {
+          path: "news",
+          handle: h({ crumb: "News", requiredPermission: "news.read" }),
+          children: [
+            { index: true, element: <NewsPage /> },
+            {
+              path: ":slug",
+              element: <Article />,
+              handle: h({ crumb: "Article", existenceSensitive: true }),
+            },
+          ],
+        },
+        {
+          path: "wiki",
+          handle: h({ crumb: "Wiki", requiredPermission: "wiki.read" }),
+          children: [
+            { index: true, element: <WikiHome /> },
+            {
+              path: "new",
+              element: <WikiEditor />,
+              handle: h({ crumb: "New page", requiredPermission: "wiki.edit" }),
+            },
+            { path: ":slug", element: <WikiPage />, handle: h({ crumb: "Page", existenceSensitive: true }) },
+            {
+              path: ":slug/edit",
+              element: <WikiEditor />,
+              handle: h({ crumb: "Edit", existenceSensitive: true }),
+            },
+            {
+              path: ":slug/history",
+              element: <WikiHistory />,
+              handle: h({ crumb: "History", existenceSensitive: true }),
+            },
+          ],
+        },
+        {
+          path: "calendar",
+          element: <CalendarPage />,
+          handle: h({ crumb: "Calendar", requiredPermission: "calendar.read" }),
+        },
+        {
           path: "search",
           element: <Search />,
           handle: h({ crumb: "Search", requiredPermission: "search.use" }),
@@ -137,6 +185,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <StatisticsAdmin />,
               handle: h({ crumb: "Statistic definitions" }),
             },
+            { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },
             { path: "configuration", element: <Configuration />, handle: h({ crumb: "Configuration" }) },

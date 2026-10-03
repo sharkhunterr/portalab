@@ -47,8 +47,12 @@ from portalab.modules.administration.api import routers as admin_routers
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.api import routers as authz_routers
 from portalab.modules.authz.module import AuthzModule
+from portalab.modules.calendar.api import routers as calendar_routers
+from portalab.modules.calendar.module import CalendarModule
 from portalab.modules.connectors.api import routers as connectors_routers
 from portalab.modules.connectors.module import ConnectorsModule
+from portalab.modules.content.api import routers as content_routers
+from portalab.modules.content.module import ContentModule
 from portalab.modules.dashboard.api import routers as dashboard_routers
 from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.events.api import routers as events_routers
@@ -62,6 +66,8 @@ from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.media.api import routers as media_routers
 from portalab.modules.media.module import MediaModule
+from portalab.modules.news.api import routers as news_routers
+from portalab.modules.news.module import NewsModule
 from portalab.modules.notifications.api import routers as notifications_routers
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.observability.api import routers as observability_routers
@@ -79,6 +85,8 @@ from portalab.modules.support.api import routers as support_routers
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.api import routers as ui_routers
 from portalab.modules.ui.module import UiModule
+from portalab.modules.wiki.api import routers as wiki_routers
+from portalab.modules.wiki.module import WikiModule
 
 CORRELATION_HEADER = "X-Correlation-Id"
 _CORRELATION_RE = re.compile(r"^[A-Za-z0-9._\-]{1,64}$")
@@ -128,6 +136,10 @@ def create_app(
     statistics: StatisticsModule | None = None,
     notifications: NotificationsModule | None = None,
     media: MediaModule | None = None,
+    content: ContentModule | None = None,
+    wiki: WikiModule | None = None,
+    news: NewsModule | None = None,
+    calendar: CalendarModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -159,6 +171,10 @@ def create_app(
         app.state.statistics_module = platform.statistics
         app.state.notifications_module = platform.notifications
         app.state.media_module = platform.media
+        app.state.content_module = platform.content
+        app.state.wiki_module = platform.wiki
+        app.state.news_module = platform.news
+        app.state.calendar_module = platform.calendar
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -218,6 +234,10 @@ def create_app(
     app.state.statistics_module = statistics
     app.state.notifications_module = notifications
     app.state.media_module = media
+    app.state.content_module = content
+    app.state.wiki_module = wiki
+    app.state.news_module = news
+    app.state.calendar_module = calendar
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -326,6 +346,10 @@ def create_app(
         *statistics_routers(),
         *notifications_routers(),
         *media_routers(),
+        *content_routers(),
+        *wiki_routers(),
+        *news_routers(),
+        *calendar_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

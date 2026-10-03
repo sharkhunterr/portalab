@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import Any
 
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
+from portalab.capabilities.content import default_calendar_sources
 from portalab.capabilities.health import SERVICE_STATE
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditSink
@@ -15,6 +16,7 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock
 from portalab.modules.health import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.health import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.health.calendar_source import MaintenanceCalendarSource
 from portalab.modules.health.detail.assembler import DetailAssembler
 from portalab.modules.health.detail.history import HistoryQuery
 from portalab.modules.health.detail.incidents import IncidentLinkService
@@ -74,6 +76,10 @@ class HealthModule:
             AdminSurface("health", "admin.surface.health", "/services", SERVICES_READ, OWNER)
         )
         register_targets(lambda: self.config)
+        if default_calendar_sources.get("maintenance") is None:  # spec 011: maintenance in the calendar
+            default_calendar_sources.register(
+                MaintenanceCalendarSource(self.database, clock=self.state.clock), owner=OWNER
+            )
 
     def register_jobs(self, jobs: JobRegistry) -> list[Any]:
         async def start(payload: dict[str, Any]) -> None:

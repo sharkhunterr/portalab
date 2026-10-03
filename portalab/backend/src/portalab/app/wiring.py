@@ -23,7 +23,9 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.secrets import SecretBox
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.authz.module import AuthzModule
+from portalab.modules.calendar.module import CalendarModule
 from portalab.modules.connectors.module import ConnectorsModule
+from portalab.modules.content.module import ContentModule
 from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.events.module import EventsModule
 from portalab.modules.events.publisher.publisher import EventStorePublisher
@@ -32,6 +34,7 @@ from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.media.module import MediaModule
+from portalab.modules.news.module import NewsModule
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.privacy.module import PrivacyModule
@@ -40,6 +43,7 @@ from portalab.modules.shell.module import ShellModule
 from portalab.modules.statistics.module import StatisticsModule
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.module import UiModule
+from portalab.modules.wiki.module import WikiModule
 
 
 class DeferredAuthorizer:
@@ -106,6 +110,10 @@ class Platform:
     statistics: StatisticsModule
     notifications: NotificationsModule
     media: MediaModule
+    content: ContentModule
+    wiki: WikiModule
+    news: NewsModule
+    calendar: CalendarModule
     seeds: list[Callable[[], Awaitable[None]]]
 
     async def seed_periodic_jobs(self) -> None:
@@ -198,6 +206,14 @@ def wire_platform(
         visibility=privacy.filter,
     )
     media.register()
+    content = ContentModule(database, capabilities, authz.engine, blobs=context.blobs)
+    content.register()
+    wiki = WikiModule(database, events, authz.audit, capabilities, authz.engine)
+    wiki.register()
+    news = NewsModule(database, events, authz.audit, capabilities, authz.engine)
+    news.register()
+    calendar = CalendarModule(database, events, capabilities, authz.engine)
+    calendar.register()
     search = SearchModule(database, events, authz.audit, capabilities, authz.engine)
     search.register()
     dashboard = DashboardModule(database, events, authz.audit, capabilities, authz.engine)
@@ -235,6 +251,8 @@ def wire_platform(
         seeds.extend(statistics.register_jobs(jobs))
         seeds.extend(notifications.register_jobs(jobs))
         seeds.extend(media.register_jobs(jobs))
+        seeds.extend(news.register_jobs(jobs))
+        seeds.extend(calendar.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -253,6 +271,10 @@ def wire_platform(
         statistics,
         notifications,
         media,
+        content,
+        wiki,
+        news,
+        calendar,
         seeds,
     )
     from portalab.app.config_bindings import bind

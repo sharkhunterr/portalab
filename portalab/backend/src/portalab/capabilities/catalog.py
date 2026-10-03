@@ -7,6 +7,7 @@ from portalab.capabilities import (
     aggregation,
     config,
     confirmations,
+    content,
     dashboard,
     events,
     health,
@@ -55,6 +56,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *media.SPECS,
     *media_core.SPECS,
     activity.SPEC,
+    *content.SPECS,
 )
 
 

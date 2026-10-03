@@ -16,6 +16,7 @@
   "facet.genre": "Genre",
   "facet.severity": "Severity",
   "facet.state": "State",
+  "facet.tag": "Tag",
   "facet.type": "Type",
   "facet.year": "Year",
   "filters": "Filters",

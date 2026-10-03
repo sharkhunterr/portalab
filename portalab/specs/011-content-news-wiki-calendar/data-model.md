@@ -29,3 +29,20 @@ News: `news.article_published` (dedup `(article_id, publish_seq)`), `news.articl
 
 ## Privacy / retention
 Content is non-personal except author refs (tombstone-safe). Revisions retained per policy (not public; history requires permission). Reminders are `activity` personal data (erased with account).
+
+## Implementation notes (2026-10-10)
+- `news.articles` adds `plain_text` and `search_vector` (search/AI text), and the status `deleted`
+  (a tombstone: links answer `deleted`; drafts are not hard-deleted because revisions are append-only).
+- `wiki.pages` adds `title`, `language` and the status `deleted`; `help_keys` is a JSONB list;
+  `search_vector` is computed by the service from folded text (`simple` configuration, no extension needed).
+- Revisions (wiki and news) are append-only through a guard trigger that only allows refreshing the derived
+  render cache and tombstoning an erased author (`author_id → NULL`).
+- `content.assets` stores `filename` and `size`; an asset is readable by its uploader or by viewers who may
+  read its owner (resolved through the owner's `LinkResolver`).
+- `calendar.reminders` adds `title`, `created_at`, `updated_at`; a moved item reschedules the reminder.
+- Audience modes are `all | roles | permission` (groups are expressed through roles in v1).
+- Translations are stored by each module (`article_translations`, `page_translations`) and selected by the
+  reader's language; 026's version registry is not used for them.
+- The shared upload helper lives in `portalab.core.uploads` (Pillow allowed there by the import contract).
+- The maintenance calendar source is registered by the health module (006), which owns the data.
+- OQ-50..54 use the research defaults (R2, R6–R9, R11); product confirmation still open.

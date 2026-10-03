@@ -1,0 +1,162 @@
+"""News module facade (spec 011)."""
+
+from dataclasses import replace
+from datetime import timedelta
+from typing import Any
+
+from portalab.capabilities.automation_actions import ActionRegistry, default_actions
+from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.content import (
+    CalendarSourceRegistry,
+    LinkResolverRegistry,
+    default_calendar_sources,
+    default_link_resolvers,
+)
+from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
+from portalab.capabilities.events import EventTypeRegistry, default_event_types
+from portalab.capabilities.notifications import CategoryRegistry, declare_category, default_categories
+from portalab.capabilities.observability import (
+    Check,
+    CheckResult,
+    ObservableRegistry,
+    ObservedComponent,
+    default_observables,
+)
+from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
+from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.search import SearchRegistry, default_search
+from portalab.core.audit_port import AuditSink
+from portalab.core.authz_port import Authorizer
+from portalab.core.db import Database
+from portalab.core.event_port import EventPublisher
+from portalab.core.jobs.periodic import register_periodic
+from portalab.core.jobs.registry import JobRegistry
+from portalab.core.logging import get_logger
+from portalab.core.time import Clock
+from portalab.modules.news import permissions as _permissions  # noqa: F401 — declares permissions
+from portalab.modules.news import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.news.articles import PUBLISH_JOB, ArticleService
+from portalab.modules.news.events import register_event_types
+from portalab.modules.news.integrations import (
+    FEATURED,
+    LATEST,
+    NewsCalendarSource,
+    NewsLinkResolver,
+    NewsSearchProvider,
+    NewsWidget,
+    register_publish_action,
+)
+from portalab.modules.news.participant import NewsParticipant
+from portalab.modules.news.settings import SETTINGS, NewsConfig
+
+OWNER = "module:news"
+SWEEP_JOB = "news.publish_sweep"
+log = get_logger("portalab.news")
+
+
+class NewsModule:
+    def __init__(
+        self,
+        database: Database,
+        events: EventPublisher,
+        audit: AuditSink,
+        capabilities: CapabilityRegistry,
+        authorizer: Authorizer,
+        *,
+        clock: Clock | None = None,
+        event_types: EventTypeRegistry = default_event_types,
+        resolvers: LinkResolverRegistry = default_link_resolvers,
+        calendar: CalendarSourceRegistry = default_calendar_sources,
+        search: SearchRegistry = default_search,
+        widgets: WidgetRegistry = default_widgets,
+        categories: CategoryRegistry = default_categories,
+        actions: ActionRegistry = default_actions,
+        observables: ObservableRegistry = default_observables,
+    ) -> None:
+        self.database = database
+        self.audit = audit
+        self.capabilities = capabilities
+        self.clock = clock
+        self.config = NewsConfig()
+        self.event_types = event_types
+        self.resolvers = resolvers
+        self.calendar = calendar
+        self.search = search
+        self.widgets = widgets
+        self.categories = categories
+        self.actions = actions
+        self.observables = observables
+        self.articles = ArticleService(
+            database, events, authorizer, capabilities, lambda: self.config, clock=clock
+        )
+
+    def register(self) -> None:
+        register_event_types(self.event_types)
+        participant = NewsParticipant(self.database)
+        for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
+            if not any(p.instance_ref == "news" for p in self.capabilities.system_providers(capability)):
+                self.capabilities.provide(capability, participant, instance_ref="news", owner=OWNER)
+        if self.resolvers.get("news") is None:
+            self.resolvers.register(NewsLinkResolver(self.articles), owner=OWNER)
+        if self.calendar.get("news") is None:
+            self.calendar.register(NewsCalendarSource(self.articles), owner=OWNER)
+        if self.search.provider("news") is None:
+            self.search.register(NewsSearchProvider(self.articles), owner=OWNER)
+        for definition, featured in ((FEATURED, True), (LATEST, False)):
+            if self.widgets.get(definition.key) is None:
+                self.widgets.register(
+                    definition, NewsWidget(self.articles, featured, self.clock), owner=OWNER
+                )
+        if self.categories.get("news.published") is None:
+            declare_category("news.published", OWNER, "news:category.published", registry=self.categories)
+        register_publish_action(self.articles, self.actions)
+        self.observables.declare(
+            ObservedComponent(
+                "news", OWNER, label="News", functional_checks=(Check("scheduled_publish", self.probe),)
+            )
+        )
+
+    async def probe(self) -> CheckResult:
+        """Scheduled articles whose time passed more than two minutes ago (the publish job is lagging)."""
+        from sqlalchemy import func, select
+
+        from portalab.core.time import utc_now
+        from portalab.modules.news.models import Article
+
+        async with self.database.session() as session:
+            late = await session.scalar(
+                select(func.count()).where(
+                    Article.status == "scheduled",
+                    Article.publish_at < utc_now(self.clock) - timedelta(minutes=2),
+                )
+            )
+        if late:
+            return CheckResult(
+                "degraded", f"{late} scheduled article(s) not published yet", {"late": int(late)}
+            )
+        return CheckResult("ok", "scheduled publications are on time", {"late": 0})
+
+    def register_jobs(self, jobs: JobRegistry) -> list[Any]:
+        async def publish(payload: dict[str, Any]) -> None:
+            await self.articles.run_scheduled(payload)
+
+        jobs.register(PUBLISH_JOB, publish, idempotency="state check + publish_seq", owner=OWNER)
+
+        async def sweep() -> None:
+            await self.articles.sweep()
+
+        return [
+            self.refresh_config,
+            register_periodic(jobs, self.database, SWEEP_JOB, timedelta(minutes=1), sweep, owner=OWNER),
+        ]
+
+    async def refresh_config(self) -> None:
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                values = {
+                    name: (await providers[0].provider.get(key)).value for name, key in SETTINGS.items()
+                }
+                self.config = replace(self.config, **values)
+        except Exception:
+            log.warning("news configuration not refreshed")

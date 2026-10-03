@@ -1,0 +1,12 @@
+{
+  "diagram": "Diagramme",
+  "editor.image": "Ajouter une image",
+  "editor.preview": "Aperçu",
+  "editor.sensitiveWarning": "Ce texte semble contenir un mot de passe ou une clé. Retirez-le avant d’enregistrer.",
+  "editor.uploadFailed": "L’image n’a pas pu être envoyée.",
+  "editor.write": "Écrire",
+  "link.archived": "archivé",
+  "link.deleted": "supprimé",
+  "link.forbidden": "non disponible",
+  "link.unavailable": "indisponible"
+}
