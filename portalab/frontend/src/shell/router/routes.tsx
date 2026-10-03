@@ -58,6 +58,7 @@ const CampaignConsole = lazy(() => import("../../features/campaigns/console/Camp
 const Campaigns = lazy(() => import("../../features/campaigns/CampaignsPage"));
 const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
 const Progression = lazy(() => import("../../features/gamification/progression/ProgressionPage"));
+const Community = lazy(() => import("../../features/community/CommunityPage"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
@@ -86,6 +87,21 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
+        {
+          path: "community",
+          handle: h({ crumb: "Community", requiredPermission: "community.read" }),
+          children: [
+            { index: true, element: <Community view="discover" /> },
+            { path: "members", element: <Community view="members" />, handle: h({ crumb: "Members" }) },
+            {
+              path: "members/:memberId",
+              element: <Community view="profile" />,
+              handle: h({ crumb: "Member", existenceSensitive: true }),
+            },
+            { path: "feed", element: <Community view="feed" />, handle: h({ crumb: "Activity" }) },
+            { path: "events", element: <Community view="events" />, handle: h({ crumb: "Events" }) },
+          ],
+        },
         {
           path: "campaigns",
           handle: h({ crumb: "Campaigns", requiredPermission: "campaigns.read" }),

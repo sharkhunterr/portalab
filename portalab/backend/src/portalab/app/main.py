@@ -55,6 +55,8 @@ from portalab.modules.calendar.api import routers as calendar_routers
 from portalab.modules.calendar.module import CalendarModule
 from portalab.modules.campaigns.api import routers as campaigns_routers
 from portalab.modules.campaigns.module import CampaignsModule
+from portalab.modules.community.api import routers as community_routers
+from portalab.modules.community.module import CommunityModule
 from portalab.modules.connectors.api import routers as connectors_routers
 from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.content.api import routers as content_routers
@@ -152,6 +154,7 @@ def create_app(
     gamification: GamificationModule | None = None,
     campaigns: CampaignsModule | None = None,
     automations: AutomationsModule | None = None,
+    community: CommunityModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -191,6 +194,7 @@ def create_app(
         app.state.gamification_module = platform.gamification
         app.state.campaigns_module = platform.campaigns
         app.state.automations_module = platform.automations
+        app.state.community_module = platform.community
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -258,6 +262,7 @@ def create_app(
     app.state.gamification_module = gamification
     app.state.campaigns_module = campaigns
     app.state.automations_module = automations
+    app.state.community_module = community
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None
@@ -374,6 +379,7 @@ def create_app(
         *gamification_routers(),
         *campaigns_routers(),
         *automations_routers(),
+        *community_routers(),
     ]:
         app.include_router(router)
     spa = spa_directory(static_dir) if static_dir else None

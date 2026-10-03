@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from portalab.capabilities.economy import Progress
 from portalab.core.db import Database
 from portalab.modules.gamification.levels.service import LevelService
-from portalab.modules.gamification.models import Balance, Reservation, UserAchievement
+from portalab.modules.gamification.models import Achievement, Balance, Reservation, UserAchievement
 
 
 class ProgressionService:
@@ -67,6 +67,33 @@ class ProgressionService:
                 )
             )
         return found is not None
+
+    async def achievement_list(self, user_id: UUID, limit: int = 50) -> list[dict[str, str]]:
+        """Unlocked achievements, newest first (key, label, date) — for profile surfaces (012)."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(
+                        UserAchievement.achievement_key, UserAchievement.unlocked_at, Achievement.definition
+                    )
+                    .outerjoin(
+                        Achievement,
+                        (Achievement.key == UserAchievement.achievement_key)
+                        & (Achievement.version == UserAchievement.version),
+                    )
+                    .where(UserAchievement.user_id == user_id)
+                    .order_by(UserAchievement.unlocked_at.desc())
+                    .limit(limit)
+                )
+            ).all()
+        return [
+            {
+                "key": key,
+                "label": str((definition or {}).get("label") or key),
+                "unlocked_at": unlocked_at.isoformat(),
+            }
+            for key, unlocked_at, definition in rows
+        ]
 
     async def xp(self, user_id: UUID) -> int:
         return (await self.progress(user_id)).xp

@@ -1,0 +1,58 @@
+.community-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.community-tabs a[aria-current="page"] {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.community-members,
+.community-feed,
+.community-shelf,
+.community-badges {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.community-members li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.community-meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.community-sections,
+.community-shelves {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}
+
+.community-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.community-values dd {
+  margin: 0;
+}
+
+.community-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+}

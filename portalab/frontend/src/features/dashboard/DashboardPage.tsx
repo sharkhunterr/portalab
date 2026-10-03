@@ -15,6 +15,7 @@ import { GridCell, ResponsiveGrid } from "./grid/ResponsiveGrid";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import "./widgets/builtin";
 import "../gamification/widget";
+import "../community/widget";
 import { ActiveCampaignBanner } from "../campaigns/banner/ActiveCampaignBanner";
 
 const ONBOARDED = "portalab.onboarding.dashboard";

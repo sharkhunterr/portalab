@@ -13,6 +13,7 @@ from portalab.capabilities.registry import CapabilitySpec
 
 CAPABILITY = "identity.directory"
 CONTACT = "identity.contact"
+MEMBERS = "identity.members"
 VERIFICATION_CHANNEL = "identity.verification_channel"
 
 AccountState = Literal[
@@ -77,4 +78,36 @@ VERIFICATION_SPEC = CapabilitySpec(
     protocol=VerificationChannel,
     multi_provider=False,
     description="Delivers verification and invitation tokens (e-mail by Notifications 010).",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class MemberEntry:
+    id: UUID
+    display_name: str
+    joined_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class MemberPage:
+    items: tuple[MemberEntry, ...]
+    next_offset: int | None = None
+
+
+@runtime_checkable
+class MemberListing(Protocol):
+    """Active accounts with a display name, ordered by name (Community directory 012). Visibility is the
+    caller's job (021): this only lists who *could* be shown."""
+
+    async def active_members(
+        self, *, query: str | None = None, offset: int = 0, limit: int = 30, newest: bool = False
+    ) -> MemberPage: ...
+
+
+MEMBERS_SPEC = CapabilitySpec(
+    name=MEMBERS,
+    version="1.0",
+    protocol=MemberListing,
+    multi_provider=False,
+    description="Active members by display name (owned by identity).",
 )

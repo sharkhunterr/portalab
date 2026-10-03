@@ -291,6 +291,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "campaigns.manage",
     },
     {
+        "key": "community.page",
+        "owner": "module:community",
+        "kind": "entry",
+        "label_key": "nav.community",
+        "icon": "users",
+        "route": "/community",
+        "group": "main",
+        "order_hint": 58,
+        "required_permission": "community.read",
+    },
+    {
         "key": "gamification.progression",
         "owner": "module:gamification",
         "kind": "entry",
