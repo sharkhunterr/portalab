@@ -117,6 +117,7 @@
   "queue.unassigned": "Non assignés seulement",
   "queue.waitingMember": "En attente du membre",
   "review.empty": "Aucun avis.",
+  "review.subtitle": "Ce que les membres suggèrent ou signalent, à traiter ou transformer en ticket ou en projet.",
   "review.title": "Avis à traiter",
   "severity.critical": "Critique",
   "severity.major": "Majeur",

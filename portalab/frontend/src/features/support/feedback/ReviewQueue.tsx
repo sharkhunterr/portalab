@@ -1,7 +1,7 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import "../support.css";
+import { AdminPage } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -81,12 +81,10 @@ function Detail({ id }: { id: string }) {
 export function ReviewQueue() {
   const t = useT();
   const format = useFormat();
-  const headingId = useId();
   const queue = useFeedbackQueue();
   const [open, setOpen] = useState<string | null>(null);
   return (
-    <section aria-labelledby={headingId}>
-      <PageHeader titleId={headingId} level={2} icon="message" title={t("support:review.title")} />
+    <AdminPage icon="message" title={t("support:review.title")} description={t("support:review.subtitle")}>
       {queue.isError ? <FunctionalState state="unauthorized" /> : null}
       {queue.data && queue.data.length === 0 ? <p>{t("support:review.empty")}</p> : null}
       <ul className="support-list">
@@ -103,7 +101,7 @@ export function ReviewQueue() {
           </li>
         ))}
       </ul>
-    </section>
+    </AdminPage>
   );
 }
 

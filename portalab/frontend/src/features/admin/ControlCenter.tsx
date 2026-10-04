@@ -14,6 +14,8 @@ import {
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { type Translate, useT } from "../../i18n/hooks/useT";
+import { useNavigationView } from "../../shell/nav/NavigationProvider";
+import { useShellStrings } from "../../shell/strings";
 import { DataRegion } from "../../state/regions";
 import "./admin.css";
 
@@ -53,23 +55,6 @@ const PANEL_ICONS: Record<string, string> = {
   audit: "shield",
   support: "lifebuoy",
 };
-
-const SHORTCUTS: [string, string, string][] = [
-  ["services", "/admin/services", "server"],
-  ["configuration", "/admin/configuration", "settings"],
-  ["roles", "/admin/roles", "key"],
-  ["observability", "/admin/observability", "activity"],
-  ["events", "/admin/events", "zap"],
-  ["audit", "/admin/audit", "shield"],
-  ["marketplace", "/admin/marketplace", "shop"],
-  ["gamification", "/admin/gamification", "trophy"],
-  ["news", "/admin/news", "newspaper"],
-  ["support", "/admin/support", "lifebuoy"],
-  ["moderation", "/admin/community/moderation", "users"],
-  ["plugins", "/admin/plugins", "plug"],
-  ["modules", "/admin/modules", "dashboard"],
-  ["privacy", "/admin/privacy", "lock"],
-];
 
 const MAX_ATTENTION = 8;
 const STATE_TONE: Record<string, Tone> = {
@@ -125,6 +110,9 @@ export function ControlCenter() {
 
 function ControlCenterView({ overview }: { overview: Overview }) {
   const t = useT();
+  const strings = useShellStrings();
+  const { view } = useNavigationView();
+  const hubs = view.sections.filter((s) => s.audience === "administration").flatMap((s) => s.topics);
   const format = useFormat();
   const panel = (name: string) => overview.panels.find((p) => p.panel === name);
   const health = panel("observability");
@@ -239,12 +227,19 @@ function ControlCenterView({ overview }: { overview: Overview }) {
           <PanelSection key={p.panel} panel={p} />
         ))}
         <AdminSection title={t("admin:cc.shortcuts")} icon="compass" span="full">
-          <ul className="control-center__shortcuts">
-            {SHORTCUTS.map(([key, to, icon]) => (
-              <li key={key}>
-                <Link to={to}>
-                  <Icon name={icon} size={18} />
-                  {t(`admin:cc.shortcut.${key}`)}
+          <ul className="control-center__hubs">
+            {hubs.map((hub) => (
+              <li key={hub.key}>
+                <Link to={hub.route ?? hub.entries[0]?.route ?? "/admin"} className="control-center__hub">
+                  <span className="connector-card__icon" aria-hidden="true">
+                    <Icon name={hub.icon ?? "settings"} size={20} />
+                  </span>
+                  <span className="services-admin__name">
+                    <strong>{strings.label(hub.label_key)}</strong>
+                    <span className="admin-muted">
+                      {hub.entries.map((entry) => strings.label(entry.label_key)).join(" · ")}
+                    </span>
+                  </span>
                 </Link>
               </li>
             ))}

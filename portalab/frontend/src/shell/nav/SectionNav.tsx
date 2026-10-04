@@ -5,7 +5,7 @@ import { Menu, Popover } from "../../design-system/components/Overlays";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useShellPreference } from "../preferences";
 import { useShellStrings } from "../strings";
-import { type NavEntry, type NavSection, useNavigationView } from "./NavigationProvider";
+import { type NavEntry, type NavSection, type NavTopic, useNavigationView } from "./NavigationProvider";
 
 /**
  * Section navigation (spec 027 US2, FR-008…FR-017): named sections with icons instead of a flat list.
@@ -30,6 +30,16 @@ export function currentEntry(sections: readonly NavSection[], pathname: string):
     .flatMap(sectionEntries)
     .filter((entry) => isCurrent(entry.route, pathname))
     .sort((a, b) => (b.route?.length ?? 0) - (a.route?.length ?? 0))[0];
+}
+
+/** The Administration hub holding the current page (its pages become tabs, 027). */
+export function currentHub(sections: readonly NavSection[], pathname: string): NavTopic | undefined {
+  const entry = currentEntry(sections, pathname);
+  if (!entry) return undefined;
+  return sections
+    .filter((section) => section.audience === "administration")
+    .flatMap((section) => section.topics)
+    .find((topic) => topic.entries.some((e) => e.key === entry.key));
 }
 
 export interface SectionNavProps {
@@ -135,6 +145,32 @@ function EntryLinks({ section, currentKey, onNavigate }: Omit<ItemProps, "active
       </NavLink>
     </li>
   );
+  if (section.audience === "administration") {
+    // hubs: one link each (icon + label), current when the page belongs to it
+    return (
+      <ul className="shell-entries shell-hubs">
+        {section.topics.map((topic) => {
+          const current = topic.entries.some((entry) => entry.key === currentKey);
+          return (
+            <li key={topic.key}>
+              <NavLink
+                to={topic.route ?? topic.entries[0]?.route ?? "/admin"}
+                end
+                className="shell-entry shell-hub"
+                aria-current={current ? "page" : undefined}
+                data-active={current ? "true" : undefined}
+                onClick={onNavigate}
+              >
+                <Icon name={topic.icon ?? "settings"} size={18} />
+                {strings.label(topic.label_key)}
+              </NavLink>
+            </li>
+          );
+        })}
+        {section.entries.map(link)}
+      </ul>
+    );
+  }
   return (
     <>
       {section.entries.length ? <ul className="shell-entries">{section.entries.map(link)}</ul> : null}
@@ -206,7 +242,16 @@ function RailSection(props: ItemProps) {
 function BarSection({ section, active, onNavigate }: ItemProps) {
   const strings = useShellStrings();
   const navigate = useNavigate();
-  const items = sectionEntries(section).map((entry) => ({
+  const items = (
+    section.audience === "administration"
+      ? section.topics.map((topic) => ({
+          key: topic.key,
+          label_key: topic.label_key,
+          icon: topic.icon,
+          route: topic.route ?? topic.entries[0]?.route ?? "/admin",
+        }))
+      : sectionEntries(section)
+  ).map((entry) => ({
     key: entry.key,
     label: strings.label(entry.label_key),
     icon: entry.icon ?? undefined,

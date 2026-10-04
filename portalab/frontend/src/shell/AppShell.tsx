@@ -5,6 +5,7 @@ import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
 import { useHeaderData } from "./header/useHeaderData";
 import { BottomBar } from "./nav/BottomBar";
+import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
@@ -133,6 +134,7 @@ export function AppShell({
           <main id="main-content" tabIndex={-1} className="shell-main ds-reflow">
             <div className="shell-content">
               <Breadcrumbs />
+              <HubTabs />
               <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
               <RelatedLinks />
             </div>

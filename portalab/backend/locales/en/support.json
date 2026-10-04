@@ -117,6 +117,7 @@
   "queue.unassigned": "Unassigned only",
   "queue.waitingMember": "Waiting for the member",
   "review.empty": "No feedback.",
+  "review.subtitle": "What members suggest or report, to answer or turn into a ticket or a project.",
   "review.title": "Feedback to review",
   "severity.critical": "Critical",
   "severity.major": "Major",

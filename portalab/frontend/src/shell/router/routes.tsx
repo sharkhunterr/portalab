@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter, type RouteObject } from "react-router";
+import { createBrowserRouter, Navigate, type RouteObject } from "react-router";
 import type { RouteHandle } from "./handle";
 import { RouteErrorElement } from "./RouteBoundary";
 
@@ -68,6 +68,9 @@ const ProductRoute = lazy(() => import("../../features/marketplace/product/Produ
 const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
 const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStudio"));
+const MembersAdmin = lazy(() => import("../../features/admin/members/MembersAdmin"));
+const AnnouncementsAdmin = lazy(() => import("../../features/admin/communication/AnnouncementsAdmin"));
+const WikiAdmin = lazy(() => import("../../features/wiki/WikiAdmin"));
 const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
 const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAdmin"));
 const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
@@ -317,6 +320,10 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
             { path: "marketplace", element: <MarketplaceAdmin />, handle: h({ crumb: "Marketplace" }) },
             { path: "themes", element: <ThemeStudio />, handle: h({ crumb: "Theme studio" }) },
+            { path: "members", element: <MembersAdmin />, handle: h({ crumb: "Members" }) },
+            { path: "announcements", element: <AnnouncementsAdmin />, handle: h({ crumb: "Announcements" }) },
+            { path: "maintenance", element: <Navigate to="/admin/announcements?tab=maintenance" replace /> },
+            { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
             { path: "modules", element: <ModulesAdmin />, handle: h({ crumb: "Modules" }) },
             {

@@ -1,4 +1,12 @@
 {
+  "admin.all": "All",
+  "admin.archive": "Archive",
+  "admin.broken": "Broken links",
+  "admin.pages": "Pages",
+  "admin.state": "State",
+  "admin.subtitle": "Every page, its place and state; publish, archive and fix broken links.",
+  "admin.title": "Wiki",
+  "admin.toDraft": "Back to draft",
   "aiReadable": "The assistant may use this page",
   "body": "Page content",
   "breadcrumbs": "Page location",

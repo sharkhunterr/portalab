@@ -35,8 +35,22 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
     assert home["direct"] is True and [e["route"] for e in home["entries"]] == ["/"]
     assert "support.tickets" in entries(by_key["support"])
     topics = {t["key"]: {e["key"] for e in t["entries"]} for t in by_key["admin"]["topics"]}
-    assert {"authz.roles", "authz.audit"} <= topics["access"]
-    assert "plugins.modules" in topics["extensions"]
+    # 027 hubs: Administration in a few hubs, each opening on its first page
+    assert list(topics) == [
+        "pilot",
+        "members",
+        "services",
+        "support",
+        "communication",
+        "engagement",
+        "shop",
+        "system",
+    ]
+    assert {"authz.roles", "identity.members"} <= topics["members"] and "authz.audit" in topics["pilot"]
+    assert {"support.queue", "wiki.admin"} <= topics["support"]
+    assert "plugins.modules" in topics["system"]
+    hubs = {t["key"]: t for t in by_key["admin"]["topics"]}
+    assert hubs["pilot"]["route"] == "/admin" and hubs["pilot"]["icon"] == "gauge"
     assert not by_key["admin"]["entries"]  # every built-in admin entry has a topic
 
     personal = {e["key"] for e in view["personal"]}

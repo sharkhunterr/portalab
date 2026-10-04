@@ -16,11 +16,16 @@ LEGACY_GROUP = "main"  # the 004 default group: silently routed to the owner def
 
 
 class SectionTopic(BaseModel):
+    """A topic of a section. In Administration a topic is a *hub* (027): one navigation link, its pages shown
+    as tabs; ``aliases`` keep entries that name an older topic key in the right hub."""
+
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     key: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,47}$")
     label_key: str = Field(min_length=1, max_length=128)
     order_hint: int = Field(default=100, ge=0, le=10_000)
+    icon: str | None = Field(default=None, max_length=64)
+    aliases: tuple[str, ...] = ()
 
 
 class NavigationSection(BaseModel):
@@ -45,4 +50,8 @@ class NavigationSection(BaseModel):
         return self
 
     def topic(self, key: str | None) -> SectionTopic | None:
-        return next((t for t in self.topics if t.key == key), None) if key else None
+        if not key:
+            return None
+        return next((t for t in self.topics if t.key == key), None) or next(
+            (t for t in self.topics if key in t.aliases), None
+        )

@@ -272,7 +272,13 @@ def _section(
         topic = meta.topic(entry.topic)
         (by_topic.setdefault(topic.key, []) if topic else loose).append(_entry(entry))
     topics = [
-        {"key": t.key, "label_key": t.label_key, "entries": by_topic[t.key]}
+        {
+            "key": t.key,
+            "label_key": t.label_key,
+            "icon": t.icon,
+            "route": by_topic[t.key][0]["route"],  # a hub opens on its first page (027)
+            "entries": by_topic[t.key],
+        }
         for t in sorted(meta.topics, key=lambda t: (t.order_hint, t.key))
         if t.key in by_topic
     ]

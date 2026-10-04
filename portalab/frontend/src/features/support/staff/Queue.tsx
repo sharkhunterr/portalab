@@ -1,7 +1,7 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import "../support.css";
+import { AdminPage } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
@@ -14,21 +14,13 @@ const STATES = ["open", "in_progress", "waiting_user", "resolved", "closed", "ca
 
 export function Queue() {
   const t = useT();
-  const headingId = useId();
   const [state, setState] = useState("open");
   const [unassigned, setUnassigned] = useState(false);
   const [q, setQ] = useState("");
   const queue = useQueue({ state, unassigned, q });
   const items = queue.data?.items ?? [];
   return (
-    <section aria-labelledby={headingId} className="support-page">
-      <PageHeader
-        titleId={headingId}
-        level={2}
-        icon="inbox"
-        title={t("support:queue.title")}
-        context={t("support:queue.subtitle")}
-      />
+    <AdminPage icon="inbox" title={t("support:queue.title")} description={t("support:queue.subtitle")}>
       <search className="support-toolbar">
         <fieldset className="ds-subnav" aria-label={t("support:ticket.state")}>
           <button type="button" aria-pressed={!state} onClick={() => setState("")}>
@@ -72,7 +64,7 @@ export function Queue() {
         />
       ) : null}
       {items.length ? <TicketList items={items} label={t("support:queue.title")} /> : null}
-    </section>
+    </AdminPage>
   );
 }
 

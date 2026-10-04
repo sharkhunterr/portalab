@@ -23,14 +23,23 @@ export interface NavCommand extends NavEntry {
   confirmation_required?: boolean;
 }
 
-/** A navigation section (027 R1/R2): server-filtered; topics group Administration pages. */
+/** An Administration hub (027): one navigation link (``route``: its first page), its pages as tabs. */
+export interface NavTopic {
+  key: string;
+  label_key: string;
+  icon?: string | null;
+  route?: string | null;
+  entries: NavEntry[];
+}
+
+/** A navigation section (027 R1/R2): server-filtered; topics group Administration pages into hubs. */
 export interface NavSection {
   key: string;
   label_key: string;
   icon?: string | null;
   audience: "everyone" | "administration" | "personal";
   direct: boolean;
-  topics: Array<{ key: string; label_key: string; entries: NavEntry[] }>;
+  topics: NavTopic[];
   entries: NavEntry[];
 }
 

@@ -551,3 +551,74 @@
   display: flex;
   gap: var(--space-3);
 }
+
+/* 027 Administration hubs: the hub is the page's main header, its pages are tabs; the page header below
+   becomes a compact sub-header (one place per subject rather than separate pages) */
+.hub-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block-end: var(--space-4);
+}
+.hub-tabs__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+.hub-tabs__title .ds-icon {
+  box-sizing: content-box;
+  padding: 0.45rem;
+  border-radius: var(--radius-md);
+  color: var(--color-accent-contrast);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt));
+}
+.hub-tabs ul {
+  display: flex;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+.hub-tabs a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+.hub-tabs a:hover {
+  color: var(--color-text);
+}
+.hub-tabs a[data-active] {
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
+}
+.hub-tabs ~ * .admin-page > .ds-page-header .ds-page-header__title,
+.hub-tabs ~ .admin-page > .ds-page-header .ds-page-header__title {
+  font-size: var(--font-size-lg);
+}
+.hub-tabs ~ * .admin-page > .ds-page-header .ds-page-header__icon,
+.hub-tabs ~ .admin-page > .ds-page-header .ds-page-header__icon {
+  display: none;
+}
+.shell-hub {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

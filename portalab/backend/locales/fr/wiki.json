@@ -1,4 +1,12 @@
 {
+  "admin.all": "Toutes",
+  "admin.archive": "Archiver",
+  "admin.broken": "Liens cassés",
+  "admin.pages": "Pages",
+  "admin.state": "État",
+  "admin.subtitle": "Toutes les pages, leur place et leur état ; publier, archiver et corriger les liens cassés.",
+  "admin.title": "Wiki",
+  "admin.toDraft": "Repasser en brouillon",
   "aiReadable": "L’assistant peut utiliser cette page",
   "body": "Contenu de la page",
   "breadcrumbs": "Emplacement de la page",
