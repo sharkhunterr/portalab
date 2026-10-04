@@ -1281,6 +1281,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/marketplace/products/{key}/presentation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Present Product */
+        put: operations["present_product_api_v1_admin_marketplace_products__key__presentation_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/marketplace/products/{key}/{transition}": {
         parameters: {
             query?: never;
@@ -8615,6 +8632,8 @@ export interface components {
         };
         /** MarketplaceCategoryIn */
         MarketplaceCategoryIn: {
+            /** Icon */
+            icon?: string | null;
             /** Key */
             key: string;
             /** Label Key */
@@ -8627,6 +8646,8 @@ export interface components {
         };
         /** MarketplaceCategoryOut */
         MarketplaceCategoryOut: {
+            /** Icon */
+            icon?: string | null;
             /** Key */
             key: string;
             /** Label Key */
@@ -8708,6 +8729,15 @@ export interface components {
             /** State */
             state: string;
         };
+        /**
+         * MarketplacePresentationIn
+         * @description 027 US8: shop presentation and collection — merchandising, no new price version.
+         */
+        MarketplacePresentationIn: {
+            /** Category */
+            category?: string | null;
+            presentation: components["schemas"]["PresentationIn"];
+        };
         /** MarketplaceProductIn */
         MarketplaceProductIn: {
             /** Confirmation */
@@ -8719,6 +8749,8 @@ export interface components {
         };
         /** MarketplaceProductOut */
         MarketplaceProductOut: {
+            /** Category */
+            category?: string | null;
             /** Conditions */
             conditions: {
                 [key: string]: unknown;
@@ -8734,6 +8766,13 @@ export interface components {
              * @default []
              */
             eligibility: components["schemas"]["MarketplaceCheckOut"][];
+            /**
+             * Featured
+             * @default false
+             */
+            featured: boolean;
+            /** Icon */
+            icon?: string | null;
             /** Key */
             key: string;
             /** Name */
@@ -8744,8 +8783,18 @@ export interface components {
             };
             /** Owned */
             owned: boolean;
+            /**
+             * Poster Effect
+             * @default auto
+             */
+            poster_effect: string;
             /** Price Coins */
             price_coins: number | null;
+            /**
+             * Rarity
+             * @default common
+             */
+            rarity: string;
             /** Refund Policy */
             refund_policy: {
                 [key: string]: unknown;
@@ -9604,6 +9653,31 @@ export interface components {
              * @default true
              */
             stored: boolean;
+        };
+        /**
+         * PresentationIn
+         * @description Shop presentation (027 US8): changes it without a new price version.
+         */
+        PresentationIn: {
+            /**
+             * Featured
+             * @default false
+             */
+            featured: boolean;
+            /** Icon */
+            icon?: string | null;
+            /**
+             * Poster Effect
+             * @default auto
+             * @enum {string}
+             */
+            poster_effect: "auto" | "none" | "shine" | "glitch" | "spin" | "neon" | "blink";
+            /**
+             * Rarity
+             * @default common
+             * @enum {string}
+             */
+            rarity: "common" | "rare" | "epic" | "legendary";
         };
         /** PrivacyInventory */
         PrivacyInventory: {
@@ -14024,6 +14098,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["MarketplaceProductIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceProductOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    present_product_api_v1_admin_marketplace_products__key__presentation_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarketplacePresentationIn"];
             };
         };
         responses: {

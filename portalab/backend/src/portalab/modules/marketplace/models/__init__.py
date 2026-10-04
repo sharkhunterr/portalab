@@ -105,12 +105,18 @@ class Category(MarketplaceBase):
     key: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     label_key: Mapped[str] = mapped_column(String(160), nullable=False)
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    icon: Mapped[str | None] = mapped_column(String(64))  # 027 US8: collections shown as shop shelves
 
 
 class Product(MarketplaceBase):
     __tablename__ = "products"
     __table_args__ = (
         CheckConstraint("state IN ('draft', 'available', 'unavailable', 'archived')", name="state"),
+        CheckConstraint("rarity IN ('common', 'rare', 'epic', 'legendary')", name="rarity"),
+        CheckConstraint(
+            "poster_effect IN ('auto', 'none', 'shine', 'glitch', 'spin', 'neon', 'blink')",
+            name="poster_effect",
+        ),
         Index("ix_products_state", "state", "category_id"),
     )
 
@@ -122,6 +128,13 @@ class Product(MarketplaceBase):
     current_version: Mapped[int] = mapped_column(Integer, nullable=False)
     repeatable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     extension_ref: Mapped[str | None] = mapped_column(String(120))
+    # presentation (027 US8): merchandising only — never part of price, conditions or history
+    rarity: Mapped[str] = mapped_column(String(12), nullable=False, default="common", server_default="common")
+    featured: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    poster_effect: Mapped[str] = mapped_column(
+        String(12), nullable=False, default="auto", server_default="auto"
+    )
+    icon: Mapped[str | None] = mapped_column(String(64))
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

@@ -227,16 +227,16 @@ lossless migration.
 
 ## Phase 11: Shop, achievements, administration polish, theme studio (US8–US11, added 2026-10-04)
 
-- [ ] T088 [US8] Product presentation attributes (rarity, featured, poster_effect, icon; collections = categories) — model, migration, admin API, catalog API in `backend/src/portalab/modules/marketplace/`
-- [ ] T089 [US8] Game-style shop page: featured banner, collection and type shelves, rarity cards, animated posters, filters in `frontend/src/features/marketplace/catalog/`
-- [ ] T090 [US8] Product detail and admin product form with presentation fields in `frontend/src/features/marketplace/{product,admin}/`
-- [ ] T091 [US9] Achievement category + global unlock share and derived rarity — model, migration, API in `backend/src/portalab/modules/gamification/achievements/`
-- [ ] T092 [US9] Steam-like achievement list (category filter, sort by rarity, percentage, animated rare medals) in `frontend/src/features/gamification/achievements/`
+- [X] T088 [US8] Product presentation attributes (rarity, featured, poster_effect, icon; collections = categories) — model, migration, admin API, catalog API in `backend/src/portalab/modules/marketplace/`
+- [X] T089 [US8] Game-style shop page: featured banner, collection and type shelves, rarity cards, animated posters, filters in `frontend/src/features/marketplace/catalog/`
+- [X] T090 [US8] Product detail and admin product form with presentation fields in `frontend/src/features/marketplace/{product,admin}/`
+- [X] T091 [US9] Achievement category + global unlock share and derived rarity — model, migration, API in `backend/src/portalab/modules/gamification/achievements/`
+- [X] T092 [US9] Steam-like achievement list (category filter, sort by rarity, percentage, animated rare medals) in `frontend/src/features/gamification/achievements/`
 - [ ] T093 [US10] Services page admin entry ("Add a service") and services administration polish in `frontend/src/features/services/`, `frontend/src/features/admin/services/`
 - [ ] T094 [US10] Control Center as readable panel cards with states, figures and actions; wire the health panel in `frontend/src/features/admin/ControlCenter.tsx` and the overview providers
 - [ ] T095 [US10] News (member and admin), wiki and support (tickets, queue, admin) pages on the page kit in `frontend/src/features/{news,wiki,support}/`
 - [ ] T096 [US11] Theme studio: duplicate a theme, edit colors/fonts/layout/motion/sounds with live preview and floor report, publish and create the Marketplace product in `frontend/src/features/appearance/studio/`
-- [ ] T097 Demo data: rarities, collections (Halloween, New Wave), featured items, theme products, achievement categories in `backend/src/portalab/app/demo_seed.py`
+- [X] T097 Demo data: rarities, collections (Halloween, New Wave), featured items, theme products, achievement categories in `backend/src/portalab/app/demo_seed.py`
 - [ ] T098 Tests (backend integration, frontend unit, Playwright) for US8–US11; dev-mode verification on the LAN instance
 
 ## Dependencies & Execution Order

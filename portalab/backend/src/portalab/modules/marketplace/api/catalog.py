@@ -3,6 +3,7 @@ type, price, conditions **with the viewer's eligibility by name**, refund policy
 ownership), ``marketplace.purchase`` to acquire (``Idempotency-Key``), and the member's own purchases,
 owned products, configuration and refunds."""
 
+from collections.abc import Mapping
 from datetime import datetime, timedelta
 from typing import Annotated, Any
 from uuid import UUID, uuid4
@@ -30,6 +31,7 @@ Me = Annotated[Principal, require("users.self.manage")]
 class MarketplaceCategoryOut(BaseModel):
     key: str
     label_key: str
+    icon: str | None = None
 
 
 class MarketplaceCheckOut(BaseModel):
@@ -53,6 +55,11 @@ class MarketplaceProductOut(BaseModel):
     config_required: bool
     repeatable: bool
     owned: bool
+    rarity: str = "common"
+    featured: bool = False
+    poster_effect: str = "auto"
+    icon: str | None = None
+    category: str | None = None
     eligibility: list[MarketplaceCheckOut] = []
 
 
@@ -87,7 +94,11 @@ def _me(principal: Principal) -> UUID:
 
 
 def product_out(
-    product: Product, version: ProductVersion, owned: bool, language: str = "en"
+    product: Product,
+    version: ProductVersion,
+    owned: bool,
+    language: str = "en",
+    categories: Mapping[UUID, str] | None = None,
 ) -> MarketplaceProductOut:
     return MarketplaceProductOut(
         key=product.key,
@@ -103,7 +114,16 @@ def product_out(
         config_required=version.config_required,
         repeatable=product.repeatable,
         owned=owned,
+        rarity=product.rarity,
+        featured=product.featured,
+        poster_effect=product.poster_effect,
+        icon=product.icon,
+        category=(categories or {}).get(product.category_id) if product.category_id else None,
     )
+
+
+async def category_keys(module: MarketplaceModule) -> dict[UUID, str]:
+    return {c.id: c.key for c in await module.catalog.categories()}
 
 
 async def ownership_out(module: MarketplaceModule, row: Ownership) -> MarketplaceOwnershipOut:
@@ -145,7 +165,8 @@ async def owned_ids(module: MarketplaceModule, user: UUID) -> set[UUID]:
 @router.get("/marketplace/categories", response_model=list[MarketplaceCategoryOut])
 async def categories(_: Reader, module: Module) -> list[MarketplaceCategoryOut]:
     return [
-        MarketplaceCategoryOut(key=c.key, label_key=c.label_key) for c in await module.catalog.categories()
+        MarketplaceCategoryOut(key=c.key, label_key=c.label_key, icon=c.icon)
+        for c in await module.catalog.categories()
     ]
 
 
@@ -159,7 +180,8 @@ async def products(
 ) -> list[MarketplaceProductOut]:
     mine = await owned_ids(module, _me(principal))
     rows = await module.catalog.listing(category=category, product_type=type, q=q, owned_ids=mine)
-    return [product_out(p, v, p.id in mine) for p, v in rows]
+    keys = await category_keys(module)
+    return [product_out(p, v, p.id in mine, categories=keys) for p, v in rows]
 
 
 @router.get("/marketplace/products/{key}", response_model=MarketplaceProductOut)
@@ -169,7 +191,7 @@ async def product_detail(principal: Reader, key: str, module: Module) -> Marketp
     mine = await owned_ids(module, user)
     if product.state in ("draft",) or (product.state == "archived" and product.id not in mine):
         raise ProductNotFound("This product does not exist.")
-    out = product_out(product, version, product.id in mine)
+    out = product_out(product, version, product.id in mine, categories=await category_keys(module))
     checks = await module.eligibility.checks(user, list(version.conditions), version.price_coins)
     out.eligibility = [
         MarketplaceCheckOut(name=c.name, value=c.value, met=c.met, reason=c.reason) for c in checks

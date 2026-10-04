@@ -71,12 +71,27 @@ class ProductVersionIn(BaseModel):
         return value
 
 
+Rarity = Literal["common", "rare", "epic", "legendary"]
+PosterEffect = Literal["auto", "none", "shine", "glitch", "spin", "neon", "blink"]
+
+
+class PresentationIn(BaseModel):
+    """Shop presentation (027 US8): changes it without a new price version."""
+
+    model_config = ConfigDict(extra="forbid")
+    rarity: Rarity = "common"
+    featured: bool = False
+    poster_effect: PosterEffect = "auto"
+    icon: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9-]{0,63}$")
+
+
 class ProductIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     key: str = Field(pattern=r"^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$", max_length=96)
     type: str = Field(min_length=1, max_length=96)
     category: str | None = Field(default=None, max_length=64)
     repeatable: bool = False
+    presentation: PresentationIn = Field(default_factory=PresentationIn)
     version: ProductVersionIn
 
 

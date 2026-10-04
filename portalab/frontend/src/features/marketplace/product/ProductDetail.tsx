@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
+import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { useProduct } from "../api";
+import { ProductPoster } from "../catalog/ProductPoster";
 import { ConditionsChecklist } from "./ConditionsChecklist";
+import "../marketplace.css";
 import { PurchaseDialog } from "./PurchaseDialog";
 
 /** ``/marketplace/products/:key`` (spec 015 T021): type, price, named conditions, refund policy, purchase. */
@@ -29,19 +32,29 @@ export function ProductDetail() {
   const eligible = (data.eligibility ?? []).every((c) => c.met);
   return (
     <div className="ds-stack">
-      <PageHeader icon="shop" title={data.name} />
-      <p className="ds-badge">
-        {t(`marketplace:type.${data.type}`)} ·{" "}
-        {data.price_coins
-          ? t("marketplace:purchase.price", { price: data.price_coins })
-          : t("marketplace:purchase.free")}
-      </p>
-      {Object.values(data.descriptions)[0] ? <p>{Object.values(data.descriptions)[0]}</p> : null}
+      <section className="product-hero" data-rarity={data.rarity ?? "common"}>
+        <ProductPoster product={data} size="lg" />
+        <div className="product-hero__text">
+          <span className="product-card__rarity">
+            {t(`marketplace:rarity.${data.rarity ?? "common"}`)} · {t(`marketplace:type.${data.type}`)}
+          </span>
+          <PageHeader title={data.name} context={Object.values(data.descriptions)[0] ?? null} />
+          <div className="ds-stack ds-stack--row">
+            {data.price_coins ? (
+              <CoinBadge amount={data.price_coins} label={t("gamification:value.coins")} />
+            ) : (
+              <span className="ds-badge">{t("marketplace:purchase.free")}</span>
+            )}
+            {data.owned ? (
+              <span className="product-card__owned">{t("marketplace:product.owned")}</span>
+            ) : null}
+          </div>
+        </div>
+      </section>
       <section aria-labelledby="product-conditions" className="ds-stack">
         <h2 id="product-conditions">{t("marketplace:conditions.title")}</h2>
         <ConditionsChecklist checks={data.eligibility ?? []} />
       </section>
-      {data.owned ? <p role="status">{t("marketplace:product.owned")}</p> : null}
       {!data.owned && canBuy && data.state === "available" ? (
         buying ? (
           <PurchaseDialog product={data} onClose={() => setBuying(false)} />

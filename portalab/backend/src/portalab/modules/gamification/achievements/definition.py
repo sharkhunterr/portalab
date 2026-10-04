@@ -56,6 +56,10 @@ class AchievementDefinition(BaseModel):
     description: str = Field(default="", max_length=400)
     icon: str | None = Field(default=None, max_length=64)
     hidden: bool = False
+    # 027 US9: what the achievement rewards (shown as a filter, like game platforms)
+    category: Literal[
+        "service_usage", "purchase", "community", "progression", "events", "content", "other"
+    ] = "other"
     criteria: list[Criterion] = Field(min_length=1, max_length=5)
     rewards: list[Reward] = Field(default_factory=list, max_length=3)
 

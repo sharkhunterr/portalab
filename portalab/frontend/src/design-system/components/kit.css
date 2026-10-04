@@ -699,7 +699,15 @@ progress {
   max-inline-size: 100%;
 }
 .ds-subnav a,
+.ds-subnav button,
 .community-tabs a {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   flex: none;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
@@ -713,6 +721,7 @@ progress {
   color: var(--color-text);
 }
 .ds-subnav a[aria-current="page"],
+.ds-subnav button[aria-pressed="true"],
 .community-tabs a[aria-current="page"] {
   background: var(--color-surface-raised);
   color: var(--color-text);
@@ -906,4 +915,11 @@ input[type="file"] {
   justify-self: stretch;
   background: var(--color-accent);
   color: var(--color-accent-contrast);
+}
+/* chips never stretch inside column layouts */
+.ds-badge,
+.ds-coins,
+.ds-level {
+  inline-size: fit-content;
+  align-self: flex-start;
 }

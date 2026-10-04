@@ -101,11 +101,91 @@
   margin: 0;
 }
 
-.achievement {
+.achievements {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.achievements__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.achievements__head h2 {
+  margin: 0;
+}
+
+.achievements__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  inline-size: min(18rem, 100%);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.achievements__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.achievements__sort {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.achievements__sort select {
+  min-block-size: 2.25rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.achievements__list {
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+.achievement {
+  --rarity: var(--rarity-common);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: 4px solid var(--rarity);
+}
+
+.achievement[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+
+.achievement[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+
+.achievement[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+
+.achievement__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-inline-size: 0;
 }
 
 .achievement h3,
@@ -113,17 +193,115 @@
   margin: 0;
 }
 
-.achievement__medal {
-  display: inline-grid;
-  place-items: center;
-  inline-size: 3.25rem;
-  block-size: 3.25rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--rarity-legendary), var(--color-accent));
-  color: var(--color-accent-contrast);
-  box-shadow: var(--shadow-2);
+.achievement p {
+  color: var(--color-text-muted);
 }
 
-.achievement[data-state="unlocked"] {
-  border-color: color-mix(in srgb, var(--rarity-legendary) 45%, transparent);
+.achievement__category {
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.achievement__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  text-align: end;
+}
+
+.achievement__meta .ds-badge {
+  align-self: flex-end;
+}
+
+.achievement__rarity {
+  color: var(--rarity);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+}
+
+.achievement__share {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.achievement__medal {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--rarity) 85%, var(--artwork-text) 15%),
+    var(--rarity) 55%,
+    color-mix(in srgb, var(--rarity) 55%, var(--color-surface) 45%)
+  );
+  color: var(--artwork-text);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--rarity) 35%, transparent),
+    var(--shadow-2);
+}
+
+.achievement[data-state="unlocked"][data-rarity="epic"] .achievement__medal,
+.achievement[data-state="unlocked"][data-rarity="legendary"] .achievement__medal {
+  animation: medal-glow 2.6s ease-in-out infinite;
+}
+
+.achievement[data-state="unlocked"][data-rarity="legendary"] .achievement__medal::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--rarity) 70%, transparent);
+  animation: medal-orbit 8s linear infinite;
+}
+
+@keyframes medal-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--rarity) 35%, transparent),
+      0 0 10px color-mix(in srgb, var(--rarity) 40%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--rarity) 55%, transparent),
+      0 0 26px color-mix(in srgb, var(--rarity) 75%, transparent);
+  }
+}
+
+@keyframes medal-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .achievement {
+    grid-template-columns: auto 1fr;
+  }
+  .achievement__meta {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+.achievement__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-inline-size: 22rem;
+}
+
+.achievement__step .gamification-meta {
+  white-space: nowrap;
 }

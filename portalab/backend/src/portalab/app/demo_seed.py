@@ -28,6 +28,7 @@ from portalab.capabilities.support import TicketRequest
 from portalab.core.authz_port import Principal
 from portalab.core.logging import get_logger
 from portalab.core.time import utc_now
+from portalab.modules.gamification.achievements.definition import parse_achievement
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.services.common import SYSTEM
 from portalab.modules.identity.services.credentials import set_password
@@ -48,6 +49,7 @@ PROGRESSION: dict[str, dict[str, int]] = {
 
 ACHIEVEMENTS: dict[str, dict[str, Any]] = {
     "first_steps": {
+        "category": "service_usage",
         "label": "First steps",
         "description": "Sign in to the portal for the first time.",
         "icon": "sparkles",
@@ -55,6 +57,7 @@ ACHIEVEMENTS: dict[str, dict[str, Any]] = {
         "rewards": [{"value": "coins", "amount": 10}],
     },
     "regular": {
+        "category": "service_usage",
         "label": "Regular",
         "description": "Sign in on ten different occasions.",
         "icon": "calendar",
@@ -62,12 +65,14 @@ ACHIEVEMENTS: dict[str, dict[str, Any]] = {
         "rewards": [{"value": "xp", "amount": 50}],
     },
     "saver": {
+        "category": "purchase",
         "label": "Saver",
         "description": "Hold at least 200 Coins.",
         "icon": "coins",
         "criteria": [{"kind": "value_at_least", "value": "coins", "amount": 200}],
     },
     "rising_star": {
+        "category": "progression",
         "label": "Rising star",
         "description": "Reach level 3.",
         "icon": "star",
@@ -75,6 +80,7 @@ ACHIEVEMENTS: dict[str, dict[str, Any]] = {
         "rewards": [{"value": "coins", "amount": 25}],
     },
     "veteran": {
+        "category": "progression",
         "label": "Veteran",
         "description": "Reach level 5.",
         "icon": "trophy",
@@ -82,12 +88,61 @@ ACHIEVEMENTS: dict[str, dict[str, Any]] = {
         "rewards": [{"value": "coins", "amount": 50}],
     },
     "night_owl": {
+        "category": "other",
         "label": "Night owl",
         "description": "A secret achievement.",
         "icon": "moon",
         "hidden": True,
         "criteria": [{"kind": "value_at_least", "value": "coins", "amount": 5000}],
     },
+}
+
+ACHIEVEMENTS |= {
+    "first_purchase": {
+        "category": "purchase",
+        "label": "First purchase",
+        "description": "Buy something in the shop.",
+        "icon": "shop",
+        "criteria": [{"kind": "event_count", "event_type": "marketplace.purchase", "count": 1}],
+        "rewards": [{"value": "xp", "amount": 20}],
+    },
+    "collector": {
+        "category": "purchase",
+        "label": "Collector",
+        "description": "Own three items from the shop.",
+        "icon": "star",
+        "criteria": [{"kind": "event_count", "event_type": "marketplace.purchase", "count": 3}],
+        "rewards": [{"value": "coins", "amount": 40}],
+    },
+    "pillar": {
+        "category": "community",
+        "label": "Pillar of the community",
+        "description": "Reach 25 Contribution points.",
+        "icon": "heart",
+        "criteria": [{"kind": "value_at_least", "value": "contribution", "amount": 25}],
+    },
+}
+
+# 027 US8: shop collections (marketplace categories) and presentation of each product
+COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
+    ("halloween", "Halloween", "moon", 10),
+    ("new_wave", "New Wave", "zap", 20),
+    ("essentials", "Essentials", "star", 30),
+)
+PRESENTATION: dict[
+    str, tuple[str, str, bool, str, str | None]
+] = {  # rarity, effect, featured, collection, icon
+    "badge_pioneer": ("common", "none", False, "essentials", "compass"),
+    "badge_night_owl": ("rare", "shine", False, "halloween", "moon"),
+    "title_legend": ("legendary", "neon", True, "essentials", "trophy"),
+    "title_cinephile": ("rare", "shine", False, "essentials", "film"),
+    "effect_confetti": ("epic", "spin", False, "new_wave", "sparkles"),
+    "effect_aurora": ("epic", "glitch", True, "new_wave", "sparkles"),
+    "theme_orbit": ("legendary", "neon", True, "new_wave", "compass"),
+    "theme_studio": ("rare", "shine", False, "essentials", "palette"),
+    "effect_pumpkin": ("epic", "blink", False, "halloween", "sparkles"),
+    "badge_ghost": ("legendary", "glitch", True, "halloween", "moon"),
+    "quota_requests": ("common", "none", False, "essentials", "inbox"),
 }
 
 QUESTS: dict[str, dict[str, Any]] = {
@@ -161,6 +216,26 @@ PRODUCTS: tuple[dict[str, Any], ...] = (
     _product(
         "effect_aurora", "effect", 200, "Aurora effect", "Effet aurore",
         "A soft aurora behind your profile.", {"effect": "aurora"},
+    ),
+    _product(
+        "theme_orbit", "theme", 400, "Orbit theme", "Thème Orbite",
+        "Navigation in an orbiting bubble, header at the bottom, playful motion.", {"theme": "orbit"},
+    ),
+    _product(
+        "theme_studio", "theme", 250, "Studio theme", "Thème Studio",
+        "A calm studio: top bar, flat cards, narrow reading width.", {"theme": "studio"},
+    ),
+    _product(
+        "effect_pumpkin", "effect", 180, "Pumpkin glow", "Lueur citrouille",
+        "A flickering pumpkin glow for the spooky season.", {"effect": "pumpkin"},
+    ),
+    _product(
+        "badge_ghost", "badge", 500, "Ghost badge", "Badge Fantôme",
+        "Only the bravest haunt the portal at night.", {"label": "Ghost", "icon": "moon"},
+    ),
+    _product(
+        "quota_requests", "quota", 60, "+5 media requests", "+5 demandes de médias",
+        "Five extra media requests this month.", {"kind": "media_requests", "units": 5},
     ),
 )  # fmt: skip
 OWNED_BY_ADMIN = ("badge_pioneer", "effect_confetti")
@@ -334,9 +409,14 @@ class DemoSeeder:
         gamification = self.platform.gamification
         made = 0
         for key, raw in ACHIEVEMENTS.items():
-            if await self._scalar("SELECT 1 FROM gamification.achievements WHERE key = :k LIMIT 1", k=key):
-                continue
-            await gamification.achievements.save(self.admin, key, raw)
+            stored = await self._scalar(
+                "SELECT definition FROM gamification.achievements WHERE key = :k "
+                "ORDER BY version DESC LIMIT 1",
+                k=key,
+            )
+            if stored is not None and stored == parse_achievement(raw).model_dump():
+                continue  # unchanged: idempotent
+            await gamification.achievements.save(self.admin, key, raw)  # new definition or new version
             made += 1
         for key, raw in QUESTS.items():
             if await self._scalar("SELECT 1 FROM gamification.quests WHERE key = :k LIMIT 1", k=key):
@@ -398,14 +478,33 @@ class DemoSeeder:
         return f"{unlocked} newly unlocked"
 
     async def catalog(self) -> str:
+        from portalab.modules.marketplace.products.definition import PresentationIn
+
         catalog = self.platform.marketplace.catalog
+        for key, label, icon, position in COLLECTIONS:
+            await catalog.add_category(key, label, position, icon)
         made = 0
         for product in PRODUCTS:
-            if await self._scalar("SELECT 1 FROM marketplace.products WHERE key = :k", k=product["key"]):
-                continue
-            await catalog.create(self.admin, product)
-            await catalog.move(self.admin, product["key"], "available")
-            made += 1
+            if not await self._scalar("SELECT 1 FROM marketplace.products WHERE key = :k", k=product["key"]):
+                await catalog.create(self.admin, product)
+                await catalog.move(self.admin, product["key"], "available")
+                made += 1
+            presentation: tuple[str, str, bool, str, str | None] = PRESENTATION.get(
+                product["key"], ("common", "auto", False, "essentials", None)
+            )
+            rarity, effect, featured, collection, art = presentation
+            current = await self._scalar(
+                "SELECT rarity || '|' || poster_effect || '|' || featured::text || '|' || coalesce(icon, '') "
+                "FROM marketplace.products WHERE key = :k",
+                k=product["key"],
+            )
+            if current != f"{rarity}|{effect}|{str(featured).lower()}|{art or ''}":
+                await catalog.present(
+                    self.admin,
+                    product["key"],
+                    PresentationIn(rarity=rarity, poster_effect=effect, featured=featured, icon=art),
+                    collection,
+                )
         return f"{made} products published"
 
     async def purchases(self) -> str:

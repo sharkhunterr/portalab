@@ -5198,6 +5198,18 @@
       },
       "MarketplaceCategoryIn": {
         "properties": {
+          "icon": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
           "key": {
             "maxLength": 64,
             "pattern": "^[a-z][a-z0-9_]*$",
@@ -5225,6 +5237,17 @@
       },
       "MarketplaceCategoryOut": {
         "properties": {
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
           "key": {
             "title": "Key",
             "type": "string"
@@ -5448,6 +5471,31 @@
         "title": "MarketplaceOwnershipOut",
         "type": "object"
       },
+      "MarketplacePresentationIn": {
+        "description": "027 US8: shop presentation and collection \u2014 merchandising, no new price version.",
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "presentation": {
+            "$ref": "#/components/schemas/PresentationIn"
+          }
+        },
+        "required": [
+          "presentation"
+        ],
+        "title": "MarketplacePresentationIn",
+        "type": "object"
+      },
       "MarketplaceProductIn": {
         "properties": {
           "confirmation": {
@@ -5475,6 +5523,17 @@
       },
       "MarketplaceProductOut": {
         "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
           "conditions": {
             "items": {
               "additionalProperties": true,
@@ -5502,6 +5561,22 @@
             "title": "Eligibility",
             "type": "array"
           },
+          "featured": {
+            "default": false,
+            "title": "Featured",
+            "type": "boolean"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
           "key": {
             "title": "Key",
             "type": "string"
@@ -5521,6 +5596,11 @@
             "title": "Owned",
             "type": "boolean"
           },
+          "poster_effect": {
+            "default": "auto",
+            "title": "Poster Effect",
+            "type": "string"
+          },
           "price_coins": {
             "anyOf": [
               {
@@ -5531,6 +5611,11 @@
               }
             ],
             "title": "Price Coins"
+          },
+          "rarity": {
+            "default": "common",
+            "title": "Rarity",
+            "type": "string"
           },
           "refund_policy": {
             "additionalProperties": true,
@@ -7861,6 +7946,56 @@
           "effective_now"
         ],
         "title": "PreferenceOut",
+        "type": "object"
+      },
+      "PresentationIn": {
+        "additionalProperties": false,
+        "description": "Shop presentation (027 US8): changes it without a new price version.",
+        "properties": {
+          "featured": {
+            "default": false,
+            "title": "Featured",
+            "type": "boolean"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "poster_effect": {
+            "default": "auto",
+            "enum": [
+              "auto",
+              "none",
+              "shine",
+              "glitch",
+              "spin",
+              "neon",
+              "blink"
+            ],
+            "title": "Poster Effect",
+            "type": "string"
+          },
+          "rarity": {
+            "default": "common",
+            "enum": [
+              "common",
+              "rare",
+              "epic",
+              "legendary"
+            ],
+            "title": "Rarity",
+            "type": "string"
+          }
+        },
+        "title": "PresentationIn",
         "type": "object"
       },
       "PrivacyInventory": {
@@ -16388,6 +16523,58 @@
           }
         },
         "summary": "Revise Product",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/products/{key}/presentation": {
+      "put": {
+        "operationId": "present_product_api_v1_admin_marketplace_products__key__presentation_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplacePresentationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Present Product",
         "tags": [
           "marketplace-admin"
         ]

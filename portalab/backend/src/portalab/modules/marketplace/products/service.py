@@ -19,6 +19,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.models import Category, Product, ProductVersion
 from portalab.modules.marketplace.products.definition import (
+    PresentationIn,
     ProductVersionIn,
     check_payload,
     parse_product,
@@ -123,12 +124,16 @@ class Catalog:
                 (await session.execute(select(Category).order_by(Category.position, Category.key))).scalars()
             )
 
-    async def add_category(self, key: str, label_key: str, position: int = 0) -> Category:
+    async def add_category(
+        self, key: str, label_key: str, position: int = 0, icon: str | None = None
+    ) -> Category:
         async with self.database.unit_of_work() as uow:
             existing = await uow.session.scalar(select(Category).where(Category.key == key))
             if existing is not None:
+                if icon and existing.icon != icon:
+                    existing.icon = icon
                 return existing
-            category = Category(key=key, label_key=label_key, position=position)
+            category = Category(key=key, label_key=label_key, position=position, icon=icon)
             uow.session.add(category)
         return category
 
@@ -153,6 +158,10 @@ class Catalog:
                 state="draft",
                 current_version=1,
                 repeatable=data.repeatable,
+                rarity=data.presentation.rarity,
+                featured=data.presentation.featured,
+                poster_effect=data.presentation.poster_effect,
+                icon=data.presentation.icon,
                 created_by=actor_id(actor),
                 created_at=now,
                 updated_at=now,
@@ -186,6 +195,26 @@ class Catalog:
             session.add(self._version_row(product, number, version, actor))
             product.current_version, product.updated_at = number, utc_now(self.clock)
             await self._audit(session, actor, "product_revised", product, price=version.price_coins)
+        return product
+
+    async def present(
+        self, actor: Principal, key: str, presentation: PresentationIn, category: str | None
+    ) -> Product:
+        """Shop presentation and collection (027 US8): merchandising only — no new version, audited."""
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            product = await session.scalar(select(Product).where(Product.key == key).with_for_update())
+            if product is None:
+                raise ProductNotFound("This product does not exist.")
+            category_id = None
+            if category:
+                category_id = await session.scalar(select(Category.id).where(Category.key == category))
+                if category_id is None:
+                    raise ValidationFailed("Unknown collection.", code="marketplace.invalid_product")
+            product.rarity, product.featured = presentation.rarity, presentation.featured
+            product.poster_effect, product.icon = presentation.poster_effect, presentation.icon
+            product.category_id, product.updated_at = category_id, utc_now(self.clock)
+            await self._audit(session, actor, "product_presented", product, rarity=presentation.rarity)
         return product
 
     async def move(self, actor: Principal, key: str, target: State) -> Product:

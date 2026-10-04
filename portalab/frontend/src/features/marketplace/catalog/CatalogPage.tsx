@@ -1,65 +1,207 @@
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CoinBadge } from "../../../design-system/components/Badges";
+import { Button } from "../../../design-system/components/Button";
+import { Icon } from "../../../design-system/components/Icon";
+import { PageHeader } from "../../../design-system/components/PageHeader";
+import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { useCategories, useProducts } from "../api";
+import { PROGRESSION_KEY } from "../../../shell/header/useHeaderData";
+import type { Progression } from "../../gamification/api";
+import { type Category, type Product, useCategories, useProducts } from "../api";
 import { ProductCard } from "./ProductCard";
+import { ProductPoster } from "./ProductPoster";
 import "../marketplace.css";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 
-/** ``/marketplace`` (spec 015 T021): categories, search and products bought with Coins (no real money). */
+/**
+ * ``/marketplace`` (spec 015 T021, 027 US8): a game-style shop — featured banner, shelves by collection or
+ * by type, rarity filter and search. Products are bought with Coins earned on the portal, never real money.
+ */
+export const TYPE_GROUPS: Array<{ key: string; icon: string; types: string[] }> = [
+  { key: "badges", icon: "star", types: ["badge", "title"] },
+  { key: "animations", icon: "sparkles", types: ["effect"] },
+  { key: "themes", icon: "palette", types: ["theme"] },
+  { key: "features", icon: "zap", types: ["feature", "plugin", "widget", "statistic", "access"] },
+  { key: "bonus", icon: "inbox", types: ["quota"] },
+];
+const RARITIES = ["common", "rare", "epic", "legendary"] as const;
+const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
+
+function groupOf(type: string): string {
+  return TYPE_GROUPS.find((g) => g.types.includes(type))?.key ?? "other";
+}
+
+function byRarity(a: Product, b: Product): number {
+  return (
+    (RANK[a.rarity ?? "common"] ?? 3) - (RANK[b.rarity ?? "common"] ?? 3) || a.name.localeCompare(b.name)
+  );
+}
+
 export default function CatalogPage() {
   const t = useT();
-  const [category, setCategory] = useState("");
+  const client = useQueryClient();
+  const coins = client.getQueryData<Progression>(PROGRESSION_KEY)?.coins;
+  const [view, setView] = useState<"collections" | "types">("collections");
+  const [rarity, setRarity] = useState("");
   const [q, setQ] = useState("");
   const categories = useCategories();
-  const products = useProducts({ category, q: q.trim() });
+  const products = useProducts({ category: "", q: q.trim() });
+  const all = useMemo(
+    () => (products.data ?? []).filter((p) => !rarity || p.rarity === rarity).sort(byRarity),
+    [products.data, rarity],
+  );
+  const featured = all.filter((p) => p.featured);
+  const shelves = useMemo(() => {
+    if (view === "types") {
+      return [
+        ...TYPE_GROUPS.map((g) => ({ key: g.key, icon: g.icon, title: t(`marketplace:group.${g.key}`) })),
+        { key: "other", icon: "more", title: t("marketplace:group.other") },
+      ]
+        .map((g) => ({ ...g, items: all.filter((p) => groupOf(p.type) === g.key) }))
+        .filter((g) => g.items.length);
+    }
+    const known = (categories.data ?? []) as Category[];
+    return [
+      ...known.map((c) => ({
+        key: c.key,
+        icon: c.icon ?? "star",
+        title: t(c.label_key),
+        items: all.filter((p) => p.category === c.key),
+      })),
+      {
+        key: "_other",
+        icon: "more",
+        title: t("marketplace:shop.otherCollection"),
+        items: all.filter((p) => !p.category || !known.some((c) => c.key === p.category)),
+      },
+    ].filter((g) => g.items.length);
+  }, [view, all, categories.data, t]);
+
   return (
-    <div className="ds-stack">
+    <div className="shop">
       <PageHeader
         icon="shop"
         title={t("marketplace:catalog.title")}
         context={t("marketplace:catalog.intro")}
         secondary={
           <>
+            {coins !== undefined ? <CoinBadge amount={coins} label={t("gamification:value.coins")} /> : null}
             <Link className="ds-button ds-button--secondary" to="/projects">
-              {t("marketplace:projects.title")}
+              {t("marketplace:shop.projects")}
             </Link>
             <Link className="ds-button ds-button--primary" to="/marketplace/owned">
-              {t("marketplace:owned.title")}
+              <Icon name="star" size={18} />
+              {t("marketplace:shop.myItems")}
             </Link>
           </>
         }
       />
-      <div className="ds-stack--row community-filters">
-        <SelectField
-          label={t("marketplace:catalog.category")}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">{t("marketplace:catalog.all")}</option>
-          {(categories.data ?? []).map((c) => (
-            <option key={c.key} value={c.key}>
-              {t(c.label_key)}
-            </option>
+
+      {featured.length && !q && !rarity ? (
+        <section className="shop-featured" aria-labelledby="shop-featured">
+          <h2 id="shop-featured" className="shop-shelf__title">
+            <Icon name="sparkles" size={20} /> {t("marketplace:shop.featured")}
+          </h2>
+          <ul className="shop-featured__list">
+            {featured.map((product) => (
+              <li key={product.key} className="shop-hero" data-rarity={product.rarity ?? "common"}>
+                <ProductPoster product={product} size="lg" />
+                <div className="shop-hero__text">
+                  <span className="product-card__rarity">
+                    {t(`marketplace:rarity.${product.rarity ?? "common"}`)}
+                  </span>
+                  <h3>
+                    <Link to={`/marketplace/products/${product.key}`}>{product.name}</Link>
+                  </h3>
+                  {Object.values(product.descriptions)[0] ? (
+                    <p>{Object.values(product.descriptions)[0]}</p>
+                  ) : null}
+                  {product.owned ? (
+                    <span className="product-card__owned">
+                      <Icon name="check" size={16} /> {t("marketplace:product.owned")}
+                    </span>
+                  ) : product.price_coins ? (
+                    <CoinBadge amount={product.price_coins} label={t("gamification:value.coins")} />
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <div className="shop-toolbar">
+        <div className="ds-subnav" role="group" aria-label={t("marketplace:catalog.title")}>
+          <button type="button" aria-pressed={view === "collections"} onClick={() => setView("collections")}>
+            <Icon name="star" size={16} /> {t("marketplace:shop.byCollection")}
+          </button>
+          <button type="button" aria-pressed={view === "types"} onClick={() => setView("types")}>
+            <Icon name="list" size={16} /> {t("marketplace:shop.byType")}
+          </button>
+        </div>
+        <div className="shop-rarities" role="group" aria-label={t("marketplace:shop.rarity")}>
+          <button type="button" aria-pressed={!rarity} onClick={() => setRarity("")}>
+            {t("marketplace:shop.allRarities")}
+          </button>
+          {RARITIES.map((r) => (
+            <button
+              key={r}
+              type="button"
+              data-rarity={r}
+              aria-pressed={rarity === r}
+              onClick={() => setRarity(rarity === r ? "" : r)}
+            >
+              {t(`marketplace:rarity.${r}`)}
+            </button>
           ))}
-        </SelectField>
-        <TextField
-          type="search"
-          label={t("marketplace:catalog.search")}
-          value={q}
-          maxLength={64}
-          onChange={(e) => setQ(e.target.value)}
-        />
+        </div>
+        <label className="shop-search">
+          <Icon name="search" size={18} />
+          <span className="visually-hidden">{t("marketplace:catalog.search")}</span>
+          <input
+            type="search"
+            value={q}
+            maxLength={64}
+            placeholder={t("marketplace:catalog.search")}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </label>
       </div>
+
+      {products.isPending ? <Skeleton shape="tile" count={6} label={t("marketplace:catalog.title")} /> : null}
       {products.isError ? <FunctionalState state="unavailable" onRetry={() => products.refetch()} /> : null}
-      {products.data?.length === 0 ? <p>{t("marketplace:catalog.empty")}</p> : null}
-      <ul className="project-grid">
-        {(products.data ?? []).map((product) => (
-          <ProductCard key={product.key} product={product} />
-        ))}
-      </ul>
+      {products.data && all.length === 0 ? (
+        <EmptyState
+          icon="shop"
+          title={t("marketplace:shop.nothing")}
+          action={
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setQ("");
+                setRarity("");
+              }}
+            >
+              {t("marketplace:shop.reset")}
+            </Button>
+          }
+        />
+      ) : null}
+      {shelves.map((shelf) => (
+        <section key={shelf.key} className="shop-shelf" aria-labelledby={`shelf-${shelf.key}`}>
+          <h2 id={`shelf-${shelf.key}`} className="shop-shelf__title">
+            <Icon name={shelf.icon} size={20} /> {shelf.title}
+            <span className="shop-shelf__count">{shelf.items.length}</span>
+          </h2>
+          <ul className="shop-shelf__list">
+            {shelf.items.map((product) => (
+              <ProductCard key={product.key} product={product} />
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }

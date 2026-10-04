@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Change, Instance } from "../api";
@@ -75,48 +76,88 @@ export function EditControls({
   const fixed = instance.locked;
   return (
     <div className="widget-frame__controls ds-stack ds-stack--row" role="toolbar" aria-label={title}>
-      <Button variant="secondary" disabled={fixed || index === 0} onClick={() => move(true)}>
-        {t("dashboard:moveUp")}
+      <Button
+        variant="secondary"
+        disabled={fixed || index === 0}
+        onClick={() => move(true)}
+        size="icon"
+        aria-label={t("dashboard:moveUp")}
+        title={t("dashboard:moveUp")}
+      >
+        <Icon name="arrow-up" size={18} />
       </Button>
-      <Button variant="secondary" disabled={fixed || index >= total - 1} onClick={() => move(false)}>
-        {t("dashboard:moveDown")}
+      <Button
+        variant="secondary"
+        disabled={fixed || index >= total - 1}
+        onClick={() => move(false)}
+        size="icon"
+        aria-label={t("dashboard:moveDown")}
+        title={t("dashboard:moveDown")}
+      >
+        <Icon name="arrow-down" size={18} />
       </Button>
       <Button
         variant="secondary"
         disabled={fixed || !widget || cell.w >= widget.max_w}
         onClick={() => resize(cell.w + 1, cell.h)}
+        size="icon"
+        aria-label={t("dashboard:wider")}
+        title={t("dashboard:wider")}
       >
-        {t("dashboard:wider")}
+        <Icon name="wider" size={18} />
       </Button>
       <Button
         variant="secondary"
         disabled={fixed || !widget || cell.w <= widget.min_w}
         onClick={() => resize(cell.w - 1, cell.h)}
+        size="icon"
+        aria-label={t("dashboard:narrower")}
+        title={t("dashboard:narrower")}
       >
-        {t("dashboard:narrower")}
+        <Icon name="narrower" size={18} />
       </Button>
       <Button
         variant="secondary"
         disabled={fixed || !widget || cell.h >= widget.max_h}
         onClick={() => resize(cell.w, cell.h + 1)}
+        size="icon"
+        aria-label={t("dashboard:taller")}
+        title={t("dashboard:taller")}
       >
-        {t("dashboard:taller")}
+        <Icon name="taller" size={18} />
       </Button>
       <Button
         variant="secondary"
         disabled={fixed || !widget || cell.h <= widget.min_h}
         onClick={() => resize(cell.w, cell.h - 1)}
+        size="icon"
+        aria-label={t("dashboard:shorter")}
+        title={t("dashboard:shorter")}
       >
-        {t("dashboard:shorter")}
+        <Icon name="shorter" size={18} />
       </Button>
       {widget && !fixed && Object.keys((widget.config_schema.properties as object) ?? {}).length ? (
         <ConfigDialog instance={instance} onSave={(config) => patch({ config })} />
       ) : null}
-      <Button variant="secondary" disabled={!instance.hideable} onClick={() => patch({ status: "hidden" })}>
-        {t("dashboard:hide")}
+      <Button
+        variant="secondary"
+        disabled={!instance.hideable}
+        onClick={() => patch({ status: "hidden" })}
+        size="icon"
+        aria-label={t("dashboard:hide")}
+        title={t("dashboard:hide")}
+      >
+        <Icon name="hide" size={18} />
       </Button>
-      <Button variant="danger" disabled={!instance.removable} onClick={() => apply({ kind: "remove", id })}>
-        {t("dashboard:remove")}
+      <Button
+        variant="danger"
+        disabled={!instance.removable}
+        onClick={() => apply({ kind: "remove", id })}
+        size="icon"
+        aria-label={t("dashboard:remove")}
+        title={t("dashboard:remove")}
+      >
+        <Icon name="trash" size={18} />
       </Button>
       {!instance.hideable ? <span className="widget__meta">{t("dashboard:mandatory")}</span> : null}
     </div>
@@ -143,7 +184,16 @@ function ConfigDialog({
       }}
       title={t("dashboard:settings")}
       closeLabel={t("dashboard:cancel")}
-      trigger={<Button variant="secondary">{t("dashboard:settings")}</Button>}
+      trigger={
+        <Button
+          variant="secondary"
+          size="icon"
+          aria-label={t("dashboard:settings")}
+          title={t("dashboard:settings")}
+        >
+          <Icon name="settings" size={18} />
+        </Button>
+      }
     >
       <form
         onSubmit={(event) => {

@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.economy import DEFINITION_SOURCES
 from portalab.capabilities.events import Envelope
+from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.statistics import PROVIDER as STATISTICS
 from portalab.capabilities.statistics import SubjectRef as StatSubject
@@ -54,6 +55,17 @@ class Definition:
 
     def counter(self, index: int) -> str:
         return f"{self.key}:{self.version}:{index}"
+
+
+def rarity_of(share: float) -> str:
+    """027 US9: rarity from the unlock share — common > 50 %, rare 20-50 %, epic 5-20 %, legendary < 5 %."""
+    if share > 50:
+        return "common"
+    if share >= 20:
+        return "rare"
+    if share >= 5:
+        return "epic"
+    return "legendary"
 
 
 class AchievementNotFound(NotFound):
@@ -341,9 +353,33 @@ class Achievements:
                 return await self.unlock(session, user, definition, at)
         raise AchievementNotFound("This achievement does not exist.")
 
+    async def unlock_shares(self) -> dict[str, float]:
+        """027 US9: share (%) of active members who unlocked each achievement — aggregate, non-identifying."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(UserAchievement.achievement_key, func.count()).group_by(
+                        UserAchievement.achievement_key
+                    )
+                )
+            ).all()
+            counts: dict[str, int] = {str(key): int(n) for key, n in rows}
+            fallback = int(
+                await session.scalar(select(func.count(func.distinct(UserAchievement.user_id)))) or 0
+            )
+        total = fallback
+        providers = self.capabilities.system_providers(CONTACT)
+        if providers:
+            try:
+                total = max(total, len(await providers[0].provider.active_user_ids()))
+            except Exception:
+                total = fallback
+        return {key: round(100 * int(n) / total, 1) for key, n in counts.items()} if total else {}
+
     async def progress(self, user: UUID) -> list[dict[str, Any]]:
         """Own view: unlocked ones and progress of visible ones; hidden ones appear only once unlocked."""
         now = utc_now(self.clock)
+        shares = await self.unlock_shares()
         async with self.database.session() as session:
             unlocked = {
                 r.achievement_key: r
@@ -358,8 +394,16 @@ class Achievements:
         out: list[dict[str, Any]] = []
         for definition in await self.definitions(now):
             row = unlocked.get(definition.key)
+            share = shares.get(definition.key, 0.0)
             if definition.definition.hidden and row is None:
-                out.append({"key": definition.key, "state": "hidden"})
+                out.append(
+                    {
+                        "key": definition.key,
+                        "state": "hidden",
+                        "unlock_share": share,
+                        "rarity": rarity_of(share),
+                    }
+                )
                 continue
             steps = [
                 {"current": min(counters.get(definition.counter(i), 0), c.count), "target": c.count}
@@ -373,6 +417,9 @@ class Achievements:
                     "label": definition.definition.label,
                     "description": definition.definition.description,
                     "icon": definition.definition.icon,
+                    "category": definition.definition.category,
+                    "unlock_share": share,
+                    "rarity": rarity_of(share),
                     "unlocked_at": row.unlocked_at.isoformat() if row else None,
                     "progress": steps,
                 }

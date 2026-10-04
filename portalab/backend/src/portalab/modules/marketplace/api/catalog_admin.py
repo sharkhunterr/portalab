@@ -17,11 +17,13 @@ from portalab.modules.marketplace.api.admin import _confirm_generic
 from portalab.modules.marketplace.api.catalog import (
     MarketplaceOwnershipOut,
     MarketplaceProductOut,
+    category_keys,
     ownership_out,
     product_out,
 )
 from portalab.modules.marketplace.api.projects import Module
 from portalab.modules.marketplace.permissions import AUDIT, GRANT, MANAGE, REFUND, REVOKE
+from portalab.modules.marketplace.products.definition import PresentationIn
 
 router = APIRouter(prefix="/api/v1", tags=["marketplace-admin"])
 Manager = Annotated[Principal, require(MANAGE)]
@@ -40,6 +42,14 @@ class MarketplaceCategoryIn(BaseModel):
     key: str = Field(pattern=r"^[a-z][a-z0-9_]*$", max_length=64)
     label_key: str = Field(min_length=1, max_length=160)
     position: int = 0
+    icon: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9-]{0,63}$")
+
+
+class MarketplacePresentationIn(BaseModel):
+    """027 US8: shop presentation and collection — merchandising, no new price version."""
+
+    presentation: PresentationIn
+    category: str | None = Field(default=None, max_length=64)
 
 
 class MarketplaceConfirmIn(BaseModel):
@@ -74,12 +84,13 @@ class MarketplaceAuditPage(BaseModel):
 @router.get("/admin/marketplace/products", response_model=list[MarketplaceProductOut])
 async def admin_products(_: Manager, module: Module) -> list[MarketplaceProductOut]:
     rows = await module.catalog.listing(states=("draft", "available", "unavailable", "archived"))
-    return [product_out(p, v, False) for p, v in rows]
+    keys = await category_keys(module)
+    return [product_out(p, v, False, categories=keys) for p, v in rows]
 
 
 @router.post("/admin/marketplace/categories", status_code=201)
 async def add_category(_: Manager, body: MarketplaceCategoryIn, module: Module) -> dict[str, str]:
-    category = await module.catalog.add_category(body.key, body.label_key, body.position)
+    category = await module.catalog.add_category(body.key, body.label_key, body.position, body.icon)
     return {"key": category.key}
 
 
@@ -89,7 +100,7 @@ async def create_product(
 ) -> MarketplaceProductOut:
     product = await module.catalog.create(principal, body.definition)
     _, version = await module.catalog.get(product.key)
-    return product_out(product, version, False)
+    return product_out(product, version, False, categories=await category_keys(module))
 
 
 @router.put("/admin/marketplace/products/{key}", response_model=MarketplaceProductOut)
@@ -104,6 +115,15 @@ async def revise_product(
     product = await module.catalog.revise(principal, key, body.definition)
     _, version = await module.catalog.get(key)
     return product_out(product, version, False)
+
+
+@router.put("/admin/marketplace/products/{key}/presentation", response_model=MarketplaceProductOut)
+async def present_product(
+    principal: Manager, key: str, body: MarketplacePresentationIn, module: Module
+) -> MarketplaceProductOut:
+    await module.catalog.present(principal, key, body.presentation, body.category)
+    product, version = await module.catalog.get(key)
+    return product_out(product, version, False, categories=await category_keys(module))
 
 
 @router.post("/admin/marketplace/grants", response_model=MarketplaceOwnershipOut, status_code=201)

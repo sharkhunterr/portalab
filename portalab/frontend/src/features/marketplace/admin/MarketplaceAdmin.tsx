@@ -3,11 +3,16 @@ import { useState } from "react";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
+import { type Category, type Product, useCategories } from "../api";
+import { ProductPoster } from "../catalog/ProductPoster";
+import { NewProductDialog, PresentationDialog } from "./ProductEditor";
+import "../marketplace.css";
 
 /** Run a sensitive admin call, retrying once with the confirmation the server asks for. */
 async function withConfirmation<T>(
@@ -41,7 +46,10 @@ export default function MarketplaceAdmin() {
     enabled: canAudit,
     queryFn: async () => (await api.GET("/api/v1/admin/marketplace/audit")).data?.items ?? [],
   });
-  const [definition, setDefinition] = useState("");
+  const categories = useCategories();
+  const [collectionKey, setCollectionKey] = useState("");
+  const [collectionName, setCollectionName] = useState("");
+  const refresh = () => client.invalidateQueries({ queryKey: ["marketplace"] });
   const [grantUser, setGrantUser] = useState("");
   const [grantProduct, setGrantProduct] = useState("");
   const [revokeId, setRevokeId] = useState("");
@@ -70,59 +78,113 @@ export default function MarketplaceAdmin() {
     );
   return (
     <div className="ds-stack">
-      <PageHeader icon="shop" title={t("marketplace:admin.title")} />
+      <PageHeader
+        icon="shop"
+        title={t("marketplace:admin.title")}
+        primary={<NewProductDialog categories={(categories.data ?? []) as Category[]} onCreated={refresh} />}
+      />
       {message ? <p role="status">{message}</p> : null}
       <section aria-labelledby="mk-products" className="ds-stack">
         <h2 id="mk-products">{t("marketplace:admin.products")}</h2>
         {products.isError ? <FunctionalState state="unavailable" /> : null}
-        <ul className="ds-stack">
-          {(products.data ?? []).map((p) => (
-            <li key={p.key} className="ds-card ds-stack--row">
-              <span>
-                {p.name} · {t(`marketplace:type.${p.type}`)} · {t(`marketplace:productState.${p.state}`)} · v
-                {p.version}
-              </span>
-              {p.state !== "available" && p.state !== "archived" ? (
-                <Button variant="secondary" onClick={() => move(p.key, "publish")}>
-                  {t("marketplace:admin.publish")}
-                </Button>
-              ) : null}
-              {p.state === "available" ? (
-                <Button variant="secondary" onClick={() => move(p.key, "unavailable")}>
-                  {t("marketplace:admin.unavailable")}
-                </Button>
-              ) : null}
-              {p.state !== "archived" ? (
-                <Button variant="secondary" onClick={() => move(p.key, "archive")}>
-                  {t("marketplace:admin.archive")}
-                </Button>
-              ) : null}
+        <ul className="admin-products">
+          {((products.data ?? []) as Product[]).map((p) => (
+            <li key={p.key} className="admin-product" data-rarity={p.rarity ?? "common"}>
+              <ProductPoster product={p} />
+              <div className="admin-product__body">
+                <strong>{p.name}</strong>
+                <span className="widget__meta">
+                  {t(`marketplace:type.${p.type}`)} · {t(`marketplace:rarity.${p.rarity ?? "common"}`)} · v
+                  {p.version}
+                  {p.price_coins ? ` · ${p.price_coins} Coins` : ""}
+                </span>
+                <span className="ds-badge" data-state={p.state}>
+                  {t(`marketplace:productState.${p.state}`)}
+                  {p.featured ? ` · ${t("marketplace:shop.featured")}` : ""}
+                </span>
+              </div>
+              <div className="admin-product__actions">
+                <PresentationDialog
+                  product={p}
+                  categories={(categories.data ?? []) as Category[]}
+                  onSaved={refresh}
+                />
+                {p.state !== "available" && p.state !== "archived" ? (
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    aria-label={t("marketplace:admin.publish")}
+                    title={t("marketplace:admin.publish")}
+                    onClick={() => move(p.key, "publish")}
+                  >
+                    <Icon name="check" size={18} />
+                  </Button>
+                ) : null}
+                {p.state === "available" ? (
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    aria-label={t("marketplace:admin.unavailable")}
+                    title={t("marketplace:admin.unavailable")}
+                    onClick={() => move(p.key, "unavailable")}
+                  >
+                    <Icon name="hide" size={18} />
+                  </Button>
+                ) : null}
+                {p.state !== "archived" ? (
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    aria-label={t("marketplace:admin.archive")}
+                    title={t("marketplace:admin.archive")}
+                    onClick={() => move(p.key, "archive")}
+                  >
+                    <Icon name="trash" size={18} />
+                  </Button>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>
-        <div className="ds-field">
-          <label htmlFor="mk-definition">{t("marketplace:admin.definition")}</label>
-          <textarea
-            id="mk-definition"
-            rows={8}
-            value={definition}
-            onChange={(e) => setDefinition(e.target.value)}
+      </section>
+      <section aria-labelledby="mk-collections" className="ds-card ds-stack">
+        <h2 id="mk-collections">{t("marketplace:shop.byCollection")}</h2>
+        <ul className="admin-collections">
+          {((categories.data ?? []) as Category[]).map((c) => (
+            <li key={c.key} className="ds-badge">
+              <Icon name={c.icon ?? "star"} size={14} /> {t(c.label_key)}
+            </li>
+          ))}
+        </ul>
+        <div className="ds-stack ds-stack--row">
+          <TextField
+            label={t("marketplace:admin.collectionKey")}
+            value={collectionKey}
+            pattern="[a-z][a-z0-9_]*"
+            onChange={(e) => setCollectionKey(e.target.value)}
           />
+          <TextField
+            label={t("marketplace:admin.collectionName")}
+            value={collectionName}
+            onChange={(e) => setCollectionName(e.target.value)}
+          />
+          <Button
+            variant="secondary"
+            disabled={!collectionKey || !collectionName}
+            onClick={() =>
+              run.mutate(async () => {
+                await api.POST("/api/v1/admin/marketplace/categories", {
+                  body: { key: collectionKey, label_key: collectionName, position: 100 },
+                });
+                setCollectionKey("");
+                setCollectionName("");
+              })
+            }
+          >
+            <Icon name="plus" size={18} />
+            {t("marketplace:admin.newCollection")}
+          </Button>
         </div>
-        <Button
-          onClick={() =>
-            run.mutate(async () => {
-              const parsed = JSON.parse(definition) as Record<string, unknown>;
-              const result = await api.POST("/api/v1/admin/marketplace/products", {
-                body: { definition: parsed },
-              });
-              return result.data;
-            })
-          }
-          disabled={!definition.trim()}
-        >
-          {t("marketplace:admin.create")}
-        </Button>
       </section>
       <section aria-labelledby="mk-grants" className="ds-stack">
         <h2 id="mk-grants">{t("marketplace:admin.grants")}</h2>

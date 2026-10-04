@@ -18,6 +18,10 @@ export interface AchievementView {
   icon?: string | null;
   unlocked_at?: string | null;
   progress?: Array<{ current: number; target: number }>;
+  /** 027 US9: what it rewards, the share of active members who unlocked it, and the derived rarity. */
+  category?: string;
+  unlock_share?: number;
+  rarity?: "common" | "rare" | "epic" | "legendary";
 }
 
 export interface AnomalyView {
