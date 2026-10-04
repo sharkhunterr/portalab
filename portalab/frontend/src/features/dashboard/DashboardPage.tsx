@@ -5,6 +5,7 @@ import { connectStream } from "../../api/stream";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
+import { useDeviceClass } from "../../design-system/components/Layout";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { EmptyState } from "../../design-system/components/Placeholders";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
@@ -15,9 +16,12 @@ import { IncidentBanner } from "../support/incidents/IncidentBanner";
 import { type Change, DASHBOARD_KEY, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
+import { itemsOf, keyOf, useEditSession } from "./edit/EditSession";
 import { WidgetFrame } from "./frame/WidgetFrame";
-import { GridCell, ResponsiveGrid } from "./grid/ResponsiveGrid";
+import { DashboardGrid } from "./grid/DashboardGrid";
+import { readingOrder } from "./grid/engine";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
+import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
 import "../gamification/widget";
 import "../community/widget";
@@ -48,7 +52,10 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const announce = useAnnounce();
   const client = useQueryClient();
   const dashboard = useDashboard();
-  const [editing, setEditing] = useState(false);
+  const device = useDeviceClass();
+  const desktop = device === "desktop";
+  const columns = desktop ? 12 : device === "tablet" ? 6 : 2;
+  const [editing, setEditing] = useState(false); // tablet/phone edit mode (027 FR-046)
   const write = useDashboardWrite(() => announce(t("dashboard:conflict")));
   const apply = (change: Change) => write.mutate(change);
 
@@ -82,6 +89,29 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const instances = dashboard.data?.instances ?? [];
   const visible = instances.filter((i) => i.status === "active");
   const hidden = instances.filter((i) => i.status === "hidden");
+  // desktop: a 2D edit session (drag, resize, keyboard) saved in one write (027 US6)
+  const session = useEditSession(visible, dashboard.data?.layout_version, () => {
+    void client.invalidateQueries({ queryKey: DASHBOARD_KEY });
+  });
+  const arranging = desktop && session.editing;
+  const isEditing = desktop ? session.editing : editing;
+  const cells = session.draft ?? new Map(visible.map((i) => [keyOf(i), { x: i.x, y: i.y, w: i.w, h: i.h }]));
+  const order = readingOrder(itemsOf(cells, visible));
+  const arrangeOf = (key: string) => {
+    if (!arranging) return undefined;
+    const index = order.findIndex((item) => item.id === key);
+    const cell = order[index];
+    if (!cell) return undefined;
+    return {
+      cell,
+      index,
+      count: order.length,
+      prev: order[index - 1],
+      next: order[index + 1],
+      move: (x: number, y: number) => session.move(key, x, y),
+      resize: (w: number, h: number) => session.resize(key, w, h),
+    };
+  };
   return (
     <div className="dashboard-page">
       <PageHeader
@@ -94,19 +124,33 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
           </>
         }
         secondary={
-          <>
-            {editing ? <CatalogDrawer apply={apply} /> : null}
-            <Button
-              variant={editing ? "primary" : "secondary"}
-              aria-pressed={editing}
-              onClick={() => setEditing((value) => !value)}
-            >
-              <Icon name={editing ? "check" : "dashboard"} size={18} />
-              {editing ? t("dashboard:done") : t("dashboard:edit")}
-            </Button>
-          </>
+          arranging ? (
+            <>
+              <CatalogDrawer apply={apply} />
+              <Button variant="secondary" disabled={session.saving} onClick={() => void session.cancel()}>
+                {t("dashboard:cancel")}
+              </Button>
+              <Button disabled={session.saving} onClick={() => void session.save()}>
+                <Icon name="check" size={18} />
+                {t("dashboard:save")}
+              </Button>
+            </>
+          ) : (
+            <>
+              {editing ? <CatalogDrawer apply={apply} /> : null}
+              <Button
+                variant={editing ? "primary" : "secondary"}
+                aria-pressed={editing}
+                onClick={() => (desktop ? session.start() : setEditing((value) => !value))}
+              >
+                <Icon name={editing ? "check" : "dashboard"} size={18} />
+                {editing ? t("dashboard:done") : t("dashboard:edit")}
+              </Button>
+            </>
+          )
         }
       />
+      <WelcomeCard />
       <ActiveCampaignBanner />
       <IncidentBanner />
       <SinceLastLoginCard />
@@ -123,19 +167,31 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
       <h2 id={headingId} className="visually-hidden">
         {t("dashboard:title")}
       </h2>
-      <ResponsiveGrid label={t("dashboard:title")}>
-        {visible.map((instance) => (
-          <GridCell key={instance.id ?? instance.widget_key} w={instance.w}>
-            <WidgetFrame
-              instance={instance}
-              controls={
-                editing ? <EditControls instance={instance} count={instances.length} apply={apply} /> : null
-              }
-            />
-          </GridCell>
-        ))}
-      </ResponsiveGrid>
-      {editing && hidden.length ? (
+      {arranging ? <p className="dashboard-page__hint">{t("dashboard:editHint")}</p> : null}
+      <DashboardGrid
+        label={t("dashboard:title")}
+        instances={visible}
+        cells={cells}
+        columns={columns}
+        arranger={arranging ? session : null}
+        render={(instance, handles) => (
+          <WidgetFrame
+            instance={instance}
+            handles={handles}
+            controls={
+              isEditing ? (
+                <EditControls
+                  instance={instance}
+                  count={instances.length}
+                  apply={apply}
+                  arrange={arrangeOf(keyOf(instance))}
+                />
+              ) : null
+            }
+          />
+        )}
+      />
+      {isEditing && hidden.length ? (
         <section className="ds-panel" aria-label={t("dashboard:hidden")}>
           <h3>{t("dashboard:hidden")}</h3>
           <ul className="widget-list">

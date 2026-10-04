@@ -63,7 +63,15 @@ function Body({ instance }: { instance: Instance }) {
   );
 }
 
-export function WidgetFrame({ instance, controls }: { instance: Instance; controls?: ReactNode }) {
+export function WidgetFrame({
+  instance,
+  controls,
+  handles,
+}: {
+  instance: Instance;
+  controls?: ReactNode;
+  handles?: ReactNode;
+}) {
   const t = useT();
   const headingId = useId();
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
@@ -74,6 +82,7 @@ export function WidgetFrame({ instance, controls }: { instance: Instance; contro
       data-widget={instance.widget_key}
       style={{ "--widget-w": instance.w, "--widget-h": instance.h } as React.CSSProperties}
     >
+      {handles}
       <header className="widget-frame__header">
         <h3 id={headingId} className="widget-frame__title">
           {instance.widget?.icon ? <Icon name={instance.widget.icon} size={18} /> : null}

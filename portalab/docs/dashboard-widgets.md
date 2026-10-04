@@ -79,3 +79,26 @@ Register a `ChangeSummaryProvider` (`kind`, `changes_since(principal, since, lim
 `default_widgets.register_summary(provider, owner=...)`: apply permissions and privacy at the source;
 `tests/contract/dashboard/provider_kit.py` checks the contract. The boundary only moves when the user
 marks the summary as seen.
+
+## 2D arrangement and the editor (spec 027)
+
+Each widget instance has grid coordinates `x` (column 0–11) and `y` (row) besides its size `w`×`h` (cells,
+bounded by the widget's `SizeLimits`). The arrangement engine — `frontend/src/features/dashboard/grid/
+engine.ts` and its server twin `backend/src/portalab/modules/dashboard/arrangement.py`, held together by the
+shared cases in `tests/fixtures/dashboard-arrangements.json` — keeps widgets from overlapping, makes them float
+up into free space, pushes widgets out of the way of a moved/resized one, and never moves a locked widget.
+`position` is the derived reading order (row, then column): it is the DOM order and the order of the tablet
+(6 columns) and phone (2 columns) views, which are computed from the desktop arrangement and never stored.
+
+- `GET /api/v1/dashboard` returns `x`, `y`, `w`, `h` and `position` per instance;
+- `PUT /api/v1/dashboard/arrangement` (If-Match) stores the editor's arrangement in one write — coordinates
+  are bounded, overlaps resolved, omitted widgets kept; locked widgets refuse changes (`dashboard.policy_locked`);
+- `POST /api/v1/dashboard/widgets` places a new widget at the first free slot, or where it was dropped (`x`, `y`);
+- `PATCH /api/v1/dashboard/widgets/{id}` accepts `x`, `y` (move) and `w`, `h` (resize); neighbours make room;
+- `PUT /api/v1/dashboard/layout` (ordered list) is deprecated: the order is flowed into rows.
+
+Editor: on desktop, *Customize* starts a session — drag a widget by its grip, resize it by its corner, or use
+the keyboard (focus the grip, Enter, arrow keys to move, Shift + arrows to resize, Enter to drop) or the
+explicit buttons; *Save* sends the arrangement, *Cancel* drops the draft. Tablets and phones offer add, hide,
+remove and reorder. The gallery shows every widget the user may add with its icon, description and sizes.
+Existing ordered dashboards were flowed into the grid by the `dashboard_0002` migration.

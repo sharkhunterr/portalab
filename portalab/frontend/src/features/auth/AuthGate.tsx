@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AuthLayout } from "../../design-system/components/AuthLayout";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { stateForError } from "../../state/regions";
 import { FirstRunWizard } from "../admin/FirstRunWizard";
@@ -22,12 +23,21 @@ export function AuthGate({
   if (location?.pathname === "/setup") return <FirstRunWizard />;
   if (location?.pathname === "/verify") {
     const token = new URLSearchParams(location.search).get("token") ?? "";
-    return <VerifyForm initialToken={token} />;
+    return (
+      <AuthLayout tagline={t.tagline}>
+        <VerifyForm initialToken={token} />
+      </AuthLayout>
+    );
   }
   if (me.isPending) return <FunctionalState state="loading" detail={t.loginTitle} />;
   if (me.isError)
     return <FunctionalState state={stateForError(me.error)} onRetry={() => void me.refetch()} />;
-  if (!me.data) return <LoginForm />;
+  if (!me.data)
+    return (
+      <AuthLayout tagline={t.tagline}>
+        <LoginForm />
+      </AuthLayout>
+    );
   return <>{children(me.data)}</>;
 }
 

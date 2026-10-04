@@ -66,6 +66,8 @@ export const NAVIGATION = {
 export interface DashboardStore {
   version: number;
   instances: Array<Record<string, unknown>>;
+  /** Arrangements saved by the editor (027), in order. */
+  arrangements?: Array<Array<{ id: string; x: number; y: number; w: number; h: number }>>;
 }
 
 const WIDGET_META = (title: string, extra: Record<string, unknown> = {}) => ({
@@ -96,6 +98,8 @@ export function newDashboard(): DashboardStore {
     widget_key: key,
     status: "active",
     position,
+    x: (position % 2) * 6,
+    y: Math.floor(position / 2) * 2,
     w: 6,
     h: 2,
     config: {},
@@ -205,11 +209,27 @@ export async function stubApi(
         id: `00000000-0000-7000-8000-0000000000${10 + dashboard.instances.length}`,
         widget_key: key,
         position: dashboard.instances.length,
+        // like the server: the first free row below the others (027)
+        x: 0,
+        y: Math.max(0, ...dashboard.instances.map((i) => Number(i.y) + Number(i.h))),
         w: 4,
         widget: entry?.widget,
       });
       dashboard.version += 1;
       return json(201, { layout_version: dashboard.version, id: null });
+    }
+    if (url.pathname === "/api/v1/dashboard/arrangement" && method === "PUT") {
+      // 027: the editor's Save — store the coordinates as sent (the client already resolved them)
+      const body = route.request().postDataJSON() as {
+        items: Array<{ id: string; x: number; y: number; w: number; h: number }>;
+      };
+      for (const item of body.items) {
+        const stored = dashboard.instances.find((i) => i.id === item.id);
+        if (stored) Object.assign(stored, { x: item.x, y: item.y, w: item.w, h: item.h });
+      }
+      dashboard.arrangements = [...(dashboard.arrangements ?? []), body.items];
+      dashboard.version += 1;
+      return json(200, { layout_version: dashboard.version });
     }
     const instanceMatch = /^\/api\/v1\/dashboard\/widgets\/([^/]+)$/.exec(url.pathname);
     if (instanceMatch && method === "PATCH") {

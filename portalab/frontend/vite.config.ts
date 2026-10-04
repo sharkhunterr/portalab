@@ -57,6 +57,7 @@ export default defineConfig({
       "@tanstack/react-query",
       "class-variance-authority",
       "intl-messageformat",
+      "lucide-react",
       "openapi-fetch",
       "react-intl",
       "zod",

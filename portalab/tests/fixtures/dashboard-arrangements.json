@@ -1,0 +1,919 @@
+{
+ "description": "Shared cases of the dashboard arrangement engine (spec 027 R10/R11): frontend engine.ts and backend arrangement.py must produce `expected` exactly. Regenerate expected values with UPDATE_ARRANGEMENT_FIXTURES=1 npx vitest run tests/unit/dashboard-engine.test.ts, then review the diff.",
+ "cases": [
+  {
+   "name": "compact lifts widgets into gaps",
+   "op": "compact",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 5,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 6,
+     "y": 9,
+     "w": 6,
+     "h": 1
+    }
+   ],
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 1
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "compact keeps locked widgets in place",
+   "op": "compact",
+   "items": [
+    {
+     "id": "lock",
+     "x": 0,
+     "y": 3,
+     "w": 12,
+     "h": 1,
+     "locked": true
+    },
+    {
+     "id": "a",
+     "x": 0,
+     "y": 6,
+     "w": 4,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 4,
+     "y": 0,
+     "w": 4,
+     "h": 1
+    }
+   ],
+   "expected": [
+    {
+     "id": "b",
+     "x": 4,
+     "y": 0,
+     "w": 4,
+     "h": 1
+    },
+    {
+     "id": "lock",
+     "x": 0,
+     "y": 3,
+     "w": 12,
+     "h": 1
+    },
+    {
+     "id": "a",
+     "x": 0,
+     "y": 4,
+     "w": 4,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "compact resolves overlaps in reading order",
+   "op": "compact",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 3,
+     "y": 1,
+     "w": 6,
+     "h": 2
+    }
+   ],
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 3,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "move onto another widget pushes it down",
+   "op": "move",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 2,
+     "w": 12,
+     "h": 1
+    }
+   ],
+   "id": "c",
+   "to": {
+    "x": 0,
+    "y": 0
+   },
+   "expected": [
+    {
+     "id": "c",
+     "x": 0,
+     "y": 0,
+     "w": 12,
+     "h": 1
+    },
+    {
+     "id": "a",
+     "x": 0,
+     "y": 1,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 1,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "move to the side of a widget",
+   "op": "move",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ],
+   "id": "b",
+   "to": {
+    "x": 6,
+    "y": 0
+   },
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "move is bounded by the grid",
+   "op": "move",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ],
+   "id": "a",
+   "to": {
+    "x": 10,
+    "y": -3
+   },
+   "expected": [
+    {
+     "id": "a",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "move never displaces a locked widget",
+   "op": "move",
+   "items": [
+    {
+     "id": "lock",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2,
+     "locked": true
+    },
+    {
+     "id": "a",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ],
+   "id": "a",
+   "to": {
+    "x": 0,
+    "y": 0
+   },
+   "expected": [
+    {
+     "id": "lock",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "a",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "a locked widget cannot move",
+   "op": "move",
+   "items": [
+    {
+     "id": "lock",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2,
+     "locked": true
+    },
+    {
+     "id": "a",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ],
+   "id": "lock",
+   "to": {
+    "x": 6,
+    "y": 3
+   },
+   "expected": [
+    {
+     "id": "lock",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "a",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "move down then compaction lifts it back if free above",
+   "op": "move",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 4,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    }
+   ],
+   "id": "b",
+   "to": {
+    "x": 4,
+    "y": 5
+   },
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 4,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "dragging a widget fully below another in the same column swaps them",
+   "op": "move",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ],
+   "id": "a",
+   "to": {
+    "x": 0,
+    "y": 4
+   },
+   "expected": [
+    {
+     "id": "b",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "a",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "resize grows and pushes neighbours",
+   "op": "resize",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 1
+    }
+   ],
+   "id": "a",
+   "size": {
+    "w": 12,
+    "h": 2
+   },
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 12,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 1
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "resize respects the widget limits",
+   "op": "resize",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 2,
+     "min": {
+      "w": 3,
+      "h": 2
+     },
+     "max": {
+      "w": 6,
+      "h": 3
+     }
+    }
+   ],
+   "id": "a",
+   "size": {
+    "w": 12,
+    "h": 1
+   },
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    }
+   ]
+  },
+  {
+   "name": "resize near the edge stays inside the grid",
+   "op": "resize",
+   "items": [
+    {
+     "id": "a",
+     "x": 8,
+     "y": 0,
+     "w": 4,
+     "h": 1
+    }
+   ],
+   "id": "a",
+   "size": {
+    "w": 8,
+    "h": 1
+   },
+   "expected": [
+    {
+     "id": "a",
+     "x": 4,
+     "y": 0,
+     "w": 8,
+     "h": 1
+    }
+   ]
+  },
+  {
+   "name": "first free slot on an empty grid",
+   "op": "firstFree",
+   "items": [],
+   "size": {
+    "w": 4,
+    "h": 2
+   },
+   "expected": {
+    "x": 0,
+    "y": 0
+   }
+  },
+  {
+   "name": "first free slot beside existing widgets",
+   "op": "firstFree",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 0,
+     "w": 2,
+     "h": 2
+    }
+   ],
+   "size": {
+    "w": 4,
+    "h": 2
+   },
+   "expected": {
+    "x": 8,
+    "y": 0
+   }
+  },
+  {
+   "name": "first free slot on the next row when the row is full",
+   "op": "firstFree",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 1
+    }
+   ],
+   "size": {
+    "w": 8,
+    "h": 1
+   },
+   "expected": {
+    "x": 0,
+    "y": 2
+   }
+  },
+  {
+   "name": "normalize bounds sizes and positions and removes overlaps",
+   "op": "normalize",
+   "items": [
+    {
+     "id": "a",
+     "x": -2,
+     "y": 0,
+     "w": 14,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 9,
+     "y": 4,
+     "w": 6,
+     "h": 1,
+     "max": {
+      "w": 4,
+      "h": 4
+     }
+    }
+   ],
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 12,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 8,
+     "y": 2,
+     "w": 4,
+     "h": 1
+    }
+   ]
+  },
+  {
+   "name": "flow packs an ordered dashboard into rows (migration)",
+   "op": "flow",
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 1
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "d",
+     "x": 0,
+     "y": 0,
+     "w": 12,
+     "h": 1
+    },
+    {
+     "id": "e",
+     "x": 0,
+     "y": 0,
+     "w": 3,
+     "h": 1
+    }
+   ],
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 4,
+     "y": 0,
+     "w": 4,
+     "h": 1
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "d",
+     "x": 0,
+     "y": 4,
+     "w": 12,
+     "h": 1
+    },
+    {
+     "id": "e",
+     "x": 0,
+     "y": 5,
+     "w": 3,
+     "h": 1
+    }
+   ]
+  },
+  {
+   "name": "tablet view: half or full width in reading order",
+   "op": "derive",
+   "columns": 6,
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 4,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 4,
+     "y": 0,
+     "w": 8,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 2,
+     "w": 3,
+     "h": 1
+    },
+    {
+     "id": "d",
+     "x": 3,
+     "y": 2,
+     "w": 3,
+     "h": 1
+    }
+   ],
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 3,
+     "h": 2
+    },
+    {
+     "id": "b",
+     "x": 0,
+     "y": 2,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 4,
+     "w": 3,
+     "h": 1
+    },
+    {
+     "id": "d",
+     "x": 3,
+     "y": 4,
+     "w": 3,
+     "h": 1
+    }
+   ]
+  },
+  {
+   "name": "phone view: small widgets two by two, others full width",
+   "op": "derive",
+   "columns": 2,
+   "items": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 3,
+     "h": 1
+    },
+    {
+     "id": "b",
+     "x": 3,
+     "y": 0,
+     "w": 3,
+     "h": 1
+    },
+    {
+     "id": "c",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 2
+    },
+    {
+     "id": "d",
+     "x": 0,
+     "y": 1,
+     "w": 2,
+     "h": 1
+    }
+   ],
+   "expected": [
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 1,
+     "h": 1
+    },
+    {
+     "id": "b",
+     "x": 1,
+     "y": 0,
+     "w": 1,
+     "h": 1
+    },
+    {
+     "id": "c",
+     "x": 0,
+     "y": 1,
+     "w": 2,
+     "h": 2
+    },
+    {
+     "id": "d",
+     "x": 0,
+     "y": 3,
+     "w": 1,
+     "h": 1
+    }
+   ]
+  },
+  {
+   "name": "reading order is row then column",
+   "op": "readingOrder",
+   "items": [
+    {
+     "id": "c",
+     "x": 6,
+     "y": 1,
+     "w": 6,
+     "h": 1
+    },
+    {
+     "id": "a",
+     "x": 0,
+     "y": 0,
+     "w": 6,
+     "h": 1
+    },
+    {
+     "id": "b",
+     "x": 6,
+     "y": 0,
+     "w": 6,
+     "h": 1
+    },
+    {
+     "id": "d",
+     "x": 0,
+     "y": 1,
+     "w": 6,
+     "h": 1
+    }
+   ],
+   "expected": [
+    "a",
+    "b",
+    "d",
+    "c"
+   ]
+  }
+ ]
+}

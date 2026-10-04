@@ -27,7 +27,7 @@ quickstart.md maps SC-001…SC-012 to automated checks.
 
 - [X] T001 Add `lucide-react`, `@fontsource-variable/inter` and `@fontsource-variable/plus-jakarta-sans` to `frontend/package.json` (npm install, lockfile updated) and import the two fonts once in `frontend/src/main.tsx` (R15, R16)
 - [X] T002 [P] Write `frontend/scripts/gen-sounds.mjs` (synthesizes short WAV tones: notification, alert, success, reward, levelUp, ui) and generate `frontend/public/assets/sounds/portalab/*.wav` (< 200 kB total); add an `npm run gen:sounds` script (R18)
-- [ ] T003 [P] Create shared engine parity cases `tests/fixtures/dashboard-arrangements.json` (place/move/resize/compact/firstFree/derive inputs and expected outputs, ≥ 20 cases incl. overlaps, edges, size limits) (R10)
+- [X] T003 [P] Create shared engine parity cases `tests/fixtures/dashboard-arrangements.json` (place/move/resize/compact/firstFree/derive inputs and expected outputs, ≥ 20 cases incl. overlaps, edges, size limits) (R10)
 
 ---
 
@@ -180,25 +180,25 @@ lossless migration.
 
 ### Tests for User Story 6
 
-- [ ] T065 [P] [US6] Engine unit tests reading `tests/fixtures/dashboard-arrangements.json` in `frontend/tests/unit/dashboard-engine.test.ts`
-- [ ] T066 [P] [US6] Python engine parity tests reading the same fixtures in `backend/tests/unit/dashboard/test_arrangement.py`
-- [ ] T067 [P] [US6] Migration test: ordered layouts back-filled with identical widget sets/sizes/configs, no overlaps, `x + w ≤ 12`, in `backend/tests/migrations/test_dashboard_0002.py`
-- [ ] T068 [P] [US6] API tests: `PUT /dashboard/arrangement` (If-Match 409, bounds/size-limit 422 with offending ids, locked/mandatory 403 with reason, compaction, `position` recomputed, omitted instances kept), `POST` first-free placement, `PATCH` x/y, deprecated `PUT /dashboard/layout` still flows, starter x/y, in `backend/tests/integration/dashboard/test_arrangement_api.py`
+- [X] T065 [P] [US6] Engine unit tests reading `tests/fixtures/dashboard-arrangements.json` in `frontend/tests/unit/dashboard-engine.test.ts`
+- [X] T066 [P] [US6] Python engine parity tests reading the same fixtures in `backend/tests/unit/dashboard/test_arrangement.py`
+- [X] T067 [P] [US6] Migration test: ordered layouts back-filled with identical widget sets/sizes/configs, no overlaps, `x + w ≤ 12`, in `backend/tests/migrations/test_dashboard_0002.py`
+- [X] T068 [P] [US6] API tests: `PUT /dashboard/arrangement` (If-Match 409, bounds/size-limit 422 with offending ids, locked/mandatory 403 with reason, compaction, `position` recomputed, omitted instances kept), `POST` first-free placement, `PATCH` x/y, deprecated `PUT /dashboard/layout` still flows, starter x/y, in `backend/tests/integration/dashboard/test_arrangement_api.py`
 
 ### Implementation for User Story 6
 
-- [ ] T069 [US6] Pure engine `place/resize/compact/firstFree/derive/readingOrder` in `frontend/src/features/dashboard/grid/engine.ts` (R10, R11)
-- [ ] T070 [US6] Python port with server validation (bounds, limits, policy, overlap resolution, compaction) in `backend/src/portalab/modules/dashboard/arrangement.py`
-- [ ] T071 [US6] Add `x`,`y` to `backend/src/portalab/modules/dashboard/models/__init__.py` and migration `backend/migrations/dashboard/versions/20261004_0910_dashboard_0002_arrangement.py` (nullable → back-fill with the engine flow → NOT NULL + check, index `(user_id, y, x)`)
-- [ ] T072 [US6] Service: `arrangement()` write, first-free placement on add, x/y on patch, derived `position`, starter layout with optional x/y, in `backend/src/portalab/modules/dashboard/service/` and `starter/`
-- [ ] T073 [US6] API: `PUT /dashboard/arrangement`, x/y in `GET/POST/PATCH`, deprecated alias, admin starter x/y in `backend/src/portalab/modules/dashboard/api/router.py`; regenerate OpenAPI + client
-- [ ] T074 [US6] `DashboardGrid` (explicit grid placement on desktop, derived 6-column tablet and 1–2-column phone views, DOM order = reading order) replacing `ResponsiveGrid` in `frontend/src/features/dashboard/grid/DashboardGrid.tsx` and `dashboard.css`
-- [ ] T075 [US6] `EditSession` (snapshot, optimistic local state, save via one PUT with If-Match, cancel restores, 409 handling) in `frontend/src/features/dashboard/edit/EditSession.ts`
-- [ ] T076 [US6] `DragLayer` (pointer events, capture, snapping ghost, live engine preview, edge auto-scroll, resize handles; desktop only) in `frontend/src/features/dashboard/edit/DragLayer.tsx`
-- [ ] T077 [US6] `KeyboardArrange` (Enter select, arrows move, Shift+arrows resize, Escape cancel, announcements) and button fallback in `frontend/src/features/dashboard/edit/KeyboardArrange.tsx` and `EditControls.tsx`; tablet/phone edit = add/hide/remove/reorder only
-- [ ] T078 [US6] `WidgetGallery` (preview per template or widget, description, size options, policy reasons) in `frontend/src/features/dashboard/edit/WidgetGallery.tsx`
-- [ ] T079 [US6] Playwright: drag, resize, gallery add, save/reload, cancel, keyboard-only path, locked reason, phone derived view, in `frontend/tests/e2e/dashboard/arrange.spec.ts`
-- [ ] T080 [US6] Update `docs/dashboard-widgets.md` (2D arrangement, size limits, preview for plugin widgets)
+- [X] T069 [US6] Pure engine `place/resize/compact/firstFree/derive/readingOrder` in `frontend/src/features/dashboard/grid/engine.ts` (R10, R11)
+- [X] T070 [US6] Python port with server validation (bounds, limits, policy, overlap resolution, compaction) in `backend/src/portalab/modules/dashboard/arrangement.py`
+- [X] T071 [US6] Add `x`,`y` to `backend/src/portalab/modules/dashboard/models/__init__.py` and migration `backend/migrations/dashboard/versions/20261004_0910_dashboard_0002_arrangement.py` (nullable → back-fill with the engine flow → NOT NULL + check, index `(user_id, y, x)`)
+- [X] T072 [US6] Service: `arrangement()` write, first-free placement on add, x/y on patch, derived `position`, starter layout with optional x/y, in `backend/src/portalab/modules/dashboard/service/` and `starter/`
+- [X] T073 [US6] API: `PUT /dashboard/arrangement`, x/y in `GET/POST/PATCH`, deprecated alias, admin starter x/y in `backend/src/portalab/modules/dashboard/api/router.py`; regenerate OpenAPI + client
+- [X] T074 [US6] `DashboardGrid` (explicit grid placement on desktop, derived 6-column tablet and 1–2-column phone views, DOM order = reading order) replacing `ResponsiveGrid` in `frontend/src/features/dashboard/grid/DashboardGrid.tsx` and `dashboard.css`
+- [X] T075 [US6] `EditSession` (snapshot, optimistic local state, save via one PUT with If-Match, cancel restores, 409 handling) in `frontend/src/features/dashboard/edit/EditSession.ts`
+- [X] T076 [US6] `DragLayer` (pointer events, capture, snapping ghost, live engine preview, edge auto-scroll, resize handles; desktop only) in `frontend/src/features/dashboard/edit/DragLayer.tsx`
+- [X] T077 [US6] `KeyboardArrange` (Enter select, arrows move, Shift+arrows resize, Escape cancel, announcements) and button fallback in `frontend/src/features/dashboard/edit/KeyboardArrange.tsx` and `EditControls.tsx`; tablet/phone edit = add/hide/remove/reorder only
+- [X] T078 [US6] `WidgetGallery` (preview per template or widget, description, size options, policy reasons) in `frontend/src/features/dashboard/edit/WidgetGallery.tsx`
+- [X] T079 [US6] Playwright: drag, resize, gallery add, save/reload, cancel, keyboard-only path, locked reason, phone derived view, in `frontend/tests/e2e/dashboard/arrange.spec.ts`
+- [X] T080 [US6] Update `docs/dashboard-widgets.md` (2D arrangement, size limits, preview for plugin widgets)
 
 **Checkpoint**: dashboard editor complete (SC-011, SC-012).
 
@@ -210,17 +210,17 @@ lossless migration.
 
 **Independent Test**: quickstart scenario 13.
 
-- [ ] T081 [P] [US7] `AuthLayout` (centered card over theme background/artwork, brand mark) in `frontend/src/design-system/components/AuthLayout.tsx`; apply to `LoginForm`, `VerifyForm`, registration/recovery and first-run screens in `frontend/src/features/auth/` and `frontend/src/features/admin/` first-run
-- [ ] T082 [P] [US7] `WelcomeCard` (introduces header, sections, appearance; dismiss writes `shell.welcome.dismissedAt`) in `frontend/src/features/dashboard/WelcomeCard.tsx`
-- [ ] T083 [US7] Tests: auth screens axe at phone/desktop, welcome shown once and not on another session after dismissal, in `frontend/tests/a11y/auth-screens.test.tsx` and `frontend/tests/e2e/visual-experience/welcome.spec.ts`
+- [X] T081 [P] [US7] `AuthLayout` (centered card over theme background/artwork, brand mark) in `frontend/src/design-system/components/AuthLayout.tsx`; apply to `LoginForm`, `VerifyForm`, registration/recovery and first-run screens in `frontend/src/features/auth/` and `frontend/src/features/admin/` first-run
+- [X] T082 [P] [US7] `WelcomeCard` (introduces header, sections, appearance; dismiss writes `shell.welcome.dismissedAt`) in `frontend/src/features/dashboard/WelcomeCard.tsx`
+- [X] T083 [US7] Tests: auth screens axe at phone/desktop, welcome shown once and not on another session after dismissal, in `frontend/tests/a11y/auth-screens.test.tsx` and `frontend/tests/e2e/visual-experience/welcome.spec.ts`
 
 ---
 
 ## Phase 10: Polish & Cross-Cutting Concerns
 
-- [ ] T084 [P] Update `docs/design-system.md` (theme v2 vocabulary, families, page kit, celebrations, sounds) and `docs/extensibility.md` (plugin sections, theme v2)
-- [ ] T085 [P] French locale pass for all new strings in `backend/locales/fr/*.json` (catalog hygiene test green)
-- [ ] T086 Full verification: backend `uv run pytest -n auto --dist loadfile`, ruff/format/mypy/lint-imports; frontend lint/typecheck/test/build; Playwright alone afterwards
+- [X] T084 [P] Update `docs/design-system.md` (theme v2 vocabulary, families, page kit, celebrations, sounds) and `docs/extensibility.md` (plugin sections, theme v2)
+- [X] T085 [P] French locale pass for all new strings in `backend/locales/fr/*.json` (catalog hygiene test green)
+- [X] T086 Full verification: backend `uv run pytest -n auto --dist loadfile`, ruff/format/mypy/lint-imports; frontend lint/typecheck/test/build; Playwright alone afterwards
 - [ ] T087 Docker smoke (`scripts/smoke.sh`, dependencies changed) and LAN redeploy for manual hallway checks (SC-005, SC-011) per `quickstart.md`
 
 ---

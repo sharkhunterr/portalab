@@ -130,3 +130,10 @@ CLI: `portalab plugin validate|pack|install [--approve]|enable|disable [--cascad
 * Per-plugin roles need a database user with `CREATEROLE` (or the database owner).
 * Restart `serve` and `worker` gracefully after enabling a code plugin or confirming an update; both load
   enabled plugins at startup (dependencies first) and quarantine any that fails.
+
+## Visual experience hooks (spec 027)
+
+Plugins place their pages in a navigation section (`[[ui.sections]]` + `section = "plugin-<key>"` on `ui.nav`
+entries, or `ctx.nav_section()` / `ctx.nav_entry(..., group=, topic=)`), build pages with the design-system kit
+(`PageHeader`, cards, tiles, empty states…) and may ship themes using the v2 vocabulary — layout, motion and sound
+profiles included — under the same validation, accessibility floor and enablement rules as other themes.

@@ -35,14 +35,20 @@ class WidgetInstance(DashboardBase):
         CheckConstraint("status IN ('active', 'hidden')", name="status"),
         CheckConstraint("origin IN ('starter', 'user', 'policy_default')", name="origin"),
         CheckConstraint("w BETWEEN 1 AND 12 AND h BETWEEN 1 AND 12", name="size"),
+        CheckConstraint("x >= 0 AND x + w <= 12 AND y >= 0", name="grid"),
         Index("ix_widget_instances_user_position", "user_id", "position"),
+        Index("ix_widget_instances_user_grid", "user_id", "y", "x"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
     user_id: Mapped[UUID] = mapped_column(nullable=False)
     widget_key: Mapped[str] = mapped_column(String(96), nullable=False, info=pii("preference", tombstone=""))
     status: Mapped[str] = mapped_column(String(8), nullable=False, default="active")
-    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)  # reading order, derived from (y, x)
+    x: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )  # grid column (027)
+    y: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")  # grid row
     w: Mapped[int] = mapped_column(Integer, nullable=False)
     h: Mapped[int] = mapped_column(Integer, nullable=False)
     config: Mapped[dict[str, Any]] = mapped_column(

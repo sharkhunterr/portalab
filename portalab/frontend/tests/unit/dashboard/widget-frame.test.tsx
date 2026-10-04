@@ -47,6 +47,8 @@ const instance = (key: string, position: number, overrides: Record<string, unkno
   widget_key: key,
   status: "active",
   position,
+  x: (position % 3) * 4,
+  y: Math.floor(position / 3) * 2,
   w: 4,
   h: 2,
   config: {},
@@ -116,6 +118,7 @@ function setup(dashboard: unknown, onWrite?: (request: Request) => Response | Pr
     if (url.pathname === "/api/v1/incidents") return json(200, []);
     if (url.pathname === "/api/v1/campaigns/active") return json(200, []);
     if (url.pathname === "/api/v1/me") return json(200, { id: "u1", login: "alex", display_name: "Alex" });
+    if (url.pathname === "/api/v1/me/preferences") return json(200, { preferences: [] });
     if (url.pathname === "/api/v1/dashboard/since-last-login")
       return json(200, { since: "2026-10-01T00:00:00Z", items: [], unavailable: [] });
     const widget = /^\/api\/v1\/widgets\/([^/]+)\/data$/.exec(url.pathname);

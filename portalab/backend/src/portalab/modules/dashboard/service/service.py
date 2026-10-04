@@ -20,6 +20,11 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound, ValidationFailed
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
+from portalab.modules.dashboard.arrangement import Item as GridItem
+from portalab.modules.dashboard.arrangement import Size as GridSize
+from portalab.modules.dashboard.arrangement import first_free, flow, normalize, reading_order
+from portalab.modules.dashboard.arrangement import move as grid_move
+from portalab.modules.dashboard.arrangement import resize as grid_resize
 from portalab.modules.dashboard.conditions.evaluator import ConditionEvaluator, parse_condition
 from portalab.modules.dashboard.gateway.gateway import WidgetGateway, config_errors
 from portalab.modules.dashboard.models import UserDashboard, WidgetInstance
@@ -74,9 +79,21 @@ class LayoutItem:
     h: int
 
 
+@dataclass(frozen=True, slots=True)
+class ArrangedItem:
+    """One widget of a desktop arrangement (027 R13): ``id`` null materializes a policy widget."""
+
+    id: UUID | None
+    widget_key: str
+    x: int
+    y: int
+    w: int
+    h: int
+
+
 def _stored(row: WidgetInstance) -> StoredInstance:
     return StoredInstance(
-        row.id, row.widget_key, row.status, row.position, row.w, row.h, row.config, row.origin
+        row.id, row.widget_key, row.status, row.position, row.w, row.h, row.config, row.origin, row.x, row.y
     )
 
 
@@ -265,6 +282,8 @@ class DashboardService:
         config: Mapping[str, Any] | None = None,
         w: int | None = None,
         h: int | None = None,
+        x: int | None = None,
+        y: int | None = None,
         if_match: int | None = None,
     ) -> tuple[UUID, int]:
         widget = await self._addable(principal, key)
@@ -298,16 +317,20 @@ class DashboardService:
             if hidden is not None and not widget.definition.multiple:
                 hidden.status = "active"  # re-adding a hidden widget restores its configuration
                 hidden.updated_at = now
+                await self._rearrange(session, user)
                 version = await self._bump(session, board, principal)
                 return hidden.id, version
             if existing and not widget.definition.multiple:
                 raise WidgetExists("This widget is already on your dashboard.")
             position = await self._next_position(session, user)
+            slot = await self._free_slot(session, user, size.w, size.h)
             row = WidgetInstance(
                 user_id=user,
                 widget_key=key,
                 status="active",
                 position=position,
+                x=slot[0],
+                y=slot[1],
                 w=size.w,
                 h=size.h,
                 config=values,
@@ -318,8 +341,150 @@ class DashboardService:
             )
             session.add(row)
             await session.flush()
+            if x is not None or y is not None:  # placed where it was dropped; neighbours make room
+                await self._rearrange(session, user, move_to=(row.id, x if x is not None else row.x, y or 0))
+            else:
+                await self._rearrange(session, user)
             version = await self._bump(session, board, principal)
             return row.id, version
+
+    # --- arrangement (027 R10) ------------------------------------------------------------------------
+    def _grid(self, row: WidgetInstance, policies: Mapping[str, Mapping[str, Any]]) -> GridItem:
+        widget = self.registry.get(row.widget_key)
+        limits = widget.definition.size if widget is not None else None
+        return GridItem(
+            str(row.id),
+            row.x,
+            row.y,
+            row.w,
+            row.h,
+            GridSize(limits.min.w, limits.min.h) if limits else None,
+            GridSize(limits.max.w, limits.max.h) if limits else None,
+            policy_class(policies, row.widget_key) == "locked",
+        )
+
+    async def _rearrange(
+        self,
+        session: AsyncSession,
+        user: UUID,
+        *,
+        move_to: tuple[UUID, int, int] | None = None,
+        resize_to: tuple[UUID, int, int] | None = None,
+        by_position: bool = False,
+    ) -> None:
+        """Re-run the engine on the user's active widgets after a write and store coordinates and reading
+        order (``position``); hidden widgets keep their coordinates and come after."""
+        await session.flush()
+        rows = list(
+            (
+                await session.execute(
+                    select(WidgetInstance).where(WidgetInstance.user_id == user).with_for_update()
+                )
+            ).scalars()
+        )
+        policies = self.config().widget_policies
+        active = [r for r in rows if r.status == "active"]
+        if by_position:  # an ordered list (legacy layout/position writes, starter): flow it into rows
+            ordered = sorted(active, key=lambda r: (r.position, str(r.id)))
+            items = flow([self._grid(r, policies) for r in ordered])
+        else:
+            items = [self._grid(r, policies) for r in active]
+        if move_to is not None:
+            items = grid_move(items, str(move_to[0]), move_to[1], move_to[2])
+        elif resize_to is not None:
+            items = grid_resize(items, str(resize_to[0]), resize_to[1], resize_to[2])
+        else:
+            items = normalize(items)
+        by_id = {str(r.id): r for r in rows}
+        for index, item in enumerate(reading_order(items)):
+            row = by_id[item.id]
+            row.x, row.y, row.w, row.h, row.position = item.x, item.y, item.w, item.h, index
+        hidden = sorted((r for r in rows if r.status != "active"), key=lambda r: (r.position, str(r.id)))
+        for offset, row in enumerate(hidden, start=len(items)):
+            row.position = offset
+
+    async def _free_slot(self, session: AsyncSession, user: UUID, w: int, h: int) -> tuple[int, int]:
+        policies = self.config().widget_policies
+        rows = (
+            await session.execute(
+                select(WidgetInstance).where(
+                    WidgetInstance.user_id == user, WidgetInstance.status == "active"
+                )
+            )
+        ).scalars()
+        return first_free([self._grid(r, policies) for r in rows], w, h)
+
+    async def arrangement(
+        self, principal: Principal, items: Sequence[ArrangedItem], *, if_match: int | None
+    ) -> int:
+        """Store a desktop arrangement (027 R13): listed widgets take the given coordinates (bounded by
+        their limits and the grid; locked widgets must not change), widgets left out keep theirs, then the
+        engine resolves overlaps and compacts. Removal stays ``DELETE``; hide/show stays ``PATCH``."""
+        user = _user(principal)
+        policies = self.config().widget_policies
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            rows = {
+                row.id: row
+                for row in (
+                    await session.execute(
+                        select(WidgetInstance).where(WidgetInstance.user_id == user).with_for_update()
+                    )
+                ).scalars()
+            }
+            for item in items:
+                widget = self.registry.get(item.widget_key)
+                if item.id is None:
+                    if widget is None or policy_class(policies, item.widget_key) not in (
+                        "mandatory",
+                        "default",
+                    ):
+                        raise WidgetUnavailableError("This widget is not available.")
+                    row = WidgetInstance(
+                        user_id=user,
+                        widget_key=item.widget_key,
+                        status="active",
+                        position=len(rows),
+                        x=0,
+                        y=0,
+                        w=widget.definition.size.default.w,
+                        h=widget.definition.size.default.h,
+                        config=dict(widget.definition.config_defaults),
+                        config_schema_version=widget.definition.schema_version,
+                        origin="policy_default",
+                        created_at=now,
+                        updated_at=now,
+                    )
+                    session.add(row)
+                else:
+                    found = rows.get(item.id)
+                    if found is None:
+                        raise NotFound(
+                            "This widget is not on your dashboard.", code="dashboard.instance_not_found"
+                        )
+                    row = found
+                if policy_class(policies, row.widget_key) == "locked":
+                    if (item.x, item.y, item.w, item.h) != (
+                        row.x,
+                        row.y,
+                        row.w,
+                        row.h,
+                    ) and item.id is not None:
+                        raise PolicyLocked(
+                            "This widget is locked by your administrator.",
+                            extensions={"widget": row.widget_key, "reason": "locked"},
+                        )
+                    continue
+                size = widget.definition.size.clamp(item.w, item.h) if widget else None
+                row.x = max(0, min(item.x, 12 - (size.w if size else row.w)))
+                row.y = max(0, item.y)
+                if size is not None:
+                    row.w, row.h = size.w, size.h
+                row.updated_at = now
+            await self._rearrange(session, user)
+            return await self._bump(session, board, principal)
 
     async def _next_position(self, session: AsyncSession, user: UUID) -> int:
         positions = (
@@ -344,6 +509,8 @@ class DashboardService:
         position: int | None = None,
         w: int | None = None,
         h: int | None = None,
+        x: int | None = None,
+        y: int | None = None,
         config: Mapping[str, Any] | None = None,
         if_match: int | None = None,
     ) -> int:
@@ -363,21 +530,38 @@ class DashboardService:
                 if status == "active" and widget is None:
                     raise WidgetUnavailableError("This widget is not available.")
                 row.status = status
-            if cls in ("locked",) and any(v is not None for v in (position, w, h, config)):
+            if cls in ("locked",) and any(v is not None for v in (position, w, h, x, y, config)):
                 raise PolicyLocked("This widget is locked by your administrator.")
             if position is not None:
                 await self._move(session, user, row, position)
+            resize_to: tuple[UUID, int, int] | None = None
             if w is not None or h is not None:
                 if widget is None:
                     raise WidgetUnavailableError("This widget is not available.")
                 size = widget.definition.size.clamp(w or row.w, h or row.h)
-                row.w, row.h = size.w, size.h
+                resize_to = (row.id, size.w, size.h)
             if config is not None:
                 if widget is None:
                     raise WidgetUnavailableError("This widget is not available.")
                 row.config = self._check_config(widget, config)
                 row.config_schema_version = widget.definition.schema_version
             row.updated_at = utc_now(self.clock)
+            if position is not None:  # legacy ordered write (deprecated): new size, then flow by order
+                if resize_to is not None:
+                    row.w, row.h = resize_to[1], resize_to[2]
+                await self._rearrange(session, user, by_position=True)
+            elif resize_to is not None:
+                if x is not None or y is not None:
+                    row.x, row.y = x if x is not None else row.x, y if y is not None else row.y
+                await self._rearrange(session, user, resize_to=resize_to)
+            elif x is not None or y is not None:
+                await self._rearrange(
+                    session,
+                    user,
+                    move_to=(row.id, x if x is not None else row.x, y if y is not None else row.y),
+                )
+            else:
+                await self._rearrange(session, user)
             return await self._bump(session, board, principal)
 
     async def _move(self, session: AsyncSession, user: UUID, row: WidgetInstance, position: int) -> None:
@@ -413,6 +597,7 @@ class DashboardService:
                 raise PolicyLocked("This widget is required by your administrator.")
             await session.delete(row)  # removal discards the configuration (hide keeps it)
             await session.flush()
+            await self._rearrange(session, user)
             return await self._bump(session, board, principal)
 
     async def layout(self, principal: Principal, items: Sequence[LayoutItem], *, if_match: int | None) -> int:
@@ -476,7 +661,7 @@ class DashboardService:
             await self._check_locked_order(ordered)
             for index, row in enumerate(ordered):
                 row.position = index
-            await session.flush()
+            await self._rearrange(session, user, by_position=True)  # deprecated alias: flow the order
             return await self._bump(session, board, principal)
 
     # --- starter -------------------------------------------------------------------------------------
@@ -549,7 +734,7 @@ class DashboardService:
                 )
                 position += 1
             board.starter_applied_at = now
-            await session.flush()
+            await self._rearrange(session, user, by_position=True)
             await self._bump(session, board, principal)
             await self.events.publish(
                 session,

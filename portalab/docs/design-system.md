@@ -51,3 +51,37 @@ state = icon + text + color. Calendar and chart wrappers arrive with their first
 - `npm run test:a11y`: Playwright against the dev server with a stubbed API — keyboard-only journey
   (sign-in → settings), no focus trap, target sizes, dialog focus return, 320 px reflow with WCAG text
   spacing and 200 % text, axe (WCAG 2.2 AA tags) on `/dev/gallery` for every built-in theme.
+
+## Visual experience (spec 027)
+
+**Theme schema v2.** Besides colors, states, typography, radii, icons, backgrounds and sounds, a theme may
+choose — never define — an arrangement from a closed vocabulary that the portal implements once:
+
+| Block | Choices |
+|-------|---------|
+| `layout.nav.desktop / tablet / phone` | `sidebar`, `topbar`, `rail`, `orbit` / `rail`, `topbar`, `drawer`, `orbit` / `bottom-bar`, `drawer`, `orbit` |
+| `layout.header`, `layout.headerPosition` | `full`, `compact`, `centered`; `top` or `bottom` (the header becomes a footer bar) |
+| `layout.cards`, `layout.widgetFrame` | `elevated`, `flat`, `outlined`, `glass`; `card`, `plain`, `glass` |
+| `layout.content`, `layout.corners` | `narrow`, `wide`, `full`; `square`, `soft`, `round` |
+| `motion.profile`, `motion.celebration` | `none`, `subtle`, `lively`, `playful`; `none`, `sparkle`, `confetti`, `glow` |
+| `sounds` | `notification`, `alert`, `success`, `reward`, `levelUp`, `ui` (bundled `asset:` only) |
+| `colors.accentAlt`, `colors.rarity` | gamification accent and badge rarities (floor-checked, 3:1 on raised surfaces) |
+| `family` | groups light/dark members; the user's `ui.colorMode` (`dark`, `light`, `system`) picks the member |
+
+v1 documents remain valid (missing blocks take defaults). The choices land as `data-*` attributes on `<html>`
+(`data-nav-desktop|tablet|phone`, `data-header`, `data-header-position`, `data-cards`, `data-content`,
+`data-corners`, `data-widget-frame`, `data-motion`, `data-celebration`); accessibility overrides are applied last
+and always win (reduced motion ⇒ `data-motion="none"`; high contrast or reduced transparency ⇒ glass becomes solid).
+Built-ins: `portalab-dark` (default) and `portalab-light` (family `portalab`), `orbit` (orbit navigation, header at
+the bottom), `studio` (top bar, flat, narrow), `light`, `dark`, `high-contrast`.
+
+**Page kit** (exported to plugins): `PageHeader` (required on every routed page — `npm run lint` checks it), `Card`
+(variants), `Tile`/`TileGrid`, `ListItem`, `StatFigure`, `Avatar` (initials on a hue derived from the user id),
+`LevelBadge`, `ProgressBar`, `CoinBadge`, `Skeleton`, `EmptyState` (an action is mandatory), `Icon` (stable names
+mapped to lucide icons), `AuthLayout`, and `useCelebrate()` (rewards and level-ups, coalesced, reduced-motion
+aware, sounds through `SoundService`). Fonts (Inter, Plus Jakarta Sans) and sounds are self-hosted.
+
+**Shell.** The personal header (avatar, level + XP, Coins, notifications, search, assistant, personal menu) reads
+its parts independently and updates live from `progression.changed`; navigation comes in sections
+(`docs/navigation-contributions.md`); the frame picks the theme's arrangement per device class (phone < 640 px,
+tablet < 1024 px, desktop) without remounting the page. All live updates share one SSE connection.

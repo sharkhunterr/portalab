@@ -13,6 +13,8 @@ from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.dashboard import Size, WidgetDefinition
+from portalab.modules.dashboard.arrangement import Item, first_free, normalize
+from portalab.modules.dashboard.arrangement import Size as GridSize
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +27,8 @@ class StoredInstance:
     h: int
     config: Mapping[str, Any]
     origin: str = "user"
+    x: int = 0  # desktop grid coordinates (027 R10)
+    y: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,6 +44,8 @@ class EffectiveInstance:
     locked: bool = False
     mandatory: bool = False
     available: bool = True  # False: definition gone (plugin disabled) → placeholder
+    x: int = 0  # desktop grid coordinates (027 R10)
+    y: int = 0
 
     @property
     def removable(self) -> bool:
@@ -111,6 +117,8 @@ def effective(
                 locked,
                 mandatory,
                 definition is not None,
+                row.x,
+                row.y,
             )
         )
         placed.add(key)
@@ -139,5 +147,38 @@ def effective(
             )
         )
         next_position += 1
-    out.instances = [replace(instance, position=index) for index, instance in enumerate(out.instances)]
+    out.instances = _arranged(out.instances, definitions)
     return out
+
+
+def _arranged(
+    instances: list[EffectiveInstance], definitions: Mapping[str, WidgetDefinition]
+) -> list[EffectiveInstance]:
+    """Effective desktop arrangement (027 R10): synthesized policy widgets take the first free slot, then
+    the engine resolves overlaps (sizes forced by policy may collide) and compacts; ``position`` becomes the
+    reading order — active widgets first, hidden ones keep their coordinates after them."""
+    active = [i for i in instances if i.status == "active"]
+    stored = [_item(index, i, definitions) for index, i in enumerate(active) if i.id is not None]
+    for index, instance in enumerate(active):
+        if instance.id is None:
+            x, y = first_free(stored, instance.w, instance.h)
+            stored.append(_item(index, replace(instance, x=x, y=y), definitions))
+    by_key = {str(index): instance for index, instance in enumerate(active)}
+    ordered = [replace(by_key[item.id], x=item.x, y=item.y, w=item.w, h=item.h) for item in normalize(stored)]
+    hidden = [i for i in instances if i.status != "active"]
+    return [replace(instance, position=index) for index, instance in enumerate([*ordered, *hidden])]
+
+
+def _item(index: int, instance: EffectiveInstance, definitions: Mapping[str, WidgetDefinition]) -> Item:
+    definition = definitions.get(instance.widget_key)
+    limits = definition.size if definition is not None else None
+    return Item(
+        str(index),
+        instance.x,
+        instance.y,
+        instance.w,
+        instance.h,
+        GridSize(limits.min.w, limits.min.h) if limits else None,
+        GridSize(limits.max.w, limits.max.h) if limits else None,
+        instance.locked,
+    )

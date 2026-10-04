@@ -3656,6 +3656,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dashboard/arrangement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Arrangement
+         * @description 027 R13: the desktop arrangement in one write (Save); tablet/phone views derive from it.
+         */
+        put: operations["put_arrangement_api_v1_dashboard_arrangement_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dashboard/catalog": {
         parameters: {
             query?: never;
@@ -3681,7 +3701,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Put Layout */
+        /**
+         * Put Layout
+         * @deprecated
+         */
         put: operations["put_layout_api_v1_dashboard_layout_put"];
         post?: never;
         delete?: never;
@@ -6741,6 +6764,10 @@ export interface components {
             w?: number | null;
             /** Widget Key */
             widget_key: string;
+            /** X */
+            x?: number | null;
+            /** Y */
+            y?: number | null;
         };
         /** AdminCreateUser */
         AdminCreateUser: {
@@ -6988,6 +7015,26 @@ export interface components {
         AnomalyDecisionIn: {
             /** Reason */
             reason: string;
+        };
+        /** ArrangementIn */
+        ArrangementIn: {
+            /** Items */
+            items: components["schemas"]["ArrangementItemIn"][];
+        };
+        /** ArrangementItemIn */
+        ArrangementItemIn: {
+            /** H */
+            h: number;
+            /** Id */
+            id?: string | null;
+            /** W */
+            w: number;
+            /** Widget Key */
+            widget_key: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
         };
         /** AssistIn */
         AssistIn: {
@@ -7915,6 +7962,10 @@ export interface components {
             widget: components["schemas"]["WidgetMeta"] | null;
             /** Widget Key */
             widget_key: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
         };
         /** DashboardOut */
         DashboardOut: {
@@ -9420,6 +9471,10 @@ export interface components {
             status?: ("active" | "hidden") | null;
             /** W */
             w?: number | null;
+            /** X */
+            x?: number | null;
+            /** Y */
+            y?: number | null;
         };
         /** PermissionOut */
         PermissionOut: {
@@ -18810,6 +18865,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DashboardOut"];
+                };
+            };
+        };
+    };
+    put_arrangement_api_v1_dashboard_arrangement_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArrangementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

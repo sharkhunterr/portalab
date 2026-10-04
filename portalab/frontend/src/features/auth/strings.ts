@@ -4,6 +4,7 @@
  */
 export const authStrings = {
   loginTitle: "Sign in",
+  tagline: "Your services, your community, your progress — in one place.",
   loginField: "Login",
   passwordField: "Password",
   signIn: "Sign in",

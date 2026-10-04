@@ -74,6 +74,32 @@
             "minLength": 3,
             "title": "Widget Key",
             "type": "string"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "maximum": 11.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
           }
         },
         "required": [
@@ -803,6 +829,80 @@
           "reason"
         ],
         "title": "AnomalyDecisionIn",
+        "type": "object"
+      },
+      "ArrangementIn": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ArrangementItemIn"
+            },
+            "maxItems": 100,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ArrangementIn",
+        "type": "object"
+      },
+      "ArrangementItemIn": {
+        "additionalProperties": false,
+        "properties": {
+          "h": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "H",
+            "type": "integer"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "w": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "W",
+            "type": "integer"
+          },
+          "widget_key": {
+            "maxLength": 96,
+            "minLength": 3,
+            "title": "Widget Key",
+            "type": "string"
+          },
+          "x": {
+            "maximum": 11.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "integer"
+          },
+          "y": {
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "widget_key",
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "title": "ArrangementItemIn",
         "type": "object"
       },
       "AssistIn": {
@@ -3235,6 +3335,14 @@
           "widget_key": {
             "title": "Widget Key",
             "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "integer"
+          },
+          "y": {
+            "title": "Y",
+            "type": "integer"
           }
         },
         "required": [
@@ -3242,6 +3350,8 @@
           "widget_key",
           "status",
           "position",
+          "x",
+          "y",
           "w",
           "h",
           "config",
@@ -7405,6 +7515,32 @@
               }
             ],
             "title": "W"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "maximum": 11.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
           }
         },
         "title": "PatchWidgetIn",
@@ -23260,6 +23396,67 @@
         ]
       }
     },
+    "/api/v1/dashboard/arrangement": {
+      "put": {
+        "description": "027 R13: the desktop arrangement in one write (Save); tablet/phone views derive from it.",
+        "operationId": "put_arrangement_api_v1_dashboard_arrangement_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArrangementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Arrangement",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
     "/api/v1/dashboard/catalog": {
       "get": {
         "operationId": "catalog_api_v1_dashboard_catalog_get",
@@ -23287,6 +23484,7 @@
     },
     "/api/v1/dashboard/layout": {
       "put": {
+        "deprecated": true,
         "operationId": "put_layout_api_v1_dashboard_layout_put",
         "parameters": [
           {

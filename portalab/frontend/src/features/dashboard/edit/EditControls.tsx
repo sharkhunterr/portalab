@@ -19,14 +19,30 @@ interface SchemaProperty {
   maxLength?: number;
 }
 
+export interface Arrange {
+  cell: { x: number; y: number; w: number; h: number };
+  index: number;
+  count: number;
+  prev?: { x: number; y: number; w: number; h: number } | undefined;
+  next?: { x: number; y: number; w: number; h: number } | undefined;
+  move: (x: number, y: number) => void;
+  resize: (w: number, h: number) => void;
+}
+
 export function EditControls({
   instance,
   count,
   apply,
+  arrange,
 }: {
   instance: Instance;
   count: number;
   apply: (change: Change) => void;
+  /**
+   * Desktop edit session (027 FR-040): the buttons change the draft like a drag would — moving up takes
+   * the previous widget's place (reading order), moving down goes below the next one; saved with the rest.
+   */
+  arrange?: Arrange | undefined;
 }) {
   const t = useT();
   const announce = useAnnounce();
@@ -38,51 +54,58 @@ export function EditControls({
     apply({ kind: "patch", id, body });
     if (message) announce(message);
   };
-  const resize = (w: number, h: number) => patch({ w, h }, t("dashboard:resized", { title, w, h }));
-  const move = (position: number) =>
-    patch({ position }, t("dashboard:moved", { title, position: position + 1 }));
+  const cell = arrange?.cell ?? instance;
+  const index = arrange?.index ?? instance.position;
+  const total = arrange?.count ?? count;
+  const resize = (w: number, h: number) => {
+    if (arrange) arrange.resize(w, h);
+    else patch({ w, h });
+    announce(t("dashboard:resized", { title, w, h }));
+  };
+  const move = (up: boolean) => {
+    const neighbour = up ? arrange?.prev : arrange?.next;
+    if (arrange && neighbour) {
+      if (up) arrange.move(neighbour.x, neighbour.y);
+      else arrange.move(neighbour.x, neighbour.y + neighbour.h);
+    } else if (!arrange) {
+      patch({ position: instance.position + (up ? -1 : 1) });
+    }
+    announce(t("dashboard:moved", { title, position: index + (up ? 0 : 2) }));
+  };
   const fixed = instance.locked;
   return (
     <div className="widget-frame__controls ds-stack ds-stack--row" role="toolbar" aria-label={title}>
-      <Button
-        variant="secondary"
-        disabled={fixed || instance.position === 0}
-        onClick={() => move(instance.position - 1)}
-      >
+      <Button variant="secondary" disabled={fixed || index === 0} onClick={() => move(true)}>
         {t("dashboard:moveUp")}
       </Button>
-      <Button
-        variant="secondary"
-        disabled={fixed || instance.position >= count - 1}
-        onClick={() => move(instance.position + 1)}
-      >
+      <Button variant="secondary" disabled={fixed || index >= total - 1} onClick={() => move(false)}>
         {t("dashboard:moveDown")}
       </Button>
       <Button
         variant="secondary"
-        disabled={fixed || !widget || instance.w >= widget.max_w}
-        onClick={() => resize(instance.w + 1, instance.h)}
+        disabled={fixed || !widget || cell.w >= widget.max_w}
+        onClick={() => resize(cell.w + 1, cell.h)}
       >
         {t("dashboard:wider")}
       </Button>
       <Button
         variant="secondary"
-        disabled={fixed || !widget || instance.w <= widget.min_w}
-        onClick={() => resize(instance.w - 1, instance.h)}
+        disabled={fixed || !widget || cell.w <= widget.min_w}
+        onClick={() => resize(cell.w - 1, cell.h)}
       >
         {t("dashboard:narrower")}
       </Button>
       <Button
         variant="secondary"
-        disabled={fixed || !widget || instance.h >= widget.max_h}
-        onClick={() => resize(instance.w, instance.h + 1)}
+        disabled={fixed || !widget || cell.h >= widget.max_h}
+        onClick={() => resize(cell.w, cell.h + 1)}
       >
         {t("dashboard:taller")}
       </Button>
       <Button
         variant="secondary"
-        disabled={fixed || !widget || instance.h <= widget.min_h}
-        onClick={() => resize(instance.w, instance.h - 1)}
+        disabled={fixed || !widget || cell.h <= widget.min_h}
+        onClick={() => resize(cell.w, cell.h - 1)}
       >
         {t("dashboard:shorter")}
       </Button>

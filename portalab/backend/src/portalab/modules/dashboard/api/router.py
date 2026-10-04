@@ -14,7 +14,7 @@ from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.dashboard.overlay.overlay import EffectiveInstance
 from portalab.modules.dashboard.permissions import DASHBOARD_MANAGE, SELF
-from portalab.modules.dashboard.service.service import LayoutItem
+from portalab.modules.dashboard.service.service import ArrangedItem, LayoutItem
 
 router = APIRouter(prefix="/api/v1", tags=["dashboard"])
 
@@ -64,6 +64,8 @@ class DashboardInstanceOut(BaseModel):
     widget_key: str
     status: Literal["active", "hidden"]
     position: int
+    x: int
+    y: int
     w: int
     h: int
     config: dict[str, Any]
@@ -93,6 +95,8 @@ class AddWidgetIn(BaseModel):
     config: dict[str, Any] = Field(default_factory=dict)
     w: int | None = Field(default=None, ge=1, le=12)
     h: int | None = Field(default=None, ge=1, le=12)
+    x: int | None = Field(default=None, ge=0, le=11)  # 027: placed where dropped (else first free slot)
+    y: int | None = Field(default=None, ge=0, le=500)
 
 
 class PatchWidgetIn(BaseModel):
@@ -101,6 +105,8 @@ class PatchWidgetIn(BaseModel):
     position: int | None = Field(default=None, ge=0, le=500)
     w: int | None = Field(default=None, ge=1, le=12)
     h: int | None = Field(default=None, ge=1, le=12)
+    x: int | None = Field(default=None, ge=0, le=11)
+    y: int | None = Field(default=None, ge=0, le=500)
     config: dict[str, Any] | None = None
 
 
@@ -115,6 +121,21 @@ class LayoutItemIn(BaseModel):
 class LayoutIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     items: list[LayoutItemIn] = Field(max_length=100)
+
+
+class ArrangementItemIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    id: UUID | None = None
+    widget_key: str = Field(min_length=3, max_length=96)
+    x: int = Field(ge=0, le=11)
+    y: int = Field(ge=0, le=500)
+    w: int = Field(ge=1, le=12)
+    h: int = Field(ge=1, le=12)
+
+
+class ArrangementIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    items: list[ArrangementItemIn] = Field(max_length=100)
 
 
 class VersionOut(BaseModel):
@@ -180,6 +201,8 @@ def _instance(module: DashboardModule, instance: EffectiveInstance) -> Dashboard
         widget_key=instance.widget_key,
         status=instance.status,
         position=instance.position,
+        x=instance.x,
+        y=instance.y,
         w=instance.w,
         h=instance.h,
         config=dict(instance.config),
@@ -217,7 +240,14 @@ async def add_widget(
     principal: User, body: AddWidgetIn, module: Module, if_match: IfMatch = None
 ) -> VersionOut:
     instance_id, version = await module.service.add(
-        principal, body.widget_key, config=body.config, w=body.w, h=body.h, if_match=version_of(if_match)
+        principal,
+        body.widget_key,
+        config=body.config,
+        w=body.w,
+        h=body.h,
+        x=body.x,
+        y=body.y,
+        if_match=version_of(if_match),
     )
     return VersionOut(layout_version=version, id=instance_id)
 
@@ -233,6 +263,8 @@ async def patch_widget(
         position=body.position,
         w=body.w,
         h=body.h,
+        x=body.x,
+        y=body.y,
         config=body.config,
         if_match=version_of(if_match),
     )
@@ -248,7 +280,18 @@ async def delete_widget(
     )
 
 
-@router.put("/dashboard/layout", response_model=VersionOut)
+@router.put("/dashboard/arrangement", response_model=VersionOut)
+async def put_arrangement(
+    principal: User, body: ArrangementIn, module: Module, if_match: IfMatch = None
+) -> VersionOut:
+    """027 R13: the desktop arrangement in one write (Save); tablet/phone views derive from it."""
+    items = [ArrangedItem(i.id, i.widget_key, i.x, i.y, i.w, i.h) for i in body.items]
+    return VersionOut(
+        layout_version=await module.service.arrangement(principal, items, if_match=version_of(if_match))
+    )
+
+
+@router.put("/dashboard/layout", response_model=VersionOut, deprecated=True)
 async def put_layout(principal: User, body: LayoutIn, module: Module, if_match: IfMatch = None) -> VersionOut:
     items = [LayoutItem(i.id, i.widget_key, i.w, i.h) for i in body.items]
     return VersionOut(

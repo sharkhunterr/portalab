@@ -30,6 +30,8 @@ function frame(state: string) {
     widget_key: `t.${state}`,
     status: "active" as const,
     position: 0,
+    x: 0,
+    y: 0,
     w: 4,
     h: 2,
     config: {},

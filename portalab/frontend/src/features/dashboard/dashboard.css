@@ -6,128 +6,100 @@
 }
 
 .dashboard-grid-container {
-  container-type: inline-size;
+  min-inline-size: 0;
 }
 
+/* 027 R10/R11: explicit 2D placement (inline grid-column/grid-row); 12 / 6 / 2 columns by device class */
 .dashboard-grid {
+  --row-height: 4.75rem;
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(var(--columns, 12), minmax(0, 1fr));
+  grid-auto-rows: var(--row-height);
 }
 
 .dashboard-grid__cell {
+  position: relative;
   min-inline-size: 0;
+  min-block-size: 0;
+  transition: transform var(--motion-duration-normal) var(--motion-easing);
 }
 
-@container (min-width: 40rem) {
-  .dashboard-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .dashboard-grid__cell[data-w="1"] {
-    grid-column: span 2;
-  }
-
-  .dashboard-grid__cell[data-w="2"] {
-    grid-column: span 4;
-  }
-
-  .dashboard-grid__cell[data-w="3"] {
-    grid-column: span 3;
-  }
-
-  .dashboard-grid__cell[data-w="4"] {
-    grid-column: span 4;
-  }
-
-  .dashboard-grid__cell[data-w="5"] {
-    grid-column: span 5;
-  }
-
-  .dashboard-grid__cell[data-w="6"] {
-    grid-column: span 6;
-  }
-
-  .dashboard-grid__cell[data-w="7"] {
-    grid-column: span 6;
-  }
-
-  .dashboard-grid__cell[data-w="8"] {
-    grid-column: span 6;
-  }
-
-  .dashboard-grid__cell[data-w="9"] {
-    grid-column: span 6;
-  }
-
-  .dashboard-grid__cell[data-w="10"] {
-    grid-column: span 6;
-  }
-
-  .dashboard-grid__cell[data-w="11"] {
-    grid-column: span 6;
-  }
-
-  .dashboard-grid__cell[data-w="12"] {
-    grid-column: span 6;
-  }
+.dashboard-grid__cell > .widget-frame {
+  block-size: 100%;
+  min-block-size: 0;
+  overflow: auto;
 }
 
-@container (min-width: 64rem) {
-  .dashboard-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
+.dashboard-grid[data-editing] {
+  padding: var(--space-2);
+  border-radius: var(--radius-xl);
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-accent) 10%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: calc((100% + var(--space-4)) / var(--columns, 12)) 100%;
+  outline: 2px dashed color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
 
-  .dashboard-grid__cell[data-w="1"] {
-    grid-column: span 1;
-  }
+.dashboard-grid[data-editing] .widget-frame {
+  outline: 1px dashed color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
 
-  .dashboard-grid__cell[data-w="2"] {
-    grid-column: span 2;
-  }
+.dashboard-grid__cell[data-dragging] .widget-frame {
+  box-shadow: var(--shadow-glow), var(--shadow-3);
+  opacity: 0.92;
+}
 
-  .dashboard-grid__cell[data-w="3"] {
-    grid-column: span 3;
-  }
+.dashboard-grid__cell[data-grabbed] .widget-frame {
+  box-shadow: var(--shadow-glow);
+}
 
-  .dashboard-grid__cell[data-w="4"] {
-    grid-column: span 4;
-  }
+.dash-grip {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: max(var(--target-min), 2.25rem);
+  block-size: max(var(--target-min), 2.25rem);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  cursor: grab;
+  touch-action: none;
+}
 
-  .dashboard-grid__cell[data-w="5"] {
-    grid-column: span 5;
-  }
+.dash-grip:active,
+.dash-grip[aria-pressed="true"] {
+  cursor: grabbing;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
 
-  .dashboard-grid__cell[data-w="6"] {
-    grid-column: span 6;
-  }
+.dash-resize {
+  position: absolute;
+  inset-block-end: 4px;
+  inset-inline-end: 4px;
+  z-index: 2;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-inline-end: 3px solid var(--color-accent);
+  border-block-end: 3px solid var(--color-accent);
+  border-end-end-radius: var(--radius-md);
+  cursor: nwse-resize;
+  touch-action: none;
+}
 
-  .dashboard-grid__cell[data-w="7"] {
-    grid-column: span 7;
-  }
-
-  .dashboard-grid__cell[data-w="8"] {
-    grid-column: span 8;
-  }
-
-  .dashboard-grid__cell[data-w="9"] {
-    grid-column: span 9;
-  }
-
-  .dashboard-grid__cell[data-w="10"] {
-    grid-column: span 10;
-  }
-
-  .dashboard-grid__cell[data-w="11"] {
-    grid-column: span 11;
-  }
-
-  .dashboard-grid__cell[data-w="12"] {
-    grid-column: span 12;
-  }
+.dashboard-page__hint {
+  margin: 0;
+  color: var(--color-text-muted);
 }
 
 .widget-frame {
@@ -344,4 +316,90 @@
 .widget-stat__value {
   font-family: var(--font-display);
   font-size: var(--font-size-3xl);
+}
+
+/* 027 T078: widget gallery */
+.widget-gallery {
+  gap: var(--space-3);
+}
+
+.widget-gallery__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.widget-gallery__preview {
+  display: grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--color-accent) 30%, transparent),
+    color-mix(in srgb, var(--color-accent-alt) 22%, transparent)
+  );
+  color: var(--color-accent);
+}
+
+.widget-gallery__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+/* 027 FR-029: first-visit welcome */
+.welcome-card {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  background:
+    radial-gradient(
+      30rem 12rem at 100% 0%,
+      color-mix(in srgb, var(--color-accent-alt) 18%, transparent),
+      transparent 70%
+    ),
+    var(--color-surface-raised);
+}
+
+.welcome-card__art {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+}
+
+.welcome-card__body h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.welcome-card__body ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.welcome-card__body li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.welcome-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
