@@ -302,6 +302,72 @@ the welcome appears once, can be dismissed, and is not shown again.
 2. **Given** a user's first visit, **When** the home page renders, **Then** a dismissible welcome introduces the
    header, sections and appearance settings; once dismissed it does not reappear on any device.
 
+### User Story 8 - A shop that makes you want to buy (Priority: P2)
+
+The Marketplace looks like a video-game shop: a featured banner, products presented as collectible cards
+with their **rarity** (common, rare, epic, legendary), browsable **by collection** (seasonal or themed sets
+such as Halloween or New Wave) and **by type** (badges, animations, themes, features, request bonuses,
+others). Posters are animated according to the product: a rare item may shine, glitch, rotate, glow like
+neon or blink — within reduced-motion preferences.
+
+**Why this priority**: the Marketplace is where Coins become rewarding; a flat list does not motivate use.
+
+**Independent Test**: Open the shop with demo data; confirm the featured banner, rarity frames, collection
+and type shelves, animated posters for rare items (static under reduced motion), and that buying still uses
+the same confirmation and Coin rules.
+
+**Acceptance Scenarios**:
+
+1. **Given** published products, **When** the shop opens, **Then** featured products are highlighted and the
+   rest are grouped in shelves by collection and by type, each card showing name, type, rarity and price.
+2. **Given** a product with a poster effect, **When** its card is visible, **Then** the effect plays (shine,
+   glitch, spin, neon or blink); **and given** reduced motion, **Then** the card is static.
+3. **Given** an administrator editing a product, **When** they set rarity, collection, featured and poster
+   effect, **Then** the shop reflects them without changing the price history (presentation only).
+
+---
+
+### User Story 9 - Achievements like a game platform (Priority: P2)
+
+Achievements show their **category** (service usage, purchases, community, progression, events, other), how
+many members unlocked them (**percentage**), a **rarity** derived from that percentage, and unlocked rare
+achievements are celebrated with an animated medal.
+
+**Independent Test**: With demo data, open my progression and the community achievements; confirm each
+achievement shows category, unlock percentage and rarity, sorted and filterable, with animated rare medals.
+
+**Acceptance Scenarios**:
+
+1. **Given** achievements and members, **When** the list renders, **Then** each shows its category, the
+   share of active members who unlocked it and the matching rarity (common > 50 %, rare 20–50 %, epic 5–20 %,
+   legendary < 5 %).
+2. **Given** a hidden achievement, **When** it is not unlocked, **Then** its name and criteria stay hidden but
+   its rarity is shown.
+3. **Given** reduced motion, **When** rare medals render, **Then** they are static.
+
+---
+
+### User Story 10 - Administration and content pages that are pleasant to use (Priority: P2)
+
+Administrators find what they need where they expect it (e.g. "Add a service" from the Services page and the
+services administration), the Control Center shows readable panels with clear states and actions instead of
+raw values, and the news, wiki and support pages (for members and administrators) use the page kit: lists,
+cards, editors and empty states.
+
+**Independent Test**: As an administrator, add a service starting from the Services page; open the Control
+Center and read each panel; create a news article, a wiki page and answer a ticket; as a member, read them.
+
+---
+
+### User Story 11 - Creating themes for the Marketplace is simple (Priority: P3)
+
+An administrator creates a theme from an existing one in a **theme studio**: colors, fonts, layout, motion and
+sound choices with a live preview and the accessibility report, then publishes it and offers it in the
+Marketplace in one step.
+
+**Independent Test**: Duplicate Portalab, change accent and layout, check the report, save, then create the
+matching Marketplace product; a member buys it and can select it.
+
 ### Edge Cases
 
 - **Very long names or large numbers**: long display names are truncated with the full name available on
@@ -428,6 +494,22 @@ the welcome appears once, can be dismissed, and is not shown again.
   profiles under the same validation, policy and enablement rules as existing themes (022, 023).
 - **FR-037**: Modules and plugins MUST obtain the header, navigation, page header and building blocks from the
   shell and design system, so that a theme change restyles them without per-module work.
+
+#### Shop, achievements, administration (US8–US11)
+- **FR-049**: Products MUST carry presentation attributes — rarity, collection, featured flag, poster effect,
+  icon — editable by administrators without creating a new price version; they never affect price, rules or
+  history.
+- **FR-050**: The shop MUST present featured products and shelves by collection and by type (badges,
+  animations, themes, features, request bonuses, others), with rarity frames and animated posters that honor
+  reduced motion.
+- **FR-051**: Achievements MUST carry a category and expose the share of active members who unlocked them and a
+  rarity derived from it; hidden achievements keep their secret but show rarity.
+- **FR-052**: Administration entry points MUST be reachable from the related member pages for administrators
+  (e.g. "Add a service" on the Services page), and the Control Center MUST render each panel as a readable card
+  with state, key figures and next actions.
+- **FR-053**: News, wiki and support pages (member and administration views) MUST use the page kit.
+- **FR-054**: Administrators MUST be able to create a theme from an existing one with live preview and the
+  accessibility report, and offer it in the Marketplace without editing raw documents.
 
 #### Dashboard arrangement
 - **FR-038**: The dashboard MUST be arranged on a 2D grid where each widget has a position and a size (width and
