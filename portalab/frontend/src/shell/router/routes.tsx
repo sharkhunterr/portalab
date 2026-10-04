@@ -38,6 +38,7 @@ const MediaRequests = lazy(() => import("../../features/media/requests/RequestsP
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
+const MediaSourcesAdmin = lazy(() => import("../../features/admin/media/MediaSourcesAdmin"));
 const NewsPage = lazy(() => import("../../features/news/NewsPage"));
 const Article = lazy(() => import("../../features/news/ArticlePage"));
 const NewsAdmin = lazy(() => import("../../features/news/NewsAdmin"));
@@ -336,6 +337,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "automations/:id", element: <Automations />, handle: h({ crumb: "Automation" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
+            {
+              path: "media-sources",
+              element: <MediaSourcesAdmin />,
+              handle: h({ crumb: "History and metadata" }),
+            },
             { path: "incidents", element: <IncidentConsole />, handle: h({ crumb: "Incident console" }) },
             { path: "configuration", element: <Configuration />, handle: h({ crumb: "Configuration" }) },
             { path: "services", element: <ServicesAdmin />, handle: h({ crumb: "Services" }) },

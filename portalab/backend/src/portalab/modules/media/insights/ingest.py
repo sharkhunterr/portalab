@@ -36,6 +36,7 @@ from portalab.modules.media.models import (
     ActivityDirtyDay,
     ExternalId,
     MediaObject,
+    MediaRequest,
     PlaybackSession,
     SourceItem,
     UserLink,
@@ -62,7 +63,18 @@ async def mark_days(session: AsyncSession, days: Iterable[datetime]) -> None:
 
 
 async def attribute(session: AsyncSession, service_id: UUID, external_user_id: str, user: UUID | None) -> int:
-    """(Re-)attribute an account's plays on one service to a member (``None`` detaches them)."""
+    """(Re-)attribute an account's plays — and the requests it made, 027 — on one service to a member
+    (``None`` detaches them). Requests made from the portal keep their member; only synchronised ones move."""
+    await session.execute(
+        update(MediaRequest)
+        .where(
+            MediaRequest.service_id == service_id,
+            MediaRequest.external_ref["requester"].astext == external_user_id,
+            MediaRequest.counted == "none",
+            MediaRequest.requester_user_id.is_distinct_from(user),
+        )
+        .values(requester_user_id=user)
+    )
     rows = (
         await session.execute(
             update(Activity)

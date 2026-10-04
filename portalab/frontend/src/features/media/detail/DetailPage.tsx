@@ -13,8 +13,10 @@ import {
   useSection,
 } from "../api";
 import "../media.css";
+import { StatusBadge } from "../../../design-system/admin/AdminKit";
+import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
-import { Backdrop, Enrichment } from "./Enrichment";
+import { Backdrop, Enrichment, useMetadata } from "./Enrichment";
 
 /**
  * Media detail (spec 024 T017/T020): a header and independent section frames — each section loads, fails
@@ -34,6 +36,19 @@ const SECTIONS = [
   "blocks",
 ];
 type Data = Record<string, unknown>;
+
+const ICONS: Record<string, string> = {
+  info: "book",
+  sources: "server",
+  progress: "target",
+  history: "clock",
+  requests: "inbox",
+  people: "users",
+  statistics: "chart",
+  events: "activity",
+  links: "link",
+  blocks: "list",
+};
 
 function clock(seconds: number): string {
   const total = Math.max(0, Math.round(seconds));
@@ -60,13 +75,13 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
           {list(data.children).length ? (
             <>
               <h4>{t("media:detail.children")}</h4>
-              <ol className="media-list">
+              <ul className="media-chips">
                 {list(data.children).map((child) => (
                   <li key={String(child.id)}>
                     <Link to={`/media/${String(child.id)}`}>{String(child.title)}</Link>
                   </li>
                 ))}
-              </ol>
+              </ul>
             </>
           ) : null}
         </>
@@ -75,18 +90,26 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
       return (
         <ul className="media-list">
           {list(data.sources).map((source) => (
-            <li key={String(source.service_id)}>
+            <li key={String(source.service_id)} className="media-source">
               <strong>{String(source.service_name ?? source.connector ?? source.service_id)}</strong>
-              <br />
-              {source.present ? t("media:detail.source.present") : t("media:detail.source.gone")} ·{" "}
-              {source.availability === "available"
-                ? t("media:detail.available")
-                : t("media:detail.unavailable")}
-              <br />
-              {t("media:detail.source.health", { state: String(source.service_state) })} ·{" "}
-              {source.sync_error
-                ? t("media:detail.source.syncError")
-                : t("media:detail.source.sync", { status: String(source.sync_status) })}
+              <span className="media-source__badges">
+                <StatusBadge tone={source.availability === "available" ? "ok" : "neutral"}>
+                  {source.availability === "available"
+                    ? t("media:detail.available")
+                    : t("media:detail.unavailable")}
+                </StatusBadge>
+                {!source.present ? (
+                  <StatusBadge tone="warn">{t("media:detail.source.gone")}</StatusBadge>
+                ) : null}
+                {source.sync_error ? (
+                  <StatusBadge tone="bad">{t("media:detail.source.syncError")}</StatusBadge>
+                ) : null}
+                {source.service_state && source.service_state !== "operational" ? (
+                  <StatusBadge tone="warn">
+                    {t("media:detail.source.health", { state: String(source.service_state) })}
+                  </StatusBadge>
+                ) : null}
+              </span>
             </li>
           ))}
         </ul>
@@ -151,11 +174,11 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
       );
     case "links":
       return (
-        <ul className="media-list">
+        <ul className="media-chips">
           {list(data.links).map((l) => (
             <li key={String(l.url)}>
               <a href={String(l.url)} rel="noopener noreferrer external" target="_blank">
-                {String(l.label)}
+                {String(l.label)} <Icon name="link" size={14} />
               </a>
             </li>
           ))}
@@ -191,10 +214,41 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
   }
 }
 
+/** Whether a section has something to show (027: empty sections are left out instead of « No data »). */
+function hasContent(name: string, data: Data): boolean {
+  switch (name) {
+    case "info":
+      return Boolean(data.overview) || list(data.children).length > 0;
+    case "history":
+      return list(data.mine).length > 0 || list(data.concerned_users).length > 0;
+    case "requests":
+      return Number(data.open_total ?? 0) > 0 || list(data.mine).length > 0;
+    case "people":
+      return Array.isArray(data.people) && data.people.length > 0;
+    case "statistics":
+      return Number(data.finished_by ?? 0) > 0;
+    case "events":
+      return list(data.events).length > 0;
+    case "links":
+      return list(data.links).length > 0;
+    case "blocks":
+      return list(data.blocks).some((b) => b.state === "available");
+    case "sources":
+      return list(data.sources).length > 0;
+    default:
+      return true;
+  }
+}
+
 function SectionFrame({ objectId, name }: { objectId: string; name: string }) {
   const t = useT();
   const headingId = useId();
   const section = useSection(objectId, name);
+  const state = section.data?.state;
+  // nothing to tell: the section is left out (while loading too, to avoid a page of spinners)
+  if (section.isPending) return null;
+  if (state === "no-data" || state === "insufficient_data") return null;
+  if (section.data && state !== "unavailable" && !hasContent(name, section.data.data as Data)) return null;
   let body: ReactNode = null;
   if (section.isPending) body = <FunctionalState state="loading" />;
   else if (section.isError) body = <FunctionalState state="unavailable" onRetry={() => section.refetch()} />;
@@ -217,7 +271,10 @@ function SectionFrame({ objectId, name }: { objectId: string; name: string }) {
   }
   return (
     <section aria-labelledby={headingId} className="media-section" data-section={name}>
-      <h3 id={headingId}>{t(`media:detail.section.${name}`)}</h3>
+      <h3 id={headingId}>
+        <Icon name={ICONS[name] ?? "list"} size={18} />
+        {t(`media:detail.section.${name}`)}
+      </h3>
       {body}
     </section>
   );
@@ -250,6 +307,8 @@ export function DetailPage() {
   const { objectId = "" } = useParams();
   const headingId = useId();
   const detail = useMediaDetail(objectId);
+  // with enriched details (TMDB), the cast and the technical timeline would only repeat or distract
+  const enriched = Boolean(useMetadata(objectId).data);
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;
@@ -278,7 +337,7 @@ export function DetailPage() {
       />
       <Enrichment objectId={media.id} />
       <div className="media-sections">
-        {SECTIONS.map((name) => (
+        {SECTIONS.filter((name) => !(enriched && (name === "people" || name === "events"))).map((name) => (
           <SectionFrame key={name} objectId={media.id} name={name} />
         ))}
       </div>

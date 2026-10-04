@@ -435,7 +435,7 @@ function ServiceActions({
       {active ? (
         <>
           {continuous(connector) ? (
-            <Link className="ds-button ds-button--secondary" to="/media/insights?scope=all#sources">
+            <Link className="ds-button ds-button--secondary" to="/admin/media-sources">
               <Icon name="chart" size={16} />
               {t("admin:services.followUp")}
             </Link>

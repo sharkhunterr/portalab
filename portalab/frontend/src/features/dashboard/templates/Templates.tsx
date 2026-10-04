@@ -1,5 +1,8 @@
 import { Link } from "react-router";
+import { StatusBadge, type Tone } from "../../../design-system/admin/AdminKit";
+import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
+import { useT } from "../../../i18n/hooks/useT";
 import type { WidgetProps } from "../widgets/registry";
 
 /**
@@ -12,55 +15,139 @@ const text = (value: unknown): string => (value === null || value === undefined 
 const route = (value: unknown): string | null =>
   typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : null;
 
-function Item({ title, to, meta }: { title: string; to: string | null; meta?: string }) {
-  return (
-    <li>
-      {to ? <Link to={to}>{title}</Link> : title}
-      {meta ? <span className="widget__meta"> {meta}</span> : null}
-    </li>
-  );
+/** Known states → a tone and a shared label (027): badges instead of raw words. */
+const TONES: Record<string, Tone> = {
+  open: "info",
+  new: "info",
+  pending: "info",
+  waiting: "info",
+  scheduled: "info",
+  approved: "info",
+  processing: "info",
+  in_progress: "info",
+  investigating: "warn",
+  identified: "warn",
+  monitoring: "info",
+  active: "warn",
+  playing: "ok",
+  paused: "neutral",
+  resolved: "ok",
+  closed: "neutral",
+  available: "ok",
+  ended: "neutral",
+  declined: "bad",
+  failed: "bad",
+  cancelled: "neutral",
+  critical: "bad",
+  major: "warn",
+  minor: "info",
+};
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}(T[\d:.]+(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+function useStateLabel() {
+  const t = useT();
+  return (state: string) => {
+    const key = `dashboard:state.${state}`;
+    const label = t(key);
+    return label === key.split(":")[1] ? state.replace(/_/g, " ") : label;
+  };
 }
 
-export function StatTemplate({ payload }: WidgetProps) {
+/** A meta text: an ISO date becomes a readable (relative when close) date; anything else stays as is. */
+function useMeta() {
+  const format = useFormat();
+  return (value: unknown): string => {
+    const raw = text(value);
+    if (!ISO_DATE.test(raw)) return raw;
+    const at = new Date(raw);
+    const seconds = (at.getTime() - Date.now()) / 1000;
+    if (Math.abs(seconds) < 6 * 86400 && raw.includes("T")) return format.relative(seconds);
+    return raw.includes("T") ? format.dateTime(at) : format.date(at);
+  };
+}
+
+function Thumb({ item, icon }: { item: Row; icon: string | null | undefined }) {
+  const image = typeof item.image_id === "string" ? `/api/v1/media/images/${item.image_id}` : null;
+  if (image) {
+    return (
+      <span className="widget-row__thumb widget-row__thumb--poster">
+        <img src={image} alt="" loading="lazy" />
+      </span>
+    );
+  }
+  const name = typeof item.icon === "string" ? item.icon : icon;
+  return name ? (
+    <span className="widget-row__thumb" aria-hidden="true">
+      <Icon name={name} size={18} />
+    </span>
+  ) : null;
+}
+
+function Row({ item, icon }: { item: Row; icon: string | null | undefined }) {
+  const meta = useMeta();
+  const stateLabel = useStateLabel();
+  const to = route(item.route);
+  const state = typeof item.state === "string" ? item.state : null;
+  const progress = typeof item.progress === "number" ? Math.min(1, Math.max(0, item.progress)) : null;
+  const details = [item.subtitle, item.meta, item.at].map(meta).filter(Boolean).join(" · ");
+  const body = (
+    <>
+      <Thumb item={item} icon={icon} />
+      <span className="widget-row__main">
+        <span className="widget-row__title">{text(item.title)}</span>
+        {details ? <span className="widget-row__meta">{details}</span> : null}
+        {progress !== null ? (
+          <span className="widget-row__progress" aria-hidden="true">
+            <span style={{ inlineSize: `${Math.round(progress * 100)}%` }} />
+          </span>
+        ) : null}
+      </span>
+      {state ? <StatusBadge tone={TONES[state] ?? "neutral"}>{stateLabel(state)}</StatusBadge> : null}
+      {to ? <Icon name="chevron-right" size={16} className="widget-row__chevron" /> : null}
+    </>
+  );
+  return <li className="widget-row">{to ? <Link to={to}>{body}</Link> : <span>{body}</span>}</li>;
+}
+
+export function StatTemplate({ payload, icon }: WidgetProps) {
   const format = useFormat();
   const data = (payload.data ?? {}) as Row;
   const value = typeof data.value === "number" ? format.number(data.value) : text(data.value);
   return (
     <p className="widget-stat">
+      {icon ? (
+        <span className="widget-stat__icon" aria-hidden="true">
+          <Icon name={icon} size={22} />
+        </span>
+      ) : null}
       <span className="widget-stat__value">
         {value}
-        {data.unit ? ` ${text(data.unit)}` : ""}
+        {data.unit ? <span className="widget-stat__unit"> {text(data.unit)}</span> : null}
       </span>
       {data.label ? <span className="widget-stat__label">{text(data.label)}</span> : null}
     </p>
   );
 }
 
-export function ListTemplate({ payload }: WidgetProps) {
+export function ListTemplate({ payload, icon }: WidgetProps) {
   const items = ((payload.data ?? {}) as Row).items;
   return (
-    <ul className="widget-list">
+    <ul className="widget-rows">
       {(Array.isArray(items) ? (items as Row[]) : []).slice(0, 50).map((item, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: declarative rows have no stable id
-        <Item key={index} title={text(item.title)} to={route(item.route)} meta={text(item.meta)} />
+        <Row key={index} item={item} icon={icon} />
       ))}
     </ul>
   );
 }
 
-export function TimelineTemplate({ payload }: WidgetProps) {
-  const format = useFormat();
+export function TimelineTemplate({ payload, icon }: WidgetProps) {
   const entries = ((payload.data ?? {}) as Row).entries;
   return (
-    <ol className="widget-list">
+    <ol className="widget-rows widget-rows--timeline">
       {(Array.isArray(entries) ? (entries as Row[]) : []).slice(0, 50).map((entry, index) => (
-        <Item
-          // biome-ignore lint/suspicious/noArrayIndexKey: declarative rows have no stable id
-          key={index}
-          title={text(entry.title)}
-          to={route(entry.route)}
-          meta={typeof entry.at === "string" ? format.dateTime(entry.at) : ""}
-        />
+        // biome-ignore lint/suspicious/noArrayIndexKey: declarative rows have no stable id
+        <Row key={index} item={entry} icon={icon} />
       ))}
     </ol>
   );
@@ -101,19 +188,14 @@ export function ChartTemplate({ payload }: WidgetProps) {
   );
 }
 
-export function StatusTemplate({ payload }: WidgetProps) {
+export function StatusTemplate({ payload, icon }: WidgetProps) {
   const data = (payload.data ?? {}) as Row;
   const items = Array.isArray(data.items) ? (data.items as Row[]) : [];
   return (
-    <ul className="widget-list">
+    <ul className="widget-rows">
       {items.slice(0, 50).map((item, index) => (
-        <Item
-          // biome-ignore lint/suspicious/noArrayIndexKey: declarative rows have no stable id
-          key={index}
-          title={text(item.name)}
-          to={route(item.route)}
-          meta={text(item.state)}
-        />
+        // biome-ignore lint/suspicious/noArrayIndexKey: declarative rows have no stable id
+        <Row key={index} item={{ ...item, title: item.title ?? item.name }} icon={icon} />
       ))}
     </ul>
   );

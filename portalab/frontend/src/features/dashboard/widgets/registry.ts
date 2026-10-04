@@ -8,6 +8,8 @@ import type { WidgetPayload } from "../api";
 export interface WidgetProps {
   payload: WidgetPayload;
   config: Record<string, unknown>;
+  /** The widget's icon (027: shown on rows without an image). */
+  icon?: string | null | undefined;
 }
 
 const components = new Map<string, ComponentType<WidgetProps>>();

@@ -272,6 +272,8 @@ class RequestSink:
                         if strong_ids(payload.ids)
                         else (None, {"ids": {}, "kind": payload.kind, "title": payload.title})
                     )
+                    if payload.requester:  # kept so a later account link attributes the request (027)
+                        ref = {**ref, "requester": payload.requester}
                     row = MediaRequest(
                         object_id=target,
                         external_ref=ref,
@@ -290,8 +292,13 @@ class RequestSink:
                     await self.requests.publish(session, row, "media.request_created")
                     added += 1
                     continue
+                attributed = await self._attribution(row, payload.requester, service)
                 if row.state == payload.state and row.source_state == payload.source_state:
-                    ignored += 1
+                    if attributed:  # who asked changed: no notification, nothing else moved
+                        row.updated_at = now
+                        modified += 1
+                    else:
+                        ignored += 1
                     continue
                 became_available = payload.state == "available" and row.state != "available"
                 row.state, row.source_state, row.updated_at = payload.state, payload.source_state, now
@@ -300,6 +307,19 @@ class RequestSink:
                     await self.requests.publish(session, row, "media.request_available")
                 modified += 1
         return SinkResult(added=added, modified=modified, ignored=ignored, errored=errored)
+
+    async def _attribution(self, row: MediaRequest, requester: str | None, service: ServiceRef) -> bool:
+        """027: remember who asked on the service, and attribute the request once the account is linked."""
+        changed = False
+        if requester and (row.external_ref or {}).get("requester") != requester:
+            row.external_ref = {**(row.external_ref or {}), "requester": requester}
+            changed = True
+        if requester and row.requester_user_id is None:
+            member = await self.requests.links.resolve(service.service_id, requester)
+            if member is not None:
+                row.requester_user_id = member
+                changed = True
+        return changed
 
     async def deactivate(self, external_ids: Sequence[str], service: ServiceRef) -> int:
         return 0  # a request vanishing from the source keeps its last known state

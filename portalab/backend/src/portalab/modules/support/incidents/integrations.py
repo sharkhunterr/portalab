@@ -42,9 +42,12 @@ class OpenIncidentsWidget:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
         items = [
             {
-                "title": f"{v.reference} · {v.title}",
+                "title": v.title,
+                "subtitle": v.reference,
                 "route": f"/incidents/{v.id}",
-                "meta": f"{v.severity} · {v.state}",
+                "state": v.state,  # 027: badge; the severity stays in words
+                "meta": v.severity,
+                "icon": "alert",
             }
             for v in views
         ]

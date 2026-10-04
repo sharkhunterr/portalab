@@ -12,6 +12,7 @@ from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 from portalab.modules.media.playback.poller import PlaybackPoller
+from portalab.modules.media.providers.insight_widgets import posters
 from portalab.modules.media.requests.service import Requests
 
 OWNER = "module:media"
@@ -61,9 +62,16 @@ class ContinueWidget(_Base):
     ) -> WidgetPayload:
         user = principal.acting_for or principal.user_id
         rows = await self.history.continue_items(user, limit=8) if user else []
+        images = await posters(self.history.database, (o.id for _, o in rows))
         return self.payload(
             [
-                {"title": o.title, "route": f"/media/{o.id}", "meta": f"{round(p.percent * 100)} %"}
+                {
+                    "title": o.title,
+                    "route": f"/media/{o.id}",
+                    "meta": f"{round(p.percent * 100)} %",
+                    "progress": p.percent,  # 027: a bar under the title
+                    "image_id": images.get(o.id),
+                }
                 for p, o in rows
             ]
         )
@@ -78,7 +86,18 @@ class RecentWidget(_Base):
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
         rows, _ = await self.discovery.shelf("new", principal)
-        return self.payload([{"title": o.title, "route": f"/media/{o.id}", "meta": o.kind} for o in rows[:8]])
+        images = await posters(self.discovery.database, (o.id for o in rows[:8]))
+        return self.payload(
+            [
+                {
+                    "title": o.title,
+                    "route": f"/media/{o.id}",
+                    "meta": str(o.year) if getattr(o, "year", None) else None,
+                    "image_id": images.get(o.id),
+                }
+                for o in rows[:8]
+            ]
+        )
 
 
 class NowPlayingWidget(_Base):
@@ -113,12 +132,15 @@ class RequestsWidget(_Base):
     ) -> WidgetPayload:
         user = principal.acting_for or principal.user_id
         rows = await self.requests.mine(user, limit=8) if user else []
+        images = await posters(self.requests.database, (r.object_id for r in rows))
         return self.payload(
             [
                 {
                     "title": str(r.external_ref.get("title", "")),
                     "route": f"/media/{r.object_id}" if r.object_id else "/media/requests",
-                    "meta": r.state,
+                    "state": r.state,
+                    "at": r.requested_at.isoformat(),
+                    "image_id": images.get(r.object_id) if r.object_id else None,
                 }
                 for r in rows
             ]

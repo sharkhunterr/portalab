@@ -175,6 +175,13 @@ function ConfigDialog({
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Record<string, unknown>>(instance.config);
   const properties = (instance.widget?.config_schema.properties ?? {}) as Record<string, SchemaProperty>;
+  // 027: labels from the widget's catalog (« <ns>:widget.<name>.config.<field>[.<option>] »), else raw
+  const [ns, ...rest] = instance.widget_key.split(".");
+  const base = `${ns}:widget.${rest.join(".")}.config`;
+  const label = (key: string, fallback: string) => {
+    const text = t(key);
+    return text === key.split(":").slice(1).join(":") ? fallback : text;
+  };
   return (
     <Dialog
       open={open}
@@ -208,13 +215,13 @@ function ConfigDialog({
             return (
               <SelectField
                 key={name}
-                label={name}
+                label={label(`${base}.${name}`, name)}
                 value={String(value ?? "")}
                 onChange={(e) => setDraft({ ...draft, [name]: e.target.value })}
               >
                 {schema.enum.map((option) => (
                   <option key={String(option)} value={String(option)}>
-                    {String(option)}
+                    {label(`${base}.${name}.${String(option)}`, String(option))}
                   </option>
                 ))}
               </SelectField>
@@ -223,7 +230,7 @@ function ConfigDialog({
             return (
               <CheckboxField
                 key={name}
-                label={name}
+                label={label(`${base}.${name}`, name)}
                 checked={Boolean(value)}
                 onChange={(e) => setDraft({ ...draft, [name]: e.target.checked })}
               />
@@ -232,7 +239,7 @@ function ConfigDialog({
             return (
               <TextField
                 key={name}
-                label={name}
+                label={label(`${base}.${name}`, name)}
                 type="number"
                 value={String(value ?? "")}
                 {...(schema.minimum !== undefined ? { min: schema.minimum } : {})}
@@ -243,7 +250,7 @@ function ConfigDialog({
           return (
             <TextField
               key={name}
-              label={name}
+              label={label(`${base}.${name}`, name)}
               value={String(value ?? "")}
               maxLength={schema.maxLength ?? 200}
               onChange={(e) => setDraft({ ...draft, [name]: e.target.value })}

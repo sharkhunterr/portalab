@@ -7,11 +7,13 @@ from uuid import UUID
 
 import httpx
 from fastapi import FastAPI
+from sqlalchemy import select
 
+from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.identity_directory import AccountSummary
 from portalab.capabilities.media import ACCOUNTS, ServiceAccount
 from portalab.modules.media.links.accounts import normalize, suggest
-from portalab.modules.media.models import PlaybackSession
+from portalab.modules.media.models import MediaRequest, PlaybackSession
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 
@@ -100,3 +102,60 @@ async def test_mapping_flow(app: FastAPI, client: httpx.AsyncClient, media: Medi
 
     await login(client, "zoe")
     assert (await client.get("/api/v1/admin/media/accounts")).status_code == 403
+
+
+class _SeerrAccounts:
+    async def list_accounts(self) -> list[ServiceAccount]:
+        return [ServiceAccount("7", username="zoe")]
+
+
+def _request(external_id: str, requester: str | None, state: str = "pending") -> SourceRecord:
+    payload = {"title": f"Film {external_id}", "kind": "movie", "ids": {}, "state": state}
+    if requester:
+        payload["requester"] = requester
+    return SourceRecord(
+        source_system="seerr",
+        external_id=external_id,
+        kind="request",
+        payload=payload,
+        observed_at=T0,
+    )
+
+
+async def test_requests_synced_before_the_mapping_are_attributed(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """027: Seerr requests imported before the account was linked reach the member once it is linked."""
+    people = await users(app, media, "zoe", admin="boss")
+    seerr = media.service(8, "seerr")
+    media.provide(ACCOUNTS, seerr, _SeerrAccounts())
+    sink = media.module.request_sink
+    await sink.upsert([_request("1", "7"), _request("2", "7", "available"), _request("3", "9")], seerr)
+    # an older import that did not keep who asked: the next sync fills it in, without notifying anyone
+    async with media.database.unit_of_work() as uow:
+        row = (
+            await uow.session.execute(select(MediaRequest).where(MediaRequest.external_request_id == "1"))
+        ).scalar_one()
+        row.external_ref = {k: v for k, v in row.external_ref.items() if k != "requester"}
+    before = len(await media.events("media.request_updated"))
+    again = await sink.upsert([_request("1", "7")], seerr)
+    assert again.modified == 1 and len(await media.events("media.request_updated")) == before
+
+    await login(client, "zoe")
+    assert (await client.get("/api/v1/me/media/requests")).json()["items"] == []
+    await login(client, "boss")
+    linked = await client.put(
+        f"/api/v1/admin/media/accounts/{seerr.service_id}",
+        json={"external_user_id": "7", "user_id": str(people["zoe"])},
+    )
+    assert linked.status_code == 200
+    await login(client, "zoe")
+    mine = (await client.get("/api/v1/me/media/requests")).json()["items"]
+    assert sorted(r["state"] for r in mine) == ["available", "pending"]  # request 3 is someone else's
+
+    await login(client, "boss")
+    await client.put(
+        f"/api/v1/admin/media/accounts/{seerr.service_id}", json={"external_user_id": "7", "user_id": None}
+    )
+    await login(client, "zoe")
+    assert (await client.get("/api/v1/me/media/requests")).json()["items"] == []

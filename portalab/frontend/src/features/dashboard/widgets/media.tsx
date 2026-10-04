@@ -1,8 +1,11 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { metadataImage } from "../../media/detail/Enrichment";
 import { useMeasures } from "../../media/insights/api";
+import type { StatsPoint } from "./MediaStatsChart";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 
 /**
@@ -23,6 +26,8 @@ interface Card {
   plays?: number;
   seconds?: number;
   image_id: string | null;
+  /** 027: the metadata provider's poster when the library has none (requests, upcoming releases). */
+  poster_ref?: string | null;
   route: string | null;
 }
 
@@ -55,7 +60,7 @@ function Posters({ payload }: WidgetProps) {
   return (
     <ul className="widget-posters">
       {items.map((card, index) => {
-        const src = poster(card.image_id);
+        const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
         const body = (
           <>
             <span className="widget-posters__art">
@@ -80,34 +85,56 @@ function Posters({ payload }: WidgetProps) {
 
 interface StatsData {
   scope: "me" | "all";
+  period: string;
+  category: string;
+  metric: "time" | "plays";
+  chart: "bars" | "area" | "donut" | "top" | "figures";
+  unit: string;
   totals: { plays: number; seconds: number; works: number; completed: number };
   previous: { plays: number; seconds: number } | null;
-  by_kind: Array<{ kind: string; seconds: number }>;
-  timeline: Array<{ date: string; seconds: number }>;
+  by_kind: Array<{ kind: string; seconds: number; plays: number }>;
+  timeline: StatsPoint[];
   top: Card[];
 }
 
+const MediaStatsChart = lazy(() => import("./MediaStatsChart"));
+
+/** « My statistics » (027): configurable — whose, period, category, metric and chart. */
 function Stats({ payload }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
   const data = (payload.data ?? {}) as unknown as StatsData;
-  const max = Math.max(1, ...(data.timeline ?? []).map((p) => p.seconds));
-  const before = data.previous?.seconds ?? 0;
-  const trend = before ? (data.totals.seconds - before) / before : null;
+  const metric = data.metric ?? "time";
+  const chart = data.chart ?? "bars";
+  const headline =
+    metric === "time" ? measures.duration(data.totals.seconds) : format.number(data.totals.plays);
+  const before = data.previous ? (metric === "time" ? data.previous.seconds : data.previous.plays) : 0;
+  const now = metric === "time" ? data.totals.seconds : data.totals.plays;
+  const trend = before ? (now - before) / before : null;
+  const context = [
+    t(`media:insights.scope.${data.scope ?? "me"}`),
+    t(`media:insights.periods.${data.period ?? "30d"}`),
+    data.category && data.category !== "all" ? t(`media:insights.categories.${data.category}`) : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <div className="widget-media-stats">
+      <p className="widget-media-stats__context">{context}</p>
       <div className="widget-media-stats__figures">
         <p>
-          <strong>{measures.duration(data.totals?.seconds ?? 0)}</strong>
-          <span>{t("media:insights.stat.time")}</span>
+          <strong>{headline}</strong>
+          <span>{t(metric === "time" ? "media:insights.stat.time" : "media:insights.stat.plays")}</span>
         </p>
         <p>
-          <strong>{format.number(data.totals?.plays ?? 0)}</strong>
-          <span>{t("media:insights.stat.plays")}</span>
+          <strong>
+            {metric === "time" ? format.number(data.totals.plays) : measures.duration(data.totals.seconds)}
+          </strong>
+          <span>{t(metric === "time" ? "media:insights.stat.plays" : "media:insights.stat.time")}</span>
         </p>
         <p>
-          <strong>{format.number(data.totals?.works ?? 0)}</strong>
+          <strong>{format.number(data.totals.works)}</strong>
           <span>{t("media:insights.stat.works")}</span>
         </p>
         {trend !== null ? (
@@ -120,18 +147,41 @@ function Stats({ payload }: WidgetProps) {
           </p>
         ) : null}
       </div>
-      <div className="widget-media-stats__spark" aria-hidden="true">
-        {(data.timeline ?? []).map((point) => (
-          <span key={point.date} style={{ blockSize: `${Math.max(4, (point.seconds / max) * 100)}%` }} />
-        ))}
-      </div>
-      {data.top?.length ? (
-        <ol className="widget-media-stats__top">
-          {data.top.map((card) => (
-            <li key={card.id ?? card.title}>
-              {card.route ? <Link to={card.route}>{card.title}</Link> : card.title}
-            </li>
-          ))}
+      {chart === "bars" || chart === "area" || chart === "donut" ? (
+        <Suspense fallback={<div className="widget-media-stats__placeholder" />}>
+          <MediaStatsChart
+            chart={chart}
+            metric={metric}
+            unit={data.unit ?? "day"}
+            timeline={data.timeline ?? []}
+            byKind={data.by_kind ?? []}
+          />
+        </Suspense>
+      ) : null}
+      {chart === "top" && data.top?.length ? (
+        <ol className="widget-rows">
+          {data.top.map((card) => {
+            const src = poster(card.image_id);
+            const body = (
+              <>
+                <span className="widget-row__thumb widget-row__thumb--poster">
+                  {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={18} />}
+                </span>
+                <span className="widget-row__main">
+                  <span className="widget-row__title">{card.title}</span>
+                  <span className="widget-row__meta">
+                    {measures.duration(card.seconds ?? 0)} ·{" "}
+                    {t("media:insights.plays", { count: card.plays ?? 0 })}
+                  </span>
+                </span>
+              </>
+            );
+            return (
+              <li key={card.id ?? card.title} className="widget-row">
+                {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
+              </li>
+            );
+          })}
         </ol>
       ) : null}
       <Link

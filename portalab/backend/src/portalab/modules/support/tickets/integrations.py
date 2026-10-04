@@ -197,7 +197,14 @@ class TicketsWidget:
         if not rows:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
         items = [
-            {"title": f"T-{r.number:06d} · {r.title}", "route": f"/support/tickets/{r.id}", "meta": r.state}
+            {
+                "title": r.title,
+                "subtitle": f"T-{r.number:06d}",
+                "route": f"/support/tickets/{r.id}",
+                "state": r.state,  # 027: rendered as a badge
+                "at": _when(r),
+                "icon": "ticket",
+            }
             for r in rows[:8]
         ]
         return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
@@ -259,3 +266,9 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
                     owner=OWNER,
                 )
             )
+
+
+def _when(row: Any) -> str | None:
+    """The last change of a ticket, for the widget row (027)."""
+    at = getattr(row, "updated_at", None) or getattr(row, "created_at", None)
+    return at.isoformat() if at is not None else None

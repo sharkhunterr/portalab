@@ -10,6 +10,7 @@ import httpx
 from fastapi import FastAPI
 from sqlalchemy import select
 
+from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
@@ -260,6 +261,7 @@ class _Tmdb:
             revenue=402_027_830,
             collection={"id": "726871", "name": "Dune - Saga", "poster": None, "backdrop": None},
             backdrop="/backdrop.jpg",
+            poster="/poster.jpg",
             people=[MetadataPerson("Timothée Chalamet", "Paul", image="/tc.jpg")],
         )
 
@@ -353,12 +355,41 @@ async def test_dashboard_widgets(app: FastAPI, media: MediaHarness, clock: Fixed
     assert added.state == "available" and added.data["items"][0]["image_id"]
     stats = await _widget(media, "media.stats").load(zoe, {"scope": "me"}, ctx)
     assert stats.data["totals"]["plays"] == 1 and stats.data["top"][0]["route"] == f"/media/{dune}"
+    shaped = await _widget(media, "media.stats").load(
+        zoe, {"chart": "donut", "metric": "plays", "category": "movies", "period": "90d"}, ctx
+    )
+    assert (shaped.data["chart"], shaped.data["metric"], shaped.data["category"]) == (
+        "donut",
+        "plays",
+        "movies",
+    )
+    assert shaped.data["period"] == "90d" and shaped.data["timeline"][-1]["plays"] >= 0
+    odd = await _widget(media, "media.stats").load(zoe, {"chart": "pie3d", "period": "10y"}, ctx)
+    assert odd.data["chart"] == "bars" and odd.data["period"] == "30d"  # unknown choices fall back
     top = await _widget(media, "media.top").load(zoe, {}, ctx)
     assert top.data["items"][0]["title"] == "Dune"
     upcoming = await _widget(media, "media.upcoming").load(zoe, {}, ctx)
     assert upcoming.data["items"][0]["type"] == "digital"
     requested = await _widget(media, "media.recently_requested").load(zoe, {}, ctx)
     assert requested.state == "no-data"
+    # a request the library does not have gets the metadata provider's poster
+    media.provide(METADATA, media.service(9, "tmdb"), _Tmdb())
+    seerr = media.service(8, "seerr")
+    await media.module.request_sink.upsert(
+        [
+            SourceRecord(
+                source_system="seerr",
+                external_id="r1",
+                kind="request",
+                payload={"title": "Dune", "kind": "movie", "ids": {}, "state": "pending"},
+                observed_at=clock.now(),
+            )
+        ],
+        seerr,
+    )
+    requested = await _widget(media, "media.recently_requested").load(zoe, {}, ctx)
+    card = requested.data["items"][0]
+    assert card["image_id"] is None and card["poster_ref"] == "/poster.jpg" and card["state"] == "pending"
 
 
 def _widget(media: MediaHarness, key: str) -> Any:

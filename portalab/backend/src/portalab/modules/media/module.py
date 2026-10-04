@@ -302,8 +302,8 @@ class MediaModule:
             (REQUESTS_WIDGET, RequestsWidget(self.requests, self.clock)),
             (STATS_WIDGET, StatsWidget(self.database, self.insights, self.clock)),
             (RECENTLY_ADDED, RecentlyAddedWidget(self.database, self.clock)),
-            (RECENTLY_REQUESTED, RecentlyRequestedWidget(self.database, self.clock)),
-            (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock)),
+            (RECENTLY_REQUESTED, RecentlyRequestedWidget(self.database, self.clock, self.enricher)),
+            (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
         )
         for definition, widget in widgets:

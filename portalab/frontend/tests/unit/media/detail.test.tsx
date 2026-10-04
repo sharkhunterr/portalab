@@ -110,8 +110,10 @@ describe("media detail", () => {
     expect(within(sources).getByText(/Service: unavailable/)).toBeTruthy();
     expect(within(sources).getByText(/The last sync failed/)).toBeTruthy();
     expect(await screen.findByText("Linguists.", { selector: "p" })).toBeTruthy();
-    expect(await screen.findByText("Not enough people yet to show statistics.")).toBeTruthy();
     expect(await screen.findByText("8/10")).toBeTruthy();
+    // 027: sections with nothing to tell are left out (no « not enough people », no « no data »)
+    expect(screen.queryByRole("heading", { name: "Statistics" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Requests" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Request" }));
     expect(await screen.findByText("You have used your requests for this period.")).toBeTruthy();
     expect(posts).toEqual(["/api/v1/media/requests"]);

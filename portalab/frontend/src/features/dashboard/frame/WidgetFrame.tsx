@@ -43,7 +43,13 @@ function Body({ instance }: { instance: Instance }) {
     case "unauthorized":
       return <FunctionalState state="unauthorized" />;
     case "no-data":
-      return <FunctionalState state="no-data" />;
+      // 027: a calm empty state with the widget's own icon, not a status pill
+      return (
+        <p className="widget-empty" data-state="no-data" role="status">
+          <Icon name={widget?.icon ?? "sparkles"} size={28} />
+          <span>{t("dashboard:widgetEmpty")}</span>
+        </p>
+      );
   }
   const Rendered =
     widgetComponent(widget?.component_id) ??
@@ -58,7 +64,7 @@ function Body({ instance }: { instance: Instance }) {
         />
       ) : null}
       {payload.config_invalid ? <p className="widget__meta">{t("dashboard:configInvalid")}</p> : null}
-      {Rendered ? <Rendered payload={payload} config={instance.config} /> : null}
+      {Rendered ? <Rendered payload={payload} config={instance.config} icon={widget?.icon} /> : null}
     </>
   );
 }

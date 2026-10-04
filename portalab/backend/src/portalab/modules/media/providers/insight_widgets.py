@@ -14,12 +14,15 @@ from portalab.capabilities.i18n import LocaleContext
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.insights.stats import InsightsQuery
+from portalab.modules.media.insights.enrich import MetadataEnricher
+from portalab.modules.media.insights.stats import CATEGORIES, InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
 from portalab.modules.media.models import Image, MediaObject, MediaRequest
 from portalab.modules.media.permissions import MEDIA_READ
 
 OWNER = "module:media"
+CHARTS = ("bars", "area", "donut", "top", "figures")
+PERIODS = ("7d", "30d", "90d", "365d", "all")
 POSTERS = SizeLimits(default=Size(12, 3), min=Size(4, 2), max=Size(12, 6))
 
 
@@ -60,11 +63,17 @@ STATS = _definition(
         "type": "object",
         "properties": {
             "scope": {"type": "string", "enum": ["me", "all"]},
-            "period": {"type": "string", "enum": ["7d", "30d", "365d"]},
+            "period": {"type": "string", "enum": ["7d", "30d", "90d", "365d", "all"]},
+            "category": {
+                "type": "string",
+                "enum": ["all", "movies", "series", "live", "music", "books", "audiobooks"],
+            },
+            "metric": {"type": "string", "enum": ["time", "plays"]},
+            "chart": {"type": "string", "enum": ["bars", "area", "donut", "top", "figures"]},
         },
         "additionalProperties": False,
     },
-    defaults={"scope": "me", "period": "30d"},
+    defaults={"scope": "me", "period": "30d", "category": "all", "metric": "time", "chart": "bars"},
 )
 RECENTLY_ADDED = _definition(
     "media.recently_added", component="media.posters", icon="sparkles", events=("media.added",)
@@ -91,9 +100,12 @@ async def posters(database: Database, object_ids: Iterable[UUID | None]) -> dict
 
 
 class _Base:
-    def __init__(self, database: Database, clock: Clock | None = None) -> None:
+    def __init__(
+        self, database: Database, clock: Clock | None = None, enricher: MetadataEnricher | None = None
+    ) -> None:
         self.database = database
         self.clock = clock
+        self.enricher = enricher
 
     def payload(self, data: Mapping[str, Any] | None) -> WidgetPayload:
         empty = not data or (isinstance(data.get("items"), list) and not data["items"])
@@ -104,10 +116,17 @@ class _Base:
         for row in rows:
             row["image_id"] = images.get(UUID(row["id"])) if row.get("id") else None
             row["route"] = f"/media/{row['id']}" if row.get("id") else None
+            lookup = row.pop("_lookup", None)
+            if row["image_id"] is None and lookup and self.enricher is not None:
+                # not in the library: the metadata provider's poster (TMDB), served by the portal
+                row["poster_ref"] = await self.enricher.poster(*lookup)
         return rows
 
 
 class StatsWidget(_Base):
+    """027: configurable — whose (me / server), over which period and category, which metric (time spent or
+    plays) and which chart (bars, area, donut by kind, top titles, figures only)."""
+
     def __init__(self, database: Database, insights: InsightsQuery, clock: Clock | None = None) -> None:
         super().__init__(database, clock)
         self.insights = insights
@@ -116,26 +135,33 @@ class StatsWidget(_Base):
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
         user = principal.acting_for or principal.user_id
-        scope = config.get("scope", "me")
-        period = config.get("period", "30d")
+        scope = "all" if config.get("scope") == "all" else "me"
+        period = (
+            config.get("period") if config.get("period") in ("7d", "30d", "90d", "365d", "all") else "30d"
+        )
+        category = config.get("category") if config.get("category") in CATEGORIES else "all"
         data = await self.insights.overview(
-            period=period if period in ("7d", "30d", "365d") else "30d",
-            category="all",
-            user=user if scope != "all" else None,
+            period=str(period),
+            category=str(category),
+            user=user if scope == "me" else None,
             manager=False,
         )
         if not data["totals"]["plays"]:
             return self.payload(None)
-        top = await self.cards(data["top_works"][:4])
+        top = await self.cards(data["top_works"][:5])
         return self.payload(
             {
                 "scope": data["scope"],
                 "period": data["period"]["key"],
+                "category": data["category"],
+                "metric": "plays" if config.get("metric") == "plays" else "time",
+                "chart": config.get("chart") if config.get("chart") in CHARTS else "bars",
                 "totals": data["totals"],
                 "previous": data["previous"],
                 "by_kind": data["by_kind"],
+                "unit": data["timeline"]["unit"],
                 "timeline": [
-                    {"date": p["date"], "seconds": sum(p["seconds"].values())}
+                    {"date": p["date"], "seconds": sum(p["seconds"].values()), "plays": p["plays"]}
                     for p in data["timeline"]["points"]
                 ],
                 "top": top,
@@ -183,6 +209,12 @@ class RecentlyRequestedWidget(_Base):
                 "kind": str(r.external_ref.get("kind") or ""),
                 "state": r.state,
                 "at": r.requested_at.isoformat(),
+                "_lookup": (
+                    "series" if r.external_ref.get("kind") in ("series", "tv") else "movie",
+                    dict(r.external_ref.get("ids") or {}),
+                    str(r.external_ref.get("title") or ""),
+                    None,
+                ),
             }
             for r in rows
         ]
@@ -190,8 +222,14 @@ class RecentlyRequestedWidget(_Base):
 
 
 class UpcomingWidget(_Base):
-    def __init__(self, database: Database, upcoming: Upcoming, clock: Clock | None = None) -> None:
-        super().__init__(database, clock)
+    def __init__(
+        self,
+        database: Database,
+        upcoming: Upcoming,
+        clock: Clock | None = None,
+        enricher: MetadataEnricher | None = None,
+    ) -> None:
+        super().__init__(database, clock, enricher)
         self.upcoming = upcoming
 
     async def load(
@@ -210,6 +248,12 @@ class UpcomingWidget(_Base):
                 "episode": r["episode"],
                 "at": r["at"],
                 "available": r["available"],
+                "_lookup": (
+                    "movie" if r["kind"] == "movie" else "series",
+                    dict(r.get("ids") or {}),
+                    r["parent_title"] or r["title"],
+                    None,
+                ),
             }
             for r in releases
             if r["at"] >= now.isoformat()

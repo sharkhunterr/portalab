@@ -9,11 +9,7 @@ import {
   AdminStats,
   AdminTable,
   AdminTabs,
-  LiveProgress,
-  StatusBadge,
 } from "../../../design-system/admin/AdminKit";
-import { Button } from "../../../design-system/components/Button";
-import { Progress } from "../../../design-system/components/Content";
 import { SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -29,9 +25,6 @@ import {
   type Scope,
   useInsights,
   useMeasures,
-  useResync,
-  useRunNow,
-  useSources,
 } from "./api";
 import "../../admin/admin.css";
 import "./insights.css";
@@ -331,146 +324,6 @@ function BoxOffice({ data }: { data: NonNullable<Insights["box_office"]> }) {
   );
 }
 
-function Sources() {
-  const t = useT();
-  const format = useFormat();
-  const sources = useSources(true);
-  const resync = useResync();
-  const run = useRunNow();
-  if (!sources.data) return null;
-  const meta = sources.data.metadata;
-  return (
-    <AdminSection
-      actions={
-        <Button variant="secondary" disabled={run.isPending} onClick={() => run.mutate("history")}>
-          <Icon name="sync" size={16} />
-          {t("media:insights.sources.runNow")}
-        </Button>
-      }
-      title={t("media:insights.sources.title")}
-      description={t("media:insights.sources.hint")}
-      icon="server"
-      flush
-      span="full"
-    >
-      <AdminTable
-        label={t("media:insights.sources.title")}
-        rows={sources.data.sources}
-        rowKey={(s) => s.service_id}
-        empty={<p className="admin-muted admin-pad">{t("media:insights.sources.none")}</p>}
-        columns={[
-          {
-            key: "name",
-            header: t("media:insights.sources.service"),
-            primary: true,
-            render: (s) => <strong>{s.name}</strong>,
-          },
-          {
-            key: "state",
-            header: t("media:insights.sources.state"),
-            render: (s) => {
-              const p = s.progress;
-              if (p.running) {
-                return (
-                  <LiveProgress
-                    label={t(
-                      s.mode === "backfill"
-                        ? "media:insights.sources.catchingUp"
-                        : "media:insights.sources.reading",
-                    )}
-                    done={p.done}
-                    total={p.total}
-                    detail={p.total ? `${format.number(p.done ?? 0)} / ${format.number(p.total)}` : null}
-                  />
-                );
-              }
-              if (s.last_error)
-                return <StatusBadge tone="bad">{t("media:insights.sources.error")}</StatusBadge>;
-              if (s.mode === "backfill") {
-                return (
-                  <span className="insights-source-state">
-                    <StatusBadge tone="info">{t("media:insights.sources.backfill")}</StatusBadge>
-                    {p.total ? (
-                      <span className="admin-muted">
-                        {t("media:insights.sources.paused", {
-                          percent: format.percent((p.done ?? 0) / p.total),
-                        })}
-                      </span>
-                    ) : null}
-                  </span>
-                );
-              }
-              return <StatusBadge tone="ok">{t("media:insights.sources.live")}</StatusBadge>;
-            },
-          },
-          { key: "items", header: t("media:insights.sources.items"), render: (s) => format.number(s.items) },
-          {
-            key: "last",
-            header: t("media:insights.sources.last"),
-            render: (s) =>
-              s.last_run_at ? format.relative((Date.parse(s.last_run_at) - Date.now()) / 1000) : "—",
-          },
-        ]}
-        actions={(s) =>
-          s.source === "history" ? (
-            <Button
-              variant="ghost"
-              disabled={resync.isPending}
-              onClick={() => resync.mutate(s.service_id)}
-              aria-label={`${t("media:insights.sources.resync")} ${s.name}`}
-            >
-              <Icon name="sync" size={16} />
-              {t("media:insights.sources.resync")}
-            </Button>
-          ) : null
-        }
-      />
-      {meta.provider && meta.eligible ? (
-        <div className="admin-pad insights-metadata__progress">
-          {meta.progress.running ? (
-            <LiveProgress
-              label={t("media:insights.sources.enriching")}
-              done={meta.found + meta.missing + meta.error}
-              total={meta.eligible}
-              detail={`${format.number(meta.found + meta.missing + meta.error)} / ${format.number(meta.eligible)}`}
-            />
-          ) : (
-            <Progress
-              label={t("media:insights.sources.enriched", {
-                done: format.number(Math.min(meta.found + meta.missing + meta.error, meta.eligible)),
-                total: format.number(meta.eligible),
-              })}
-              value={Math.min(meta.found + meta.missing + meta.error, meta.eligible)}
-              max={meta.eligible}
-            />
-          )}
-        </div>
-      ) : null}
-      <div className="insights-metadata admin-pad">
-        <span className="admin-muted">
-          {meta.provider
-            ? t("media:insights.sources.metadata", {
-                found: format.number(meta.found),
-                missing: format.number(meta.missing),
-              })
-            : t("media:insights.sources.noMetadata")}
-        </span>
-        {meta.provider ? (
-          <Button variant="ghost" disabled={run.isPending} onClick={() => run.mutate("metadata")}>
-            <Icon name="sparkles" size={16} />
-            {t("media:insights.sources.enrichNow")}
-          </Button>
-        ) : null}
-        {run.isSuccess ? (
-          <span role="status" className="admin-muted">
-            {t("media:insights.sources.queued")}
-          </span>
-        ) : null}
-      </div>
-    </AdminSection>
-  );
-}
-
 export default function InsightsPage() {
   const t = useT();
   const format = useFormat();
@@ -535,13 +388,6 @@ export default function InsightsPage() {
       {insights.isError ? <FunctionalState state="error" onRetry={() => insights.refetch()} /> : null}
       {data ? (
         <>
-          {data.unattributed ? (
-            <p className="insights-notice" role="status">
-              <Icon name="link" size={18} />
-              {t("media:insights.unattributed", { count: data.unattributed })}{" "}
-              <Link to="/admin/members?tab=accounts">{t("media:insights.mapAccounts")}</Link>
-            </p>
-          ) : null}
           <AdminStats
             label={t("media:insights.title")}
             stats={[
@@ -742,11 +588,6 @@ export default function InsightsPage() {
               ) : null}
             </AdminGrid>
           )}
-          {data.manager && scope === "all" ? (
-            <div id="sources">
-              <Sources />
-            </div>
-          ) : null}
         </>
       ) : null}
     </AdminPage>

@@ -528,6 +528,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "media.manage",
     },
     {
+        "key": "media.sources",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.admin.media_sources",
+        "icon": "chart",
+        "route": "/admin/media-sources",
+        "group": "admin",
+        "topic": "services",
+        "order_hint": 3,
+        "required_permission": "media.manage",
+    },
+    {
         "key": "ui.theme_studio",
         "owner": "module:ui",
         "kind": "entry",

@@ -110,5 +110,6 @@ class MediaParticipant:
             await session.execute(
                 update(MediaRequest)
                 .where(MediaRequest.requester_user_id == user_id)
-                .values(requester_user_id=None)
+                # 027: the account id on the request service goes too
+                .values(requester_user_id=None, external_ref=MediaRequest.external_ref.op("-")("requester"))
             )

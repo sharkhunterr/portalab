@@ -94,6 +94,7 @@ class Upcoming:
                     "available": release.available,
                     "object_id": str(object_id) if object_id else None,
                     "overview": release.overview,
+                    "ids": dict(release.ids),
                 }
             )
         self._cache = (time.monotonic(), days, out)
