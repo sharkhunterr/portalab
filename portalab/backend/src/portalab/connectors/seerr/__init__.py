@@ -18,7 +18,7 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import REQUESTS, RequestState, SourceRequest
+from portalab.capabilities.media import ACCOUNTS, REQUESTS, RequestState, ServiceAccount, SourceRequest
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
 
@@ -51,7 +51,11 @@ class SeerrConnector(HttpConnector):
     description = "Media requests: members ask for a film or a series, Seerr sends it to Radarr or Sonarr."
     icon = "inbox"
     category = "requests"
-    provides: Sequence[CapabilityBinding] = (binding(REQUESTS, syncable=True), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (
+        binding(REQUESTS, syncable=True),
+        binding(HEALTH_PROBE),
+        binding(ACCOUNTS),
+    )
     status_path = "/api/v1/settings/main"
     public_path = "/api/v1/status"
 
@@ -119,6 +123,8 @@ class SeerrConnector(HttpConnector):
             return _Requests(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
+        if capability == ACCOUNTS:
+            return _Accounts(self, service)
         return None
 
 
@@ -152,3 +158,23 @@ class _Requests:
             raise InvalidPayload("unexpected request payload")
         state, source_state = state_of(request)
         return SourceRequest(external_request_id=external_request_id, state=state, source_state=source_state)
+
+
+class _Accounts:
+    def __init__(self, connector: SeerrConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def list_accounts(self) -> Sequence[ServiceAccount]:
+        page = await self.connector.get_json(self.service, "/api/v1/user", take=500, skip=0)
+        if not isinstance(page, Mapping) or not isinstance(page.get("results"), list):
+            raise InvalidPayload("unexpected /user payload")
+        return [
+            ServiceAccount(
+                external_id=str(u["id"]),
+                username=u.get("username") or u.get("plexUsername") or u.get("jellyfinUsername"),
+                display_name=u.get("displayName"),
+                email=u.get("email"),
+            )
+            for u in page["results"]
+            if u.get("id")
+        ]

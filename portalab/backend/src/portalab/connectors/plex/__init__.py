@@ -23,7 +23,14 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import LIBRARY, PLAYBACK, SourceHistoryItem, SourcePlayback
+from portalab.capabilities.media import (
+    ACCOUNTS,
+    LIBRARY,
+    PLAYBACK,
+    ServiceAccount,
+    SourceHistoryItem,
+    SourcePlayback,
+)
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
 
@@ -81,6 +88,7 @@ class PlexConnector(HttpConnector):
         binding(LIBRARY, syncable=True),
         binding(PLAYBACK),
         binding(HEALTH_PROBE),
+        binding(ACCOUNTS),
     )
     status_path = "/"
     public_path = "/identity"
@@ -160,6 +168,8 @@ class PlexConnector(HttpConnector):
             return _Playback(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
+        if capability == ACCOUNTS:
+            return _Accounts(self, service)
         return None
 
 
@@ -225,3 +235,18 @@ class _Playback:
                 )
             )
         return sorted(history, key=lambda h: h.occurred_at)
+
+
+class _Accounts:
+    """The accounts known to the server (owner, home and shared users): ids match sessions and history."""
+
+    def __init__(self, connector: PlexConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def list_accounts(self) -> Sequence[ServiceAccount]:
+        container = _container(await self.connector.get_json(self.service, "/accounts"))
+        return [
+            ServiceAccount(external_id=str(a["id"]), username=a.get("name"), display_name=a.get("name"))
+            for a in container.get("Account") or []
+            if a.get("id") and a.get("name")  # id 0 is the anonymous system account
+        ]

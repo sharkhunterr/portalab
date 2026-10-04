@@ -6,9 +6,11 @@ from uuid import UUID
 from sqlalchemy import select
 
 from portalab.capabilities.identity_directory import (
+    ACCOUNTS,
     CAPABILITY,
     CONTACT,
     MEMBERS,
+    AccountSummary,
     MemberEntry,
     MemberPage,
     UserSummary,
@@ -99,9 +101,28 @@ class IdentityMembersService:
         return MemberPage(items, offset + limit if len(rows) > limit else None)
 
 
+class IdentityAccountsService:
+    """``identity.accounts`` (027): live accounts for administrative matching with service accounts."""
+
+    def __init__(self, ctx: IdentityContext) -> None:
+        self.ctx = ctx
+
+    async def accounts(self) -> list[AccountSummary]:
+        live = [s.value for s in AccountState if s is not AccountState.DELETED]
+        async with self.ctx.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(User).where(User.state.in_(live)).order_by(User.display_name_key, User.id)
+                )
+            ).scalars()
+            return [AccountSummary(u.id, u.login_display, u.display_name, u.email) for u in rows]
+
+
 def register_directory(registry: CapabilityRegistry, ctx: IdentityContext) -> None:
     registry.provide(CAPABILITY, IdentityDirectoryService(ctx), instance_ref="identity", owner=OWNER)
     if not registry.system_providers(MEMBERS):
         registry.provide(MEMBERS, IdentityMembersService(ctx), instance_ref="identity", owner=OWNER)
     if not registry.system_providers(CONTACT):
         registry.provide(CONTACT, IdentityContactService(ctx), instance_ref="identity", owner=OWNER)
+    if not registry.system_providers(ACCOUNTS):
+        registry.provide(ACCOUNTS, IdentityAccountsService(ctx), instance_ref="identity", owner=OWNER)

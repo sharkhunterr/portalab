@@ -34,8 +34,8 @@ describe("AppShell", () => {
     expect(screen.getByRole("banner")).toBe(banner); // same element: the shell was not remounted
     // 027: personal pages live in the avatar menu; the section of the current page is marked instead
     expect(screen.getByRole("button", { name: /Personal menu/ })).toBeInTheDocument();
-    // the section of the previous page folds away once another page is current
-    expect(screen.getByRole("button", { name: "Portal" })).toHaveAttribute("aria-expanded", "false");
+    // 027: a member section is a hub — one link, its pages as tabs; it is no longer marked once left
+    expect(screen.getByRole("link", { name: "Portal" })).not.toHaveAttribute("aria-current");
     const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
     expect(results.violations.map((v) => v.id)).toEqual([]);
   });

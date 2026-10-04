@@ -240,6 +240,9 @@ lossless migration.
 - [X] T098 Tests (backend integration, frontend unit, Playwright) for US8–US11; dev-mode verification on the LAN instance
 - [X] T099 [US10] Ship the first real connectors (Jellyfin, Plex, Seerr, Radarr, Sonarr, RomM) on a shared HTTP base, registered at start; conformance kit + mapping tests in `backend/src/portalab/connectors/`, `backend/tests/contract/connectors/`
 - [X] T100 [US10] Administration kit (AdminPage, AdminSection, AdminStats, AdminTable, StatusBadge, toolbar/forms) in `frontend/src/design-system/admin/` and every administration page rebuilt on it; guided "Add a service" wizard with connector cards
+- [X] T101 [US10] Service accounts ↔ members: connectors list their accounts (`service.accounts`), suggestions by e-mail then name, link/unlink/apply-all with past plays attributed, in `backend/src/portalab/modules/media/links/accounts.py` and the « Service accounts » tab of `frontend/src/features/admin/members/`
+- [X] T102 [US10] Edit a member (display name, e-mail, roles, linked service accounts): `PATCH /api/v1/users/{id}` in `backend/src/portalab/modules/identity/` and `frontend/src/features/admin/members/MemberEdit.tsx`
+- [X] T103 [US2] Member navigation in the hub spirit: every member section is one link whose pages are tabs, « My account » included, in `frontend/src/shell/nav/{SectionNav,HubTabs}.tsx`
 
 ## Dependencies & Execution Order
 

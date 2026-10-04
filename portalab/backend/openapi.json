@@ -20,6 +20,34 @@
         "title": "Accepted",
         "type": "object"
       },
+      "AccountLinkIn": {
+        "additionalProperties": false,
+        "properties": {
+          "external_user_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "External User Id",
+            "type": "string"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "required": [
+          "external_user_id"
+        ],
+        "title": "AccountLinkIn",
+        "type": "object"
+      },
       "AchievementIn": {
         "additionalProperties": false,
         "properties": {
@@ -142,6 +170,40 @@
           "display_name"
         ],
         "title": "AdminCreateUser",
+        "type": "object"
+      },
+      "AdminEditUser": {
+        "additionalProperties": false,
+        "description": "027: what an administrator may correct on an account (empty e-mail removes it).",
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "pattern": "^$|^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "title": "AdminEditUser",
         "type": "object"
       },
       "AdminReason": {
@@ -829,6 +891,25 @@
           "reason"
         ],
         "title": "AnomalyDecisionIn",
+        "type": "object"
+      },
+      "ApplySuggestionsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "service_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Id"
+          }
+        },
+        "title": "ApplySuggestionsIn",
         "type": "object"
       },
       "ArrangementIn": {
@@ -11237,6 +11318,17 @@
             ],
             "title": "Display Name"
           },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -16654,6 +16746,130 @@
         "summary": "Move Product",
         "tags": [
           "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/media/accounts": {
+      "get": {
+        "description": "027: every account of the connected services, its member (or a suggestion) \u2014 for the mapping screen.",
+        "operationId": "service_accounts_api_v1_admin_media_accounts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Service Accounts Api V1 Admin Media Accounts Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service Accounts",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/accounts/apply-suggestions": {
+      "post": {
+        "operationId": "apply_account_suggestions_api_v1_admin_media_accounts_apply_suggestions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplySuggestionsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Apply Account Suggestions Api V1 Admin Media Accounts Apply Suggestions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply Account Suggestions",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/accounts/{service_id}": {
+      "put": {
+        "operationId": "link_service_account_api_v1_admin_media_accounts__service_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountLinkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Link Service Account Api V1 Admin Media Accounts  Service Id  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Link Service Account",
+        "tags": [
+          "media"
         ]
       }
     },
@@ -31395,6 +31611,62 @@
           }
         },
         "summary": "Create User",
+        "tags": [
+          "identity-admin"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}": {
+      "patch": {
+        "operationId": "edit_user_api_v1_users__user_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminEditUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListItem"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "taken"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit User",
         "tags": [
           "identity-admin"
         ]

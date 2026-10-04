@@ -1315,6 +1315,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/media/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Service Accounts
+         * @description 027: every account of the connected services, its member (or a suggestion) — for the mapping screen.
+         */
+        get: operations["service_accounts_api_v1_admin_media_accounts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/accounts/apply-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply Account Suggestions */
+        post: operations["apply_account_suggestions_api_v1_admin_media_accounts_apply_suggestions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/accounts/{service_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Link Service Account */
+        put: operations["link_service_account_api_v1_admin_media_accounts__service_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/media/links/{link_id}/verify": {
         parameters: {
             query?: never;
@@ -6268,6 +6322,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit User */
+        patch: operations["edit_user_api_v1_users__user_id__patch"];
+        trace?: never;
+    };
     "/api/v1/users/{user_id}/avatar": {
         parameters: {
             query?: never;
@@ -6762,6 +6833,13 @@ export interface components {
              */
             status: "accepted";
         };
+        /** AccountLinkIn */
+        AccountLinkIn: {
+            /** External User Id */
+            external_user_id: string;
+            /** User Id */
+            user_id?: string | null;
+        };
         /** AchievementIn */
         AchievementIn: {
             /** Definition */
@@ -6794,6 +6872,16 @@ export interface components {
             email?: string | null;
             /** Login */
             login: string;
+        };
+        /**
+         * AdminEditUser
+         * @description 027: what an administrator may correct on an account (empty e-mail removes it).
+         */
+        AdminEditUser: {
+            /** Display Name */
+            display_name?: string | null;
+            /** Email */
+            email?: string | null;
         };
         /** AdminReason */
         AdminReason: {
@@ -7032,6 +7120,11 @@ export interface components {
         AnomalyDecisionIn: {
             /** Reason */
             reason: string;
+        };
+        /** ApplySuggestionsIn */
+        ApplySuggestionsIn: {
+            /** Service Id */
+            service_id?: string | null;
         };
         /** ArrangementIn */
         ArrangementIn: {
@@ -10848,6 +10941,8 @@ export interface components {
             created_at: string;
             /** Display Name */
             display_name: string | null;
+            /** Email */
+            email?: string | null;
             /**
              * Id
              * Format: uuid
@@ -14181,6 +14276,100 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarketplaceProductOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    service_accounts_api_v1_admin_media_accounts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    apply_account_suggestions_api_v1_admin_media_accounts_apply_suggestions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplySuggestionsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    link_service_account_api_v1_admin_media_accounts__service_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountLinkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -24157,6 +24346,48 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["VerificationTokenOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_user_api_v1_users__user_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminEditUser"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserListItem"];
+                };
+            };
+            /** @description taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

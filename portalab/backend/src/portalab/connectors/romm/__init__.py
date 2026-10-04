@@ -23,7 +23,7 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import LIBRARY
+from portalab.capabilities.media import ACCOUNTS, LIBRARY, ServiceAccount
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
 
@@ -51,7 +51,11 @@ class RommConnector(HttpConnector):
     category = "games"
     config_schema: type[BaseModel] = RommConfig
     secret_fields: frozenset[str] = frozenset({"password"})
-    provides: Sequence[CapabilityBinding] = (binding(LIBRARY, syncable=True), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (
+        binding(LIBRARY, syncable=True),
+        binding(HEALTH_PROBE),
+        binding(ACCOUNTS),
+    )
     status_path = "/api/users/me"
     public_path = "/api/heartbeat"
 
@@ -117,6 +121,8 @@ class RommConnector(HttpConnector):
             return _Covers(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
+        if capability == ACCOUNTS:
+            return _Accounts(self, service)
         return None
 
 
@@ -126,3 +132,18 @@ class _Covers:
 
     async def fetch_image(self, ref: str) -> bytes:
         return await self.connector.get_bytes(self.service, cover_path(ref))
+
+
+class _Accounts:
+    def __init__(self, connector: RommConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def list_accounts(self) -> Sequence[ServiceAccount]:
+        users = await self.connector.get_json(self.service, "/api/users")
+        if not isinstance(users, list):
+            raise InvalidPayload("unexpected /users payload")
+        return [
+            ServiceAccount(external_id=str(u["id"]), username=u.get("username"), email=u.get("email"))
+            for u in users
+            if u.get("id") is not None
+        ]

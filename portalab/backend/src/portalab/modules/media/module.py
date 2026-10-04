@@ -61,6 +61,7 @@ from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.identity.resolver import IdentityResolver
 from portalab.modules.media.images.service import JOB as IMAGE_JOB
 from portalab.modules.media.images.service import ImageService
+from portalab.modules.media.links.accounts import AccountMatching
 from portalab.modules.media.links.service import UserLinkService
 from portalab.modules.media.models import MatchCandidate, PlaybackSession, SourceItem
 from portalab.modules.media.observability import log, metrics
@@ -148,6 +149,7 @@ class MediaModule:
         )
         self.library = LibrarySink(self.writer, types, clock=clock)
         self.links = UserLinkService(database, capabilities, clock=clock)
+        self.accounts = AccountMatching(database, capabilities, clock=clock)
         self.poller = PlaybackPoller(
             database, events, capabilities, self.links, lambda: self.config, self.threshold, clock=clock
         )

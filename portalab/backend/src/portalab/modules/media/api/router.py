@@ -597,6 +597,83 @@ async def unlinked(_: Manager, module: Module) -> list[dict[str, Any]]:
         ]
 
 
+class AccountLinkIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    external_user_id: str = Field(min_length=1, max_length=200)
+    user_id: UUID | None = None
+
+
+class ApplySuggestionsIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    service_id: UUID | None = None
+
+
+def _suggestion(value: tuple[UUID, str] | None) -> dict[str, str] | None:
+    return {"user_id": str(value[0]), "reason": value[1]} if value else None
+
+
+@router.get("/admin/media/accounts")
+async def service_accounts(_: Manager, module: Module) -> dict[str, Any]:
+    """027: every account of the connected services, its member (or a suggestion) — for the mapping screen."""
+    blocks, members = await module.accounts.overview()
+    return {
+        "services": [
+            {
+                "service_id": b.service_id,
+                "name": b.name,
+                "connector": b.connector,
+                "available": b.available,
+                "accounts": [
+                    {
+                        "external_id": a.external_id,
+                        "username": a.username,
+                        "display_name": a.display_name,
+                        "email": a.email,
+                        "linked_user_id": str(a.linked_user_id) if a.linked_user_id else None,
+                        "verified": a.verified,
+                        "suggestion": (
+                            {"user_id": str(a.suggestion[0]), "reason": a.suggestion[1]}
+                            if a.suggestion
+                            else None
+                        ),
+                        "unlinked_sessions": a.unlinked_sessions,
+                    }
+                    for a in b.accounts
+                ],
+            }
+            for b in blocks
+        ],
+        "members": [
+            {"id": str(m.id), "login": m.login, "display_name": m.display_name, "email": m.email}
+            for m in members
+        ],
+    }
+
+
+@router.put("/admin/media/accounts/{service_id}")
+async def link_service_account(
+    principal: Manager, service_id: UUID, body: AccountLinkIn, module: Module
+) -> dict[str, Any]:
+    attributed = await module.accounts.link(service_id, body.external_user_id, body.user_id)
+    await _audit(
+        module,
+        principal,
+        "media.account_linked" if body.user_id else "media.account_unlinked",
+        str(service_id),
+        {"attributed_sessions": attributed},
+    )
+    return {"linked": body.user_id is not None, "attributed_sessions": attributed}
+
+
+@router.post("/admin/media/accounts/apply-suggestions")
+async def apply_account_suggestions(
+    principal: Manager, body: ApplySuggestionsIn, module: Module
+) -> dict[str, int]:
+    made = await module.accounts.apply_suggestions(body.service_id)
+    await _audit(module, principal, "media.account_suggestions_applied", "accounts", {"linked": made})
+    return {"linked": made}
+
+
 @router.post("/admin/media/links/{link_id}/verify", response_model=MediaLinkOut)
 async def admin_verify_link(principal: Manager, link_id: UUID, module: Module) -> MediaLinkOut:
     view = await module.links.verify(None, link_id, None)

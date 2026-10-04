@@ -22,8 +22,10 @@ from portalab.capabilities.connector_sdk import (
 )
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
+    ACCOUNTS,
     LIBRARY,
     PLAYBACK,
+    ServiceAccount,
     SourceHistoryItem,
     SourcePlayback,
 )
@@ -74,6 +76,7 @@ class JellyfinConnector(HttpConnector):
         binding(LIBRARY, syncable=True),
         binding(PLAYBACK),
         binding(HEALTH_PROBE),
+        binding(ACCOUNTS),
     )
     status_path = "/System/Info"
     public_path = "/System/Info/Public"
@@ -142,6 +145,8 @@ class JellyfinConnector(HttpConnector):
             return _Playback(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
+        if capability == ACCOUNTS:
+            return _Accounts(self, service)
         return None
 
 
@@ -222,3 +227,18 @@ class _Playback:
                     )
                 )
         return sorted(history, key=lambda h: h.occurred_at)
+
+
+class _Accounts:
+    def __init__(self, connector: JellyfinConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def list_accounts(self) -> Sequence[ServiceAccount]:
+        users = await self.connector.get_json(self.service, "/Users")
+        if not isinstance(users, list):
+            raise InvalidPayload("unexpected /Users payload")
+        return [
+            ServiceAccount(external_id=str(u["Id"]), username=u.get("Name"), display_name=u.get("Name"))
+            for u in users
+            if u.get("Id")
+        ]

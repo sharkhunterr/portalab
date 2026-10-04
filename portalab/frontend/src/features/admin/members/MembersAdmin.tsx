@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
+import { useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import {
   AdminPage,
@@ -23,12 +24,15 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import "../admin.css";
+import { MemberEdit } from "./MemberEdit";
+import { ServiceAccountsPanel } from "./ServiceAccountsPanel";
 
 /**
  * Members (027 hubs; identity 002 admin API): every account with its state, creation and last sign-in,
  * searchable and filtered by state; invite a member (a verification link to share), resend it, suspend or
- * reactivate, ask for deletion (with the legal delay) or cancel it. The server enforces every right and
- * protects the sole administrator.
+ * reactivate, ask for deletion (with the legal delay) or cancel it; edit a member (name, e-mail, roles,
+ * linked service accounts). A second tab maps the accounts of the connected services to members. The server
+ * enforces every right and protects the sole administrator.
  */
 interface Member {
   id: string;
@@ -37,6 +41,7 @@ interface Member {
   state: string;
   created_at: string;
   last_sign_in_at: string | null;
+  email?: string | null;
 }
 
 const KEY = ["admin", "members"] as const;
@@ -172,6 +177,18 @@ function MemberActions({ member, onLink }: { member: Member; onLink: (token: str
   const name = member.display_name ?? member.login ?? "";
   return (
     <>
+      <Dialog
+        size="lg"
+        title={t("admin:members.editTitle", { name })}
+        closeLabel={t("admin:services.close")}
+        trigger={
+          <Button variant="secondary" aria-label={`${t("admin:members.edit")} ${name}`}>
+            {t("admin:members.edit")}
+          </Button>
+        }
+      >
+        <MemberEdit member={member} />
+      </Dialog>
       {act.isError ? (
         <span role="alert" className="admin-muted">
           {act.error instanceof ApiError ? act.error.message : t("admin:members.refused")}
@@ -228,22 +245,12 @@ function MemberActions({ member, onLink }: { member: Member; onLink: (token: str
   );
 }
 
+const TABS = ["members", "accounts"] as const;
+
 export default function MembersAdmin() {
   const t = useT();
-  const format = useFormat();
-  const members = useQuery({ queryKey: KEY, queryFn: allMembers });
-  const [query, setQuery] = useState("");
-  const [state, setState] = useState("all");
-  const [link, setLink] = useState<string | null>(null);
-  const all = members.data ?? [];
-  const count = (s: string) => all.filter((m) => m.state === s).length;
-  const needle = query.trim().toLowerCase();
-  const shown = all.filter(
-    (m) =>
-      (state === "all" || m.state === state) &&
-      (!needle || `${m.login ?? ""} ${m.display_name ?? ""}`.toLowerCase().includes(needle)),
-  );
-  const ago = (iso: string | null) => (iso ? format.relative((Date.parse(iso) - Date.now()) / 1000) : "—");
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") === "accounts" ? "accounts" : "members";
   return (
     <AdminPage
       icon="users"
@@ -263,7 +270,38 @@ export default function MembersAdmin() {
           <InviteForm />
         </Dialog>
       }
+      tabs={
+        <AdminTabs
+          label={t("admin:members.title")}
+          current={tab}
+          onChange={(next) => setParams(next === "members" ? {} : { tab: next }, { replace: true })}
+          tabs={TABS.map((key) => ({ key, label: t(`admin:members.tabs.${key}`) }))}
+        />
+      }
     >
+      {tab === "members" ? <MembersPanel /> : <ServiceAccountsPanel />}
+    </AdminPage>
+  );
+}
+
+function MembersPanel() {
+  const t = useT();
+  const format = useFormat();
+  const members = useQuery({ queryKey: KEY, queryFn: allMembers });
+  const [query, setQuery] = useState("");
+  const [state, setState] = useState("all");
+  const [link, setLink] = useState<string | null>(null);
+  const all = members.data ?? [];
+  const count = (s: string) => all.filter((m) => m.state === s).length;
+  const needle = query.trim().toLowerCase();
+  const shown = all.filter(
+    (m) =>
+      (state === "all" || m.state === state) &&
+      (!needle || `${m.login ?? ""} ${m.display_name ?? ""} ${m.email ?? ""}`.toLowerCase().includes(needle)),
+  );
+  const ago = (iso: string | null) => (iso ? format.relative((Date.parse(iso) - Date.now()) / 1000) : "—");
+  return (
+    <>
       <AdminStats
         label={t("admin:members.title")}
         stats={[
@@ -332,7 +370,10 @@ export default function MembersAdmin() {
                   <Avatar name={m.display_name ?? m.login ?? "?"} userId={m.id} size="sm" decorative />
                   <span className="services-admin__name">
                     <strong>{m.display_name ?? m.login}</strong>
-                    <span className="admin-muted">@{m.login}</span>
+                    <span className="admin-muted">
+                      @{m.login}
+                      {m.email ? ` · ${m.email}` : ""}
+                    </span>
                   </span>
                 </span>
               ),
@@ -352,6 +393,6 @@ export default function MembersAdmin() {
           actions={(m) => <MemberActions member={m} onLink={setLink} />}
         />
       </AdminSection>
-    </AdminPage>
+    </>
   );
 }

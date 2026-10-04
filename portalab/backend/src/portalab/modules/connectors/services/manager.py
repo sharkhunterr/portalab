@@ -662,11 +662,24 @@ class ServiceManager:
         """Rebuild this process's provider registrations from the stored states (start-up, refresh)."""
         provided = 0
         self.declare_specs()
-        async with self.database.session() as session:
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
             rows = (await session.execute(select(Service))).scalars().all()
             caps_by_service: dict[UUID, dict[str, ServiceCapability]] = {}
             for cap in (await session.execute(select(ServiceCapability))).scalars():
                 caps_by_service.setdefault(cap.service_id, {})[cap.capability] = cap
+            # a connector upgrade may bring a capability the stored service does not know yet (027: the
+            # accounts of a service): it is enabled like the ones present at configuration
+            for row in rows:
+                connector = self.connectors.get(row.connector_key)
+                known = caps_by_service.setdefault(row.id, {})
+                for binding in connector.provides if connector is not None else ():
+                    if binding.spec.name not in known:
+                        added = ServiceCapability(
+                            service_id=row.id, capability=binding.spec.name, enabled=True, priority=100
+                        )
+                        session.add(added)
+                        known[binding.spec.name] = added
         for row in rows:
             self._withdraw(row.id)
             if row.state in ACTIVE:

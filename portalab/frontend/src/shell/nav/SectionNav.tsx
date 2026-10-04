@@ -32,14 +32,42 @@ export function currentEntry(sections: readonly NavSection[], pathname: string):
     .sort((a, b) => (b.route?.length ?? 0) - (a.route?.length ?? 0))[0];
 }
 
-/** The Administration hub holding the current page (its pages become tabs, 027). */
-export function currentHub(sections: readonly NavSection[], pathname: string): NavTopic | undefined {
+/** A place grouping related pages, shown as tabs above the content (027). */
+export interface Hub {
+  key: string;
+  label_key: string;
+  icon?: string | null | undefined;
+  entries: NavEntry[];
+  audience: string;
+}
+
+/**
+ * Member sections are hubs too (027): one link in the navigation (to their first page) and their pages as
+ * tabs — the same spirit as the Administration hubs. A single-page section stays a direct link.
+ */
+export function isHubSection(section: NavSection): boolean {
+  return section.audience !== "administration" && !section.direct && sectionEntries(section).length > 1;
+}
+
+/** The hub holding the current page: an Administration hub, a member section or « My account » (027). */
+export function currentHub(sections: readonly NavSection[], pathname: string): Hub | undefined {
   const entry = currentEntry(sections, pathname);
   if (!entry) return undefined;
-  return sections
-    .filter((section) => section.audience === "administration")
-    .flatMap((section) => section.topics)
-    .find((topic) => topic.entries.some((e) => e.key === entry.key));
+  for (const section of sections) {
+    if (section.audience === "administration") {
+      const topic = section.topics.find((t: NavTopic) => t.entries.some((e) => e.key === entry.key));
+      if (topic) return { ...topic, icon: topic.icon, audience: section.audience };
+    } else if (sectionEntries(section).some((e) => e.key === entry.key)) {
+      return {
+        key: section.key,
+        label_key: section.label_key,
+        icon: section.icon,
+        entries: sectionEntries(section),
+        audience: section.audience,
+      };
+    }
+  }
+  return undefined;
 }
 
 export interface SectionNavProps {
@@ -72,7 +100,7 @@ export function SectionNav({ sections, variant = "list", onNavigate }: SectionNa
       {sections.map((section) => {
         const active = sectionEntries(section).some((entry) => entry.key === current?.key);
         const props = { section, active, currentKey: current?.key, onNavigate };
-        if (section.direct) {
+        if (section.direct || isHubSection(section)) {
           return (
             <li key={section.key}>
               <DirectLink {...props} compact={variant === "rail"} />
@@ -109,9 +137,10 @@ interface ItemProps {
   onNavigate: (() => void) | undefined;
 }
 
+/** A direct link: a single-page section, or a member hub opening on its first page (its pages are tabs). */
 function DirectLink({ section, active, onNavigate, compact = false }: ItemProps & { compact?: boolean }) {
   const strings = useShellStrings();
-  const entry = section.entries[0] as NavEntry;
+  const entry = sectionEntries(section)[0] as NavEntry;
   const label = strings.label(section.label_key);
   return (
     <NavLink
@@ -119,7 +148,7 @@ function DirectLink({ section, active, onNavigate, compact = false }: ItemProps 
       end={entry.route === "/"}
       className="shell-section__head"
       data-active={active ? "true" : undefined}
-      aria-current={active ? "page" : undefined}
+      aria-current={active ? (section.direct ? "page" : "true") : undefined}
       aria-label={compact ? label : undefined}
       title={compact ? label : undefined}
       onClick={onNavigate}

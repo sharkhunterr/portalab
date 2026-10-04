@@ -609,6 +609,16 @@
   color: var(--color-accent-contrast);
   background: var(--color-accent);
 }
+/* member hubs (027): the hub names the place, the page header below gets compact */
+.hub-tabs:not([data-audience="administration"]) .hub-tabs__title {
+  font-size: var(--font-size-xl);
+}
+.hub-tabs:not([data-audience="administration"]) ~ * .ds-page-header__title {
+  font-size: var(--font-size-lg);
+}
+.hub-tabs:not([data-audience="administration"]) ~ * .ds-page-header__icon {
+  display: none;
+}
 .hub-tabs ~ * .admin-page > .ds-page-header .ds-page-header__title,
 .hub-tabs ~ .admin-page > .ds-page-header .ds-page-header__title {
   font-size: var(--font-size-lg);

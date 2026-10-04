@@ -10,16 +10,19 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from portalab.capabilities.admin_authority import AdminAuthorityError
 from portalab.core.authz_port import Principal
 from portalab.core.errors import BadRequest, Conflict
 from portalab.modules.identity.context import IdentityContext
+from portalab.modules.identity.domain.display_name import clean_display_name, display_name_key
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.models import User
 from portalab.modules.identity.observability import metrics
-from portalab.modules.identity.services.account_service import AccountService
+from portalab.modules.identity.services.account_service import AccountService, is_unique_violation
 from portalab.modules.identity.services.common import (
+    DisplayNameTaken,
     SoleAdminProtected,
     admin_actor,
     audit,
@@ -39,6 +42,7 @@ class UserRow:
     state: str
     created_at: datetime
     last_sign_in_at: datetime | None
+    email: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,10 +90,60 @@ class AdminOperations:
             users = list((await session.execute(statement)).scalars())
         page = users[:limit]
         items = [
-            UserRow(u.id, u.login_display, u.display_name, u.state, u.created_at, u.last_sign_in_at)
+            UserRow(u.id, u.login_display, u.display_name, u.state, u.created_at, u.last_sign_in_at, u.email)
             for u in page
         ]
         return UserPage(items, str(page[-1].id) if len(users) > limit else None)
+
+    async def edit(
+        self,
+        principal: Principal,
+        user_id: UUID,
+        *,
+        display_name: str | None = None,
+        email: str | None = None,
+        clear_email: bool = False,
+    ) -> UserRow:
+        """027: an administrator corrects a member's display name or e-mail (audited, values not logged)."""
+        changed: list[str] = []
+        async with self.ctx.database.unit_of_work() as uow:
+            user = await self.accounts.get_for_update(uow.session, user_id)
+            if display_name is not None and clean_display_name(display_name) != user.display_name:
+                user.display_name = clean_display_name(display_name)
+                user.display_name_key = display_name_key(display_name)
+                try:
+                    async with uow.session.begin_nested():
+                        await uow.session.flush()
+                except IntegrityError as exc:
+                    if is_unique_violation(exc, "uq_users_display_name_key"):
+                        raise DisplayNameTaken() from exc
+                    raise
+                changed.append("display_name")
+            new_email = None if clear_email else (email.strip() if email is not None else user.email)
+            if new_email != user.email:
+                user.email = new_email
+                changed.append("email")
+            if changed:
+                user.updated_at = self.ctx.now()
+                await audit(
+                    self.ctx,
+                    uow.session,
+                    "user.admin_edited",
+                    principal,
+                    resource=user_ref(user_id),
+                    decision="allow",
+                    context={"fields": changed},
+                    sensitive=True,
+                )
+            return UserRow(
+                user.id,
+                user.login_display,
+                user.display_name,
+                user.state,
+                user.created_at,
+                user.last_sign_in_at,
+                user.email,
+            )
 
     async def transfer_admin(self, principal: Principal, target_id: UUID) -> None:
         """Atomic hand-over through ``authz.admin_authority``: exactly one Admin before and after."""

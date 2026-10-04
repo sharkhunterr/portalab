@@ -111,6 +111,14 @@ class UserListItem(BaseModel):
     state: str
     created_at: datetime
     last_sign_in_at: datetime | None
+    email: str | None = None  # administrators only (this list requires ``users.manage``)
+
+
+class AdminEditUser(Strict):
+    """027: what an administrator may correct on an account (empty e-mail removes it)."""
+
+    display_name: str | None = Field(default=None, min_length=1, max_length=64)
+    email: str | None = Field(default=None, max_length=320, pattern=r"^$|" + EMAIL_PATTERN)
 
 
 class UserList(BaseModel):

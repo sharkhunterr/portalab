@@ -2,22 +2,29 @@ import { NavLink, useLocation } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useShellStrings } from "../strings";
 import { useNavigationView } from "./NavigationProvider";
-import { currentEntry, currentHub } from "./SectionNav";
+import { currentEntry, currentHub, type Hub, isCurrent } from "./SectionNav";
 
 /**
- * Administration hub tabs (027): the pages of the hub holding the current page, above the content — one
- * place per subject (support, communication, services…) instead of pages scattered in the menu. Only the
- * pages the viewer may open are listed (the server filters the navigation); hidden with a single page.
+ * Hub tabs (027): the pages of the hub holding the current page, above the content — one place per subject
+ * instead of pages scattered in the menu. Administration hubs (support, communication, services…), member
+ * sections (media, community, support…) and « My account » work the same way. Only the pages the viewer
+ * may open are listed (the server filters the navigation); hidden with a single page.
  */
 export function HubTabs() {
   const strings = useShellStrings();
   const location = useLocation();
   const { view } = useNavigationView();
-  const hub = currentHub(view.sections, location.pathname);
+  // « My account » (027): the personal pages of the avatar menu are a hub too
+  const personal = [...view.personal]
+    .filter((entry) => isCurrent(entry.route, location.pathname))
+    .sort((a, b) => (b.route?.length ?? 0) - (a.route?.length ?? 0))[0];
+  const hub: Hub | undefined = personal
+    ? { key: "me", label_key: "nav.section.me", icon: "user", entries: view.personal, audience: "personal" }
+    : currentHub(view.sections, location.pathname);
   if (!hub || hub.entries.length < 2) return null;
-  const current = currentEntry(view.sections, location.pathname);
+  const current = personal ?? currentEntry(view.sections, location.pathname);
   return (
-    <nav className="hub-tabs" aria-label={strings.label(hub.label_key)}>
+    <nav className="hub-tabs" data-audience={hub.audience} aria-label={strings.label(hub.label_key)}>
       <p className="hub-tabs__title">
         <Icon name={hub.icon ?? "settings"} size={24} />
         {strings.label(hub.label_key)}
@@ -26,7 +33,7 @@ export function HubTabs() {
         {hub.entries.map((entry) => (
           <li key={entry.key}>
             <NavLink
-              to={entry.route ?? "/admin"}
+              to={entry.route ?? "/"}
               end
               aria-current={entry.key === current?.key ? "page" : undefined}
               data-active={entry.key === current?.key ? "true" : undefined}

@@ -15,6 +15,7 @@ CAPABILITY = "identity.directory"
 CONTACT = "identity.contact"
 MEMBERS = "identity.members"
 VERIFICATION_CHANNEL = "identity.verification_channel"
+ACCOUNTS = "identity.accounts"
 
 AccountState = Literal[
     "pending_verification", "active", "inactive", "suspended", "pending_deletion", "deleted"
@@ -65,6 +66,29 @@ class VerificationChannel(Protocol):
     async def deliver(self, user_id: UUID, token: str, expires_at: datetime) -> None: ...
 
 
+@dataclass(frozen=True, slots=True)
+class AccountSummary:
+    id: UUID
+    login: str | None
+    display_name: str | None
+    email: str | None
+
+
+@runtime_checkable
+class AccountDirectory(Protocol):
+    """027: the live accounts with their login, name and e-mail, for administrators matching a member
+    with their accounts on connected services. Never shown to other members."""
+
+    async def accounts(self) -> list[AccountSummary]: ...
+
+
+ACCOUNTS_SPEC = CapabilitySpec(
+    name=ACCOUNTS,
+    version="1.0",
+    protocol=AccountDirectory,
+    multi_provider=False,
+    description="Accounts with login, name and e-mail for administrative matching (owned by identity).",
+)
 CONTACT_SPEC = CapabilitySpec(
     name=CONTACT,
     version="1.0",

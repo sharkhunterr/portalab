@@ -11,6 +11,7 @@ from portalab.modules.identity.api.auth import client_ip
 from portalab.modules.identity.api.middleware import identity_module
 from portalab.modules.identity.api.schemas import (
     AdminCreateUser,
+    AdminEditUser,
     AdminReason,
     AdminTransferRequest,
     DeletionStatus,
@@ -45,6 +46,7 @@ async def list_users(
                 state=row.state,
                 created_at=row.created_at,
                 last_sign_in_at=row.last_sign_in_at,
+                email=row.email,
             )
             for row in page.items
         ],
@@ -61,6 +63,28 @@ async def create_user(
     )
     return VerificationTokenOut(
         user_id=issued.user_id, verification_token=issued.token, expires_at=issued.expires_at
+    )
+
+
+@router.patch("/users/{user_id}", response_model=UserListItem, responses={409: {"description": "taken"}})
+async def edit_user(
+    user_id: UUID, body: AdminEditUser, module: Module, principal: Principal = require("users.manage")
+) -> UserListItem:
+    row = await module.admin.edit(
+        principal,
+        user_id,
+        display_name=body.display_name,
+        email=body.email or None,
+        clear_email=body.email == "",
+    )
+    return UserListItem(
+        id=row.id,
+        login=row.login,
+        display_name=row.display_name,
+        state=row.state,
+        created_at=row.created_at,
+        last_sign_in_at=row.last_sign_in_at,
+        email=row.email,
     )
 
 

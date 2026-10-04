@@ -41,6 +41,7 @@ EXPECTED_PERMISSIONS = {
     ("GET", "/api/v1/users/{user_id}/avatar"): "users.read",
     ("GET", "/api/v1/users"): "users.manage",
     ("POST", "/api/v1/users"): "users.manage",
+    ("PATCH", "/api/v1/users/{user_id}"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/verification"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/suspend"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/reactivate"): "users.manage",

@@ -25,6 +25,7 @@ from portalab.capabilities.results import CapabilityResult
 LIBRARY = "media.library"
 PLAYBACK = "media.playback"
 REQUESTS = "request.service"
+ACCOUNTS = "service.accounts"
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
 RequestState = Literal["pending", "approved", "declined", "processing", "available", "failed", "cancelled"]
@@ -144,6 +145,21 @@ class RequestService(Protocol):
     async def status(self, external_request_id: str) -> SourceRequest: ...
 
 
+@dataclass(frozen=True, slots=True)
+class ServiceAccount:
+    """An account on a connected service (027): what an administrator matches with a portal member."""
+
+    external_id: str
+    username: str | None = None
+    display_name: str | None = None
+    email: str | None = None
+
+
+@runtime_checkable
+class ServiceAccounts(Protocol):
+    async def list_accounts(self) -> Sequence[ServiceAccount]: ...
+
+
 def _spec(name: str, protocol: type[Any], description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=True, description=description
@@ -154,4 +170,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(LIBRARY, MediaLibrary, "Media library of one service (sync records + images)"),
     _spec(PLAYBACK, MediaPlayback, "Live playback sessions and recent history of one service"),
     _spec(REQUESTS, RequestService, "Media requests on one request service"),
+    _spec(ACCOUNTS, ServiceAccounts, "User accounts of one service, to match with portal members (027)"),
 )
