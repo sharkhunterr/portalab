@@ -1,6 +1,6 @@
 # portalab Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-10-01 (consolidated after the pre-implementation audit)
+Auto-generated from all feature plans. Last updated: 2026-10-04 (consolidated after the pre-implementation audit)
 
 ## Active Technologies
 - Backend: Python 3.12 · FastAPI · Pydantic 2 · SQLAlchemy 2 (async) + asyncpg · Alembic · httpx · uv · ruff · mypy · import-linter (001)
@@ -9,6 +9,7 @@ Auto-generated from all feature plans. Last updated: 2026-10-01 (consolidated af
 - Frontend: TypeScript 5.9 on Node 22 LTS · React 19 · Vite 7 · TanStack Query · React Router · Radix UI + Tailwind on CSS-variable tokens · react-intl · Recharts · Mermaid (strict) · Biome · Vitest · Playwright + axe (001, 004, 011, 017, 022, 026)
 - Domain libraries: `argon2-cffi`, `Pillow` (002); `Babel`, `tzdata` (026); `markdown-it-py`, `nh3`, `diff-match-patch` (011); `aiosmtplib` (010); `jsonschema`, optional `mcp` (018, 019); `packaging` (023)
 - Delivery: single Docker image (`serve` / `worker`) + PostgreSQL; GitLab CI stages validate/test/build/publish (001)
+- Visual experience: `lucide-react` icons, self-hosted `@fontsource-variable/inter` + `plus-jakarta-sans`; theme schema v2 (layout/motion/sound profiles, families); dashboard `x`,`y` arrangement (`dashboard_0002`) (027)
 
 ## Project Structure
 
@@ -48,6 +49,7 @@ portalab/scripts/smoke.sh
 Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain): follow standard conventions; layers `core ← capabilities ← modules|connectors ← app`; plugins import only `portalab.sdk`.
 
 ## Recent Changes
+- 027-visual-experience planned: personal header, navigation sections, responsive frames, page kit, theme v2, 2D dashboard editor.
 - All 26 specs planned (research, data model, contracts, quickstart, plan, tasks) in roadmap order; audit 2026-10-01 aligned names/ownership (see `decisions/CANONICAL_DECISIONS.md` §7 and `decisions/PLAN_FOLLOWUPS.md`).
 
 <!-- MANUAL ADDITIONS START -->
