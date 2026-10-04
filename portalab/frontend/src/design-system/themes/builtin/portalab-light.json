@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "key": "portalab-light",
+  "name": "Portalab (light)",
+  "family": "portalab",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f5f6fb",
+    "surfaceRaised": "#ffffff",
+    "text": "#141824",
+    "textMuted": "#4a5368",
+    "border": "#d5d9e4",
+    "accent": "#3a55d0",
+    "accentContrast": "#ffffff",
+    "focus": "#3a55d0",
+    "accentAlt": "#a35f00",
+    "rarity": {
+      "common": "#5b6477",
+      "rare": "#1767bd",
+      "epic": "#8436cc",
+      "legendary": "#a35f00"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b4252",
+      "bg": "#eceff4",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#15603a",
+      "bg": "#e3f4ea",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#fdf1dc",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6b4a00",
+      "bg": "#faf1d7",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#a1121d",
+      "bg": "#fde7e8",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#57303a",
+      "bg": "#f3e6ea",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b2b8f",
+      "bg": "#ede6fb",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a1f52",
+      "bg": "#f9e4ef",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#3f4652",
+      "bg": "#eef0f3",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#0f4c75",
+      "bg": "#e1eff8",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Inter Variable, system-ui, sans-serif"
+  },
+  "radii": {
+    "sm": 0.5,
+    "md": 1
+  },
+  "motion": {
+    "fastMs": 140,
+    "normalMs": 260,
+    "profile": "lively",
+    "celebration": "confetti"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "sidebar",
+      "tablet": "rail",
+      "phone": "bottom-bar"
+    },
+    "header": "full",
+    "headerPosition": "top",
+    "cards": "elevated",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline"
+  },
+  "background": {
+    "fallback": "#f5f6fb"
+  },
+  "sounds": {
+    "notification": "asset:portalab/notification.wav",
+    "alert": "asset:portalab/alert.wav",
+    "success": "asset:portalab/success.wav",
+    "reward": "asset:portalab/reward.wav",
+    "levelUp": "asset:portalab/level-up.wav",
+    "ui": "asset:portalab/ui.wav"
+  },
+  "notification": {
+    "position": "top-end",
+    "durationSeconds": 6,
+    "style": "toast"
+  }
+}

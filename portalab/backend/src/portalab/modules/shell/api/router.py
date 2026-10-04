@@ -35,6 +35,7 @@ class Layout(BaseModel):
     pinned: list[str] = Field(default_factory=list, max_length=50)
     groups_of: dict[str, str] = Field(default_factory=dict)
     group_order: list[str] = Field(default_factory=list, max_length=50)
+    section_labels: dict[str, str] = Field(default_factory=dict)  # 027: rename a section (an i18n key)
 
 
 @router.get("/me/navigation")
@@ -53,13 +54,21 @@ async def my_navigation(
 async def get_layout(_: Manager, request: Request, module: Module) -> dict[str, Any]:
     providers = request.app.state.capabilities.system_providers(CONFIG)
     layout = (await providers[0].provider.get("shell.navigation.layout")).value if providers else {}
-    return {"layout": layout, "entries": [c.key for c in module.registry.all() if c.kind == "entry"]}
+    return {
+        "layout": layout,
+        "entries": [c.key for c in module.registry.all() if c.kind == "entry"],
+        "sections": [s.key for s in module.registry.sections()],
+    }
 
 
 @router.put("/admin/shell/layout")
 async def put_layout(principal: Manager, body: Layout, request: Request, module: Module) -> dict[str, Any]:
     known = {c.key for c in module.registry.all() if c.kind == "entry"}
+    sections = {s.key for s in module.registry.sections()}
     unknown = sorted((set(body.order) | set(body.pinned) | set(body.groups_of)) - known)
+    unknown += sorted(
+        f"section:{key}" for key in (set(body.groups_of.values()) | set(body.section_labels)) - sections
+    )
     if unknown:
         raise ValidationFailed(
             "The layout references unknown navigation entries.",

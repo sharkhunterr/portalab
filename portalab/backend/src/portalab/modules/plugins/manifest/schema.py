@@ -138,6 +138,7 @@ SCHEMA: dict[str, Any] = {
             "additionalProperties": False,
             "properties": {
                 "nav": {**_LIST, "items": {"type": "object"}},
+                "sections": {**_LIST, "items": {"type": "object"}},
                 "pages": {**_LIST, "items": {"type": "object"}},
                 "widgets": {**_LIST, "items": {"type": "object"}},
                 "notification_categories": {**_LIST, "items": {"type": "object"}},

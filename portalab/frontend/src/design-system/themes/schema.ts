@@ -40,7 +40,26 @@ export const ICON_IDS = [
   "sync",
 ] as const;
 
-export const THEME_SCHEMA_VERSION = 1;
+export const THEME_SCHEMA_VERSION = 2;
+
+/**
+ * Layout, motion and sound vocabulary (spec 027 R7/R24): a theme *chooses* among arrangements the portal
+ * implements — including ones that change the arrangement principle (header as a footer bar, an orbit
+ * bubble instead of a menu) — and never ships structure or code of its own.
+ */
+export const NAV_DESKTOP = ["sidebar", "topbar", "rail", "orbit"] as const;
+export const NAV_TABLET = ["rail", "topbar", "drawer", "orbit"] as const;
+export const NAV_PHONE = ["bottom-bar", "drawer", "orbit"] as const;
+export const HEADER_STYLES = ["full", "compact", "centered"] as const;
+export const HEADER_POSITIONS = ["top", "bottom"] as const;
+export const CARD_STYLES = ["elevated", "flat", "outlined", "glass"] as const;
+export const CONTENT_WIDTHS = ["narrow", "wide", "full"] as const;
+export const CORNER_STYLES = ["square", "soft", "round"] as const;
+export const WIDGET_FRAMES = ["card", "plain", "glass"] as const;
+export const MOTION_PROFILES = ["none", "subtle", "lively", "playful"] as const;
+export const CELEBRATIONS = ["none", "sparkle", "confetti", "glow"] as const;
+export const SOUND_EVENTS = ["notification", "alert", "success", "reward", "levelUp", "ui"] as const;
+export const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 
 const color = z.string().max(64).refine(isColor, { message: "expected a #hex or rgb()/rgba() color" });
 const asset = z.string().regex(/^asset:[a-z0-9][a-z0-9._/-]{0,127}$/, "expected a bundled asset reference");
@@ -63,10 +82,30 @@ const stateStyle = z.strictObject({
   display: z.enum(["inline", "block", "none"]).optional(),
 });
 
+const layoutSchema = z.strictObject({
+  nav: z
+    .strictObject({
+      desktop: z.enum(NAV_DESKTOP).optional(),
+      tablet: z.enum(NAV_TABLET).optional(),
+      phone: z.enum(NAV_PHONE).optional(),
+    })
+    .optional(),
+  header: z.enum(HEADER_STYLES).optional(),
+  headerPosition: z.enum(HEADER_POSITIONS).optional(),
+  cards: z.enum(CARD_STYLES).optional(),
+  content: z.enum(CONTENT_WIDTHS).optional(),
+  corners: z.enum(CORNER_STYLES).optional(),
+  widgetFrame: z.enum(WIDGET_FRAMES).optional(),
+});
+
 export const themeDefinitionSchema = z.strictObject({
-  schemaVersion: z.literal(THEME_SCHEMA_VERSION),
+  schemaVersion: z.union([z.literal(1), z.literal(THEME_SCHEMA_VERSION)]),
   key: z.string().regex(/^[a-z][a-z0-9-]{1,47}$/),
   name: z.string().min(1).max(80),
+  family: z
+    .string()
+    .regex(/^[a-z][a-z0-9-]{1,47}$/)
+    .optional(),
   colorScheme: z.enum(["light", "dark"]),
   colors: z.strictObject({
     surface: color,
@@ -77,6 +116,15 @@ export const themeDefinitionSchema = z.strictObject({
     accent: color,
     accentContrast: color,
     focus: color,
+    accentAlt: color.optional(),
+    rarity: z
+      .strictObject(
+        Object.fromEntries(RARITIES.map((rarity) => [rarity, color])) as Record<
+          (typeof RARITIES)[number],
+          typeof color
+        >,
+      )
+      .optional(),
   }),
   states: z.strictObject(
     Object.fromEntries(FUNCTIONAL_STATES.map((state) => [state, stateStyle])) as Record<
@@ -99,13 +147,19 @@ export const themeDefinitionSchema = z.strictObject({
     .optional(),
   radii: z.strictObject({ sm: z.number().min(0).max(2), md: z.number().min(0).max(3) }).optional(),
   motion: z
-    .strictObject({ fastMs: z.number().int().min(0).max(1000), normalMs: z.number().int().min(0).max(2000) })
+    .strictObject({
+      fastMs: z.number().int().min(0).max(1000).optional(),
+      normalMs: z.number().int().min(0).max(2000).optional(),
+      profile: z.enum(MOTION_PROFILES).optional(),
+      celebration: z.enum(CELEBRATIONS).optional(),
+    })
     .optional(),
+  layout: layoutSchema.optional(),
   icons: z.strictObject({ set: z.enum(["default", "outline"]) }).optional(),
   background: z
     .strictObject({ image: z.union([asset, rasterDataUri]).optional(), fallback: color })
     .optional(),
-  sounds: z.record(z.enum(["notification", "alert", "success"]), asset).optional(),
+  sounds: z.partialRecord(z.enum(SOUND_EVENTS), asset).optional(),
   notification: z
     .strictObject({
       position: z.enum(["top-end", "top-start", "bottom-end", "bottom-start"]).optional(),
@@ -116,11 +170,60 @@ export const themeDefinitionSchema = z.strictObject({
 });
 
 export type ThemeDefinition = z.infer<typeof themeDefinitionSchema>;
+export type ThemeLayout = z.infer<typeof layoutSchema>;
+
+/** Every layout/motion choice resolved — v1 documents and partial v2 documents get the defaults. */
+export interface ResolvedPresentation {
+  nav: {
+    desktop: (typeof NAV_DESKTOP)[number];
+    tablet: (typeof NAV_TABLET)[number];
+    phone: (typeof NAV_PHONE)[number];
+  };
+  header: (typeof HEADER_STYLES)[number];
+  headerPosition: (typeof HEADER_POSITIONS)[number];
+  cards: (typeof CARD_STYLES)[number];
+  content: (typeof CONTENT_WIDTHS)[number];
+  corners: (typeof CORNER_STYLES)[number];
+  widgetFrame: (typeof WIDGET_FRAMES)[number];
+  motion: (typeof MOTION_PROFILES)[number];
+  celebration: (typeof CELEBRATIONS)[number];
+  fastMs: number;
+  normalMs: number;
+}
+
+export function presentationOf(theme: ThemeDefinition): ResolvedPresentation {
+  const layout = theme.layout ?? {};
+  const motion = theme.motion ?? {};
+  return {
+    nav: {
+      desktop: layout.nav?.desktop ?? "sidebar",
+      tablet: layout.nav?.tablet ?? "rail",
+      phone: layout.nav?.phone ?? "bottom-bar",
+    },
+    header: layout.header ?? "full",
+    headerPosition: layout.headerPosition ?? "top",
+    cards: layout.cards ?? "elevated",
+    content: layout.content ?? "wide",
+    corners: layout.corners ?? "soft",
+    widgetFrame: layout.widgetFrame ?? "card",
+    motion: motion.profile ?? "subtle",
+    celebration: motion.celebration ?? "sparkle",
+    fastMs: motion.fastMs ?? 120,
+    normalMs: motion.normalMs ?? 220,
+  };
+}
+
+/** Upgrade a stored document to the current schema version (new blocks are optional: nothing to invent). */
+export function upgradeTheme(theme: ThemeDefinition): ThemeDefinition {
+  return theme.schemaVersion === THEME_SCHEMA_VERSION
+    ? theme
+    : { ...theme, schemaVersion: THEME_SCHEMA_VERSION };
+}
 
 export function parseTheme(value: unknown): { theme?: ThemeDefinition; errors: string[] } {
   const result = themeDefinitionSchema.safeParse(value);
   if (result.success) {
-    return { theme: result.data, errors: [] };
+    return { theme: upgradeTheme(result.data), errors: [] };
   }
   return {
     errors: result.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`),

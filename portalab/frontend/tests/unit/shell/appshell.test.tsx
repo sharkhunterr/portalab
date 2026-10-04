@@ -32,7 +32,10 @@ describe("AppShell", () => {
     await act(() => router.navigate("/account"));
     expect(await screen.findByRole("heading", { name: "Account page" })).toBeInTheDocument();
     expect(screen.getByRole("banner")).toBe(banner); // same element: the shell was not remounted
-    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute("aria-current", "page");
+    // 027: personal pages live in the avatar menu; the section of the current page is marked instead
+    expect(screen.getByRole("button", { name: /Personal menu/ })).toBeInTheDocument();
+    // the section of the previous page folds away once another page is current
+    expect(screen.getByRole("button", { name: "Portal" })).toHaveAttribute("aria-expanded", "false");
     const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
     expect(results.violations.map((v) => v.id)).toEqual([]);
   });

@@ -11,11 +11,12 @@ from pydantic import Field
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:ui"
-BUILTIN_KEYS = ("light", "dark", "high-contrast")
+BUILTIN_KEYS = ("portalab-dark", "portalab-light", "light", "dark", "high-contrast")
+DEFAULT_THEME = "portalab"  # a theme family (spec 027 R8): resolved to its member for the color mode
 
 GLOBAL_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.allowedThemes", list[str], list(BUILTIN_KEYS), "Themes users may choose."),
-    ("ui.defaultTheme", str, "light", "Theme used when the user has not chosen one."),
+    ("ui.defaultTheme", str, DEFAULT_THEME, "Theme (or theme family) used when the user has not chosen one."),
     ("ui.textScale.min", Annotated[float, Field(ge=0.5, le=1.0)], 0.85, "Smallest text scale allowed."),
     ("ui.textScale.max", Annotated[float, Field(ge=1.0, le=3.0)], 2.0, "Largest text scale allowed."),
     ("ui.forceReducedMotion", bool, False, "Force reduced motion for everyone."),
@@ -38,6 +39,7 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.notificationStyle", Literal["toast", "banner"], "toast", "Notification style."),
     ("ui.layoutPresets", dict[str, Any], {}, "Saved layout presets (dashboard layouts are owned by 009)."),
     ("ui.campaignThemes", Literal["allow", "ignore"], "allow", "Apply campaign theme overlays."),
+    ("ui.colorMode", Literal["dark", "light", "system"], "dark", "Light or dark variant of a theme family."),
 )
 
 

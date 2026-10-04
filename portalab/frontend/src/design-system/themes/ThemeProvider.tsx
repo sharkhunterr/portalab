@@ -1,5 +1,6 @@
-import { createContext, type ReactNode, useContext, useEffect, useMemo } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { usePreferences } from "../a11y/PreferencesProvider";
+import { sound } from "../sound/SoundService";
 import { applyToDocument, type CampaignOverlay, type Effective, resolve } from "./apply";
 import { BUILTIN_THEMES, builtinTheme } from "./builtin";
 import { parseTheme, type ThemeDefinition } from "./schema";
@@ -40,11 +41,13 @@ export function ThemeProvider({ children, themes, overlay = null, root }: ThemeP
     const valid = validThemes(themes ?? []);
     return valid.length ? valid : [...BUILTIN_THEMES];
   }, [themes]);
+  const systemDark = useSystemDark(preferences.colorMode === "system");
   const effective = useMemo(
-    () => resolve(preferences, policy, available, { overlay }),
-    [preferences, policy, available, overlay],
+    () => resolve(preferences, policy, available, { overlay, systemDark }),
+    [preferences, policy, available, overlay, systemDark],
   );
   useEffect(() => {
+    sound.sounds = { ...(effective.theme.sounds ?? {}) }; // the theme's sound set (027 R18)
     try {
       applyToDocument(effective, preferences, root);
     } catch {
@@ -63,6 +66,25 @@ export function ThemeProvider({ children, themes, overlay = null, root }: ThemeP
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
+/** Follows the device light/dark preference while the user's color mode is ``system`` (027 R8). */
+function useSystemDark(active: boolean): boolean {
+  const query = "(prefers-color-scheme: dark)";
+  const read = () =>
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function" ||
+    window.matchMedia(query).matches;
+  const [dark, setDark] = useState(read);
+  useEffect(() => {
+    if (!active || typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia(query);
+    const update = () => setDark(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, [active]);
+  return dark;
+}
+
 /** Current theme; outside a provider the built-in default applies (components never crash). */
 export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
@@ -71,6 +93,7 @@ export function useTheme(): ThemeContextValue {
   return {
     effective: {
       theme,
+      scheme: theme.colorScheme,
       requestedTheme: null,
       fallback: false,
       reducedMotion: false,

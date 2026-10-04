@@ -2,8 +2,9 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as MenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { Button } from "./Button";
+import { Icon } from "./Icon";
 
 /**
  * Overlays on Radix primitives (focus management, Escape to close, focus return, labelled by their
@@ -64,23 +65,44 @@ export interface MenuItem {
   label: string;
   onSelect: () => void;
   disabled?: boolean;
+  /** Design-system icon name shown before the label (027). */
+  icon?: string | undefined;
+  /** Draw a separator before this item (027). */
+  separated?: boolean;
 }
 
-export function Menu({ trigger, items, label }: { trigger: ReactNode; items: MenuItem[]; label: string }) {
+export function Menu({
+  trigger,
+  items,
+  label,
+  header,
+  align = "start",
+}: {
+  trigger: ReactNode;
+  items: MenuItem[];
+  label: string;
+  /** Non-interactive content above the items (e.g. the signed-in user, 027). */
+  header?: ReactNode;
+  align?: "start" | "end";
+}) {
   return (
     <MenuPrimitive.Root>
       <MenuPrimitive.Trigger asChild>{trigger}</MenuPrimitive.Trigger>
       <MenuPrimitive.Portal>
-        <MenuPrimitive.Content className="ds-menu" aria-label={label} sideOffset={4}>
+        <MenuPrimitive.Content className="ds-menu" aria-label={label} sideOffset={6} align={align}>
+          {header ? <div className="ds-menu__header">{header}</div> : null}
           {items.map((item) => (
-            <MenuPrimitive.Item
-              key={item.key}
-              className="ds-menu__item"
-              disabled={item.disabled ?? false}
-              onSelect={item.onSelect}
-            >
-              {item.label}
-            </MenuPrimitive.Item>
+            <Fragment key={item.key}>
+              {item.separated ? <MenuPrimitive.Separator className="ds-menu__separator" /> : null}
+              <MenuPrimitive.Item
+                className="ds-menu__item"
+                disabled={item.disabled ?? false}
+                onSelect={item.onSelect}
+              >
+                {item.icon ? <Icon name={item.icon} size={18} /> : null}
+                {item.label}
+              </MenuPrimitive.Item>
+            </Fragment>
           ))}
         </MenuPrimitive.Content>
       </MenuPrimitive.Portal>

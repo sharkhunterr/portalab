@@ -6,13 +6,25 @@ from portalab.capabilities.navigation.registry import (
     Rejection,
     default_navigation,
     register_contribution,
+    register_section,
+)
+from portalab.capabilities.navigation.sections import (
+    FALLBACK_SECTION,
+    LEGACY_GROUP,
+    NavigationSection,
+    SectionTopic,
 )
 
 __all__ = [
+    "FALLBACK_SECTION",
+    "LEGACY_GROUP",
     "NavigationContribution",
     "NavigationRegistry",
+    "NavigationSection",
     "Rejection",
+    "SectionTopic",
     "VisibleWhen",
     "default_navigation",
     "register_contribution",
+    "register_section",
 ]

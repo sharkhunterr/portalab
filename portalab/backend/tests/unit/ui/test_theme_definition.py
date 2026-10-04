@@ -17,7 +17,7 @@ def _theme(key: str = "light") -> dict[str, object]:
     return json.loads((BUILTIN / "builtin" / f"{key}.json").read_text(encoding="utf-8"))
 
 
-@pytest.mark.parametrize("key", ["light", "dark", "high-contrast"])
+@pytest.mark.parametrize("key", ["portalab-dark", "portalab-light", "light", "dark", "high-contrast"])
 def test_builtins_valid_pass_floor_and_match_frontend(key: str) -> None:
     theme, errors = validate_definition(_theme(key))
     assert errors == [] and theme is not None

@@ -37,6 +37,15 @@ export function floorReport(theme: ThemeDefinition): FloorReport {
   if (theme.background) {
     check("text/backgroundFallback", colors.text, theme.background.fallback);
   }
+  // 027: gamification accent and rarity colors are UI cues on raised surfaces (glass falls back to it).
+  if (colors.accentAlt) {
+    check("accentAlt/surfaceRaised", colors.accentAlt, colors.surfaceRaised, LARGE_OR_UI_MIN);
+  }
+  if (colors.rarity) {
+    for (const [rarity, value] of Object.entries(colors.rarity)) {
+      check(`rarity.${rarity}/surfaceRaised`, value, colors.surfaceRaised, LARGE_OR_UI_MIN);
+    }
+  }
   for (const state of FUNCTIONAL_STATES) {
     const style = theme.states[state];
     check(`state.${state}.fg/bg`, style.fg, style.bg, TEXT_MIN);

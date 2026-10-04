@@ -33,7 +33,8 @@ export function backoffDelay(attempt: number, initialMs = 1000, maxMs = 30000): 
   return Math.min(initialMs * 2 ** attempt, maxMs);
 }
 
-export function connectStream(options: StreamOptions): StreamHandle {
+/** One EventSource for the given options (the shared hub below multiplexes consumers onto one). */
+export function openStream(options: StreamOptions): StreamHandle {
   const base = options.url ?? "/api/v1/stream";
   const create =
     options.createEventSource ?? ((url: string) => new EventSource(url, { withCredentials: true }));
@@ -83,6 +84,52 @@ export function connectStream(options: StreamOptions): StreamHandle {
       if (timer) clearTimeout(timer);
       source?.close();
       setState("closed");
+    },
+  };
+}
+
+/*
+ * Shared connection (spec 027): every consumer of the default stream shares ONE EventSource. Browsers allow
+ * only ~6 HTTP/1.1 connections per host, so one SSE per feature (toasts, navigation, dashboard, header…)
+ * would starve ordinary requests. The hub subscribes to the union of the consumers' topics and reopens
+ * only when that set grows or shrinks; consumers keep the ``connectStream`` signature.
+ */
+interface Subscriber {
+  topics: ReadonlySet<string>;
+  onEvent: (event: LiveEvent) => void;
+}
+
+const subscribers = new Set<Subscriber>();
+let shared: StreamHandle | null = null;
+let sharedTopics = "";
+
+function rebuild(): void {
+  const topics = [...new Set([...subscribers].flatMap((s) => [...s.topics]))].sort();
+  const key = topics.join(",");
+  if (key === sharedTopics) return;
+  shared?.close();
+  sharedTopics = key;
+  shared = topics.length
+    ? openStream({
+        topics,
+        onEvent: (event) => {
+          for (const subscriber of subscribers) {
+            if (subscriber.topics.has(event.topic)) subscriber.onEvent(event);
+          }
+        },
+      })
+    : null;
+}
+
+export function connectStream(options: StreamOptions): StreamHandle {
+  if (options.createEventSource || options.url || options.onStateChange) return openStream(options);
+  const subscriber: Subscriber = { topics: new Set(options.topics), onEvent: options.onEvent };
+  subscribers.add(subscriber);
+  rebuild();
+  return {
+    close: () => {
+      if (!subscribers.delete(subscriber)) return;
+      rebuild();
     },
   };
 }

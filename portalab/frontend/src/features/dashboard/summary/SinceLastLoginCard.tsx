@@ -3,6 +3,7 @@ import { useId } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
+import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -21,16 +22,21 @@ export function SinceLastLoginCard() {
   }
   return (
     <section aria-labelledby={headingId} className="dashboard-summary ds-panel">
-      <h2 id={headingId}>{t("dashboard:summary.title")}</h2>
+      <h2 id={headingId} className="dashboard-summary__title">
+        <span className="dashboard-summary__icon" aria-hidden="true">
+          <Icon name="sparkles" size={18} />
+        </span>
+        {t("dashboard:summary.title")}
+      </h2>
       {summary.isPending ? <FunctionalState state="loading" /> : null}
       {summary.isError ? <FunctionalState state="error" onRetry={() => summary.refetch()} /> : null}
       {summary.data && summary.data.items.length === 0 ? (
-        <>
+        <div className="dashboard-summary__empty">
           <p>{t("dashboard:summary.empty")}</p>
           <Link className="ds-button ds-button--secondary" to="/services">
             {t("dashboard:summary.browse")}
           </Link>
-        </>
+        </div>
       ) : null}
       {summary.data?.items.length ? (
         <>

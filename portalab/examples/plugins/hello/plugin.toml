@@ -29,7 +29,8 @@ consumes = ["user.verified"]
 enabled = false
 
 [ui]
-nav = [{ key = "home", label_key = "plugin.hello:nav.home", route = "/plugins/hello/main", permission = "plugin:hello.view" }]
+sections = [{ label_key = "plugin.hello:nav.section", icon = "sparkles" }]
+nav = [{ key = "home", label_key = "plugin.hello:nav.home", route = "/plugins/hello/main", permission = "plugin:hello.view", section = "plugin-hello" }]
 notification_categories = [{ name = "news", label_key = "plugin.hello:category.news" }]
 widgets = [{ key = "welcome", title_key = "plugin.hello:widget.welcome", permission = "plugin:hello.view", template = "stat", data = { value = 1, label = "greetings" } }]
 
@@ -62,6 +63,7 @@ colorScheme = "light"
 colors = { surface = "#ffffff", surfaceRaised = "#f4f5f7", text = "#16181d", textMuted = "#4a4f5a", border = "#c9cdd4", accent = "#5b2bd1", accentContrast = "#ffffff", focus = "#5b2bd1" }
 
 [i18n.en."plugin.hello"]
+"nav.section" = "Hello"
 "nav.home" = "Hello"
 "page.title" = "Hello"
 "page.count" = "Greetings"
@@ -71,6 +73,7 @@ colors = { surface = "#ffffff", surfaceRaised = "#f4f5f7", text = "#16181d", tex
 "stat.greetings" = "Greetings"
 
 [i18n.fr."plugin.hello"]
+"nav.section" = "Bonjour"
 "nav.home" = "Bonjour"
 "page.title" = "Bonjour"
 "page.count" = "Salutations"

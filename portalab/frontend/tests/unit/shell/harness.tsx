@@ -4,7 +4,11 @@ import type { ReactNode } from "react";
 import { createMemoryRouter, Outlet, type RouteObject, RouterProvider } from "react-router";
 import { AnnounceProvider } from "../../../src/design-system/a11y/Announce";
 import { AppShell } from "../../../src/shell/AppShell";
-import { NavigationProvider, type NavigationView } from "../../../src/shell/nav/NavigationProvider";
+import {
+  NavigationProvider,
+  type NavigationView,
+  normalize,
+} from "../../../src/shell/nav/NavigationProvider";
 import { RouteErrorElement } from "../../../src/shell/router/RouteBoundary";
 import { type ShellSlots, ShellSlotsProvider } from "../../../src/shell/slots/providers";
 
@@ -27,7 +31,7 @@ export function setViewport(width: number): void {
 
 setViewport(1280);
 
-export const VIEW: NavigationView = {
+export const VIEW: NavigationView = normalize({
   version: "v1",
   degraded: false,
   groups: [
@@ -63,7 +67,7 @@ export const VIEW: NavigationView = {
   ],
   related: { "/services": [{ key: "x.manage", label_key: "nav.admin.services", route: "/admin/services" }] },
   crumbs: {},
-};
+});
 
 export function renderShell(
   options: {

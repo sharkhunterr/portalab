@@ -1,17 +1,29 @@
 import { Link } from "react-router";
+import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { useNavigationView } from "../../../shell/nav/NavigationProvider";
 import { useShellStrings } from "../../../shell/strings";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 
 /** First-party widgets (spec 009 T013): welcome / next steps and the services health summary. */
 function Welcome({ payload }: WidgetProps) {
   const strings = useShellStrings();
+  const { view } = useNavigationView();
   const steps = ((payload.data ?? {}) as { steps?: Array<{ label_key: string; route: string }> }).steps ?? [];
+  const iconOf = (route: string) =>
+    view.commands.find((c) => c.route === route)?.icon ??
+    view.personal.find((e) => e.route === route)?.icon ??
+    "chevron-right";
   return (
-    <ul className="widget-list">
+    <ul className="widget-shortcuts">
       {steps.map((step) => (
         <li key={step.route}>
-          <Link to={step.route}>{strings.label(step.label_key)}</Link>
+          <Link to={step.route} className="widget-shortcut">
+            <span className="widget-shortcut__icon" aria-hidden="true">
+              <Icon name={iconOf(step.route)} size={20} />
+            </span>
+            {strings.label(step.label_key)}
+          </Link>
         </li>
       ))}
     </ul>

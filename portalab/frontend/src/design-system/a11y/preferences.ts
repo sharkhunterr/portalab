@@ -18,6 +18,8 @@ export interface UiPreferences {
   notificationDurationSeconds: number;
   notificationStyle: "toast" | "banner";
   campaignThemes: "allow" | "ignore";
+  /** Light/dark choice for theme families (027 R8): dark by default, or follow the device. */
+  colorMode: "dark" | "light" | "system";
 }
 
 export interface UiPolicy {
@@ -39,11 +41,12 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   notificationDurationSeconds: 6,
   notificationStyle: "toast",
   campaignThemes: "allow",
+  colorMode: "dark",
 };
 
 export const DEFAULT_POLICY: UiPolicy = {
-  allowedThemes: ["light", "dark", "high-contrast"],
-  defaultTheme: "light",
+  allowedThemes: ["portalab-dark", "portalab-light", "light", "dark", "high-contrast"],
+  defaultTheme: "portalab",
   textScaleMin: 0.85,
   textScaleMax: 2,
   forceReducedMotion: false,
@@ -61,6 +64,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   notificationDurationSeconds: "ui.notificationDurationSeconds",
   notificationStyle: "ui.notificationStyle",
   campaignThemes: "ui.campaignThemes",
+  colorMode: "ui.colorMode",
 };
 
 /** Accept only known fields with valid values (an option removed by an update falls back to its default). */
@@ -79,6 +83,7 @@ export function sanitize(input: object): UiPreferences {
   pick("notificationPosition", ["top-end", "top-start", "bottom-end", "bottom-start"]);
   pick("notificationStyle", ["toast", "banner"]);
   pick("campaignThemes", ["allow", "ignore"]);
+  pick("colorMode", ["dark", "light", "system"]);
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;
   if (typeof raw.textScale === "number" && Number.isFinite(raw.textScale)) out.textScale = raw.textScale;
   if (typeof raw.notificationDurationSeconds === "number") {

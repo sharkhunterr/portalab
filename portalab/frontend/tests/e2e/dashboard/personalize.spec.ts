@@ -13,7 +13,7 @@ async function signIn(page: Page, dashboard: ReturnType<typeof newDashboard>) {
     .first()
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: /Alex/ })).toBeVisible(); // greeting (027)
 }
 
 const titles = async (page: Page) => page.locator(".dashboard-grid .widget-frame h3").allTextContents();

@@ -19,6 +19,8 @@ SETTINGS: tuple[tuple[str, Any, Any, bool, str], ...] = (
     ("shell.navigation.userOrder", list[str], [], True, "Your navigation order."),
     ("shell.shortcuts", dict[str, str], {}, True, "Your keyboard shortcuts."),
     ("shell.sidebarCollapsed", bool, False, True, "Collapse the navigation sidebar."),
+    ("shell.navigation.expanded", list[str], [], True, "Navigation sections you keep expanded."),
+    ("shell.welcome.dismissedAt", str | None, None, True, "When you dismissed the welcome card."),
 )
 
 

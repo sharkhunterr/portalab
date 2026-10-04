@@ -11,7 +11,9 @@ const options = { overlay, systemReducedMotion: false };
 
 describe("campaign overlay", () => {
   it("applies when allowed", () => {
-    const effective = resolve(DEFAULT_PREFERENCES, DEFAULT_POLICY, BUILTIN_THEMES, options);
+    // the overlay's colors are designed for a light theme (they would fail the floor on a dark one)
+    const light = { ...DEFAULT_PREFERENCES, theme: "light" };
+    const effective = resolve(light, DEFAULT_POLICY, BUILTIN_THEMES, options);
     expect(effective.overlay).toBe("winter-fest");
     expect(effective.theme.colors.accent).toBe("#0b5394");
   });

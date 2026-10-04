@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode, Suspense, useId } from "react";
+import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Instance, useWidgetData } from "../api";
@@ -74,7 +75,10 @@ export function WidgetFrame({ instance, controls }: { instance: Instance; contro
       style={{ "--widget-w": instance.w, "--widget-h": instance.h } as React.CSSProperties}
     >
       <header className="widget-frame__header">
-        <h3 id={headingId}>{title}</h3>
+        <h3 id={headingId} className="widget-frame__title">
+          {instance.widget?.icon ? <Icon name={instance.widget.icon} size={18} /> : null}
+          {title}
+        </h3>
         {instance.mandatory ? <span className="widget__badge">{t("dashboard:mandatory")}</span> : null}
         {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
       </header>

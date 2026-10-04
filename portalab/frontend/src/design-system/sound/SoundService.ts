@@ -3,7 +3,8 @@
  * ``ui.soundEnabled``, never autoplays before a user gesture, plays only bundled theme assets and fails
  * silently (a missing asset never breaks a notification).
  */
-export type SoundEvent = "notification" | "alert" | "success";
+/** Sound events a theme may map (027 R18 adds rewards, level-ups and subtle interface feedback). */
+export type SoundEvent = "notification" | "alert" | "success" | "reward" | "levelUp" | "ui";
 
 export interface AudioLike {
   play: () => Promise<void>;

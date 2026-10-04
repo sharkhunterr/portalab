@@ -18,13 +18,19 @@ from typing import Any
 
 from portalab.capabilities.administration import EXTENSION_STATE_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
-from portalab.capabilities.navigation import NavigationContribution, NavigationRegistry, Rejection
+from portalab.capabilities.navigation import (
+    LEGACY_GROUP,
+    NavigationContribution,
+    NavigationRegistry,
+    NavigationSection,
+    Rejection,
+)
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.metrics import default_metrics
 from portalab.core.time import Clock, utc_now
 from portalab.modules.shell.assembler.epochs import Epochs
-from portalab.modules.shell.assembler.layout import arrange
+from portalab.modules.shell.assembler.layout import UNRANKED, arrange
 from portalab.modules.shell.observability import log, metrics
 
 CACHE_SIZE = 512
@@ -47,6 +53,7 @@ class NavigationAssembler:
         self.clock = clock
         self._cache: OrderedDict[tuple[Any, ...], dict[str, Any]] = OrderedDict()
         self.runtime_rejections: list[Rejection] = []
+        self._reported_sections: set[tuple[str, str]] = set()
 
     def _provider(self, name: str) -> Any:
         providers = self.capabilities.system_providers(name)
@@ -120,7 +127,15 @@ class NavigationAssembler:
         return view
 
     def _minimal(self) -> dict[str, Any]:
-        view: dict[str, Any] = {"groups": [], "commands": [], "related": {}, "crumbs": {}, "degraded": True}
+        view: dict[str, Any] = {
+            "sections": [],
+            "personal": [],
+            "groups": [],
+            "commands": [],
+            "related": {},
+            "crumbs": {},
+            "degraded": True,
+        }
         return {**view, "version": _version(view), "generated_at": utc_now(self.clock).isoformat()}
 
     async def _assemble(
@@ -154,6 +169,7 @@ class NavigationAssembler:
             {"key": g["key"], "label_key": g["label_key"], "entries": [_entry(e) for e in g["entries"]]}
             for g in arrange(entries, layout=layout, user_order=user_order, allow_user_ordering=allow_user)
         ]
+        sections, personal = self._sections(entries, layout, user_order, allow_user)
         commands = [_command(c) for c in usable if c.kind == "command"] + [
             {**_entry(e), "kind": "navigate"} for e in entries
         ]
@@ -170,13 +186,66 @@ class NavigationAssembler:
             elif contribution.kind == "crumb_parent":
                 crumbs[target.route] = {"label_key": contribution.label_key, "route": contribution.route}
         view: dict[str, Any] = {
-            "groups": [g for g in groups if g["entries"]],
+            "sections": sections,
+            "personal": personal,
+            "groups": [g for g in groups if g["entries"]],  # 004 shape, kept one release (027 R2)
             "commands": sorted(commands, key=lambda c: c["key"]),
             "related": related,
             "crumbs": crumbs,
             "degraded": False,
         }
         return {**view, "version": _version(view), "generated_at": utc_now(self.clock).isoformat()}
+
+    def _placement(self, entry: NavigationContribution, layout: Mapping[str, Any]) -> str:
+        """Section of an entry: admin override (if it names a section), else its own, else the fallback."""
+        override = dict(layout.get("groups_of", {})).get(entry.key)
+        if override and self.registry.section(str(override)):
+            return str(override)
+        placed = self.registry.section_for(entry)
+        if placed != entry.group and entry.group != LEGACY_GROUP:
+            marker = (entry.key, entry.group)
+            if marker not in self._reported_sections:
+                self._reported_sections.add(marker)
+                self.runtime_rejections.append(
+                    Rejection(
+                        entry.owner,
+                        entry.key,
+                        "runtime",
+                        f"navigation.section_unknown: {entry.group!r}; placed in {placed!r}",
+                    )
+                )
+        return placed
+
+    def _sections(
+        self,
+        entries: list[NavigationContribution],
+        layout: Mapping[str, Any],
+        user_order: list[str],
+        allow_user: bool,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        """Sections view (027 R1/R2): sections with no usable entry are absent; a single-entry section without
+        topics renders as a direct link; the personal section feeds the avatar menu."""
+        placement = {e.key: self._placement(e, layout) for e in entries}
+        arranged = arrange(
+            entries,
+            layout={**layout, "groups_of": placement},
+            user_order=user_order,
+            allow_user_ordering=allow_user,
+        )
+        order = [str(g) for g in layout.get("group_order", [])]
+        labels = {str(k): str(v) for k, v in dict(layout.get("section_labels", {})).items()}
+        sections: list[tuple[tuple[int, int, str], dict[str, Any]]] = []
+        personal: list[dict[str, Any]] = []
+        for group in arranged:
+            meta = self.registry.section(group["key"])
+            if meta is None or not group["entries"]:
+                continue
+            if meta.audience == "personal":
+                personal.extend(_entry(e) for e in group["entries"])
+                continue
+            rank = (order.index(meta.key) if meta.key in order else UNRANKED, meta.order_hint, meta.key)
+            sections.append((rank, _section(meta, group["entries"], labels.get(meta.key))))
+        return [view for _, view in sorted(sections, key=lambda item: item[0])], personal
 
     def drain_runtime_rejections(self) -> list[Rejection]:
         drained, self.runtime_rejections = self.runtime_rejections, []
@@ -191,6 +260,30 @@ def _entry(c: NavigationContribution) -> dict[str, Any]:
         "route": c.route,
         "existence_sensitive": c.existence_sensitive,
         "keywords": list(c.keywords),
+    }
+
+
+def _section(
+    meta: NavigationSection, entries: list[NavigationContribution], label: str | None
+) -> dict[str, Any]:
+    by_topic: dict[str, list[dict[str, Any]]] = {}
+    loose: list[dict[str, Any]] = []
+    for entry in entries:
+        topic = meta.topic(entry.topic)
+        (by_topic.setdefault(topic.key, []) if topic else loose).append(_entry(entry))
+    topics = [
+        {"key": t.key, "label_key": t.label_key, "entries": by_topic[t.key]}
+        for t in sorted(meta.topics, key=lambda t: (t.order_hint, t.key))
+        if t.key in by_topic
+    ]
+    return {
+        "key": meta.key,
+        "label_key": label or meta.label_key,
+        "icon": meta.icon,
+        "audience": meta.audience,
+        "direct": len(entries) == 1 and not topics,
+        "topics": topics,
+        "entries": loose,
     }
 
 

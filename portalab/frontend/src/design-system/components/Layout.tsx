@@ -103,3 +103,12 @@ export function Table<T>({
     </section>
   );
 }
+
+/** Device class (spec 027 R19): phone < 640 px ≤ tablet < 1024 px ≤ desktop. */
+export type DeviceClass = "phone" | "tablet" | "desktop";
+
+export function useDeviceClass(): DeviceClass {
+  const tablet = useBreakpoint("sm");
+  const desktop = useBreakpoint("lg");
+  return desktop ? "desktop" : tablet ? "tablet" : "phone";
+}

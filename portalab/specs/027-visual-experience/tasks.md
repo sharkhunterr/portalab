@@ -25,8 +25,8 @@ quickstart.md maps SC-001…SC-012 to automated checks.
 
 **Purpose**: dependencies, assets and shared fixtures.
 
-- [ ] T001 Add `lucide-react`, `@fontsource-variable/inter` and `@fontsource-variable/plus-jakarta-sans` to `frontend/package.json` (npm install, lockfile updated) and import the two fonts once in `frontend/src/main.tsx` (R15, R16)
-- [ ] T002 [P] Write `frontend/scripts/gen-sounds.mjs` (synthesizes short WAV tones: notification, alert, success, reward, levelUp, ui) and generate `frontend/public/assets/sounds/portalab/*.wav` (< 200 kB total); add an `npm run gen:sounds` script (R18)
+- [X] T001 Add `lucide-react`, `@fontsource-variable/inter` and `@fontsource-variable/plus-jakarta-sans` to `frontend/package.json` (npm install, lockfile updated) and import the two fonts once in `frontend/src/main.tsx` (R15, R16)
+- [X] T002 [P] Write `frontend/scripts/gen-sounds.mjs` (synthesizes short WAV tones: notification, alert, success, reward, levelUp, ui) and generate `frontend/public/assets/sounds/portalab/*.wav` (< 200 kB total); add an `npm run gen:sounds` script (R18)
 - [ ] T003 [P] Create shared engine parity cases `tests/fixtures/dashboard-arrangements.json` (place/move/resize/compact/firstFree/derive inputs and expected outputs, ≥ 20 cases incl. overlaps, edges, size limits) (R10)
 
 ---
@@ -37,23 +37,23 @@ quickstart.md maps SC-001…SC-012 to automated checks.
 
 **⚠️ CRITICAL**: no user-story work starts before this phase is complete.
 
-- [ ] T004 Extend the theme zod schema to v2 in `frontend/src/design-system/themes/schema.ts`: `schemaVersion` 1|2, `family`, `layout` (nav per device class incl. `orbit`, header, `headerPosition` top|bottom, cards, content, corners, widgetFrame), `motion.profile`/`motion.celebration`, `sounds` keys `notification|alert|success|reward|levelUp|ui`, `colors.accentAlt`, `colors.rarity`; add `upgradeTheme()` filling v1 defaults (data-model §5)
-- [ ] T005 [P] Unit tests for v2 parsing, unknown-value refusal with JSON path, and v1 → v2 upgrade defaults in `frontend/tests/unit/theme-schema-v2.test.ts`
-- [ ] T006 Regenerate `backend/src/portalab/modules/ui/themes/theme.schema.json` from the zod schema (`UPDATE_THEME_SCHEMA=1 npx vitest run tests/unit/theme-schema.test.ts`) and mirror v2 + v1 upgrade in `backend/src/portalab/modules/ui/themes/definition.py`
-- [ ] T007 Extend the accessibility floor for `accentAlt`, `rarity.*` and glass surfaces evaluated with the solid `surfaceRaised` fallback in `frontend/src/design-system/themes/floor.ts` and `backend/src/portalab/modules/ui/themes/definition.py` (R9)
-- [ ] T008 [P] Backend tests for v2 validation, upgrade on read and floor report (`theme.invalid`, `theme.floor_violation`) in `backend/tests/unit/ui/test_theme_v2.py`
-- [ ] T009 Author built-in themes `portalab-dark.json` (default, family `portalab`) and `portalab-light.json` and upgrade `light/dark/high-contrast` to v2 in `frontend/src/design-system/themes/builtin/` and their backend copies `backend/src/portalab/modules/ui/themes/builtin/` (media-center direction, accent + gamification accent + rarity palette, glass cards, playful-but-subtle motion, sound set `asset:portalab/*.wav`)
-- [ ] T010 Migration `backend/migrations/ui/versions/20261004_0900_ui_0002_theme_v2.py`: upsert the two `portalab-*` built-ins, upgrade stored built-ins to v2, set `ui.defaultTheme` default to `portalab-dark` unless explicitly configured
-- [ ] T011 Declare user-tier `ui.colorMode` (`dark|light|system`, default `dark`) in `backend/src/portalab/modules/ui/settings.py` and resolve family + color mode in `frontend/src/design-system/themes/ThemeProvider.tsx` (system ⇒ `prefers-color-scheme`; missing stored theme ⇒ default) (R8)
-- [ ] T012 Apply v2 in `frontend/src/design-system/themes/apply.ts` and `firstPaint.ts`: CSS variables + `data-nav-desktop|tablet|phone`, `data-header`, `data-cards`, `data-content`, `data-corners`, `data-widget-frame`, `data-motion`, `data-celebration`, `data-color-scheme` on `<html>`; accessibility overrides applied last (ui-contracts §Theme application)
-- [ ] T013 [P] Rewrite `frontend/src/design-system/tokens/tokens.css`: type scale with the two fonts, spacing, radii per `data-corners`, elevation levels, glass surface (with `@supports`/`prefers-reduced-transparency`/high-contrast fallback), motion durations/easings per `data-motion`, rarity and gamification tokens
-- [ ] T014 [P] `Icon` component mapping stable names to lucide icons (unknown ⇒ dot) in `frontend/src/design-system/components/Icon.tsx` + unit test `frontend/tests/unit/icon.test.tsx`
-- [ ] T015 [P] `Avatar` (image → initials with stable hue from user id), `LevelBadge`, `ProgressBar`, `CoinBadge` (compact ≥ 10 000, exact value in accessible name) in `frontend/src/design-system/components/Avatar.tsx` and `Badges.tsx` + tests `frontend/tests/unit/avatar-badges.test.tsx`
-- [ ] T016 [P] `PageHeader`, `Card` (variant from `data-cards`), `Tile`/`TileGrid` (artwork with gradient+icon fallback), `ListItem`, `StatFigure` in `frontend/src/design-system/components/{PageHeader,Card,Tile,ListItem,StatFigure}.tsx` + axe tests `frontend/tests/a11y/page-kit.test.tsx`
-- [ ] T017 [P] `Skeleton` (text/card/tile/list/figure, `aria-busy` region) and `EmptyState` (icon, title, message, required action) in `frontend/src/design-system/components/{Skeleton,EmptyState}.tsx` + tests `frontend/tests/unit/skeleton-empty.test.tsx`
-- [ ] T018 [P] Extend `frontend/src/design-system/sound/SoundService.ts` with `reward`, `levelUp`, `ui` events (still off by default, gesture-gated) + tests in `frontend/tests/unit/sound-service.test.ts`
-- [ ] T019 `Celebration` + `useCelebrate()` (queue of 1 with coalescing, sparkle/confetti/glow per `data-celebration`, reduced motion ⇒ static toast, plays `reward`/`levelUp` sounds) in `frontend/src/design-system/feedback/Celebration.tsx` + tests `frontend/tests/unit/celebration.test.tsx`
-- [ ] T020 Export the new kit from `frontend/src/design-system/index.ts` (plugin surface) and add every component to the `/dev/gallery` page in `frontend/src/features/dev/`
+- [X] T004 Extend the theme zod schema to v2 in `frontend/src/design-system/themes/schema.ts`: `schemaVersion` 1|2, `family`, `layout` (nav per device class incl. `orbit`, header, `headerPosition` top|bottom, cards, content, corners, widgetFrame), `motion.profile`/`motion.celebration`, `sounds` keys `notification|alert|success|reward|levelUp|ui`, `colors.accentAlt`, `colors.rarity`; add `upgradeTheme()` filling v1 defaults (data-model §5)
+- [X] T005 [P] Unit tests for v2 parsing, unknown-value refusal with JSON path, and v1 → v2 upgrade defaults in `frontend/tests/unit/theme-schema-v2.test.ts`
+- [X] T006 Regenerate `backend/src/portalab/modules/ui/themes/theme.schema.json` from the zod schema (`UPDATE_THEME_SCHEMA=1 npx vitest run tests/unit/theme-schema.test.ts`) and mirror v2 + v1 upgrade in `backend/src/portalab/modules/ui/themes/definition.py`
+- [X] T007 Extend the accessibility floor for `accentAlt`, `rarity.*` and glass surfaces evaluated with the solid `surfaceRaised` fallback in `frontend/src/design-system/themes/floor.ts` and `backend/src/portalab/modules/ui/themes/definition.py` (R9)
+- [X] T008 [P] Backend tests for v2 validation, upgrade on read and floor report (`theme.invalid`, `theme.floor_violation`) in `backend/tests/unit/ui/test_theme_v2.py`
+- [X] T009 Author built-in themes `portalab-dark.json` (default, family `portalab`) and `portalab-light.json` and upgrade `light/dark/high-contrast` to v2 in `frontend/src/design-system/themes/builtin/` and their backend copies `backend/src/portalab/modules/ui/themes/builtin/` (media-center direction, accent + gamification accent + rarity palette, glass cards, playful-but-subtle motion, sound set `asset:portalab/*.wav`)
+- [X] T010 Migration `backend/migrations/ui/versions/20261004_0900_ui_0002_theme_v2.py`: upsert the two `portalab-*` built-ins, upgrade stored built-ins to v2, set `ui.defaultTheme` default to `portalab-dark` unless explicitly configured
+- [X] T011 Declare user-tier `ui.colorMode` (`dark|light|system`, default `dark`) in `backend/src/portalab/modules/ui/settings.py` and resolve family + color mode in `frontend/src/design-system/themes/ThemeProvider.tsx` (system ⇒ `prefers-color-scheme`; missing stored theme ⇒ default) (R8)
+- [X] T012 Apply v2 in `frontend/src/design-system/themes/apply.ts` and `firstPaint.ts`: CSS variables + `data-nav-desktop|tablet|phone`, `data-header`, `data-cards`, `data-content`, `data-corners`, `data-widget-frame`, `data-motion`, `data-celebration`, `data-color-scheme` on `<html>`; accessibility overrides applied last (ui-contracts §Theme application)
+- [X] T013 [P] Rewrite `frontend/src/design-system/tokens/tokens.css`: type scale with the two fonts, spacing, radii per `data-corners`, elevation levels, glass surface (with `@supports`/`prefers-reduced-transparency`/high-contrast fallback), motion durations/easings per `data-motion`, rarity and gamification tokens
+- [X] T014 [P] `Icon` component mapping stable names to lucide icons (unknown ⇒ dot) in `frontend/src/design-system/components/Icon.tsx` + unit test `frontend/tests/unit/icon.test.tsx`
+- [X] T015 [P] `Avatar` (image → initials with stable hue from user id), `LevelBadge`, `ProgressBar`, `CoinBadge` (compact ≥ 10 000, exact value in accessible name) in `frontend/src/design-system/components/Avatar.tsx` and `Badges.tsx` + tests `frontend/tests/unit/avatar-badges.test.tsx`
+- [X] T016 [P] `PageHeader`, `Card` (variant from `data-cards`), `Tile`/`TileGrid` (artwork with gradient+icon fallback), `ListItem`, `StatFigure` in `frontend/src/design-system/components/{PageHeader,Card,Tile,ListItem,StatFigure}.tsx` + axe tests `frontend/tests/a11y/page-kit.test.tsx`
+- [X] T017 [P] `Skeleton` (text/card/tile/list/figure, `aria-busy` region) and `EmptyState` (icon, title, message, required action) in `frontend/src/design-system/components/{Skeleton,EmptyState}.tsx` + tests `frontend/tests/unit/skeleton-empty.test.tsx`
+- [X] T018 [P] Extend `frontend/src/design-system/sound/SoundService.ts` with `reward`, `levelUp`, `ui` events (still off by default, gesture-gated) + tests in `frontend/tests/unit/sound-service.test.ts`
+- [X] T019 `Celebration` + `useCelebrate()` (queue of 1 with coalescing, sparkle/confetti/glow per `data-celebration`, reduced motion ⇒ static toast, plays `reward`/`levelUp` sounds) in `frontend/src/design-system/feedback/Celebration.tsx` + tests `frontend/tests/unit/celebration.test.tsx`
+- [X] T020 Export the new kit from `frontend/src/design-system/index.ts` (plugin surface) and add every component to the `/dev/gallery` page in `frontend/src/features/dev/`
 
 **Checkpoint**: theme v2 + kit ready — stories can start.
 
@@ -69,18 +69,18 @@ level-up celebration, reduced motion, sounds off).
 
 ### Tests for User Story 1
 
-- [ ] T021 [P] [US1] Backend integration test: an XP/Coins ledger write publishes exactly one `progression.changed` live event with the user audience and post-transaction values, none on rollback, `level_up` true only when crossing a level, in `backend/tests/integration/gamification/test_live_progression.py`
-- [ ] T022 [P] [US1] Frontend unit tests for header degradation (progression 503 ⇒ chip hidden/neutral, unread-count failure ⇒ bell without count, gamification disabled ⇒ no empty space) and live cache patching in `frontend/tests/unit/app-header.test.tsx`
+- [X] T021 [P] [US1] Backend integration test: an XP/Coins ledger write publishes exactly one `progression.changed` live event with the user audience and post-transaction values, none on rollback, `level_up` true only when crossing a level, in `backend/tests/integration/gamification/test_live_progression.py`
+- [X] T022 [P] [US1] Frontend unit tests for header degradation (progression 503 ⇒ chip hidden/neutral, unread-count failure ⇒ bell without count, gamification disabled ⇒ no empty space) and live cache patching in `frontend/tests/unit/app-header.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Publish `progression.changed` via `core.live.publish_live` inside the ledger transaction in `backend/src/portalab/modules/gamification/ledger/writer.py` (payload per data-model §7; no other user's data) and register the topic where gamification declares its live/event types
-- [ ] T024 [P] [US1] `useHeaderData` (independent queries `/me`, `/me/progression`, `/me/notifications/unread-count`; SSE `progression.changed` patches the progression cache, dedup by `seq`, triggers `useCelebrate` on `level_up`/gains) in `frontend/src/shell/header/useHeaderData.ts`
-- [ ] T025 [P] [US1] `ProgressChip` (LevelBadge + XP ProgressBar with animated counter respecting reduced motion) in `frontend/src/shell/header/ProgressChip.tsx`
-- [ ] T026 [US1] `PersonalMenu` (Radix dropdown: profile, progression, personal entries, sign out) in `frontend/src/shell/header/PersonalMenu.tsx`
-- [ ] T027 [US1] `AppHeader` (menu control, brand, search bar ≥ tablet / button on phone, assistant, notifications with count, ProgressChip, CoinBadge, avatar → PersonalMenu; each data element in its own `RegionBoundary`; single compact row on phones; `data-header` variants) in `frontend/src/shell/header/AppHeader.tsx` and replace the old header in `frontend/src/shell/AppShell.tsx` + `ShellLayout.tsx`
-- [ ] T028 [US1] Header styles (full/compact/centered, glass on scroll, safe areas) in `frontend/src/shell/header/header.css`; strings in `backend/locales/en/shell.json` (+ `fr`)
-- [ ] T029 [US1] Playwright: header elements at 390/820/1440 widths on 4 pages, live credit animates, level-up celebrates once, reduced motion ⇒ toast only, in `frontend/tests/e2e/visual-experience/header.spec.ts` (extend the stub API in `frontend/tests/a11y/support.ts` with progression + SSE event)
+- [X] T023 [US1] Publish `progression.changed` via `core.live.publish_live` inside the ledger transaction in `backend/src/portalab/modules/gamification/ledger/writer.py` (payload per data-model §7; no other user's data) and register the topic where gamification declares its live/event types
+- [X] T024 [P] [US1] `useHeaderData` (independent queries `/me`, `/me/progression`, `/me/notifications/unread-count`; SSE `progression.changed` patches the progression cache, dedup by `seq`, triggers `useCelebrate` on `level_up`/gains) in `frontend/src/shell/header/useHeaderData.ts`
+- [X] T025 [P] [US1] `ProgressChip` (LevelBadge + XP ProgressBar with animated counter respecting reduced motion) in `frontend/src/shell/header/ProgressChip.tsx`
+- [X] T026 [US1] `PersonalMenu` (Radix dropdown: profile, progression, personal entries, sign out) in `frontend/src/shell/header/PersonalMenu.tsx`
+- [X] T027 [US1] `AppHeader` (menu control, brand, search bar ≥ tablet / button on phone, assistant, notifications with count, ProgressChip, CoinBadge, avatar → PersonalMenu; each data element in its own `RegionBoundary`; single compact row on phones; `data-header` variants) in `frontend/src/shell/header/AppHeader.tsx` and replace the old header in `frontend/src/shell/AppShell.tsx` + `ShellLayout.tsx`
+- [X] T028 [US1] Header styles (full/compact/centered, glass on scroll, safe areas) in `frontend/src/shell/header/header.css`; strings in `backend/locales/en/shell.json` (+ `fr`)
+- [X] T029 [US1] Playwright: header elements at 390/820/1440 widths on 4 pages, live credit animates, level-up celebrates once, reduced motion ⇒ toast only, in `frontend/tests/e2e/visual-experience/header.spec.ts` (extend the stub API in `frontend/tests/a11y/support.ts` with progression + SSE event)
 
 **Checkpoint**: header complete and independently testable.
 
@@ -94,21 +94,21 @@ level-up celebration, reduced motion, sounds off).
 
 ### Tests for User Story 2
 
-- [ ] T030 [P] [US2] Unit tests for section registry (closed schema, duplicates, plugin namespace, owner withdrawal) in `backend/tests/unit/navigation/test_sections.py`
-- [ ] T031 [P] [US2] Integration tests for `GET /me/navigation` sections: admin ≤ 9 / user ≤ 8 sections, empty sections omitted, `direct` single-entry sections, admin topics, `personal` list, unknown section ⇒ owner default ⇒ `more` + diagnostic, `groups` alias still present, degraded on authz failure, in `backend/tests/integration/shell/test_sections_view.py`
+- [X] T030 [P] [US2] Unit tests for section registry (closed schema, duplicates, plugin namespace, owner withdrawal) in `backend/tests/unit/navigation/test_sections.py`
+- [X] T031 [P] [US2] Integration tests for `GET /me/navigation` sections: admin ≤ 9 / user ≤ 8 sections, empty sections omitted, `direct` single-entry sections, admin topics, `personal` list, unknown section ⇒ owner default ⇒ `more` + diagnostic, `groups` alias still present, degraded on authz failure, in `backend/tests/integration/shell/test_sections_view.py`
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] `NavigationSection` model + `register_section`/`SectionRegistry` (+ `unregister(owner)`) in `backend/src/portalab/capabilities/navigation/sections.py`; export from `capabilities/navigation/__init__.py`; add optional `topic` to `NavigationContribution` in `contribution.py` (schema_version stays 1)
-- [ ] T033 [US2] Hook section withdrawal into the 023 contribution sweep (`Registries.remove(owner)`) in `backend/src/portalab/modules/plugins/context/registries.py`
-- [ ] T034 [US2] Declare built-in sections (`home, media, content, services, support, community, marketplace, admin` with topics `access, services, content, economy, system, extensions`, `me`, `more`) and re-assign every built-in contribution's `group`/`topic` per R3 in `backend/src/portalab/modules/shell/builtin.py`
-- [ ] T035 [US2] Section-aware assembly (sections/topics/personal/direct, empty omission, fallback + `navigation.section_unknown` diagnostic, `groups` alias) in `backend/src/portalab/modules/shell/assembler/assembler.py` and `assembler/layout.py`
-- [ ] T036 [US2] Admin layout API accepts section keys and `section_labels`, lists `sections` in `backend/src/portalab/modules/shell/api/router.py`; declare user settings `shell.navigation.expanded` and `shell.welcome.dismissedAt` in `backend/src/portalab/modules/shell/settings.py`
-- [ ] T037 [US2] Regenerate OpenAPI + client (`uv run portalab openapi -o openapi.json`, `npm run gen:api`, `npm run check:api-drift`) and update `frontend/src/shell/nav/NavigationProvider.tsx` to expose `sections` and `personal`
-- [ ] T038 [US2] `SectionNav` (collapsible sections with icon + label, `aria-expanded`, `direct` links, admin topic sub-headings, current entry + auto-expanded section, expansion persisted via `/me/preferences` with localStorage mirror) in `frontend/src/shell/nav/SectionNav.tsx`; wire `personal` entries into `PersonalMenu`
-- [ ] T039 [US2] Breadcrumbs reflect section → page in `frontend/src/shell/breadcrumbs/Breadcrumbs.tsx`; section/topic labels in `backend/locales/en/shell.json` (+ `fr`)
-- [ ] T040 [US2] Update the example plugin to declare a section/topic in `examples/plugins/hello/` and document sections/topics in `docs/navigation-contributions.md`
-- [ ] T041 [US2] Playwright: sections for admin and user, every route of the 004 route table reachable within 2 interactions, in `frontend/tests/e2e/visual-experience/sections.spec.ts`
+- [X] T032 [US2] `NavigationSection` model + `register_section`/`SectionRegistry` (+ `unregister(owner)`) in `backend/src/portalab/capabilities/navigation/sections.py`; export from `capabilities/navigation/__init__.py`; add optional `topic` to `NavigationContribution` in `contribution.py` (schema_version stays 1)
+- [X] T033 [US2] Hook section withdrawal into the 023 contribution sweep (`Registries.remove(owner)`) in `backend/src/portalab/modules/plugins/context/registries.py`
+- [X] T034 [US2] Declare built-in sections (`home, media, content, services, support, community, marketplace, admin` with topics `access, services, content, economy, system, extensions`, `me`, `more`) and re-assign every built-in contribution's `group`/`topic` per R3 in `backend/src/portalab/modules/shell/builtin.py`
+- [X] T035 [US2] Section-aware assembly (sections/topics/personal/direct, empty omission, fallback + `navigation.section_unknown` diagnostic, `groups` alias) in `backend/src/portalab/modules/shell/assembler/assembler.py` and `assembler/layout.py`
+- [X] T036 [US2] Admin layout API accepts section keys and `section_labels`, lists `sections` in `backend/src/portalab/modules/shell/api/router.py`; declare user settings `shell.navigation.expanded` and `shell.welcome.dismissedAt` in `backend/src/portalab/modules/shell/settings.py`
+- [X] T037 [US2] Regenerate OpenAPI + client (`uv run portalab openapi -o openapi.json`, `npm run gen:api`, `npm run check:api-drift`) and update `frontend/src/shell/nav/NavigationProvider.tsx` to expose `sections` and `personal`
+- [X] T038 [US2] `SectionNav` (collapsible sections with icon + label, `aria-expanded`, `direct` links, admin topic sub-headings, current entry + auto-expanded section, expansion persisted via `/me/preferences` with localStorage mirror) in `frontend/src/shell/nav/SectionNav.tsx`; wire `personal` entries into `PersonalMenu`
+- [X] T039 [US2] Breadcrumbs reflect section → page in `frontend/src/shell/breadcrumbs/Breadcrumbs.tsx`; section/topic labels in `backend/locales/en/shell.json` (+ `fr`)
+- [X] T040 [US2] Update the example plugin to declare a section/topic in `examples/plugins/hello/` and document sections/topics in `docs/navigation-contributions.md`
+- [X] T041 [US2] Playwright: sections for admin and user, every route of the 004 route table reachable within 2 interactions, in `frontend/tests/e2e/visual-experience/sections.spec.ts`
 
 **Checkpoint**: grouped navigation complete.
 
@@ -120,12 +120,12 @@ level-up celebration, reduced motion, sounds off).
 
 **Independent Test**: quickstart scenarios 5–6.
 
-- [ ] T042 [P] [US3] `Sidebar`, `Rail` (collapsible, icon-only with labels on expand), `TopBar` variants rendering `SectionNav` in `frontend/src/shell/nav/{Sidebar,Rail,TopBar}.tsx`
-- [ ] T043 [P] [US3] `BottomBar` (Home, Search, Notifications badge, Menu → `Drawer` with `SectionNav`; safe-area aware) in `frontend/src/shell/nav/BottomBar.tsx`, and `OrbitNav` (floating bubble opening a radial menu of section icons, entries on an arc/list, roving focus, Escape, reduced-motion and narrow-screen half-circle fallback — R24) in `frontend/src/shell/nav/OrbitNav.tsx`
-- [ ] T044 [US3] `NavFrame` choosing the variant from `data-nav-*` + device class (phone < 640, tablet 640–1023, desktop ≥ 1024) without remounting the outlet; replace `ResponsiveNav` usage (removes the phone empty-column defect) in `frontend/src/shell/nav/NavFrame.tsx`, `frontend/src/shell/AppShell.tsx`, `frontend/src/shell/shell.css`
-- [ ] T045 [US3] `PageFrame` (content width from `data-content`, breadcrumbs, related links) in `frontend/src/shell/PageFrame.tsx`; touch targets ≥ 44 px on coarse pointers, no hover-only actions in `shell.css`
-- [ ] T046 [US3] Unit tests: variant choice per device class and theme, outlet not remounted on resize (form text kept) in `frontend/tests/unit/nav-frame.test.tsx`
-- [ ] T047 [US3] Playwright: 320/390/820/1440 widths on every route — no horizontal scroll, bottom bar on phones, rotation keeps page/scroll/text, in `frontend/tests/e2e/visual-experience/responsive.spec.ts` (extend `frontend/tests/a11y/reflow.spec.ts`)
+- [X] T042 [P] [US3] `Sidebar`, `Rail` (collapsible, icon-only with labels on expand), `TopBar` variants rendering `SectionNav` in `frontend/src/shell/nav/{Sidebar,Rail,TopBar}.tsx`
+- [X] T043 [P] [US3] `BottomBar` (Home, Search, Notifications badge, Menu → `Drawer` with `SectionNav`; safe-area aware) in `frontend/src/shell/nav/BottomBar.tsx`, and `OrbitNav` (floating bubble opening a radial menu of section icons, entries on an arc/list, roving focus, Escape, reduced-motion and narrow-screen half-circle fallback — R24) in `frontend/src/shell/nav/OrbitNav.tsx`
+- [X] T044 [US3] `NavFrame` choosing the variant from `data-nav-*` + device class (phone < 640, tablet 640–1023, desktop ≥ 1024) without remounting the outlet; replace `ResponsiveNav` usage (removes the phone empty-column defect) in `frontend/src/shell/nav/NavFrame.tsx`, `frontend/src/shell/AppShell.tsx`, `frontend/src/shell/shell.css`
+- [X] T045 [US3] `PageFrame` (content width from `data-content`, breadcrumbs, related links) in `frontend/src/shell/PageFrame.tsx`; touch targets ≥ 44 px on coarse pointers, no hover-only actions in `shell.css`
+- [X] T046 [US3] Unit tests: variant choice per device class and theme, outlet not remounted on resize (form text kept) in `frontend/tests/unit/nav-frame.test.tsx`
+- [X] T047 [US3] Playwright: 320/390/820/1440 widths on every route — no horizontal scroll, bottom bar on phones, rotation keeps page/scroll/text, in `frontend/tests/e2e/visual-experience/responsive.spec.ts` (extend `frontend/tests/a11y/reflow.spec.ts`)
 
 **Checkpoint**: P1 stories (MVP) complete — header, sections and responsive frames.
 

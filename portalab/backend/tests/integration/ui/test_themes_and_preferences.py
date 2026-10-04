@@ -27,7 +27,13 @@ def ocean() -> dict[str, object]:
 
 async def test_registry_floor_policy_and_owner(ui: UiHarness) -> None:
     themes = ui.module.themes
-    assert {t["key"] for t in (await themes.catalog())["themes"]} == {"light", "dark", "high-contrast"}
+    assert {t["key"] for t in (await themes.catalog())["themes"]} == {
+        "portalab-dark",
+        "portalab-light",
+        "light",
+        "dark",
+        "high-contrast",
+    }
     pale = ocean()
     pale["states"] = {**pale["states"], "error": {"fg": "#2a1a1a", "bg": "#262b35"}}  # type: ignore[dict-item]
     with pytest.raises(FloorViolation) as refused:
@@ -44,7 +50,7 @@ async def test_registry_floor_policy_and_owner(ui: UiHarness) -> None:
     )
     assert "ocean" in {t["key"] for t in (await themes.catalog())["themes"]}
     with pytest.raises(ThemeConflict):
-        await themes.update(SYSTEM_ACTOR, "light", enabled=False)  # the default theme stays enabled
+        await themes.update(SYSTEM_ACTOR, "portalab-dark", enabled=False)  # the default family stays enabled
     assert await themes.unregister("plugin:ocean") == 1
     assert "ocean" not in {t["key"] for t in (await themes.catalog())["themes"]}
     async with ui.full.database.session() as session:

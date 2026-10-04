@@ -8449,6 +8449,10 @@ export interface components {
             };
             /** Pinned */
             pinned?: string[];
+            /** Section Labels */
+            section_labels?: {
+                [key: string]: string;
+            };
         };
         /** LayoutIn */
         LayoutIn: {

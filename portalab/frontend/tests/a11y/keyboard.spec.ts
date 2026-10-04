@@ -26,8 +26,11 @@ test("keyboard-only: sign in, reach and change appearance settings", async ({ pa
   await expect(theme).toBeFocused();
   const outline = await theme.evaluate((el) => getComputedStyle(el).outlineStyle);
   expect(outline).not.toBe("none"); // visible focus
-  await page.keyboard.press("ArrowDown"); // first option after "Portal default": Light
-  await page.keyboard.press("ArrowDown");
+  // keyboard only: move through the options until the Dark theme applies (order follows the catalog)
+  for (let i = 0; i < 8; i += 1) {
+    await page.keyboard.press("ArrowDown");
+    if ((await page.evaluate(() => document.documentElement.dataset.theme)) === "dark") break;
+  }
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
   await expect.poll(() => saved["ui.theme"]).toBe("dark");
 });

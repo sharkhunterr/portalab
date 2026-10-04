@@ -1,0 +1,60 @@
+import { Icon } from "./Icon";
+
+/**
+ * Progression badges (spec 027 FR-001/FR-007): level, XP progress and Coins. Values are display-only —
+ * the economy is never computed here. Large numbers use compact notation with the exact value in the
+ * accessible name.
+ */
+
+export function compactNumber(value: number, locale?: string): string {
+  if (Math.abs(value) < 10_000) return new Intl.NumberFormat(locale).format(value);
+  return new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(value);
+}
+
+/** Share of the current level already earned, in [0, 1]; a top level (no next threshold) is full. */
+export function levelProgress(xp: number, floor: number, next: number | null): number {
+  if (next === null || next <= floor) return 1;
+  return Math.min(1, Math.max(0, (xp - floor) / (next - floor)));
+}
+
+export function LevelBadge({ level, label }: { level: number; label: string }) {
+  return (
+    <span className="ds-level" role="img" aria-label={label}>
+      <span aria-hidden="true">{level}</span>
+    </span>
+  );
+}
+
+export interface ProgressBarProps {
+  value: number;
+  /** Accessible name, e.g. "Level 3: 240 of 400 XP". */
+  label: string;
+  tone?: "xp" | "accent";
+  size?: "sm" | "md";
+}
+
+export function ProgressBar({ value, label, tone = "xp", size = "md" }: ProgressBarProps) {
+  const percent = Math.round(Math.min(1, Math.max(0, value)) * 100);
+  return (
+    <span
+      className={`ds-bar ds-bar--${tone} ds-bar--${size}`}
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={percent}
+    >
+      <span className="ds-bar__fill" style={{ inlineSize: `${percent}%` }} />
+    </span>
+  );
+}
+
+export function CoinBadge({ amount, label, locale }: { amount: number; label: string; locale?: string }) {
+  const exact = new Intl.NumberFormat(locale).format(amount);
+  return (
+    <span className="ds-coins" role="img" aria-label={`${label}: ${exact}`} title={exact}>
+      <Icon name="coins" size={18} />
+      <span aria-hidden="true">{compactNumber(amount, locale)}</span>
+    </span>
+  );
+}

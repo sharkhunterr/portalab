@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { FunctionalState } from "../state/FunctionalState";
 import type { FunctionalStateName } from "../state/stateMap";
+import { Icon } from "./Icon";
 
 /**
  * Content components (spec 022 T038): Card, Panel, Badge, Progress, Timeline, Avatar and an EntityCard
@@ -10,16 +11,47 @@ import type { FunctionalStateName } from "../state/stateMap";
  */
 export function Card({
   title,
+  icon,
+  actions,
+  variant,
+  level = 3,
   children,
   className,
   ...props
-}: HTMLAttributes<HTMLElement> & { title?: string }) {
+}: HTMLAttributes<HTMLElement> & {
+  title?: string;
+  /** Heading level of the title, to keep the page outline (default 3). */
+  level?: 2 | 3 | 4;
+  icon?: string;
+  actions?: ReactNode;
+  /** Defaults to the theme's card style (027 ``data-cards``). */
+  variant?: "elevated" | "flat" | "outlined" | "glass";
+}) {
   return (
-    <article className={["ds-card", "ds-reflow", className].filter(Boolean).join(" ")} {...props}>
-      {title ? <h3>{title}</h3> : null}
+    <article
+      className={["ds-card", "ds-reflow", className].filter(Boolean).join(" ")}
+      data-variant={variant}
+      {...props}
+    >
+      {title || actions ? (
+        <header className="ds-card__header">
+          {title ? (
+            <Heading level={level} className="ds-card__title">
+              {icon ? <Icon name={icon} size={18} /> : null}
+              {title}
+            </Heading>
+          ) : null}
+          {actions ? <div className="ds-card__actions">{actions}</div> : null}
+        </header>
+      ) : null}
       {children}
     </article>
   );
+}
+
+function Heading({ level, ...props }: HTMLAttributes<HTMLHeadingElement> & { level: 2 | 3 | 4 }) {
+  const Tag = `h${level}` as const;
+  return <Tag {...props} />;
 }
 
 export function Panel({ title, children }: { title: string; children: ReactNode }) {
@@ -80,23 +112,7 @@ export function Timeline({ entries, label }: { entries: TimelineEntry[]; label: 
   );
 }
 
-export function Avatar({ name, src }: { name: string; src?: string }) {
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-  return (
-    <span className="ds-avatar" role="img" aria-label={name}>
-      {src ? (
-        <img src={src} alt="" width={40} height={40} />
-      ) : (
-        <span aria-hidden="true">{initials || "?"}</span>
-      )}
-    </span>
-  );
-}
+export { Avatar } from "./Avatar";
 
 export interface EntityCardProps {
   kind: "media" | "service" | "user" | "achievement" | "project";

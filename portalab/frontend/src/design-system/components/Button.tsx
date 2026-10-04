@@ -9,20 +9,25 @@ const button = cva("ds-button", {
       primary: "ds-button--primary",
       secondary: "ds-button--secondary",
       danger: "ds-button--danger",
+      ghost: "ds-button--ghost",
+    },
+    size: {
+      md: "",
+      icon: "ds-button--icon",
     },
   },
-  defaultVariants: { variant: "primary" },
+  defaultVariants: { variant: "primary", size: "md" },
 });
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof button> {
   asChild?: boolean;
 }
 
-export function Button({ asChild = false, variant, className, type, ...props }: ButtonProps) {
+export function Button({ asChild = false, variant, size, className, type, ...props }: ButtonProps) {
   const Component = asChild ? Slot : "button";
   return (
     <Component
-      className={button({ variant, className })}
+      className={button({ variant, size, className })}
       type={asChild ? undefined : (type ?? "button")}
       {...props}
     />

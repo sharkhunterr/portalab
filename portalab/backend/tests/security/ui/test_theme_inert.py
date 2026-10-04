@@ -31,8 +31,14 @@ async def test_matrix(app: FastAPI, client: httpx.AsyncClient, ui: UiHarness) ->
     for method, path in ADMIN_ROUTES:
         assert (await client.request(method, path, json={"definition": {}})).status_code == 403, path
     catalog = (await client.get("/api/v1/ui/themes")).json()
-    assert {t["key"] for t in catalog["themes"]} == {"light", "dark", "high-contrast"}
-    assert catalog["policy"]["defaultTheme"] == "light"
+    assert {t["key"] for t in catalog["themes"]} == {
+        "portalab-dark",
+        "portalab-light",
+        "light",
+        "dark",
+        "high-contrast",
+    }
+    assert catalog["policy"]["defaultTheme"] == "portalab"
 
 
 async def test_themes_are_inert_and_bounded(ui: UiHarness) -> None:

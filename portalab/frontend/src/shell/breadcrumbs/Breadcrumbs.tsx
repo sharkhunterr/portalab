@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useLocation, useMatches } from "react-router";
 import { useNavigationView } from "../nav/NavigationProvider";
+import { currentEntry, sectionEntries } from "../nav/SectionNav";
 import { crumbOf } from "../router/handle";
 import { useShellStrings } from "../strings";
 
@@ -9,22 +10,37 @@ import { useShellStrings } from "../strings";
  * params), ancestors navigable, the current page marked. Long trails collapse the middle items behind an
  * accessible "…" while keeping the first and the last two.
  */
+interface Crumb {
+  path: string;
+  text: string;
+  section?: boolean;
+}
+
 export function Breadcrumbs({ max = 4 }: { max?: number }) {
   const shellStrings = useShellStrings();
   const matches = useMatches();
   const { view } = useNavigationView();
   const location = useLocation();
-  let items = matches
+  let items: Crumb[] = matches
     .map((match) => ({ path: match.pathname, text: crumbOf(match.handle, match.params) }))
     .filter((item): item is { path: string; text: string } => Boolean(item.text));
   const parent = view.crumbs[location.pathname.replace(/\/[^/]+$/, "") || "/"];
   if (parent?.route && !items.some((i) => i.path === parent.route)) {
     items = [{ path: parent.route, text: shellStrings.label(parent.label_key) }, ...items];
   }
+  // 027 FR-017: section → page — the section (not a page itself) is shown, unlinked, after the root.
+  const entry = currentEntry(view.sections, location.pathname);
+  const section = view.sections.find((s) => !s.direct && sectionEntries(s).some((e) => e.key === entry?.key));
+  if (section && items.length > 1) {
+    items = [
+      items[0] as { path: string; text: string },
+      { path: `#section-${section.key}`, text: shellStrings.label(section.label_key), section: true },
+      ...items.slice(1),
+    ];
+  }
   if (items.length <= 1) return null;
-  const first = items[0] as { path: string; text: string };
-  const shown: Array<{ path: string; text: string } | null> =
-    items.length > max ? [first, null, ...items.slice(-2)] : items;
+  const first = items[0] as Crumb;
+  const shown: Array<Crumb | null> = items.length > max ? [first, null, ...items.slice(-2)] : items;
   return (
     <nav aria-label={shellStrings.breadcrumb} className="shell-breadcrumbs">
       <ol>
@@ -38,6 +54,8 @@ export function Breadcrumbs({ max = 4 }: { max?: number }) {
             <li key={item.path}>
               {index === shown.length - 1 ? (
                 <span aria-current="page">{item.text}</span>
+              ) : item.section ? (
+                <span>{item.text}</span>
               ) : (
                 <Link to={item.path}>{item.text}</Link>
               )}

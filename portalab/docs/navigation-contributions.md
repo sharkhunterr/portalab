@@ -20,6 +20,36 @@ register_contribution({
 })
 ```
 
+## Sections (spec 027)
+
+The menu is organized in **sections**, not a flat list. `group` names the section of an entry and `topic`
+an optional sub-group (used by Administration):
+
+```python
+from portalab.capabilities.navigation import register_section
+
+register_section({
+    "key": "games",                    # plugins: "plugin-<key>" or "plugin-<key>-<name>"
+    "owner": "module:games",
+    "label_key": "nav.section.games",
+    "icon": "game",                    # design-system icon name
+    "order_hint": 45,
+    "audience": "everyone",            # everyone | administration | personal (avatar menu)
+    "topics": (),                      # optional sub-groups: ({"key", "label_key", "order_hint"}, …)
+    "default_for": ("module:games",),  # owners whose unplaced entries land here
+})
+```
+
+Built-in sections: `home`, `media`, `content` (Discover), `services`, `community`, `marketplace`, `support`,
+`more` (fallback), `me` (personal pages, shown in the avatar menu) and `admin` (topics `access`, `services`,
+`content`, `economy`, `system`, `extensions`). An entry naming an unknown section lands in its owner's default
+section, else in `more` — never dropped — and a `navigation.section_unknown` diagnostic is recorded (the 004
+default `main` is routed silently). Sections without a usable entry are absent; a section with one entry and
+no topic renders as a direct link. `GET /api/v1/me/navigation` returns `sections`, `personal` and, for one
+release, the 004 `groups` shape. Plugins declare `[[ui.sections]]` and `section = "plugin-<key>"` on their
+`ui.nav` entries (`ctx.nav_section()` / `ctx.nav_entry(..., group=, topic=)` from code). Administrators can
+re-assign entries (`groups_of`), order sections (`group_order`) and rename them (`section_labels`).
+
 * **Closed schema**: unknown fields, a missing permission, a key outside the owner's namespace or an external
   route are rejected; duplicates keep the first registration. Rejections are recorded
   (`shell.contribution_errors`, `GET /api/v1/admin/shell/contribution-errors`) and announced once

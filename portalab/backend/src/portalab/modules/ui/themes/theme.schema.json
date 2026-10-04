@@ -3,8 +3,16 @@
   "type": "object",
   "properties": {
     "schemaVersion": {
-      "type": "number",
-      "const": 1
+      "anyOf": [
+        {
+          "type": "number",
+          "const": 1
+        },
+        {
+          "type": "number",
+          "const": 2
+        }
+      ]
     },
     "key": {
       "type": "string",
@@ -14,6 +22,10 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 80
+    },
+    "family": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,47}$"
     },
     "colorScheme": {
       "type": "string",
@@ -56,6 +68,38 @@
         "focus": {
           "type": "string",
           "maxLength": 64
+        },
+        "accentAlt": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "rarity": {
+          "type": "object",
+          "properties": {
+            "common": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "rare": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "epic": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "legendary": {
+              "type": "string",
+              "maxLength": 64
+            }
+          },
+          "required": [
+            "common",
+            "rare",
+            "epic",
+            "legendary"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -661,12 +705,112 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 2000
+        },
+        "profile": {
+          "type": "string",
+          "enum": [
+            "none",
+            "subtle",
+            "lively",
+            "playful"
+          ]
+        },
+        "celebration": {
+          "type": "string",
+          "enum": [
+            "none",
+            "sparkle",
+            "confetti",
+            "glow"
+          ]
         }
       },
-      "required": [
-        "fastMs",
-        "normalMs"
-      ],
+      "additionalProperties": false
+    },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "nav": {
+          "type": "object",
+          "properties": {
+            "desktop": {
+              "type": "string",
+              "enum": [
+                "sidebar",
+                "topbar",
+                "rail",
+                "orbit"
+              ]
+            },
+            "tablet": {
+              "type": "string",
+              "enum": [
+                "rail",
+                "topbar",
+                "drawer",
+                "orbit"
+              ]
+            },
+            "phone": {
+              "type": "string",
+              "enum": [
+                "bottom-bar",
+                "drawer",
+                "orbit"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "header": {
+          "type": "string",
+          "enum": [
+            "full",
+            "compact",
+            "centered"
+          ]
+        },
+        "headerPosition": {
+          "type": "string",
+          "enum": [
+            "top",
+            "bottom"
+          ]
+        },
+        "cards": {
+          "type": "string",
+          "enum": [
+            "elevated",
+            "flat",
+            "outlined",
+            "glass"
+          ]
+        },
+        "content": {
+          "type": "string",
+          "enum": [
+            "narrow",
+            "wide",
+            "full"
+          ]
+        },
+        "corners": {
+          "type": "string",
+          "enum": [
+            "square",
+            "soft",
+            "round"
+          ]
+        },
+        "widgetFrame": {
+          "type": "string",
+          "enum": [
+            "card",
+            "plain",
+            "glass"
+          ]
+        }
+      },
       "additionalProperties": false
     },
     "icons": {
@@ -718,18 +862,16 @@
         "enum": [
           "notification",
           "alert",
-          "success"
+          "success",
+          "reward",
+          "levelUp",
+          "ui"
         ]
       },
       "additionalProperties": {
         "type": "string",
         "pattern": "^asset:[a-z0-9][a-z0-9._/-]{0,127}$"
-      },
-      "required": [
-        "notification",
-        "alert",
-        "success"
-      ]
+      }
     },
     "notification": {
       "type": "object",

@@ -37,7 +37,14 @@
   --state-syncing-bg: #e1eff8;
 
   /* typography */
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font-display: "Plus Jakarta Sans Variable", var(--font-sans);
+  --font-size-xs: 0.75rem;
+  --font-size-2xl: 1.875rem;
+  --font-size-3xl: 2.25rem;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
@@ -153,4 +160,158 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* --- spec 027: visual experience tokens ------------------------------------------------------------
+ * Themes choose arrangements through data attributes on <html> (data-cards, data-corners, data-motion, …);
+ * these tokens give every choice its values. Raw colors live only here and in theme data.
+ */
+:root {
+  --space-5: calc(1.25rem * var(--space-unit));
+  --space-8: calc(2rem * var(--space-unit));
+  --space-10: calc(2.5rem * var(--space-unit));
+  --space-12: calc(3rem * var(--space-unit));
+
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.18), 0 1px 1px rgb(0 0 0 / 0.08);
+  --shadow-2: 0 6px 16px rgb(0 0 0 / 0.22), 0 2px 4px rgb(0 0 0 / 0.12);
+  --shadow-3: 0 18px 40px rgb(0 0 0 / 0.32), 0 6px 12px rgb(0 0 0 / 0.16);
+  --shadow-glow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    0 8px 30px color-mix(in srgb, var(--color-accent) 30%, transparent);
+
+  --glass-bg: color-mix(in srgb, var(--color-surface-raised) 74%, transparent);
+  --glass-border: color-mix(in srgb, var(--color-text) 10%, transparent);
+  --glass-blur: 18px;
+  --scrim: rgb(0 0 0 / 0.55);
+  --artwork-fade: linear-gradient(to top, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0) 60%);
+  --artwork-text: #ffffff;
+  --ambient:
+    radial-gradient(
+      60rem 40rem at 10% -10%,
+      color-mix(in srgb, var(--color-accent) 16%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 30rem at 110% 0%,
+      color-mix(in srgb, var(--color-accent-alt) 10%, transparent),
+      transparent 60%
+    );
+
+  --color-accent-alt: var(--color-accent);
+  --rarity-common: var(--color-text-muted);
+  --rarity-rare: var(--color-accent);
+  --rarity-epic: var(--color-accent);
+  --rarity-legendary: var(--color-accent-alt);
+  --xp-gradient: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
+
+  --motion-easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-hover-lift: 0px;
+  --motion-duration-slow: calc(var(--motion-duration-normal) * 1.8);
+
+  --header-height: 4rem;
+  --sidebar-width: 16.5rem;
+  --rail-width: 4.75rem;
+  --bottom-bar-height: 4.25rem;
+  --content-max: 80rem;
+  --target-touch: 44px;
+
+  --z-header: 40;
+  --z-nav: 45;
+  --z-overlay: 60;
+  --z-celebration: 80;
+}
+
+/* corners */
+[data-corners="square"] {
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+}
+[data-corners="round"] {
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+}
+
+/* content width */
+[data-content="narrow"] {
+  --content-max: 60rem;
+}
+[data-content="full"] {
+  --content-max: 100%;
+}
+
+/* motion profiles: durations come from the theme; profiles add character (lift, overshoot) */
+[data-motion="lively"] {
+  --motion-hover-lift: -2px;
+}
+[data-motion="playful"] {
+  --motion-hover-lift: -4px;
+  --motion-easing: var(--motion-easing-spring);
+}
+[data-motion="none"] {
+  --motion-duration-fast: 0ms;
+  --motion-duration-normal: 0ms;
+}
+
+/* light schemes need softer shadows */
+[data-color-scheme="light"] {
+  --shadow-1: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.1);
+  --shadow-2: 0 4px 12px rgb(16 24 40 / 0.08), 0 2px 4px rgb(16 24 40 / 0.06);
+  --shadow-3: 0 16px 32px rgb(16 24 40 / 0.12), 0 4px 8px rgb(16 24 40 / 0.06);
+  --scrim: rgb(16 24 40 / 0.45);
+}
+
+/* glass degrades to the solid raised surface: no support, reduced transparency or high contrast (R9) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-bg: var(--color-surface-raised);
+    --glass-blur: 0px;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-bg: var(--color-surface-raised);
+    --glass-blur: 0px;
+  }
+}
+[data-contrast="high"] {
+  --glass-bg: var(--color-surface-raised);
+  --glass-blur: 0px;
+  --glass-border: var(--color-border);
+  --ambient: none;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --target-min: 44px;
+  }
+}
+
+body {
+  background: var(--ambient), var(--color-surface);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+h1,
+h2,
+h3,
+.ds-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+/* placeholder avatars: a gradient on the hue derived from the user id (set inline as --avatar-hue) */
+.ds-avatar {
+  --avatar-placeholder: linear-gradient(
+    135deg,
+    hsl(var(--avatar-hue, 220) 62% 30%),
+    hsl(calc(var(--avatar-hue, 220) + 40) 62% 22%)
+  );
 }

@@ -110,6 +110,15 @@ class StateStyle(_Closed):
     _colors = field_validator("fg", "bg")(_check_color)
 
 
+class Rarity(_Closed):
+    common: Color
+    rare: Color
+    epic: Color
+    legendary: Color
+
+    _colors = field_validator("*")(_check_color)
+
+
 class Colors(_Closed):
     surface: Color
     surfaceRaised: Color
@@ -119,8 +128,17 @@ class Colors(_Closed):
     accent: Color
     accentContrast: Color
     focus: Color
+    accentAlt: Color | None = None
+    rarity: Rarity | None = None
 
-    _colors = field_validator("*")(_check_color)
+    _colors = field_validator(
+        "surface", "surfaceRaised", "text", "textMuted", "border", "accent", "accentContrast", "focus"
+    )(_check_color)
+
+    @field_validator("accentAlt")
+    @classmethod
+    def _alt(cls, value: str | None) -> str | None:
+        return None if value is None else _check_color(value)
 
 
 class States(_Closed):
@@ -161,8 +179,28 @@ class Radii(_Closed):
 
 
 class Motion(_Closed):
-    fastMs: Annotated[int, Field(ge=0, le=1000)]
-    normalMs: Annotated[int, Field(ge=0, le=2000)]
+    fastMs: Annotated[int, Field(ge=0, le=1000)] | None = None
+    normalMs: Annotated[int, Field(ge=0, le=2000)] | None = None
+    profile: Literal["none", "subtle", "lively", "playful"] | None = None
+    celebration: Literal["none", "sparkle", "confetti", "glow"] | None = None
+
+
+class Nav(_Closed):
+    desktop: Literal["sidebar", "topbar", "rail", "orbit"] | None = None
+    tablet: Literal["rail", "topbar", "drawer", "orbit"] | None = None
+    phone: Literal["bottom-bar", "drawer", "orbit"] | None = None
+
+
+class Layout(_Closed):
+    """Closed arrangement vocabulary (spec 027 R7/R24): themes choose, the portal implements."""
+
+    nav: Nav | None = None
+    header: Literal["full", "compact", "centered"] | None = None
+    headerPosition: Literal["top", "bottom"] | None = None
+    cards: Literal["elevated", "flat", "outlined", "glass"] | None = None
+    content: Literal["narrow", "wide", "full"] | None = None
+    corners: Literal["square", "soft", "round"] | None = None
+    widgetFrame: Literal["card", "plain", "glass"] | None = None
 
 
 class Icons(_Closed):
@@ -180,6 +218,9 @@ class Sounds(_Closed):
     notification: Asset | None = None
     alert: Asset | None = None
     success: Asset | None = None
+    reward: Asset | None = None
+    levelUp: Asset | None = None
+    ui: Asset | None = None
 
 
 class NotificationAppearance(_Closed):
@@ -189,24 +230,33 @@ class NotificationAppearance(_Closed):
 
 
 class ThemeDefinition(_Closed):
-    schemaVersion: Literal[1]
+    schemaVersion: Literal[1, 2]
     key: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9-]{1,47}$")]
     name: Annotated[str, StringConstraints(min_length=1, max_length=80)]
+    family: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9-]{1,47}$")] | None = None
     colorScheme: Literal["light", "dark"]
     colors: Colors
     states: States
     typography: Typography | None = None
     radii: Radii | None = None
     motion: Motion | None = None
+    layout: Layout | None = None
     icons: Icons | None = None
     background: Background | None = None
     sounds: Sounds | None = None
     notification: NotificationAppearance | None = None
 
 
+SCHEMA_VERSION = 2
+
+
 def validate_definition(document: object) -> tuple[ThemeDefinition | None, list[str]]:
+    """Validate a v1 or v2 document; a valid v1 document is upgraded (its new blocks are optional)."""
     try:
-        return ThemeDefinition.model_validate(document), []
+        theme = ThemeDefinition.model_validate(document)
+        if theme.schemaVersion != SCHEMA_VERSION:
+            theme = theme.model_copy(update={"schemaVersion": SCHEMA_VERSION})
+        return theme, []
     except ValidationError as exc:
         return None, [f"{'.'.join(str(p) for p in e['loc']) or '(root)'}: {e['msg']}" for e in exc.errors()]
 
@@ -227,6 +277,17 @@ def floor_report(theme: ThemeDefinition) -> dict[str, object]:
     check("focus/surface", colors.focus, colors.surface, LARGE_OR_UI_MIN)
     if theme.background:
         check("text/backgroundFallback", colors.text, theme.background.fallback)
+    # 027: gamification accent and rarity colors are UI cues on raised surfaces (glass falls back to it).
+    if colors.accentAlt:
+        check("accentAlt/surfaceRaised", colors.accentAlt, colors.surfaceRaised, LARGE_OR_UI_MIN)
+    if colors.rarity:
+        for rarity in ("common", "rare", "epic", "legendary"):
+            check(
+                f"rarity.{rarity}/surfaceRaised",
+                getattr(colors.rarity, rarity),
+                colors.surfaceRaised,
+                LARGE_OR_UI_MIN,
+            )
     for state in FUNCTIONAL_STATES:
         style = theme.states.get(state)
         check(f"state.{state}.fg/bg", style.fg, style.bg)

@@ -84,8 +84,10 @@ class Context:
         permission: str,
         icon: str | None = None,
         group: str = "main",
+        topic: str | None = None,
     ) -> None:
-        entry_key = f"plugin_{self.key}.{key}"
+        # keys are namespaced ``plugin.<key>.…`` (004 contribution rules); the group names the section (027)
+        entry_key = f"plugin.{self.key}.{key}"
         contribution: dict[str, Any] = {
             "key": entry_key,
             "owner": self.owner,
@@ -94,6 +96,7 @@ class Context:
             "route": route,
             "icon": icon,
             "group": group,
+            "topic": topic,
             "order_hint": 500,
             "required_permission": permission,
         }
@@ -101,6 +104,24 @@ class Context:
             "nav",
             contribution["key"],
             lambda: self.registries.navigation.register(contribution, owner=self.owner),
+        )
+
+    def nav_section(
+        self, key: str, label_key: str, *, icon: str | None = None, order_hint: int = 500
+    ) -> None:
+        section_key = f"plugin-{self.key}" if key in ("", self.key) else f"plugin-{self.key}-{key}"
+        section: dict[str, Any] = {
+            "key": section_key,
+            "owner": self.owner,
+            "label_key": label_key,
+            "icon": icon,
+            "order_hint": order_hint,
+            "default_for": (self.owner,),
+        }
+        self._try(
+            "nav",
+            f"section:{section_key}",
+            lambda: self.registries.navigation.register_section(section, owner=self.owner),
         )
 
     def page(self, page: PageDefinition) -> None:
@@ -370,6 +391,13 @@ def apply_manifest(ctx: Context, manifest: Mapping[str, Any]) -> None:
     for name in manifest.get("events", {}).get("produces", []):
         ctx.event_type(name)
     ui = manifest.get("ui", {})
+    for section in ui.get("sections", []):
+        ctx.nav_section(
+            str(section.get("key", "")),
+            str(section["label_key"]),
+            icon=section.get("icon"),
+            order_hint=int(section.get("order_hint", 500)),
+        )
     for entry in ui.get("nav", []):
         ctx.nav_entry(
             str(entry["key"]),
@@ -377,7 +405,8 @@ def apply_manifest(ctx: Context, manifest: Mapping[str, Any]) -> None:
             str(entry["route"]),
             permission=str(entry["permission"]),
             icon=entry.get("icon"),
-            group=str(entry.get("group", "main")),
+            group=str(entry.get("section", entry.get("group", "main"))),
+            topic=entry.get("topic"),
         )
     for raw in ui.get("pages", []):
         ctx.page(page_from(raw))

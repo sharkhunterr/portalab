@@ -64,6 +64,6 @@ async def test_etag_304(app: FastAPI, client: httpx.AsyncClient, sh: ShellHarnes
     await login(client, "reader")
     first = await client.get("/api/v1/me/navigation")
     assert first.status_code == 200 and first.headers["ETag"]
-    assert next(g["key"] for g in first.json()["groups"]) == "main"
+    assert first.json()["sections"][0]["key"] == "home"  # 027 sections, home first
     again = await client.get("/api/v1/me/navigation", headers={"If-None-Match": first.headers["ETag"]})
     assert again.status_code == 304

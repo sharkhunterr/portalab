@@ -60,7 +60,14 @@ class PluginContext(Protocol):
         permission: str,
         icon: str | None = None,
         group: str = "main",
+        topic: str | None = None,
     ) -> None: ...
+
+    def nav_section(
+        self, key: str, label_key: str, *, icon: str | None = None, order_hint: int = 500
+    ) -> None:
+        """Declare a section ``plugin-<plugin key>[-<key>]`` for this plugin's entries (spec 027)."""
+        ...
 
     def page(self, page: PageDefinition) -> None: ...
 

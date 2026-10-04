@@ -29,7 +29,8 @@ class NavigationContribution(BaseModel):
     icon: str | None = Field(default=None, max_length=64)
     route: str | None = Field(default=None, pattern=r"^/[A-Za-z0-9/_:.\-]*$", max_length=256)
     action_id: str | None = Field(default=None, max_length=128)
-    group: str = Field(default="main", pattern=r"^[a-z][a-z0-9_-]{0,47}$")
+    group: str = Field(default="main", pattern=r"^[a-z][a-z0-9_-]{0,47}$")  # the section key (027)
+    topic: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9_-]{0,47}$")  # sub-group in a section
     order_hint: int = Field(default=100, ge=0, le=10_000)
     required_permission: str = Field(min_length=3, max_length=128)
     resource_kind: str | None = Field(default=None, max_length=64)

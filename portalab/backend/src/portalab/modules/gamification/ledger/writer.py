@@ -4,7 +4,9 @@
 2. update the balance: credits upsert, debits are guarded (``amount + delta >= 0``) — an overdraft raises
    ``InsufficientCoins`` and the caller's transaction rolls back entirely;
 3. for XP, derive the level from the curve and emit one ``user.level_up`` when it rises;
-4. publish the matching event through the outbox in the same transaction.
+4. publish the matching event through the outbox in the same transaction;
+5. for XP and Coins, queue a ``progression.changed`` live notification to the owner only (spec 027 R6), so
+   the header updates without polling — and never on rollback, since it shares the transaction.
 Rows are never updated or deleted (database triggers); corrections are new rows."""
 
 from dataclasses import dataclass, field
@@ -20,6 +22,7 @@ from portalab.capabilities.economy import InsufficientCoins, Transaction
 from portalab.core.authz_port import Principal
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
+from portalab.core.live import publish_live
 from portalab.core.time import Clock, utc_now
 from portalab.modules.gamification.levels.service import LevelService
 from portalab.modules.gamification.models import Balance, LedgerTransaction
@@ -143,7 +146,38 @@ class LedgerWriter:
         amount = await self._balance(session, row)
         level_up = await self._level(session, row, amount) if row.value == "xp" else None
         await self._publish(session, row, level_up)
+        if row.value in ("xp", "coins"):
+            await self._live(session, row, level_up)
         return Recorded(to_transaction(row), level_up=level_up)
+
+    async def _live(self, session: AsyncSession, row: LedgerTransaction, level_up: int | None) -> None:
+        rows = (
+            await session.execute(
+                select(Balance.value, Balance.amount).where(
+                    Balance.user_id == row.user_id, Balance.value.in_(("xp", "coins"))
+                )
+            )
+        ).all()
+        amounts: dict[str, int] = {str(value): int(amount) for value, amount in rows}
+        xp, coins = int(amounts.get("xp", 0)), int(amounts.get("coins", 0))
+        curve = await self.levels.curve(session)
+        level = curve.level_for(xp)
+        await publish_live(
+            session,
+            topic="progression.changed",
+            payload={
+                "xp": xp,
+                "level": level,
+                "level_floor": curve.threshold(level),
+                "next_level_at": curve.next_threshold(xp),
+                "coins": coins,
+                "delta_xp": row.delta if row.value == "xp" else 0,
+                "delta_coins": row.delta if row.value == "coins" else 0,
+                "level_up": level_up is not None,
+            },
+            audience_user_id=row.user_id,
+            clock=self.clock,
+        )
 
     async def _balance(self, session: AsyncSession, row: LedgerTransaction) -> int:
         if row.delta >= 0:

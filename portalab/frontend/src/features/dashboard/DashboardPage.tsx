@@ -4,8 +4,13 @@ import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Button } from "../../design-system/components/Button";
+import { Icon } from "../../design-system/components/Icon";
+import { PageHeader } from "../../design-system/components/PageHeader";
+import { EmptyState } from "../../design-system/components/Placeholders";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
+import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { useMe } from "../auth/useAuth";
 import { IncidentBanner } from "../support/incidents/IncidentBanner";
 import { type Change, DASHBOARD_KEY, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
@@ -26,8 +31,19 @@ const ONBOARDED = "portalab.onboarding.dashboard";
  * its own isolated frame; "Customize" turns on keyboard/touch edit controls and the catalog; live
  * ``widget.invalidate`` messages refetch only the affected widget (refetch re-authorizes).
  */
+/** Greeting by time of day (027 FR-027). */
+export function greetingKey(hour: number): string {
+  if (hour < 5) return "dashboard:greeting.night";
+  if (hour < 12) return "dashboard:greeting.morning";
+  if (hour < 18) return "dashboard:greeting.afternoon";
+  return "dashboard:greeting.evening";
+}
+
 export function DashboardPage({ live = true }: { live?: boolean }) {
   const t = useT();
+  const format = useFormat();
+  const me = useMe();
+  const name = me.data?.display_name ?? me.data?.login ?? "";
   const headingId = useId();
   const announce = useAnnounce();
   const client = useQueryClient();
@@ -67,26 +83,46 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const visible = instances.filter((i) => i.status === "active");
   const hidden = instances.filter((i) => i.status === "hidden");
   return (
-    <section aria-labelledby={headingId} className="dashboard-page">
+    <div className="dashboard-page">
+      <PageHeader
+        title={name ? t(greetingKey(new Date().getHours()), { name }) : t("dashboard:title")}
+        context={
+          <>
+            <span className="dashboard-page__date">{format.date(new Date(), "long")}</span>
+            {" · "}
+            {t("dashboard:subtitle")}
+          </>
+        }
+        secondary={
+          <>
+            {editing ? <CatalogDrawer apply={apply} /> : null}
+            <Button
+              variant={editing ? "primary" : "secondary"}
+              aria-pressed={editing}
+              onClick={() => setEditing((value) => !value)}
+            >
+              <Icon name={editing ? "check" : "dashboard"} size={18} />
+              {editing ? t("dashboard:done") : t("dashboard:edit")}
+            </Button>
+          </>
+        }
+      />
       <ActiveCampaignBanner />
-      <div className="ds-stack ds-stack--row dashboard-page__header">
-        <h2 id={headingId}>{t("dashboard:title")}</h2>
-        <Button variant="secondary" aria-pressed={editing} onClick={() => setEditing((value) => !value)}>
-          {editing ? t("dashboard:done") : t("dashboard:edit")}
-        </Button>
-        {editing ? <CatalogDrawer apply={apply} /> : null}
-      </div>
       <IncidentBanner />
       <SinceLastLoginCard />
       {dashboard.isPending ? <FunctionalState state="loading" /> : null}
       {dashboard.isError ? <FunctionalState state="error" onRetry={() => dashboard.refetch()} /> : null}
       {dashboard.data && visible.length === 0 ? (
-        <section className="ds-panel">
-          <p>{t("dashboard:empty")}</p>
-          <p>{t("dashboard:emptyHint")}</p>
-          {!editing ? <Button onClick={() => setEditing(true)}>{t("dashboard:addWidget")}</Button> : null}
-        </section>
+        <EmptyState
+          icon="dashboard"
+          title={t("dashboard:empty")}
+          message={t("dashboard:emptyHint")}
+          action={{ label: t("dashboard:addWidget"), onSelect: () => setEditing(true) }}
+        />
       ) : null}
+      <h2 id={headingId} className="visually-hidden">
+        {t("dashboard:title")}
+      </h2>
       <ResponsiveGrid label={t("dashboard:title")}>
         {visible.map((instance) => (
           <GridCell key={instance.id ?? instance.widget_key} w={instance.w}>
@@ -119,7 +155,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
           </ul>
         </section>
       ) : null}
-    </section>
+    </div>
   );
 }
 

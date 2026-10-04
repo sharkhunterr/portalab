@@ -4713,6 +4713,13 @@
             "maxItems": 50,
             "title": "Pinned",
             "type": "array"
+          },
+          "section_labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Section Labels",
+            "type": "object"
           }
         },
         "title": "Layout",

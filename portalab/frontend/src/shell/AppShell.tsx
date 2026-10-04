@@ -1,21 +1,27 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { Dialog } from "../design-system/components/Overlays";
+import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
-import { ResponsiveNav } from "./nav/ResponsiveNav";
+import { AppHeader } from "./header/AppHeader";
+import { useHeaderData } from "./header/useHeaderData";
+import { BottomBar } from "./nav/BottomBar";
+import { useArrangement } from "./nav/NavFrame";
+import { useNavigationView } from "./nav/NavigationProvider";
+import { OrbitNav } from "./nav/OrbitNav";
+import { NavContent } from "./nav/SectionNav";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
 import { RegionBoundary } from "./router/RouteBoundary";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
-import { AiEntry, HelpEntry, IdentityMenu, NotificationEntry, SearchEntry } from "./slots/Entries";
 import { GlobalStatusBanner } from "./status/GlobalStatusBanner";
 import { useShellStrings } from "./strings";
 
 /**
- * Persistent shell (spec 004 T017; R1, FR-001..004): one environment for every module — header (search,
- * assistant, notifications, identity), primary navigation, global status banner, breadcrumbs and the page
- * outlet. Only the outlet changes on navigation; the shell stays mounted and keeps its state. Unknown to
- * anonymous visitors (the router renders only after sign-in, CD-025).
+ * Persistent shell (spec 004 T017; 027 US1–US3): one environment for every module — the personal header,
+ * the section navigation in the arrangement the theme chose for the device (sidebar, rail, top bar,
+ * drawer, phone bottom bar, orbit bubble; header on top or as a footer bar), the global status banner,
+ * breadcrumbs and the page outlet. Only the outlet changes on navigation, and a change of arrangement
+ * never remounts it: the page keeps its state. Unknown to anonymous visitors (CD-025).
  */
 export interface AppShellProps {
   userName: string;
@@ -35,6 +41,15 @@ export function AppShell({
   const shellStrings = useShellStrings();
   const navigate = useNavigate();
   const location = useLocation();
+  const arrangement = useArrangement();
+  const { view } = useNavigationView();
+  const header = useHeaderData();
+  const [menuOpen, setMenuOpen] = useState(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: close the menu panel on navigation
+  useEffect(() => setMenuOpen(false), [location.pathname]);
+  const sections = view.sections;
+  const nav = sidebarCollapsed && arrangement.nav === "sidebar" ? "rail" : arrangement.nav;
+  const drawerNav = nav === "drawer" || nav === "bottom-bar";
   const [palette, setPalette] = useState<{ open: boolean; query: string }>({ open: false, query: "" });
   const [helpOpen, setHelpOpen] = useState(false);
   const control = useMemo(
@@ -87,24 +102,59 @@ export function AppShell({
       <a className="skip-link" href="#main-content">
         {shellStrings.skip}
       </a>
-      <header className="shell-header">
-        <span className="shell-brand">{shellStrings.brand}</span>
-        <div className="ds-stack ds-stack--row shell-header__slots">
-          <SearchEntry />
-          <AiEntry />
-          <NotificationEntry />
-          <HelpEntry />
-          <IdentityMenu name={userName} onSignOut={onSignOut} onNavigate={(to) => navigate(to)} />
+      <div
+        className="shell"
+        data-nav={nav}
+        data-device={arrangement.device}
+        data-header-position={arrangement.headerPosition}
+      >
+        <AppHeader
+          device={arrangement.device}
+          data={header}
+          fallbackName={userName}
+          personal={view.personal}
+          onNavigate={(to) => navigate(to)}
+          onSignOut={onSignOut}
+          onOpenNavigation={nav === "drawer" ? () => setMenuOpen(true) : undefined}
+          bottomBar={nav === "bottom-bar"}
+        />
+        <GlobalStatusBanner />
+        {nav === "topbar" ? (
+          <nav aria-label={shellStrings.mainNav} className="shell-topnav">
+            <NavContent variant="bar" />
+          </nav>
+        ) : null}
+        <div className="shell-body">
+          {nav === "sidebar" || nav === "rail" ? (
+            <nav aria-label={shellStrings.mainNav} className="shell-side" data-variant={nav}>
+              <NavContent variant={nav === "rail" ? "rail" : "list"} />
+            </nav>
+          ) : null}
+          <main id="main-content" tabIndex={-1} className="shell-main ds-reflow">
+            <div className="shell-content">
+              <Breadcrumbs />
+              <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
+              <RelatedLinks />
+            </div>
+          </main>
         </div>
-      </header>
-      <GlobalStatusBanner />
-      <div className="shell-body">
-        <ResponsiveNav collapsed={sidebarCollapsed} />
-        <main id="main-content" tabIndex={-1} className="shell-main ds-reflow">
-          <Breadcrumbs />
-          <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
-          <RelatedLinks />
-        </main>
+        {nav === "bottom-bar" ? (
+          <BottomBar unread={header.unread} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        ) : null}
+        {nav === "orbit" ? <OrbitNav sections={sections} /> : null}
+        {drawerNav ? (
+          <Drawer
+            title={shellStrings.mainNav}
+            open={menuOpen}
+            onOpenChange={setMenuOpen}
+            closeLabel={shellStrings.closeMenu}
+            trigger={<span hidden />}
+          >
+            <nav aria-label={shellStrings.mainNav}>
+              <NavContent onNavigate={() => setMenuOpen(false)} />
+            </nav>
+          </Drawer>
+        ) : null}
       </div>
       <CommandPalette
         open={palette.open}

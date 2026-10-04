@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { AnnounceProvider, useAnnounce } from "../../../design-system/a11y/Announce";
 import { PreferencesProvider } from "../../../design-system/a11y/PreferencesProvider";
+import { CoinBadge, LevelBadge, ProgressBar } from "../../../design-system/components/Badges";
 import { Button, Link } from "../../../design-system/components/Button";
+import { ListItem, StatFigure, Tile, TileGrid } from "../../../design-system/components/Collections";
 import {
   Avatar,
   Badge,
@@ -12,9 +14,12 @@ import {
   Timeline,
 } from "../../../design-system/components/Content";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { Container, Grid, Stack, Table } from "../../../design-system/components/Layout";
 import { NotificationArea, useNotify } from "../../../design-system/components/Notification";
 import { Dialog, Drawer, Menu, Popover, Tooltip } from "../../../design-system/components/Overlays";
+import { PageHeader } from "../../../design-system/components/PageHeader";
+import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
 import { PolicyField } from "../../../design-system/components/PolicyField";
 import { Tabs } from "../../../design-system/components/Tabs";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -97,6 +102,43 @@ function Demos() {
             </SelectField>
           )}
         </PolicyField>
+      </section>
+      <section aria-labelledby="g-kit">
+        <h2 id="g-kit">Page kit (027)</h2>
+        <PageHeader
+          title="Media"
+          icon="film"
+          context="Everything available on your services"
+          primary={{ label: "Request a title", icon: "plus" }}
+        />
+        <Stack row>
+          <LevelBadge level={7} label="Level 7" />
+          <ProgressBar value={0.62} label="Level 7: 620 of 1000 XP" />
+          <CoinBadge amount={12450} label="Coins" />
+        </Stack>
+        <TileGrid label="Recently added">
+          <Tile key="a" title="A long film title" subtitle="2024 · Film" />
+          <Tile key="b" title="Series" subtitle="3 seasons" icon="film" />
+          <Tile key="c" title="Album" aspect="square" icon="star" />
+        </TileGrid>
+        <ul className="ds-list">
+          <ListItem leading={<Icon name="ticket" />} title="Ticket #42" meta="Waiting for you" />
+          <ListItem leading={<Icon name="bell" />} title="New article" meta="2 minutes ago" />
+        </ul>
+        <Grid>
+          <StatFigure
+            label="Hours watched"
+            value="128"
+            icon="clock"
+            trend={{ direction: "up", text: "+12%" }}
+          />
+          <Skeleton shape="card" label="Loading" />
+        </Grid>
+        <EmptyState
+          title="Nothing here yet"
+          message="Requests you make appear here."
+          action={{ label: "Browse media" }}
+        />
       </section>
       <section aria-labelledby="g-content">
         <h2 id="g-content">Content</h2>

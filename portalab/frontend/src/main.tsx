@@ -11,6 +11,8 @@ import { DirectionBridge, I18nProvider } from "./i18n";
 import { NavigationProvider } from "./shell/nav/NavigationProvider";
 import { createRouter } from "./shell/router/routes";
 import { ShellLayout } from "./shell/ShellLayout";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/plus-jakarta-sans";
 import "./styles.css";
 
 /**

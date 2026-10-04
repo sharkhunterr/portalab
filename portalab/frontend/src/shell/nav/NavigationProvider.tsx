@@ -23,8 +23,22 @@ export interface NavCommand extends NavEntry {
   confirmation_required?: boolean;
 }
 
+/** A navigation section (027 R1/R2): server-filtered; topics group Administration pages. */
+export interface NavSection {
+  key: string;
+  label_key: string;
+  icon?: string | null;
+  audience: "everyone" | "administration" | "personal";
+  direct: boolean;
+  topics: Array<{ key: string; label_key: string; entries: NavEntry[] }>;
+  entries: NavEntry[];
+}
+
 export interface NavigationView {
   version: string;
+  sections: NavSection[];
+  /** Personal destinations, shown in the avatar menu. */
+  personal: NavEntry[];
   groups: Array<{ key: string; label_key: string; entries: NavEntry[] }>;
   commands: NavCommand[];
   related: Record<string, NavEntry[]>;
@@ -34,13 +48,36 @@ export interface NavigationView {
 
 export const NAVIGATION_KEY = ["shell", "navigation"] as const;
 
+/** Sections from the 004 ``groups`` shape (servers or stubs without sections): ``me`` becomes personal. */
+function fromGroups(groups: NavigationView["groups"]): Pick<NavigationView, "sections" | "personal"> {
+  return {
+    sections: groups
+      .filter((group) => group.key !== "me" && group.entries.length > 0)
+      .map((group) => ({
+        key: group.key,
+        label_key: group.label_key,
+        icon: null,
+        audience: group.key === "admin" ? "administration" : "everyone",
+        direct: group.entries.length === 1,
+        topics: [],
+        entries: group.entries,
+      })),
+    personal: groups.find((group) => group.key === "me")?.entries ?? [],
+  };
+}
+
 /** Defensive parsing: a malformed answer degrades the navigation, it never breaks the shell. */
 export function normalize(data: unknown): NavigationView {
   const raw = (data ?? {}) as Partial<NavigationView>;
   const valid = Array.isArray(raw.groups) && Array.isArray(raw.commands);
+  const groups = valid ? (raw.groups as NavigationView["groups"]) : [];
+  const sectioned = Array.isArray(raw.sections)
+    ? { sections: raw.sections as NavSection[], personal: Array.isArray(raw.personal) ? raw.personal : [] }
+    : fromGroups(groups);
   return {
     version: typeof raw.version === "string" ? raw.version : "",
-    groups: valid ? (raw.groups as NavigationView["groups"]) : [],
+    ...sectioned,
+    groups,
     commands: valid ? (raw.commands as NavigationView["commands"]) : [],
     related: raw.related && typeof raw.related === "object" ? raw.related : {},
     crumbs: raw.crumbs && typeof raw.crumbs === "object" ? raw.crumbs : {},
@@ -49,6 +86,8 @@ export function normalize(data: unknown): NavigationView {
 }
 const EMPTY: NavigationView = {
   version: "",
+  sections: [],
+  personal: [],
   groups: [],
   commands: [],
   related: {},

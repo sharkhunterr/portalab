@@ -22,6 +22,31 @@ export const NAVIGATION = {
       ],
     },
   ],
+  // 027: the server's section view (the 004 ``groups`` above stay as the deprecated alias)
+  sections: [
+    {
+      key: "home",
+      label_key: "nav.section.home",
+      icon: "home",
+      audience: "everyone",
+      direct: true,
+      topics: [],
+      entries: [{ key: "shell.home", label_key: "nav.home", icon: "home", route: "/" }],
+    },
+    {
+      key: "services",
+      label_key: "nav.section.services",
+      icon: "server",
+      audience: "everyone",
+      direct: true,
+      topics: [],
+      entries: [{ key: "health.services", label_key: "nav.services", icon: "server", route: "/services" }],
+    },
+  ],
+  personal: [
+    { key: "identity.account", label_key: "nav.account", icon: "user", route: "/account" },
+    { key: "ui.appearance", label_key: "nav.appearance", icon: "palette", route: "/settings/appearance" },
+  ],
   commands: [
     { key: "health.services", label_key: "nav.services", route: "/services", kind: "navigate" },
     { key: "identity.account", label_key: "nav.account", route: "/account", kind: "navigate" },
@@ -135,6 +160,19 @@ export async function stubApi(
     if (url.pathname === "/api/v1/me/permissions")
       return json(200, { permissions: ["users.self.manage"], roles: ["user"] });
     if (url.pathname === "/api/v1/me/navigation") return json(200, NAVIGATION);
+    if (url.pathname === "/api/v1/me/progression")
+      return json(200, {
+        user_id: me.id,
+        xp: 240,
+        level: 3,
+        level_floor: 200,
+        next_level_at: 400,
+        contribution: 0,
+        coins: 120,
+        reserved_coins: 0,
+        achievements: 1,
+      });
+    if (url.pathname === "/api/v1/me/notifications/unread-count") return json(200, { unread: 2 });
     if (url.pathname === "/api/v1/services/health") {
       const failing = options.failing ?? [];
       return json(200, {

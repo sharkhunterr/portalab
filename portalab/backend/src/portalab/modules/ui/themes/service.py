@@ -17,6 +17,7 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound, ValidationFailed
 from portalab.core.time import Clock, utc_now
 from portalab.modules.ui.models import Theme
+from portalab.modules.ui.settings import BUILTIN_KEYS, DEFAULT_THEME
 from portalab.modules.ui.themes.definition import floor_report, validate_definition
 
 ACCESSIBILITY_THEMES = ("high-contrast",)  # always offered: an accessibility preference, not a style choice
@@ -45,6 +46,7 @@ def theme_out(row: Theme, *, admin: bool = False) -> dict[str, Any]:
         "key": row.key,
         "name": row.name,
         "colorScheme": row.definition.get("colorScheme"),
+        "family": row.definition.get("family"),
         "definition": row.definition,
         "version": row.version,
     }
@@ -83,10 +85,8 @@ class ThemeService:
 
     async def policy(self) -> dict[str, Any]:
         return {
-            "allowedThemes": list(
-                await self._setting("ui.allowedThemes", ["light", "dark", "high-contrast"])
-            ),
-            "defaultTheme": await self._setting("ui.defaultTheme", "light"),
+            "allowedThemes": list(await self._setting("ui.allowedThemes", list(BUILTIN_KEYS))),
+            "defaultTheme": await self._setting("ui.defaultTheme", DEFAULT_THEME),
             "textScaleMin": await self._setting("ui.textScale.min", 0.85),
             "textScaleMax": await self._setting("ui.textScale.max", 2.0),
             "forceReducedMotion": await self._setting("ui.forceReducedMotion", False),
@@ -170,7 +170,8 @@ class ThemeService:
                 row.definition, row.floor_report, row.name = clean, report, clean["name"]
                 row.version += 1
             if enabled is not None and enabled != row.enabled:
-                if not enabled and key == await self._setting("ui.defaultTheme", "light"):
+                default = await self._setting("ui.defaultTheme", DEFAULT_THEME)
+                if not enabled and default in (key, row.definition.get("family")):  # family default (027)
                     raise ThemeConflict(
                         "The portal default theme cannot be disabled; change the default first."
                     )
@@ -211,7 +212,9 @@ class ThemeService:
         if value is None:
             return []
         catalog = await self.catalog()
-        if value not in {theme["key"] for theme in catalog["themes"]}:
+        choices = {theme["key"] for theme in catalog["themes"]}
+        choices |= {theme["family"] for theme in catalog["themes"] if theme.get("family")}  # 027 R8
+        if value not in choices:
             return [f"theme {value!r} is not available"]
         return []
 

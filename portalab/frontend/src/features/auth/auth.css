@@ -9,18 +9,27 @@
 .auth-form input,
 .auth-form textarea,
 .auth-form select {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: max(var(--target-min), 2.75rem);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2);
-  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-surface) 70%, var(--color-surface-raised));
   color: var(--color-text);
+  font: inherit;
 }
 
 .auth-form button,
 .account-page button {
   justify-self: start;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
+  min-block-size: 2.5rem;
+  padding: var(--space-2) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
   background: var(--color-accent);
   color: var(--color-accent-contrast);
 }
