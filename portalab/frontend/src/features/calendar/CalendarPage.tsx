@@ -8,6 +8,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { type CalendarItem, useCalendar, useReminderActions, useReminders } from "./api";
 import "./calendar.css";
+import { PageHeader } from "../../design-system/components/PageHeader";
 
 /**
  * Calendar (spec 011 T025): month, week and list views of items owned by other domains. Every type has an
@@ -150,7 +151,7 @@ export function CalendarPage() {
   const types = [...new Set((calendar.data?.items ?? []).map((i) => i.type))];
   return (
     <section aria-labelledby={headingId} className="calendar-page">
-      <h2 id={headingId}>{t("calendar:title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="calendar" title={t("calendar:title")} />
       <div className="ds-stack ds-stack--row" role="toolbar" aria-label={t("calendar:navigation")}>
         {(["month", "week", "list"] as View[]).map((v) => (
           <Button

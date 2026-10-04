@@ -8,6 +8,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { type OwnershipRow, useOwnedActions, usePurchases } from "../api";
 import "../marketplace.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 function NeedsConfiguration({ row }: { row: OwnershipRow }) {
   const t = useT();
@@ -64,7 +65,7 @@ export default function OwnedPage() {
   ];
   return (
     <div className="ds-stack">
-      <h1>{t("marketplace:owned.title")}</h1>
+      <PageHeader icon="shop" title={t("marketplace:owned.title")} />
       {purchases.isError ? <FunctionalState state="unavailable" onRetry={() => purchases.refetch()} /> : null}
       {error ? (
         <p role="alert">{t(`marketplace:purchase.error.${error.split(".")[1] ?? "generic"}`)}</p>

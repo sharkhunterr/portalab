@@ -6,6 +6,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useMyRequests, useRequestActions } from "../api";
 import "../media.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** My media requests (spec 024 T026): state as text, quota left (base + extra units), cancel while pending. */
 const CANCELLABLE = new Set(["pending", "approved"]);
@@ -18,7 +19,7 @@ export function RequestsPage() {
   const { cancel } = useRequestActions();
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("media:requests.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="film" title={t("media:requests.title")} />
       {requests.data ? (
         <p>
           {t("media:requests.quota", { count: Number(requests.data.quota.base_remaining ?? 0) })} ·{" "}

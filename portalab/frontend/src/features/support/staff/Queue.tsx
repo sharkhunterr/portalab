@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import "../support.css";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useQueue } from "../tickets/api";
@@ -18,7 +19,7 @@ export function Queue() {
   const queue = useQueue({ state, unassigned, q });
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("support:queue.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="inbox" title={t("support:queue.title")} />
       <search>
         <fieldset className="support-filters">
           <legend className="visually-hidden">{t("support:queue.filters")}</legend>

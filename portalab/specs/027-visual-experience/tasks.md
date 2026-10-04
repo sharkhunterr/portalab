@@ -137,17 +137,17 @@ level-up celebration, reduced motion, sounds off).
 
 **Independent Test**: quickstart scenario 7 (`check-page-header` lint + skeleton/empty-state checks).
 
-- [ ] T048 [US4] Lint `frontend/scripts/check-page-header.mjs` (every module imported by `frontend/src/shell/router/routes.tsx` renders `PageHeader`; every `EmptyState` has an action) wired into `npm run lint`
-- [ ] T049 [P] [US4] Migrate home & dashboard chrome: greeting by name, "since your last visit" card, widget frames per `data-widget-frame`, skeletons in `frontend/src/features/dashboard/{DashboardPage.tsx,frame/,summary/,dashboard.css}`
-- [ ] T050 [P] [US4] Migrate media pages (MediaHome, CatalogPage, DetailPage with artwork hero, RequestsPage, LinksSettings, MatchingScreen) to Tile/TileGrid/PageHeader in `frontend/src/features/media/`
-- [ ] T051 [P] [US4] Migrate content pages (NewsPage, ArticlePage, NewsAdmin, WikiHome, PageView, PageEditor, History, CalendarPage) in `frontend/src/features/{news,wiki,calendar}/`
-- [ ] T052 [P] [US4] Migrate services & statistics pages (ServicesRoute, ServiceDetailRoute, StatisticsPage, WrappedStory, DefinitionsAdmin) in `frontend/src/pages/` and `frontend/src/features/statistics/`
-- [ ] T053 [P] [US4] Migrate support pages (IncidentsPage, IncidentConsole, MyTickets, NewTicket, TicketPage, FeedbackPage, ReviewQueue, staff Queue, admin Definitions) in `frontend/src/features/support/`
-- [ ] T054 [P] [US4] Migrate community & gamification pages (CommunityPage, ModerationQueue, ProgressionPage with rarity-colored achievements, leaderboards, quests, GamificationAdmin) in `frontend/src/features/{community,gamification}/`
-- [ ] T055 [P] [US4] Migrate marketplace pages (CatalogPage, ProductRoute, OwnedPage, ProjectsPage, ProjectRoute, MarketplaceAdmin, ProjectConsole) in `frontend/src/features/marketplace/`
-- [ ] T056 [P] [US4] Migrate personal pages (AccountRoute, AppearanceRoute incl. color mode selector and theme previews, LanguageSettings, NotificationCenter, NotificationPreferences, PrivacyRoute, SearchPage) in `frontend/src/pages/` and `frontend/src/features/{notifications,settings,search,appearance}/`
-- [ ] T057 [P] [US4] Migrate administration pages (ControlCenterRoute as topic-grouped tiles, ConfigurationRoute, RolesRoute, AuditRoute, EventsRoute, ObservabilityRoute, PrivacyAdminRoute, ServicesAdminRoute, AiAdminPage, AutomationsPage, CampaignsPage, CampaignConsole, PluginsAdmin, ModulesAdmin, PageRenderer, NotAvailablePage) in `frontend/src/pages/admin/` and `frontend/src/features/{ai,automations,campaigns,plugins,admin}/`
-- [ ] T058 [US4] Update existing unit/a11y/e2e tests broken by the migration (selectors via roles/labels) across `frontend/tests/` and run `npm test` + `npx playwright test`
+- [X] T048 [US4] Lint `frontend/scripts/check-page-header.mjs` (every module imported by `frontend/src/shell/router/routes.tsx` renders `PageHeader`; every `EmptyState` has an action) wired into `npm run lint`
+- [X] T049 [P] [US4] Migrate home & dashboard chrome: greeting by name, "since your last visit" card, widget frames per `data-widget-frame`, skeletons in `frontend/src/features/dashboard/{DashboardPage.tsx,frame/,summary/,dashboard.css}`
+- [X] T050 [P] [US4] Migrate media pages (MediaHome, CatalogPage, DetailPage with artwork hero, RequestsPage, LinksSettings, MatchingScreen) to Tile/TileGrid/PageHeader in `frontend/src/features/media/`
+- [X] T051 [P] [US4] Migrate content pages (NewsPage, ArticlePage, NewsAdmin, WikiHome, PageView, PageEditor, History, CalendarPage) in `frontend/src/features/{news,wiki,calendar}/`
+- [X] T052 [P] [US4] Migrate services & statistics pages (ServicesRoute, ServiceDetailRoute, StatisticsPage, WrappedStory, DefinitionsAdmin) in `frontend/src/pages/` and `frontend/src/features/statistics/`
+- [X] T053 [P] [US4] Migrate support pages (IncidentsPage, IncidentConsole, MyTickets, NewTicket, TicketPage, FeedbackPage, ReviewQueue, staff Queue, admin Definitions) in `frontend/src/features/support/`
+- [X] T054 [P] [US4] Migrate community & gamification pages (CommunityPage, ModerationQueue, ProgressionPage with rarity-colored achievements, leaderboards, quests, GamificationAdmin) in `frontend/src/features/{community,gamification}/`
+- [X] T055 [P] [US4] Migrate marketplace pages (CatalogPage, ProductRoute, OwnedPage, ProjectsPage, ProjectRoute, MarketplaceAdmin, ProjectConsole) in `frontend/src/features/marketplace/`
+- [X] T056 [P] [US4] Migrate personal pages (AccountRoute, AppearanceRoute incl. color mode selector and theme previews, LanguageSettings, NotificationCenter, NotificationPreferences, PrivacyRoute, SearchPage) in `frontend/src/pages/` and `frontend/src/features/{notifications,settings,search,appearance}/`
+- [X] T057 [P] [US4] Migrate administration pages (ControlCenterRoute as topic-grouped tiles, ConfigurationRoute, RolesRoute, AuditRoute, EventsRoute, ObservabilityRoute, PrivacyAdminRoute, ServicesAdminRoute, AiAdminPage, AutomationsPage, CampaignsPage, CampaignConsole, PluginsAdmin, ModulesAdmin, PageRenderer, NotAvailablePage) in `frontend/src/pages/admin/` and `frontend/src/features/{ai,automations,campaigns,plugins,admin}/`
+- [X] T058 [US4] Update existing unit/a11y/e2e tests broken by the migration (selectors via roles/labels) across `frontend/tests/` and run `npm test` + `npx playwright test`
 
 **Checkpoint**: one composition everywhere (SC-007, SC-008).
 

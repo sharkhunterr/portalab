@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Button } from "../../design-system/components/Button";
 import { SelectField, TextField } from "../../design-system/components/Field";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
 import { type Mode, type SearchParams, useSearch } from "./api";
@@ -67,7 +68,7 @@ export function SearchPage() {
   const started = Boolean(params.q || params.kinds.length || Object.keys(params.filters).length);
   return (
     <section aria-labelledby={headingId} className="search-page">
-      <h2 id={headingId}>{t("search:title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="search" title={t("search:title")} />
       <search>
         <form onSubmit={submit} className="ds-stack ds-stack--row search-form">
           <TextField

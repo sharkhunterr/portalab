@@ -6,6 +6,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { type DiffSegment, fetchCompare, usePage, useRevisions, useWikiActions } from "./api";
 import "../content/content.css";
+import { PageHeader } from "../../design-system/components/PageHeader";
 
 /** Changes as text with "+"/"−" markers and labels (never color alone, spec 011 T014). */
 export function DiffView({ segments }: { segments: DiffSegment[] }) {
@@ -43,7 +44,12 @@ export function History() {
   const pageId = page.data?.id ?? "";
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("wiki:historyOf", { title: page.data?.title ?? "" })}</h2>
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        icon="book"
+        title={t("wiki:historyOf", { title: page.data?.title ?? "" })}
+      />
       <ol className="wiki-revisions">
         {rows.map((r, index) => (
           <li key={r.version}>

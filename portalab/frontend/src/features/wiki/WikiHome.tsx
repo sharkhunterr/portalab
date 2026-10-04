@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { Link } from "react-router";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
 import { type TreeNode, useTree } from "./api";
@@ -28,7 +29,7 @@ export function WikiHome() {
   const tree = useTree();
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("wiki:title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="book" title={t("wiki:title")} />
       <p>
         <Link to="/wiki/new">{t("wiki:new")}</Link>
       </p>

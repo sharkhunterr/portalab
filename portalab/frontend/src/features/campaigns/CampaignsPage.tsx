@@ -4,6 +4,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { useActiveCampaigns, useCampaign } from "./api";
 import { ActiveCampaignBanner } from "./banner/ActiveCampaignBanner";
 import "./campaigns.css";
+import { PageHeader } from "../../design-system/components/PageHeader";
 
 /** ``/campaigns`` and ``/campaigns/:key`` (spec 014): what runs now and a campaign's public view. */
 export default function CampaignsPage() {
@@ -16,7 +17,7 @@ function ActiveList() {
   const active = useActiveCampaigns();
   return (
     <div className="ds-stack">
-      <h1>{t("campaigns:page.title")}</h1>
+      <PageHeader icon="star" title={t("campaigns:page.title")} />
       <ActiveCampaignBanner />
       {active.data?.length === 0 ? <p>{t("campaigns:page.empty")}</p> : null}
       <ul>

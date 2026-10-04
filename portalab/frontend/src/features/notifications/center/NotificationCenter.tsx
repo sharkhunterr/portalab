@@ -7,6 +7,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type CenterFilter, type NotificationItem, useNotificationActions, useNotifications } from "../api";
 import { severityOf } from "../presentation";
 import "../notifications.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /**
  * Notification center (spec 010 T013): unread and important items first; alerts and notifications are
@@ -81,7 +82,7 @@ export function NotificationCenter() {
   const unread = pages[0]?.unread ?? 0;
   return (
     <section aria-labelledby={headingId} className="notification-center">
-      <h2 id={headingId}>{t("notifications:center.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="bell" title={t("notifications:center.title")} />
       <p aria-live="polite">{t("notifications:center.unread", { count: unread })}</p>
       <div className="ds-stack ds-stack--row">
         <fieldset className="notification-center__filters">

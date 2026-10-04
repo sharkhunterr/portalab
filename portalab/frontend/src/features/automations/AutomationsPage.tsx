@@ -9,6 +9,7 @@ import { Builder } from "./builder/Builder";
 import { ExecutionList } from "./history/ExecutionList";
 import { Gallery } from "./templates/Gallery";
 import "./automations.css";
+import { PageHeader } from "../../design-system/components/PageHeader";
 
 /** ``/admin/automations`` and ``/admin/automations/:id`` (spec 019). */
 export default function AutomationsPage() {
@@ -21,7 +22,7 @@ function Overview() {
   const automations = useAutomations();
   return (
     <div className="ds-stack">
-      <h1>{t("automations:title")}</h1>
+      <PageHeader icon="zap" title={t("automations:title")} />
       <ul className="ds-stack">
         {(automations.data ?? []).map((a) => (
           <li key={a.id}>

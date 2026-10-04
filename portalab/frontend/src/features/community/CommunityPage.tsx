@@ -11,6 +11,7 @@ import { ProfilePage } from "./profile/ProfilePage";
 import { ProposalDetail } from "./projects/ProposalDetail";
 import { ProposalList } from "./projects/ProposalList";
 import "./community.css";
+import { PageHeader } from "../../design-system/components/PageHeader";
 
 const TABS = [
   { to: "/community", key: "discover", end: true },
@@ -43,7 +44,7 @@ export default function CommunityPage({
   if (view === "proposal") return <ProposalDetail />;
   return (
     <div className="ds-stack">
-      <h1>{t("community:title")}</h1>
+      <PageHeader icon="users" title={t("community:title")} />
       <p>{t("community:intro")}</p>
       <nav aria-label={t("community:title")} className="community-tabs">
         {TABS.map((tab) => (

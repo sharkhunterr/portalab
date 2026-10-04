@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../../api/client";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { ApiError, DataRegion } from "../../../state/regions";
 
 /** Event operations (spec 007 T031): deliveries and dead letters, quarantine, replay. Strings for i18n (026). */
@@ -151,7 +152,7 @@ function Replay() {
 export function EventsAdmin() {
   return (
     <div className="account-page">
-      <h2>{eventsStrings.title}</h2>
+      <PageHeader level={2} icon="bolt" title={eventsStrings.title} />
       <DeadLetters />
       <QuarantineList />
       <Replay />

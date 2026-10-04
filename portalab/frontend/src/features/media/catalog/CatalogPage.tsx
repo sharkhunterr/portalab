@@ -6,6 +6,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type CatalogFilters, useCatalogPage } from "../api";
 import { MediaGrid } from "../MediaGrid";
 import "../media.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** Catalog browse (spec 024 T014): text, kind, genre, year and availability filters; cursor pagination. */
 const KINDS = ["movie", "series", "book", "game", "album"];
@@ -23,7 +24,7 @@ export function CatalogPage() {
   };
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("media:catalog.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="film" title={t("media:catalog.title")} />
       <search>
         <form onSubmit={submit}>
           <fieldset className="media-filters">

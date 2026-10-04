@@ -6,6 +6,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useCategories, useProducts } from "../api";
 import { ProductCard } from "./ProductCard";
 import "../marketplace.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** ``/marketplace`` (spec 015 T021): categories, search and products bought with Coins (no real money). */
 export default function CatalogPage() {
@@ -16,11 +17,21 @@ export default function CatalogPage() {
   const products = useProducts({ category, q: q.trim() });
   return (
     <div className="ds-stack">
-      <h1>{t("marketplace:catalog.title")}</h1>
-      <p>
-        {t("marketplace:catalog.intro")} <Link to="/marketplace/owned">{t("marketplace:owned.title")}</Link> ·{" "}
-        <Link to="/projects">{t("marketplace:projects.title")}</Link>
-      </p>
+      <PageHeader
+        icon="shop"
+        title={t("marketplace:catalog.title")}
+        context={t("marketplace:catalog.intro")}
+        secondary={
+          <>
+            <Link className="ds-button ds-button--secondary" to="/projects">
+              {t("marketplace:projects.title")}
+            </Link>
+            <Link className="ds-button ds-button--primary" to="/marketplace/owned">
+              {t("marketplace:owned.title")}
+            </Link>
+          </>
+        }
+      />
       <div className="ds-stack--row community-filters">
         <SelectField
           label={t("marketplace:catalog.category")}

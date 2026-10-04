@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { ApiError, DataRegion } from "../../state/regions";
 import { type LevelKey, privacyStrings as t } from "./strings";
 
@@ -97,7 +98,7 @@ export function PoliciesAdmin() {
   });
   return (
     <div className="account-page">
-      <h2>{t.policiesTitle}</h2>
+      <PageHeader level={2} icon="shield" title={t.policiesTitle} />
       <DataRegion<Policy[]>
         label={t.policiesTitle}
         queryKey={POLICIES_KEY}

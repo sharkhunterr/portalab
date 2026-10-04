@@ -5,6 +5,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Preferences, usePreferences, useSavePreferences } from "../api";
 import "../notifications.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /**
  * Notification preferences (spec 010 T016): per category and channel; a channel required by the category
@@ -67,7 +68,7 @@ export function NotificationPreferences() {
     save.mutate(body, { onSuccess: () => setSaved(true), onError: () => setSaved(false) });
   return (
     <section aria-labelledby={headingId} className="notification-preferences">
-      <h2 id={headingId}>{t("notifications:preferences.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="bell" title={t("notifications:preferences.title")} />
       <table>
         <thead>
           <tr>

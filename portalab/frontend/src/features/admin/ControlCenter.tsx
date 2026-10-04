@@ -1,4 +1,5 @@
 import { api } from "../../api/client";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState, type FunctionalStateName } from "../../design-system/FunctionalState";
 import { DataRegion } from "../../state/regions";
 import { adminStrings as t } from "./strings";
@@ -18,7 +19,7 @@ export function ControlCenter() {
     >
       {(overview) => (
         <div className="account-page">
-          <h2>{t.overviewTitle}</h2>
+          <PageHeader level={2} icon="dashboard" title={t.overviewTitle} />
           <ul className="panel-grid">
             {overview.panels.map((panel) => (
               <li key={panel.panel}>

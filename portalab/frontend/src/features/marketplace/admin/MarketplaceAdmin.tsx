@@ -3,6 +3,7 @@ import { useState } from "react";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -69,7 +70,7 @@ export default function MarketplaceAdmin() {
     );
   return (
     <div className="ds-stack">
-      <h1>{t("marketplace:admin.title")}</h1>
+      <PageHeader icon="shop" title={t("marketplace:admin.title")} />
       {message ? <p role="status">{message}</p> : null}
       <section aria-labelledby="mk-products" className="ds-stack">
         <h2 id="mk-products">{t("marketplace:admin.products")}</h2>

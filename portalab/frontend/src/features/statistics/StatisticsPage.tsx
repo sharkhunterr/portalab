@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { Button } from "../../design-system/components/Button";
 import { SelectField } from "../../design-system/components/Field";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
 import { type PeriodKind, useCatalog, useHiddenSections } from "./api";
@@ -31,7 +32,7 @@ export function StatisticsPage() {
   const hiddenEntries = entries.filter((e) => hidden.includes(e.key));
   return (
     <section aria-labelledby={headingId} className="statistics-page">
-      <h2 id={headingId}>{t("statistics:title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="chart" title={t("statistics:title")} />
       <SelectField
         label={t("statistics:period")}
         value={period}

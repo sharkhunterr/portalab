@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { useParams } from "react-router";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -19,7 +20,7 @@ export function ArticlePage() {
   const data = article.data;
   return (
     <article aria-labelledby={headingId}>
-      <h2 id={headingId}>{data.title}</h2>
+      <PageHeader titleId={headingId} level={2} icon="newspaper" title={data.title} />
       {data.published_at ? <p className="news-meta">{format.dateTime(data.published_at)}</p> : null}
       {data.archived ? <p role="note">{t("news:archived")}</p> : null}
       {data.translation_missing ? <p role="note">{t("news:notTranslated")}</p> : null}

@@ -87,7 +87,7 @@ describe("gamification", () => {
     show(<ProgressionPage />);
     expect(await screen.findByRole("heading", { name: "Level 2" })).toBeTruthy();
     expect(screen.getByText("133 XP to level 3")).toBeTruthy();
-    const values = Array.from(document.querySelectorAll(".gamification-values dt")).map(
+    const values = Array.from(document.querySelectorAll(".gamification-values .ds-stat__label")).map(
       (dt) => dt.textContent,
     );
     expect(values).toEqual(["XP", "Contribution", "Coins"]);

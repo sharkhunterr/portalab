@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { stateForError } from "../../state/regions";
 import { privacyStrings as t } from "./strings";
@@ -48,7 +49,7 @@ export function AuditViewer() {
   const items = (query.data?.pages.flatMap((page) => page.items) ?? []) as unknown as AuditItem[];
   return (
     <section aria-labelledby={titleId} className="account-page">
-      <h2 id={titleId}>{t.auditTitle}</h2>
+      <PageHeader titleId={titleId} level={2} icon="list" title={t.auditTitle} />
       <form onSubmit={submit} className="auth-form">
         <label htmlFor={fieldId}>{t.auditAction}</label>
         <input id={fieldId} value={draft} onChange={(e) => setDraft(e.target.value)} />

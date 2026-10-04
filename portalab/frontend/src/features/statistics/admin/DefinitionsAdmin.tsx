@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { api } from "../../../api/client";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -74,7 +75,7 @@ export function DefinitionsAdmin() {
   }
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("statistics:admin.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="chart" title={t("statistics:admin.title")} />
       {list.isPending ? <FunctionalState state="loading" /> : null}
       <table>
         <thead>

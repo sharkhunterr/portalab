@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "../../../design-system/components/Button";
 import { Badge } from "../../../design-system/components/Content";
 import { TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -116,7 +117,7 @@ export default function PluginsAdmin() {
     );
   return (
     <div className="ds-stack">
-      <h1>{t("plugins:title")}</h1>
+      <PageHeader icon="plug" title={t("plugins:title")} />
       {restart ? <FunctionalState state="maintenance" label={t("plugins:restartBanner")} /> : null}
       {review ? (
         <ReviewConsent

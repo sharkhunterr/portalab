@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useId, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { DataRegion } from "../../state/regions";
 
@@ -224,7 +225,7 @@ export function ServicesHealth() {
   const [selected, setSelected] = useState<OverviewItem | null>(null);
   return (
     <div className="account-page">
-      <h2>{servicesHealthStrings.title}</h2>
+      <PageHeader level={2} icon="server" title={servicesHealthStrings.title} />
       <DataRegion<OverviewItem[]>
         label={servicesHealthStrings.overview}
         queryKey={["services", "health"]}

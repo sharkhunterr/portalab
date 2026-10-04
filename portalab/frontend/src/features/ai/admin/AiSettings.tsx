@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { useT } from "../../../i18n/hooks/useT";
 import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig, useAiUsage } from "../api";
 
@@ -53,7 +54,7 @@ export function AiSettings() {
   };
   return (
     <section aria-labelledby="ai-settings-title">
-      <h2 id="ai-settings-title">{t("ai:admin.title")}</h2>
+      <PageHeader titleId="ai-settings-title" level={2} icon="sparkles" title={t("ai:admin.title")} />
       <form className="ds-stack" onSubmit={submit}>
         <CheckboxField
           label={t("ai:admin.enabled")}

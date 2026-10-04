@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { useParams } from "react-router";
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -26,12 +27,15 @@ export function WrappedStory() {
   const current = stats[Math.min(step, stats.length - 1)];
   return (
     <section aria-labelledby={headingId} className="wrapped">
-      <h2 id={headingId}>
-        {t("statistics:wrapped.title", {
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        icon="sparkles"
+        title={t("statistics:wrapped.title", {
           start: format.date(snapshot.period_start),
           end: format.date(snapshot.period_end),
         })}
-      </h2>
+      />
       {current ? (
         <p className="wrapped__value" aria-live="polite">
           {titles.has(current.key) ? t(titles.get(current.key) as string) : current.key} :{" "}

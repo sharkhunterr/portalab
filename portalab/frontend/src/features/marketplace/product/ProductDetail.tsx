@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useHasPermission } from "../../authz/useMyPermissions";
@@ -28,7 +29,7 @@ export function ProductDetail() {
   const eligible = (data.eligibility ?? []).every((c) => c.met);
   return (
     <div className="ds-stack">
-      <h1>{data.name}</h1>
+      <PageHeader icon="shop" title={data.name} />
       <p className="ds-badge">
         {t(`marketplace:type.${data.type}`)} ·{" "}
         {data.price_coins

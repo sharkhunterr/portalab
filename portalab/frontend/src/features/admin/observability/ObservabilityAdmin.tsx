@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../../api/client";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { DataRegion } from "../../../state/regions";
 
 /**
@@ -308,7 +309,7 @@ function Trends() {
 export function ObservabilityAdmin() {
   return (
     <div className="account-page">
-      <h2>{observabilityStrings.title}</h2>
+      <PageHeader level={2} icon="activity" title={observabilityStrings.title} />
       <Overview />
       <h3>{observabilityStrings.errors}</h3>
       <Errors />

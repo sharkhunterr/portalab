@@ -1,5 +1,6 @@
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { DataRegion } from "../../state/regions";
 import { type LevelKey, privacyStrings as t } from "./strings";
 
@@ -15,7 +16,7 @@ export function PrivacyCenter() {
     >
       {(inventory) => (
         <div className="account-page">
-          <h2>{t.centerTitle}</h2>
+          <PageHeader level={2} icon="shield" title={t.centerTitle} />
           <p>{t.centerIntro}</p>
           <table>
             <caption className="sr-only">{t.centerTitle}</caption>

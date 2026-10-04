@@ -2,6 +2,7 @@ import { type FormEvent, useId, useState } from "react";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -160,7 +161,7 @@ export function IncidentConsole() {
   const open = useIncidents("open");
   return (
     <section aria-label={t("support:console.title_page")}>
-      <h2>{t("support:console.title_page")}</h2>
+      <PageHeader level={2} icon="alert" title={t("support:console.title_page")} />
       <Declare />
       {open.isPending ? <FunctionalState state="loading" /> : null}
       {open.isError ? <FunctionalState state="unavailable" onRetry={() => open.refetch()} /> : null}

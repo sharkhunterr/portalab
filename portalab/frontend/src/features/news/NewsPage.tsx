@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { Link } from "react-router";
 import { SelectField } from "../../design-system/components/Field";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -33,7 +34,7 @@ export function NewsPage() {
   const list = useNewsList(category || undefined);
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("news:title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="newspaper" title={t("news:title")} />
       {featured.data?.length ? (
         <section aria-label={t("news:featured")}>
           <h3>{t("news:featured")}</h3>

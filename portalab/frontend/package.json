@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "biome check . && node scripts/check-tokens.mjs",
+    "lint": "biome check . && node scripts/check-tokens.mjs && node scripts/check-page-header.mjs",
     "format": "biome format --write .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",

@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { Link, useParams } from "react-router";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -43,9 +44,12 @@ export function IncidentDetail({ id }: { id: string }) {
   const incident = query.data;
   return (
     <article aria-labelledby={headingId} className="incident">
-      <h2 id={headingId}>
-        {incident.reference} · {incident.title}
-      </h2>
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        icon="alert"
+        title={`${incident.reference} · ${incident.title}`}
+      />
       <Summary incident={incident} />
       {incident.summary ? <p>{incident.summary}</p> : null}
       <h3>{t("support:incident.timeline")}</h3>
@@ -68,7 +72,7 @@ export function IncidentsList() {
   const all = useIncidents();
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("support:incident.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="alert" title={t("support:incident.title")} />
       {all.isPending ? <FunctionalState state="loading" /> : null}
       {all.isError ? <FunctionalState state="unavailable" onRetry={() => all.refetch()} /> : null}
       {all.data && all.data.length === 0 ? <p>{t("support:incident.none")}</p> : null}

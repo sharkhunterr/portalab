@@ -31,10 +31,11 @@ export function Breadcrumbs({ max = 4 }: { max?: number }) {
   // 027 FR-017: section → page — the section (not a page itself) is shown, unlinked, after the root.
   const entry = currentEntry(view.sections, location.pathname);
   const section = view.sections.find((s) => !s.direct && sectionEntries(s).some((e) => e.key === entry?.key));
-  if (section && items.length > 1) {
+  const sectionLabel = section ? shellStrings.label(section.label_key) : "";
+  if (section && items.length > 1 && items[1]?.text !== sectionLabel) {
     items = [
       items[0] as { path: string; text: string },
-      { path: `#section-${section.key}`, text: shellStrings.label(section.label_key), section: true },
+      { path: `#section-${section.key}`, text: sectionLabel, section: true },
       ...items.slice(1),
     ];
   }

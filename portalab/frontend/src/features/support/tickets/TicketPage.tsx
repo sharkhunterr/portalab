@@ -2,6 +2,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import "../support.css";
 import { Link, useParams } from "react-router";
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -34,9 +35,7 @@ export function TicketPage() {
   };
   return (
     <article aria-labelledby={headingId} className="support-ticket">
-      <h2 id={headingId}>
-        {data.reference} · {data.title}
-      </h2>
+      <PageHeader titleId={headingId} level={2} icon="ticket" title={`${data.reference} · ${data.title}`} />
       <p>
         {t("support:ticket.state")}: <strong>{data.state_label}</strong> · {t("support:ticket.priority")}:{" "}
         {data.priority}

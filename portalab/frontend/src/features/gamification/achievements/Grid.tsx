@@ -1,3 +1,4 @@
+import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { AchievementView } from "../api";
@@ -11,7 +12,10 @@ export function AchievementGrid({ achievements }: { achievements: AchievementVie
       <h2 id="gamification-achievements">{t("gamification:achievements.title")}</h2>
       <ul className="gamification-grid">
         {achievements.map((achievement) => (
-          <li key={achievement.key} className="ds-card" data-state={achievement.state}>
+          <li key={achievement.key} className="ds-card achievement" data-state={achievement.state}>
+            <span className="achievement__medal" aria-hidden="true">
+              <Icon name={achievement.state === "hidden" ? "lock" : "trophy"} size={26} />
+            </span>
             {achievement.state === "hidden" ? (
               <p>{t("gamification:achievements.hidden")}</p>
             ) : (

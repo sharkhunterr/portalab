@@ -4,6 +4,7 @@ import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../design-system/a11y/preferences";
 import { CheckboxField, SelectField } from "../../design-system/components/Field";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { PolicyField, type PolicyState } from "../../design-system/components/PolicyField";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 
@@ -77,7 +78,7 @@ export function AppearanceSettings() {
   };
   return (
     <section aria-labelledby={headingId} className="account-page">
-      <h2 id={headingId}>{appearanceStrings.title}</h2>
+      <PageHeader titleId={headingId} level={2} icon="palette" title={appearanceStrings.title} />
       {effective.fallback ? <p role="status">{appearanceStrings.themeFallback}</p> : null}
       {field("ui.theme", (disabled, describedBy) => (
         <SelectField

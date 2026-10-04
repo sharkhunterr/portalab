@@ -68,6 +68,7 @@ test("no horizontal scroll from 320 px, and the page survives a class change", a
     await page.setViewportSize({ width, height: 800 });
     for (const path of ["/", "/services", "/account"]) {
       await page.goto(path);
+      await page.waitForLoadState("networkidle");
       await expect(page.getByRole("main")).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, `${path} at ${width}px`).toBeLessThanOrEqual(1);

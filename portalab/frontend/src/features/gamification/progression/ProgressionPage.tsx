@@ -7,6 +7,7 @@ import { LeaderboardPanel } from "../leaderboards/LeaderboardPanel";
 import { QuestPanel } from "../quests/QuestPanel";
 import { ProgressionCard } from "./ProgressionCard";
 import "../gamification.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** ``/progression`` (spec 013): my level and values, achievements and history. */
 export default function ProgressionPage() {
@@ -15,7 +16,7 @@ export default function ProgressionPage() {
   const achievements = useAchievements();
   return (
     <div className="ds-stack">
-      <h1>{t("gamification:progression.title")}</h1>
+      <PageHeader icon="trophy" title={t("gamification:progression.title")} />
       {progression.isError ? <FunctionalState state="unavailable" /> : null}
       {progression.data ? <ProgressionCard progression={progression.data} /> : null}
       {achievements.data?.length ? <AchievementGrid achievements={achievements.data} /> : null}

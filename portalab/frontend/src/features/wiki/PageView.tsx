@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { Link, useParams } from "react-router";
 import { Button } from "../../design-system/components/Button";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
 import { SafeHtml } from "../content/SafeHtml";
@@ -29,7 +30,7 @@ export function PageView() {
           </ol>
         </nav>
       ) : null}
-      <h2 id={headingId}>{data.title}</h2>
+      <PageHeader titleId={headingId} level={2} icon="book" title={data.title} />
       {data.status !== "published" ? <p className="wiki-badge">{t(`wiki:status.${data.status}`)}</p> : null}
       {data.translation_missing ? <p role="note">{t("wiki:notTranslated")}</p> : null}
       {data.can_edit ? (

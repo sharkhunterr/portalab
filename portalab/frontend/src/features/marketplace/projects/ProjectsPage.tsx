@@ -5,6 +5,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useProjects } from "../api";
 import { MyFundings } from "./MyFundings";
 import "../marketplace.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** ``/projects`` (spec 015 slice A): community projects with their state and public totals; my fundings. */
 export default function ProjectsPage() {
@@ -13,7 +14,7 @@ export default function ProjectsPage() {
   const projects = useProjects();
   return (
     <div className="ds-stack">
-      <h1>{t("marketplace:projects.title")}</h1>
+      <PageHeader icon="lightbulb" title={t("marketplace:projects.title")} />
       {projects.isError ? <FunctionalState state="unavailable" onRetry={() => projects.refetch()} /> : null}
       {projects.data?.length === 0 ? (
         <p>

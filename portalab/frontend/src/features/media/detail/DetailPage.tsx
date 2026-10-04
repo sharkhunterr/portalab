@@ -13,6 +13,7 @@ import {
   useSection,
 } from "../api";
 import "../media.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /**
  * Media detail (spec 024 T017/T020): a header and independent section frames — each section loads, fails
@@ -255,20 +256,24 @@ export function DetailPage() {
   const poster = imageUrl(media.image_id);
   return (
     <article aria-labelledby={headingId}>
-      <header className="ds-stack ds-stack--row">
-        {poster ? <img src={poster} alt="" width={120} className="media-card__poster" /> : null}
-        <div>
-          <h2 id={headingId}>
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        artwork={poster}
+        title={
+          <>
             {media.title} {media.year ? <span className="media-muted">({media.year})</span> : null}
-          </h2>
-          <p>
+          </>
+        }
+        context={
+          <>
             {t(`media:kind.${media.kind}`)} ·{" "}
             {media.available ? t("media:detail.available") : t("media:detail.unavailable")}
             {media.genres.length ? ` · ${media.genres.join(", ")}` : ""}
-          </p>
-          {media.available ? null : <RequestButton objectId={media.id} />}
-        </div>
-      </header>
+          </>
+        }
+        primary={media.available ? null : <RequestButton objectId={media.id} />}
+      />
       <div className="media-sections">
         {SECTIONS.map((name) => (
           <SectionFrame key={name} objectId={media.id} name={name} />

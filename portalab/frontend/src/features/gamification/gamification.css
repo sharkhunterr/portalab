@@ -3,9 +3,9 @@
 }
 
 .gamification-values {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-4);
   margin: 0;
 }
 
@@ -33,9 +33,11 @@
   grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 }
 
-.gamification-grid li[data-state="locked"],
-.gamification-grid li[data-state="hidden"] {
-  opacity: 0.85;
+.gamification-grid li[data-state="locked"] .achievement__medal,
+.gamification-grid li[data-state="hidden"] .achievement__medal {
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  color: var(--color-text-muted);
+  box-shadow: none;
 }
 
 .gamification-table {
@@ -55,4 +57,73 @@
 
 .leaderboard-me {
   font-weight: 600;
+}
+
+/* 027: progression hero and achievement medals */
+.gamification-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background:
+    radial-gradient(
+      40rem 12rem at 0% 0%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 70%
+    ),
+    var(--color-surface-raised);
+}
+
+.gamification-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.gamification-hero .ds-level {
+  min-inline-size: 4rem;
+  block-size: 4rem;
+  font-size: var(--font-size-2xl);
+  box-shadow: var(--shadow-glow);
+}
+
+.gamification-hero__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gamification-hero__text h2 {
+  margin: 0;
+}
+
+.gamification-card .gamification-meta {
+  margin: 0;
+}
+
+.achievement {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.achievement h3,
+.achievement p {
+  margin: 0;
+}
+
+.achievement__medal {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 3.25rem;
+  block-size: 3.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rarity-legendary), var(--color-accent));
+  color: var(--color-accent-contrast);
+  box-shadow: var(--shadow-2);
+}
+
+.achievement[data-state="unlocked"] {
+  border-color: color-mix(in srgb, var(--rarity-legendary) 45%, transparent);
 }

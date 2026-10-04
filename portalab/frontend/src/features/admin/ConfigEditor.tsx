@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { ApiError, DataRegion } from "../../state/regions";
 import { adminStrings as t } from "./strings";
 
@@ -113,7 +114,7 @@ export function ConfigEditor() {
     >
       {(settings) => (
         <div className="account-page">
-          <h2>{t.configTitle}</h2>
+          <PageHeader level={2} icon="settings" title={t.configTitle} />
           <table>
             <thead>
               <tr>

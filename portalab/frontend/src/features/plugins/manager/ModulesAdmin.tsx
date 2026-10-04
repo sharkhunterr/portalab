@@ -1,4 +1,5 @@
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -11,7 +12,7 @@ export default function ModulesAdmin() {
   const action = usePluginActions();
   return (
     <div className="ds-stack">
-      <h1>{t("plugins:modules.title")}</h1>
+      <PageHeader icon="plug" title={t("plugins:modules.title")} />
       {modules.isError ? <FunctionalState state="unavailable" /> : null}
       {action.error instanceof ApiError ? <p role="alert">{action.error.message}</p> : null}
       <ul className="ds-stack">

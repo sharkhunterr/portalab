@@ -5,6 +5,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { MediaError, useAdminActions, useCandidates } from "../api";
 import "../media.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /**
  * Media identity (spec 024 T015): possible duplicates proposed on fuzzy evidence — never merged without an
@@ -44,7 +45,7 @@ export function MatchingScreen() {
   };
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("media:admin.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="film" title={t("media:admin.title")} />
       <h3>{t("media:admin.candidates")}</h3>
       {pending ? (
         <div role="alertdialog" aria-labelledby={`${headingId}-confirm`}>

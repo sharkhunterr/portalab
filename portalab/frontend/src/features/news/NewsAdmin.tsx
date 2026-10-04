@@ -1,6 +1,7 @@
 import { type FormEvent, useId, useState } from "react";
 import { Button } from "../../design-system/components/Button";
 import { CheckboxField, TextField } from "../../design-system/components/Field";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -77,7 +78,7 @@ export function NewsAdmin() {
   const [when, setWhen] = useState("");
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("news:admin.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="newspaper" title={t("news:admin.title")} />
       <Button onClick={() => setEditing("new")}>{t("news:admin.new")}</Button>
       {editing ? (
         <Editor article={editing === "new" ? null : editing} onDone={() => setEditing(null)} />

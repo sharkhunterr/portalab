@@ -16,13 +16,17 @@ export interface PageAction {
 }
 
 export interface PageHeaderProps {
-  title: string;
+  title: ReactNode;
   context?: ReactNode;
   icon?: string;
   primary?: PageAction | ReactNode;
   secondary?: ReactNode;
   /** Image URL shown behind the header (media detail pages). */
   artwork?: string | null;
+  /** Id of the title, for ``aria-labelledby`` of the page section. */
+  titleId?: string;
+  /** Heading level of the title (pages nested in a titled region keep their outline with 2). */
+  level?: 1 | 2;
   children?: ReactNode;
 }
 
@@ -51,7 +55,18 @@ function ActionButton({ action }: { action: PageAction }) {
   );
 }
 
-export function PageHeader({ title, context, icon, primary, secondary, artwork, children }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  context,
+  icon,
+  primary,
+  secondary,
+  artwork,
+  titleId,
+  level = 1,
+  children,
+}: PageHeaderProps) {
+  const Title = level === 2 ? "h2" : "h1";
   return (
     <header className="ds-page-header" data-artwork={artwork ? "true" : undefined}>
       {artwork ? (
@@ -61,10 +76,10 @@ export function PageHeader({ title, context, icon, primary, secondary, artwork, 
       ) : null}
       <div className="ds-page-header__body">
         <div className="ds-page-header__text">
-          <h1 className="ds-page-header__title">
+          <Title id={titleId} className="ds-page-header__title">
             {icon ? <Icon name={icon} size={26} className="ds-page-header__icon" /> : null}
             {title}
-          </h1>
+          </Title>
           {context ? <p className="ds-page-header__context">{context}</p> : null}
         </div>
         {primary || secondary ? (

@@ -648,3 +648,87 @@
     opacity: 0;
   }
 }
+
+/* ---------------------------------------------------------------- 027 US4: shared content patterns */
+.ds-badge {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--color-text) 9%, transparent);
+}
+.ds-progress-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.ds-progress-field__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.ds-bar[data-indeterminate] .ds-bar__fill {
+  animation: ds-indeterminate 1.4s var(--motion-easing) infinite;
+}
+@keyframes ds-indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+progress {
+  accent-color: var(--color-accent);
+  block-size: 0.5rem;
+}
+.ds-table th {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.ds-table tr:hover td {
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+/* sub-navigation inside a page (tabs made of links): community, statistics, admin consoles… */
+.ds-subnav,
+.community-tabs {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  overflow-x: auto;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+.ds-subnav a,
+.community-tabs a {
+  flex: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ds-subnav a:hover,
+.community-tabs a:hover {
+  color: var(--color-text);
+}
+.ds-subnav a[aria-current="page"],
+.community-tabs a[aria-current="page"] {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: var(--shadow-1);
+}
+.support-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: var(--space-2);
+}
+.ds-list-item__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.ds-list-item__title a:hover {
+  text-decoration: underline;
+}

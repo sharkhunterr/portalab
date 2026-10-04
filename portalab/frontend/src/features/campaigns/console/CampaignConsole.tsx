@@ -7,6 +7,7 @@ import { type Campaign, type CampaignAction, useCampaignAdmin, useCampaignsAdmin
 import { Timeline } from "../history/Timeline";
 import { SimulationPanel } from "./SimulationPanel";
 import "../campaigns.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 const TEMPLATE = JSON.stringify(
   {
@@ -51,7 +52,7 @@ export default function CampaignConsole() {
   };
   return (
     <div className="ds-stack campaign-console">
-      <h1>{t("campaigns:admin.title")}</h1>
+      <PageHeader icon="star" title={t("campaigns:admin.title")} />
       <section aria-labelledby="campaign-new" className="ds-stack">
         <h2 id="campaign-new">{t("campaigns:admin.create")}</h2>
         <TextField label={t("campaigns:admin.key")} value={key} onChange={(e) => setKey(e.target.value)} />

@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import "../support.css";
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -85,7 +86,7 @@ export function ReviewQueue() {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("support:review.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="message" title={t("support:review.title")} />
       {queue.isError ? <FunctionalState state="unauthorized" /> : null}
       {queue.data && queue.data.length === 0 ? <p>{t("support:review.empty")}</p> : null}
       <ul className="support-list">

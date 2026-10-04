@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ReactElement, useId } from "react";
 import { api } from "../../api/client";
 import { SelectField } from "../../design-system/components/Field";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { PolicyField, type PolicyState } from "../../design-system/components/PolicyField";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -88,7 +89,7 @@ export function LanguageSettings() {
     );
   return (
     <section aria-labelledby={headingId} className="account-page">
-      <h2 id={headingId}>{t("i18n:title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="globe" title={t("i18n:title")} />
       {ctx.retained_language ? (
         <p role="status">{t("i18n:retained", { language: ctx.retained_language })}</p>
       ) : null}

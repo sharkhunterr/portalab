@@ -5,6 +5,7 @@ import { useProject } from "../api";
 import { FundingPanel } from "./FundingPanel";
 import { Timeline } from "./Timeline";
 import "../marketplace.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** ``/projects/:projectId`` (spec 015 T014): state timeline, published rules and funding. */
 export function ProjectPage() {
@@ -17,7 +18,7 @@ export function ProjectPage() {
   const data = project.data;
   return (
     <div className="ds-stack">
-      <h1>{data.title}</h1>
+      <PageHeader icon="lightbulb" title={data.title} />
       <p>
         {t("marketplace:project.state", { state: t(`marketplace:state.${data.state}`) })} ·{" "}
         <Link to={`/community/proposals/${data.proposal_ref}`}>{t("marketplace:project.proposal")}</Link>

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -73,7 +74,7 @@ export function Definitions() {
   });
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("support:admin.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="lifebuoy" title={t("support:admin.title")} />
       <div className="ds-stack ds-stack--row" role="toolbar" aria-label={t("support:admin.title")}>
         {(["types", "workflows", "forms"] as Kind[]).map((k) => (
           <Button

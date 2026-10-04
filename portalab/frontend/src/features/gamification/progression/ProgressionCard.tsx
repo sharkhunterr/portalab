@@ -1,3 +1,5 @@
+import { LevelBadge, levelProgress, ProgressBar } from "../../../design-system/components/Badges";
+import { StatFigure } from "../../../design-system/components/Collections";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Progression } from "../api";
@@ -10,16 +12,19 @@ export function ProgressionCard({ progression }: { progression: Progression }) {
   const t = useT();
   const format = useFormat();
   const next = progression.next_level_at;
-  const span = next === null ? 1 : Math.max(1, next - progression.level_floor);
-  const done = next === null ? span : progression.xp - progression.level_floor;
+  const levelLabel = t("gamification:level", { level: progression.level });
   return (
     <section className="ds-card gamification-card" aria-labelledby="gamification-level">
-      <h2 id="gamification-level">{t("gamification:level", { level: progression.level })}</h2>
-      <progress
-        max={span}
-        value={Math.min(done, span)}
-        aria-labelledby="gamification-level gamification-next"
-      />
+      <div className="gamification-hero">
+        <LevelBadge level={progression.level} label={levelLabel} />
+        <div className="gamification-hero__text">
+          <h2 id="gamification-level">{levelLabel}</h2>
+          <ProgressBar
+            value={levelProgress(progression.xp, progression.level_floor, next ?? null)}
+            label={levelLabel}
+          />
+        </div>
+      </div>
       <p id="gamification-next" className="gamification-meta">
         {next === null
           ? t("gamification:progression.max")
@@ -28,20 +33,19 @@ export function ProgressionCard({ progression }: { progression: Progression }) {
               next: progression.level + 1,
             })}
       </p>
-      <dl className="gamification-values">
-        <div>
-          <dt>{t("gamification:value.xp")}</dt>
-          <dd>{format.number(progression.xp)}</dd>
-        </div>
-        <div>
-          <dt>{t("gamification:value.contribution")}</dt>
-          <dd>{format.number(progression.contribution)}</dd>
-        </div>
-        <div>
-          <dt>{t("gamification:value.coins")}</dt>
-          <dd>{format.number(progression.coins)}</dd>
-        </div>
-      </dl>
+      <div className="gamification-values">
+        <StatFigure icon="zap" label={t("gamification:value.xp")} value={format.number(progression.xp)} />
+        <StatFigure
+          icon="heart"
+          label={t("gamification:value.contribution")}
+          value={format.number(progression.contribution)}
+        />
+        <StatFigure
+          icon="coins"
+          label={t("gamification:value.coins")}
+          value={format.number(progression.coins)}
+        />
+      </div>
       {progression.reserved_coins ? (
         <p className="gamification-meta">
           {t("gamification:progression.reserved", { amount: progression.reserved_coins })}

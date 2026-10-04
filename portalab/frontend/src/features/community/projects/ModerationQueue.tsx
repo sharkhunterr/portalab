@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { SafeHtml } from "../../content/SafeHtml";
@@ -13,7 +14,7 @@ export default function ModerationQueue() {
   const [reason, setReason] = useState("");
   return (
     <div className="ds-stack">
-      <h1>{t("community:moderation.title")}</h1>
+      <PageHeader icon="users" title={t("community:moderation.title")} />
       <TextField
         label={t("community:moderation.reason")}
         value={reason}

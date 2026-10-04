@@ -2,6 +2,7 @@ import { type FormEvent, useId, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { type FieldDef, useFeedbackForms, useSubmitFeedback } from "../tickets/api";
@@ -25,7 +26,7 @@ export function FeedbackPage() {
   };
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("support:feedback.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="message" title={t("support:feedback.title")} />
       {submit.isSuccess ? (
         <p role="status">{t("support:feedback.thanks")}</p>
       ) : (

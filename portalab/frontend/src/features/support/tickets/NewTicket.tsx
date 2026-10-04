@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -68,7 +69,7 @@ export function NewTicket() {
     create.error instanceof ApiError ? ((create.error.extensions.fields as string[] | undefined) ?? []) : [];
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("support:new.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="ticket" title={t("support:new.title")} />
       <SelectField
         label={t("support:new.type")}
         value={typeKey}

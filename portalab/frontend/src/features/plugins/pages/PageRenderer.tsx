@@ -5,6 +5,7 @@ import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, TextField } from "../../../design-system/components/Field";
 import { type Column, Table } from "../../../design-system/components/Layout";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -175,7 +176,7 @@ export default function PageRenderer() {
   }
   return (
     <div className="ds-stack">
-      <h1>{t(page.data.title_key)}</h1>
+      <PageHeader icon="plug" title={t(page.data.title_key)} />
       {page.data.blocks.map((block, index) => {
         const key = `${block.kind}-${index}`;
         if (block.kind === "markdown") return <SafeHtml key={key} html={block.html ?? ""} diagrams={false} />;

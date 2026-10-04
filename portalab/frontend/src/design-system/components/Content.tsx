@@ -78,16 +78,20 @@ export function Badge({
 }
 
 export function Progress({ value, max = 100, label }: { value: number | null; max?: number; label: string }) {
+  const percent = value === null ? null : Math.round((Math.min(value, max) / Math.max(max, 1)) * 100);
   return (
-    <div className="ds-field">
-      <span>{label}</span>
-      {value === null ? (
-        <progress className="ds-progress" aria-label={label} />
-      ) : (
-        <progress className="ds-progress" aria-label={label} value={value} max={max}>
-          {Math.round((value / max) * 100)}%
-        </progress>
-      )}
+    <div className="ds-progress-field">
+      <span className="ds-progress-field__label">{label}</span>
+      <span
+        className="ds-bar ds-bar--accent"
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        {...(percent === null ? { "data-indeterminate": "true" } : { "aria-valuenow": percent })}
+      >
+        <span className="ds-bar__fill" style={{ inlineSize: percent === null ? "35%" : `${percent}%` }} />
+      </span>
     </div>
   );
 }

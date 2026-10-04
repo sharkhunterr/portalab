@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { ApiError, DataRegion, stateForError } from "../../state/regions";
 import { type ScopeKind, authzStrings as t } from "./strings";
@@ -203,7 +204,7 @@ export function AuthzAdminPage() {
   const [selected, setSelected] = useState<{ kind: "role" | "group"; id: string; name: string } | null>(null);
   return (
     <div className="account-page">
-      <h1>{t.title}</h1>
+      <PageHeader icon="key" title={t.title} />
       <div className="authz-roles">
         <h2>{t.rolesTitle}</h2>
         <DataRegion<Role[]>

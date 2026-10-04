@@ -5,6 +5,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type ShelfName, useNowPlaying, useShelf } from "../api";
 import { MediaGrid } from "../MediaGrid";
 import "../media.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /**
  * Media home (spec 024 T024/T028): what is playing, then the discovery shelves. Each shelf loads and fails on
@@ -68,7 +69,7 @@ export function MediaHome() {
   const headingId = useId();
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("media:home.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="film" title={t("media:home.title")} />
       <p>
         <Link to="/media/browse">{t("media:home.browse")}</Link>
       </p>

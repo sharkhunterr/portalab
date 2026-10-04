@@ -5,6 +5,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLinkActions, useLinks } from "../api";
 import "../media.css";
+import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /**
  * Media accounts (spec 024 T022): link an account on a media service; activity is only attributed once the
@@ -27,7 +28,7 @@ export function LinksSettings() {
   };
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{t("media:links.title")}</h2>
+      <PageHeader titleId={headingId} level={2} icon="film" title={t("media:links.title")} />
       <p>{t("media:links.intro")}</p>
       {links.isPending ? <FunctionalState state="loading" /> : null}
       {links.data && links.data.length === 0 ? <p>{t("media:links.empty")}</p> : null}
