@@ -13,6 +13,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.connectors.builtin import register_builtin
 from portalab.core.audit_port import AuditSink, LogAuditSink
 from portalab.core.authz_port import Authorizer, DenyAllAuthorizer, Principal, ResourceRef
 from portalab.core.blobstore import FileSystemBlobStore
@@ -183,6 +184,7 @@ def wire_platform(
         database, events, authz.audit, capabilities, SecretBox(secret_key), authorizer=authz.engine
     )
     connectors.register_capabilities()
+    register_builtin(connectors.manager.connectors)  # Jellyfin, Plex, Seerr, Radarr, Sonarr, RomM
     health = HealthModule(database, events, authz.audit, capabilities)
     health.register_capabilities()
     observability = ObservabilityModule(database, events, authz.audit, capabilities)

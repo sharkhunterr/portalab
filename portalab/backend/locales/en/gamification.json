@@ -36,6 +36,7 @@
   "admin.curve.base": "Base XP",
   "admin.curve.exponent": "Exponent",
   "admin.curve.save": "Publish curve",
+  "admin.description": "How members earn XP and Coins, manual rewards, suspicious activity and the level curve.",
   "admin.grant.amount": "Amount",
   "admin.grant.confirm": "This amount needs a confirmation. Grant anyway?",
   "admin.grant.done": "Reward granted.",

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -19,8 +20,7 @@ export function LevelCurve() {
     }
   }, [curve.data]);
   return (
-    <section aria-labelledby="gamification-curve">
-      <h2 id="gamification-curve">{t("gamification:admin.curve")}</h2>
+    <AdminSection title={t("gamification:admin.curve")} icon="chart">
       <div className="ds-stack--row">
         <TextField
           label={t("gamification:admin.curve.base")}
@@ -59,6 +59,6 @@ export function LevelCurve() {
             : t("gamification:admin.verify.drift", { count: verify.data.drifts.length })}
         </p>
       ) : null}
-    </section>
+    </AdminSection>
   );
 }

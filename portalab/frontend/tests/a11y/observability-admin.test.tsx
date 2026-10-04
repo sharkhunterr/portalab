@@ -97,8 +97,8 @@ describe("observability admin", () => {
     };
     const { container } = render(withClient(<ObservabilityAdmin />));
     expect(await screen.findByText(/Media sync: degraded/)).toBeInTheDocument();
-    expect(screen.getByText("Action needed:")).toBeInTheDocument();
-    expect(screen.getByText("POST /api/v1/services/s1/sync")).toBeInTheDocument();
+    expect(screen.getAllByText("Action needed").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/\/api\/v1\//)).toBeNull(); // API paths are never shown
     expect(screen.getByText("Failing")).toBeInTheDocument();
     fireEvent.click(await screen.findByRole("button", { name: "Acknowledge" }));
     fireEvent.change(screen.getByLabelText("Resolution note"), { target: { value: "fixed" } });

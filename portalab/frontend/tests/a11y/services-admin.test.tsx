@@ -102,26 +102,29 @@ describe("services admin", () => {
     };
     const { container } = render(withClient(<ServicesAdmin />));
     expect(await screen.findByText("Media server")).toBeInTheDocument();
-    expect(screen.getByText("Enabled")).toBeInTheDocument();
+    expect(screen.getByText("Enabled", { selector: ".status-badge" })).toBeInTheDocument();
     expect(screen.getByText(/Never synchronized/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Add a service" }));
     const dialog = await screen.findByRole("dialog", { name: "Add a service" });
-    fireEvent.change(await within(dialog).findByLabelText("Name"), { target: { value: "Home" } });
-    fireEvent.change(screen.getByLabelText("Base Url"), { target: { value: "http://media.lan" } });
-    const secret = screen.getByLabelText("api_token");
+    fireEvent.click(await within(dialog).findByRole("button", { name: /Fake service/ }));
+    fireEvent.change(within(dialog).getByLabelText("Name"), { target: { value: "Home" } });
+    fireEvent.change(within(dialog).getByLabelText("Address"), { target: { value: "http://media.lan" } });
+    const secret = within(dialog).getByLabelText("API token");
     expect(secret).toHaveAttribute("type", "password");
     fireEvent.change(secret, { target: { value: "s3cret" } });
-    fireEvent.click(screen.getByRole("button", { name: "Test the connection" }));
-    expect(await screen.findByText("Connection failed: Cannot reach the service.")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    expect(await screen.findByText(/Service saved/)).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Test the connection" }));
+    expect(
+      await within(dialog).findByText("Connection failed: Cannot reach the service."),
+    ).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    expect(await within(dialog).findByText(/Service saved/)).toBeInTheDocument();
     expect(savedBody).toMatchObject({
       connector: "fake",
       name: "Home",
       config: { base_url: "http://media.lan" },
     });
-    expect((screen.getByLabelText("api_token") as HTMLInputElement).value).toBe(""); // never kept on screen
+    expect((within(dialog).getByLabelText("API token") as HTMLInputElement).value).toBe(""); // never kept
     fireEvent.keyDown(dialog, { key: "Escape" });
     await vi.waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
 
@@ -129,6 +132,8 @@ describe("services admin", () => {
     expect(await screen.findByText("Synchronization queued.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Sync history" }));
     expect(await screen.findByText(/manual · succeeded · \+3 ~1 -0/)).toBeInTheDocument();
+    fireEvent.keyDown(await screen.findByRole("dialog"), { key: "Escape" });
+    await vi.waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Disconnect" }));
     expect(calls.some((call) => call.endsWith("/disconnect"))).toBe(false);
     fireEvent.click(await screen.findByRole("button", { name: "Confirm disconnection (data is kept)" }));

@@ -92,11 +92,15 @@ describe("admin screens", () => {
     };
     const { container } = render(withClient(<ConfigEditor />));
     expect(await screen.findByText("Hidden (write-only)")).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("New value for demo.pageSize"), { target: { value: "50" } });
-    fireEvent.click(screen.getAllByRole("button", { name: "Preview the change" })[0] as HTMLElement);
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: "Modify demo.pageSize" }));
+    fireEvent.change(await screen.findByLabelText("New value for demo.pageSize"), {
+      target: { value: "50" },
+    });
+    expect(screen.queryByRole("button", { name: "Apply" })).toBeNull(); // preview first
+    fireEvent.click(screen.getByRole("button", { name: "Preview the change" }));
     fireEvent.click(await screen.findByRole("button", { name: "Apply" }));
     expect(await screen.findByText("Configuration updated.")).toBeInTheDocument();
-    await expectAccessible(container);
   });
 
   it("toggles explain refusals", async () => {

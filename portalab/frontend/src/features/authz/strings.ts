@@ -4,6 +4,10 @@
  */
 export const authzStrings = {
   title: "Roles & permissions",
+  description: "Who may do what: roles and groups, and the permissions they grant.",
+  noGroups: "No group yet.",
+  grantsPick: "Permissions",
+  grantsHint: "Choose a role or a group to see and change its permissions.",
   rolesTitle: "Roles",
   groupsTitle: "Groups",
   grantsTitle: (name: string) => `Permissions of “${name}”`,

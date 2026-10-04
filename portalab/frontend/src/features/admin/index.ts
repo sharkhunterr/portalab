@@ -1,4 +1,4 @@
-export { ConfigEditor } from "./ConfigEditor";
+export { ConfigEditor, ConfigurationPage } from "./ConfigEditor";
 export { ControlCenter } from "./ControlCenter";
 export { EventsAdmin, eventsStrings } from "./events/EventsAdmin";
 export { FirstRunWizard } from "./FirstRunWizard";

@@ -48,6 +48,10 @@ async def test_rate_limit_per_ip_and_health_exempt() -> None:
         # 027: static assets (dozens of chunks per page load) are not rate limited, only the API is
         statics = [(await client.get("/assets/app.js")).status_code for _ in range(5)]
         assert 429 not in statics
+        # nor the translation catalogs read on every full load; writes to the same prefix still count
+        catalogs = [(await client.get("/api/v1/i18n/catalogs/core")).status_code for _ in range(5)]
+        assert 429 not in catalogs
+        assert (await client.post("/api/v1/i18n/catalogs/core")).status_code == 429
 
 
 async def test_rate_limit_per_session() -> None:

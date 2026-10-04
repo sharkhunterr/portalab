@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -41,8 +42,7 @@ export function RuleEditor() {
     if (definition && key) admin.save.mutate({ key, definition }, { onError: () => setInvalid(true) });
   };
   return (
-    <section aria-labelledby="gamification-rules" className="gamification-admin">
-      <h2 id="gamification-rules">{t("gamification:admin.rules")}</h2>
+    <AdminSection title={t("gamification:admin.rules")} icon="list">
       <ul className="gamification-table">
         {(rules.data ?? []).map((rule) => (
           <li key={rule.key}>
@@ -91,6 +91,6 @@ export function RuleEditor() {
         {t("gamification:admin.rule.save")}
       </Button>
       <SimulationPanel ruleKey={key} definition={parsed()} />
-    </section>
+    </AdminSection>
   );
 }

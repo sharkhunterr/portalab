@@ -2,8 +2,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { api } from "../../../api/client";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
+import {
+  AdminPage,
+  AdminSection,
+  AdminTable,
+  AdminTabs,
+  FormActions,
+  JsonField,
+  StatusBadge,
+} from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { PageHeader } from "../../../design-system/components/PageHeader";
+import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -26,7 +35,6 @@ export function DefinitionsAdmin() {
   const t = useT();
   const announce = useAnnounce();
   const client = useQueryClient();
-  const headingId = useId();
   const editorId = useId();
   const list = useQuery({
     queryKey: ["statistics", "admin"],
@@ -73,66 +81,118 @@ export function DefinitionsAdmin() {
     }
     await refresh();
   }
+  const rows = list.data ?? [];
+  const domains = [...new Set(rows.map((row) => row.key.split(".")[0] ?? row.key))].sort();
+  const [domain, setDomain] = useState("all");
+  const shown = rows.filter((row) => domain === "all" || row.key.startsWith(`${domain}.`));
   return (
-    <section aria-labelledby={headingId}>
-      <PageHeader titleId={headingId} level={2} icon="chart" title={t("statistics:admin.title")} />
+    <AdminPage
+      icon="chart"
+      title={t("statistics:admin.title")}
+      description={t("statistics:admin.description")}
+      primary={
+        <Button
+          onClick={() => {
+            setDraft(NEW_DEFINITION);
+            document.getElementById(editorId)?.focus();
+          }}
+        >
+          <Icon name="plus" size={16} />
+          {t("statistics:admin.new")}
+        </Button>
+      }
+    >
       {list.isPending ? <FunctionalState state="loading" /> : null}
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">{t("statistics:admin.key")}</th>
-            <th scope="col">{t("statistics:admin.status")}</th>
-            <th scope="col">{t("statistics:admin.version")}</th>
-            <th scope="col">{t("statistics:admin.actions")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(list.data ?? []).map((row) => (
-            <tr key={row.key}>
-              <th scope="row">{row.key}</th>
-              <td>{row.status}</td>
-              <td>
-                {row.active_version ?? "—"} / {row.latest_version}
-              </td>
-              <td className="ds-stack ds-stack--row">
-                <Button variant="secondary" onClick={() => setDraft(JSON.stringify(row.definition, null, 2))}>
-                  {t("statistics:admin.edit")}
-                </Button>
-                <Button variant="secondary" onClick={() => void confirmed("activate", row.key)}>
-                  {t("statistics:admin.activate")}
-                </Button>
-                <Button
-                  variant="danger"
-                  disabled={row.status !== "active"}
-                  onClick={() => void confirmed("rebuild", row.key)}
-                >
-                  {t("statistics:admin.rebuild")}
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <label htmlFor={editorId}>{t("statistics:admin.definition")}</label>
-      <textarea
-        id={editorId}
-        rows={14}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        spellCheck={false}
-      />
-      {errors.length ? (
-        <ul role="alert">
-          {errors.map((error) => (
-            <li key={error}>{error}</li>
-          ))}
-        </ul>
-      ) : null}
-      <Button disabled={!draft.trim() || save.isPending} onClick={() => save.mutate()}>
-        {t("statistics:admin.save")}
-      </Button>
-    </section>
+      <AdminSection title={t("statistics:admin.list")} icon="chart" flush>
+        {domains.length > 1 ? (
+          <div className="admin-pad">
+            <AdminTabs
+              label={t("statistics:admin.list")}
+              current={domain}
+              onChange={setDomain}
+              tabs={[
+                { key: "all", label: t("statistics:admin.all"), count: rows.length },
+                ...domains.map((d) => ({
+                  key: d,
+                  label: d,
+                  count: rows.filter((r) => r.key.startsWith(`${d}.`)).length,
+                })),
+              ]}
+            />
+          </div>
+        ) : null}
+        <AdminTable<Row>
+          label={t("statistics:admin.list")}
+          rows={shown}
+          rowKey={(row) => row.key}
+          columns={[
+            {
+              key: "key",
+              header: t("statistics:admin.key"),
+              primary: true,
+              render: (row) => <code>{row.key}</code>,
+            },
+            {
+              key: "status",
+              header: t("statistics:admin.status"),
+              render: (row) => (
+                <StatusBadge tone={row.status === "active" ? "ok" : "neutral"}>{row.status}</StatusBadge>
+              ),
+            },
+            {
+              key: "version",
+              header: t("statistics:admin.version"),
+              render: (row) => `${row.active_version ?? "—"} / ${row.latest_version}`,
+            },
+          ]}
+          actions={(row) => (
+            <>
+              <Button variant="ghost" onClick={() => setDraft(JSON.stringify(row.definition, null, 2))}>
+                {t("statistics:admin.edit")}
+                <span className="visually-hidden"> {row.key}</span>
+              </Button>
+              <Button variant="secondary" onClick={() => void confirmed("activate", row.key)}>
+                {t("statistics:admin.activate")}
+              </Button>
+              <Button
+                variant="ghost"
+                disabled={row.status !== "active"}
+                onClick={() => void confirmed("rebuild", row.key)}
+              >
+                {t("statistics:admin.rebuild")}
+              </Button>
+            </>
+          )}
+        />
+      </AdminSection>
+      <AdminSection title={t("statistics:admin.definition")} icon="settings">
+        <JsonField
+          id={editorId}
+          label={t("statistics:admin.definition")}
+          value={draft}
+          onChange={setDraft}
+          rows={14}
+        />
+        {errors.length ? (
+          <ul role="alert" className="admin-errors">
+            {errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        ) : null}
+        <FormActions>
+          <Button disabled={!draft.trim() || save.isPending} onClick={() => save.mutate()}>
+            {t("statistics:admin.save")}
+          </Button>
+        </FormActions>
+      </AdminSection>
+    </AdminPage>
   );
 }
+
+const NEW_DEFINITION = `{
+  "key": "domain.my_statistic",
+  "version": 1
+}`;
 
 export default DefinitionsAdmin;

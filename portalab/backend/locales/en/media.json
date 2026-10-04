@@ -3,6 +3,7 @@
   "action.request": "Request a media",
   "admin.candidates": "Possible duplicates",
   "admin.confirm": "Merging changes the identity of catalog objects. Confirm?",
+  "admin.description": "Titles several services describe: confirm or split the possible duplicates.",
   "admin.empty": "No possible duplicate.",
   "admin.merge": "Merge",
   "admin.merged": "Objects merged.",

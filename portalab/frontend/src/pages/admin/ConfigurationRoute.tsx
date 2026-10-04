@@ -1,10 +1,5 @@
-import { ConfigEditor, Toggles } from "../../features/admin";
+import { ConfigurationPage } from "../../features/admin";
 
 export default function ConfigurationRoute() {
-  return (
-    <>
-      <ConfigEditor />
-      <Toggles />
-    </>
-  );
+  return <ConfigurationPage />;
 }

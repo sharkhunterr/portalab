@@ -85,6 +85,9 @@
   width: min(32rem, calc(100vw - 2rem));
   border-radius: var(--radius-md);
 }
+.ds-dialog[data-size="lg"] {
+  width: min(48rem, calc(100vw - 2rem));
+}
 .ds-drawer {
   inset-block: 0;
   inset-inline-end: 0;

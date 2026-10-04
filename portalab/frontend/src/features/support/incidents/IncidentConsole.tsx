@@ -1,8 +1,8 @@
 import { type FormEvent, useId, useState } from "react";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
+import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -39,42 +39,43 @@ function Declare() {
     );
   }
   return (
-    <form onSubmit={submit} className="ds-panel">
-      <h3>{t("support:console.declare")}</h3>
-      <TextField
-        label={t("support:console.title")}
-        value={title}
-        required
-        minLength={3}
-        maxLength={200}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <SelectField
-        label={t("support:console.severity")}
-        value={severity}
-        onChange={(e) => setSeverity(e.target.value as Severity)}
-      >
-        {SEVERITIES.map((s) => (
-          <option key={s} value={s}>
-            {t(`support:severity.${s}`)}
-          </option>
-        ))}
-      </SelectField>
-      <TextField
-        label={t("support:console.summary")}
-        value={summary}
-        maxLength={4000}
-        onChange={(e) => setSummary(e.target.value)}
-      />
-      <TextField
-        label={t("support:console.services")}
-        value={services}
-        onChange={(e) => setServices(e.target.value)}
-      />
-      <Button type="submit" disabled={staff.isPending}>
-        {t("support:console.declare")}
-      </Button>
-    </form>
+    <AdminSection title={t("support:console.declare")} icon="alert">
+      <form onSubmit={submit} className="ds-stack">
+        <TextField
+          label={t("support:console.title")}
+          value={title}
+          required
+          minLength={3}
+          maxLength={200}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <SelectField
+          label={t("support:console.severity")}
+          value={severity}
+          onChange={(e) => setSeverity(e.target.value as Severity)}
+        >
+          {SEVERITIES.map((s) => (
+            <option key={s} value={s}>
+              {t(`support:severity.${s}`)}
+            </option>
+          ))}
+        </SelectField>
+        <TextField
+          label={t("support:console.summary")}
+          value={summary}
+          maxLength={4000}
+          onChange={(e) => setSummary(e.target.value)}
+        />
+        <TextField
+          label={t("support:console.services")}
+          value={services}
+          onChange={(e) => setServices(e.target.value)}
+        />
+        <Button type="submit" disabled={staff.isPending}>
+          {t("support:console.declare")}
+        </Button>
+      </form>
+    </AdminSection>
   );
 }
 
@@ -93,7 +94,7 @@ function Manage({ incident }: { incident: Incident }) {
   };
   const base = { id: incident.id, version: incident.version };
   return (
-    <section aria-labelledby={headingId} className="ds-panel">
+    <section aria-labelledby={headingId} className="admin-section incident-manage">
       <h3 id={headingId}>
         {incident.reference} · {incident.title}
       </h3>
@@ -160,15 +161,18 @@ export function IncidentConsole() {
   const t = useT();
   const open = useIncidents("open");
   return (
-    <section aria-label={t("support:console.title_page")}>
-      <PageHeader level={2} icon="alert" title={t("support:console.title_page")} />
+    <AdminPage
+      icon="alert"
+      title={t("support:console.title_page")}
+      description={t("support:console.description")}
+    >
       <Declare />
       {open.isPending ? <FunctionalState state="loading" /> : null}
       {open.isError ? <FunctionalState state="unavailable" onRetry={() => open.refetch()} /> : null}
       {(open.data ?? []).map((incident) => (
         <Manage key={`${incident.id}:${incident.version}`} incident={incident} />
       ))}
-    </section>
+    </AdminPage>
   );
 }
 

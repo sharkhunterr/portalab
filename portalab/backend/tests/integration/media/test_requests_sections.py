@@ -228,3 +228,22 @@ class TestMediaSearch(SearchProviderContractKit):
         return ProviderWorld(
             provider, Principal(user_id=user), Principal(channel="anonymous"), "searchable", hide
         )
+
+
+async def test_poster_when_one_source_lists_a_title_twice(app: FastAPI, media: MediaHarness) -> None:
+    """027: the same film in two libraries of one server (4K and HD) is one object; its poster is fetched."""
+    people = await users(app, media, "sam")
+    one = media.service(1)
+    library = media.library(one)
+    library.images["hd"] = PNG_1PX
+    library.images["uhd"] = PNG_1PX
+    await media.module.library.upsert(
+        [
+            library_record("hd", title="Dune", ids={"tmdb": "438631"}, image="hd"),
+            library_record("uhd", title="Dune", ids={"tmdb": "438631"}, image="uhd"),
+        ],
+        one,
+    )
+    objects = (await media.module.catalog.browse(Principal(user_id=people["sam"])))[0]
+    assert len(objects) == 1
+    assert await media.module.images.fetch(objects[0][0].id)

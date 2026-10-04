@@ -1,7 +1,9 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
-import { PageHeader } from "../../design-system/components/PageHeader";
+import { AdminPage, AdminSection, AdminTable, StatusBadge } from "../../design-system/admin/AdminKit";
+import { Button } from "../../design-system/components/Button";
+import { Icon } from "../../design-system/components/Icon";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { stateForError } from "../../state/regions";
 import { privacyStrings as t } from "./strings";
@@ -26,7 +28,6 @@ function contextText(context: Record<string, unknown>): string {
 /** Read-only audit viewer (spec 021 T021/T036); every read is audited server-side. */
 export function AuditViewer() {
   const fieldId = useId();
-  const titleId = useId();
   const [draft, setDraft] = useState("");
   const [action, setAction] = useState("");
   const query = useInfiniteQuery({
@@ -47,36 +48,95 @@ export function AuditViewer() {
   }
 
   const items = (query.data?.pages.flatMap((page) => page.items) ?? []) as unknown as AuditItem[];
+  const exportHref = `/api/v1/audit/export${action ? `?action=${encodeURIComponent(action)}` : ""}`;
   return (
-    <section aria-labelledby={titleId} className="account-page">
-      <PageHeader titleId={titleId} level={2} icon="list" title={t.auditTitle} />
-      <form onSubmit={submit} className="auth-form">
-        <label htmlFor={fieldId}>{t.auditAction}</label>
-        <input id={fieldId} value={draft} onChange={(e) => setDraft(e.target.value)} />
-        <button type="submit">{t.auditSearch}</button>
-      </form>
-      <a href={`/api/v1/audit/export${action ? `?action=${encodeURIComponent(action)}` : ""}`} download>
-        {t.auditExport}
-      </a>
-      {query.isPending ? <FunctionalState state="loading" detail={t.auditTitle} /> : null}
-      {query.isError ? <FunctionalState state={stateForError(query.error)} detail={t.auditTitle} /> : null}
-      {query.isSuccess && items.length === 0 ? <p>{t.auditEmpty}</p> : null}
-      {items.length > 0 ? (
-        <ol>
-          {items.map((item) => (
-            <li key={item.seq}>
-              <time dateTime={item.occurred_at}>{new Date(item.occurred_at).toLocaleString()}</time> ·{" "}
-              {item.action} · {item.actor_kind} · {item.decision}/{item.result}
-              {item.resource_type ? ` · ${item.resource_type}` : ""} — {contextText(item.context)}
-            </li>
-          ))}
-        </ol>
-      ) : null}
-      {query.hasNextPage ? (
-        <button type="button" onClick={() => void query.fetchNextPage()} disabled={query.isFetchingNextPage}>
-          {t.auditMore}
-        </button>
-      ) : null}
-    </section>
+    <AdminPage
+      icon="list"
+      title={t.auditTitle}
+      description={t.auditDescription}
+      secondary={
+        <a className="ds-button ds-button--ghost" href={exportHref} download>
+          <Icon name="arrow-down" size={16} />
+          {t.auditExport}
+        </a>
+      }
+      wide
+    >
+      <AdminSection title={t.auditEntries} icon="list" flush>
+        <form onSubmit={submit} className="audit-filter">
+          <div className="ds-field audit-filter__field">
+            <label htmlFor={fieldId}>{t.auditAction}</label>
+            <input
+              id={fieldId}
+              value={draft}
+              placeholder="authorize:"
+              onChange={(e) => setDraft(e.target.value)}
+            />
+          </div>
+          <Button type="submit" variant="secondary">
+            <Icon name="search" size={16} />
+            {t.auditSearch}
+          </Button>
+        </form>
+        {query.isPending ? <FunctionalState state="loading" detail={t.auditTitle} /> : null}
+        {query.isError ? <FunctionalState state={stateForError(query.error)} detail={t.auditTitle} /> : null}
+        {query.isSuccess ? (
+          <AdminTable<AuditItem>
+            label={t.auditEntries}
+            rows={items}
+            rowKey={(item) => String(item.seq)}
+            empty={<p className="admin-muted admin-pad">{t.auditEmpty}</p>}
+            columns={[
+              {
+                key: "when",
+                header: t.auditWhen,
+                render: (item) => (
+                  <time dateTime={item.occurred_at}>{new Date(item.occurred_at).toLocaleString()}</time>
+                ),
+              },
+              {
+                key: "action",
+                header: t.auditActionColumn,
+                primary: true,
+                render: (item) => <code>{item.action}</code>,
+              },
+              { key: "actor", header: t.auditActor, render: (item) => item.actor_kind },
+              {
+                key: "decision",
+                header: t.auditDecision,
+                render: (item) => (
+                  <StatusBadge
+                    tone={item.decision === "deny" ? "bad" : item.result === "success" ? "ok" : "warn"}
+                  >
+                    {item.decision}/{item.result}
+                  </StatusBadge>
+                ),
+              },
+              {
+                key: "details",
+                header: t.auditDetails,
+                render: (item) => (
+                  <span className="admin-mono">
+                    {item.resource_type ? `${item.resource_type} — ` : ""}
+                    {contextText(item.context)}
+                  </span>
+                ),
+              },
+            ]}
+          />
+        ) : null}
+        {query.hasNextPage ? (
+          <div className="admin-pad">
+            <Button
+              variant="secondary"
+              onClick={() => void query.fetchNextPage()}
+              disabled={query.isFetchingNextPage}
+            >
+              {t.auditMore}
+            </Button>
+          </div>
+        ) : null}
+      </AdminSection>
+    </AdminPage>
   );
 }

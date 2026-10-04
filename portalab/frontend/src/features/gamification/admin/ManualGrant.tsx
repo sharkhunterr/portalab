@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -37,8 +38,7 @@ export function ManualGrant() {
     send();
   };
   return (
-    <section aria-labelledby="gamification-grant">
-      <h2 id="gamification-grant">{t("gamification:admin.grant.title")}</h2>
+    <AdminSection title={t("gamification:admin.grant.title")} icon="coins">
       <form className="ds-stack" onSubmit={submit}>
         <TextField
           label={t("gamification:admin.grant.user")}
@@ -82,6 +82,6 @@ export function ManualGrant() {
         </div>
       ) : null}
       {done ? <p role="status">{t("gamification:admin.grant.done")}</p> : null}
-    </section>
+    </AdminSection>
   );
 }

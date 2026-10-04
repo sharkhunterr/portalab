@@ -507,7 +507,11 @@ matching Marketplace product; a member buys it and can select it.
 - **FR-052**: Administration entry points MUST be reachable from the related member pages for administrators
   (e.g. "Add a service" on the Services page), and the Control Center MUST render each panel as a readable card
   with state, key figures and next actions.
-- **FR-053**: News, wiki and support pages (member and administration views) MUST use the page kit.
+- **FR-053**: News, wiki and support pages (member and administration views) MUST use the page kit; every
+  administration page MUST use the same administration layout (header, key figures, titled sections, tables
+  that become cards on phones, one status badge style).
+- **FR-055**: The portal MUST ship ready-to-use connectors for the common self-hosted services (Jellyfin/Emby,
+  Plex, Overseerr/Jellyseerr, Radarr, Sonarr, RomM) so an administrator can add a service without any plugin.
 - **FR-054**: Administrators MUST be able to create a theme from an existing one with live preview and the
   accessibility report, and offer it in the Marketplace without editing raw documents. A theme sold by an
   available Marketplace product MUST be listed and selectable only by its owners (the portal default and the

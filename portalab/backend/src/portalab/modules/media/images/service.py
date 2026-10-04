@@ -112,13 +112,20 @@ class ImageService:
             source = (row.field_provenance or {}).get("image")
             if not ref or not source:
                 return False
-            item = (
-                await session.execute(
-                    select(SourceItem).where(
-                        SourceItem.object_id == object_id, SourceItem.source_system == source
+            # one source may hold the same title twice (a film in two libraries, 4K and HD…): take the
+            # item whose payload carries this image reference, preferring active ones
+            candidates = list(
+                (
+                    await session.execute(
+                        select(SourceItem)
+                        .where(SourceItem.object_id == object_id, SourceItem.source_system == source)
+                        .order_by(SourceItem.active.desc(), SourceItem.last_seen_at.desc())
                     )
-                )
-            ).scalar_one_or_none()
+                ).scalars()
+            )
+            item = next((c for c in candidates if (c.payload or {}).get("image") == ref), None) or (
+                candidates[0] if candidates else None
+            )
             existing = (
                 await session.execute(
                     select(Image).where(Image.object_id == object_id, Image.role == "poster")

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -80,8 +81,7 @@ export function Builder({ onCreated }: { onCreated?: (id: string) => void }) {
   const update = (index: number, patch: Partial<StepDraft>) =>
     setSteps(steps.map((s, i) => (i === index ? { ...s, ...patch } : s)));
   return (
-    <section aria-labelledby="automation-builder" className="ds-stack automation-builder">
-      <h2 id="automation-builder">{t("automations:new")}</h2>
+    <AdminSection title={t("automations:new")} icon="plus">
       <TextField label={t("automations:identifier")} value={key} onChange={(e) => setKey(e.target.value)} />
       <TextField label={t("automations:name")} value={name} onChange={(e) => setName(e.target.value)} />
       <fieldset className="ds-stack">
@@ -195,6 +195,6 @@ export function Builder({ onCreated }: { onCreated?: (id: string) => void }) {
           )}
         </section>
       ) : null}
-    </section>
+    </AdminSection>
   );
 }

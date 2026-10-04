@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../../../api/client";
+import { AdminGrid, AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useHasPermission } from "../../authz/useMyPermissions";
@@ -62,15 +62,14 @@ export default function MarketplaceAdmin() {
       ),
     );
   return (
-    <div className="ds-stack">
-      <PageHeader
-        icon="shop"
-        title={t("marketplace:admin.title")}
-        primary={<NewProductDialog categories={(categories.data ?? []) as Category[]} onCreated={refresh} />}
-      />
+    <AdminPage
+      icon="shop"
+      title={t("marketplace:admin.title")}
+      description={t("marketplace:admin.description")}
+      primary={<NewProductDialog categories={(categories.data ?? []) as Category[]} onCreated={refresh} />}
+    >
       {message ? <p role="status">{message}</p> : null}
-      <section aria-labelledby="mk-products" className="ds-stack">
-        <h2 id="mk-products">{t("marketplace:admin.products")}</h2>
+      <AdminSection title={t("marketplace:admin.products")} icon="shop">
         {products.isError ? <FunctionalState state="unavailable" /> : null}
         <ul className="admin-products">
           {((products.data ?? []) as Product[]).map((p) => (
@@ -131,9 +130,8 @@ export default function MarketplaceAdmin() {
             </li>
           ))}
         </ul>
-      </section>
-      <section aria-labelledby="mk-collections" className="ds-card ds-stack">
-        <h2 id="mk-collections">{t("marketplace:shop.byCollection")}</h2>
+      </AdminSection>
+      <AdminSection title={t("marketplace:shop.byCollection")} icon="star">
         <ul className="admin-collections">
           {((categories.data ?? []) as Category[]).map((c) => (
             <li key={c.key} className="ds-badge">
@@ -170,86 +168,85 @@ export default function MarketplaceAdmin() {
             {t("marketplace:admin.newCollection")}
           </Button>
         </div>
-      </section>
-      <section aria-labelledby="mk-grants" className="ds-stack">
-        <h2 id="mk-grants">{t("marketplace:admin.grants")}</h2>
-        <TextField
-          label={t("marketplace:admin.user")}
-          value={grantUser}
-          onChange={(e) => setGrantUser(e.target.value)}
-        />
-        <TextField
-          label={t("marketplace:admin.product")}
-          value={grantProduct}
-          onChange={(e) => setGrantProduct(e.target.value)}
-        />
-        <TextField
-          label={t("marketplace:admin.reason")}
-          value={reason}
-          maxLength={500}
-          onChange={(e) => setReason(e.target.value)}
-        />
-        <Button
-          disabled={!grantUser || !grantProduct || !reason}
-          onClick={() =>
-            run.mutate(() =>
-              withConfirmation(
-                (confirmation) =>
-                  api.POST("/api/v1/admin/marketplace/grants", {
-                    body: {
-                      user_id: grantUser,
-                      product: grantProduct,
-                      reason,
-                      confirmation: confirmation ?? null,
-                    },
-                  }),
-                confirm,
-              ),
-            )
-          }
-        >
-          {t("marketplace:admin.grant")}
-        </Button>
-      </section>
-      <section aria-labelledby="mk-revoke" className="ds-stack">
-        <h2 id="mk-revoke">{t("marketplace:admin.revocations")}</h2>
-        <TextField
-          label={t("marketplace:admin.ownership")}
-          value={revokeId}
-          onChange={(e) => setRevokeId(e.target.value)}
-        />
-        <SelectField
-          label={t("marketplace:admin.ground")}
-          value={ground}
-          onChange={(e) => setGround(e.target.value)}
-        >
-          {(["abuse", "grant_expired", "refund", "withdrawn_for_cause"] as const).map((g) => (
-            <option key={g} value={g}>
-              {t(`marketplace:ground.${g}`)}
-            </option>
-          ))}
-        </SelectField>
-        <Button
-          disabled={!revokeId || !reason}
-          onClick={() =>
-            run.mutate(() =>
-              withConfirmation(
-                (confirmation) =>
-                  api.POST("/api/v1/admin/marketplace/ownerships/{ownership_id}/revoke", {
-                    params: { path: { ownership_id: revokeId } },
-                    body: { ground: ground as "abuse", reason, confirmation: confirmation ?? null },
-                  }),
-                confirm,
-              ),
-            )
-          }
-        >
-          {t("marketplace:admin.revoke")}
-        </Button>
-      </section>
+      </AdminSection>
+      <AdminGrid>
+        <AdminSection title={t("marketplace:admin.grants")} icon="coins">
+          <TextField
+            label={t("marketplace:admin.user")}
+            value={grantUser}
+            onChange={(e) => setGrantUser(e.target.value)}
+          />
+          <TextField
+            label={t("marketplace:admin.product")}
+            value={grantProduct}
+            onChange={(e) => setGrantProduct(e.target.value)}
+          />
+          <TextField
+            label={t("marketplace:admin.reason")}
+            value={reason}
+            maxLength={500}
+            onChange={(e) => setReason(e.target.value)}
+          />
+          <Button
+            disabled={!grantUser || !grantProduct || !reason}
+            onClick={() =>
+              run.mutate(() =>
+                withConfirmation(
+                  (confirmation) =>
+                    api.POST("/api/v1/admin/marketplace/grants", {
+                      body: {
+                        user_id: grantUser,
+                        product: grantProduct,
+                        reason,
+                        confirmation: confirmation ?? null,
+                      },
+                    }),
+                  confirm,
+                ),
+              )
+            }
+          >
+            {t("marketplace:admin.grant")}
+          </Button>
+        </AdminSection>
+        <AdminSection title={t("marketplace:admin.revocations")} icon="list">
+          <TextField
+            label={t("marketplace:admin.ownership")}
+            value={revokeId}
+            onChange={(e) => setRevokeId(e.target.value)}
+          />
+          <SelectField
+            label={t("marketplace:admin.ground")}
+            value={ground}
+            onChange={(e) => setGround(e.target.value)}
+          >
+            {(["abuse", "grant_expired", "refund", "withdrawn_for_cause"] as const).map((g) => (
+              <option key={g} value={g}>
+                {t(`marketplace:ground.${g}`)}
+              </option>
+            ))}
+          </SelectField>
+          <Button
+            disabled={!revokeId || !reason}
+            onClick={() =>
+              run.mutate(() =>
+                withConfirmation(
+                  (confirmation) =>
+                    api.POST("/api/v1/admin/marketplace/ownerships/{ownership_id}/revoke", {
+                      params: { path: { ownership_id: revokeId } },
+                      body: { ground: ground as "abuse", reason, confirmation: confirmation ?? null },
+                    }),
+                  confirm,
+                ),
+              )
+            }
+          >
+            {t("marketplace:admin.revoke")}
+          </Button>
+        </AdminSection>
+      </AdminGrid>
       {canAudit ? (
-        <section aria-labelledby="mk-audit" className="ds-stack">
-          <h2 id="mk-audit">{t("marketplace:admin.audit")}</h2>
+        <AdminSection title={t("marketplace:admin.audit")} icon="settings">
           <ul className="ds-stack">
             {(audit.data ?? []).map((entry) => (
               <li key={String(entry.id)}>
@@ -258,8 +255,8 @@ export default function MarketplaceAdmin() {
               </li>
             ))}
           </ul>
-        </section>
+        </AdminSection>
       ) : null}
-    </div>
+    </AdminPage>
   );
 }

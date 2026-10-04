@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { AdminPage } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -65,8 +65,11 @@ export default function ProjectConsole() {
   };
 
   return (
-    <div className="ds-stack">
-      <PageHeader icon="shop" title={t("marketplace:console.title")} />
+    <AdminPage
+      icon="shop"
+      title={t("marketplace:console.title")}
+      description={t("marketplace:console.description")}
+    >
       <TextField
         label={t("marketplace:console.reason")}
         value={reason}
@@ -120,6 +123,6 @@ export default function ProjectConsole() {
           </li>
         ))}
       </ul>
-    </div>
+    </AdminPage>
   );
 }

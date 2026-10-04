@@ -238,6 +238,8 @@ lossless migration.
 - [X] T096 [US11] Theme studio: duplicate a theme, edit colors/fonts/layout/motion/sounds with live preview and floor report, publish and create the Marketplace product in `frontend/src/features/appearance/studio/`
 - [X] T097 Demo data: rarities, collections (Halloween, New Wave), featured items, theme products, achievement categories in `backend/src/portalab/app/demo_seed.py`
 - [X] T098 Tests (backend integration, frontend unit, Playwright) for US8–US11; dev-mode verification on the LAN instance
+- [X] T099 [US10] Ship the first real connectors (Jellyfin, Plex, Seerr, Radarr, Sonarr, RomM) on a shared HTTP base, registered at start; conformance kit + mapping tests in `backend/src/portalab/connectors/`, `backend/tests/contract/connectors/`
+- [X] T100 [US10] Administration kit (AdminPage, AdminSection, AdminStats, AdminTable, StatusBadge, toolbar/forms) in `frontend/src/design-system/admin/` and every administration page rebuilt on it; guided "Add a service" wizard with connector cards
 
 ## Dependencies & Execution Order
 

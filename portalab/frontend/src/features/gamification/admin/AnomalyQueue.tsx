@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -13,8 +14,7 @@ export function AnomalyQueue() {
   const decide = useAnomalyDecision();
   const [reasons, setReasons] = useState<Record<string, string>>({});
   return (
-    <section aria-labelledby="gamification-anomalies">
-      <h2 id="gamification-anomalies">{t("gamification:admin.anomalies")}</h2>
+    <AdminSection title={t("gamification:admin.anomalies")} icon="alert">
       {anomalies.data?.length === 0 ? <p>{t("gamification:admin.anomalies.empty")}</p> : null}
       <ul className="ds-stack">
         {(anomalies.data ?? []).map((flag) => {
@@ -47,6 +47,6 @@ export function AnomalyQueue() {
           );
         })}
       </ul>
-    </section>
+    </AdminSection>
   );
 }

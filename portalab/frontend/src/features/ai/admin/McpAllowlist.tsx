@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -56,9 +57,7 @@ export function McpAllowlist() {
       credentials: Object.fromEntries(rows.filter((r) => r.access).map((r) => [r.name, r.access])),
     });
   return (
-    <section aria-labelledby="ai-mcp-title">
-      <h2 id="ai-mcp-title">{t("ai:mcp.title")}</h2>
-      <p>{t("ai:mcp.description")}</p>
+    <AdminSection title={t("ai:mcp.title")} description={t("ai:mcp.description")} icon="plug">
       {rows.map((row, index) => (
         <fieldset key={row.uid} className="ds-card ds-stack">
           <legend>{row.name || t("ai:mcp.addServer")}</legend>
@@ -181,6 +180,6 @@ export function McpAllowlist() {
           {t("ai:mcp.save")}
         </Button>
       </div>
-    </section>
+    </AdminSection>
   );
 }

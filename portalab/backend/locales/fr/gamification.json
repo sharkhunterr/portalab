@@ -36,6 +36,7 @@
   "admin.curve.base": "XP de base",
   "admin.curve.exponent": "Exposant",
   "admin.curve.save": "Publier la courbe",
+  "admin.description": "Comment les membres gagnent XP et Coins, les récompenses manuelles, les activités suspectes et la courbe des niveaux.",
   "admin.grant.amount": "Montant",
   "admin.grant.confirm": "Ce montant demande une confirmation. Attribuer quand même ?",
   "admin.grant.done": "Récompense attribuée.",

@@ -5,6 +5,24 @@ A **connector** is code that knows how to talk to one kind of external service (
 plugins and implement the SDK in `portalab.capabilities.connector_sdk`; they never import modules and
 never write module tables.
 
+## Connectors shipped with the portal
+
+Registered at start (`portalab.connectors.builtin`); plugins can add more.
+
+| Key | Service | Provides | Credentials |
+|---|---|---|---|
+| `jellyfin` | Jellyfin / Emby | `media.library` (sync), `media.playback`, health probe | API key (*Dashboard → API Keys*) |
+| `plex` | Plex Media Server | `media.library` (sync), `media.playback`, health probe | `X-Plex-Token` |
+| `seerr` | Overseerr / Jellyseerr | `request.service` (sync + submit/status), health probe | API key (*Settings → General*) |
+| `radarr` | Radarr (API v3) | `media.library` (sync: films, availability), health probe | API key |
+| `sonarr` | Sonarr v3/v4 | `media.library` (sync: series and seasons), health probe | API key |
+| `romm` | RomM 3/4 | `media.library` (sync: games), health probe | account username + password |
+
+They share `portalab.connectors.http_base.HttpConnector`: HTTP outcomes become typed results (401/403 →
+`ProviderAuthError`, transport errors → `ConnectionError`, non-JSON → `InvalidPayload`), image references are
+validated opaque ids (a value read from a source can never point the client at another host), and every
+connector passes the `ConformanceKit` against fake HTTP servers (`tests/contract/connectors/`).
+
 ## Writing a connector
 
 ```python

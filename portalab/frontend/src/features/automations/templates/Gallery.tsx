@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -11,8 +12,7 @@ export function Gallery() {
   const { instantiate } = useAutomationAdmin();
   const [keys, setKeys] = useState<Record<string, string>>({});
   return (
-    <section aria-labelledby="automation-templates">
-      <h2 id="automation-templates">{t("automations:templates.title")}</h2>
+    <AdminSection title={t("automations:templates.title")} icon="sparkles">
       <ul className="ds-stack">
         {(templates.data ?? []).map((template) => (
           <li key={template.key} className="ds-card ds-stack">
@@ -39,6 +39,6 @@ export function Gallery() {
           </li>
         ))}
       </ul>
-    </section>
+    </AdminSection>
   );
 }

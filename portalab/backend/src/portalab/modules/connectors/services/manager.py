@@ -158,6 +158,9 @@ class ServiceManager:
                 {
                     "key": connector.key,
                     "name": connector.name,
+                    "description": str(getattr(connector, "description", "")),
+                    "icon": str(getattr(connector, "icon", "server")),
+                    "category": str(getattr(connector, "category", "other")),
                     "version": connector.manifest.version,
                     "provides": [binding.spec.name for binding in connector.provides],
                     "config_schema": connector.config_schema.model_json_schema(),

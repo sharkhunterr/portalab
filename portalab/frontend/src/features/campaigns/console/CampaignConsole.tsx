@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdminPage, AdminSection, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
@@ -7,7 +8,6 @@ import { type Campaign, type CampaignAction, useCampaignAdmin, useCampaignsAdmin
 import { Timeline } from "../history/Timeline";
 import { SimulationPanel } from "./SimulationPanel";
 import "../campaigns.css";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 
 const TEMPLATE = JSON.stringify(
   {
@@ -51,10 +51,8 @@ export default function CampaignConsole() {
     if (definition && key) admin.create.mutate({ key, definition }, { onError: () => setInvalid(true) });
   };
   return (
-    <div className="ds-stack campaign-console">
-      <PageHeader icon="star" title={t("campaigns:admin.title")} />
-      <section aria-labelledby="campaign-new" className="ds-stack">
-        <h2 id="campaign-new">{t("campaigns:admin.create")}</h2>
+    <AdminPage icon="star" title={t("campaigns:admin.title")} description={t("campaigns:admin.description")}>
+      <AdminSection title={t("campaigns:admin.create")} icon="plus">
         <TextField label={t("campaigns:admin.key")} value={key} onChange={(e) => setKey(e.target.value)} />
         <label htmlFor="campaign-definition">{t("campaigns:admin.definition")}</label>
         <textarea
@@ -68,11 +66,11 @@ export default function CampaignConsole() {
         <Button onClick={create} disabled={!key || admin.create.isPending}>
           {t("campaigns:admin.save")}
         </Button>
-      </section>
+      </AdminSection>
       {(campaigns.data ?? []).map((campaign) => (
         <CampaignCard key={campaign.id} campaign={campaign} />
       ))}
-    </div>
+    </AdminPage>
   );
 }
 
@@ -95,9 +93,17 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       },
     );
   return (
-    <section className="ds-card ds-stack" aria-labelledby={`campaign-${campaign.id}`}>
-      <h2 id={`campaign-${campaign.id}`}>{campaign.key}</h2>
-      <p>{t("campaigns:admin.state", { state: campaign.state, version: campaign.current_version })}</p>
+    <AdminSection
+      title={campaign.key}
+      icon="star"
+      actions={
+        <StatusBadge
+          tone={campaign.state === "active" ? "ok" : campaign.state === "cancelled" ? "bad" : "neutral"}
+        >
+          {t("campaigns:admin.state", { state: campaign.state, version: campaign.current_version })}
+        </StatusBadge>
+      }
+    >
       <TextField
         label={t("campaigns:admin.reason")}
         value={reason}
@@ -131,6 +137,6 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       ) : null}
       <SimulationPanel campaignId={campaign.id} />
       {showHistory ? <Timeline campaignId={campaign.id} /> : null}
-    </section>
+    </AdminSection>
   );
 }

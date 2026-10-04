@@ -6,6 +6,7 @@
   "admin.create": "Nouvelle campagne",
   "admin.deactivate": "Désactiver",
   "admin.definition": "Définition (JSON)",
+  "admin.description": "Les événements saisonniers : dates, thème, récompenses et classements.",
   "admin.history": "Historique",
   "admin.invalid": "Cette définition n'est pas valide.",
   "admin.key": "Clé",

@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { SafeHtml } from "../../content/SafeHtml";
@@ -13,35 +13,40 @@ export default function ModerationQueue() {
   const { queue, decide } = useModeration();
   const [reason, setReason] = useState("");
   return (
-    <div className="ds-stack">
-      <PageHeader icon="users" title={t("community:moderation.title")} />
-      <TextField
-        label={t("community:moderation.reason")}
-        value={reason}
-        maxLength={500}
-        onChange={(e) => setReason(e.target.value)}
-      />
-      {queue.isError ? <FunctionalState state="unavailable" onRetry={() => queue.refetch()} /> : null}
-      {queue.data?.length === 0 ? <p>{t("community:moderation.empty")}</p> : null}
-      <ul className="ds-stack">
-        {(queue.data ?? []).map((proposal) => (
-          <li key={proposal.id} className="ds-card ds-stack">
-            <h2>{proposal.title}</h2>
-            <SafeHtml html={proposal.rendered_html} diagrams={false} />
-            <div className="ds-stack--row">
-              <Button onClick={() => decide.mutate({ id: proposal.id, approve: true, reason })}>
-                {t("community:moderation.approve")}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => decide.mutate({ id: proposal.id, approve: false, reason })}
-              >
-                {t("community:moderation.reject")}
-              </Button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <AdminPage
+      icon="users"
+      title={t("community:moderation.title")}
+      description={t("community:moderation.description")}
+    >
+      <AdminSection title={t("community:moderation.queue")} icon="inbox">
+        <TextField
+          label={t("community:moderation.reason")}
+          value={reason}
+          maxLength={500}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        {queue.isError ? <FunctionalState state="unavailable" onRetry={() => queue.refetch()} /> : null}
+        {queue.data?.length === 0 ? <p className="admin-muted">{t("community:moderation.empty")}</p> : null}
+        <ul className="ds-stack">
+          {(queue.data ?? []).map((proposal) => (
+            <li key={proposal.id} className="ds-card ds-stack">
+              <h2>{proposal.title}</h2>
+              <SafeHtml html={proposal.rendered_html} diagrams={false} />
+              <div className="ds-stack--row">
+                <Button onClick={() => decide.mutate({ id: proposal.id, approve: true, reason })}>
+                  {t("community:moderation.approve")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => decide.mutate({ id: proposal.id, approve: false, reason })}
+                >
+                  {t("community:moderation.reject")}
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </AdminSection>
+    </AdminPage>
   );
 }

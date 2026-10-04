@@ -54,8 +54,8 @@ describe("events admin", () => {
         : json(202, { processed: 4 });
     };
     const { container } = render(withClient(<EventsAdmin />));
-    expect(await screen.findByText(/rewards · e1/)).toBeInTheDocument();
-    expect(await screen.findByText(/x.y · unknown_type/)).toBeInTheDocument();
+    expect(await screen.findByText("rewards")).toBeInTheDocument();
+    expect(await screen.findByText("unknown_type")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Projection"), { target: { value: "scores" } });
     fireEvent.click(screen.getByRole("button", { name: "Rebuild" }));
     fireEvent.click(await screen.findByRole("button", { name: "Confirm the rebuild" }));

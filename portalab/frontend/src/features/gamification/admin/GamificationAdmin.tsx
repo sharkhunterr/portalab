@@ -1,21 +1,26 @@
+import { AdminGrid, AdminPage } from "../../../design-system/admin/AdminKit";
 import { useT } from "../../../i18n/hooks/useT";
 import { AnomalyQueue } from "./AnomalyQueue";
 import { LevelCurve } from "./LevelCurve";
 import { ManualGrant } from "./ManualGrant";
 import { RuleEditor } from "./RuleEditor";
 import "../gamification.css";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 
-/** ``/admin/gamification`` (spec 013): rules, manual rewards, anomaly review, level curve and verification. */
+/** ``/admin/gamification`` (spec 013, 027 administration kit): rules, manual rewards, anomaly review, level curve. */
 export default function GamificationAdmin() {
   const t = useT();
   return (
-    <div className="ds-stack">
-      <PageHeader icon="trophy" title={t("gamification:admin.title")} />
+    <AdminPage
+      icon="trophy"
+      title={t("gamification:admin.title")}
+      description={t("gamification:admin.description")}
+    >
       <RuleEditor />
-      <ManualGrant />
-      <AnomalyQueue />
+      <AdminGrid>
+        <ManualGrant />
+        <AnomalyQueue />
+      </AdminGrid>
       <LevelCurve />
-    </div>
+    </AdminPage>
   );
 }

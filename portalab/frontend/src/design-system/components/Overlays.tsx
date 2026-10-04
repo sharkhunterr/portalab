@@ -19,6 +19,8 @@ export interface DialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   variant?: "dialog" | "drawer";
+  /** ``lg``: a wider dialog for guided forms (027). */
+  size?: "md" | "lg" | undefined;
 }
 
 export function Dialog({
@@ -30,6 +32,7 @@ export function Dialog({
   open,
   onOpenChange,
   variant = "dialog",
+  size = "md",
 }: DialogProps) {
   return (
     <DialogPrimitive.Root
@@ -39,7 +42,10 @@ export function Dialog({
       <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="ds-overlay" />
-        <DialogPrimitive.Content className={variant === "drawer" ? "ds-drawer" : "ds-dialog"}>
+        <DialogPrimitive.Content
+          className={variant === "drawer" ? "ds-drawer" : "ds-dialog"}
+          data-size={variant === "drawer" ? undefined : size}
+        >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
           {description ? (
             <DialogPrimitive.Description>{description}</DialogPrimitive.Description>

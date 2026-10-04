@@ -2,7 +2,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
-import { PageHeader } from "../../design-system/components/PageHeader";
+import {
+  AdminPage,
+  AdminSection,
+  AdminTable,
+  FormActions,
+  FormGrid,
+  StatusBadge,
+} from "../../design-system/admin/AdminKit";
+import { Button } from "../../design-system/components/Button";
+import { SelectField, TextField } from "../../design-system/components/Field";
 import { ApiError, DataRegion } from "../../state/regions";
 import { type LevelKey, privacyStrings as t } from "./strings";
 
@@ -51,39 +60,64 @@ function NewPolicy() {
   }
 
   return (
-    <form onSubmit={submit} aria-labelledby={ids.title} className="auth-form">
-      <h3 id={ids.title}>{t.newPolicyTitle}</h3>
-      {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
-      <label htmlFor={ids.datum}>{t.datumField}</label>
-      <input id={ids.datum} required value={datum} onChange={(e) => setDatum(e.target.value)} />
-      <label htmlFor={ids.mode}>{t.modeField}</label>
-      <select id={ids.mode} value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
-        {(Object.keys(t.modes) as Mode[]).map((key) => (
-          <option key={key} value={key}>
-            {t.modes[key]}
-          </option>
-        ))}
-      </select>
-      {mode === "force_visible" ? (
-        <>
-          <label htmlFor={ids.level}>{t.levelField}</label>
-          <select id={ids.level} value={level} onChange={(e) => setLevel(e.target.value as LevelKey)}>
-            {(["public", "community", "leaderboard"] as LevelKey[]).map((key) => (
+    <AdminSection title={t.newPolicyTitle} icon="plus">
+      <form onSubmit={submit} className="admin-form">
+        {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
+        <FormGrid>
+          <TextField
+            id={ids.datum}
+            label={t.datumField}
+            required
+            value={datum}
+            onChange={(e) => setDatum(e.target.value)}
+          />
+          <SelectField
+            id={ids.mode}
+            label={t.modeField}
+            value={mode}
+            onChange={(e) => setMode(e.target.value as Mode)}
+          >
+            {(Object.keys(t.modes) as Mode[]).map((key) => (
               <option key={key} value={key}>
-                {t.levels[key]}
+                {t.modes[key]}
               </option>
             ))}
-          </select>
-        </>
-      ) : null}
-      <label htmlFor={ids.subject}>{t.subjectField}</label>
-      <input id={ids.subject} value={subject} onChange={(e) => setSubject(e.target.value)} />
-      <label htmlFor={ids.reason}>{t.reasonField}</label>
-      <input id={ids.reason} required value={reason} onChange={(e) => setReason(e.target.value)} />
-      <button type="submit" disabled={mutation.isPending}>
-        {t.apply}
-      </button>
-    </form>
+          </SelectField>
+          {mode === "force_visible" ? (
+            <SelectField
+              id={ids.level}
+              label={t.levelField}
+              value={level}
+              onChange={(e) => setLevel(e.target.value as LevelKey)}
+            >
+              {(["public", "community", "leaderboard"] as LevelKey[]).map((key) => (
+                <option key={key} value={key}>
+                  {t.levels[key]}
+                </option>
+              ))}
+            </SelectField>
+          ) : null}
+          <TextField
+            id={ids.subject}
+            label={t.subjectField}
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+          <TextField
+            id={ids.reason}
+            label={t.reasonField}
+            required
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </FormGrid>
+        <FormActions>
+          <Button type="submit" disabled={mutation.isPending}>
+            {t.apply}
+          </Button>
+        </FormActions>
+      </form>
+    </AdminSection>
   );
 }
 
@@ -97,33 +131,47 @@ export function PoliciesAdmin() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: POLICIES_KEY }),
   });
   return (
-    <div className="account-page">
-      <PageHeader level={2} icon="shield" title={t.policiesTitle} />
-      <DataRegion<Policy[]>
-        label={t.policiesTitle}
-        queryKey={POLICIES_KEY}
-        queryFn={async () => (await api.GET("/api/v1/privacy/policies")).data ?? []}
-      >
-        {(policies) =>
-          policies.length === 0 ? (
-            <p>{t.noPolicies}</p>
-          ) : (
-            <ul>
-              {policies.map((policy) => (
-                <li key={policy.id}>
-                  {t.policyFor(policy.subject_user_id ?? t.everyone, policy.datum_class)} ·{" "}
-                  {t.modes[policy.mode as Mode] ?? policy.mode}
-                  {policy.level ? ` (${t.levels[policy.level as LevelKey] ?? policy.level})` : ""}{" "}
-                  <button type="button" onClick={() => remove.mutate(policy.id)}>
-                    {t.removePolicy}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </DataRegion>
+    <AdminPage icon="lock" title={t.policiesTitle} description={t.policiesDescription}>
+      <AdminSection title={t.activePolicies} icon="shield" flush>
+        <DataRegion<Policy[]>
+          label={t.activePolicies}
+          queryKey={POLICIES_KEY}
+          queryFn={async () => (await api.GET("/api/v1/privacy/policies")).data ?? []}
+        >
+          {(policies) => (
+            <AdminTable<Policy>
+              label={t.activePolicies}
+              rows={policies}
+              rowKey={(policy) => policy.id}
+              empty={<p className="admin-muted admin-pad">{t.noPolicies}</p>}
+              columns={[
+                {
+                  key: "who",
+                  header: t.datumField,
+                  primary: true,
+                  render: (policy) => t.policyFor(policy.subject_user_id ?? t.everyone, policy.datum_class),
+                },
+                {
+                  key: "mode",
+                  header: t.modeField,
+                  render: (policy) => (
+                    <StatusBadge tone={policy.mode === "force_private" ? "warn" : "info"}>
+                      {t.modes[policy.mode as Mode] ?? policy.mode}
+                      {policy.level ? ` (${t.levels[policy.level as LevelKey] ?? policy.level})` : ""}
+                    </StatusBadge>
+                  ),
+                },
+              ]}
+              actions={(policy) => (
+                <Button variant="ghost" onClick={() => remove.mutate(policy.id)}>
+                  {t.removePolicy}
+                </Button>
+              )}
+            />
+          )}
+        </DataRegion>
+      </AdminSection>
       <NewPolicy />
-    </div>
+    </AdminPage>
   );
 }

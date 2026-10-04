@@ -1,3 +1,4 @@
+import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -10,8 +11,7 @@ export function Inbox() {
   const approvals = useApprovals();
   const { decide } = useAutomationAdmin();
   return (
-    <section aria-labelledby="automation-approvals">
-      <h2 id="automation-approvals">{t("automations:approvals.title")}</h2>
+    <AdminSection title={t("automations:approvals.title")} icon="check">
       {approvals.data?.length === 0 ? <p>{t("automations:approvals.empty")}</p> : null}
       <ul className="ds-stack">
         {(approvals.data ?? []).map((approval) => (
@@ -36,6 +36,6 @@ export function Inbox() {
           </li>
         ))}
       </ul>
-    </section>
+    </AdminSection>
   );
 }

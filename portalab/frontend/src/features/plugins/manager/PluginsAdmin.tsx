@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Badge } from "../../../design-system/components/Content";
 import { TextField } from "../../../design-system/components/Field";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -116,8 +116,7 @@ export default function PluginsAdmin() {
       { onSuccess: (data) => setReview((data as { review: Review }).review) },
     );
   return (
-    <div className="ds-stack">
-      <PageHeader icon="plug" title={t("plugins:title")} />
+    <AdminPage icon="plug" title={t("plugins:title")} description={t("plugins:description")}>
       {restart ? <FunctionalState state="maintenance" label={t("plugins:restartBanner")} /> : null}
       {review ? (
         <ReviewConsent
@@ -129,8 +128,7 @@ export default function PluginsAdmin() {
           onCancel={() => setReview(null)}
         />
       ) : null}
-      <section aria-labelledby="plugins-installed" className="ds-stack">
-        <h2 id="plugins-installed">{t("plugins:installed")}</h2>
+      <AdminSection title={t("plugins:installed")} icon="plug">
         {plugins.isError ? <FunctionalState state="unavailable" /> : null}
         {plugins.data?.length === 0 ? <p>{t("plugins:none")}</p> : null}
         <ul className="ds-stack">
@@ -164,10 +162,8 @@ export default function PluginsAdmin() {
             </li>
           ))}
         </ul>
-      </section>
-      <section aria-labelledby="plugins-discovery" className="ds-stack">
-        <h2 id="plugins-discovery">{t("plugins:discovery")}</h2>
-        <p>{t("plugins:discoveryHint")}</p>
+      </AdminSection>
+      <AdminSection title={t("plugins:discovery")} description={t("plugins:discoveryHint")} icon="compass">
         <ul className="ds-stack">
           {(discovery.data ?? []).map((item) => (
             <li key={item.package} className="ds-card ds-stack--row">
@@ -186,7 +182,7 @@ export default function PluginsAdmin() {
             </li>
           ))}
         </ul>
-      </section>
-    </div>
+      </AdminSection>
+    </AdminPage>
   );
 }

@@ -5,7 +5,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { MediaError, useAdminActions, useCandidates } from "../api";
 import "../media.css";
-import { PageHeader } from "../../../design-system/components/PageHeader";
+import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 
 /**
  * Media identity (spec 024 T015): possible duplicates proposed on fuzzy evidence — never merged without an
@@ -44,40 +44,48 @@ export function MatchingScreen() {
     );
   };
   return (
-    <section aria-labelledby={headingId}>
-      <PageHeader titleId={headingId} level={2} icon="film" title={t("media:admin.title")} />
-      <h3>{t("media:admin.candidates")}</h3>
-      {pending ? (
-        <div role="alertdialog" aria-labelledby={`${headingId}-confirm`}>
-          <p id={`${headingId}-confirm`}>{t("media:admin.confirm")}</p>
-          <Button onClick={confirm}>{t("media:admin.merge")}</Button>{" "}
-          <Button variant="secondary" onClick={() => setPending(null)}>
-            {t("media:requests.cancel")}
-          </Button>
-        </div>
-      ) : null}
-      <p aria-live="polite">{done ? t("media:admin.merged") : ""}</p>
-      {candidates.isPending ? <FunctionalState state="loading" /> : null}
-      {candidates.isError ? (
-        <FunctionalState state="unavailable" onRetry={() => candidates.refetch()} />
-      ) : null}
-      {candidates.data && candidates.data.length === 0 ? <p>{t("media:admin.empty")}</p> : null}
-      <ul className="media-list">
-        {(candidates.data ?? []).map((c) => (
-          <li key={c.id}>
-            <Link to={`/media/${c.object_a.id}`}>{c.object_a.title}</Link> ↔{" "}
-            <Link to={`/media/${c.object_b.id}`}>{c.object_b.title}</Link> ·{" "}
-            {t("media:admin.score", { score: c.score.toFixed(2) })}{" "}
-            <Button variant="secondary" onClick={() => start(c.object_a.id, c.object_b.id)}>
-              {t("media:admin.merge")}
-            </Button>{" "}
-            <Button variant="secondary" onClick={() => reject.mutate(c.id)}>
-              {t("media:admin.reject")}
+    <AdminPage icon="film" title={t("media:admin.title")} description={t("media:admin.description")}>
+      <AdminSection title={t("media:admin.candidates")} icon="link" flush>
+        {pending ? (
+          <div role="alertdialog" aria-labelledby={`${headingId}-confirm`}>
+            <p id={`${headingId}-confirm`}>{t("media:admin.confirm")}</p>
+            <Button onClick={confirm}>{t("media:admin.merge")}</Button>{" "}
+            <Button variant="secondary" onClick={() => setPending(null)}>
+              {t("media:requests.cancel")}
             </Button>
-          </li>
-        ))}
-      </ul>
-    </section>
+          </div>
+        ) : null}
+        <p aria-live="polite">{done ? t("media:admin.merged") : ""}</p>
+        {candidates.isPending ? <FunctionalState state="loading" /> : null}
+        {candidates.isError ? (
+          <FunctionalState state="unavailable" onRetry={() => candidates.refetch()} />
+        ) : null}
+        {candidates.data && candidates.data.length === 0 ? (
+          <p className="admin-muted admin-pad">{t("media:admin.empty")}</p>
+        ) : null}
+        <ul className="admin-list">
+          {(candidates.data ?? []).map((c) => (
+            <li key={c.id}>
+              <span className="admin-list__main">
+                <span>
+                  <Link to={`/media/${c.object_a.id}`}>{c.object_a.title}</Link> ↔{" "}
+                  <Link to={`/media/${c.object_b.id}`}>{c.object_b.title}</Link>
+                </span>
+                <span className="admin-muted">{t("media:admin.score", { score: c.score.toFixed(2) })}</span>
+              </span>
+              <span className="admin-list__actions">
+                <Button variant="secondary" onClick={() => start(c.object_a.id, c.object_b.id)}>
+                  {t("media:admin.merge")}
+                </Button>
+                <Button variant="ghost" onClick={() => reject.mutate(c.id)}>
+                  {t("media:admin.reject")}
+                </Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </AdminSection>
+    </AdminPage>
   );
 }
 

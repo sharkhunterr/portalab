@@ -1,11 +1,11 @@
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { Link } from "react-router";
+import { AdminPage } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
 import { Card } from "../../design-system/components/Content";
 import { CheckboxField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { Popover } from "../../design-system/components/Overlays";
-import { PageHeader } from "../../design-system/components/PageHeader";
 import { EmptyState } from "../../design-system/components/Placeholders";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
@@ -196,7 +196,6 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
 
 export function NewsAdmin() {
   const t = useT();
-  const headingId = useId();
   const editorial = useEditorial();
   const [editing, setEditing] = useState<NewsEditor | "new" | null>(null);
   const [status, setStatus] = useState<string>("");
@@ -204,15 +203,17 @@ export function NewsAdmin() {
   const shown = articles.filter((a) => !status || a.status === status);
   const count = (s: string) => articles.filter((a) => a.status === s).length;
   return (
-    <section aria-labelledby={headingId} className="news-admin">
-      <PageHeader
-        titleId={headingId}
-        level={2}
-        icon="newspaper"
-        title={t("news:admin.title")}
-        context={t("news:admin.subtitle")}
-        primary={{ label: t("news:admin.new"), icon: "plus", onSelect: () => setEditing("new") }}
-      />
+    <AdminPage
+      icon="newspaper"
+      title={t("news:admin.title")}
+      description={t("news:admin.subtitle")}
+      primary={
+        <Button onClick={() => setEditing("new")}>
+          <Icon name="plus" size={16} />
+          {t("news:admin.new")}
+        </Button>
+      }
+    >
       {editing ? (
         <Editor
           key={editing === "new" ? "new" : editing.id}
@@ -248,7 +249,7 @@ export function NewsAdmin() {
           ))}
         </ul>
       ) : null}
-    </section>
+    </AdminPage>
   );
 }
 

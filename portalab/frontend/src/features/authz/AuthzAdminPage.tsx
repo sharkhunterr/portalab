@@ -2,7 +2,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
-import { PageHeader } from "../../design-system/components/PageHeader";
+import {
+  AdminGrid,
+  AdminPage,
+  AdminSection,
+  AdminTable,
+  FormActions,
+  FormGrid,
+  StatusBadge,
+} from "../../design-system/admin/AdminKit";
+import { Button } from "../../design-system/components/Button";
+import { SelectField, TextField } from "../../design-system/components/Field";
+import { Icon } from "../../design-system/components/Icon";
+import { Dialog } from "../../design-system/components/Overlays";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { ApiError, DataRegion, stateForError } from "../../state/regions";
 import { type ScopeKind, authzStrings as t } from "./strings";
@@ -56,55 +68,65 @@ function GrantForm({
   }
 
   return (
-    <form onSubmit={submit} className="auth-form">
+    <form onSubmit={submit} className="admin-form">
       {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
-      <label htmlFor={ids.permission}>{t.permissionField}</label>
-      <select id={ids.permission} value={permission} onChange={(event) => setPermission(event.target.value)}>
-        {permissions.map((item) => (
-          <option key={item.key} value={item.key}>
-            {item.key}
-            {item.reserved ? ` — ${t.reserved}` : ""}
-            {item.sensitive ? ` — ${t.sensitive}` : ""}
-          </option>
-        ))}
-      </select>
-      <label htmlFor={ids.effect}>{t.effectField}</label>
-      <select
-        id={ids.effect}
-        value={effect}
-        onChange={(event) => setEffect(event.target.value as "allow" | "deny")}
-      >
-        <option value="allow">{t.effects.allow}</option>
-        <option value="deny">{t.effects.deny}</option>
-      </select>
-      <label htmlFor={ids.scope}>{t.scopeField}</label>
-      <select id={ids.scope} value={scope} onChange={(event) => setScope(event.target.value as ScopeKind)}>
-        {(Object.keys(t.scopes) as ScopeKind[]).map((key) => (
-          <option key={key} value={key}>
-            {t.scopes[key]}
-          </option>
-        ))}
-      </select>
-      {needsRef ? (
-        <>
-          <label htmlFor={ids.ref}>{t.scopeRefField}</label>
-          <input
+      <FormGrid>
+        <SelectField
+          id={ids.permission}
+          label={t.permissionField}
+          value={permission}
+          onChange={(event) => setPermission(event.target.value)}
+        >
+          {permissions.map((item) => (
+            <option key={item.key} value={item.key}>
+              {item.key}
+              {item.reserved ? ` — ${t.reserved}` : ""}
+              {item.sensitive ? ` — ${t.sensitive}` : ""}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          id={ids.effect}
+          label={t.effectField}
+          value={effect}
+          onChange={(event) => setEffect(event.target.value as "allow" | "deny")}
+        >
+          <option value="allow">{t.effects.allow}</option>
+          <option value="deny">{t.effects.deny}</option>
+        </SelectField>
+        <SelectField
+          id={ids.scope}
+          label={t.scopeField}
+          value={scope}
+          onChange={(event) => setScope(event.target.value as ScopeKind)}
+        >
+          {(Object.keys(t.scopes) as ScopeKind[]).map((key) => (
+            <option key={key} value={key}>
+              {t.scopes[key]}
+            </option>
+          ))}
+        </SelectField>
+        {needsRef ? (
+          <TextField
             id={ids.ref}
+            label={t.scopeRefField}
             required
             value={scopeRef}
             onChange={(event) => setScopeRef(event.target.value)}
           />
-        </>
-      ) : null}
-      <button type="submit" disabled={mutation.isPending || !permission} aria-busy={mutation.isPending}>
-        {t.addGrant}
-      </button>
+        ) : null}
+      </FormGrid>
+      <FormActions>
+        <Button type="submit" disabled={mutation.isPending || !permission} aria-busy={mutation.isPending}>
+          <Icon name="plus" size={16} />
+          {t.addGrant}
+        </Button>
+      </FormActions>
     </form>
   );
 }
 
 function GrantList({ holder, name }: { holder: { kind: "role" | "group"; id: string }; name: string }) {
-  const titleId = useId();
   const queryClient = useQueryClient();
   const permissions = useQuery({
     queryKey: PERMISSIONS_KEY,
@@ -117,8 +139,7 @@ function GrantList({ holder, name }: { holder: { kind: "role" | "group"; id: str
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authz", "grants", holder.id] }),
   });
   return (
-    <div className="grant-list">
-      <h3 id={titleId}>{t.grantsTitle(name)}</h3>
+    <AdminSection title={t.grantsTitle(name)} icon="key" span="full">
       <DataRegion<Grant[]>
         label={t.grantsTitle(name)}
         queryKey={["authz", "grants", holder.id]}
@@ -133,30 +154,47 @@ function GrantList({ holder, name }: { holder: { kind: "role" | "group"; id: str
               ).data ?? [])
         }
       >
-        {(grants) =>
-          grants.length === 0 ? (
-            <p>{t.noGrants}</p>
-          ) : (
-            <ul>
-              {grants.map((grant) => (
-                <li key={grant.id}>
-                  <span>
-                    {grant.effect === "deny" ? `${t.effects.deny}: ` : ""}
-                    {grant.permission_key} · {t.scopes[grant.scope_kind as ScopeKind] ?? grant.scope_kind}
-                    {grant.scope_ref ? ` (${grant.scope_ref})` : ""}
-                  </span>{" "}
-                  <button type="button" onClick={() => remove.mutate(grant.id)}>
-                    {t.removeGrant(grant.permission_key)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )
-        }
+        {(grants) => (
+          <AdminTable<Grant>
+            label={t.grantsTitle(name)}
+            rows={grants}
+            rowKey={(grant) => grant.id}
+            empty={<p className="admin-muted">{t.noGrants}</p>}
+            columns={[
+              {
+                key: "permission",
+                header: t.permissionField,
+                primary: true,
+                render: (grant) => <code>{grant.permission_key}</code>,
+              },
+              {
+                key: "effect",
+                header: t.effectField,
+                render: (grant) => (
+                  <StatusBadge tone={grant.effect === "deny" ? "bad" : "ok"}>
+                    {grant.effect === "deny" ? t.effects.deny : t.effects.allow}
+                  </StatusBadge>
+                ),
+              },
+              {
+                key: "scope",
+                header: t.scopeField,
+                render: (grant) =>
+                  `${t.scopes[grant.scope_kind as ScopeKind] ?? grant.scope_kind}${grant.scope_ref ? ` (${grant.scope_ref})` : ""}`,
+              },
+            ]}
+            actions={(grant) => (
+              <Button variant="ghost" onClick={() => remove.mutate(grant.id)}>
+                <Icon name="trash" size={16} />
+                <span className="visually-hidden">{t.removeGrant(grant.permission_key)}</span>
+              </Button>
+            )}
+          />
+        )}
       </DataRegion>
       {permissions.data ? <GrantForm holder={holder} permissions={permissions.data} /> : null}
       {permissions.isError ? <FunctionalState state={stateForError(permissions.error)} /> : null}
-    </div>
+    </AdminSection>
   );
 }
 
@@ -179,82 +217,144 @@ function CreateForm({ kind }: { kind: "role" | "group" }) {
   }
 
   return (
-    <form onSubmit={submit} aria-labelledby={ids.title} className="auth-form">
-      <h3 id={ids.title}>{kind === "role" ? t.newRoleTitle : t.newGroupTitle}</h3>
+    <form onSubmit={submit} className="admin-form">
       {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
-      <label htmlFor={ids.key}>{t.keyField}</label>
-      <input
-        id={ids.key}
-        required
-        pattern="[a-z][a-z0-9_-]+"
-        value={key}
-        onChange={(e) => setKey(e.target.value)}
-      />
-      <label htmlFor={ids.name}>{t.nameField}</label>
-      <input id={ids.name} required value={name} onChange={(e) => setName(e.target.value)} />
-      <button type="submit" disabled={mutation.isPending}>
-        {t.create}
-      </button>
+      {mutation.isSuccess ? <p role="status">✓</p> : null}
+      <FormGrid>
+        <TextField
+          id={ids.key}
+          label={t.keyField}
+          required
+          pattern="[a-z][a-z0-9_-]+"
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+        />
+        <TextField
+          id={ids.name}
+          label={t.nameField}
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </FormGrid>
+      <FormActions>
+        <Button type="submit" disabled={mutation.isPending}>
+          {t.create}
+        </Button>
+      </FormActions>
     </form>
   );
 }
 
-/** Roles, groups and their grants (spec 003 US2/US6). Admin-only on the server (`users.roles.manage`). */
-export function AuthzAdminPage() {
-  const [selected, setSelected] = useState<{ kind: "role" | "group"; id: string; name: string } | null>(null);
+function CreateButton({ kind }: { kind: "role" | "group" }) {
   return (
-    <div className="account-page">
-      <PageHeader icon="key" title={t.title} />
-      <div className="authz-roles">
-        <h2>{t.rolesTitle}</h2>
-        <DataRegion<Role[]>
-          label={t.rolesTitle}
-          queryKey={ROLES_KEY}
-          queryFn={async () => (await api.GET("/api/v1/roles")).data ?? []}
-        >
-          {(roles) => (
-            <ul>
-              {roles.map((role) => (
-                <li key={role.id}>
-                  <button
-                    type="button"
-                    onClick={() => setSelected({ kind: "role", id: role.id, name: role.name })}
-                  >
-                    {t.manage(role.name)}
-                  </button>
-                  {role.system ? ` · ${t.base}` : ""}
-                </li>
-              ))}
-            </ul>
-          )}
-        </DataRegion>
-        <CreateForm kind="role" />
-      </div>
-      <div className="authz-groups">
-        <h2>{t.groupsTitle}</h2>
-        <DataRegion<Group[]>
-          label={t.groupsTitle}
-          queryKey={GROUPS_KEY}
-          queryFn={async () => (await api.GET("/api/v1/groups")).data ?? []}
-        >
-          {(groups) => (
-            <ul>
-              {groups.map((group) => (
-                <li key={group.id}>
-                  <button
-                    type="button"
-                    onClick={() => setSelected({ kind: "group", id: group.id, name: group.name })}
-                  >
-                    {t.manage(group.name)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </DataRegion>
-        <CreateForm kind="group" />
-      </div>
-      {selected ? <GrantList holder={{ kind: selected.kind, id: selected.id }} name={selected.name} /> : null}
-    </div>
+    <Dialog
+      title={kind === "role" ? t.newRoleTitle : t.newGroupTitle}
+      trigger={
+        <Button variant="secondary">
+          <Icon name="plus" size={16} />
+          {kind === "role" ? t.newRoleTitle : t.newGroupTitle}
+        </Button>
+      }
+    >
+      <CreateForm kind={kind} />
+    </Dialog>
+  );
+}
+
+/** Roles, groups and their grants (spec 003 US2/US6, 027 administration kit). Admin-only on the server. */
+type Holder = { kind: "role" | "group"; id: string; name: string };
+
+function HolderList({
+  items,
+  label,
+  selected,
+  onSelect,
+}: {
+  items: Array<Holder & { base?: boolean }>;
+  label: string;
+  selected: Holder | null;
+  onSelect: (holder: Holder) => void;
+}) {
+  return (
+    <ul className="admin-list" aria-label={label}>
+      {items.map((item) => (
+        <li key={item.id} data-selected={selected?.id === item.id || undefined}>
+          <span className="admin-list__main">
+            <strong>{item.name}</strong>
+            {item.base ? <span className="admin-muted">{t.base}</span> : null}
+          </span>
+          <Button
+            variant={selected?.id === item.id ? "primary" : "ghost"}
+            aria-pressed={selected?.id === item.id}
+            onClick={() => onSelect(item)}
+          >
+            {t.manage(item.name)}
+          </Button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function AuthzAdminPage() {
+  const [selected, setSelected] = useState<Holder | null>(null);
+  return (
+    <AdminPage icon="key" title={t.title} description={t.description} primary={<CreateButton kind="role" />}>
+      <AdminGrid>
+        <AdminSection title={t.rolesTitle} icon="shield" flush>
+          <DataRegion<Role[]>
+            label={t.rolesTitle}
+            queryKey={ROLES_KEY}
+            queryFn={async () => (await api.GET("/api/v1/roles")).data ?? []}
+          >
+            {(roles) => (
+              <HolderList
+                label={t.rolesTitle}
+                selected={selected}
+                onSelect={setSelected}
+                items={roles.map((role) => ({
+                  kind: "role",
+                  id: role.id,
+                  name: role.name,
+                  base: role.system,
+                }))}
+              />
+            )}
+          </DataRegion>
+        </AdminSection>
+        <AdminSection title={t.groupsTitle} icon="users" flush actions={<CreateButton kind="group" />}>
+          <DataRegion<Group[]>
+            label={t.groupsTitle}
+            queryKey={GROUPS_KEY}
+            queryFn={async () => (await api.GET("/api/v1/groups")).data ?? []}
+          >
+            {(groups) =>
+              groups.length ? (
+                <HolderList
+                  label={t.groupsTitle}
+                  selected={selected}
+                  onSelect={setSelected}
+                  items={groups.map((group) => ({ kind: "group", id: group.id, name: group.name }))}
+                />
+              ) : (
+                <p className="admin-muted admin-pad">{t.noGroups}</p>
+              )
+            }
+          </DataRegion>
+        </AdminSection>
+        {selected ? (
+          <GrantList
+            key={selected.id}
+            holder={{ kind: selected.kind, id: selected.id }}
+            name={selected.name}
+          />
+        ) : (
+          <AdminSection title={t.grantsPick} icon="key" span="full">
+            <p className="admin-muted">{t.grantsHint}</p>
+          </AdminSection>
+        )}
+      </AdminGrid>
+    </AdminPage>
   );
 }

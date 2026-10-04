@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Page composition lint (spec 027 T048, FR-023/FR-026, SC-007/SC-008): every page module lazily imported by
- * the router renders the design-system ``PageHeader`` (directly or through a component of its own folder),
+ * the router renders the design-system ``PageHeader`` (directly, through ``AdminPage`` or a component of its own folder),
  * and every ``EmptyState`` carries an ``action``. Exits 1 and lists offenders.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -65,7 +65,8 @@ export function offenders() {
     const text = closure(file, 3)
       .map((f) => readFileSync(f, "utf8"))
       .join("\n");
-    if (!text.includes("PageHeader")) found.push(`${rel}: no PageHeader`);
+    // ``AdminPage`` (027 administration kit) renders the PageHeader itself
+    if (!/PageHeader|<AdminPage\b/.test(text)) found.push(`${rel}: no PageHeader`);
   }
   for (const file of walk(SRC)) {
     const text = readFileSync(file, "utf8");

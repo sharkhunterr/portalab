@@ -76,6 +76,9 @@ SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
     (b"cross-origin-opener-policy", b"same-origin"),
 )
 EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
+# Read-only, cacheable documents the SPA fetches by the dozen on every full load (one catalog per i18n
+# namespace): counting them would rate-limit a member who simply reloads a few pages (027).
+EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/",)
 SESSION_COOKIE_NAME = "__Host-portalab_session"
 
 
@@ -150,7 +153,10 @@ class SecurityMiddleware:
             await self.app(scope, receive, send)
             return
         path = scope.get("path", "")
-        if path.startswith("/api/") and path not in EXEMPT_PATHS:
+        exempt = path in EXEMPT_PATHS or (
+            scope.get("method") == "GET" and path.startswith(EXEMPT_GET_PREFIXES)
+        )
+        if path.startswith("/api/") and not exempt:
             client = scope.get("client") or ("unknown", 0)
             wait = self.per_ip.hit(f"ip:{client[0]}")
             session = _session_key(scope)

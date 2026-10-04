@@ -1,10 +1,17 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
-import { StatFigure } from "../../design-system/components/Collections";
-import { Card } from "../../design-system/components/Content";
+import {
+  AdminGrid,
+  AdminPage,
+  AdminSection,
+  AdminStats,
+  KeyValues,
+  type Stat,
+  StatusBadge,
+  type Tone,
+} from "../../design-system/admin/AdminKit";
 import { Icon } from "../../design-system/components/Icon";
-import { PageHeader } from "../../design-system/components/PageHeader";
 import { useFormat } from "../../i18n/format/useFormat";
 import { type Translate, useT } from "../../i18n/hooks/useT";
 import { DataRegion } from "../../state/regions";
@@ -32,20 +39,11 @@ interface Overview {
   required_actions: RequiredAction[];
 }
 
-interface Problem {
-  id: string;
-  title: string;
-  kind: string;
-  impact: number;
-  criticality: number;
-  since: string;
-}
-
 /**
- * Control Center (spec 020 US1, 027 T094): the portal status first, then what needs the administrator
- * (ranked, with a severity in text), one readable card per panel (known panels get a tailored body, others a
- * labelled list) and shortcuts to every administration area. Each panel keeps its own state — one failing
- * panel never hides the rest.
+ * Control Center (spec 020 US1, 027 T094) on the administration kit: key figures first (health, what needs
+ * you, services, storage, audit), then what needs the administrator as a ranked list with a severity in
+ * text, one section per panel and the shortcuts to every administration area. Each panel keeps its own
+ * state — one failing panel never hides the rest.
  */
 const PANEL_ICONS: Record<string, string> = {
   configuration: "settings",
@@ -73,7 +71,16 @@ const SHORTCUTS: [string, string, string][] = [
   ["privacy", "/admin/privacy", "lock"],
 ];
 
-const MAX_ATTENTION = 6;
+const MAX_ATTENTION = 8;
+const STATE_TONE: Record<string, Tone> = {
+  available: "ok",
+  partial: "warn",
+  stale: "warn",
+  unavailable: "bad",
+  "no-data": "neutral",
+};
+const STATUS_TONE: Record<string, Tone> = { ok: "ok", degraded: "warn", failing: "bad", unknown: "neutral" };
+const SEVERITY_TONE: Record<string, Tone> = { high: "bad", medium: "warn", low: "neutral" };
 
 export function severity(impact = 0, criticality = 0): "high" | "medium" | "low" {
   const score = Math.max(impact, criticality);
@@ -107,7 +114,7 @@ export function ControlCenter() {
   const t = useT();
   return (
     <DataRegion<Overview>
-      label={t("admin:cc.title")}
+      label={t("admin:cc.overview")}
       queryKey={["admin", "overview"]}
       queryFn={async () => (await api.GET("/api/v1/admin/overview")).data as unknown as Overview}
     >
@@ -118,128 +125,138 @@ export function ControlCenter() {
 
 function ControlCenterView({ overview }: { overview: Overview }) {
   const t = useT();
-  const health = overview.panels.find((p) => p.panel === "observability");
-  const panels = overview.panels.filter((p) => p.panel !== "observability");
-  const actions = overview.required_actions;
-  return (
-    <div className="control-center">
-      <PageHeader level={2} icon="gauge" title={t("admin:cc.title")} context={t("admin:cc.subtitle")} />
-      <StatusBanner health={health} />
-      <section className="control-center__attention" aria-labelledby="cc-attention">
-        <h3 id="cc-attention">
-          <Icon name="bell" size={18} />
-          {t("admin:cc.attention")}
-          {actions.length ? <span className="ds-badge">{actions.length}</span> : null}
-        </h3>
-        {actions.length === 0 ? (
-          <p className="control-center__calm">
-            <Icon name="check" size={18} />
-            {t("admin:cc.attention.none")}
-          </p>
-        ) : (
-          <AttentionList actions={actions} />
-        )}
-      </section>
-      <ul className="control-center__panels">
-        {health ? (
-          <li>
-            <HealthCard panel={health} />
-          </li>
-        ) : null}
-        {panels.map((panel) => (
-          <li key={panel.panel}>
-            <PanelCard panel={panel} />
-          </li>
-        ))}
-      </ul>
-      <section aria-labelledby="cc-shortcuts">
-        <h3 id="cc-shortcuts" className="control-center__section-title">
-          {t("admin:cc.shortcuts")}
-        </h3>
-        <ul className="control-center__shortcuts">
-          {SHORTCUTS.map(([key, to, icon]) => (
-            <li key={key}>
-              <Link to={to}>
-                <Icon name={icon} size={20} />
-                {t(`admin:cc.shortcut.${key}`)}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
-  );
-}
-
-function StatusBanner({ health }: { health: PanelView | undefined }) {
-  const t = useT();
   const format = useFormat();
+  const panel = (name: string) => overview.panels.find((p) => p.panel === name);
+  const health = panel("observability");
   const status = health?.state === "available" ? String(health.data.status ?? "unknown") : "unknown";
-  const known = ["ok", "degraded", "failing"].includes(status) ? status : "unknown";
-  const since = secondsSince(health?.data.since);
-  const icon = known === "ok" ? "check" : known === "unknown" ? "half" : "alert";
+  const known = status in STATUS_TONE ? status : "unknown";
+  const actions = overview.required_actions;
+  const high = actions.filter((a) => severity(a.impact, a.criticality) === "high").length;
+  const services = panel("services");
+  const storage = panel("storage");
+  const audit = panel("audit");
+  const stats: Stat[] = [
+    {
+      key: "health",
+      label: t("admin:cc.panel.observability"),
+      value: t(`admin:cc.status.${known}`),
+      tone: STATUS_TONE[known],
+      icon: "activity",
+      to: "/admin/observability",
+    },
+    {
+      key: "attention",
+      label: t("admin:cc.attention"),
+      value: format.number(actions.length),
+      hint: high ? t("admin:cc.highCount", { count: high }) : undefined,
+      tone: high ? "bad" : actions.length ? "warn" : "ok",
+      icon: "bell",
+    },
+  ];
+  if (services?.state === "available" || services?.state === "partial") {
+    const troubled = Number(services.data.troubled ?? 0);
+    stats.push({
+      key: "services",
+      label: t("admin:cc.panel.services"),
+      value: format.number(Number(services.data.total ?? 0)),
+      hint: troubled ? t("admin:cc.services.troubledCount", { count: troubled }) : undefined,
+      tone: troubled ? "warn" : Number(services.data.total ?? 0) ? "ok" : "neutral",
+      icon: "server",
+      to: "/admin/services",
+    });
+  }
+  if (storage?.state === "available") {
+    stats.push({
+      key: "storage",
+      label: t("admin:cc.panel.storage"),
+      value: formatBytes(Number(storage.data.database_bytes ?? 0)),
+      icon: "chart",
+      tone: "info",
+    });
+  }
+  if (audit?.state === "available") {
+    const since = secondsSince(audit.data.last_checkpoint_at);
+    stats.push({
+      key: "audit",
+      label: t("admin:cc.panel.audit"),
+      value: format.number(Number(audit.data.unsealed_entries ?? 0)),
+      hint: since !== null ? t("admin:cc.audit.sealed", { when: format.relative(since) }) : undefined,
+      icon: "shield",
+      tone: "info",
+      to: "/admin/audit",
+    });
+  }
+  const others = overview.panels.filter((p) => p.panel !== "observability");
   return (
-    <div className="control-center__status" data-status={known} role="status">
-      <span className="control-center__status-icon" aria-hidden="true">
-        <Icon name={icon} size={26} />
-      </span>
-      <span>
-        <strong>{t(`admin:cc.status.${known}`)}</strong>
-        {since !== null ? (
-          <span className="control-center__muted">
-            {t("admin:cc.status.since", { when: format.relative(since) })}
-          </span>
-        ) : null}
-      </span>
-    </div>
-  );
-}
-
-function AttentionList({ actions }: { actions: RequiredAction[] }) {
-  const t = useT();
-  const format = useFormat();
-  const shown = actions.slice(0, MAX_ATTENTION);
-  return (
-    <>
-      <ol className="control-center__actions">
-        {shown.map((action) => {
-          const level = severity(action.impact, action.criticality);
-          const since = secondsSince(action.since);
-          return (
-            <li key={action.id} data-severity={level}>
-              <span className="control-center__severity">{t(`admin:cc.severity.${level}`)}</span>
-              <span className="control-center__action-text">
-                <Link to={action.link}>{titleOf(t, action.title_key)}</Link>
-                {since !== null ? (
-                  <span className="control-center__muted">{format.relative(since)}</span>
-                ) : null}
-              </span>
-              <Icon name="chevron-right" size={18} />
-            </li>
-          );
-        })}
-      </ol>
-      {actions.length > MAX_ATTENTION ? (
-        <Link className="control-center__more" to="/admin/observability">
-          {t("admin:cc.attention.more", { count: actions.length - MAX_ATTENTION })}
-        </Link>
-      ) : null}
-    </>
-  );
-}
-
-function StateChip({ state }: { state: string }) {
-  const t = useT();
-  return (
-    <span className="ds-badge control-center__state" data-state={state}>
-      {t(`admin:cc.state.${state}`)}
-    </span>
+    <AdminPage
+      icon="gauge"
+      title={t("admin:cc.title")}
+      description={t("admin:cc.subtitle")}
+      secondary={
+        <StatusBadge tone={STATUS_TONE[known] ?? "neutral"}>{t(`admin:cc.status.${known}`)}</StatusBadge>
+      }
+    >
+      <AdminStats stats={stats} label={t("admin:cc.figures")} />
+      <AdminGrid>
+        <AdminSection
+          title={t("admin:cc.attention")}
+          icon="bell"
+          flush
+          actions={
+            actions.length > MAX_ATTENTION ? (
+              <Link to="/admin/observability" className="ds-button ds-button--ghost">
+                {t("admin:cc.attention.more", { count: actions.length - MAX_ATTENTION })}
+              </Link>
+            ) : undefined
+          }
+        >
+          {actions.length === 0 ? (
+            <p className="control-center__calm">
+              <Icon name="check" size={18} />
+              {t("admin:cc.attention.none")}
+            </p>
+          ) : (
+            <ol className="admin-list control-center__actions">
+              {actions.slice(0, MAX_ATTENTION).map((action) => {
+                const level = severity(action.impact, action.criticality);
+                const since = secondsSince(action.since);
+                return (
+                  <li key={action.id}>
+                    <StatusBadge tone={SEVERITY_TONE[level] ?? "neutral"}>
+                      {t(`admin:cc.severity.${level}`)}
+                    </StatusBadge>
+                    <span className="admin-list__main">
+                      <Link to={action.link}>{titleOf(t, action.title_key)}</Link>
+                      {since !== null ? <span className="admin-muted">{format.relative(since)}</span> : null}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </AdminSection>
+        {others.map((p) => (
+          <PanelSection key={p.panel} panel={p} />
+        ))}
+        <AdminSection title={t("admin:cc.shortcuts")} icon="compass" span="full">
+          <ul className="control-center__shortcuts">
+            {SHORTCUTS.map(([key, to, icon]) => (
+              <li key={key}>
+                <Link to={to}>
+                  <Icon name={icon} size={18} />
+                  {t(`admin:cc.shortcut.${key}`)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </AdminSection>
+      </AdminGrid>
+    </AdminPage>
   );
 }
 
 function panelTitle(t: Translate, name: string): string {
-  const key = `admin:cc.panel.${name}`;
-  const label = t(key);
+  const label = t(`admin:cc.panel.${name}`);
   return label === `cc.panel.${name}` ? humanize(name) : label;
 }
 
@@ -248,214 +265,160 @@ function humanize(key: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function PanelShell({
-  panel,
-  children,
-  footer,
-}: {
-  panel: PanelView;
-  children: ReactNode;
-  footer?: ReactNode;
-}) {
+function PanelSection({ panel }: { panel: PanelView }) {
   const t = useT();
   return (
-    <Card
-      className="control-center__panel"
-      data-state={panel.state}
+    <AdminSection
       title={panelTitle(t, panel.panel)}
       icon={PANEL_ICONS[panel.panel] ?? "dashboard"}
-      actions={<StateChip state={panel.state} />}
+      actions={
+        <StatusBadge tone={STATE_TONE[panel.state] ?? "neutral"}>
+          {t(`admin:cc.state.${panel.state}`)}
+        </StatusBadge>
+      }
     >
       {panel.state === "unavailable" ? (
-        <p className="control-center__muted">{t("admin:cc.unavailable")}</p>
+        <p className="admin-muted">{t("admin:cc.unavailable")}</p>
       ) : (
-        children
+        <PanelBody panel={panel} />
       )}
-      {footer ? <div className="control-center__panel-footer">{footer}</div> : null}
-    </Card>
+    </AdminSection>
   );
 }
 
-function PanelCard({ panel }: { panel: PanelView }) {
+function PanelBody({ panel }: { panel: PanelView }) {
+  const t = useT();
+  const format = useFormat();
+  const data = panel.data;
   switch (panel.panel) {
     case "configuration":
-      return <ConfigurationCard panel={panel} />;
-    case "services":
-      return <ServicesCard panel={panel} />;
-    case "storage":
-      return <StorageCard panel={panel} />;
-    case "audit":
-      return <AuditCard panel={panel} />;
-    default:
-      return <GenericCard panel={panel} />;
+      return (
+        <>
+          <KeyValues
+            items={[
+              {
+                key: "setup",
+                label: t("admin:cc.configuration.setup"),
+                value: t(
+                  data.first_run_completed === false
+                    ? "admin:cc.configuration.setupPending"
+                    : "admin:cc.configuration.setupDone",
+                ),
+              },
+              {
+                key: "policies",
+                label: t("admin:cc.configuration.policies"),
+                value: format.number(Number(data.active_policies ?? 0)),
+              },
+              {
+                key: "invalid",
+                label: t("admin:cc.configuration.invalid"),
+                value: format.number(Number(data.invalid_stored_values ?? 0)),
+              },
+            ]}
+          />
+          <PanelLinks>
+            <Link to="/admin/configuration">{t("admin:cc.configuration.manage")}</Link>
+          </PanelLinks>
+        </>
+      );
+    case "services": {
+      const total = Number(data.total ?? 0);
+      const byState = (data.by_state ?? {}) as Record<string, number>;
+      return (
+        <>
+          {total === 0 ? (
+            <p className="admin-muted">{t("admin:cc.services.empty")}</p>
+          ) : (
+            <ul className="control-center__chips">
+              {Object.entries(byState).map(([state, count]) => (
+                <li key={state}>
+                  <StatusBadge tone={state === "ok" ? "ok" : state === "unknown" ? "neutral" : "warn"}>
+                    {t(`admin:cc.services.state.${state}`)} · {format.number(count)}
+                  </StatusBadge>
+                </li>
+              ))}
+            </ul>
+          )}
+          <PanelLinks>
+            <Link to="/admin/services?add=1" className="ds-button ds-button--primary">
+              <Icon name="plus" size={16} />
+              {t("admin:cc.services.add")}
+            </Link>
+            <Link to="/admin/services">{t("admin:cc.services.manage")}</Link>
+          </PanelLinks>
+        </>
+      );
+    }
+    case "storage": {
+      const largest = (data.largest ?? []) as { schema: string; bytes: number }[];
+      const top = Math.max(1, ...largest.map((entry) => entry.bytes));
+      return (
+        <>
+          <KeyValues
+            items={[
+              {
+                key: "size",
+                label: t("admin:cc.storage.database"),
+                value: formatBytes(Number(data.database_bytes ?? 0)),
+              },
+            ]}
+          />
+          {largest.length ? (
+            <ul className="control-center__bars" aria-label={t("admin:cc.storage.largest")}>
+              {largest.map((entry) => (
+                <li key={entry.schema}>
+                  <span>{entry.schema}</span>
+                  <span className="control-center__bar" aria-hidden="true">
+                    <span style={{ inlineSize: `${Math.round((entry.bytes / top) * 100)}%` }} />
+                  </span>
+                  <span>{formatBytes(entry.bytes)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </>
+      );
+    }
+    case "audit": {
+      const since = secondsSince(data.last_checkpoint_at);
+      return (
+        <>
+          <KeyValues
+            items={[
+              {
+                key: "seal",
+                label: t("admin:cc.audit.checkpoint"),
+                value: since !== null ? format.relative(since) : "—",
+              },
+              {
+                key: "unsealed",
+                label: t("admin:cc.audit.unsealed"),
+                value: format.number(Number(data.unsealed_entries ?? 0)),
+              },
+            ]}
+          />
+          <PanelLinks>
+            <Link to="/admin/audit">{t("admin:cc.audit.manage")}</Link>
+          </PanelLinks>
+        </>
+      );
+    }
+    default: {
+      const entries = Object.entries(data).filter(([, value]) => typeof value !== "object" || value === null);
+      return (
+        <KeyValues
+          items={entries.map(([key, value]) => ({
+            key,
+            label: humanize(key),
+            value: value === null ? "—" : String(value),
+          }))}
+        />
+      );
+    }
   }
 }
 
-function ConfigurationCard({ panel }: { panel: PanelView }) {
-  const t = useT();
-  const format = useFormat();
-  const done = panel.data.first_run_completed !== false;
-  return (
-    <PanelShell
-      panel={panel}
-      footer={<Link to="/admin/configuration">{t("admin:cc.configuration.manage")}</Link>}
-    >
-      <div className="control-center__figures">
-        <StatFigure
-          label={t("admin:cc.configuration.setup")}
-          value={t(done ? "admin:cc.configuration.setupDone" : "admin:cc.configuration.setupPending")}
-        />
-        <StatFigure
-          label={t("admin:cc.configuration.policies")}
-          value={format.number(Number(panel.data.active_policies ?? 0))}
-        />
-        <StatFigure
-          label={t("admin:cc.configuration.invalid")}
-          value={format.number(Number(panel.data.invalid_stored_values ?? 0))}
-        />
-      </div>
-    </PanelShell>
-  );
-}
-
-function ServicesCard({ panel }: { panel: PanelView }) {
-  const t = useT();
-  const format = useFormat();
-  const total = Number(panel.data.total ?? 0);
-  const byState = (panel.data.by_state ?? {}) as Record<string, number>;
-  return (
-    <PanelShell
-      panel={panel}
-      footer={
-        <>
-          <Link to="/admin/services?add=1" className="control-center__primary-link">
-            <Icon name="plus" size={16} />
-            {t("admin:cc.services.add")}
-          </Link>
-          <Link to="/admin/services">{t("admin:cc.services.manage")}</Link>
-        </>
-      }
-    >
-      {total === 0 ? (
-        <p className="control-center__muted">{t("admin:cc.services.empty")}</p>
-      ) : (
-        <>
-          <div className="control-center__figures">
-            <StatFigure label={t("admin:cc.services.total")} value={format.number(total)} />
-            <StatFigure
-              label={t("admin:cc.services.troubled")}
-              value={format.number(Number(panel.data.troubled ?? 0))}
-            />
-          </div>
-          <ul className="control-center__chips">
-            {Object.entries(byState).map(([state, count]) => (
-              <li key={state} className="ds-badge" data-service-state={state}>
-                {t(`admin:cc.services.state.${state}`)} · {format.number(count)}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </PanelShell>
-  );
-}
-
-function StorageCard({ panel }: { panel: PanelView }) {
-  const t = useT();
-  const total = Number(panel.data.database_bytes ?? 0);
-  const largest = (panel.data.largest ?? []) as { schema: string; bytes: number }[];
-  const top = Math.max(1, ...largest.map((entry) => entry.bytes));
-  return (
-    <PanelShell panel={panel}>
-      <StatFigure label={t("admin:cc.storage.database")} value={formatBytes(total)} />
-      {largest.length ? (
-        <>
-          <p className="control-center__label">{t("admin:cc.storage.largest")}</p>
-          <ul className="control-center__bars">
-            {largest.map((entry) => (
-              <li key={entry.schema}>
-                <span>{entry.schema}</span>
-                <span className="control-center__bar" aria-hidden="true">
-                  <span style={{ inlineSize: `${Math.round((entry.bytes / top) * 100)}%` }} />
-                </span>
-                <span>{formatBytes(entry.bytes)}</span>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : null}
-    </PanelShell>
-  );
-}
-
-function AuditCard({ panel }: { panel: PanelView }) {
-  const t = useT();
-  const format = useFormat();
-  const since = secondsSince(panel.data.last_checkpoint_at);
-  return (
-    <PanelShell panel={panel} footer={<Link to="/admin/audit">{t("admin:cc.audit.manage")}</Link>}>
-      <div className="control-center__figures">
-        <StatFigure
-          label={t("admin:cc.audit.checkpoint")}
-          value={
-            <span className="control-center__small-value">
-              {since !== null ? format.relative(since) : "—"}
-            </span>
-          }
-        />
-        <StatFigure
-          label={t("admin:cc.audit.unsealed")}
-          value={format.number(Number(panel.data.unsealed_entries ?? 0))}
-        />
-      </div>
-    </PanelShell>
-  );
-}
-
-function HealthCard({ panel }: { panel: PanelView }) {
-  const t = useT();
-  const problems = (panel.data.problems ?? []) as Problem[];
-  return (
-    <PanelShell
-      panel={panel}
-      footer={<Link to="/admin/observability">{t("admin:cc.observability.manage")}</Link>}
-    >
-      {problems.length === 0 ? (
-        <p className="control-center__muted">{t("admin:cc.observability.none")}</p>
-      ) : (
-        <>
-          <p className="control-center__label">{t("admin:cc.observability.problems")}</p>
-          <ul className="control-center__problems">
-            {problems.map((problem) => {
-              const level = severity(problem.impact, problem.criticality);
-              return (
-                <li key={`${problem.kind}:${problem.id}`} data-severity={level}>
-                  <span className="control-center__severity">{t(`admin:cc.severity.${level}`)}</span>
-                  {problem.title}
-                </li>
-              );
-            })}
-          </ul>
-        </>
-      )}
-    </PanelShell>
-  );
-}
-
-function GenericCard({ panel }: { panel: PanelView }) {
-  const entries = Object.entries(panel.data).filter(
-    ([, value]) => typeof value !== "object" || value === null,
-  );
-  return (
-    <PanelShell panel={panel}>
-      <dl className="control-center__facts">
-        {entries.map(([key, value]) => (
-          <div key={key}>
-            <dt>{humanize(key)}</dt>
-            <dd>{value === null ? "—" : String(value)}</dd>
-          </div>
-        ))}
-      </dl>
-    </PanelShell>
-  );
+function PanelLinks({ children }: { children: ReactNode }) {
+  return <div className="control-center__links">{children}</div>;
 }

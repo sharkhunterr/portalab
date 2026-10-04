@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useRef, useState } from "react";
 import { api } from "../../../api/client";
 import { usePreferences } from "../../../design-system/a11y/PreferencesProvider";
+import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Card } from "../../../design-system/components/Content";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { sound } from "../../../design-system/sound/SoundService";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { applyToDocument } from "../../../design-system/themes/apply";
@@ -124,7 +124,6 @@ export function duplicate(theme: ThemeDefinition, name: string, taken: ReadonlyS
 
 export default function ThemeStudio() {
   const t = useT();
-  const headingId = useId();
   const client = useQueryClient();
   const themes = useQuery({
     queryKey: THEMES_KEY,
@@ -192,17 +191,19 @@ export default function ThemeStudio() {
     });
   const base = themes.data?.find((theme) => theme.key === DEFAULT_THEME_KEY)?.definition;
   return (
-    <section aria-labelledby={headingId} className="theme-studio">
-      <PageHeader
-        titleId={headingId}
-        level={2}
-        icon="palette"
-        title={t("admin:studio.title")}
-        context={t("admin:studio.subtitle")}
-        primary={
-          base ? { label: t("admin:studio.new"), icon: "plus", onSelect: () => startFrom(base) } : undefined
-        }
-      />
+    <AdminPage
+      icon="palette"
+      title={t("admin:studio.title")}
+      description={t("admin:studio.subtitle")}
+      primary={
+        base ? (
+          <Button onClick={() => startFrom(base)}>
+            <Icon name="plus" size={16} />
+            {t("admin:studio.new")}
+          </Button>
+        ) : undefined
+      }
+    >
       {message ? (
         <p role="alert" className="theme-studio__alert">
           {message}
@@ -224,84 +225,86 @@ export default function ThemeStudio() {
       ) : null}
       {themes.isPending ? <FunctionalState state="loading" /> : null}
       {themes.isError ? <FunctionalState state="unauthorized" /> : null}
-      <ul className="theme-studio__list" aria-label={t("admin:studio.themes")}>
-        {(themes.data ?? []).map((theme) => {
-          const parsed = parseTheme(theme.definition).theme;
-          const forSale = sold.has(theme.key);
-          return (
-            <li key={theme.key} className="theme-studio__item" data-enabled={theme.enabled}>
-              {parsed ? <ThemeMiniature theme={parsed} /> : null}
-              <span className="theme-studio__name">
-                <strong>{theme.name}</strong>
-                <code>{theme.key}</code>
-              </span>
-              <span className="theme-studio__badges">
-                <span className="ds-badge">
-                  {t(
-                    theme.source === "builtin"
-                      ? "admin:studio.source.builtin"
-                      : theme.source === "admin"
-                        ? "admin:studio.source.admin"
-                        : "admin:studio.source.other",
-                  )}
+      <AdminSection title={t("admin:studio.themes")} icon="palette">
+        <ul className="theme-studio__list" aria-label={t("admin:studio.themes")}>
+          {(themes.data ?? []).map((theme) => {
+            const parsed = parseTheme(theme.definition).theme;
+            const forSale = sold.has(theme.key);
+            return (
+              <li key={theme.key} className="theme-studio__item" data-enabled={theme.enabled}>
+                {parsed ? <ThemeMiniature theme={parsed} /> : null}
+                <span className="theme-studio__name">
+                  <strong>{theme.name}</strong>
+                  <code>{theme.key}</code>
                 </span>
-                <span className="ds-badge" data-ok={theme.floor_ok !== false}>
-                  {theme.floor_ok === false ? t("admin:studio.floorKo") : t("admin:studio.floorOk")}
+                <span className="theme-studio__badges">
+                  <span className="ds-badge">
+                    {t(
+                      theme.source === "builtin"
+                        ? "admin:studio.source.builtin"
+                        : theme.source === "admin"
+                          ? "admin:studio.source.admin"
+                          : "admin:studio.source.other",
+                    )}
+                  </span>
+                  <span className="ds-badge" data-ok={theme.floor_ok !== false}>
+                    {theme.floor_ok === false ? t("admin:studio.floorKo") : t("admin:studio.floorOk")}
+                  </span>
+                  {forSale ? (
+                    <span className="ds-badge theme-studio__sold">
+                      <Icon name="shop" size={12} />
+                      {t("admin:studio.sold")}
+                    </span>
+                  ) : allowed.has(theme.key) ? (
+                    <span className="ds-badge" data-ok="true">
+                      {t("admin:studio.offered")}
+                    </span>
+                  ) : null}
+                  {!theme.enabled ? <span className="ds-badge">{t("admin:studio.disabled")}</span> : null}
                 </span>
-                {forSale ? (
-                  <span className="ds-badge theme-studio__sold">
-                    <Icon name="shop" size={12} />
-                    {t("admin:studio.sold")}
-                  </span>
-                ) : allowed.has(theme.key) ? (
-                  <span className="ds-badge" data-ok="true">
-                    {t("admin:studio.offered")}
-                  </span>
-                ) : null}
-                {!theme.enabled ? <span className="ds-badge">{t("admin:studio.disabled")}</span> : null}
-              </span>
-              <span className="theme-studio__actions">
-                {parsed ? (
-                  <Button variant="secondary" onClick={() => startFrom(parsed)}>
-                    <Icon name="plus" size={16} />
-                    {t("admin:studio.duplicate")}
-                    <span className="visually-hidden">: {theme.name}</span>
-                  </Button>
-                ) : null}
-                {parsed && theme.source === "admin" ? (
-                  <Button variant="ghost" onClick={() => setEditing({ draft: parsed, existing: true })}>
-                    <Icon name="settings" size={16} />
-                    {t("admin:studio.edit")}
-                    <span className="visually-hidden">: {theme.name}</span>
-                  </Button>
-                ) : null}
-                {theme.source !== "builtin" ? (
-                  <Button
-                    variant="ghost"
-                    onClick={() => toggle.mutate({ key: theme.key, enabled: !theme.enabled })}
-                  >
-                    {theme.enabled ? t("admin:studio.disable") : t("admin:studio.enable")}
-                  </Button>
-                ) : null}
-                {theme.enabled && !forSale ? (
-                  <Button
-                    variant="ghost"
-                    onClick={() => offer.mutate({ key: theme.key, on: !allowed.has(theme.key) })}
-                  >
-                    {allowed.has(theme.key) ? t("admin:studio.withdraw") : t("admin:studio.offer")}
-                  </Button>
-                ) : null}
-                {theme.enabled && !forSale && theme.source !== "builtin" ? (
-                  <Button variant="ghost" onClick={() => setSelling(theme)}>
-                    <Icon name="shop" size={16} />
-                    {t("admin:studio.sell")}
-                  </Button>
-                ) : null}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
+                <span className="theme-studio__actions">
+                  {parsed ? (
+                    <Button variant="secondary" onClick={() => startFrom(parsed)}>
+                      <Icon name="plus" size={16} />
+                      {t("admin:studio.duplicate")}
+                      <span className="visually-hidden">: {theme.name}</span>
+                    </Button>
+                  ) : null}
+                  {parsed && theme.source === "admin" ? (
+                    <Button variant="ghost" onClick={() => setEditing({ draft: parsed, existing: true })}>
+                      <Icon name="settings" size={16} />
+                      {t("admin:studio.edit")}
+                      <span className="visually-hidden">: {theme.name}</span>
+                    </Button>
+                  ) : null}
+                  {theme.source !== "builtin" ? (
+                    <Button
+                      variant="ghost"
+                      onClick={() => toggle.mutate({ key: theme.key, enabled: !theme.enabled })}
+                    >
+                      {theme.enabled ? t("admin:studio.disable") : t("admin:studio.enable")}
+                    </Button>
+                  ) : null}
+                  {theme.enabled && !forSale ? (
+                    <Button
+                      variant="ghost"
+                      onClick={() => offer.mutate({ key: theme.key, on: !allowed.has(theme.key) })}
+                    >
+                      {allowed.has(theme.key) ? t("admin:studio.withdraw") : t("admin:studio.offer")}
+                    </Button>
+                  ) : null}
+                  {theme.enabled && !forSale && theme.source !== "builtin" ? (
+                    <Button variant="ghost" onClick={() => setSelling(theme)}>
+                      <Icon name="shop" size={16} />
+                      {t("admin:studio.sell")}
+                    </Button>
+                  ) : null}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </AdminSection>
       {selling ? (
         <SellDialog
           theme={selling}
@@ -312,7 +315,7 @@ export default function ThemeStudio() {
           }}
         />
       ) : null}
-    </section>
+    </AdminPage>
   );
 }
 

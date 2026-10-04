@@ -1,30 +1,45 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
+import {
+  AdminEmpty,
+  AdminPage,
+  AdminSection,
+  AdminStats,
+  AdminTable,
+  FormActions,
+  FormGrid,
+  StatusBadge,
+  type Tone,
+} from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { Card } from "../../../design-system/components/Content";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
-import { PageHeader } from "../../../design-system/components/PageHeader";
-import { EmptyState } from "../../../design-system/components/Placeholders";
 import { useFormat } from "../../../i18n/format/useFormat";
-import { useT } from "../../../i18n/hooks/useT";
+import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../../state/regions";
 import "../admin.css";
 
 /**
- * Services administration (spec 005 T034, 027 T093): "Add a service" is the page's primary action (also
- * reachable from the Control Center with ``?add=1``) and opens a guided form — connector, name, address,
- * write-only secrets, test, save. Each configured service is a card with its state in text and its actions
- * (enable, sync, disable, disconnect with confirmation, sync history). Secrets are never displayed.
+ * Services administration (spec 005 T034, 027 T093) on the administration kit: key figures, one table row
+ * per configured service (state in text, last synchronization, actions) and "Add a service" as the primary
+ * action (also reachable with ``?add=1``) — a two-step wizard: choose the kind of service among the
+ * installed connectors (Jellyfin, Plex, Seerr, Radarr, Sonarr, RomM, plugins…), then fill its address and
+ * credentials with a hint telling where to find them, test, save and enable. Secrets are write-only.
  */
 interface ConnectorItem {
   key: string;
   name: string;
+  description?: string;
+  icon?: string;
+  category?: string;
   secret_fields: string[];
-  config_schema: { properties?: Record<string, { type?: string; title?: string }>; required?: string[] };
+  config_schema: {
+    properties?: Record<string, { type?: string; title?: string; description?: string; default?: unknown }>;
+    required?: string[];
+  };
   compatibility: { result: string; reasons: string[] };
 }
 
@@ -57,32 +72,95 @@ interface TestOutcome {
 }
 
 const SERVICES_KEY = ["admin", "services"] as const;
+/** Catalog entry naming each kind of write-only credential field (catalog keys never name secrets). */
+const ACCESS_LABELS: Record<string, string> = {
+  api_key: "app",
+  token: "plex",
+  password: "account",
+  api_token: "generic",
+};
+const STATE_TONE: Record<string, Tone> = {
+  enabled: "ok",
+  syncing: "info",
+  configured: "neutral",
+  disabled: "neutral",
+  disconnected: "neutral",
+  maintenance: "warn",
+  error: "bad",
+  unavailable: "bad",
+};
 
 async function unwrap<T>(promise: Promise<{ data?: unknown }>): Promise<T> {
   return (await promise).data as T;
 }
 
-function ConfigureService() {
-  const t = useT();
-  const queryClient = useQueryClient();
-  const connectors = useQuery({
+/** A translated text when the catalog has one, else the fallback (connectors added by plugins). */
+function maybe(t: Translate, key: string, fallback: string): string {
+  const text = t(key);
+  return text === key.split(":").slice(1).join(":") ? fallback : text;
+}
+
+function useConnectors() {
+  return useQuery({
     queryKey: ["admin", "connectors"],
     queryFn: async () => (await unwrap<{ items: ConnectorItem[] }>(api.GET("/api/v1/connectors"))).items,
   });
-  const [key, setKey] = useState("");
-  const [name, setName] = useState("");
-  const [config, setConfig] = useState<Record<string, string>>({});
-  const [secrets, setSecrets] = useState<Record<string, string>>({});
-  const connector = connectors.data?.find((item) => item.key === key) ?? connectors.data?.[0];
-  const fields = Object.entries(connector?.config_schema.properties ?? {}).filter(
-    ([, schema]) => schema.type === "string",
+}
+
+function ConnectorPicker({
+  connectors,
+  onPick,
+}: {
+  connectors: ConnectorItem[];
+  onPick: (connector: ConnectorItem) => void;
+}) {
+  const t = useT();
+  return (
+    <ul className="connector-picker" aria-label={t("admin:services.connector")}>
+      {connectors.map((connector) => (
+        <li key={connector.key}>
+          <button type="button" className="connector-card" onClick={() => onPick(connector)}>
+            <span className="connector-card__icon" aria-hidden="true">
+              <Icon name={connector.icon ?? "server"} size={24} />
+            </span>
+            <span className="connector-card__text">
+              <strong>{connector.name}</strong>
+              <span>
+                {maybe(
+                  t,
+                  `admin:services.connector.${connector.key}.description`,
+                  connector.description ?? "",
+                )}
+              </span>
+            </span>
+            {connector.category ? (
+              <span className="ds-badge">
+                {maybe(t, `admin:services.category.${connector.category}`, connector.category)}
+              </span>
+            ) : null}
+          </button>
+        </li>
+      ))}
+    </ul>
   );
+}
+
+function ConfigureService({ connector, onBack }: { connector: ConnectorItem; onBack: () => void }) {
+  const t = useT();
+  const queryClient = useQueryClient();
+  const fields = Object.entries(connector.config_schema.properties ?? {});
+  const [name, setName] = useState(connector.name.split(" (")[0] ?? connector.name);
+  const [config, setConfig] = useState<Record<string, unknown>>(() =>
+    Object.fromEntries(fields.filter(([, s]) => s.default !== undefined).map(([k, s]) => [k, s.default])),
+  );
+  const [secrets, setSecrets] = useState<Record<string, string>>({});
+  const [created, setCreated] = useState<ServiceItem | null>(null);
 
   const test = useMutation({
     mutationFn: async () =>
       unwrap<TestOutcome>(
         api.POST("/api/v1/connectors/{key}/test", {
-          params: { path: { key: connector?.key ?? "" } },
+          params: { path: { key: connector.key } },
           body: { config, secrets },
         }),
       ),
@@ -90,12 +168,20 @@ function ConfigureService() {
   const save = useMutation({
     mutationFn: async () =>
       unwrap<ServiceItem>(
-        api.POST("/api/v1/services", { body: { connector: connector?.key ?? "", name, config, secrets } }),
+        api.POST("/api/v1/services", { body: { connector: connector.key, name, config, secrets } }),
       ),
-    onSuccess: () => {
+    onSuccess: (service) => {
       setSecrets({});
+      setCreated(service);
       void queryClient.invalidateQueries({ queryKey: SERVICES_KEY });
     },
+  });
+  const enable = useMutation({
+    mutationFn: async (serviceId: string) => {
+      await api.POST("/api/v1/services/{service_id}/enable", { params: { path: { service_id: serviceId } } });
+      await api.POST("/api/v1/services/{service_id}/sync", { params: { path: { service_id: serviceId } } });
+    },
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: SERVICES_KEY }),
   });
 
   function submit(event: FormEvent) {
@@ -103,17 +189,75 @@ function ConfigureService() {
     save.mutate();
   }
 
-  if (connectors.isPending) return null;
-  if (!connectors.data || connectors.data.length === 0 || !connector) {
-    return <p className="control-center__muted">{t("admin:services.noConnector")}</p>;
-  }
+  const help = maybe(t, `admin:services.connector.${connector.key}.help`, "");
   return (
     <form onSubmit={submit} className="services-admin__form">
-      <p className="control-center__muted">{t("admin:services.wizard.intro")}</p>
-      {save.isError ? <p role="alert">{t("admin:services.refused")}</p> : null}
-      {save.isSuccess ? (
-        <p role="status" className="services-admin__ok">
-          {t("admin:services.saved")}
+      <div className="services-admin__chosen">
+        <span className="connector-card__icon" aria-hidden="true">
+          <Icon name={connector.icon ?? "server"} size={22} />
+        </span>
+        <strong>{connector.name}</strong>
+        {!created ? (
+          <Button type="button" variant="ghost" onClick={onBack}>
+            <Icon name="chevron-left" size={16} />
+            {t("admin:services.otherKind")}
+          </Button>
+        ) : null}
+      </div>
+      {help ? (
+        <p className="services-admin__help">
+          <Icon name="lightbulb" size={16} />
+          {help}
+        </p>
+      ) : null}
+      <FormGrid>
+        <TextField
+          label={t("admin:services.name")}
+          hint={t("admin:services.name.hint")}
+          required
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+        {fields.map(([field, schema]) => {
+          const label = maybe(t, `admin:services.field.${field}`, schema.title ?? field);
+          if (schema.type === "boolean") {
+            return (
+              <CheckboxField
+                key={field}
+                label={label}
+                checked={Boolean(config[field] ?? true)}
+                onChange={(event) => setConfig({ ...config, [field]: event.target.checked })}
+              />
+            );
+          }
+          return (
+            <TextField
+              key={field}
+              label={label}
+              hint={maybe(t, `admin:services.field.${field}.hint`, schema.description ?? "") || undefined}
+              required={connector.config_schema.required?.includes(field) ?? false}
+              inputMode={field === "base_url" ? "url" : undefined}
+              placeholder={field === "base_url" ? "http://192.168.1.10:8096" : undefined}
+              value={String(config[field] ?? "")}
+              onChange={(event) => setConfig({ ...config, [field]: event.target.value })}
+            />
+          );
+        })}
+        {connector.secret_fields.map((field) => (
+          <TextField
+            key={field}
+            label={maybe(t, `admin:services.access.${ACCESS_LABELS[field] ?? field}`, field)}
+            hint={t("admin:services.writeOnly.hint")}
+            type="password"
+            autoComplete="off"
+            value={secrets[field] ?? ""}
+            onChange={(event) => setSecrets({ ...secrets, [field]: event.target.value })}
+          />
+        ))}
+      </FormGrid>
+      {save.isError ? (
+        <p role="alert" className="services-admin__ko">
+          {save.error instanceof ApiError ? save.error.message : t("admin:services.refused")}
         </p>
       ) : null}
       {test.data ? (
@@ -123,56 +267,63 @@ function ConfigureService() {
             : t("admin:services.testFailed", { detail: test.data.detail })}
         </p>
       ) : null}
-      <SelectField
-        label={t("admin:services.connector")}
-        value={connector.key}
-        onChange={(event) => setKey(event.target.value)}
-      >
-        {connectors.data.map((item) => (
-          <option key={item.key} value={item.key}>
-            {item.name}
-          </option>
-        ))}
-      </SelectField>
-      <TextField
-        label={t("admin:services.name")}
-        hint={t("admin:services.name.hint")}
-        required
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-      />
-      {fields.map(([field, schema]) => (
-        <TextField
-          key={field}
-          label={schema.title ?? field}
-          required={connector.config_schema.required?.includes(field) ?? false}
-          value={config[field] ?? ""}
-          onChange={(event) => setConfig({ ...config, [field]: event.target.value })}
-        />
-      ))}
-      {connector.secret_fields.map((field) => (
-        <TextField
-          key={field}
-          label={field}
-          hint={t("admin:services.writeOnly.hint")}
-          type="password"
-          autoComplete="off"
-          value={secrets[field] ?? ""}
-          onChange={(event) => setSecrets({ ...secrets, [field]: event.target.value })}
-        />
-      ))}
-      <div className="services-admin__buttons">
-        <Button type="button" variant="secondary" onClick={() => test.mutate()} disabled={test.isPending}>
-          <Icon name="plug" size={16} />
-          {t("admin:services.test")}
-        </Button>
-        <Button type="submit" disabled={save.isPending}>
-          <Icon name="check" size={16} />
-          {t("admin:services.save")}
-        </Button>
-      </div>
+      {created ? (
+        <div role="status" className="services-admin__ok services-admin__done">
+          <span>{t("admin:services.saved")}</span>
+          {enable.isSuccess ? (
+            <strong>{t("admin:services.enabledSyncing")}</strong>
+          ) : (
+            <Button type="button" onClick={() => enable.mutate(created.id)} disabled={enable.isPending}>
+              <Icon name="zap" size={16} />
+              {t("admin:services.enableNow")}
+            </Button>
+          )}
+          {enable.isError ? <span role="alert">{t("admin:services.refused")}</span> : null}
+        </div>
+      ) : (
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={() => test.mutate()} disabled={test.isPending}>
+            <Icon name="plug" size={16} />
+            {t("admin:services.test")}
+          </Button>
+          <Button type="submit" disabled={save.isPending}>
+            <Icon name="check" size={16} />
+            {t("admin:services.save")}
+          </Button>
+        </FormActions>
+      )}
     </form>
   );
+}
+
+function AddServiceWizard() {
+  const t = useT();
+  const connectors = useConnectors();
+  const [chosen, setChosen] = useState<ConnectorItem | null>(null);
+  if (connectors.isPending) return <p className="admin-muted">…</p>;
+  const usable = (connectors.data ?? []).filter((c) => c.compatibility.result !== "incompatible");
+  if (!usable.length) {
+    return (
+      <AdminEmpty
+        icon="plug"
+        title={t("admin:services.noConnector")}
+        action={
+          <Link className="ds-button ds-button--primary" to="/admin/plugins">
+            {t("admin:services.toPlugins")}
+          </Link>
+        }
+      />
+    );
+  }
+  if (!chosen) {
+    return (
+      <>
+        <p className="admin-muted">{t("admin:services.wizard.pick")}</p>
+        <ConnectorPicker connectors={usable} onPick={setChosen} />
+      </>
+    );
+  }
+  return <ConfigureService key={chosen.key} connector={chosen} onBack={() => setChosen(null)} />;
 }
 
 function SyncHistory({ service }: { service: ServiceItem }) {
@@ -194,7 +345,7 @@ function SyncHistory({ service }: { service: ServiceItem }) {
     >
       {(runs) =>
         runs.length === 0 ? (
-          <p className="control-center__muted">{t("admin:services.noHistory")}</p>
+          <p className="admin-muted">{t("admin:services.noHistory")}</p>
         ) : (
           <ul aria-label={label} className="services-admin__runs">
             {runs.map((run) => (
@@ -219,23 +370,10 @@ function SyncHistory({ service }: { service: ServiceItem }) {
 
 type Action = "enable" | "disable" | "disconnect" | "sync";
 
-const STATE_TONE: Record<string, string> = {
-  enabled: "ok",
-  syncing: "ok",
-  configured: "idle",
-  disabled: "idle",
-  disconnected: "idle",
-  maintenance: "warn",
-  error: "bad",
-  unavailable: "bad",
-};
-
-function ServiceCard({ service }: { service: ServiceItem }) {
+function ServiceActions({ service }: { service: ServiceItem }) {
   const t = useT();
-  const format = useFormat();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const action = useMutation({
     mutationFn: async (kind: Action) => {
@@ -252,65 +390,152 @@ function ServiceCard({ service }: { service: ServiceItem }) {
     },
     onError: (error) => setMessage(error instanceof ApiError ? error.message : t("admin:services.refused")),
   });
-  const state = t(`admin:services.state.${service.display_state}`);
   const active = ["enabled", "error", "unavailable", "maintenance"].includes(service.state);
-  const last = service.sync.last_success_at;
-  const since = last ? (Date.parse(last) - Date.now()) / 1000 : null;
   return (
-    <Card
-      className="services-admin__card"
-      data-tone={STATE_TONE[service.display_state] ?? "idle"}
-      title={service.name}
-      icon="server"
-      actions={<span className="ds-badge services-admin__state">{state}</span>}
-    >
-      <p className="control-center__muted">
-        {service.connector} ·{" "}
-        {since !== null && !Number.isNaN(since)
-          ? t("admin:services.lastSuccess", { when: format.relative(since) })
-          : t("admin:services.never")}
-      </p>
-      {message ? <p role="status">{message}</p> : null}
-      <div className="services-admin__buttons">
-        {service.state === "configured" || service.state === "disabled" ? (
-          <Button type="button" onClick={() => action.mutate("enable")}>
-            {t("admin:services.enable")}
-          </Button>
-        ) : null}
-        {active ? (
-          <>
-            <Button type="button" variant="secondary" onClick={() => action.mutate("sync")}>
-              <Icon name="sync" size={16} />
-              {t("admin:services.syncNow")}
-            </Button>
-            <Button type="button" variant="ghost" onClick={() => action.mutate("disable")}>
-              {t("admin:services.disable")}
-            </Button>
-          </>
-        ) : null}
-        {service.state !== "disconnected" ? (
-          confirming ? (
-            <Button type="button" variant="danger" onClick={() => action.mutate("disconnect")}>
-              {t("admin:services.confirmDisconnect")}
-            </Button>
-          ) : (
-            <Button type="button" variant="ghost" onClick={() => setConfirming(true)}>
-              {t("admin:services.disconnect")}
-            </Button>
-          )
-        ) : null}
-        <Button
-          type="button"
-          variant="ghost"
-          aria-expanded={showHistory}
-          onClick={() => setShowHistory(!showHistory)}
-        >
-          <Icon name="clock" size={16} />
-          {t("admin:services.history")}
+    <>
+      {message ? (
+        <span role="status" className="admin-muted">
+          {message}
+        </span>
+      ) : null}
+      {service.state === "configured" || service.state === "disabled" ? (
+        <Button type="button" onClick={() => action.mutate("enable")}>
+          {t("admin:services.enable")}
         </Button>
-      </div>
-      {showHistory ? <SyncHistory service={service} /> : null}
-    </Card>
+      ) : null}
+      {active ? (
+        <>
+          <Button type="button" variant="secondary" onClick={() => action.mutate("sync")}>
+            <Icon name="sync" size={16} />
+            {t("admin:services.syncNow")}
+          </Button>
+          <Button type="button" variant="ghost" onClick={() => action.mutate("disable")}>
+            {t("admin:services.disable")}
+          </Button>
+        </>
+      ) : null}
+      <Dialog
+        title={t("admin:services.historyOf", { name: service.name })}
+        closeLabel={t("admin:services.close")}
+        trigger={
+          <Button type="button" variant="ghost">
+            <Icon name="clock" size={16} />
+            {t("admin:services.history")}
+          </Button>
+        }
+      >
+        <SyncHistory service={service} />
+      </Dialog>
+      {service.state !== "disconnected" ? (
+        confirming ? (
+          <Button type="button" variant="danger" onClick={() => action.mutate("disconnect")}>
+            {t("admin:services.confirmDisconnect")}
+          </Button>
+        ) : (
+          <Button type="button" variant="ghost" onClick={() => setConfirming(true)}>
+            {t("admin:services.disconnect")}
+          </Button>
+        )
+      ) : null}
+    </>
+  );
+}
+
+function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () => void }) {
+  const t = useT();
+  const format = useFormat();
+  const connectors = useConnectors();
+  const names = new Map((connectors.data ?? []).map((c) => [c.key, c.name]));
+  const enabled = services.filter((s) => s.state === "enabled").length;
+  const troubled = services.filter((s) => ["error", "unavailable"].includes(s.state)).length;
+  if (services.length === 0) {
+    return (
+      <AdminSection title={t("admin:services.list")} icon="server">
+        <AdminEmpty
+          icon="server"
+          title={t("admin:services.empty.title")}
+          message={t("admin:services.empty.message")}
+          action={
+            <Button onClick={onAdd}>
+              <Icon name="plus" size={16} />
+              {t("admin:services.add")}
+            </Button>
+          }
+        />
+      </AdminSection>
+    );
+  }
+  return (
+    <>
+      <AdminStats
+        label={t("admin:services.list")}
+        stats={[
+          {
+            key: "total",
+            label: t("admin:services.stat.total"),
+            value: format.number(services.length),
+            icon: "server",
+            tone: "info",
+          },
+          {
+            key: "enabled",
+            label: t("admin:services.stat.enabled"),
+            value: format.number(enabled),
+            icon: "check",
+            tone: "ok",
+          },
+          {
+            key: "troubled",
+            label: t("admin:services.stat.troubled"),
+            value: format.number(troubled),
+            icon: "alert",
+            tone: troubled ? "bad" : "neutral",
+          },
+        ]}
+      />
+      <AdminSection title={t("admin:services.list")} icon="server" flush>
+        <AdminTable<ServiceItem>
+          label={t("admin:services.list")}
+          rows={services}
+          rowKey={(s) => s.id}
+          columns={[
+            {
+              key: "name",
+              header: t("admin:services.name"),
+              primary: true,
+              render: (s) => (
+                <span className="services-admin__name">
+                  <strong>{s.name}</strong>
+                  <span className="admin-muted">{names.get(s.connector) ?? s.connector}</span>
+                </span>
+              ),
+            },
+            {
+              key: "state",
+              header: t("admin:services.stateColumn"),
+              render: (s) => (
+                <StatusBadge tone={STATE_TONE[s.display_state] ?? "neutral"}>
+                  {t(`admin:services.state.${s.display_state}`)}
+                </StatusBadge>
+              ),
+            },
+            {
+              key: "sync",
+              header: t("admin:services.lastSync"),
+              render: (s) => {
+                const last = s.sync.last_success_at;
+                return last
+                  ? t("admin:services.lastSuccess", {
+                      when: format.relative((Date.parse(last) - Date.now()) / 1000),
+                    })
+                  : t("admin:services.never");
+              },
+            },
+          ]}
+          actions={(s) => <ServiceActions service={s} />}
+        />
+      </AdminSection>
+    </>
   );
 }
 
@@ -318,6 +543,10 @@ export function ServicesAdmin() {
   const t = useT();
   const [params, setParams] = useSearchParams();
   const [open, setOpen] = useState(params.get("add") === "1");
+  const wantsAdd = params.get("add") === "1";
+  useEffect(() => {
+    if (wantsAdd) setOpen(true); // reached from another page's "Add a service" (client navigation)
+  }, [wantsAdd]);
   function toggle(next: boolean) {
     setOpen(next);
     if (!next && params.has("add")) {
@@ -325,59 +554,41 @@ export function ServicesAdmin() {
       setParams(params, { replace: true });
     }
   }
-  const addButton = (
-    <Button type="button">
-      <Icon name="plus" size={18} />
-      {t("admin:services.add")}
-    </Button>
-  );
   return (
-    <div className="services-admin">
-      <PageHeader
-        level={2}
-        icon="plug"
-        title={t("admin:services.title")}
-        context={t("admin:services.subtitle")}
-        secondary={
-          <Link className="ds-button ds-button--ghost" to="/services">
-            {t("admin:services.status")}
-          </Link>
-        }
-        primary={
-          <Dialog
-            open={open}
-            onOpenChange={toggle}
-            title={t("admin:services.wizard.title")}
-            trigger={addButton}
-          >
-            <ConfigureService />
-          </Dialog>
-        }
-      />
+    <AdminPage
+      icon="plug"
+      title={t("admin:services.title")}
+      description={t("admin:services.subtitle")}
+      secondary={
+        <Link className="ds-button ds-button--ghost" to="/services">
+          {t("admin:services.status")}
+        </Link>
+      }
+      primary={
+        <Dialog
+          open={open}
+          onOpenChange={toggle}
+          size="lg"
+          title={t("admin:services.wizard.title")}
+          closeLabel={t("admin:services.close")}
+          trigger={
+            <Button type="button">
+              <Icon name="plus" size={18} />
+              {t("admin:services.add")}
+            </Button>
+          }
+        >
+          <AddServiceWizard />
+        </Dialog>
+      }
+    >
       <DataRegion<ServiceItem[]>
         label={t("admin:services.list")}
         queryKey={SERVICES_KEY}
         queryFn={async () => (await unwrap<{ items: ServiceItem[] }>(api.GET("/api/v1/services"))).items}
       >
-        {(services) =>
-          services.length === 0 ? (
-            <EmptyState
-              icon="server"
-              title={t("admin:services.empty.title")}
-              message={t("admin:services.empty.message")}
-              action={{ label: t("admin:services.add"), onSelect: () => toggle(true) }}
-            />
-          ) : (
-            <ul aria-label={t("admin:services.list")} className="services-admin__list">
-              {services.map((service) => (
-                <li key={service.id}>
-                  <ServiceCard service={service} />
-                </li>
-              ))}
-            </ul>
-          )
-        }
+        {(services) => <ServiceTable services={services} onAdd={() => toggle(true)} />}
       </DataRegion>
-    </div>
+    </AdminPage>
   );
 }

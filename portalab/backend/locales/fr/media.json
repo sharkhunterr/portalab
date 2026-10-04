@@ -3,6 +3,7 @@
   "action.request": "Demander un média",
   "admin.candidates": "Doublons possibles",
   "admin.confirm": "La fusion modifie l’identité des objets du catalogue. Confirmer ?",
+  "admin.description": "Les titres décrits par plusieurs services : confirmez ou séparez les doublons possibles.",
   "admin.empty": "Aucun doublon possible.",
   "admin.merge": "Fusionner",
   "admin.merged": "Objets fusionnés.",

@@ -6,6 +6,7 @@
   "admin.create": "New campaign",
   "admin.deactivate": "Deactivate",
   "admin.definition": "Definition (JSON)",
+  "admin.description": "Seasonal events: their dates, theme, rewards and leaderboards.",
   "admin.history": "History",
   "admin.invalid": "This definition is not valid.",
   "admin.key": "Key",
