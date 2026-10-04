@@ -31,6 +31,17 @@ async def schedule_sweeps(platform: Platform, stop: asyncio.Event) -> None:
 
 
 DISPATCH_INTERVAL_SECONDS = 1.0
+SERVICES_REFRESH_SECONDS = 60.0
+
+
+async def provide_services(platform: Platform, stop: asyncio.Event) -> None:
+    """Provide the capabilities of the enabled services in the worker too (images, playback, requests run
+    here), and pick up the services enabled from the web process since the last round."""
+    while not stop.is_set():
+        if not await platform.start_services():
+            log.warning("service providers could not be refreshed, will retry")
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(stop.wait(), timeout=SERVICES_REFRESH_SECONDS)
 
 
 async def dispatch_events(platform: Platform, stop: asyncio.Event) -> None:
@@ -61,10 +72,12 @@ async def run_worker(settings: BootstrapSettings) -> None:
         loop.add_signal_handler(signum, stop.set)
     scheduler = asyncio.create_task(schedule_sweeps(platform, stop))
     dispatcher = asyncio.create_task(dispatch_events(platform, stop))
+    services = asyncio.create_task(provide_services(platform, stop))
     try:
         await Worker(database, default_registry).run_forever(stop)
     finally:
         stop.set()
         await scheduler
         await dispatcher
+        await services
         await database.dispose()

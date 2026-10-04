@@ -247,3 +247,17 @@ async def test_poster_when_one_source_lists_a_title_twice(app: FastAPI, media: M
     objects = (await media.module.catalog.browse(Principal(user_id=people["sam"])))[0]
     assert len(objects) == 1
     assert await media.module.images.fetch(objects[0][0].id)
+
+
+async def test_poster_waits_for_its_source(app: FastAPI, media: MediaHarness) -> None:
+    """027: a poster job in a process where the source is not provided yet fails (and is retried) instead
+    of succeeding without an image; once the source is provided, it is fetched."""
+    people = await users(app, media, "kim")
+    one = media.service(3)
+    record = library_record("p", title="Heat", ids={"tmdb": "949"}, image="p")
+    await media.module.library.upsert([record], one)
+    object_id = (await media.module.catalog.browse(Principal(user_id=people["kim"])))[0][0][0].id
+    with pytest.raises(LookupError):
+        await media.module.images.fetch(object_id)
+    media.library(one).images["p"] = PNG_1PX
+    assert await media.module.images.fetch(object_id)

@@ -135,7 +135,8 @@ class ImageService:
             return False
         provider = self._provider(item.service_id)
         if provider is None:
-            return False
+            # the source service is not provided in this process (yet): retried by the job queue
+            raise LookupError("the image source is not available in this process")
         try:
             raw = unwrap(await asyncio.wait_for(provider.fetch_image(ref), timeout=20))
             data = normalize_image(bytes(raw))
