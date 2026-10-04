@@ -74,10 +74,16 @@ export interface DataRegionProps<T> {
   queryFn: () => Promise<T>;
   isEmpty?: (data: T) => boolean;
   children: (data: T) => ReactNode;
+  /** Refresh every N ms while it returns a number (027: live progress of running tasks). */
+  poll?: ((data: T | undefined) => number | false) | undefined;
 }
 
-function RegionContent<T>({ label, queryKey, queryFn, isEmpty, children }: DataRegionProps<T>) {
-  const query = useQuery({ queryKey, queryFn });
+function RegionContent<T>({ label, queryKey, queryFn, isEmpty, children, poll }: DataRegionProps<T>) {
+  const query = useQuery({
+    queryKey,
+    queryFn,
+    ...(poll ? { refetchInterval: (q: { state: { data: T | undefined } }) => poll(q.state.data) } : {}),
+  });
   if (query.isPending) return <FunctionalState state="loading" detail={label} />;
   if (query.isError) {
     return (

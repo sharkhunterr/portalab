@@ -91,6 +91,8 @@ class SyncState(ConnectorsBase):
     cursor: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     next_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     consecutive_failures: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # 027: how far the running sync got — {"capability", "done", "total", "started_at"}; null when idle
+    progress: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
 
 class SyncRun(ConnectorsBase):

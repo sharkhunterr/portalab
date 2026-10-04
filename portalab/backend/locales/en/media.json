@@ -239,5 +239,13 @@
   "enriched.job.writer": "Writer",
   "enriched.job.composer": "Music",
   "enriched.job.producer": "Producer",
-  "enriched.job.creator": "Creator"
+  "enriched.job.creator": "Creator",
+  "insights.sources.runNow": "Update now",
+  "insights.sources.enrichNow": "Enrich now",
+  "insights.sources.queued": "Started: the update runs in the background.",
+  "insights.sources.catchingUp": "Catching up",
+  "insights.sources.reading": "Reading what's new",
+  "insights.sources.paused": "{percent} read, resumes at the next run",
+  "insights.sources.enriching": "TMDB enrichment running",
+  "insights.sources.enriched": "TMDB details: {done} of {total} titles"
 }

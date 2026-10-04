@@ -43,7 +43,12 @@ class _History:
         rows = [p for p in self.plays if since is None or p.started_at >= since]
         start = int(cursor or 0)
         page = rows[start : start + 2]
-        return ActivityPage(items=page, cursor=str(start + 2) if start + 2 < len(rows) else None)
+        return ActivityPage(
+            items=page,
+            cursor=str(start + 2) if start + 2 < len(rows) else None,
+            total=len(rows),
+            position=start + len(page),
+        )
 
 
 class _Accounts:
@@ -182,8 +187,18 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     server = (await client.get("/api/v1/media/insights", params={"scope": "all", "period": "30d"})).json()
     assert server["manager"] and server["totals"]["plays"] == 5 and server["totals"]["members"] == 1
     assert server["members"][0]["name"] == "zoe" and server["unattributed"] == 0
+    ran = await client.post("/api/v1/admin/media/insights/run", json={"what": "metadata"})
+    assert ran.status_code == 202 and ran.json() == {"state": "scheduled"}
+    assert (await client.post("/api/v1/admin/media/insights/run", json={"what": "x"})).status_code == 422
     sources = (await client.get("/api/v1/admin/media/insights/sources")).json()
     assert {s["mode"] for s in sources["sources"]} == {"incremental"}
+    # live progress: nothing runs now; the last run went to the end of each history
+    assert not any(s["progress"]["running"] for s in sources["sources"])
+    assert sorted((s["progress"]["done"], s["progress"]["total"]) for s in sources["sources"]) == [
+        (3, 3),
+        (4, 4),
+    ]
+    assert sources["metadata"]["eligible"] == 2 and sources["metadata"]["progress"]["running"] is False
 
     await login(client, "zoe")
     mine = (await client.get("/api/v1/media/insights", params={"period": "30d", "tz": "Europe/Paris"})).json()
@@ -200,6 +215,9 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     assert anonymous["members"] is None and anonymous["recent"] is None and anonymous["platforms"] is None
     assert (await client.get("/api/v1/media/insights", params={"tz": "Mars/Base"})).status_code == 422
     assert (await client.get("/api/v1/admin/media/insights/sources")).status_code == 403
+    assert (
+        await client.post("/api/v1/admin/media/insights/run", json={"what": "history"})
+    ).status_code == 403
 
     # incremental: only what is new since the latest play (with an overlap) is asked for
     tautulli_history.plays.append(play("t4", now + timedelta(minutes=1), priority=20, user="1234"))

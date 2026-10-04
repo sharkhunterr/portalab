@@ -114,6 +114,8 @@ class JellyfinConnector(HttpConnector):
             )
             if not isinstance(page, Mapping) or not isinstance(page.get("Items"), list):
                 raise InvalidPayload("unexpected /Items payload")
+            if start == 0 and page.get("TotalRecordCount"):
+                yield SyncProgress(cursor={}, total=int(page["TotalRecordCount"]))
             for item in page["Items"]:
                 kind = KINDS.get(str(item.get("Type")))
                 if kind is None or not item.get("Name"):

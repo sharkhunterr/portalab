@@ -279,3 +279,23 @@
   background: var(--state-partial-bg);
   color: var(--state-partial-fg);
 }
+
+.insights-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+#sources {
+  scroll-margin-block-start: 5rem;
+}
+
+.insights-source-state {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.insights-metadata__progress {
+  max-inline-size: 36rem;
+}

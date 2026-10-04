@@ -239,5 +239,13 @@
   "enriched.job.writer": "Écriture",
   "enriched.job.composer": "Musique",
   "enriched.job.producer": "Production",
-  "enriched.job.creator": "Création"
+  "enriched.job.creator": "Création",
+  "insights.sources.runNow": "Mettre à jour maintenant",
+  "insights.sources.enrichNow": "Enrichir maintenant",
+  "insights.sources.queued": "C'est parti : la mise à jour tourne en arrière-plan.",
+  "insights.sources.catchingUp": "Rattrapage en cours",
+  "insights.sources.reading": "Lecture des nouveautés",
+  "insights.sources.paused": "{percent} lu, reprend au prochain passage",
+  "insights.sources.enriching": "Enrichissement TMDB en cours",
+  "insights.sources.enriched": "Fiches TMDB : {done} sur {total} titres"
 }

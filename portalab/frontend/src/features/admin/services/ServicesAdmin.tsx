@@ -10,6 +10,7 @@ import {
   AdminTable,
   FormActions,
   FormGrid,
+  LiveProgress,
   StatusBadge,
   type Tone,
 } from "../../../design-system/admin/AdminKit";
@@ -41,6 +42,14 @@ interface ConnectorItem {
     required?: string[];
   };
   compatibility: { result: string; reasons: string[] };
+  provides?: string[];
+  /** 027: capabilities « sync now » runs; an empty list means the service is read continuously. */
+  syncable?: string[];
+}
+
+/** Read continuously (history every few minutes, metadata enrichment…): nothing for « sync now » to do. */
+function continuous(connector: ConnectorItem | undefined): boolean {
+  return Boolean(connector?.syncable && connector.syncable.length === 0);
 }
 
 interface ServiceItem {
@@ -52,7 +61,11 @@ interface ServiceItem {
   health: string;
   stale: boolean;
   secrets_set?: string[];
-  sync: { status: string; last_success_at: string | null };
+  sync: {
+    status: string;
+    last_success_at: string | null;
+    progress?: { capability: string; done: number; total: number | null; started_at: string } | null;
+  };
 }
 
 interface SyncRunItem {
@@ -72,6 +85,13 @@ interface TestOutcome {
 }
 
 const SERVICES_KEY = ["admin", "services"] as const;
+/** When a sync was last asked for: the list refreshes quickly until it shows up as running (027). */
+let syncRequestedAt = 0;
+
+function pollServices(services: ServiceItem[] | undefined): number | false {
+  const running = (services ?? []).some((s) => s.sync.status === "running");
+  return running || Date.now() - syncRequestedAt < 20_000 ? 2000 : false;
+}
 /** Catalog entry naming each kind of write-only credential field (catalog keys never name secrets). */
 const ACCESS_LABELS: Record<string, string> = {
   api_key: "app",
@@ -370,7 +390,13 @@ function SyncHistory({ service }: { service: ServiceItem }) {
 
 type Action = "enable" | "disable" | "disconnect" | "sync";
 
-function ServiceActions({ service }: { service: ServiceItem }) {
+function ServiceActions({
+  service,
+  connector,
+}: {
+  service: ServiceItem;
+  connector?: ConnectorItem | undefined;
+}) {
   const t = useT();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
@@ -378,7 +404,10 @@ function ServiceActions({ service }: { service: ServiceItem }) {
   const action = useMutation({
     mutationFn: async (kind: Action) => {
       const params = { params: { path: { service_id: service.id } } };
-      if (kind === "sync") return api.POST("/api/v1/services/{service_id}/sync", params);
+      if (kind === "sync") {
+        syncRequestedAt = Date.now();
+        return api.POST("/api/v1/services/{service_id}/sync", params);
+      }
       if (kind === "enable") return api.POST("/api/v1/services/{service_id}/enable", params);
       if (kind === "disable") return api.POST("/api/v1/services/{service_id}/disable", params);
       return api.POST("/api/v1/services/{service_id}/disconnect", params);
@@ -405,10 +434,17 @@ function ServiceActions({ service }: { service: ServiceItem }) {
       ) : null}
       {active ? (
         <>
-          <Button type="button" variant="secondary" onClick={() => action.mutate("sync")}>
-            <Icon name="sync" size={16} />
-            {t("admin:services.syncNow")}
-          </Button>
+          {continuous(connector) ? (
+            <Link className="ds-button ds-button--secondary" to="/media/insights?scope=all#sources">
+              <Icon name="chart" size={16} />
+              {t("admin:services.followUp")}
+            </Link>
+          ) : (
+            <Button type="button" variant="secondary" onClick={() => action.mutate("sync")}>
+              <Icon name="sync" size={16} />
+              {t("admin:services.syncNow")}
+            </Button>
+          )}
           <Button type="button" variant="ghost" onClick={() => action.mutate("disable")}>
             {t("admin:services.disable")}
           </Button>
@@ -446,6 +482,7 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
   const format = useFormat();
   const connectors = useConnectors();
   const names = new Map((connectors.data ?? []).map((c) => [c.key, c.name]));
+  const byKey = new Map((connectors.data ?? []).map((c) => [c.key, c]));
   const enabled = services.filter((s) => s.state === "enabled").length;
   const troubled = services.filter((s) => ["error", "unavailable"].includes(s.state)).length;
   if (services.length === 0) {
@@ -523,6 +560,24 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
               key: "sync",
               header: t("admin:services.lastSync"),
               render: (s) => {
+                if (s.sync.status === "running") {
+                  const p = s.sync.progress;
+                  return (
+                    <LiveProgress
+                      label={t("admin:services.syncing")}
+                      done={p?.done}
+                      total={p?.total}
+                      detail={
+                        p
+                          ? p.total
+                            ? `${format.number(p.done)} / ${format.number(p.total)}`
+                            : t("admin:services.syncedSoFar", { count: p.done })
+                          : null
+                      }
+                    />
+                  );
+                }
+                if (continuous(byKey.get(s.connector))) return t("admin:services.continuous");
                 const last = s.sync.last_success_at;
                 return last
                   ? t("admin:services.lastSuccess", {
@@ -532,7 +587,7 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
               },
             },
           ]}
-          actions={(s) => <ServiceActions service={s} />}
+          actions={(s) => <ServiceActions service={s} connector={byKey.get(s.connector)} />}
         />
       </AdminSection>
     </>
@@ -586,6 +641,7 @@ export function ServicesAdmin() {
         label={t("admin:services.list")}
         queryKey={SERVICES_KEY}
         queryFn={async () => (await unwrap<{ items: ServiceItem[] }>(api.GET("/api/v1/services"))).items}
+        poll={pollServices}
       >
         {(services) => <ServiceTable services={services} onAdd={() => toggle(true)} />}
       </DataRegion>

@@ -107,3 +107,13 @@ async def test_release_calendars() -> None:
     (premiere,) = episodes
     assert premiere.parent_title == "Andor" and (premiere.season, premiere.episode) == (3, 1)
     assert premiere.ids == {"tvdb": "393189"}
+
+
+def test_continuous_connectors_have_nothing_to_sync_now() -> None:
+    """« Sync now » runs library syncs only: history and metadata services are read continuously."""
+    syncable = {
+        c.key: [b.spec.name for b in c.provides if b.syncable]
+        for c in (TautulliConnector(), GrimmoryConnector(), TmdbConnector(), RadarrConnector())
+    }
+    assert syncable["tautulli"] == [] and syncable["tmdb"] == []
+    assert syncable["grimmory"] == [LIBRARY] and syncable["radarr"] == [LIBRARY]

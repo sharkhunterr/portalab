@@ -73,7 +73,7 @@
 }
 .media-backdrop {
   position: absolute;
-  inset-inline: calc(var(--space-4, 1rem) * -1);
+  inset-inline: 0;
   inset-block-start: calc(var(--space-4, 1rem) * -1);
   block-size: clamp(14rem, 38vw, 26rem);
   z-index: -1;
@@ -93,8 +93,18 @@
 }
 .media-enriched {
   display: grid;
+  /* children may scroll inside (cast row) but never widen the page */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4, 1rem);
   margin-block: var(--space-4, 1rem);
+  min-inline-size: 0;
+}
+.media-detail {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.media-enriched__block {
+  min-inline-size: 0;
 }
 .media-enriched__tagline {
   margin: 0;

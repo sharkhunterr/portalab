@@ -1,5 +1,6 @@
 import { type ReactNode, useId } from "react";
 import { Link } from "react-router";
+import { Progress } from "../components/Content";
 import { Icon } from "../components/Icon";
 import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/Placeholders";
@@ -367,5 +368,33 @@ export function JsonField({
         </span>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * A task that is running (027): a spinner, what it is doing (« 1 234 / 6 000 »), and a bar — determinate
+ * when the total is known, indeterminate otherwise. The spinner stops for reduced motion.
+ */
+export function LiveProgress({
+  label,
+  done,
+  total,
+  detail,
+}: {
+  label: string;
+  done?: number | null | undefined;
+  total?: number | null | undefined;
+  detail?: ReactNode | undefined;
+}) {
+  const known = typeof total === "number" && total > 0 && typeof done === "number";
+  return (
+    <span className="live-progress" role="status">
+      <span className="live-progress__line">
+        <Icon name="spinner" size={16} className="live-progress__spinner" />
+        <span>{label}</span>
+        {detail ? <span className="live-progress__detail">{detail}</span> : null}
+      </span>
+      <Progress label={label} value={known ? (done ?? 0) : null} max={known ? (total ?? 1) : 100} />
+    </span>
   );
 }

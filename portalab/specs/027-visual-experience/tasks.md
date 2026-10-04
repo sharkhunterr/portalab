@@ -246,6 +246,7 @@ lossless migration.
 - [X] T104 [US10] Connectors Tautulli (history incl. live TV, accounts), Grimmory (books/audiobooks, reading sessions, accounts), TMDB (`media.metadata`), Plex full history, Radarr/Sonarr release calendars in `backend/src/portalab/connectors/`; capabilities `media.activity_history`, `media.calendar`, `media.metadata`; `audiobook` media type
 - [X] T105 [US10] Activity ingestion (backfill → incremental, attribution, catalog/work resolution, Plex/Tautulli de-duplication), daily aggregates, metadata enrichment and upcoming releases in `backend/src/portalab/modules/media/insights/` (migration `media_0002`), with export/erasure
 - [X] T106 [US10] Statistics page `/media/insights` (me / whole server, categories, periods, charts, tops with posters, records, box office, members and sources for managers), enriched detail page, dashboard widgets (stats, recently added/requested, upcoming, top) in `frontend/src/features/media/` and `frontend/src/features/dashboard/widgets/media.tsx`
+- [X] T107 [US10] Live progress: connector syncs report done/total (`SyncProgress.total`, `connectors.sync_state.progress`), history ingestion and TMDB enrichment report theirs (`media.task_progress`); spinner + progress bar (`LiveProgress`) on the services page and the statistics sources panel, polled while running; « Sync now » replaced by « Follow-up » for continuously read services; « Update now » / « Enrich now »
 
 ## Dependencies & Execution Order
 

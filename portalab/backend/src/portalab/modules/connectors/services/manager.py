@@ -163,6 +163,8 @@ class ServiceManager:
                     "category": str(getattr(connector, "category", "other")),
                     "version": connector.manifest.version,
                     "provides": [binding.spec.name for binding in connector.provides],
+                    # 027: what « sync now » runs; the others are read continuously (history, metadata…)
+                    "syncable": [binding.spec.name for binding in connector.provides if binding.syncable],
                     "config_schema": connector.config_schema.model_json_schema(),
                     "secret_fields": sorted(connector.secret_fields),
                     "compatibility": {"result": compatibility.result, "reasons": compatibility.reasons},
@@ -194,6 +196,7 @@ class ServiceManager:
             "last_success_at": state.last_success_at.isoformat() if state and state.last_success_at else None,
             "next_run_at": state.next_run_at.isoformat() if state and state.next_run_at else None,
             "consecutive_failures": state.consecutive_failures if state else 0,
+            "progress": state.progress if state and state.status == "running" else None,
         }
         return ServiceView(
             id=row.id,

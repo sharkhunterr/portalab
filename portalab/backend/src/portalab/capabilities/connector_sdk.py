@@ -44,7 +44,11 @@ class SourceRecord:
 
 @dataclass(frozen=True, slots=True)
 class SyncProgress:
+    """A checkpoint (``cursor``, empty to only report progress) and, when the source knows it, how many
+    records the run will yield in all (``total``, 027: shown as a progress bar)."""
+
     cursor: Mapping[str, Any]
+    total: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

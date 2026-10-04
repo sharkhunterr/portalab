@@ -403,3 +403,16 @@ class ObjectMetadata(MediaBase):
     data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     fetched_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class TaskProgress(MediaBase):
+    """027 — live progress of a background task (history of one service, metadata enrichment), for the
+    spinners and progress bars of the statistics sources panel."""
+
+    __tablename__ = "task_progress"
+
+    task: Mapped[str] = mapped_column(String(80), primary_key=True)  # ``history:<service>``, ``metadata``
+    running_since: Mapped[datetime | None] = mapped_column(TZDateTime)
+    done: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
+    total: Mapped[int | None] = mapped_column(BigInteger)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

@@ -124,6 +124,21 @@ class PlexConnector(HttpConnector):
         service = ctx.service
         sections = _container(await self.get_json(service, "/library/sections")).get("Directory") or []
         count = 0
+        total = 0
+        for section in sections:  # sizes first, for the progress bar (one tiny request per type)
+            section_id = safe_id(section.get("key"))
+            for type_number, _kind in SECTION_TYPES.get(str(section.get("type")), ()):
+                head = _container(
+                    await self.request(
+                        service,
+                        "GET",
+                        f"/library/sections/{section_id}/all",
+                        params={"type": type_number},
+                        headers={"X-Plex-Container-Start": "0", "X-Plex-Container-Size": "0"},
+                    )
+                )
+                total += int(head.get("totalSize") or head.get("size") or 0)
+        yield SyncProgress(cursor={}, total=total)
         for section in sections:
             section_id = safe_id(section.get("key"))
             for type_number, kind in SECTION_TYPES.get(str(section.get("type")), ()):
@@ -296,7 +311,12 @@ class _History:
         items = [a for a in (map_history(r) for r in rows) if a is not None]
         total = int(container.get("totalSize") or 0)
         done = len(rows) < PAGE or (total and start + len(rows) >= total)
-        return ActivityPage(items=items, cursor=None if done else str(start + len(rows)))
+        return ActivityPage(
+            items=items,
+            cursor=None if done else str(start + len(rows)),
+            total=total or None,
+            position=start + len(rows),
+        )
 
 
 class _Accounts:

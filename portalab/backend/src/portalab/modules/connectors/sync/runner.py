@@ -242,6 +242,8 @@ class SyncRunner:
         seen: set[str] = set()
         size = self.manager.config.sync_batch_size
         step = self.manager.config.http_timeout_seconds * 3
+        total: int | None = None
+        await self._progress(ref.service_id, capability, 0, None)
 
         async def flush() -> None:
             if not batch:
@@ -258,6 +260,7 @@ class SyncRunner:
             outcome.ignored += result.ignored
             outcome.errored += result.errored
             batch.clear()
+            await self._progress(ref.service_id, capability, len(seen), total)
 
         iterator: AsyncIterator[SourceRecord | SyncProgress] = connector.sync(
             _Context(handle, capability, kind), cursor
@@ -272,8 +275,13 @@ class SyncRunner:
             except Exception as exc:
                 raise _Failed(f"the service sync failed ({type(exc).__name__}: {exc})", source=True) from exc
             if isinstance(item, SyncProgress):
+                if item.total is not None:
+                    total = item.total
                 await flush()
-                await self._checkpoint(ref.service_id, capability, dict(item.cursor))
+                if item.cursor:  # an empty cursor only reports progress
+                    await self._checkpoint(ref.service_id, capability, dict(item.cursor))
+                else:
+                    await self._progress(ref.service_id, capability, len(seen), total)
                 continue
             if not isinstance(item, SourceRecord) or not item.external_id:
                 outcome.errored += 1
@@ -303,6 +311,19 @@ class SyncRunner:
                 doomed.extend(m for m in missing if m not in doomed)
         if doomed:
             outcome.removed += await sink.deactivate(doomed, ref)
+
+    async def _progress(self, service_id: UUID, capability: str, done: int, total: int | None) -> None:
+        """027: how far the running sync got, for the live progress bar of the services page."""
+        async with self.manager.database.unit_of_work() as uow:
+            state = await uow.session.get(SyncState, service_id, with_for_update=True)
+            if state is not None:
+                started = (state.progress or {}).get("started_at") or utc_now(self.manager.clock).isoformat()
+                state.progress = {
+                    "capability": capability,
+                    "done": done,
+                    "total": max(total, done) if total is not None else None,
+                    "started_at": started,
+                }
 
     async def _checkpoint(self, service_id: UUID, capability: str, cursor: dict[str, Any]) -> None:
         async with self.manager.database.unit_of_work() as uow:
@@ -338,6 +359,7 @@ class SyncRunner:
             if state is not None:
                 failed = outcome.status == "failed"
                 state.status = "failed" if failed else "idle"
+                state.progress = None
                 state.consecutive_failures = state.consecutive_failures + 1 if failed else 0
                 if not failed:
                     state.last_success_at = finished

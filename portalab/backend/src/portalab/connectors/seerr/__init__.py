@@ -87,6 +87,8 @@ class SeerrConnector(HttpConnector):
             page = await self.get_json(service, "/api/v1/request", take=PAGE, skip=skip, sort="added")
             if not isinstance(page, Mapping) or not isinstance(page.get("results"), list):
                 raise InvalidPayload("unexpected /request payload")
+            if skip == 0 and (page.get("pageInfo") or {}).get("results"):
+                yield SyncProgress(cursor={}, total=int(page["pageInfo"]["results"]))
             for request in page["results"]:
                 media = request.get("media") or {}
                 media_type = str(media.get("mediaType") or request.get("type") or "movie")

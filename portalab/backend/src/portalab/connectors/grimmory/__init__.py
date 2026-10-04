@@ -262,7 +262,9 @@ class GrimmoryConnector(HttpConnector):
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None
     ) -> AsyncIterator[SourceRecord | SyncProgress]:
         count = 0
-        for book in await self.books(ctx.service):
+        books = await self.books(ctx.service)
+        yield SyncProgress(cursor={}, total=len(books))
+        for book in books:
             mapped = map_book(book)
             if mapped is None:
                 continue
@@ -349,7 +351,12 @@ class _Sessions:
                 if activity is not None and (since is None or activity.started_at >= since):
                     items.append(activity)
         end = start + BOOKS_PER_PAGE
-        return ActivityPage(items=items, cursor=str(end) if end < len(books) else None)
+        return ActivityPage(
+            items=items,
+            cursor=str(end) if end < len(books) else None,
+            total=len(books),  # progress counts books: sessions are read book by book
+            position=min(end, len(books)),
+        )
 
 
 class _Accounts:

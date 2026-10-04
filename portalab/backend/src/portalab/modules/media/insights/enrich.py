@@ -19,11 +19,14 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.media.insights.progress import Progress
 from portalab.modules.media.models import Activity, ExternalId, MediaObject, ObjectMetadata
 from portalab.modules.media.observability import log, metrics
 
 JOB = "media.metadata_enrich"
-BATCH = 25
+TASK = "metadata"
+BATCH = 100
+CONCURRENCY = 4
 TIMEOUT = 20
 REFRESH = timedelta(days=30)
 RETRY = timedelta(days=3)
@@ -52,6 +55,7 @@ class MetadataEnricher:
         self.blobs = blobs
         self.clock = clock
         self._images: dict[tuple[str, str], str] = {}
+        self.progress = Progress(database)
 
     def provider(self) -> tuple[str, Any] | None:
         try:
@@ -92,11 +96,21 @@ class MetadataEnricher:
             return 0
         provider_ref, provider = found
         language = await self.language()
-        done = 0
-        for obj in await self.due():
-            await self.enrich(obj, provider_ref, provider, language)
-            done += 1
-        return done
+        due = await self.due()
+        if not due:
+            return 0
+        await self.progress.set(TASK, utc_now(self.clock), running=True, total=len(due))
+        gate = asyncio.Semaphore(CONCURRENCY)
+
+        async def one(obj: MediaObject) -> None:
+            async with gate:
+                await self.enrich(obj, provider_ref, provider, language)
+
+        try:
+            await asyncio.gather(*(one(obj) for obj in due))
+        finally:
+            await self.progress.set(TASK, utc_now(self.clock), running=False)
+        return len(due)
 
     async def enrich(self, obj: MediaObject, provider_ref: str, provider: Any, language: str) -> str:
         async with self.database.session() as session:

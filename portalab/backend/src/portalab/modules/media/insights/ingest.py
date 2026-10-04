@@ -29,6 +29,7 @@ from portalab.core.db import Database
 from portalab.core.logging import redact_text
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import strong_ids
+from portalab.modules.media.insights.progress import Progress, history_task
 from portalab.modules.media.models import (
     Activity,
     ActivityCursor,
@@ -174,6 +175,7 @@ class ActivityIngestor:
         self.database = database
         self.capabilities = capabilities
         self.clock = clock
+        self.progress = Progress(database)
 
     def providers(self) -> list[tuple[UUID, Any]]:
         try:
@@ -224,11 +226,16 @@ class ActivityIngestor:
         if mode == "incremental":
             cursor = None
         finished = False
+        task = history_task(service_id)
+        await self.progress.set(task, utc_now(self.clock), running=True)
         for _ in range(pages):
             page: ActivityPage = unwrap(
                 await asyncio.wait_for(provider.history(since=since, cursor=cursor), timeout=PAGE_TIMEOUT)
             )
             stored += await self.store(service_id, page.items)
+            await self.progress.set(
+                task, utc_now(self.clock), running=True, done=page.position, total=page.total
+            )
             for item in page.items:
                 if latest is None or item.started_at > latest:
                     latest = item.started_at
@@ -250,6 +257,7 @@ class ActivityIngestor:
             if mode == "backfill" and finished:
                 state.mode, state.cursor, state.backfilled_at = "incremental", None, now
                 state.watermark = latest or now
+        await self.progress.set(task, now, running=False)
         return stored
 
     async def store(self, service_id: UUID, items: Iterable[SourceActivity]) -> int:
@@ -445,6 +453,7 @@ class ActivityIngestor:
             await mark_days(session, (r[0] for r in changed))
 
     async def _failed(self, service_id: UUID, source: str, exc: Exception) -> None:
+        await self.progress.set(history_task(service_id), utc_now(self.clock), running=False)
         log.warning("media activity ingestion failed for %s: %s", service_id, type(exc).__name__)
         async with self.database.unit_of_work() as uow:
             state = await self._cursor(uow.session, service_id, source)
@@ -457,3 +466,4 @@ class ActivityIngestor:
             state = await self._cursor(uow.session, service_id, "history")
             state.mode, state.cursor, state.watermark, state.items = "backfill", None, None, 0
             state.backfilled_at, state.last_error = None, None
+        await self.progress.set(history_task(service_id), utc_now(self.clock), running=False, done=0)

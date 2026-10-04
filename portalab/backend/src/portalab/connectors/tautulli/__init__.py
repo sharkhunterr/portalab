@@ -185,7 +185,13 @@ class _History:
         items = [a for a in (map_history_row(r) for r in rows if isinstance(r, Mapping)) if a is not None]
         if since is not None:
             items = [a for a in items if a.started_at >= since]
-        return ActivityPage(items=items, cursor=str(start + len(rows)) if len(rows) >= PAGE else None)
+        total = data.get("recordsFiltered") if isinstance(data, Mapping) else None
+        return ActivityPage(
+            items=items,
+            cursor=str(start + len(rows)) if len(rows) >= PAGE else None,
+            total=int(total) if isinstance(total, int | str) and str(total).isdigit() else None,
+            position=start + len(rows),
+        )
 
 
 class _Accounts:

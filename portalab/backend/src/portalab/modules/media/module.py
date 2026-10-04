@@ -47,8 +47,9 @@ from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
+from portalab.core.jobs.queue import enqueue
 from portalab.core.jobs.registry import JobRegistry
-from portalab.core.time import Clock
+from portalab.core.time import Clock, utc_now
 from portalab.core.visibility_port import VisibilityFilter
 from portalab.modules.media import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.media import settings as _settings  # noqa: F401 — declares settings
@@ -363,12 +364,25 @@ class MediaModule:
                 jobs,
                 self.database,
                 ENRICH_JOB,
-                timedelta(minutes=5),
+                timedelta(minutes=2),
                 enrich,
                 owner=OWNER,
                 timeout_seconds=900,
             ),
         ]
+
+    async def run_now(self, what: str) -> None:
+        """Queue an immediate run of the history ingestion or of the metadata enrichment (027)."""
+        kind = ACTIVITY_JOB if what == "history" else ENRICH_JOB
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await enqueue(
+                uow.session,
+                kind=kind,
+                dedup_key=f"{kind}:manual:{now.strftime('%Y%m%dT%H%M')}",
+                run_at=now,
+                clock=self.clock,
+            )
 
     async def start(self) -> None:
         await self.refresh_config()

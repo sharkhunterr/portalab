@@ -2,7 +2,7 @@
 history, continue, requests and account links; administration of identity (match candidates, merge, split,
 overrides) and unlinked activity. Personal data is the caller's own; admin views carry metadata only."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -23,6 +23,9 @@ from portalab.modules.media.discovery.shelves import SHELVES
 from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.images.service import CONTENT_TYPE
+from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
+from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
+from portalab.modules.media.insights.progress import history_task
 from portalab.modules.media.models import (
     Activity,
     ActivityCursor,
@@ -798,6 +801,23 @@ async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
         )
         metadata: dict[str, int] = {state: int(n) for state, n in per_status.all()}
         unattributed = await session.scalar(select(func.count()).where(Activity.user_id.is_(None)))
+        eligible = await session.scalar(
+            select(func.count()).where(MediaObject.kind.in_(ENRICHED_KINDS), MediaObject.status == "active")
+        )
+    tasks = await module.ingestor.progress.all()
+    now = utc_now(module.clock)
+
+    def live(task: str) -> dict[str, Any]:
+        row = tasks.get(task)
+        # a task silent for 10 minutes is not running any more (worker restarted mid-run)
+        running = bool(row and row.running_since and now - row.updated_at < timedelta(minutes=10))
+        return {
+            "running": running,
+            "since": row.running_since if row and running else None,
+            "done": int(row.done) if row else None,
+            "total": int(row.total) if row and row.total is not None else None,
+        }
+
     return {
         "sources": [
             {
@@ -810,6 +830,7 @@ async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
                 "backfilled_at": c.backfilled_at,
                 "last_run_at": c.last_run_at,
                 "last_error": c.last_error,
+                "progress": live(history_task(c.service_id)),
             }
             for c in sorted(cursors, key=lambda c: names.get(str(c.service_id), ""))
         ],
@@ -818,6 +839,8 @@ async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
             "found": int(metadata.get("found", 0)),
             "missing": int(metadata.get("missing", 0)),
             "error": int(metadata.get("error", 0)),
+            "eligible": int(eligible or 0),
+            "progress": live(ENRICH_TASK),
         },
         "unattributed": int(unattributed or 0),
     }
@@ -827,6 +850,19 @@ async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
 async def resync_source(principal: Manager, service_id: UUID, module: Module) -> dict[str, str]:
     await module.ingestor.reset(service_id)
     await _audit(module, principal, "media.activity_resync", str(service_id), {})
+    return {"state": "scheduled"}
+
+
+class InsightsRunIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    what: Literal["history", "metadata"]
+
+
+@router.post("/admin/media/insights/run", status_code=status.HTTP_202_ACCEPTED)
+async def run_insights(principal: Manager, body: InsightsRunIn, module: Module) -> dict[str, str]:
+    """Update now: read the services' histories, or enrich more titles, without waiting for the schedule."""
+    await module.run_now(body.what)
+    await _audit(module, principal, "media.insights_run", body.what, {})
     return {"state": "scheduled"}
 
 

@@ -454,7 +454,7 @@ class InsightsQuery:
                 ).where(ObjectMetadata.object_id == watched.c.work_id, ObjectMetadata.status == "found")
             )
         ).one()
-        if not row[0]:
+        if not row[0] or not (row[1] or row[2]):  # no amounts known yet: nothing to tell
             return None
         top = (
             await session.execute(

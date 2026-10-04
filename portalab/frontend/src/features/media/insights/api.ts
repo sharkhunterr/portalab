@@ -105,13 +105,31 @@ export interface Source {
   backfilled_at: string | null;
   last_run_at: string | null;
   last_error: string | null;
+  progress: TaskProgress;
+}
+
+export interface TaskProgress {
+  running: boolean;
+  since: string | null;
+  done: number | null;
+  total: number | null;
 }
 
 export interface Sources {
   sources: Source[];
-  metadata: { provider: boolean; found: number; missing: number; error: number };
+  metadata: {
+    provider: boolean;
+    found: number;
+    missing: number;
+    error: number;
+    eligible: number;
+    progress: TaskProgress;
+  };
   unattributed: number;
 }
+
+/** When an update was last asked for: the panel refreshes quickly until it shows up as running. */
+let requestedAt = 0;
 
 export function useInsights(scope: Scope, category: Category, period: string) {
   const { time_zone } = useLocaleContext();
@@ -131,6 +149,12 @@ export function useSources(enabled: boolean) {
     queryKey: ["media", "insights", "sources"],
     enabled,
     retry: false,
+    refetchInterval: (query) => {
+      const data = query.state.data as Sources | undefined;
+      const running =
+        data?.metadata.progress.running || (data?.sources ?? []).some((source) => source.progress.running);
+      return running || Date.now() - requestedAt < 30_000 ? 2000 : false;
+    },
     queryFn: async () => (await api.GET("/api/v1/admin/media/insights/sources")).data as unknown as Sources,
   });
 }
@@ -138,10 +162,12 @@ export function useSources(enabled: boolean) {
 export function useResync() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (serviceId: string) =>
-      api.POST("/api/v1/admin/media/insights/sources/{service_id}/resync", {
+    mutationFn: async (serviceId: string) => {
+      requestedAt = Date.now();
+      return api.POST("/api/v1/admin/media/insights/sources/{service_id}/resync", {
         params: { path: { service_id: serviceId } },
-      }),
+      });
+    },
     onSuccess: () => void client.invalidateQueries({ queryKey: ["media", "insights", "sources"] }),
   });
 }
@@ -181,4 +207,15 @@ export function useMeasures() {
       ),
     compact: (value: number) => new Intl.NumberFormat(locale, { notation: "compact" }).format(value),
   };
+}
+
+export function useRunNow() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (what: "history" | "metadata") => {
+      requestedAt = Date.now();
+      return api.POST("/api/v1/admin/media/insights/run", { body: { what } });
+    },
+    onSuccess: () => void client.invalidateQueries({ queryKey: ["media", "insights"] }),
+  });
 }

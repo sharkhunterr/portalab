@@ -425,5 +425,9 @@
   "services.connector.tmdb.description": "Fiches enrichies des films et séries : fond d'écran, acteurs, saga, budget, recettes, genres…",
   "services.connector.tmdb.help": "Créez une clé gratuite sur themoviedb.org → Paramètres → API, puis collez le « jeton d'accès en lecture » (ou la clé v3).",
   "services.field.language": "Langue",
-  "services.field.language.hint": "Par exemple fr-FR ; vide = la langue du portail."
+  "services.field.language.hint": "Par exemple fr-FR ; vide = la langue du portail.",
+  "services.continuous": "Lu en continu",
+  "services.followUp": "Suivi",
+  "services.syncing": "Synchronisation en cours",
+  "services.syncedSoFar": "{count, plural, one {# élément lu} other {# éléments lus}}"
 }

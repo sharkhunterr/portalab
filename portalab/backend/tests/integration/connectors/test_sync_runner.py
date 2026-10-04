@@ -116,3 +116,33 @@ async def test_scheduler_enqueues_due_and_handles_job(cn: ConnectorsHarness) -> 
     await cn.module.scheduler.handle(payload)
     assert set(cn.sink.stored(await _ref(cn, service_id))) == {"a"}  # type: ignore[arg-type]
     assert await cn.module.scheduler.enqueue_due() == 0  # next run is in the future now
+
+
+async def test_progress_is_visible_while_running_and_cleared_after(cn: ConnectorsHarness) -> None:
+    """027: the services page shows how far a running sync got (records read so far, total if known)."""
+    cn.module.config = replace(cn.module.config, sync_batch_size=2)
+    service_id = await cn.enabled()
+    for index in range(5):
+        cn.remote.put(f"i{index}", at=index + 1)
+    seen: list[dict[str, object] | None] = []
+    upsert = cn.sink.upsert
+
+    async def spying(records: list[object], ref: object) -> object:
+        async with cn.full.database.session() as session:
+            state = await session.get(SyncState, service_id)
+            seen.append(dict(state.progress) if state and state.progress else None)
+            view = await cn.module.manager.get(service_id)
+        assert view.sync["progress"] == seen[-1]  # exposed on the service while running
+        return await upsert(records, ref)  # type: ignore[arg-type]
+
+    cn.sink.upsert = spying  # type: ignore[method-assign]
+    await cn.module.runner.run(service_id, kind="manual")
+    assert [p["done"] if p else None for p in seen] == [0, 2, 4]
+    assert all(p and p["capability"] == "demo.items" and p["started_at"] for p in seen)
+    async with cn.full.database.session() as session:
+        state = await session.get(SyncState, service_id)
+    assert (
+        state is not None
+        and state.progress is None
+        and (await cn.module.manager.get(service_id)).sync["progress"] is None
+    )

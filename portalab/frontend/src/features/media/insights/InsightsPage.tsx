@@ -9,9 +9,11 @@ import {
   AdminStats,
   AdminTable,
   AdminTabs,
+  LiveProgress,
   StatusBadge,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
+import { Progress } from "../../../design-system/components/Content";
 import { SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -28,6 +30,7 @@ import {
   useInsights,
   useMeasures,
   useResync,
+  useRunNow,
   useSources,
 } from "./api";
 import "../../admin/admin.css";
@@ -96,7 +99,14 @@ function Timeline({ data }: { data: Insights }) {
             }}
           />
           {kinds.map((kind) => (
-            <Bar key={kind} dataKey={kind} stackId="a" fill={`var(--kind-${kind})`} radius={[3, 3, 0, 0]} />
+            <Bar
+              key={kind}
+              dataKey={kind}
+              stackId="a"
+              fill={`var(--kind-${kind})`}
+              radius={[3, 3, 0, 0]}
+              isAnimationActive={false}
+            />
           ))}
         </BarChart>
       </ResponsiveContainer>
@@ -326,9 +336,17 @@ function Sources() {
   const format = useFormat();
   const sources = useSources(true);
   const resync = useResync();
+  const run = useRunNow();
   if (!sources.data) return null;
+  const meta = sources.data.metadata;
   return (
     <AdminSection
+      actions={
+        <Button variant="secondary" disabled={run.isPending} onClick={() => run.mutate("history")}>
+          <Icon name="sync" size={16} />
+          {t("media:insights.sources.runNow")}
+        </Button>
+      }
       title={t("media:insights.sources.title")}
       description={t("media:insights.sources.hint")}
       icon="server"
@@ -350,14 +368,40 @@ function Sources() {
           {
             key: "state",
             header: t("media:insights.sources.state"),
-            render: (s) =>
-              s.last_error ? (
-                <StatusBadge tone="bad">{t("media:insights.sources.error")}</StatusBadge>
-              ) : s.mode === "backfill" ? (
-                <StatusBadge tone="info">{t("media:insights.sources.backfill")}</StatusBadge>
-              ) : (
-                <StatusBadge tone="ok">{t("media:insights.sources.live")}</StatusBadge>
-              ),
+            render: (s) => {
+              const p = s.progress;
+              if (p.running) {
+                return (
+                  <LiveProgress
+                    label={t(
+                      s.mode === "backfill"
+                        ? "media:insights.sources.catchingUp"
+                        : "media:insights.sources.reading",
+                    )}
+                    done={p.done}
+                    total={p.total}
+                    detail={p.total ? `${format.number(p.done ?? 0)} / ${format.number(p.total)}` : null}
+                  />
+                );
+              }
+              if (s.last_error)
+                return <StatusBadge tone="bad">{t("media:insights.sources.error")}</StatusBadge>;
+              if (s.mode === "backfill") {
+                return (
+                  <span className="insights-source-state">
+                    <StatusBadge tone="info">{t("media:insights.sources.backfill")}</StatusBadge>
+                    {p.total ? (
+                      <span className="admin-muted">
+                        {t("media:insights.sources.paused", {
+                          percent: format.percent((p.done ?? 0) / p.total),
+                        })}
+                      </span>
+                    ) : null}
+                  </span>
+                );
+              }
+              return <StatusBadge tone="ok">{t("media:insights.sources.live")}</StatusBadge>;
+            },
           },
           { key: "items", header: t("media:insights.sources.items"), render: (s) => format.number(s.items) },
           {
@@ -381,14 +425,48 @@ function Sources() {
           ) : null
         }
       />
-      <p className="admin-muted admin-pad">
-        {sources.data.metadata.provider
-          ? t("media:insights.sources.metadata", {
-              found: format.number(sources.data.metadata.found),
-              missing: format.number(sources.data.metadata.missing),
-            })
-          : t("media:insights.sources.noMetadata")}
-      </p>
+      {meta.provider && meta.eligible ? (
+        <div className="admin-pad insights-metadata__progress">
+          {meta.progress.running ? (
+            <LiveProgress
+              label={t("media:insights.sources.enriching")}
+              done={meta.found + meta.missing + meta.error}
+              total={meta.eligible}
+              detail={`${format.number(meta.found + meta.missing + meta.error)} / ${format.number(meta.eligible)}`}
+            />
+          ) : (
+            <Progress
+              label={t("media:insights.sources.enriched", {
+                done: format.number(Math.min(meta.found + meta.missing + meta.error, meta.eligible)),
+                total: format.number(meta.eligible),
+              })}
+              value={Math.min(meta.found + meta.missing + meta.error, meta.eligible)}
+              max={meta.eligible}
+            />
+          )}
+        </div>
+      ) : null}
+      <div className="insights-metadata admin-pad">
+        <span className="admin-muted">
+          {meta.provider
+            ? t("media:insights.sources.metadata", {
+                found: format.number(meta.found),
+                missing: format.number(meta.missing),
+              })
+            : t("media:insights.sources.noMetadata")}
+        </span>
+        {meta.provider ? (
+          <Button variant="ghost" disabled={run.isPending} onClick={() => run.mutate("metadata")}>
+            <Icon name="sparkles" size={16} />
+            {t("media:insights.sources.enrichNow")}
+          </Button>
+        ) : null}
+        {run.isSuccess ? (
+          <span role="status" className="admin-muted">
+            {t("media:insights.sources.queued")}
+          </span>
+        ) : null}
+      </div>
     </AdminSection>
   );
 }
@@ -664,7 +742,11 @@ export default function InsightsPage() {
               ) : null}
             </AdminGrid>
           )}
-          {data.manager && scope === "all" ? <Sources /> : null}
+          {data.manager && scope === "all" ? (
+            <div id="sources">
+              <Sources />
+            </div>
+          ) : null}
         </>
       ) : null}
     </AdminPage>

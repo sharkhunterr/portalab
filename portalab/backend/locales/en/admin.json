@@ -425,5 +425,9 @@
   "services.connector.tmdb.description": "Rich film and series details: backdrop, cast, saga, budget, box office, genres…",
   "services.connector.tmdb.help": "Create a free key on themoviedb.org → Settings → API, then paste the « API Read Access Token » (or the v3 key).",
   "services.field.language": "Language",
-  "services.field.language.hint": "e.g. fr-FR; empty = the portal's language."
+  "services.field.language.hint": "e.g. fr-FR; empty = the portal's language.",
+  "services.continuous": "Read continuously",
+  "services.followUp": "Follow-up",
+  "services.syncing": "Syncing",
+  "services.syncedSoFar": "{count, plural, one {# item read} other {# items read}}"
 }

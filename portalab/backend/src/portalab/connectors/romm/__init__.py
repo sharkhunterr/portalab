@@ -83,6 +83,8 @@ class RommConnector(HttpConnector):
                 games, total = page["items"], int(page.get("total") or 0)
             else:
                 raise InvalidPayload("unexpected /roms payload")
+            if offset == 0:
+                yield SyncProgress(cursor={}, total=total)
             for game in games:
                 title = game.get("name") or game.get("fs_name_no_ext")
                 if not title:

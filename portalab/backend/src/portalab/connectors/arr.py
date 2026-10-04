@@ -138,6 +138,7 @@ class RadarrConnector(_ArrConnector):
         movies = await self.get_json(ctx.service, "/api/v3/movie")
         if not isinstance(movies, list):
             raise InvalidPayload("unexpected /movie payload")
+        yield SyncProgress(cursor={}, total=len(movies))
         for movie in movies:
             if not movie.get("title"):
                 continue
@@ -203,6 +204,13 @@ class SonarrConnector(_ArrConnector):
         series_list = await self.get_json(ctx.service, "/api/v3/series")
         if not isinstance(series_list, list):
             raise InvalidPayload("unexpected /series payload")
+        seasons = sum(
+            1
+            for series in series_list
+            for season in (series.get("seasons") or [])
+            if isinstance(season.get("seasonNumber"), int) and season["seasonNumber"] >= 0
+        )
+        yield SyncProgress(cursor={}, total=len(series_list) + seasons)
         for series in series_list:
             if not series.get("title"):
                 continue

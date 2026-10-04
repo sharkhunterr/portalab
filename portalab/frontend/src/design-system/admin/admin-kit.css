@@ -532,3 +532,43 @@
   align-self: flex-start;
   inline-size: auto;
 }
+
+/* 027: running task (spinner + progress bar) */
+.live-progress {
+  display: grid;
+  gap: 0.3rem;
+  min-inline-size: 10rem;
+}
+.live-progress__line {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.live-progress__detail {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.live-progress__spinner {
+  color: var(--color-accent);
+  animation: live-progress-spin 0.9s linear infinite;
+}
+.live-progress .ds-progress-field__label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+@keyframes live-progress-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-progress__spinner {
+    animation: none;
+  }
+}

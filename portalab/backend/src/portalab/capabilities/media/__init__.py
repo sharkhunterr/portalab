@@ -198,6 +198,8 @@ class SourceActivity:
 class ActivityPage:
     items: Sequence[SourceActivity]
     cursor: str | None = None  # pass it back for the next page; ``None`` when exhausted
+    total: int | None = None  # how far the whole history goes, when the source tells (027 progress bar)
+    position: int | None = None  # where this page ends, in the unit of ``total``
 
 
 @runtime_checkable

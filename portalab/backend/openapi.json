@@ -4856,6 +4856,24 @@
         "title": "IncidentUpdateOut",
         "type": "object"
       },
+      "InsightsRunIn": {
+        "additionalProperties": false,
+        "properties": {
+          "what": {
+            "enum": [
+              "history",
+              "metadata"
+            ],
+            "title": "What",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what"
+        ],
+        "title": "InsightsRunIn",
+        "type": "object"
+      },
       "InstantiateIn": {
         "additionalProperties": false,
         "properties": {
@@ -16868,6 +16886,52 @@
           }
         },
         "summary": "Link Service Account",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/insights/run": {
+      "post": {
+        "description": "Update now: read the services' histories, or enrich more titles, without waiting for the schedule.",
+        "operationId": "run_insights_api_v1_admin_media_insights_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsightsRunIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Run Insights Api V1 Admin Media Insights Run Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run Insights",
         "tags": [
           "media"
         ]
