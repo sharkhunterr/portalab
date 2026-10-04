@@ -34,6 +34,8 @@ async def test_matrix(app: FastAPI, client: httpx.AsyncClient, ui: UiHarness) ->
     assert {t["key"] for t in catalog["themes"]} == {
         "portalab-dark",
         "portalab-light",
+        "orbit",
+        "studio",
         "light",
         "dark",
         "high-contrast",

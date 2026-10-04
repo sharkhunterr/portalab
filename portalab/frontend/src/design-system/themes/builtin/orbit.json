@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "key": "orbit",
+  "name": "Orbit",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0d0a1a",
+    "surfaceRaised": "#1a1530",
+    "text": "#f2eefe",
+    "textMuted": "#b6acd6",
+    "border": "#332a52",
+    "accent": "#b48cff",
+    "accentContrast": "#120a24",
+    "focus": "#d4bcff",
+    "accentAlt": "#ffcf5a",
+    "rarity": {
+      "common": "#c0b8d8",
+      "rare": "#6cc7ff",
+      "epic": "#d59bff",
+      "legendary": "#ffcf5a"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#1d1733",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#10261c",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2c2210",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2a2312",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#361318",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2b1820",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#241a40",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#311424",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#1e1934",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#10253a",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Plus Jakarta Sans Variable, system-ui, sans-serif"
+  },
+  "radii": {
+    "sm": 0.75,
+    "md": 1.25
+  },
+  "motion": {
+    "fastMs": 160,
+    "normalMs": 320,
+    "profile": "playful",
+    "celebration": "confetti"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "orbit",
+      "tablet": "orbit",
+      "phone": "orbit"
+    },
+    "header": "compact",
+    "headerPosition": "bottom",
+    "cards": "glass",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "glass"
+  },
+  "icons": {
+    "set": "outline"
+  },
+  "background": {
+    "fallback": "#0d0a1a"
+  },
+  "sounds": {
+    "notification": "asset:portalab/notification.wav",
+    "alert": "asset:portalab/alert.wav",
+    "success": "asset:portalab/success.wav",
+    "reward": "asset:portalab/reward.wav",
+    "levelUp": "asset:portalab/level-up.wav",
+    "ui": "asset:portalab/ui.wav"
+  }
+}

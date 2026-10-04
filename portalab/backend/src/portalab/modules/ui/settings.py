@@ -11,7 +11,7 @@ from pydantic import Field
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:ui"
-BUILTIN_KEYS = ("portalab-dark", "portalab-light", "light", "dark", "high-contrast")
+BUILTIN_KEYS = ("portalab-dark", "portalab-light", "orbit", "studio", "light", "dark", "high-contrast")
 DEFAULT_THEME = "portalab"  # a theme family (spec 027 R8): resolved to its member for the color mode
 
 GLOBAL_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (

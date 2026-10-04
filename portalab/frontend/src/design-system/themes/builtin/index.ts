@@ -2,13 +2,17 @@ import type { ThemeDefinition } from "../schema";
 import dark from "./dark.json";
 import highContrast from "./high-contrast.json";
 import light from "./light.json";
+import orbit from "./orbit.json";
 import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
+import studio from "./studio.json";
 
 /** Built-in themes (also seeded by the backend ``ui`` migrations; a test keeps both copies identical). */
 export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   portalabDark,
   portalabLight,
+  orbit,
+  studio,
   light,
   dark,
   highContrast,

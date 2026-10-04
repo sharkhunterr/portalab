@@ -128,7 +128,8 @@ async def _problem(
 
 class SecurityMiddleware:
     """Security headers on every response, request-body cap (413) and rate limits per IP and per session
-    (429); health probes are exempt from rate limiting."""
+    (429) on the API; health probes and static assets (the SPA's chunks, fonts, sounds — dozens per page
+    load) are exempt from rate limiting."""
 
     def __init__(
         self,
@@ -149,7 +150,7 @@ class SecurityMiddleware:
             await self.app(scope, receive, send)
             return
         path = scope.get("path", "")
-        if path not in EXEMPT_PATHS:
+        if path.startswith("/api/") and path not in EXEMPT_PATHS:
             client = scope.get("client") or ("unknown", 0)
             wait = self.per_ip.hit(f"ip:{client[0]}")
             session = _session_key(scope)

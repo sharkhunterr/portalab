@@ -18,6 +18,8 @@ export default defineConfig({
     // the shared vendor chunk (React, Radix, TanStack, zod) is ~540 kB; Mermaid (core ~620 kB, some diagram types ~690 kB) is only
     // fetched when a page actually contains a diagram (spec 011)
     chunkSizeWarningLimit: 700,
+    // fonts are always separate files: the CSP (``font-src 'self'``) refuses ``data:`` fonts (spec 027)
+    assetsInlineLimit: (file) => (/\.(woff2?|ttf|otf)$/.test(file) ? false : undefined),
     rollupOptions: {
       output: {
         // third-party code in long-cached chunks, the i18n runtime (react-intl, formatjs) apart (spec 026)

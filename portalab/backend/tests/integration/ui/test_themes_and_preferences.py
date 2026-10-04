@@ -30,6 +30,8 @@ async def test_registry_floor_policy_and_owner(ui: UiHarness) -> None:
     assert {t["key"] for t in (await themes.catalog())["themes"]} == {
         "portalab-dark",
         "portalab-light",
+        "orbit",
+        "studio",
         "light",
         "dark",
         "high-contrast",

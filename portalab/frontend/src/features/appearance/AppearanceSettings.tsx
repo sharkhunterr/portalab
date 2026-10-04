@@ -6,6 +6,8 @@ import type { UiPreferences } from "../../design-system/a11y/preferences";
 import { CheckboxField, SelectField } from "../../design-system/components/Field";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { PolicyField, type PolicyState } from "../../design-system/components/PolicyField";
+import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
+import { presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 
 /**
@@ -15,6 +17,20 @@ import { useTheme } from "../../design-system/themes/ThemeProvider";
  */
 export const appearanceStrings = {
   title: "Appearance & accessibility",
+  gallery: "Themes",
+  galleryHint: "A theme can change colors and fonts, but also the layout, the animations and the sounds.",
+  current: "Current",
+  colorMode: "Light or dark",
+  colorModes: { dark: "Dark", light: "Light", system: "Follow my device" },
+  layouts: {
+    sidebar: "Side menu",
+    topbar: "Top bar",
+    rail: "Icon rail",
+    orbit: "Orbit bubble",
+    "bottom-bar": "Bottom bar",
+    drawer: "Drawer",
+  } as Record<string, string>,
+  footerHeader: "header at the bottom",
   theme: "Theme",
   themeDefault: "Portal default",
   themeFallback: "Your theme is not available right now; the portal default is used.",
@@ -59,6 +75,95 @@ function usePolicyStates(): (key: string) => { state: PolicyState; retained: str
   };
 }
 
+/** One card per theme family/theme with a miniature of its arrangement (027 T061): never data, only looks. */
+function ThemeGallery({
+  themes,
+  current,
+  onChoose,
+}: {
+  themes: readonly ThemeDefinition[];
+  current: string;
+  onChoose: (theme: ThemeDefinition) => void;
+}) {
+  const shown = themes.filter(
+    (theme, index) => !theme.family || themes.findIndex((t) => t.family === theme.family) === index,
+  );
+  const currentTheme = themes.find((t) => t.key === current);
+  return (
+    <section aria-labelledby="theme-gallery" className="theme-gallery">
+      <h3 id="theme-gallery">{appearanceStrings.gallery}</h3>
+      <p className="ds-page-header__context">{appearanceStrings.galleryHint}</p>
+      <ul className="theme-gallery__list">
+        {shown.map((theme) => {
+          const p = presentationOf(theme);
+          const active = theme.key === current || (theme.family && theme.family === currentTheme?.family);
+          const name =
+            theme.family === DEFAULT_FAMILY ? "Portalab" : theme.family ? theme.family : theme.name;
+          const layout = `${appearanceStrings.layouts[p.nav.desktop] ?? p.nav.desktop}${
+            p.headerPosition === "bottom" ? ` · ${appearanceStrings.footerHeader}` : ""
+          }`;
+          return (
+            <li key={theme.key}>
+              <button
+                type="button"
+                className="theme-card"
+                aria-pressed={Boolean(active)}
+                onClick={() => onChoose(theme)}
+              >
+                <ThemeMiniature theme={theme} />
+                <span className="theme-card__name">
+                  {name}
+                  {active ? <span className="ds-badge">{appearanceStrings.current}</span> : null}
+                </span>
+                <span className="theme-card__meta">{layout}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
+  const p = presentationOf(theme);
+  const c = theme.colors;
+  const bar = (
+    <span className="theme-mini__bar" style={{ background: c.surfaceRaised, borderColor: c.border }} />
+  );
+  return (
+    <span
+      className="theme-mini"
+      data-nav={p.nav.desktop}
+      data-cards={p.cards}
+      aria-hidden="true"
+      style={{ background: c.surface, color: c.text, borderColor: c.border }}
+    >
+      {p.headerPosition === "top" ? bar : null}
+      <span className="theme-mini__body">
+        {p.nav.desktop === "sidebar" || p.nav.desktop === "rail" ? (
+          <span className="theme-mini__side" style={{ background: c.surfaceRaised }} />
+        ) : null}
+        <span className="theme-mini__content">
+          {p.nav.desktop === "topbar" ? (
+            <span className="theme-mini__tabs" style={{ background: c.accent }} />
+          ) : null}
+          <span className="theme-mini__card" style={{ background: c.surfaceRaised, borderColor: c.border }}>
+            <span style={{ background: c.accent }} />
+          </span>
+          <span className="theme-mini__card" style={{ background: c.surfaceRaised, borderColor: c.border }}>
+            <span style={{ background: c.accentAlt ?? c.accent }} />
+          </span>
+        </span>
+        {p.nav.desktop === "orbit" ? (
+          <span className="theme-mini__orbit" style={{ background: c.accent }} />
+        ) : null}
+      </span>
+      {p.headerPosition === "bottom" ? bar : null}
+    </span>
+  );
+}
+
 export function AppearanceSettings() {
   const headingId = useId();
   const { preferences, policy, setPreference } = usePreferences();
@@ -80,6 +185,28 @@ export function AppearanceSettings() {
     <section aria-labelledby={headingId} className="account-page">
       <PageHeader titleId={headingId} level={2} icon="palette" title={appearanceStrings.title} />
       {effective.fallback ? <p role="status">{appearanceStrings.themeFallback}</p> : null}
+      <ThemeGallery
+        themes={themes}
+        current={effective.theme.key}
+        onChoose={(theme) => {
+          set("theme")(theme.family ?? theme.key);
+          if (theme.family) set("colorMode")(theme.colorScheme);
+        }}
+      />
+      {field("ui.colorMode", (disabled) => (
+        <SelectField
+          label={appearanceStrings.colorMode}
+          value={preferences.colorMode}
+          disabled={disabled}
+          onChange={(event) => set("colorMode")(event.target.value as UiPreferences["colorMode"])}
+        >
+          {Object.entries(appearanceStrings.colorModes).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </SelectField>
+      ))}
       {field("ui.theme", (disabled, describedBy) => (
         <SelectField
           label={appearanceStrings.theme}

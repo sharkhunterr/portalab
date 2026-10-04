@@ -1,5 +1,5 @@
 """021 T032 — security headers, body-size cap (413), rate limits per IP and per session (429), health
-probes exempt."""
+probes and static assets exempt."""
 
 import httpx
 import pytest
@@ -45,6 +45,9 @@ async def test_rate_limit_per_ip_and_health_exempt() -> None:
         limited = await client.get("/api/v1/stream")
         assert int(limited.headers["retry-after"]) >= 1 and limited.json()["code"] == "rate_limited"
         assert (await client.get("/healthz")).status_code == 200
+        # 027: static assets (dozens of chunks per page load) are not rate limited, only the API is
+        statics = [(await client.get("/assets/app.js")).status_code for _ in range(5)]
+        assert 429 not in statics
 
 
 async def test_rate_limit_per_session() -> None:

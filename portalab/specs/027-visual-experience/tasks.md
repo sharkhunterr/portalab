@@ -160,12 +160,12 @@ Marketplace and plugin themes.
 
 **Independent Test**: quickstart scenarios 11–12.
 
-- [ ] T059 [P] [US5] Implement the remaining layout variants across shell and kit: `data-header-position` bottom (header as footer bar, merged with a phone bottom bar — R24), `data-header` (compact/centered), `data-cards` (flat/outlined/glass), `data-content` (narrow/full), `data-corners`, `data-motion` (none/subtle/lively/playful transitions incl. View Transitions when supported) in `frontend/src/shell/shell.css`, `frontend/src/design-system/components/components.css`, `frontend/src/design-system/tokens/tokens.css`
-- [ ] T060 [P] [US5] Add test-only themes `frontend/tests/fixtures/themes/{topbar-flat,rail-playful}.json` exercising every layout/motion/celebration option
-- [ ] T061 [US5] Appearance: theme cards with live mini-preview, family/color-mode selector, switch applied without reload in `frontend/src/features/appearance/AppearanceSettings.tsx`
-- [ ] T062 [US5] Unit tests: switching themes keeps open dialog, typed text and route; critical header elements present in every variant; accessibility overrides win over motion/glass/sounds in `frontend/tests/unit/theme-switch.test.tsx`
-- [ ] T063 [US5] Backend integration: admin `POST /admin/ui/themes/check` refuses unknown layout values (`theme.invalid` path), floor report per device class with glass fallback, plugin/Marketplace theme v2 registers disabled then enables, in `backend/tests/integration/ui/test_theme_v2_registry.py`
-- [ ] T064 [US5] Playwright + axe: each built-in and test theme × 3 widths on home, a list page and a form (WCAG 2.2 AA), theme switch < 1 s without reload, in `frontend/tests/e2e/visual-experience/themes.spec.ts`
+- [X] T059 [P] [US5] Implement the remaining layout variants across shell and kit: `data-header-position` bottom (header as footer bar, merged with a phone bottom bar — R24), `data-header` (compact/centered), `data-cards` (flat/outlined/glass), `data-content` (narrow/full), `data-corners`, `data-motion` (none/subtle/lively/playful transitions incl. View Transitions when supported) in `frontend/src/shell/shell.css`, `frontend/src/design-system/components/components.css`, `frontend/src/design-system/tokens/tokens.css`
+- [X] T060 [P] [US5] Add test-only themes `frontend/tests/fixtures/themes/{topbar-flat,rail-playful}.json` exercising every layout/motion/celebration option
+- [X] T061 [US5] Appearance: theme cards with live mini-preview, family/color-mode selector, switch applied without reload in `frontend/src/features/appearance/AppearanceSettings.tsx`
+- [X] T062 [US5] Unit tests: switching themes keeps open dialog, typed text and route; critical header elements present in every variant; accessibility overrides win over motion/glass/sounds in `frontend/tests/unit/theme-switch.test.tsx`
+- [X] T063 [US5] Backend integration: admin `POST /admin/ui/themes/check` refuses unknown layout values (`theme.invalid` path), floor report per device class with glass fallback, plugin/Marketplace theme v2 registers disabled then enables, in `backend/tests/integration/ui/test_theme_v2_registry.py`
+- [X] T064 [US5] Playwright + axe: each built-in and test theme × 3 widths on home, a list page and a form (WCAG 2.2 AA), theme switch < 1 s without reload, in `frontend/tests/e2e/visual-experience/themes.spec.ts`
 
 **Checkpoint**: layout-capable themes complete.
 

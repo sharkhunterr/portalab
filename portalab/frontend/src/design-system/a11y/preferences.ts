@@ -45,7 +45,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
 };
 
 export const DEFAULT_POLICY: UiPolicy = {
-  allowedThemes: ["portalab-dark", "portalab-light", "light", "dark", "high-contrast"],
+  allowedThemes: ["portalab-dark", "portalab-light", "orbit", "studio", "light", "dark", "high-contrast"],
   defaultTheme: "portalab",
   textScaleMin: 0.85,
   textScaleMax: 2,
