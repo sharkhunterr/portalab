@@ -186,6 +186,39 @@ def _cmd_admin_bootstrap(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _demo_seed(args: argparse.Namespace) -> int:
+    from portalab.app.composition import import_all_models
+    from portalab.app.demo_seed import seed_demo
+    from portalab.app.wiring import wire_platform
+    from portalab.capabilities.catalog import new_registry
+    from portalab.core.db import Database
+
+    settings = load_settings()
+    import_all_models()
+    database = Database.from_url(settings.database_url.reveal())
+    try:
+        platform = wire_platform(
+            database, data_dir=settings.data_dir, capabilities=new_registry(), secret_key=settings.secret_key
+        )
+        await platform.refresh_config()
+        users_file = Path(args.users_file) if args.users_file else None
+        report = await seed_demo(platform, users_file=users_file)
+    finally:
+        await database.dispose()
+    for step, status in report.steps.items():
+        sys.stdout.write(f"{step}: {status}\n")
+    if report.created_users:
+        where = args.users_file or "(no file: reset their passwords to sign in)"
+        sys.stdout.write(f"demo members created: {', '.join(report.created_users)}; credentials in {where}\n")
+    return 0 if report.ok else 5
+
+
+def _cmd_demo_seed(args: argparse.Namespace) -> int:
+    """Fill the portal with demo data through the module services (idempotent)."""
+    configure_logging(load_settings().log_level)
+    return asyncio.run(_demo_seed(args))
+
+
 async def _audit_verify(args: argparse.Namespace) -> int:
     from portalab.app.composition import import_all_models
     from portalab.core.db import Database
@@ -294,6 +327,14 @@ def build_parser() -> argparse.ArgumentParser:
     economy.add_parser("verify", help="recompute balances from the ledger").set_defaults(
         func=_cmd_economy_verify
     )
+    demo = sub.add_parser("demo", help="demo data for manual tests").add_subparsers(
+        dest="demo_command", required=True
+    )
+    demo_seed = demo.add_parser("seed", help="fill the portal with demo data (idempotent)")
+    demo_seed.add_argument(
+        "--users-file", default=None, help="file receiving the demo members' generated credentials (0600)"
+    )
+    demo_seed.set_defaults(func=_cmd_demo_seed)
     from portalab.app.plugin_cli import add_parser as add_plugin_parser
 
     add_plugin_parser(sub)
