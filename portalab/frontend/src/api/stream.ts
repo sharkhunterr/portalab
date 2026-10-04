@@ -101,35 +101,51 @@ interface Subscriber {
 
 const subscribers = new Set<Subscriber>();
 let shared: StreamHandle | null = null;
-let sharedTopics = "";
+let sharedTopics = new Set<string>();
+let closing: ReturnType<typeof setTimeout> | null = null;
 
-function rebuild(): void {
-  const topics = [...new Set([...subscribers].flatMap((s) => [...s.topics]))].sort();
-  const key = topics.join(",");
-  if (key === sharedTopics) return;
+/** Reconnect only when a subscriber needs a topic the open connection does not carry yet. */
+function ensure(): void {
+  if (closing) {
+    clearTimeout(closing);
+    closing = null;
+  }
+  const wanted = new Set([...subscribers].flatMap((s) => [...s.topics]));
+  const covered = shared !== null && [...wanted].every((topic) => sharedTopics.has(topic));
+  if (covered) return;
   shared?.close();
-  sharedTopics = key;
-  shared = topics.length
-    ? openStream({
-        topics,
-        onEvent: (event) => {
-          for (const subscriber of subscribers) {
-            if (subscriber.topics.has(event.topic)) subscriber.onEvent(event);
-          }
-        },
-      })
-    : null;
+  sharedTopics = wanted;
+  shared = openStream({
+    topics: [...wanted].sort(),
+    onEvent: (event) => {
+      for (const subscriber of subscribers) {
+        if (subscriber.topics.has(event.topic)) subscriber.onEvent(event);
+      }
+    },
+  });
+}
+
+/** The connection outlives a quick unsubscribe/subscribe (re-renders, route changes) and closes when idle. */
+function release(): void {
+  if (subscribers.size || closing) return;
+  closing = setTimeout(() => {
+    closing = null;
+    if (subscribers.size) return;
+    shared?.close();
+    shared = null;
+    sharedTopics = new Set();
+  }, 1000);
 }
 
 export function connectStream(options: StreamOptions): StreamHandle {
   if (options.createEventSource || options.url || options.onStateChange) return openStream(options);
   const subscriber: Subscriber = { topics: new Set(options.topics), onEvent: options.onEvent };
   subscribers.add(subscriber);
-  rebuild();
+  ensure();
   return {
     close: () => {
       if (!subscribers.delete(subscriber)) return;
-      rebuild();
+      release();
     },
   };
 }

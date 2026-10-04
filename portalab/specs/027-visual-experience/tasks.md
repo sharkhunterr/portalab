@@ -221,7 +221,7 @@ lossless migration.
 - [X] T084 [P] Update `docs/design-system.md` (theme v2 vocabulary, families, page kit, celebrations, sounds) and `docs/extensibility.md` (plugin sections, theme v2)
 - [X] T085 [P] French locale pass for all new strings in `backend/locales/fr/*.json` (catalog hygiene test green)
 - [X] T086 Full verification: backend `uv run pytest -n auto --dist loadfile`, ruff/format/mypy/lint-imports; frontend lint/typecheck/test/build; Playwright alone afterwards
-- [ ] T087 Docker smoke (`scripts/smoke.sh`, dependencies changed) and LAN redeploy for manual hallway checks (SC-005, SC-011) per `quickstart.md`
+- [X] T087 Docker smoke (`scripts/smoke.sh`, dependencies changed) and LAN redeploy for manual hallway checks (SC-005, SC-011) per `quickstart.md`
 
 ---
 

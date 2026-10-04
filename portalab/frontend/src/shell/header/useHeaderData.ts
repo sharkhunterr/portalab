@@ -58,6 +58,9 @@ function useLiveProgression(enabled: boolean) {
   const celebrate = useCelebrate();
   const t = useT();
   const seen = useRef(new Set<string>());
+  // latest celebrate/t without re-subscribing to the stream on every render
+  const latest = useRef({ celebrate, t });
+  latest.current = { celebrate, t };
   useEffect(() => {
     if (!enabled || typeof EventSource === "undefined") return;
     const handle = connectStream({
@@ -67,6 +70,7 @@ function useLiveProgression(enabled: boolean) {
         seen.current.add(event.id);
         applyChange(client, event.data);
         const change = event.data;
+        const { celebrate, t } = latest.current;
         if (change.level_up) {
           celebrate({ kind: "level", text: t("shell:levelReached", { level: change.level }) });
         } else if (change.delta_xp > 0) {
@@ -77,7 +81,7 @@ function useLiveProgression(enabled: boolean) {
       },
     });
     return () => handle.close();
-  }, [enabled, client, celebrate, t]);
+  }, [enabled, client]);
 }
 
 export function applyChange(client: ReturnType<typeof useQueryClient>, change: ProgressionChange): void {
