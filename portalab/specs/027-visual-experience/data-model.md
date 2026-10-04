@@ -62,8 +62,9 @@ New/changed blocks (all optional; v1 documents are upgraded on read with the def
 |-------|--------|
 | `schemaVersion` | `2` |
 | `family` | str `^[a-z][a-z0-9-]{1,47}$` [none] |
-| `layout.nav` | `desktop: sidebar\|topbar\|rail` [sidebar], `tablet: rail\|topbar\|drawer` [rail], `phone: bottom-bar\|drawer` [bottom-bar] |
+| `layout.nav` | `desktop: sidebar\|topbar\|rail\|orbit` [sidebar], `tablet: rail\|topbar\|drawer\|orbit` [rail], `phone: bottom-bar\|drawer\|orbit` [bottom-bar] |
 | `layout.header` | `full\|compact\|centered` [full] |
+| `layout.headerPosition` | `top\|bottom` [top] — `bottom` turns the header into a footer bar (all header elements kept) |
 | `layout.cards` | `elevated\|flat\|outlined\|glass` [elevated] |
 | `layout.content` | `narrow\|wide\|full` [wide] |
 | `layout.corners` | `square\|soft\|round` [soft] |

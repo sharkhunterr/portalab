@@ -37,7 +37,7 @@ quickstart.md maps SC-001…SC-012 to automated checks.
 
 **⚠️ CRITICAL**: no user-story work starts before this phase is complete.
 
-- [ ] T004 Extend the theme zod schema to v2 in `frontend/src/design-system/themes/schema.ts`: `schemaVersion` 1|2, `family`, `layout` (nav per device class, header, cards, content, corners, widgetFrame), `motion.profile`/`motion.celebration`, `sounds` keys `notification|alert|success|reward|levelUp|ui`, `colors.accentAlt`, `colors.rarity`; add `upgradeTheme()` filling v1 defaults (data-model §5)
+- [ ] T004 Extend the theme zod schema to v2 in `frontend/src/design-system/themes/schema.ts`: `schemaVersion` 1|2, `family`, `layout` (nav per device class incl. `orbit`, header, `headerPosition` top|bottom, cards, content, corners, widgetFrame), `motion.profile`/`motion.celebration`, `sounds` keys `notification|alert|success|reward|levelUp|ui`, `colors.accentAlt`, `colors.rarity`; add `upgradeTheme()` filling v1 defaults (data-model §5)
 - [ ] T005 [P] Unit tests for v2 parsing, unknown-value refusal with JSON path, and v1 → v2 upgrade defaults in `frontend/tests/unit/theme-schema-v2.test.ts`
 - [ ] T006 Regenerate `backend/src/portalab/modules/ui/themes/theme.schema.json` from the zod schema (`UPDATE_THEME_SCHEMA=1 npx vitest run tests/unit/theme-schema.test.ts`) and mirror v2 + v1 upgrade in `backend/src/portalab/modules/ui/themes/definition.py`
 - [ ] T007 Extend the accessibility floor for `accentAlt`, `rarity.*` and glass surfaces evaluated with the solid `surfaceRaised` fallback in `frontend/src/design-system/themes/floor.ts` and `backend/src/portalab/modules/ui/themes/definition.py` (R9)
@@ -121,7 +121,7 @@ level-up celebration, reduced motion, sounds off).
 **Independent Test**: quickstart scenarios 5–6.
 
 - [ ] T042 [P] [US3] `Sidebar`, `Rail` (collapsible, icon-only with labels on expand), `TopBar` variants rendering `SectionNav` in `frontend/src/shell/nav/{Sidebar,Rail,TopBar}.tsx`
-- [ ] T043 [P] [US3] `BottomBar` (Home, Search, Notifications badge, Menu → `Drawer` with `SectionNav`; safe-area aware) in `frontend/src/shell/nav/BottomBar.tsx`
+- [ ] T043 [P] [US3] `BottomBar` (Home, Search, Notifications badge, Menu → `Drawer` with `SectionNav`; safe-area aware) in `frontend/src/shell/nav/BottomBar.tsx`, and `OrbitNav` (floating bubble opening a radial menu of section icons, entries on an arc/list, roving focus, Escape, reduced-motion and narrow-screen half-circle fallback — R24) in `frontend/src/shell/nav/OrbitNav.tsx`
 - [ ] T044 [US3] `NavFrame` choosing the variant from `data-nav-*` + device class (phone < 640, tablet 640–1023, desktop ≥ 1024) without remounting the outlet; replace `ResponsiveNav` usage (removes the phone empty-column defect) in `frontend/src/shell/nav/NavFrame.tsx`, `frontend/src/shell/AppShell.tsx`, `frontend/src/shell/shell.css`
 - [ ] T045 [US3] `PageFrame` (content width from `data-content`, breadcrumbs, related links) in `frontend/src/shell/PageFrame.tsx`; touch targets ≥ 44 px on coarse pointers, no hover-only actions in `shell.css`
 - [ ] T046 [US3] Unit tests: variant choice per device class and theme, outlet not remounted on resize (form text kept) in `frontend/tests/unit/nav-frame.test.tsx`
@@ -160,7 +160,7 @@ Marketplace and plugin themes.
 
 **Independent Test**: quickstart scenarios 11–12.
 
-- [ ] T059 [P] [US5] Implement the remaining layout variants across shell and kit: `data-header` (compact/centered), `data-cards` (flat/outlined/glass), `data-content` (narrow/full), `data-corners`, `data-motion` (none/subtle/lively/playful transitions incl. View Transitions when supported) in `frontend/src/shell/shell.css`, `frontend/src/design-system/components/components.css`, `frontend/src/design-system/tokens/tokens.css`
+- [ ] T059 [P] [US5] Implement the remaining layout variants across shell and kit: `data-header-position` bottom (header as footer bar, merged with a phone bottom bar — R24), `data-header` (compact/centered), `data-cards` (flat/outlined/glass), `data-content` (narrow/full), `data-corners`, `data-motion` (none/subtle/lively/playful transitions incl. View Transitions when supported) in `frontend/src/shell/shell.css`, `frontend/src/design-system/components/components.css`, `frontend/src/design-system/tokens/tokens.css`
 - [ ] T060 [P] [US5] Add test-only themes `frontend/tests/fixtures/themes/{topbar-flat,rail-playful}.json` exercising every layout/motion/celebration option
 - [ ] T061 [US5] Appearance: theme cards with live mini-preview, family/color-mode selector, switch applied without reload in `frontend/src/features/appearance/AppearanceSettings.tsx`
 - [ ] T062 [US5] Unit tests: switching themes keeps open dialog, typed text and route; critical header elements present in every variant; accessibility overrides win over motion/glass/sounds in `frontend/tests/unit/theme-switch.test.tsx`

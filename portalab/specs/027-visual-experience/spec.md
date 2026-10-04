@@ -61,6 +61,9 @@ implementation detail.
   badges, animated XP bar, celebrations).
 - Q: What may a theme change on the dashboard? → A: Only the widgets' appearance (frame, spacing, headers,
   effects); never the arrangement (positions, sizes, which widgets are present).
+- Q: (implementation input) Can a theme change the layout principle itself? → A: Yes — e.g. the header may
+  become a footer (bottom placement) and the hamburger menu may become a floating bubble around which the
+  navigation sections orbit; these are additional supported arrangements in the closed vocabulary.
 - Q: One dashboard or several per user? → A: A single, fully customizable dashboard (the home page); multiple
   named dashboards are out of scope.
 
@@ -406,8 +409,11 @@ the welcome appears once, can be dismissed, and is not shown again.
   floor, when reduced motion/transparency is requested, or on devices that cannot render them smoothly.
 - **FR-031**: A theme MUST be able to select, in addition to the 022 capabilities (colors, typography, icons,
   backgrounds, textures, borders, shadows, density, animations, transitions, notification presentation,
-  sounds): a **layout profile** (navigation placement and style per device class, header arrangement, card
-  style, content width, corner and elevation style), a **motion profile** (transition style, animation
+  sounds): a **layout profile** that may change the arrangement *principle*, not only its styling —
+  navigation placement and style per device class (side bar, top bar, rail, bottom bar, drawer, or an
+  **orbit** bubble whose activation reveals the sections gravitating around it), header placement (top or
+  **bottom**, i.e. the header becoming a footer bar) and arrangement, card style, content width, corner and
+  elevation style, a **motion profile** (transition style, animation
   intensity, celebratory effects) and a **sound set** (notification, reward, level-up and interface sounds).
 - **FR-032**: Layout profiles MUST be chosen among arrangements the portal supports; a theme MUST NOT define
   arbitrary structure or executable content, and an unsupported option MUST be refused with an explanation.

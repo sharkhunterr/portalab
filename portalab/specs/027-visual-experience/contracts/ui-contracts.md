@@ -9,7 +9,7 @@ through the design-system `index.ts` export surface only.
 |---------|----------|
 | `AppHeader` | Always renders: menu control, brand, search (bar ≥ tablet, button on phone), assistant, notifications (unread count), `ProgressChip` (level + XP bar, hidden when gamification is off), `CoinBadge`, avatar → `PersonalMenu`. Each data element is wrapped in its own `RegionBoundary` + query; failure ⇒ neutral chip, never hides search/menu/notifications/sign-out. Arrangement from `layout.header` (`full`, `compact`, `centered`). |
 | `PersonalMenu` | Radix dropdown: profile, progression, the `personal` navigation entries (account, appearance, language, notification preferences, privacy, linked accounts), sign out. |
-| `NavFrame` | Chooses `Sidebar` / `TopBar` / `Rail` / `Drawer` / `BottomBar` from `layout.nav[deviceClass]`; all variants consume the same `sections` view. The outlet is a sibling and is never remounted when the variant changes. |
+| `NavFrame` | Chooses `Sidebar` / `TopBar` / `Rail` / `Drawer` / `BottomBar` / `OrbitNav` from `layout.nav[deviceClass]`, and places `AppHeader` top or bottom from `layout.headerPosition`; all variants consume the same `sections` view. The outlet is a sibling and is never remounted when the variant changes. |
 | `SectionNav` | Collapsible sections (`aria-expanded`), section icon + label, `direct` sections as plain links, admin topics as sub-headings; current entry `aria-current="page"`; expanded state persisted (`shell.navigation.expanded`). |
 | `BottomBar` (phone) | Home, Search, Notifications (badge), Menu (opens `Drawer` with `SectionNav`). Safe-area aware. |
 | `PageFrame` | `Breadcrumbs (section → page)`, outlet, related links; content width from `layout.content`. |
