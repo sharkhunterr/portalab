@@ -5,6 +5,7 @@ overrides) and unlinked activity. Personal data is the caller's own; admin views
 from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, Query, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
@@ -23,14 +24,18 @@ from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.images.service import CONTENT_TYPE
 from portalab.modules.media.models import (
+    Activity,
+    ActivityCursor,
     FieldCandidate,
     MatchCandidate,
     MediaObject,
     MediaRequest,
+    ObjectMetadata,
     PlaybackSession,
 )
 from portalab.modules.media.module import MediaModule
 from portalab.modules.media.permissions import MEDIA_MANAGE, MEDIA_READ, MEDIA_REQUEST, SELF
+from portalab.modules.media.providers.insight_widgets import posters
 from portalab.modules.media.sections.service import SECTIONS
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
@@ -289,6 +294,97 @@ async def create_request(principal: Requester, body: MediaRequestIn, module: Mod
 @router.post("/media/requests/{request_id}/cancel", response_model=MediaRequestOut)
 async def cancel_request(principal: Requester, request_id: UUID, module: Module) -> MediaRequestOut:
     return _request(await module.requests.cancel(_me(principal), request_id))
+
+
+# --- 027: statistics, upcoming releases, enriched details -------------------------------------------------
+INSIGHT_PERIOD = r"^(7d|30d|90d|365d|all|\d{4})$"
+INSIGHT_CATEGORY = r"^(all|movies|series|live|music|books|audiobooks)$"
+IMAGE_SIZE = r"^(w92|w154|w185|w300|w342|w500|w780|w1280|h632|original)$"
+
+
+def _zone(tz: str) -> str:
+    try:
+        return ZoneInfo(tz).key
+    except (ZoneInfoNotFoundError, ValueError) as exc:
+        raise ValidationFailed("Unknown time zone.", code="media.invalid_time_zone") from exc
+
+
+@router.get("/media/insights")
+async def insights(
+    principal: Reader,
+    module: Module,
+    period: Annotated[str, Query(pattern=INSIGHT_PERIOD)] = "30d",
+    category: Annotated[str, Query(pattern=INSIGHT_CATEGORY)] = "all",
+    scope: Literal["me", "all"] = "me",
+    tz: Annotated[str, Query(max_length=64)] = "UTC",
+) -> dict[str, Any]:
+    """What was watched, listened to and read — mine, or the server's (anonymous unless media manager)."""
+    manager = await module.authorizer.is_allowed(principal, MEDIA_MANAGE)
+    data = await module.insights.overview(
+        period=period,
+        category=category,
+        user=_me(principal) if scope == "me" else None,
+        manager=manager,
+        tz=_zone(tz),
+    )
+    if scope == "all" and manager and (data.get("members") or data.get("recent")):
+        names = {str(m.id): m.display_name or m.login for m in await module.accounts.members()}
+        for row in data.get("members") or []:
+            row["name"] = names.get(row["user_id"]) if row["user_id"] else None
+        for row in data.get("recent") or []:
+            row["member"] = names.get(row["user_id"]) if row.get("user_id") else None
+    works = [UUID(w["id"]) for w in data["top_works"] if w.get("id")]
+    if data.get("box_office"):
+        works += [UUID(f["id"]) for f in data["box_office"]["top"]]
+    images = await posters(module.database, works)
+    for work in [*data["top_works"], *((data.get("box_office") or {}).get("top") or [])]:
+        work["image_id"] = images.get(UUID(work["id"])) if work.get("id") else None
+    data["manager"] = manager
+    return data
+
+
+@router.get("/media/upcoming")
+async def upcoming(
+    _: Reader, module: Module, days: Annotated[int, Query(ge=1, le=120)] = 30
+) -> dict[str, Any]:
+    return {"items": await module.upcoming.list(days)}
+
+
+@router.get("/media/metadata-images")
+async def metadata_image(
+    _: Reader,
+    module: Module,
+    ref: Annotated[str, Query(pattern=r"^/[A-Za-z0-9_-]{1,64}\.(jpg|jpeg|png|svg)$")],
+    size: Annotated[str, Query(pattern=IMAGE_SIZE)] = "w500",
+) -> Response:
+    """A metadata provider image (backdrop, portrait…), served by the portal: browsers never call TMDB."""
+    try:
+        data = await module.enricher.image(ref, size)
+    except LookupError as exc:
+        raise MediaNotFound("No metadata provider is connected.") from exc
+    except Exception as exc:
+        raise Unavailable("The image cannot be fetched right now.", code="media.image_unavailable") from exc
+    media_type = (
+        "image/png" if ref.endswith(".png") else "image/svg+xml" if ref.endswith(".svg") else "image/jpeg"
+    )
+    return Response(
+        content=data,
+        media_type=media_type,
+        headers={
+            "Cache-Control": "private, max-age=2592000, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
+        },
+    )
+
+
+@router.get("/media/{object_id}/metadata")
+async def object_metadata(_: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
+    """Enriched details of a film or a series (backdrop, cast, saga, budget, revenue…), when known."""
+    row = await module.enricher.details(object_id)
+    if row is None:
+        raise MediaNotFound("No enriched details for this title yet.")
+    return {"provider": row.provider, "language": row.language, "fetched_at": row.fetched_at, **row.data}
 
 
 @router.get("/media/{object_id}", response_model=MediaDetail)
@@ -684,3 +780,60 @@ async def admin_verify_link(principal: Manager, link_id: UUID, module: Module) -
 @router.get("/admin/media/status")
 async def admin_status(_: Manager, module: Module) -> dict[str, Any]:
     return await module.status()
+
+
+@router.get("/admin/media/insights/sources")
+async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
+    """Where the history ingestion of each service stands (backfill, incremental, last error), and the
+    metadata enrichment progress."""
+    names = await module.accounts.service_names()
+    async with module.database.session() as session:
+        cursors = list((await session.execute(select(ActivityCursor))).scalars())
+        per_service = await session.execute(
+            select(Activity.service_id, func.count()).group_by(Activity.service_id)
+        )
+        counts: dict[UUID, int] = {service: int(n) for service, n in per_service.all()}
+        per_status = await session.execute(
+            select(ObjectMetadata.status, func.count()).group_by(ObjectMetadata.status)
+        )
+        metadata: dict[str, int] = {state: int(n) for state, n in per_status.all()}
+        unattributed = await session.scalar(select(func.count()).where(Activity.user_id.is_(None)))
+    return {
+        "sources": [
+            {
+                "service_id": str(c.service_id),
+                "name": names.get(str(c.service_id), str(c.service_id)),
+                "source": c.source,
+                "mode": c.mode,
+                "items": int(counts.get(c.service_id, 0)),
+                "watermark": c.watermark,
+                "backfilled_at": c.backfilled_at,
+                "last_run_at": c.last_run_at,
+                "last_error": c.last_error,
+            }
+            for c in sorted(cursors, key=lambda c: names.get(str(c.service_id), ""))
+        ],
+        "metadata": {
+            "provider": module.enricher.provider() is not None,
+            "found": int(metadata.get("found", 0)),
+            "missing": int(metadata.get("missing", 0)),
+            "error": int(metadata.get("error", 0)),
+        },
+        "unattributed": int(unattributed or 0),
+    }
+
+
+@router.post("/admin/media/insights/sources/{service_id}/resync", status_code=status.HTTP_202_ACCEPTED)
+async def resync_source(principal: Manager, service_id: UUID, module: Module) -> dict[str, str]:
+    await module.ingestor.reset(service_id)
+    await _audit(module, principal, "media.activity_resync", str(service_id), {})
+    return {"state": "scheduled"}
+
+
+@router.post("/admin/media/objects/{object_id}/metadata/refresh")
+async def refresh_metadata(principal: Manager, object_id: UUID, module: Module) -> dict[str, Any]:
+    result = await module.enricher.refresh(object_id)
+    if result is None:
+        raise MediaNotFound("No metadata provider, or this title cannot be enriched.")
+    await _audit(module, principal, "media.metadata_refreshed", str(object_id), {"status": result})
+    return {"status": result}

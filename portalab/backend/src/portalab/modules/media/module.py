@@ -61,6 +61,14 @@ from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.identity.resolver import IdentityResolver
 from portalab.modules.media.images.service import JOB as IMAGE_JOB
 from portalab.modules.media.images.service import ImageService
+from portalab.modules.media.insights.aggregate import JOB as AGGREGATE_JOB
+from portalab.modules.media.insights.aggregate import ActivityAggregator
+from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
+from portalab.modules.media.insights.enrich import MetadataEnricher
+from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
+from portalab.modules.media.insights.ingest import ActivityIngestor
+from portalab.modules.media.insights.stats import InsightsQuery
+from portalab.modules.media.insights.upcoming import Upcoming
 from portalab.modules.media.links.accounts import AccountMatching
 from portalab.modules.media.links.service import UserLinkService
 from portalab.modules.media.models import MatchCandidate, PlaybackSession, SourceItem
@@ -69,6 +77,18 @@ from portalab.modules.media.participant import MediaParticipant
 from portalab.modules.media.playback.poller import JOB as POLL_JOB
 from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.providers.ai_tools import MediaAiTools
+from portalab.modules.media.providers.insight_widgets import (
+    RECENTLY_ADDED,
+    RECENTLY_REQUESTED,
+    RecentlyAddedWidget,
+    RecentlyRequestedWidget,
+    StatsWidget,
+    TopWidget,
+    UpcomingWidget,
+)
+from portalab.modules.media.providers.insight_widgets import STATS as STATS_WIDGET
+from portalab.modules.media.providers.insight_widgets import TOP as TOP_WIDGET
+from portalab.modules.media.providers.insight_widgets import UPCOMING as UPCOMING_WIDGET
 from portalab.modules.media.providers.ports import HistoryReader, MediaActivityAttributes
 from portalab.modules.media.providers.search import ACTIONS, MediaResolver, MediaSearchProvider
 from portalab.modules.media.providers.widgets import (
@@ -173,6 +193,12 @@ class MediaModule:
         self.discovery = Discovery(database, capabilities, self.history, lambda: self.config, clock=clock)
         self.recommender = BaselineRecommender(database, clock=clock)
         self.history_reader = HistoryReader(database, visibility)
+        # 027: Telemetra-style statistics, metadata enrichment and release calendars
+        self.ingestor = ActivityIngestor(database, capabilities, clock=clock)
+        self.aggregator = ActivityAggregator(database)
+        self.enricher = MetadataEnricher(database, capabilities, self.language, blobs=blobs, clock=clock)
+        self.insights = InsightsQuery(database, clock=clock)
+        self.upcoming = Upcoming(database, capabilities, clock=clock)
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
 
     # --- configuration ---------------------------------------------------------------------------------
@@ -196,6 +222,17 @@ class MediaModule:
             if isinstance(value, list) and value:
                 out[name] = [str(v) for v in value]
         return out
+
+    async def language(self) -> str:
+        """The portal's default language (metadata is fetched in it)."""
+        reader = self._config_reader()
+        if reader is None:
+            return "en"
+        try:
+            value = (await reader.get("i18n.defaultLocale")).value
+        except Exception:
+            return "en"
+        return str(value or "en")
 
     def threshold(self, kind: str) -> float | None:
         if kind in self.config.thresholds:
@@ -262,6 +299,11 @@ class MediaModule:
             (RECENT, RecentWidget(self.discovery, self.clock)),
             (NOW_PLAYING, NowPlayingWidget(self.poller, self.clock)),
             (REQUESTS_WIDGET, RequestsWidget(self.requests, self.clock)),
+            (STATS_WIDGET, StatsWidget(self.database, self.insights, self.clock)),
+            (RECENTLY_ADDED, RecentlyAddedWidget(self.database, self.clock)),
+            (RECENTLY_REQUESTED, RecentlyRequestedWidget(self.database, self.clock)),
+            (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock)),
+            (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:
@@ -291,9 +333,41 @@ class MediaModule:
         async def poll() -> None:
             await self.poller.tick()
 
+        async def ingest() -> None:
+            await self.ingestor.run()
+            await self.aggregator.run()
+
+        async def aggregate() -> None:
+            while await self.aggregator.run():
+                pass
+
+        async def enrich() -> None:
+            await self.enricher.run()
+
         return [
             self.start,
             register_periodic(jobs, self.database, POLL_JOB, timedelta(seconds=15), poll, owner=OWNER),
+            register_periodic(
+                jobs,
+                self.database,
+                ACTIVITY_JOB,
+                timedelta(minutes=10),
+                ingest,
+                owner=OWNER,
+                timeout_seconds=1800,
+            ),
+            register_periodic(
+                jobs, self.database, AGGREGATE_JOB, timedelta(minutes=2), aggregate, owner=OWNER
+            ),
+            register_periodic(
+                jobs,
+                self.database,
+                ENRICH_JOB,
+                timedelta(minutes=5),
+                enrich,
+                owner=OWNER,
+                timeout_seconds=900,
+            ),
         ]
 
     async def start(self) -> None:

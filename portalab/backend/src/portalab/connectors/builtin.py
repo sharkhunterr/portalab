@@ -2,10 +2,13 @@
 
 from portalab.capabilities.connector_sdk import Connector, ConnectorRegistry
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
+from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector
 from portalab.connectors.seerr import SeerrConnector
+from portalab.connectors.tautulli import TautulliConnector
+from portalab.connectors.tmdb import TmdbConnector
 
 OWNER = "core:connectors"
 
@@ -18,6 +21,9 @@ def builtin_connectors() -> list[Connector]:
         RadarrConnector(),
         SonarrConnector(),
         RommConnector(),
+        TautulliConnector(),
+        GrimmoryConnector(),
+        TmdbConnector(),
     ]
 
 

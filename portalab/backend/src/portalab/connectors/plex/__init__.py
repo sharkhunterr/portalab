@@ -5,6 +5,8 @@
   from ``Guid`` (``tmdb://``, ``imdb://``, ``tvdb://``).
 * ``media.playback``: live sessions (``/status/sessions``) and the watch history
   (``/status/sessions/history/all``).
+* ``media.activity_history`` (027): the whole watch history, paged oldest first, for the statistics. When
+  Tautulli watches the same server its richer rows win (same ``plex`` family, higher priority).
 * ``service.health_probe``: an authenticated ``/`` round trip.
 
 Authentication uses the server's ``X-Plex-Token`` (Plex Web → any item → *Get Info* → *View XML*: the
@@ -25,9 +27,12 @@ from portalab.capabilities.connector_sdk import (
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
+    ACTIVITY_HISTORY,
     LIBRARY,
     PLAYBACK,
+    ActivityPage,
     ServiceAccount,
+    SourceActivity,
     SourceHistoryItem,
     SourcePlayback,
 )
@@ -89,6 +94,7 @@ class PlexConnector(HttpConnector):
         binding(PLAYBACK),
         binding(HEALTH_PROBE),
         binding(ACCOUNTS),
+        binding(ACTIVITY_HISTORY),
     )
     status_path = "/"
     public_path = "/identity"
@@ -170,6 +176,8 @@ class PlexConnector(HttpConnector):
             return _Probe(self, service)
         if capability == ACCOUNTS:
             return _Accounts(self, service)
+        if capability == ACTIVITY_HISTORY:
+            return _History(self, service)
         return None
 
 
@@ -235,6 +243,60 @@ class _Playback:
                 )
             )
         return sorted(history, key=lambda h: h.occurred_at)
+
+
+def map_history(item: Mapping[str, Any]) -> SourceActivity | None:
+    viewed = parse_time(item.get("viewedAt"))
+    account = item.get("accountID")
+    kind = "live" if item.get("live") in (1, "1", True) else KINDS.get(str(item.get("type")))
+    if viewed is None or account in (None, "") or kind not in ("movie", "episode", "track", "live"):
+        return None
+    key = str(item.get("historyKey") or "").rstrip("/").rsplit("/", 1)[-1]
+    ref = key or f"{item.get('ratingKey')}-{int(viewed.timestamp())}-{account}"
+    duration = _seconds(item.get("duration"))
+    parent = item.get("grandparentTitle") if kind in ("episode", "track") else None
+    return SourceActivity(
+        ref=ref[:200],
+        external_user_id=str(account),
+        kind=kind,
+        title=str(item.get("title") or "?")[:500],
+        started_at=viewed,
+        stopped_at=viewed,
+        watched_s=duration or 0.0,
+        duration_s=duration,
+        progress=1.0,
+        item_external_id=str(item["ratingKey"]) if item.get("ratingKey") else None,
+        parent_title=str(parent)[:500] if parent else None,
+        ids=_ids(item),
+        year=item.get("year") if isinstance(item.get("year"), int) else None,
+        family="plex",
+        priority=10,
+    )
+
+
+class _History:
+    def __init__(self, connector: PlexConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def history(self, *, since: datetime | None, cursor: str | None) -> ActivityPage:
+        start = int(cursor) if cursor and cursor.isdigit() else 0
+        params: dict[str, Any] = {"sort": "viewedAt:asc"}
+        if since is not None:
+            params["viewedAt>"] = int(since.timestamp()) - 1
+        container = _container(
+            await self.connector.request(
+                self.service,
+                "GET",
+                "/status/sessions/history/all",
+                params=params,
+                headers={"X-Plex-Container-Start": str(start), "X-Plex-Container-Size": str(PAGE)},
+            )
+        )
+        rows = container.get("Metadata") or []
+        items = [a for a in (map_history(r) for r in rows) if a is not None]
+        total = int(container.get("totalSize") or 0)
+        done = len(rows) < PAGE or (total and start + len(rows) >= total)
+        return ActivityPage(items=items, cursor=None if done else str(start + len(rows)))
 
 
 class _Accounts:

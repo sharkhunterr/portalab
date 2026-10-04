@@ -16873,6 +16873,77 @@
         ]
       }
     },
+    "/api/v1/admin/media/insights/sources": {
+      "get": {
+        "description": "Where the history ingestion of each service stands (backfill, incremental, last error), and the\nmetadata enrichment progress.",
+        "operationId": "insight_sources_api_v1_admin_media_insights_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Insight Sources Api V1 Admin Media Insights Sources Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Insight Sources",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/insights/sources/{service_id}/resync": {
+      "post": {
+        "operationId": "resync_source_api_v1_admin_media_insights_sources__service_id__resync_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Resync Source Api V1 Admin Media Insights Sources  Service Id  Resync Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Resync Source",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/admin/media/links/{link_id}/verify": {
       "post": {
         "operationId": "admin_verify_link_api_v1_admin_media_links__link_id__verify_post",
@@ -17015,6 +17086,51 @@
           }
         },
         "summary": "Merge",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/objects/{object_id}/metadata/refresh": {
+      "post": {
+        "operationId": "refresh_metadata_api_v1_admin_media_objects__object_id__metadata_refresh_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Refresh Metadata Api V1 Admin Media Objects  Object Id  Metadata Refresh Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh Metadata",
         "tags": [
           "media"
         ]
@@ -27837,6 +27953,142 @@
         ]
       }
     },
+    "/api/v1/media/insights": {
+      "get": {
+        "description": "What was watched, listened to and read \u2014 mine, or the server's (anonymous unless media manager).",
+        "operationId": "insights_api_v1_media_insights_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "pattern": "^(7d|30d|90d|365d|all|\\d{4})$",
+              "title": "Period",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "pattern": "^(all|movies|series|live|music|books|audiobooks)$",
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "me",
+              "enum": [
+                "me",
+                "all"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tz",
+            "required": false,
+            "schema": {
+              "default": "UTC",
+              "maxLength": 64,
+              "title": "Tz",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Insights Api V1 Media Insights Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Insights",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/metadata-images": {
+      "get": {
+        "description": "A metadata provider image (backdrop, portrait\u2026), served by the portal: browsers never call TMDB.",
+        "operationId": "metadata_image_api_v1_media_metadata_images_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "pattern": "^/[A-Za-z0-9_-]{1,64}\\.(jpg|jpeg|png|svg)$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": "w500",
+              "pattern": "^(w92|w154|w185|w300|w342|w500|w780|w1280|h632|original)$",
+              "title": "Size",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Metadata Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/requests": {
       "post": {
         "operationId": "create_request_api_v1_media_requests_post",
@@ -27921,6 +28173,53 @@
         ]
       }
     },
+    "/api/v1/media/upcoming": {
+      "get": {
+        "operationId": "upcoming_api_v1_media_upcoming_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 120,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Upcoming Api V1 Media Upcoming Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upcoming",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/{object_id}": {
       "get": {
         "operationId": "detail_api_v1_media__object_id__get",
@@ -27959,6 +28258,52 @@
           }
         },
         "summary": "Detail",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/metadata": {
+      "get": {
+        "description": "Enriched details of a film or a series (backdrop, cast, saga, budget, revenue\u2026), when known.",
+        "operationId": "object_metadata_api_v1_media__object_id__metadata_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Object Metadata Api V1 Media  Object Id  Metadata Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Object Metadata",
         "tags": [
           "media"
         ]

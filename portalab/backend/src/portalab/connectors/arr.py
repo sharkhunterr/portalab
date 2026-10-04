@@ -3,6 +3,8 @@
 * ``media.library`` (sync): what the manager tracks — Radarr movies, Sonarr series and their seasons —
   marked ``available`` when the files are on disk, with TMDB/IMDb/TVDB ids so Media merges them with what a
   media server reports.
+* ``media.calendar`` (027): upcoming releases — Radarr's cinema, digital and physical release dates,
+  Sonarr's episode air dates (``/api/v3/calendar``).
 * ``service.health_probe``: an authenticated ``/api/v3/system/status`` round trip.
 
 Authentication uses the API key of *Settings → General*, sent as ``X-Api-Key``. Posters are served by
@@ -10,6 +12,7 @@ the manager itself (``/api/v3/mediacover/<id>/poster.jpg``), never fetched from 
 """
 
 from collections.abc import AsyncIterator, Mapping, Sequence
+from datetime import datetime
 from typing import Any, ClassVar
 
 from portalab.capabilities.connector_sdk import (
@@ -20,7 +23,7 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import LIBRARY
+from portalab.capabilities.media import CALENDAR, LIBRARY, SourceRelease
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
 
@@ -36,7 +39,11 @@ def _has_poster(item: Mapping[str, Any]) -> bool:
 class _ArrConnector(HttpConnector):
     app: ClassVar[str]
     category = "downloads"
-    provides: Sequence[CapabilityBinding] = (binding(LIBRARY, syncable=True), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (
+        binding(LIBRARY, syncable=True),
+        binding(CALENDAR),
+        binding(HEALTH_PROBE),
+    )
     status_path = "/api/v3/system/status"
     public_path = None
 
@@ -51,9 +58,36 @@ class _ArrConnector(HttpConnector):
     def provider(self, capability: str, service: ServiceHandle) -> Any:
         if capability == LIBRARY:
             return _Covers(self, service)
+        if capability == CALENDAR:
+            return _Calendar(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
         return None
+
+    def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
+        return []
+
+
+class _Calendar:
+    def __init__(self, connector: _ArrConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def upcoming(self, start: datetime, end: datetime) -> Sequence[SourceRelease]:
+        items = await self.connector.get_json(
+            self.service,
+            "/api/v3/calendar",
+            start=start.isoformat(),
+            end=end.isoformat(),
+            unmonitored="false",
+            includeSeries="true",
+        )
+        if not isinstance(items, list):
+            raise InvalidPayload("unexpected /calendar payload")
+        out: list[SourceRelease] = []
+        for item in items:
+            if isinstance(item, Mapping):
+                out.extend(self.connector.releases(item, start, end))
+        return sorted(out, key=lambda r: r.release_at)
 
 
 class _Covers:
@@ -71,6 +105,32 @@ class RadarrConnector(_ArrConnector):
     app = "Radarr"
     description = "The films Radarr follows, and whether they are downloaded."
     icon = "film"
+
+    def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
+        if not item.get("title") or item.get("id") is None:
+            return []
+        ids = {"tmdb": str(item["tmdbId"]) if item.get("tmdbId") else "", "imdb": item.get("imdbId") or ""}
+        out = []
+        for field, release_type in (
+            ("inCinemas", "cinema"),
+            ("digitalRelease", "digital"),
+            ("physicalRelease", "physical"),
+        ):
+            at = parse_time(item.get(field))
+            if at is not None and start <= at <= end:
+                out.append(
+                    SourceRelease(
+                        external_id=f"movie:{safe_id(item['id'])}",
+                        kind="movie",
+                        title=str(item["title"])[:500],
+                        release_at=at,
+                        release_type=release_type,
+                        ids={k: v for k, v in ids.items() if v},
+                        available=bool(item.get("hasFile")),
+                        overview=_overview(item),
+                    )
+                )
+        return out
 
     async def sync(
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None
@@ -109,6 +169,33 @@ class SonarrConnector(_ArrConnector):
     app = "Sonarr"
     description = "The series Sonarr follows, season by season, and what is downloaded."
     icon = "film"
+
+    def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
+        at = parse_time(item.get("airDateUtc"))
+        nested = item.get("series")
+        series: Mapping[str, Any] = nested if isinstance(nested, Mapping) else {}
+        if at is None or item.get("id") is None or not (start <= at <= end):
+            return []
+        ids = {
+            "tvdb": str(series["tvdbId"]) if series.get("tvdbId") else "",
+            "tmdb": str(series["tmdbId"]) if series.get("tmdbId") else "",
+            "imdb": series.get("imdbId") or "",
+        }
+        return [
+            SourceRelease(
+                external_id=f"episode:{safe_id(item['id'])}",
+                kind="episode",
+                title=str(item.get("title") or "?")[:500],
+                release_at=at,
+                release_type="air",
+                parent_title=str(series.get("title"))[:500] if series.get("title") else None,
+                season=item.get("seasonNumber"),
+                episode=item.get("episodeNumber"),
+                ids={k: v for k, v in ids.items() if v},
+                available=bool(item.get("hasFile")),
+                overview=_overview(item),
+            )
+        ]
 
     async def sync(
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None

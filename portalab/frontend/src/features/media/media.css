@@ -65,3 +65,164 @@
   display: grid;
   gap: 0.5rem;
 }
+
+/* 027: enriched details (metadata provider) */
+.media-detail {
+  position: relative;
+  isolation: isolate;
+}
+.media-backdrop {
+  position: absolute;
+  inset-inline: calc(var(--space-4, 1rem) * -1);
+  inset-block-start: calc(var(--space-4, 1rem) * -1);
+  block-size: clamp(14rem, 38vw, 26rem);
+  z-index: -1;
+  overflow: hidden;
+  border-radius: var(--radius-lg, 1rem);
+}
+.media-backdrop img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  opacity: 0.55;
+  mask-image: linear-gradient(180deg, black 30%, transparent 100%);
+}
+.media-detail:has(.media-backdrop) > .ds-page-header {
+  padding-block-start: clamp(6rem, 18vw, 13rem);
+}
+.media-enriched {
+  display: grid;
+  gap: var(--space-4, 1rem);
+  margin-block: var(--space-4, 1rem);
+}
+.media-enriched__tagline {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+.media-enriched__overview {
+  margin: 0;
+  max-inline-size: 70ch;
+  line-height: 1.6;
+}
+.media-enriched__facts,
+.media-enriched__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-enriched__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface-raised) 80%, transparent);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+.media-enriched__facts .ds-icon {
+  color: var(--color-accent);
+}
+.media-enriched__chips li {
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  font-size: var(--font-size-sm);
+}
+.media-enriched__chips--quiet li {
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  color: var(--color-text-muted);
+}
+.media-enriched__block h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md, 1rem);
+}
+.media-enriched__cast {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 6.5rem;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+.media-enriched__cast li {
+  display: grid;
+  gap: 0.15rem;
+  font-size: var(--font-size-sm);
+  scroll-snap-align: start;
+}
+.media-enriched__portrait {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text-muted);
+}
+.media-enriched__portrait img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.media-enriched__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-3);
+}
+.media-enriched__grid > .media-enriched__block {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.media-enriched__pairs {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+.media-enriched__pairs div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.media-enriched__pairs dt {
+  color: var(--color-text-muted);
+}
+.media-enriched__pairs dd {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  text-align: end;
+}
+.media-enriched__pairs dd[data-tone="ok"] {
+  color: var(--state-available-fg);
+}
+.media-enriched__pairs dd[data-tone="bad"] {
+  color: var(--state-error-fg);
+}
+.media-enriched__saga {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.media-enriched__saga h3 {
+  grid-column: 1 / -1;
+}
+.media-enriched__saga img {
+  inline-size: 3.5rem;
+  border-radius: var(--radius-sm, 0.25rem);
+}
+.media-enriched__saga p {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}

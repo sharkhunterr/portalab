@@ -14,6 +14,7 @@ import {
 } from "../api";
 import "../media.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { Backdrop, Enrichment } from "./Enrichment";
 
 /**
  * Media detail (spec 024 T017/T020): a header and independent section frames — each section loads, fails
@@ -255,7 +256,8 @@ export function DetailPage() {
   const media = detail.data;
   const poster = imageUrl(media.image_id);
   return (
-    <article aria-labelledby={headingId}>
+    <article aria-labelledby={headingId} className="media-detail">
+      <Backdrop objectId={media.id} />
       <PageHeader
         titleId={headingId}
         level={2}
@@ -274,6 +276,7 @@ export function DetailPage() {
         }
         primary={media.available ? null : <RequestButton objectId={media.id} />}
       />
+      <Enrichment objectId={media.id} />
       <div className="media-sections">
         {SECTIONS.map((name) => (
           <SectionFrame key={name} objectId={media.id} name={name} />

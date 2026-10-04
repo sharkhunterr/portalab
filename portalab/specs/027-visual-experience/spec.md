@@ -511,7 +511,18 @@ matching Marketplace product; a member buys it and can select it.
   administration page MUST use the same administration layout (header, key figures, titled sections, tables
   that become cards on phones, one status badge style).
 - **FR-055**: The portal MUST ship ready-to-use connectors for the common self-hosted services (Jellyfin/Emby,
-  Plex, Overseerr/Jellyseerr, Radarr, Sonarr, RomM) so an administrator can add a service without any plugin.
+  Plex, Overseerr/Jellyseerr, Radarr, Sonarr, RomM, Tautulli, Grimmory, TMDB) so an administrator can add a
+  service without any plugin.
+- **FR-056**: The portal MUST keep the raw play/read history of every service (full backfill, then
+  incremental), attribute it to members through their linked service accounts (also retroactively), count a
+  play reported by two sources once (Tautulli over Plex), and precompute daily aggregates; members MUST see
+  their own statistics and the server's anonymously (time, plays, titles, timeline, weekday × hour, top
+  titles, genres, people, decades, records, box office, requests); media managers additionally see members,
+  devices and the ingestion state of each source.
+- **FR-057**: A metadata provider (TMDB) MUST enrich films and series (backdrop, tagline, cast and crew with
+  portraits, saga, budget, revenue, certification, keywords), with images served by the portal itself.
+- **FR-058**: The dashboard MUST offer media widgets: my statistics, recently added, recently requested,
+  upcoming releases (Radarr/Sonarr calendars) and the server's top of the week.
 - **FR-054**: Administrators MUST be able to create a theme from an existing one with live preview and the
   accessibility report, and offer it in the Marketplace without editing raw documents. A theme sold by an
   available Marketplace product MUST be listed and selectable only by its owners (the portal default and the

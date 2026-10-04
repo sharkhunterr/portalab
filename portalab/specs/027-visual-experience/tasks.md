@@ -243,6 +243,9 @@ lossless migration.
 - [X] T101 [US10] Service accounts ↔ members: connectors list their accounts (`service.accounts`), suggestions by e-mail then name, link/unlink/apply-all with past plays attributed, in `backend/src/portalab/modules/media/links/accounts.py` and the « Service accounts » tab of `frontend/src/features/admin/members/`
 - [X] T102 [US10] Edit a member (display name, e-mail, roles, linked service accounts): `PATCH /api/v1/users/{id}` in `backend/src/portalab/modules/identity/` and `frontend/src/features/admin/members/MemberEdit.tsx`
 - [X] T103 [US2] Member navigation in the hub spirit: every member section is one link whose pages are tabs, « My account » included, in `frontend/src/shell/nav/{SectionNav,HubTabs}.tsx`
+- [X] T104 [US10] Connectors Tautulli (history incl. live TV, accounts), Grimmory (books/audiobooks, reading sessions, accounts), TMDB (`media.metadata`), Plex full history, Radarr/Sonarr release calendars in `backend/src/portalab/connectors/`; capabilities `media.activity_history`, `media.calendar`, `media.metadata`; `audiobook` media type
+- [X] T105 [US10] Activity ingestion (backfill → incremental, attribution, catalog/work resolution, Plex/Tautulli de-duplication), daily aggregates, metadata enrichment and upcoming releases in `backend/src/portalab/modules/media/insights/` (migration `media_0002`), with export/erasure
+- [X] T106 [US10] Statistics page `/media/insights` (me / whole server, categories, periods, charts, tops with posters, records, box office, members and sources for managers), enriched detail page, dashboard widgets (stats, recently added/requested, upcoming, top) in `frontend/src/features/media/` and `frontend/src/features/dashboard/widgets/media.tsx`
 
 ## Dependencies & Execution Order
 

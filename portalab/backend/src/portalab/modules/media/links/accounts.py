@@ -3,8 +3,9 @@ link of each one to a portal member, and a *suggestion* when an unlinked account
 — same e-mail, else same login or name once accents, case and punctuation are ignored. Suggestions are only
 proposals: an administrator applies them (one by one or all at once) and every link they make is verified.
 
-Linking an account also attributes its past activity on that service (sessions recorded as *unlinked*) to the
-member; requests are re-attributed by the next synchronisation of the request service.
+Linking an account also attributes its past activity on that service (sessions recorded as *unlinked*, and
+the whole play history used by the statistics) to the member; requests are re-attributed by the next
+synchronisation of the request service.
 """
 
 import asyncio
@@ -25,6 +26,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.errors import NotFound
 from portalab.core.time import Clock, utc_now
+from portalab.modules.media.insights.ingest import attribute
 from portalab.modules.media.models import PlaybackSession, UserLink
 
 TIMEOUT_SECONDS = 15
@@ -94,6 +96,10 @@ class AccountMatching:
         except Exception:
             return {}
         return {r.instance_ref: r.provider for r in registrations}
+
+    async def service_names(self) -> dict[str, str]:
+        directory = self._first(SERVICE_DIRECTORY)
+        return {s.id: s.name for s in await directory.services()} if directory is not None else {}
 
     async def members(self) -> list[AccountSummary]:
         directory = self._first(MEMBER_ACCOUNTS)
@@ -183,11 +189,22 @@ class AccountMatching:
                     )
                     .values(user_id=None)
                 )
+                await attribute(session, service_id, external_user_id, None)
                 return 0
             # one account per member and service: the member's previous account here is unlinked
-            await session.execute(
-                delete(UserLink).where(UserLink.service_id == service_id, UserLink.user_id == user_id)
+            previous = (
+                (
+                    await session.execute(
+                        delete(UserLink)
+                        .where(UserLink.service_id == service_id, UserLink.user_id == user_id)
+                        .returning(UserLink.external_user_id)
+                    )
+                )
+                .scalars()
+                .all()
             )
+            for account in previous:
+                await attribute(session, service_id, account, None)
             session.add(
                 UserLink(
                     user_id=user_id,
@@ -206,7 +223,8 @@ class AccountMatching:
                 )
                 .values(user_id=user_id)
             )
-            return int(getattr(result, "rowcount", 0) or 0)
+            plays = await attribute(session, service_id, external_user_id, user_id)
+            return int(getattr(result, "rowcount", 0) or 0) + plays
 
     async def apply_suggestions(self, service_id: UUID | None = None) -> int:
         blocks, _ = await self.overview()

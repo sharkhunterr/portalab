@@ -105,6 +105,7 @@ PLEX: Routes = {
 
 RADARR: Routes = {
     "/api/v3/system/status": {"appName": "Radarr", "version": "5.14.0", "instanceName": "Radarr"},
+    "/api/v3/calendar": lambda request: CALENDAR_RADARR,
     "/api/v3/movie": [
         {
             "id": 1,
@@ -123,6 +124,7 @@ RADARR: Routes = {
 
 SONARR: Routes = {
     "/api/v3/system/status": {"appName": "Sonarr", "version": "4.0.10"},
+    "/api/v3/calendar": lambda request: CALENDAR_SONARR,
     "/api/v3/series": [
         {
             "id": 5,
@@ -187,6 +189,194 @@ ROMM: Routes = {
     },
 }
 
+
+def _tautulli(request: httpx.Request) -> Any:
+    if request.url.params.get("apikey") != "tautulli-secret-key":
+        return {"response": {"result": "error", "message": "Invalid apikey", "data": {}}}
+    cmd = request.url.params.get("cmd")
+    if cmd == "get_tautulli_info":
+        return {"response": {"result": "success", "data": {"tautulli_version": "v2.15.0"}}}
+    if cmd == "get_users":
+        return {
+            "response": {
+                "result": "success",
+                "data": [
+                    {"user_id": 0, "username": "Local"},
+                    {"user_id": 1234, "username": "jo", "friendly_name": "Jo", "email": "jo@home.lan"},
+                ],
+            }
+        }
+    if cmd == "get_history":
+        rows = [
+            {
+                "id": 1,
+                "started": 1_700_000_000,
+                "stopped": 1_700_009_000,
+                "play_duration": 8_400,
+                "percent_complete": 96,
+                "user_id": 1234,
+                "media_type": "movie",
+                "rating_key": 101,
+                "title": "Dune",
+                "year": 2021,
+                "guid": "plex://movie/5d77",
+                "guids": ["tmdb://438631", "imdb://tt1160419"],
+                "player": "Living room TV",
+                "platform": "Android",
+            },
+            {
+                "id": 2,
+                "started": 1_700_100_000,
+                "stopped": 1_700_102_000,
+                "play_duration": 2_000,
+                "percent_complete": 40,
+                "user_id": 1234,
+                "media_type": "episode",
+                "rating_key": 202,
+                "title": "Kassa",
+                "grandparent_title": "Andor",
+            },
+            {
+                "id": 3,
+                "started": 1_700_200_000,
+                "play_duration": 3_600,
+                "user_id": 1234,
+                "media_type": "episode",
+                "live": 1,
+                "title": "Journal",
+            },
+            {"id": 4, "started": None, "user_id": 1234, "media_type": "movie"},
+        ]
+        start = int(request.url.params.get("start", "0"))
+        return {"response": {"result": "success", "data": {"data": rows[start:]}}}
+    return {"response": {"result": "error", "message": "Unknown command"}}
+
+
+TAUTULLI: Routes = {"/api/v2": _tautulli}
+
+GRIMMORY_BOOKS = [
+    {
+        "id": 1,
+        "libraryId": 1,
+        "primaryFile": {"bookType": "EPUB"},
+        "lastReadTime": "2024-03-01T10:00:00Z",
+        "metadata": {
+            "title": "Dune",
+            "authors": ["Frank Herbert"],
+            "categories": ["Science Fiction"],
+            "publishedDate": "1965-08-01",
+            "isbn13": "9780441172719",
+            "pageCount": 688,
+            "seriesName": "Dune",
+            "seriesNumber": 1,
+        },
+    },
+    {
+        "id": 2,
+        "libraryId": 2,
+        "primaryFile": {"bookType": "AUDIOBOOK"},
+        "metadata": {
+            "title": "Project Hail Mary",
+            "authors": [{"name": "Andy Weir"}],
+            "narrator": "Ray Porter",
+        },
+    },
+    {"id": 3, "metadata": {}},
+]
+
+
+def _grimmory_sessions(request: httpx.Request) -> Any:
+    book = request.url.path.rsplit("/", 1)[-1]
+    if book != "1" or request.url.params.get("page", "0") != "0":
+        return []
+    return [
+        {
+            "id": 77,
+            "bookId": 1,
+            "bookType": "EPUB",
+            "startTime": "2024-03-01T09:00:00Z",
+            "endTime": "2024-03-01T10:00:00Z",
+            "durationSeconds": 3600,
+            "startProgress": 10.0,
+            "endProgress": 25.0,
+        }
+    ]
+
+
+GRIMMORY: Routes = {
+    "/api/v1/auth/login": {"accessToken": "grimmory-access", "refreshToken": "r", "expires": 3600},
+    "/api/v1/healthcheck": {"status": "UP"},
+    "/api/v1/libraries": [{"id": 1, "name": "Books"}, {"id": 2, "name": "Audio"}],
+    "/api/v1/books": GRIMMORY_BOOKS,
+    "/api/v1/users": [{"id": 9, "username": "portal", "name": "Portal", "email": "p@home.lan"}],
+    "/api/v1/reading-sessions/book/1": _grimmory_sessions,
+    "/api/v1/reading-sessions/book/2": _grimmory_sessions,
+    "/api/v1/reading-sessions/book/3": _grimmory_sessions,
+}
+
+TMDB_MOVIE = {
+    "id": 438631,
+    "imdb_id": "tt1160419",
+    "title": "Dune",
+    "original_title": "Dune",
+    "tagline": "Beyond fear, destiny awaits.",
+    "overview": "Paul Atreides…",
+    "genres": [{"id": 878, "name": "Science-Fiction"}],
+    "release_date": "2021-09-15",
+    "runtime": 156,
+    "budget": 165_000_000,
+    "revenue": 402_027_830,
+    "vote_average": 7.8,
+    "vote_count": 12000,
+    "status": "Released",
+    "production_countries": [{"iso_3166_1": "US"}],
+    "spoken_languages": [{"english_name": "English"}],
+    "production_companies": [{"name": "Legendary Pictures"}],
+    "belongs_to_collection": {"id": 726871, "name": "Dune - Saga", "poster_path": "/coll.jpg"},
+    "poster_path": "/poster.jpg",
+    "backdrop_path": "/backdrop.jpg",
+    "credits": {
+        "cast": [
+            {"id": 1190668, "name": "Timothée Chalamet", "character": "Paul", "profile_path": "/tc.jpg"}
+        ],
+        "crew": [{"id": 137427, "name": "Denis Villeneuve", "job": "Director", "department": "Directing"}],
+    },
+    "keywords": {"keywords": [{"name": "desert"}]},
+    "release_dates": {
+        "results": [{"iso_3166_1": "FR", "release_dates": [{"certification": "Tous publics"}]}]
+    },
+}
+
+TMDB: Routes = {
+    "/3/configuration": {"images": {"secure_base_url": "https://image.tmdb.org/t/p/"}},
+    "/3/movie/438631": TMDB_MOVIE,
+    "/3/find/tt1160419": {"movie_results": [{"id": 438631}], "tv_results": []},
+    "/3/search/movie": {"results": [{"id": 438631}]},
+}
+
+CALENDAR_RADARR = [
+    {
+        "id": 3,
+        "title": "Dune: Part Three",
+        "tmdbId": 1170608,
+        "inCinemas": "2026-12-18T00:00:00Z",
+        "digitalRelease": "2027-02-01T00:00:00Z",
+        "hasFile": False,
+    }
+]
+CALENDAR_SONARR = [
+    {
+        "id": 40,
+        "seriesId": 5,
+        "seasonNumber": 3,
+        "episodeNumber": 1,
+        "title": "Premiere",
+        "airDateUtc": "2026-11-02T02:00:00Z",
+        "hasFile": False,
+        "series": {"title": "Andor", "tvdbId": 393189},
+    }
+]
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -194,6 +384,9 @@ SECRETS = {
     "sonarr": {"api_key": "sonarr-secret-key"},
     "seerr": {"api_key": "seerr-secret-key"},
     "romm": {"password": "romm-secret-pass"},
+    "tautulli": {"api_key": "tautulli-secret-key"},
+    "grimmory": {"password": "grimmory-secret-pass"},
+    "tmdb": {"api_key": "tmdb-secret-key"},
 }
 ROUTES = {
     "jellyfin": JELLYFIN,
@@ -202,6 +395,9 @@ ROUTES = {
     "sonarr": SONARR,
     "seerr": SEERR,
     "romm": ROMM,
+    "tautulli": TAUTULLI,
+    "grimmory": GRIMMORY,
+    "tmdb": TMDB,
 }
 
 
@@ -221,7 +417,7 @@ def transport(
             return httpx.Response(
                 200, content=b"<html>login page</html>", headers={"content-type": "text/html"}
             )
-        if request.url.path.endswith(("/thumb", "/Images/Primary", "/poster.jpg", ".png")):
+        if request.url.path.endswith(("/thumb", "/Images/Primary", "/poster.jpg", ".png", "/cover")):
             return httpx.Response(200, content=b"\x89PNG-image")
         body = routes.get(request.url.path)
         if body is None:
@@ -249,7 +445,8 @@ def handle_for(
         secrets=secrets,
         transport=transport(routes or ROUTES[key], scenario, seen),
     )
-    settings = {"base_url": base, **({"username": "portal"} if key == "romm" else {}), **(config or {})}
+    user = {"username": "portal"} if key in ("romm", "grimmory") else {}
+    settings = {"base_url": base, **user, **(config or {})}
     return ServiceHandle(service_id=uuid4(), name=key, config=settings, secrets=secrets, http=http)
 
 

@@ -5,6 +5,13 @@
   provider only serves images (``fetch_image``) so no source URL or token ever reaches a client.
 * ``media.playback`` (live): what is playing now and recent history on one service.
 * ``request.service`` (live + sync): submit/track requests; sync yields :class:`RequestPayload` records.
+* ``service.accounts`` (027): the accounts of one service, matched with portal members.
+* ``media.activity_history`` (027): the full play/read history of one service, paged — backfilled once,
+  then followed incrementally; sources reporting the same plays (Plex and Tautulli) share a ``family``
+  so the portal keeps one row per play, from the richest source.
+* ``media.calendar`` (027): upcoming releases (Radarr, Sonarr…).
+* ``media.metadata`` (027): a metadata provider (TMDB…) enriching catalog objects — backdrop, cast,
+  collection, budget, revenue, genres… — and serving its images.
 
 Providers are bound to one service (``instance_ref`` = the service id) and are usually wrapped by the 001
 isolation guard, so calls may return a :class:`~portalab.capabilities.results.CapabilityResult`;
@@ -26,6 +33,10 @@ LIBRARY = "media.library"
 PLAYBACK = "media.playback"
 REQUESTS = "request.service"
 ACCOUNTS = "service.accounts"
+ACTIVITY_HISTORY = "media.activity_history"
+CALENDAR = "media.calendar"
+METADATA = "media.metadata"
+ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
 RequestState = Literal["pending", "approved", "declined", "processing", "available", "failed", "cancelled"]
@@ -160,6 +171,111 @@ class ServiceAccounts(Protocol):
     async def list_accounts(self) -> Sequence[ServiceAccount]: ...
 
 
+@dataclass(frozen=True, slots=True)
+class SourceActivity:
+    """One play or reading session as the source recorded it (027, Telemetra-style raw history)."""
+
+    ref: str  # unique id of the play on the source
+    external_user_id: str
+    kind: str  # one of ACTIVITY_KINDS
+    title: str
+    started_at: datetime
+    stopped_at: datetime | None = None
+    watched_s: float = 0.0  # time actually spent
+    duration_s: float | None = None  # length of the item
+    progress: float | None = None  # 0..1 reached at the end of the session
+    item_external_id: str | None = None
+    parent_title: str | None = None  # series, album, author
+    ids: Mapping[str, str] = field(default_factory=dict)
+    year: int | None = None
+    device: str | None = None
+    platform: str | None = None
+    family: str | None = None  # sources reporting the same plays share it (``plex`` for Plex + Tautulli)
+    priority: int = 10  # within a family, the higher source wins
+
+
+@dataclass(frozen=True, slots=True)
+class ActivityPage:
+    items: Sequence[SourceActivity]
+    cursor: str | None = None  # pass it back for the next page; ``None`` when exhausted
+
+
+@runtime_checkable
+class ActivityHistory(Protocol):
+    async def history(self, *, since: datetime | None, cursor: str | None) -> ActivityPage: ...
+
+
+@dataclass(frozen=True, slots=True)
+class SourceRelease:
+    """An upcoming (or just released) item announced by a service (027)."""
+
+    external_id: str
+    kind: str  # movie, episode
+    title: str
+    release_at: datetime
+    release_type: str = "release"  # cinema, digital, physical, air
+    parent_title: str | None = None
+    season: int | None = None
+    episode: int | None = None
+    ids: Mapping[str, str] = field(default_factory=dict)
+    available: bool = False
+    overview: str | None = None
+
+
+@runtime_checkable
+class ReleaseCalendar(Protocol):
+    async def upcoming(self, start: datetime, end: datetime) -> Sequence[SourceRelease]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class MetadataPerson:
+    name: str
+    role: str | None = None  # character or job
+    department: str = "cast"  # cast, directing, writing, production…
+    image: str | None = None  # opaque ref served by the provider
+    ids: Mapping[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class MetadataRecord:
+    """What a metadata provider knows about one film, series or book (027)."""
+
+    ids: Mapping[str, str]
+    title: str
+    original_title: str | None = None
+    tagline: str | None = None
+    overview: str | None = None
+    genres: Sequence[str] = ()
+    release_date: str | None = None  # ISO date
+    runtime_min: int | None = None
+    countries: Sequence[str] = ()
+    languages: Sequence[str] = ()
+    studios: Sequence[str] = ()
+    budget: int | None = None
+    revenue: int | None = None
+    vote_average: float | None = None
+    vote_count: int | None = None
+    status: str | None = None
+    certification: str | None = None
+    collection: Mapping[str, Any] | None = None  # {id, name, poster}
+    seasons: int | None = None
+    episodes: int | None = None
+    networks: Sequence[str] = ()
+    poster: str | None = None
+    backdrop: str | None = None
+    people: Sequence[MetadataPerson] = ()
+    keywords: Sequence[str] = ()
+
+
+@runtime_checkable
+class MetadataProvider(Protocol):
+    async def lookup(
+        self, kind: str, ids: Mapping[str, str], title: str, year: int | None, language: str
+    ) -> MetadataRecord | None: ...
+
+    async def fetch_image(self, ref: str, size: str) -> bytes: ...
+
+
 def _spec(name: str, protocol: type[Any], description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=True, description=description
@@ -171,4 +287,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(PLAYBACK, MediaPlayback, "Live playback sessions and recent history of one service"),
     _spec(REQUESTS, RequestService, "Media requests on one request service"),
     _spec(ACCOUNTS, ServiceAccounts, "User accounts of one service, to match with portal members (027)"),
+    _spec(ACTIVITY_HISTORY, ActivityHistory, "Full play/read history of one service, paged (027)"),
+    _spec(CALENDAR, ReleaseCalendar, "Upcoming releases announced by one service (027)"),
+    _spec(METADATA, MetadataProvider, "Metadata provider enriching the catalog (027)"),
 )

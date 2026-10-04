@@ -194,6 +194,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "media.request",
     },
     {
+        "key": "media.insights",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.media_insights",
+        "icon": "chart",
+        "route": "/media/insights",
+        "group": "media",
+        "order_hint": 24,
+        "required_permission": "media.read",
+    },
+    {
         "key": "media.accounts",
         "owner": "module:media",
         "kind": "entry",

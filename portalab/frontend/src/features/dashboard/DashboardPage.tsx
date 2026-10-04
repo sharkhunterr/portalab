@@ -23,6 +23,7 @@ import { readingOrder } from "./grid/engine";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
+import "./widgets/media";
 import "../gamification/widget";
 import "../community/widget";
 import "../marketplace/widget";

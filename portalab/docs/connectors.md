@@ -12,11 +12,14 @@ Registered at start (`portalab.connectors.builtin`); plugins can add more.
 | Key | Service | Provides | Credentials |
 |---|---|---|---|
 | `jellyfin` | Jellyfin / Emby | `media.library` (sync), `media.playback`, health probe | API key (*Dashboard → API Keys*) |
-| `plex` | Plex Media Server | `media.library` (sync), `media.playback`, health probe | `X-Plex-Token` |
+| `plex` | Plex Media Server | `media.library` (sync), `media.playback`, `media.activity_history`, `service.accounts`, health probe | `X-Plex-Token` |
 | `seerr` | Overseerr / Jellyseerr | `request.service` (sync + submit/status), health probe | API key (*Settings → General*) |
-| `radarr` | Radarr (API v3) | `media.library` (sync: films, availability), health probe | API key |
-| `sonarr` | Sonarr v3/v4 | `media.library` (sync: series and seasons), health probe | API key |
+| `radarr` | Radarr (API v3) | `media.library` (sync: films, availability), `media.calendar`, health probe | API key |
+| `sonarr` | Sonarr v3/v4 | `media.library` (sync: series and seasons), `media.calendar`, health probe | API key |
 | `romm` | RomM 3/4 | `media.library` (sync: games), health probe | account username + password |
+| `tautulli` | Tautulli (API v2) | `media.activity_history` (films, episodes, live TV, music), `service.accounts`, health probe | API key (`apikey` parameter, redacted) |
+| `grimmory` | Grimmory / BookLore | `media.library` (sync: books, audiobooks), `media.activity_history` (reading sessions of the configured account), `service.accounts`, health probe | account username + password (bearer token) |
+| `tmdb` | The Movie Database | `media.metadata` (backdrop, cast, saga, budget, revenue…; images proxied by the portal), health probe | API Read Access Token or v3 key |
 
 They share `portalab.connectors.http_base.HttpConnector`: HTTP outcomes become typed results (401/403 →
 `ProviderAuthError`, transport errors → `ConnectionError`, non-JSON → `InvalidPayload`), image references are

@@ -415,5 +415,15 @@
   "accounts.noService": "Aucun service ne liste ses comptes",
   "accounts.noServiceHint": "Connectez Plex, Jellyfin, Seerr ou RomM dans Services pour associer leurs comptes aux membres.",
   "accounts.stat.accounts": "Comptes",
-  "accounts.search": "Rechercher un compte"
+  "accounts.search": "Rechercher un compte",
+  "services.category.books": "Livres",
+  "services.category.metadata": "Métadonnées",
+  "services.connector.tautulli.description": "Les statistiques de lecture de Plex : films, séries, TV en direct et musique, par membre.",
+  "services.connector.tautulli.help": "Clé d'API : Tautulli → Paramètres → Interface web → API (activez l'API puis copiez la clé).",
+  "services.connector.grimmory.description": "Votre bibliothèque de livres et livres audio, et les sessions de lecture.",
+  "services.connector.grimmory.help": "Utilisez un compte Grimmory (administrateur pour lister les membres). Ses sessions de lecture sont suivies ; connectez un service par lecteur à suivre.",
+  "services.connector.tmdb.description": "Fiches enrichies des films et séries : fond d'écran, acteurs, saga, budget, recettes, genres…",
+  "services.connector.tmdb.help": "Créez une clé gratuite sur themoviedb.org → Paramètres → API, puis collez le « jeton d'accès en lecture » (ou la clé v3).",
+  "services.field.language": "Langue",
+  "services.field.language.hint": "Par exemple fr-FR ; vide = la langue du portail."
 }

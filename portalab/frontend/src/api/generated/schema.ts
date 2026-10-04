@@ -1369,6 +1369,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/media/insights/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Insight Sources
+         * @description Where the history ingestion of each service stands (backfill, incremental, last error), and the
+         *     metadata enrichment progress.
+         */
+        get: operations["insight_sources_api_v1_admin_media_insights_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/insights/sources/{service_id}/resync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resync Source */
+        post: operations["resync_source_api_v1_admin_media_insights_sources__service_id__resync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/media/links/{link_id}/verify": {
         parameters: {
             query?: never;
@@ -1431,6 +1469,23 @@ export interface paths {
         put?: never;
         /** Merge */
         post: operations["merge_api_v1_admin_media_merge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/objects/{object_id}/metadata/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh Metadata */
+        post: operations["refresh_metadata_api_v1_admin_media_objects__object_id__metadata_refresh_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5175,6 +5230,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Insights
+         * @description What was watched, listened to and read — mine, or the server's (anonymous unless media manager).
+         */
+        get: operations["insights_api_v1_media_insights_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/metadata-images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Metadata Image
+         * @description A metadata provider image (backdrop, portrait…), served by the portal: browsers never call TMDB.
+         */
+        get: operations["metadata_image_api_v1_media_metadata_images_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/requests": {
         parameters: {
             query?: never;
@@ -5209,6 +5304,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/upcoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Upcoming */
+        get: operations["upcoming_api_v1_media_upcoming_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/{object_id}": {
         parameters: {
             query?: never;
@@ -5218,6 +5330,26 @@ export interface paths {
         };
         /** Detail */
         get: operations["detail_api_v1_media__object_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Object Metadata
+         * @description Enriched details of a film or a series (backdrop, cast, saga, budget, revenue…), when known.
+         */
+        get: operations["object_metadata_api_v1_media__object_id__metadata_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -14383,6 +14515,61 @@ export interface operations {
             };
         };
     };
+    insight_sources_api_v1_admin_media_insights_sources_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    resync_source_api_v1_admin_media_insights_sources__service_id__resync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     admin_verify_link_api_v1_admin_media_links__link_id__verify_post: {
         parameters: {
             query?: never;
@@ -14475,6 +14662,39 @@ export interface operations {
                 "application/json": components["schemas"]["MediaMergeIn"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_metadata_api_v1_admin_media_objects__object_id__metadata_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -21956,6 +22176,74 @@ export interface operations {
             };
         };
     };
+    insights_api_v1_media_insights_get: {
+        parameters: {
+            query?: {
+                period?: string;
+                category?: string;
+                scope?: "me" | "all";
+                tz?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metadata_image_api_v1_media_metadata_images_get: {
+        parameters: {
+            query: {
+                ref: string;
+                size?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_request_api_v1_media_requests_post: {
         parameters: {
             query?: never;
@@ -22020,6 +22308,39 @@ export interface operations {
             };
         };
     };
+    upcoming_api_v1_media_upcoming_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     detail_api_v1_media__object_id__get: {
         parameters: {
             query?: never;
@@ -22038,6 +22359,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    object_metadata_api_v1_media__object_id__metadata_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

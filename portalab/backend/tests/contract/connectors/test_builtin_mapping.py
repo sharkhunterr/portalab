@@ -144,4 +144,14 @@ def test_builtin_catalog_registers_once() -> None:
     register_builtin(registry)
     register_builtin(registry)  # idempotent at start-up
     assert sorted(c.key for c in registry.all()) == sorted(c.key for c in builtin_connectors())
-    assert {c.key for c in registry.all()} == {"jellyfin", "plex", "seerr", "radarr", "sonarr", "romm"}
+    assert {c.key for c in registry.all()} == {
+        "jellyfin",
+        "plex",
+        "seerr",
+        "radarr",
+        "sonarr",
+        "romm",
+        "tautulli",
+        "grimmory",
+        "tmdb",
+    }

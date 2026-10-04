@@ -294,3 +294,112 @@ class MediaRequest(MediaBase):
     counted: Mapped[str] = mapped_column(String(10), nullable=False)  # ``base`` or ``extra`` quota
     requested_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Activity(MediaBase):
+    """027 — one play or reading session as a source recorded it (raw history, Telemetra-style): ingested
+    from ``media.activity_history`` providers (backfill, then incremental) and from ended live sessions of
+    services without a history. ``counted`` is false for a row another source of the same ``family``
+    reports better (Tautulli over Plex), so statistics never count a play twice."""
+
+    __tablename__ = "activity"
+    __table_args__ = (
+        UniqueConstraint("service_id", "ref", name="uq_activity_service_ref"),
+        CheckConstraint(
+            "kind IN ('movie', 'episode', 'live', 'track', 'book', 'audiobook', 'other')", name="kind"
+        ),
+        Index("ix_activity_started", "started_at"),
+        Index("ix_activity_user", "user_id", "started_at"),
+        Index("ix_activity_work", "work_id", "started_at"),
+        Index("ix_activity_family", "family", "priority", "started_at"),
+        Index("ix_activity_external_user", "service_id", "external_user_id"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    service_id: Mapped[UUID] = mapped_column(nullable=False)
+    ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    family: Mapped[str | None] = mapped_column(String(40))
+    priority: Mapped[int] = mapped_column(Integer, nullable=False)
+    counted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    external_user_id: Mapped[str] = mapped_column(
+        String(200), nullable=False, info=pii("activity", tombstone="erased")
+    )
+    user_id: Mapped[UUID | None] = mapped_column()
+    kind: Mapped[str] = mapped_column(String(12), nullable=False)
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    parent_title: Mapped[str | None] = mapped_column(String(500))
+    object_id: Mapped[UUID | None] = mapped_column(ForeignKey("media.objects.id", ondelete="SET NULL"))
+    work_id: Mapped[UUID | None] = mapped_column(ForeignKey("media.objects.id", ondelete="SET NULL"))
+    item_external_id: Mapped[str | None] = mapped_column(String(200))
+    ids: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    year: Mapped[int | None] = mapped_column(Integer)
+    started_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    stopped_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    watched_s: Mapped[float] = mapped_column(Float, nullable=False)
+    duration_s: Mapped[float | None] = mapped_column(Float)
+    progress: Mapped[float | None] = mapped_column(Float)
+    device: Mapped[str | None] = mapped_column(String(120), info=pii("activity"))
+    platform: Mapped[str | None] = mapped_column(String(60))
+    received_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class ActivityCursor(MediaBase):
+    """027 — where the history ingestion of one service stands: the backfill page cursor, then the
+    incremental watermark (latest play seen)."""
+
+    __tablename__ = "activity_cursors"
+    __table_args__ = (CheckConstraint("mode IN ('backfill', 'incremental')", name="mode"),)
+
+    service_id: Mapped[UUID] = mapped_column(primary_key=True)
+    source: Mapped[str] = mapped_column(String(12), nullable=False)  # ``history`` or ``sessions``
+    mode: Mapped[str] = mapped_column(String(12), nullable=False)
+    cursor: Mapped[str | None] = mapped_column(String(200))
+    watermark: Mapped[datetime | None] = mapped_column(TZDateTime)
+    items: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
+    backfilled_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    last_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    last_error: Mapped[str | None] = mapped_column(String(300))
+
+
+class ActivityDaily(MediaBase):
+    """027 — precomputed per day, member and kind (rebuilt for the days that changed)."""
+
+    __tablename__ = "activity_daily"
+    __table_args__ = (Index("ix_activity_daily_user", "user_key", "day"),)
+
+    day: Mapped[datetime] = mapped_column(TZDateTime, primary_key=True)  # midnight UTC of the day
+    user_key: Mapped[UUID] = mapped_column(primary_key=True)  # the member, or the nil UUID when unknown
+    kind: Mapped[str] = mapped_column(String(12), primary_key=True)
+    plays: Mapped[int] = mapped_column(Integer, nullable=False)
+    completed: Mapped[int] = mapped_column(Integer, nullable=False)
+    seconds: Mapped[float] = mapped_column(Float, nullable=False)
+    works: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class ActivityDirtyDay(MediaBase):
+    """027 — days whose aggregates must be rebuilt (new rows, a linked account, a superseded source)."""
+
+    __tablename__ = "activity_dirty_days"
+
+    day: Mapped[datetime] = mapped_column(TZDateTime, primary_key=True)
+
+
+class ObjectMetadata(MediaBase):
+    """027 — what a metadata provider (TMDB…) knows about a film or a series: backdrop, cast, saga,
+    budget, revenue… (``data`` follows ``MetadataRecord``); ``missing`` when the provider found nothing."""
+
+    __tablename__ = "object_metadata"
+    __table_args__ = (
+        CheckConstraint("status IN ('found', 'missing', 'error')", name="status"),
+        Index("ix_object_metadata_fetched", "status", "fetched_at"),
+    )
+
+    object_id: Mapped[UUID] = mapped_column(
+        ForeignKey("media.objects.id", ondelete="CASCADE"), primary_key=True
+    )
+    provider: Mapped[str] = mapped_column(String(64), nullable=False)  # the provider's service id
+    status: Mapped[str] = mapped_column(String(8), nullable=False)
+    language: Mapped[str] = mapped_column(String(16), nullable=False)
+    data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    fetched_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

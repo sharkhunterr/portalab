@@ -18,6 +18,7 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, ValidationFailed
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.identity.resolver import MediaNotFound
+from portalab.modules.media.insights.ingest import attribute
 from portalab.modules.media.models import UserLink
 
 
@@ -109,15 +110,21 @@ class UserLinkService:
                 if not ok:
                     raise LinkUnverified("The service did not confirm this account.")
             row.verified = True
+            await attribute(uow.session, row.service_id, row.external_user_id, row.user_id)
             return _view(row)
 
     async def remove(self, user: UUID, link_id: UUID) -> None:
         async with self.database.unit_of_work() as uow:
-            result = await uow.session.execute(
-                delete(UserLink).where(UserLink.id == link_id, UserLink.user_id == user)
-            )
-            if not getattr(result, "rowcount", 0):
+            removed = (
+                await uow.session.execute(
+                    delete(UserLink)
+                    .where(UserLink.id == link_id, UserLink.user_id == user)
+                    .returning(UserLink.service_id, UserLink.external_user_id)
+                )
+            ).first()
+            if removed is None:
                 raise MediaNotFound("This link does not exist.")
+            await attribute(uow.session, removed[0], removed[1], None)
 
     async def resolve(self, service_id: UUID, external_user_id: str | None) -> UUID | None:
         if not external_user_id:

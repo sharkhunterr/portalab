@@ -1,6 +1,7 @@
-"""Privacy participant (T003): media history, progress, sessions, account links and requests are personal
-(``activity``) — exported and erased with the account; catalog objects and community aggregates are not
-personal and stay (requests keep their catalog effect, the requester is removed)."""
+"""Privacy participant (T003): media history, play/read activity (027), progress, sessions, account links
+and requests are personal (``activity``) — exported and erased with the account; catalog objects and
+community aggregates are not personal and stay (requests keep their catalog effect, the requester is
+removed)."""
 
 from collections.abc import Sequence
 from uuid import UUID
@@ -9,7 +10,9 @@ from sqlalchemy import delete, select, update
 
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
+from portalab.modules.media.insights.ingest import mark_days
 from portalab.modules.media.models import (
+    Activity,
     HistoryEntry,
     MediaObject,
     MediaRequest,
@@ -45,6 +48,26 @@ class MediaParticipant:
                         },
                     )
                 )
+            for activity in (
+                await session.execute(
+                    select(Activity).where(Activity.user_id == user_id).order_by(Activity.started_at)
+                )
+            ).scalars():
+                records.append(
+                    ExportRecord(
+                        "media.activity",
+                        {
+                            "title": activity.title,
+                            "series": activity.parent_title,
+                            "kind": activity.kind,
+                            "at": activity.started_at.isoformat(),
+                            "seconds": round(activity.watched_s),
+                            "progress": activity.progress,
+                            "device": activity.device,
+                            "platform": activity.platform,
+                        },
+                    )
+                )
             for link in (
                 await session.execute(select(UserLink).where(UserLink.user_id == user_id))
             ).scalars():
@@ -76,6 +99,12 @@ class MediaParticipant:
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
         async with self.database.unit_of_work() as uow:
             session = uow.session
+            erased = (
+                await session.execute(
+                    delete(Activity).where(Activity.user_id == user_id).returning(Activity.started_at)
+                )
+            ).scalars()
+            await mark_days(session, erased)
             for model in (HistoryEntry, UserProgress, PlaybackSession, UserLink, QuotaUnits, QuotaLedger):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(

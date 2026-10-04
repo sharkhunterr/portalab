@@ -75,6 +75,7 @@ BASELINE: tuple[tuple[str, tuple[str, ...], float | None], ...] = (
     ("season", ("series",), None),
     ("episode", ("season", "series"), 0.9),
     ("book", (), 0.95),
+    ("audiobook", (), 0.95),
     ("game", (), None),
     ("album", (), None),
     ("track", ("album",), 0.8),

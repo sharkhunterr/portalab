@@ -415,5 +415,15 @@
   "accounts.noService": "No service lists its accounts",
   "accounts.noServiceHint": "Connect Plex, Jellyfin, Seerr or RomM in Services to link their accounts to members.",
   "accounts.stat.accounts": "Accounts",
-  "accounts.search": "Search an account"
+  "accounts.search": "Search an account",
+  "services.category.books": "Books",
+  "services.category.metadata": "Metadata",
+  "services.connector.tautulli.description": "Plex watch statistics: films, series, live TV and music, per member.",
+  "services.connector.tautulli.help": "API key: Tautulli → Settings → Web Interface → API (enable the API, then copy the key).",
+  "services.connector.grimmory.description": "Your books and audiobooks library, and the reading sessions.",
+  "services.connector.grimmory.help": "Use a Grimmory account (an administrator to list members). Its reading sessions are followed; connect one service per reader to follow.",
+  "services.connector.tmdb.description": "Rich film and series details: backdrop, cast, saga, budget, box office, genres…",
+  "services.connector.tmdb.help": "Create a free key on themoviedb.org → Settings → API, then paste the « API Read Access Token » (or the v3 key).",
+  "services.field.language": "Language",
+  "services.field.language.hint": "e.g. fr-FR; empty = the portal's language."
 }

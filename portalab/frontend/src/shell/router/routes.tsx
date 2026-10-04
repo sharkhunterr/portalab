@@ -35,6 +35,7 @@ const MediaHome = lazy(() => import("../../features/media/home/MediaHome"));
 const MediaCatalog = lazy(() => import("../../features/media/catalog/CatalogPage"));
 const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"));
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
+const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
 const NewsPage = lazy(() => import("../../features/news/NewsPage"));
@@ -195,6 +196,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <MediaRequests />,
               handle: h({ crumb: "My requests", requiredPermission: "media.request" }),
             },
+            { path: "insights", element: <MediaInsights />, handle: h({ crumb: "Statistics" }) },
             {
               path: ":objectId",
               element: <MediaDetail />,

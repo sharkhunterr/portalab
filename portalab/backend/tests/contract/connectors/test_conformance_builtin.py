@@ -3,11 +3,14 @@
 from portalab.capabilities.connector_sdk import Connector, ServiceHandle
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.conformance import ConformanceKit, Scenario
+from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.http_base import HttpConnector
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector
 from portalab.connectors.seerr import SeerrConnector
+from portalab.connectors.tautulli import TautulliConnector
+from portalab.connectors.tmdb import TmdbConnector
 from tests.contract.connectors.builtin_fixtures import handle_for
 
 
@@ -45,3 +48,15 @@ class TestSeerr(_Kit):
 
 class TestRomm(_Kit):
     connector_class = RommConnector
+
+
+class TestTautulli(_Kit):
+    connector_class = TautulliConnector
+
+
+class TestGrimmory(_Kit):
+    connector_class = GrimmoryConnector
+
+
+class TestTmdb(_Kit):
+    connector_class = TmdbConnector
