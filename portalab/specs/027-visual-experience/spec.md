@@ -45,6 +45,25 @@ implementation detail.
 - **Themes are experiences**: a theme may change arrangement, motion, sounds and atmosphere — always within
   the presentation boundary and the accessibility floor.
 
+## Clarifications
+
+### Session 2026-10-04
+
+- Q: How does the user arrange and size dashboard widgets? → A: Free 2D grid with drag-and-drop placement and
+  resize handles (width and height in grid cells), automatic upward compaction, a widget gallery with
+  previews to add widgets; keyboard/button alternatives for every move and resize (supersedes the 009
+  ordered-list layout model, R4).
+- Q: One arrangement per device class? → A: One arrangement only, authored on desktop; tablet and phone
+  arrangements are derived automatically (same reading order, fewer columns, widths clamped) and are not
+  edited separately.
+- Q: Which visual direction for the default theme? → A: Media-center base (artwork-forward, dark by default with
+  a light variant, depth through blur/translucency) combined with playful gamification accents (colorful
+  badges, animated XP bar, celebrations).
+- Q: What may a theme change on the dashboard? → A: Only the widgets' appearance (frame, spacing, headers,
+  effects); never the arrangement (positions, sizes, which widgets are present).
+- Q: One dashboard or several per user? → A: A single, fully customizable dashboard (the home page); multiple
+  named dashboards are out of scope.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A personal header on every page (Priority: P1)
@@ -215,14 +234,54 @@ datum stay identical, and accessibility preferences still override.
 5. **Given** any theme, **When** it is active, **Then** every navigation destination, header element and
    functional state remains present and reachable — a theme may move or restyle them, never remove critical
    ones (search, notifications, menu, identity, sign out).
-6. **Given** a light/dark system preference, **When** the default theme is active, **Then** it follows the
-   device preference unless the user chose otherwise.
+6. **Given** a new user, **When** the default theme is applied, **Then** its dark variant is shown; the user can
+   switch to the light variant or choose to follow the device's light/dark preference.
 7. **Given** the administrator restricts available themes or forces a default, **When** users choose
    appearance, **Then** only allowed themes are offered (existing 022 policy).
 
 ---
 
-### User Story 6 - Welcoming sign-in and first visit (Priority: P3)
+### User Story 6 - Arrange the dashboard visually (Priority: P2)
+
+The home dashboard is the user's own space. In edit mode, the user places widgets anywhere on a 2D grid by
+dragging them, resizes them with handles (width and height in grid cells), and the other widgets make room and
+compact upward automatically. A widget gallery shows every available widget with a preview, a short
+description and its possible sizes, and adds it in one action. Everything done by dragging can also be done
+with the keyboard or explicit buttons. Administrative policy (mandatory, locked, disabled widgets — 009) is
+visible and respected while editing.
+
+**Why this priority**: the user explicitly expects a customizable dashboard (widgets, layout, dimensions); the
+current "move up / move down" buttons on an ordered list do not deliver a modern personalization experience.
+
+**Independent Test**: Enter edit mode on desktop; drag a widget next to another, resize one to twice its width
+and height, add a widget from the gallery, remove one; leave edit mode, reload, and confirm the arrangement is
+kept; repeat the same moves using only the keyboard; confirm a locked widget cannot be moved or resized.
+
+**Acceptance Scenarios**:
+
+1. **Given** edit mode, **When** the user drags a widget to a free area or onto another widget's place,
+   **Then** the widget moves there, overlapped widgets are pushed aside, and empty gaps compact upward.
+2. **Given** edit mode, **When** the user drags a widget's resize handle, **Then** the widget's width and height
+   change in whole grid cells within the widget's minimum and maximum sizes, and neighbors make room.
+3. **Given** the widget gallery, **When** the user browses it, **Then** each widget shows a preview, a description
+   and its size options, and adding it places it at the first free position.
+4. **Given** keyboard-only use, **When** the user selects a widget in edit mode, **Then** they can move it by grid
+   steps, resize it, hide or remove it with keys or buttons, with each change announced to assistive
+   technology.
+5. **Given** a locked or mandatory widget, **When** the user tries to move, resize or remove it, **Then** the
+   action is unavailable with its reason shown, and the widget keeps displaying its data.
+6. **Given** the user leaves edit mode, **When** they reload or open the portal on another device, **Then** the
+   same arrangement is shown (identical on desktop; automatically derived on tablet and phone, in the same
+   reading order).
+8. **Given** a tablet or phone, **When** the user enters edit mode, **Then** they can add, hide, remove and
+   reorder widgets (changes apply to their single arrangement), while free placement and resizing are offered
+   on desktop-width screens only.
+7. **Given** an arrangement in progress, **When** the user cancels edit mode, **Then** the dashboard returns to
+   its arrangement before editing.
+
+---
+
+### User Story 7 - Welcoming sign-in and first visit (Priority: P3)
 
 Screens shown before or right after sign-in (sign-in, registration, password reset, first-run setup, the very
 first home visit) share the same visual identity: a branded, centered, friendly layout, clear errors, and a
@@ -338,8 +397,13 @@ the welcome appears once, can be dismissed, and is not shown again.
 
 #### Default theme & layout-capable themes
 - **FR-030**: The portal MUST ship a new default theme embodying the experience principles (friendly, simple,
-  modern), with light and dark variants that follow the device preference unless the user chose otherwise;
-  existing built-in themes (including high contrast) MUST remain available.
+  modern) in a **media-center direction with gamification accents**: artwork-forward presentation (posters,
+  covers, banners shown large wherever content has imagery, with a graceful fallback when it has none), depth
+  through layered translucent surfaces, dark variant by default and a light variant (plus an option to follow
+  the device preference), and playful accents reserved for progression and community (colorful badges,
+  animated XP bar, celebrations); existing built-in themes (including high contrast) MUST remain available.
+- **FR-030a**: Translucency and blur effects MUST degrade to solid surfaces when they would break the contrast
+  floor, when reduced motion/transparency is requested, or on devices that cannot render them smoothly.
 - **FR-031**: A theme MUST be able to select, in addition to the 022 capabilities (colors, typography, icons,
   backgrounds, textures, borders, shadows, density, animations, transitions, notification presentation,
   sounds): a **layout profile** (navigation placement and style per device class, header arrangement, card
@@ -359,6 +423,31 @@ the welcome appears once, can be dismissed, and is not shown again.
 - **FR-037**: Modules and plugins MUST obtain the header, navigation, page header and building blocks from the
   shell and design system, so that a theme change restyles them without per-module work.
 
+#### Dashboard arrangement
+- **FR-038**: The dashboard MUST be arranged on a 2D grid where each widget has a position and a size (width and
+  height in grid cells); widgets MUST NOT overlap and gaps MUST compact upward automatically.
+- **FR-039**: In edit mode, users MUST be able to move widgets by drag-and-drop and resize them with handles,
+  within each widget's declared minimum and maximum sizes, with neighbors repositioned live.
+- **FR-040**: Every move and resize MUST also be achievable without dragging (keyboard and explicit buttons),
+  with changes announced to assistive technology.
+- **FR-041**: A widget gallery MUST present every widget the user may add, with preview, description and size
+  options, and add the chosen widget at the first free position.
+- **FR-042**: Edit mode MUST offer save and cancel; cancel MUST restore the arrangement from before editing.
+- **FR-043**: Administrative widget policies (009: mandatory, locked, disabled, conditional) MUST be shown and
+  enforced in edit mode; a refused change MUST state its reason.
+- **FR-044**: Existing dashboards (ordered list with sizes) MUST be converted to the 2D arrangement preserving
+  order and sizes, without any user losing widgets or configuration.
+- **FR-045**: Each user MUST have a single dashboard arrangement, authored at desktop width; tablet and phone
+  arrangements MUST be derived automatically from it (reading order = row then column, fewer columns, widths
+  clamped to the available columns) and MUST NOT be stored or edited separately.
+- **FR-046**: On tablet and phone widths, edit mode MUST offer add, hide, remove and reorder (applied to the
+  single arrangement); drag placement and resize handles are REQUIRED on desktop widths only.
+- **FR-047**: Themes MUST be able to restyle dashboard widgets (frame style, spacing, header style, effects) but
+  MUST NOT change, propose or replace the user's arrangement (positions, sizes, presence of widgets); switching
+  themes leaves the arrangement strictly unchanged.
+- **FR-048**: Each user MUST have exactly one dashboard (the home page); multiple named dashboards and
+  per-module widget areas are out of scope for this feature.
+
 ### Key Entities *(include if feature involves data)*
 
 - **Navigation Section**: a named, iconified group of navigation entries (key, label, icon, order, audience such as
@@ -371,8 +460,12 @@ the welcome appears once, can be dismissed, and is not shown again.
   header arrangement, card style, content width, corner and elevation style.
 - **Motion Profile**: a theme's transition style, animation intensity and celebratory effect style.
 - **Sound Set**: a theme's sounds for notifications, rewards, level-up and interface events.
-- **Theme (extended)**: the existing 022 theme definition plus optional layout profile, motion profile and sound
-  set; the default theme provides all three.
+- **Theme (extended)**: the existing 022 theme definition plus optional layout profile (including widget frame
+  style, never a dashboard arrangement), motion profile and sound set; the default theme provides all three.
+- **Dashboard Arrangement**: per user, one arrangement giving each widget instance's grid position (column, row)
+  and size (width, height in cells) at desktop width, bounded by the widget's minimum/maximum sizes; tablet and
+  phone views are derived from it, never stored; replaces the ordered-list layout of 009.
+- **Widget Size Constraints**: per widget, the minimum, maximum and default size declared by its owner.
 - **Navigation Preferences**: per-user expanded/collapsed sections and dismissed first-visit welcome, persisted at
   account level.
 
@@ -399,13 +492,17 @@ the welcome appears once, can be dismissed, and is not shown again.
   class; reduced motion and sound-off are honored in 100% of celebratory feedback.
 - **SC-010**: A reward or level change is reflected in the header within the portal's normal live-update delay
   (a few seconds) in 95% of cases, without page reload.
+- **SC-011**: A user can move, resize and add a widget on the dashboard in under 30 seconds on first attempt
+  (hallway test, 9 of 10 participants), and 100% of these operations are also completable by keyboard alone.
+- **SC-012**: 100% of existing dashboards are converted to the 2D arrangement with no lost widget or
+  configuration.
 
 ## Assumptions
 
-- **Visual direction** (no reference was provided): the default theme takes the "friendly modern app" direction
-  — rounded cards with soft elevation, generous whitespace, one vivid accent color, readable sans-serif type,
-  line icons next to labels, light illustrations for empty states, subtle micro-animations; it can be refined in
-  `/speckit.clarify` without changing the requirements.
+- **Visual direction** (clarified): media-center base with gamification accents — rounded cards, generous
+  whitespace, readable sans-serif type, line icons next to labels, artwork shown large, one vivid accent color
+  plus a small palette reserved for progression/rarity, subtle micro-animations; exact palette and typefaces
+  are planning/design details.
 - **Device classes**: phone < 640 px, tablet 640–1024 px, desktop > 1024 px wide (indicative; exact breakpoints
   are a planning detail).
 - **Default sections** follow the product module list (PRODUCT_BLUEPRINT); exact labels and the membership of
@@ -420,5 +517,7 @@ the welcome appears once, can be dismissed, and is not shown again.
 - **The existing light, dark and high-contrast themes** become variants of or companions to the new default
   theme; existing user theme preferences keep working (a stored choice that no longer exists falls back to the
   default theme).
+- **Out of scope**: multiple dashboards per user, per-module widget areas, themes proposing dashboard
+  arrangements, separately stored tablet/phone arrangements.
 - **Scope**: all existing module pages are re-composed with the shared building blocks; no business feature is
   added, removed or changed.
