@@ -11,5 +11,5 @@ export function useMyPermissions() {
 }
 
 export function useHasPermission(permission: string): boolean {
-  return useMyPermissions().data?.permissions.includes(permission) ?? false;
+  return useMyPermissions().data?.permissions?.includes(permission) ?? false;
 }

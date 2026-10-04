@@ -487,6 +487,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "media.manage",
     },
     {
+        "key": "ui.theme_studio",
+        "owner": "module:ui",
+        "kind": "entry",
+        "label_key": "nav.admin.themes",
+        "icon": "palette",
+        "route": "/admin/themes",
+        "group": "admin",
+        "topic": "content",
+        "order_hint": 48,
+        "required_permission": "appearance.manage",
+    },
+    {
         "key": "administration.config",
         "owner": "module:administration",
         "kind": "entry",

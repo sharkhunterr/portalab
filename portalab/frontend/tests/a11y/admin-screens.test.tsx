@@ -18,6 +18,7 @@ vi.mock("../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
+import { MemoryRouter } from "react-router";
 import { ConfigEditor, ControlCenter, FirstRunWizard, Toggles } from "../../src/features/admin";
 import { json } from "../support/fake-api";
 
@@ -43,14 +44,29 @@ describe("admin screens", () => {
       json(200, {
         panels: [
           { panel: "configuration", state: "available", data: { active_policies: 1 } },
-          { panel: "health", state: "unavailable", data: {} },
+          { panel: "storage", state: "unavailable", data: {} },
+          {
+            panel: "services",
+            state: "partial",
+            data: { total: 3, troubled: 1, by_state: { ok: 2, degraded: 1 } },
+          },
+          { panel: "custom_panel", state: "available", data: { open_items: 4 } },
         ],
-        required_actions: [{ id: "a", title_key: "Renew certificate", link: "/x", actionable: true }],
+        required_actions: [
+          { id: "a", title_key: "Renew certificate", link: "/x", actionable: true, impact: 5 },
+        ],
       });
-    const { container } = render(withClient(<ControlCenter />));
-    expect(await screen.findByText("active_policies")).toBeInTheDocument();
+    const { container } = render(withClient(<MemoryRouter>{<ControlCenter />}</MemoryRouter>));
+    expect(await screen.findByText("Active policies")).toBeInTheDocument();
     expect(screen.getByText("Unavailable")).toBeInTheDocument();
+    expect(screen.getByText("Open items")).toBeInTheDocument();
+    expect(screen.getByText("Degraded · 1")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Renew certificate" })).toBeInTheDocument();
+    expect(screen.getByText("High")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Add a service" })).toHaveAttribute(
+      "href",
+      "/admin/services?add=1",
+    );
     await expectAccessible(container);
   });
 

@@ -46,7 +46,7 @@ export function AchievementGrid({ achievements }: { achievements: AchievementVie
       </header>
       <div className="achievements__toolbar">
         {categories.length > 1 ? (
-          <div className="ds-subnav" role="group" aria-label={t("gamification:achievements.title")}>
+          <fieldset className="ds-subnav" aria-label={t("gamification:achievements.title")}>
             <button type="button" aria-pressed={!category} onClick={() => setCategory("")}>
               {t("gamification:achievements.all")}
             </button>
@@ -55,7 +55,7 @@ export function AchievementGrid({ achievements }: { achievements: AchievementVie
                 {t(`gamification:achievements.category.${c}`)}
               </button>
             ))}
-          </div>
+          </fieldset>
         ) : null}
         <label className="achievements__sort">
           {t("gamification:achievements.sort")}

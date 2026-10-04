@@ -133,15 +133,15 @@ export default function CatalogPage() {
       ) : null}
 
       <div className="shop-toolbar">
-        <div className="ds-subnav" role="group" aria-label={t("marketplace:catalog.title")}>
+        <fieldset className="ds-subnav" aria-label={t("marketplace:catalog.title")}>
           <button type="button" aria-pressed={view === "collections"} onClick={() => setView("collections")}>
             <Icon name="star" size={16} /> {t("marketplace:shop.byCollection")}
           </button>
           <button type="button" aria-pressed={view === "types"} onClick={() => setView("types")}>
             <Icon name="list" size={16} /> {t("marketplace:shop.byType")}
           </button>
-        </div>
-        <div className="shop-rarities" role="group" aria-label={t("marketplace:shop.rarity")}>
+        </fieldset>
+        <fieldset className="shop-rarities" aria-label={t("marketplace:shop.rarity")}>
           <button type="button" aria-pressed={!rarity} onClick={() => setRarity("")}>
             {t("marketplace:shop.allRarities")}
           </button>
@@ -156,7 +156,7 @@ export default function CatalogPage() {
               {t(`marketplace:rarity.${r}`)}
             </button>
           ))}
-        </div>
+        </fieldset>
         <label className="shop-search">
           <Icon name="search" size={18} />
           <span className="visually-hidden">{t("marketplace:catalog.search")}</span>

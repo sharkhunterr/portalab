@@ -2,9 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useId, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
+import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/FunctionalState";
+import { useT } from "../../i18n/hooks/useT";
 import { DataRegion } from "../../state/regions";
+import { useHasPermission } from "../authz/useMyPermissions";
+import "./services.css";
 
 /**
  * Services overview and detail page (spec 006 T024). Each detail section is independent and shows its own
@@ -223,9 +227,23 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
 
 export function ServicesHealth() {
   const [selected, setSelected] = useState<OverviewItem | null>(null);
+  const t = useT();
+  const manage = useHasPermission("services.manage");
   return (
-    <div className="account-page">
-      <PageHeader level={2} icon="server" title={servicesHealthStrings.title} />
+    <div className="account-page services-page">
+      <PageHeader
+        level={2}
+        icon="server"
+        title={servicesHealthStrings.title}
+        primary={
+          manage ? (
+            <Link className="ds-button ds-button--primary" to="/admin/services?add=1">
+              <Icon name="plus" size={18} />
+              {t("admin:services.add")}
+            </Link>
+          ) : undefined
+        }
+      />
       <DataRegion<OverviewItem[]>
         label={servicesHealthStrings.overview}
         queryKey={["services", "health"]}
@@ -237,13 +255,20 @@ export function ServicesHealth() {
           items.length === 0 ? (
             <p>{servicesHealthStrings.empty}</p>
           ) : (
-            <ul aria-label={servicesHealthStrings.overview}>
+            <ul aria-label={servicesHealthStrings.overview} className="services-page__grid">
               {items.map((item) => (
-                <li key={item.id}>
-                  <strong>{item.name}</strong> <HealthBadge state={item.state} /> ·{" "}
-                  {servicesHealthStrings.availability(item.availability)}{" "}
+                <li key={item.id} className="ds-card services-page__card" data-state={item.state}>
+                  <span className="services-page__name">
+                    <Icon name="server" size={20} />
+                    <strong>{item.name}</strong>
+                  </span>
+                  <HealthBadge state={item.state} />
+                  <span className="services-page__meta">
+                    {servicesHealthStrings.availability(item.availability)}
+                  </span>
                   <button
                     type="button"
+                    className="ds-button ds-button--secondary"
                     aria-pressed={selected?.id === item.id}
                     onClick={() => setSelected(item)}
                   >

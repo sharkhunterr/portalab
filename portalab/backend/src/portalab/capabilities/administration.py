@@ -136,6 +136,7 @@ default_admin_surfaces = AdminSurfaceRegistry()
 register_admin_surface: Callable[[AdminSurface], AdminSurface] = default_admin_surfaces.register
 
 DynamicValidator = Callable[[Any], Awaitable[list[str]]]
+UserDynamicValidator = Callable[[Any, str | None], Awaitable[list[str]]]  # value, user ref (027 US11)
 
 
 @runtime_checkable

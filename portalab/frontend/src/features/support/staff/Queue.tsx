@@ -1,13 +1,15 @@
 import { useId, useState } from "react";
 import "../support.css";
-import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useQueue } from "../tickets/api";
 import { TicketList } from "../tickets/MyTickets";
+import { stateLabel } from "../tickets/TicketBadges";
 
-/** Support queue (spec 016 T025, staff): filter by state, unassigned, text. */
+/** Support queue (spec 016 T025, 027 T095, staff): state chips, "unassigned" toggle and a text search. */
 const STATES = ["open", "in_progress", "waiting_user", "resolved", "closed", "cancelled"];
 
 export function Queue() {
@@ -17,35 +19,59 @@ export function Queue() {
   const [unassigned, setUnassigned] = useState(false);
   const [q, setQ] = useState("");
   const queue = useQueue({ state, unassigned, q });
+  const items = queue.data?.items ?? [];
   return (
-    <section aria-labelledby={headingId}>
-      <PageHeader titleId={headingId} level={2} icon="inbox" title={t("support:queue.title")} />
-      <search>
-        <fieldset className="support-filters">
-          <legend className="visually-hidden">{t("support:queue.filters")}</legend>
-          <SelectField
-            label={t("support:ticket.state")}
-            value={state}
-            onChange={(e) => setState(e.target.value)}
-          >
-            <option value="">{t("support:queue.all")}</option>
-            {STATES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </SelectField>
-          <CheckboxField
-            label={t("support:queue.unassigned")}
-            checked={unassigned}
-            onChange={(e) => setUnassigned(e.target.checked)}
-          />
-          <TextField label={t("support:queue.search")} value={q} onChange={(e) => setQ(e.target.value)} />
+    <section aria-labelledby={headingId} className="support-page">
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        icon="inbox"
+        title={t("support:queue.title")}
+        context={t("support:queue.subtitle")}
+      />
+      <search className="support-toolbar">
+        <fieldset className="ds-subnav" aria-label={t("support:ticket.state")}>
+          <button type="button" aria-pressed={!state} onClick={() => setState("")}>
+            {t("support:queue.all")}
+          </button>
+          {STATES.map((s) => (
+            <button key={s} type="button" aria-pressed={state === s} onClick={() => setState(s)}>
+              {s === "waiting_user" ? t("support:queue.waitingMember") : stateLabel(t, s)}
+            </button>
+          ))}
         </fieldset>
+        <button
+          type="button"
+          className="ds-button ds-button--ghost"
+          aria-pressed={unassigned}
+          onClick={() => setUnassigned(!unassigned)}
+        >
+          <Icon name={unassigned ? "check" : "user"} size={16} />
+          {t("support:queue.unassigned")}
+        </button>
+        <label className="support-search">
+          <Icon name="search" size={18} />
+          <span className="visually-hidden">{t("support:queue.search")}</span>
+          <input
+            type="search"
+            value={q}
+            placeholder={t("support:queue.search")}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </label>
       </search>
       {queue.isError ? <FunctionalState state="unauthorized" /> : null}
-      {queue.data && queue.data.items.length === 0 ? <p>{t("support:queue.empty")}</p> : null}
-      {queue.data ? <TicketList items={queue.data.items} label={t("support:queue.title")} /> : null}
+      {queue.data ? (
+        <p className="support-meta">{t("support:queue.count", { count: items.length })}</p>
+      ) : null}
+      {queue.data && items.length === 0 ? (
+        <EmptyState
+          icon="inbox"
+          title={t("support:queue.empty")}
+          action={{ label: t("support:queue.all"), onSelect: () => setState("") }}
+        />
+      ) : null}
+      {items.length ? <TicketList items={items} label={t("support:queue.title")} /> : null}
     </section>
   );
 }

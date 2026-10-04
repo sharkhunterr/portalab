@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.config import EffectiveValue
@@ -211,7 +211,9 @@ class ConfigService:
             raise InvalidSettingValue(
                 f"Invalid value for {change.key}.", extensions={"setting": change.key}
             ) from exc
-        problems = await self.registry.dynamic_errors(change.key, value)
+        problems = await self.registry.dynamic_errors(
+            change.key, value, user_ref=change.scope_ref if change.scope == "user" else None
+        )
         if problems:
             raise InvalidSettingValue("; ".join(problems), extensions={"setting": change.key})
         if change.scope == "user":
@@ -275,6 +277,13 @@ class ConfigService:
             )
             if published.duplicate:
                 return False
+            # a missing row cannot be locked FOR UPDATE: two first writes of the same setting would both
+            # insert (unique violation). Serialize per setting with transaction-scoped advisory locks, taken
+            # in a fixed order so concurrent multi-key changes cannot deadlock.
+            for lock in sorted({f"{c.key}|{c.scope}|{c.scope_ref}" for c in items}):
+                await session.execute(
+                    text("SELECT pg_advisory_xact_lock(hashtextextended(:lock, 0))"), {"lock": lock}
+                )
             for change in items:
                 declaration, value = await self._check(session, change)
                 existing = (

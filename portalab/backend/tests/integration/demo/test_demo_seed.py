@@ -51,6 +51,7 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
     first = await seed_demo(platform, users_file=users_file)
     skipped = {step: status for step, status in first.steps.items() if status.startswith("skipped")}
     assert first.ok and not skipped, first.steps
+    assert first.steps["first run"] == "completed"
     after_first = await counts(database)
     assert after_first["users"] == 1 + len(MEMBERS)
     assert after_first["products"] == len(PRODUCTS) and after_first["ownerships"] >= 3

@@ -38,8 +38,10 @@ class ThemePatch(BaseModel):
 
 
 @router.get("/ui/themes")
-async def themes(_: Annotated[Principal, require("users.self.manage")], module: Module) -> dict[str, Any]:
-    return await module.themes.catalog()
+async def themes(
+    principal: Annotated[Principal, require("users.self.manage")], module: Module
+) -> dict[str, Any]:
+    return await module.themes.catalog(principal.user_id)
 
 
 @router.get("/admin/ui/themes")

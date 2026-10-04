@@ -32,7 +32,7 @@ async def make_ui(database: Database, blob_root: Path, clock: Clock | None = Non
         consumers=consumers,
     )
     module.register()
-    full.administration.registry.register_validator(
+    full.administration.registry.register_user_validator(
         "ui.theme", module.themes.choice_errors, owner="module:ui"
     )
     return UiHarness(full, module, event_types, consumers)

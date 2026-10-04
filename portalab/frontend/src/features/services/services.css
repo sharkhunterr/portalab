@@ -1,0 +1,32 @@
+/* 027 T093 — services status page: one card per service, state in text and icon (never color alone). */
+.services-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.services-page__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.services-page__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-wrap: anywhere;
+}
+.services-page__name .ds-icon {
+  color: var(--color-accent);
+}
+.services-page__meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.services-page__card > button {
+  margin-block-start: auto;
+}

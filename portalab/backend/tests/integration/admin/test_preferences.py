@@ -82,3 +82,19 @@ async def test_preferences_and_policies(app: FastAPI, client: httpx.AsyncClient,
     )
     await eraser.erase(user_id, "final")
     assert (await full.administration.config.get("demo.theme", user_id=user_id)).value == "auto"
+
+
+async def test_concurrent_first_writes_do_not_collide(
+    app: FastAPI, client: httpx.AsyncClient, full: FullPlatform
+) -> None:
+    """027 T094: two first writes of the same preference at once (e.g. a double click) both succeed."""
+    import asyncio
+
+    await create_user(module_of(app), "racer")
+    await login(client, "racer")
+    responses = await asyncio.gather(
+        *(client.put("/api/v1/me/preferences", json={"demo.pageSize": 30 + n}) for n in range(4))
+    )
+    assert [r.status_code for r in responses] == [200] * 4
+    final = _pref((await client.get("/api/v1/me/preferences")).json(), "demo.pageSize")
+    assert final["source"] == "user" and final["value"] in {30, 31, 32, 33}

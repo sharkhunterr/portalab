@@ -60,6 +60,7 @@ class MarketplaceProductOut(BaseModel):
     poster_effect: str = "auto"
     icon: str | None = None
     category: str | None = None
+    theme: str | None = None  # 027 US11: the theme a ``theme`` product unlocks (shown before buying)
     eligibility: list[MarketplaceCheckOut] = []
 
 
@@ -119,6 +120,7 @@ def product_out(
         poster_effect=product.poster_effect,
         icon=product.icon,
         category=(categories or {}).get(product.category_id) if product.category_id else None,
+        theme=str(version.payload.get("theme")) if product.type == "theme" and version.payload else None,
     )
 
 

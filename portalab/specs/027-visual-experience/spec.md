@@ -509,7 +509,9 @@ matching Marketplace product; a member buys it and can select it.
   with state, key figures and next actions.
 - **FR-053**: News, wiki and support pages (member and administration views) MUST use the page kit.
 - **FR-054**: Administrators MUST be able to create a theme from an existing one with live preview and the
-  accessibility report, and offer it in the Marketplace without editing raw documents.
+  accessibility report, and offer it in the Marketplace without editing raw documents. A theme sold by an
+  available Marketplace product MUST be listed and selectable only by its owners (the portal default and the
+  accessibility themes are never reserved); other members see it as "in the shop".
 
 #### Dashboard arrangement
 - **FR-038**: The dashboard MUST be arranged on a 2D grid where each widget has a position and a size (width and

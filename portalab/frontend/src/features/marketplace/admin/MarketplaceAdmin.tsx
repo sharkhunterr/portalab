@@ -7,27 +7,12 @@ import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { type Category, type Product, useCategories } from "../api";
 import { ProductPoster } from "../catalog/ProductPoster";
 import { NewProductDialog, PresentationDialog } from "./ProductEditor";
 import "../marketplace.css";
-
-/** Run a sensitive admin call, retrying once with the confirmation the server asks for. */
-async function withConfirmation<T>(
-  call: (confirmation?: string) => Promise<T>,
-  confirm: () => boolean,
-): Promise<T> {
-  try {
-    return await call();
-  } catch (error) {
-    if (error instanceof ApiError && error.code === "authz.confirmation_required" && confirm()) {
-      return call(String(error.extensions.confirmation ?? ""));
-    }
-    throw error;
-  }
-}
+import { withConfirmation } from "./confirm";
 
 /**
  * ``/admin/marketplace`` (spec 015 T021, T030): products (JSON definition, versions, publish/archive),

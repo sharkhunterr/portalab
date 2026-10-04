@@ -189,7 +189,7 @@ def wire_platform(
     observability.register_capabilities()
     ui = UiModule(database, events, authz.audit, capabilities)
     ui.register()
-    administration.registry.register_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
+    administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     shell = ShellModule(database, events, authz.engine, capabilities)
     shell.register()
     i18n = I18nModule(database, events, authz.audit, capabilities)

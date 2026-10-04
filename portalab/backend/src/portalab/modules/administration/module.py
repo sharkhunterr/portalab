@@ -38,7 +38,12 @@ from portalab.modules.administration.config.user_prefs import (
 from portalab.modules.administration.firstrun.service import FirstRunService
 from portalab.modules.administration.importexport.service import ImportExportService
 from portalab.modules.administration.observability import metrics
-from portalab.modules.administration.overview.panels import AuditPanel, ConfigurationPanel, PlaceholderPanel
+from portalab.modules.administration.overview.panels import (
+    AuditPanel,
+    ConfigurationPanel,
+    ServicesPanel,
+    StoragePanel,
+)
 from portalab.modules.administration.overview.service import ControlCenter
 from portalab.modules.administration.policies.service import PolicyService
 from portalab.modules.administration.toggles.service import ToggleService
@@ -94,6 +99,7 @@ class AdministrationModule:
         self.import_export = ImportExportService(self.config, audit, events, clock=clock)
         self.first_run = FirstRunService(database, capabilities, self.config, audit, events, clock=clock)
         self.control_center = ControlCenter(capabilities, authorizer, timeout_ms=panel_timeout_ms)
+        self.clock = clock
 
     def register_capabilities(self) -> None:
         provide = self.capabilities.provide
@@ -139,9 +145,8 @@ class AdministrationModule:
                 "configuration.manage",
                 10,
             ),
-            ("health", PlaceholderPanel("025-observability"), "infrastructure.read", 20),
-            ("infrastructure", PlaceholderPanel("006-health-maintenance"), "infrastructure.read", 30),
-            ("storage", PlaceholderPanel("006-health-maintenance"), "infrastructure.read", 40),
+            ("services", ServicesPanel(self.capabilities), "infrastructure.read", 30),
+            ("storage", StoragePanel(self.database, self.clock), "infrastructure.read", 40),
             ("audit", AuditPanel(self.capabilities), "audit.read", 50),
         )
         for name, provider, permission, order in panels:

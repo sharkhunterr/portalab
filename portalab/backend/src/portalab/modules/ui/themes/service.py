@@ -6,11 +6,13 @@ Enabling an external (marketplace) theme is a sensitive, audited action."""
 from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import select
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.db import Database
@@ -196,22 +198,48 @@ class ThemeService:
         async with self.database.session() as session:
             return list((await session.execute(select(Theme).order_by(Theme.key))).scalars())
 
-    async def catalog(self) -> dict[str, Any]:
-        """What a user may choose: enabled themes allowed by policy (+ accessibility themes)."""
+    async def catalog(self, user_id: UUID | None = None) -> dict[str, Any]:
+        """What a user may choose: enabled themes allowed by policy (+ accessibility themes). With a user,
+        a theme sold in the Marketplace is offered only to its owners (027 US11) — never the portal default
+        (or its family) nor an accessibility theme."""
         policy = await self.policy()
         allowed = set(policy["allowedThemes"]) | set(ACCESSIBILITY_THEMES)
         themes = [theme_out(row) for row in await self.all() if row.enabled and row.key in allowed]
-        return {"themes": themes, "policy": policy}
+        if user_id is None:
+            return {"themes": themes, "policy": policy}
+        locked = await self._locked_for(user_id, policy["defaultTheme"])
+        return {
+            "themes": [theme for theme in themes if theme["key"] not in locked],
+            "locked": [theme for theme in themes if theme["key"] in locked],  # shown as "in the shop"
+            "policy": policy,
+        }
+
+    async def _locked_for(self, user_id: UUID, default: str) -> frozenset[str]:
+        providers = self.capabilities.system_providers(THEME_ENTITLEMENTS)
+        if not providers:
+            return frozenset()
+        entitlements = providers[0].provider
+        sold = await entitlements.sold()
+        if not sold:
+            return frozenset()
+        free = {default, *ACCESSIBILITY_THEMES}
+        return frozenset(sold - await entitlements.owned(user_id) - free)
 
     async def allowed_keys(self) -> frozenset[str]:
         """``ui.theme_catalog``: enabled themes the policy allows (campaign overlays, 014)."""
         return frozenset(theme["key"] for theme in (await self.catalog())["themes"])
 
-    async def choice_errors(self, value: Any) -> list[str]:
-        """Dynamic validator of the ``ui.theme`` preference."""
+    async def choice_errors(self, value: Any, user_ref: str | None = None) -> list[str]:
+        """Dynamic validator of the ``ui.theme`` preference (per user: sold themes need ownership)."""
         if value is None:
             return []
-        catalog = await self.catalog()
+        user_id = None
+        if user_ref:
+            try:
+                user_id = UUID(user_ref)
+            except ValueError:
+                user_id = None
+        catalog = await self.catalog(user_id)
         choices = {theme["key"] for theme in catalog["themes"]}
         choices |= {theme["family"] for theme in catalog["themes"] if theme.get("family")}  # 027 R8
         if value not in choices:

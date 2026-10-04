@@ -29,6 +29,7 @@ from portalab.capabilities.observability import (
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.search import SearchRegistry, default_search
+from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
@@ -40,7 +41,7 @@ from portalab.core.time import Clock
 from portalab.modules.marketplace import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.marketplace.activation.service import Activation
 from portalab.modules.marketplace.eligibility.service import Eligibility
-from portalab.modules.marketplace.entitlements.reader import Entitlements
+from portalab.modules.marketplace.entitlements.reader import Entitlements, ThemeEntitlementsReader
 from portalab.modules.marketplace.events import register_event_types
 from portalab.modules.marketplace.funding.service import Fundings
 from portalab.modules.marketplace.grants.service import Grants
@@ -126,6 +127,10 @@ class MarketplaceModule:
             self.capabilities.provide(LIFECYCLE, self.projects, instance_ref=INSTANCE, owner=OWNER)
         if not self.capabilities.system_providers(ENTITLEMENTS):
             self.capabilities.provide(ENTITLEMENTS, self.entitlements, instance_ref=INSTANCE, owner=OWNER)
+        if not self.capabilities.system_providers(THEME_ENTITLEMENTS):
+            self.capabilities.provide(
+                THEME_ENTITLEMENTS, ThemeEntitlementsReader(self.database), instance_ref=INSTANCE, owner=OWNER
+            )
         register_builtin_types(
             self.product_types, self.capabilities, self.widgets, self.permissions, lambda: self.config
         )

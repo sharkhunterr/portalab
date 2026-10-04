@@ -41,6 +41,8 @@ export const ICON_IDS = [
 ] as const;
 
 export const THEME_SCHEMA_VERSION = 2;
+/** What a native color picker shows for a non-hex color (rgb()/rgba() are edited as text). */
+export const COLOR_PICKER_FALLBACK = "#000000";
 
 /**
  * Layout, motion and sound vocabulary (spec 027 R7/R24): a theme *chooses* among arrangements the portal

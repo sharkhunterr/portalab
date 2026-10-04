@@ -67,6 +67,7 @@ const Catalog = lazy(() => import("../../features/marketplace/catalog/CatalogPag
 const ProductRoute = lazy(() => import("../../features/marketplace/product/ProductRoute"));
 const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
+const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStudio"));
 const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
 const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAdmin"));
 const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
@@ -315,6 +316,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
             { path: "marketplace", element: <MarketplaceAdmin />, handle: h({ crumb: "Marketplace" }) },
+            { path: "themes", element: <ThemeStudio />, handle: h({ crumb: "Theme studio" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
             { path: "modules", element: <ModulesAdmin />, handle: h({ crumb: "Modules" }) },
             {

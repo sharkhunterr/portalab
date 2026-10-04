@@ -184,3 +184,36 @@ async def test_admin_api(app: FastAPI, client: httpx.AsyncClient, ui: UiHarness)
     )  # type: ignore[dict-item]
     assert bad.status_code == 422 and bad.json()["code"] == "theme.floor_violation"
     assert user  # imported helper kept for symmetry with other UI tests
+
+
+async def test_sold_themes_need_ownership(app: FastAPI, client: httpx.AsyncClient, ui: UiHarness) -> None:
+    """027 US11: a theme sold in the Marketplace is listed and selectable only by its owners; the portal
+    default and accessibility themes are never locked."""
+    from uuid import UUID
+
+    from portalab.capabilities.themes import ENTITLEMENTS
+
+    owners: set[UUID] = set()
+
+    class Shop:
+        async def sold(self) -> frozenset[str]:
+            return frozenset({"dark", "high-contrast"})
+
+        async def owned(self, user_id: UUID) -> frozenset[str]:
+            return frozenset({"dark"}) if user_id in owners else frozenset()
+
+    ui.full.identity.capabilities.provide(ENTITLEMENTS, Shop(), instance_ref="shop", owner="test")
+    user_id = await create_user(module_of(app), "shopper")
+    await login(client, "shopper")
+    body = (await client.get("/api/v1/ui/themes")).json()
+    listed = {t["key"] for t in body["themes"]}
+    assert "dark" not in listed and "high-contrast" in listed and "light" in listed
+    assert [t["key"] for t in body["locked"]] == ["dark"]
+    refused = await client.put("/api/v1/me/preferences", json={"ui.theme": "dark"})
+    assert refused.status_code == 422
+
+    owners.add(user_id)
+    listed = {t["key"] for t in (await client.get("/api/v1/ui/themes")).json()["themes"]}
+    assert "dark" in listed
+    assert (await client.put("/api/v1/me/preferences", json={"ui.theme": "dark"})).status_code == 200
+    assert "dark" in await ui.module.themes.allowed_keys()  # campaigns and activation see every theme

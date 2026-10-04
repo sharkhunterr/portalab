@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import axe from "axe-core";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -18,6 +18,7 @@ vi.mock("../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
+import { MemoryRouter } from "react-router";
 import { ServicesAdmin } from "../../src/features/admin";
 import { json } from "../support/fake-api";
 
@@ -27,7 +28,9 @@ function withClient(children: ReactNode) {
   });
   return (
     <QueryClientProvider client={client}>
-      <main>{children}</main>
+      <MemoryRouter>
+        <main>{children}</main>
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }
@@ -99,9 +102,12 @@ describe("services admin", () => {
     };
     const { container } = render(withClient(<ServicesAdmin />));
     expect(await screen.findByText("Media server")).toBeInTheDocument();
-    expect(screen.getByText(/Enabled · never synchronized/)).toBeInTheDocument();
+    expect(screen.getByText("Enabled")).toBeInTheDocument();
+    expect(screen.getByText(/Never synchronized/)).toBeInTheDocument();
 
-    fireEvent.change(await screen.findByLabelText("Name"), { target: { value: "Home" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add a service" }));
+    const dialog = await screen.findByRole("dialog", { name: "Add a service" });
+    fireEvent.change(await within(dialog).findByLabelText("Name"), { target: { value: "Home" } });
     fireEvent.change(screen.getByLabelText("Base Url"), { target: { value: "http://media.lan" } });
     const secret = screen.getByLabelText("api_token");
     expect(secret).toHaveAttribute("type", "password");
@@ -116,6 +122,8 @@ describe("services admin", () => {
       config: { base_url: "http://media.lan" },
     });
     expect((screen.getByLabelText("api_token") as HTMLInputElement).value).toBe(""); // never kept on screen
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    await vi.waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
 
     fireEvent.click(screen.getByRole("button", { name: "Sync now" }));
     expect(await screen.findByText("Synchronization queued.")).toBeInTheDocument();

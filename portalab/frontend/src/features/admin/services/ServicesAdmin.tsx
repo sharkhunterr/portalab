@@ -1,51 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
+import { Button } from "../../../design-system/components/Button";
+import { Card } from "../../../design-system/components/Content";
+import { SelectField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
+import { Dialog } from "../../../design-system/components/Overlays";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { EmptyState } from "../../../design-system/components/Placeholders";
+import { useFormat } from "../../../i18n/format/useFormat";
+import { useT } from "../../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../../state/regions";
+import "../admin.css";
 
 /**
- * Services administration (spec 005 T034): list, configure + test, enable/disable/disconnect, sync now and
- * sync history. Secrets are write-only (password inputs, never displayed). Strings are externalized for 026.
+ * Services administration (spec 005 T034, 027 T093): "Add a service" is the page's primary action (also
+ * reachable from the Control Center with ``?add=1``) and opens a guided form — connector, name, address,
+ * write-only secrets, test, save. Each configured service is a card with its state in text and its actions
+ * (enable, sync, disable, disconnect with confirmation, sync history). Secrets are never displayed.
  */
-export const servicesStrings = {
-  title: "Services",
-  list: "Configured services",
-  empty: "No service is configured yet.",
-  configureTitle: "Add a service",
-  connectorField: "Connector",
-  nameField: "Name",
-  secretSet: "set",
-  test: "Test the connection",
-  save: "Save",
-  saved: "Service saved. Enable it once the test passes.",
-  testOk: "Connection succeeded.",
-  testFailed: (detail: string) => `Connection failed: ${detail}`,
-  enable: "Enable",
-  disable: "Disable",
-  disconnect: "Disconnect",
-  confirmDisconnect: "Confirm disconnection (data is kept)",
-  syncNow: "Sync now",
-  syncQueued: "Synchronization queued.",
-  history: "Sync history",
-  noHistory: "No synchronization yet.",
-  historyOf: (name: string) => `Sync history of ${name}`,
-  state: {
-    configured: "Configured",
-    enabled: "Enabled",
-    syncing: "Syncing",
-    error: "Error",
-    unavailable: "Unavailable",
-    maintenance: "Maintenance",
-    disabled: "Disabled",
-    disconnected: "Disconnected (historical)",
-  } as Record<string, string>,
-  lastSuccess: (at: string | null) => (at ? `last success ${at}` : "never synchronized"),
-  run: (run: SyncRunItem) =>
-    `${run.kind} · ${run.status} · +${run.added} ~${run.modified} -${run.removed}${run.errored ? ` !${run.errored}` : ""}`,
-  genericError: "The operation was refused.",
-} as const;
-
 interface ConnectorItem {
   key: string;
   name: string;
@@ -89,7 +63,7 @@ async function unwrap<T>(promise: Promise<{ data?: unknown }>): Promise<T> {
 }
 
 function ConfigureService() {
-  const ids = { title: useId(), connector: useId(), name: useId(), prefix: useId() };
+  const t = useT();
   const queryClient = useQueryClient();
   const connectors = useQuery({
     queryKey: ["admin", "connectors"],
@@ -129,66 +103,84 @@ function ConfigureService() {
     save.mutate();
   }
 
+  if (connectors.isPending) return null;
   if (!connectors.data || connectors.data.length === 0 || !connector) {
-    return null;
+    return <p className="control-center__muted">{t("admin:services.noConnector")}</p>;
   }
   return (
-    <form onSubmit={submit} aria-labelledby={ids.title} className="auth-form">
-      <h3 id={ids.title}>{servicesStrings.configureTitle}</h3>
-      {save.isError ? <p role="alert">{servicesStrings.genericError}</p> : null}
-      {save.isSuccess ? <p role="status">{servicesStrings.saved}</p> : null}
-      {test.data ? (
-        <p role="status">
-          {test.data.ok ? servicesStrings.testOk : servicesStrings.testFailed(test.data.detail)}
+    <form onSubmit={submit} className="services-admin__form">
+      <p className="control-center__muted">{t("admin:services.wizard.intro")}</p>
+      {save.isError ? <p role="alert">{t("admin:services.refused")}</p> : null}
+      {save.isSuccess ? (
+        <p role="status" className="services-admin__ok">
+          {t("admin:services.saved")}
         </p>
       ) : null}
-      <label htmlFor={ids.connector}>{servicesStrings.connectorField}</label>
-      <select id={ids.connector} value={connector.key} onChange={(event) => setKey(event.target.value)}>
+      {test.data ? (
+        <p role="status" className={test.data.ok ? "services-admin__ok" : "services-admin__ko"}>
+          {test.data.ok
+            ? t("admin:services.testOk")
+            : t("admin:services.testFailed", { detail: test.data.detail })}
+        </p>
+      ) : null}
+      <SelectField
+        label={t("admin:services.connector")}
+        value={connector.key}
+        onChange={(event) => setKey(event.target.value)}
+      >
         {connectors.data.map((item) => (
           <option key={item.key} value={item.key}>
             {item.name}
           </option>
         ))}
-      </select>
-      <label htmlFor={ids.name}>{servicesStrings.nameField}</label>
-      <input id={ids.name} required value={name} onChange={(event) => setName(event.target.value)} />
+      </SelectField>
+      <TextField
+        label={t("admin:services.name")}
+        hint={t("admin:services.name.hint")}
+        required
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
       {fields.map(([field, schema]) => (
-        <div key={field}>
-          <label htmlFor={`${ids.prefix}-${field}`}>{schema.title ?? field}</label>
-          <input
-            id={`${ids.prefix}-${field}`}
-            required={connector.config_schema.required?.includes(field) ?? false}
-            value={config[field] ?? ""}
-            onChange={(event) => setConfig({ ...config, [field]: event.target.value })}
-          />
-        </div>
+        <TextField
+          key={field}
+          label={schema.title ?? field}
+          required={connector.config_schema.required?.includes(field) ?? false}
+          value={config[field] ?? ""}
+          onChange={(event) => setConfig({ ...config, [field]: event.target.value })}
+        />
       ))}
       {connector.secret_fields.map((field) => (
-        <div key={field}>
-          <label htmlFor={`${ids.prefix}-secret-${field}`}>{field}</label>
-          <input
-            id={`${ids.prefix}-secret-${field}`}
-            type="password"
-            autoComplete="off"
-            value={secrets[field] ?? ""}
-            onChange={(event) => setSecrets({ ...secrets, [field]: event.target.value })}
-          />
-        </div>
+        <TextField
+          key={field}
+          label={field}
+          hint={t("admin:services.writeOnly.hint")}
+          type="password"
+          autoComplete="off"
+          value={secrets[field] ?? ""}
+          onChange={(event) => setSecrets({ ...secrets, [field]: event.target.value })}
+        />
       ))}
-      <button type="button" onClick={() => test.mutate()} disabled={test.isPending}>
-        {servicesStrings.test}
-      </button>
-      <button type="submit" disabled={save.isPending}>
-        {servicesStrings.save}
-      </button>
+      <div className="services-admin__buttons">
+        <Button type="button" variant="secondary" onClick={() => test.mutate()} disabled={test.isPending}>
+          <Icon name="plug" size={16} />
+          {t("admin:services.test")}
+        </Button>
+        <Button type="submit" disabled={save.isPending}>
+          <Icon name="check" size={16} />
+          {t("admin:services.save")}
+        </Button>
+      </div>
     </form>
   );
 }
 
 function SyncHistory({ service }: { service: ServiceItem }) {
+  const t = useT();
+  const label = t("admin:services.historyOf", { name: service.name });
   return (
     <DataRegion<SyncRunItem[]>
-      label={servicesStrings.historyOf(service.name)}
+      label={label}
       queryKey={[...SERVICES_KEY, service.id, "runs"]}
       queryFn={async () =>
         (
@@ -202,12 +194,19 @@ function SyncHistory({ service }: { service: ServiceItem }) {
     >
       {(runs) =>
         runs.length === 0 ? (
-          <p>{servicesStrings.noHistory}</p>
+          <p className="control-center__muted">{t("admin:services.noHistory")}</p>
         ) : (
-          <ul aria-label={servicesStrings.historyOf(service.name)}>
+          <ul aria-label={label} className="services-admin__runs">
             {runs.map((run) => (
-              <li key={run.id}>
-                {servicesStrings.run(run)}
+              <li key={run.id} data-status={run.status}>
+                {t("admin:services.run", {
+                  kind: run.kind,
+                  status: run.status,
+                  added: run.added,
+                  modified: run.modified,
+                  removed: run.removed,
+                })}
+                {run.errored ? ` !${run.errored}` : ""}
                 {run.last_error ? ` — ${run.last_error}` : ""}
               </li>
             ))}
@@ -220,7 +219,20 @@ function SyncHistory({ service }: { service: ServiceItem }) {
 
 type Action = "enable" | "disable" | "disconnect" | "sync";
 
-function ServiceRow({ service }: { service: ServiceItem }) {
+const STATE_TONE: Record<string, string> = {
+  enabled: "ok",
+  syncing: "ok",
+  configured: "idle",
+  disabled: "idle",
+  disconnected: "idle",
+  maintenance: "warn",
+  error: "bad",
+  unavailable: "bad",
+};
+
+function ServiceCard({ service }: { service: ServiceItem }) {
+  const t = useT();
+  const format = useFormat();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -235,76 +247,137 @@ function ServiceRow({ service }: { service: ServiceItem }) {
     },
     onSuccess: (_, kind) => {
       setConfirming(false);
-      setMessage(kind === "sync" ? servicesStrings.syncQueued : null);
+      setMessage(kind === "sync" ? t("admin:services.syncQueued") : null);
       void queryClient.invalidateQueries({ queryKey: SERVICES_KEY });
     },
-    onError: (error) => setMessage(error instanceof ApiError ? error.message : servicesStrings.genericError),
+    onError: (error) => setMessage(error instanceof ApiError ? error.message : t("admin:services.refused")),
   });
-  const state = servicesStrings.state[service.display_state] ?? service.display_state;
+  const state = t(`admin:services.state.${service.display_state}`);
   const active = ["enabled", "error", "unavailable", "maintenance"].includes(service.state);
+  const last = service.sync.last_success_at;
+  const since = last ? (Date.parse(last) - Date.now()) / 1000 : null;
   return (
-    <li>
-      <strong>{service.name}</strong> · {service.connector} · {state} ·{" "}
-      {servicesStrings.lastSuccess(service.sync.last_success_at)}
-      {message ? <span role="status"> {message}</span> : null}
-      <div>
+    <Card
+      className="services-admin__card"
+      data-tone={STATE_TONE[service.display_state] ?? "idle"}
+      title={service.name}
+      icon="server"
+      actions={<span className="ds-badge services-admin__state">{state}</span>}
+    >
+      <p className="control-center__muted">
+        {service.connector} ·{" "}
+        {since !== null && !Number.isNaN(since)
+          ? t("admin:services.lastSuccess", { when: format.relative(since) })
+          : t("admin:services.never")}
+      </p>
+      {message ? <p role="status">{message}</p> : null}
+      <div className="services-admin__buttons">
         {service.state === "configured" || service.state === "disabled" ? (
-          <button type="button" onClick={() => action.mutate("enable")}>
-            {servicesStrings.enable}
-          </button>
+          <Button type="button" onClick={() => action.mutate("enable")}>
+            {t("admin:services.enable")}
+          </Button>
         ) : null}
         {active ? (
           <>
-            <button type="button" onClick={() => action.mutate("sync")}>
-              {servicesStrings.syncNow}
-            </button>
-            <button type="button" onClick={() => action.mutate("disable")}>
-              {servicesStrings.disable}
-            </button>
+            <Button type="button" variant="secondary" onClick={() => action.mutate("sync")}>
+              <Icon name="sync" size={16} />
+              {t("admin:services.syncNow")}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => action.mutate("disable")}>
+              {t("admin:services.disable")}
+            </Button>
           </>
         ) : null}
         {service.state !== "disconnected" ? (
           confirming ? (
-            <button type="button" onClick={() => action.mutate("disconnect")}>
-              {servicesStrings.confirmDisconnect}
-            </button>
+            <Button type="button" variant="danger" onClick={() => action.mutate("disconnect")}>
+              {t("admin:services.confirmDisconnect")}
+            </Button>
           ) : (
-            <button type="button" onClick={() => setConfirming(true)}>
-              {servicesStrings.disconnect}
-            </button>
+            <Button type="button" variant="ghost" onClick={() => setConfirming(true)}>
+              {t("admin:services.disconnect")}
+            </Button>
           )
         ) : null}
-        <button type="button" aria-expanded={showHistory} onClick={() => setShowHistory(!showHistory)}>
-          {servicesStrings.history}
-        </button>
+        <Button
+          type="button"
+          variant="ghost"
+          aria-expanded={showHistory}
+          onClick={() => setShowHistory(!showHistory)}
+        >
+          <Icon name="clock" size={16} />
+          {t("admin:services.history")}
+        </Button>
       </div>
       {showHistory ? <SyncHistory service={service} /> : null}
-    </li>
+    </Card>
   );
 }
 
 export function ServicesAdmin() {
+  const t = useT();
+  const [params, setParams] = useSearchParams();
+  const [open, setOpen] = useState(params.get("add") === "1");
+  function toggle(next: boolean) {
+    setOpen(next);
+    if (!next && params.has("add")) {
+      params.delete("add");
+      setParams(params, { replace: true });
+    }
+  }
+  const addButton = (
+    <Button type="button">
+      <Icon name="plus" size={18} />
+      {t("admin:services.add")}
+    </Button>
+  );
   return (
-    <div className="account-page">
-      <PageHeader level={2} icon="plug" title={servicesStrings.title} />
+    <div className="services-admin">
+      <PageHeader
+        level={2}
+        icon="plug"
+        title={t("admin:services.title")}
+        context={t("admin:services.subtitle")}
+        secondary={
+          <Link className="ds-button ds-button--ghost" to="/services">
+            {t("admin:services.status")}
+          </Link>
+        }
+        primary={
+          <Dialog
+            open={open}
+            onOpenChange={toggle}
+            title={t("admin:services.wizard.title")}
+            trigger={addButton}
+          >
+            <ConfigureService />
+          </Dialog>
+        }
+      />
       <DataRegion<ServiceItem[]>
-        label={servicesStrings.list}
+        label={t("admin:services.list")}
         queryKey={SERVICES_KEY}
         queryFn={async () => (await unwrap<{ items: ServiceItem[] }>(api.GET("/api/v1/services"))).items}
       >
         {(services) =>
           services.length === 0 ? (
-            <p>{servicesStrings.empty}</p>
+            <EmptyState
+              icon="server"
+              title={t("admin:services.empty.title")}
+              message={t("admin:services.empty.message")}
+              action={{ label: t("admin:services.add"), onSelect: () => toggle(true) }}
+            />
           ) : (
-            <ul aria-label={servicesStrings.list}>
+            <ul aria-label={t("admin:services.list")} className="services-admin__list">
               {services.map((service) => (
-                <ServiceRow key={service.id} service={service} />
+                <li key={service.id}>
+                  <ServiceCard service={service} />
+                </li>
               ))}
             </ul>
           )
         }
       </DataRegion>
-      <ConfigureService />
     </div>
   );
 }

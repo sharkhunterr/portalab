@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.events import Consumer, ConsumerRegistry, Envelope, EventTypeRegistry
@@ -123,12 +123,17 @@ class Dispatcher:
     async def run_consumer(self, consumer: Consumer) -> ConsumerRun:
         now = utc_now(self.clock)
         offset = await self._offset(consumer.name)
-        statement = (
-            select(Event).where(Event.seq > offset).order_by(Event.seq).limit(self.config.dispatch_batch_size)
-        )
-        if "*" not in consumer.types:
-            statement = statement.where(Event.type.in_(sorted(consumer.types)))
         async with self.database.session() as session:
+            # the head is read first: every event this pass may skip over is at or below it
+            newest = await session.scalar(select(Event.seq).order_by(Event.seq.desc()).limit(1))
+            statement = (
+                select(Event)
+                .where(Event.seq > offset, Event.seq <= (newest or 0))
+                .order_by(Event.seq)
+                .limit(self.config.dispatch_batch_size)
+            )
+            if "*" not in consumer.types:
+                statement = statement.where(Event.type.in_(sorted(consumer.types)))
             rows = list((await session.execute(statement)).scalars())
             if rows:
                 head = await session.get(Delivery, (consumer.name, rows[0].event_id))
@@ -139,7 +144,6 @@ class Dispatcher:
                     and head.next_attempt_at > now
                 ):
                     return ConsumerRun(consumer.name, 0, 0, 0)  # backing off on the head event
-            newest = await session.scalar(select(Event.seq).order_by(Event.seq.desc()).limit(1))
         delivered = failed = dead = 0
         for row in rows:
             outcome = await self._deliver(consumer, row, now)
@@ -148,10 +152,22 @@ class Dispatcher:
                 break  # keep order: retry this event first
             delivered += outcome == "succeeded"
             dead += outcome == "dead"
+        if newest is not None and not failed and len(rows) < self.config.dispatch_batch_size:
+            # caught up: the events in between are of types this consumer ignores, so its offset moves to
+            # the head (027 T094) — otherwise a filtered consumer looks thousands of events behind
+            await self._advance(consumer.name, newest)
         if newest is not None:
             last = await self._current_offset(consumer.name)
             metrics.gauge(f"events.consumer.lag.{metric_part(consumer.name)}", max(0, newest - last))
         return ConsumerRun(consumer.name, delivered, failed, dead)
+
+    async def _advance(self, name: str, seq: int) -> None:
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                update(ConsumerOffset)
+                .where(ConsumerOffset.consumer == name, ConsumerOffset.last_seq < seq)
+                .values(last_seq=seq, updated_at=utc_now(self.clock))
+            )
 
     async def _current_offset(self, name: str) -> int:
         async with self.database.session() as session:

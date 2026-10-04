@@ -698,6 +698,11 @@ progress {
   inline-size: fit-content;
   max-inline-size: 100%;
 }
+fieldset.ds-subnav {
+  margin: 0;
+  border: 0;
+  min-inline-size: 0;
+}
 .ds-subnav a,
 .ds-subnav button,
 .community-tabs a {

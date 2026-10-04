@@ -8803,6 +8803,8 @@ export interface components {
             repeatable: boolean;
             /** State */
             state: string;
+            /** Theme */
+            theme?: string | null;
             /** Type */
             type: string;
             /** Version */

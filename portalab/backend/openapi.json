@@ -5630,6 +5630,17 @@
             "title": "State",
             "type": "string"
           },
+          "theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          },
           "type": {
             "title": "Type",
             "type": "string"

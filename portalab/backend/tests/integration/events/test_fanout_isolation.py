@@ -54,7 +54,7 @@ async def test_isolation_and_dead_letter(ev: EventsHarness) -> None:
             .all()
         )
     assert ("bad", "dead") in deliveries and ("good", "succeeded") in deliveries
-    assert offsets["good"] == last and offsets["bad"] == last  # the dead letters did not block forever
+    assert offsets["good"] >= last and offsets["bad"] >= last  # the dead letters did not block forever
     assert all("abcdef123456" not in (error or "") for error in errors)
     assert len(dead_events) == 3
 
@@ -89,3 +89,17 @@ async def test_idempotent_effect_on_redelivery(ev: EventsHarness) -> None:
     async with ev.full.database.session() as session:
         delivery = (await session.execute(select(Delivery))).scalar_one()
     assert delivery.status == "succeeded" and delivery.attempts == 2
+
+
+async def test_filtered_consumer_follows_the_head(ev: EventsHarness) -> None:
+    """027 T094: a consumer whose types never occur is not reported thousands of events behind."""
+    ev.types.register(EventType("demo.happened", "t"))
+
+    async def never(event: Envelope, ctx: ConsumerContext) -> None:
+        raise AssertionError("no matching event was published")
+
+    ev.consumers.register(Consumer("quiet", frozenset({"demo.other"}), never, "t"))
+    await _publish(ev, 3)
+    await ev.module.dispatcher.run_once()
+    snapshot = await ev.module.stats.snapshot()
+    assert snapshot.lag_by_consumer["quiet"] == 0

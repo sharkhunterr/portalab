@@ -3,6 +3,66 @@
   overflow-wrap: anywhere;
 }
 
+/* 027 T095 — reading typography for news, wiki and help (the global reset flattens headings and spacing) */
+.content-body > * + * {
+  margin-block-start: var(--space-3);
+}
+.content-body h1,
+.content-body h2,
+.content-body h3,
+.content-body h4 {
+  margin-block: var(--space-5) var(--space-2);
+  line-height: 1.25;
+  font-weight: var(--font-weight-bold);
+  scroll-margin-block-start: calc(var(--header-height, 4rem) + var(--space-4));
+}
+.content-body > :first-child {
+  margin-block-start: 0;
+}
+.content-body h1 {
+  font-size: var(--font-size-2xl);
+}
+.content-body h2 {
+  font-size: var(--font-size-xl);
+}
+.content-body h3 {
+  font-size: var(--font-size-lg);
+}
+.content-body ul,
+.content-body ol {
+  padding-inline-start: var(--space-5);
+}
+.content-body ul {
+  list-style: disc;
+}
+.content-body ol {
+  list-style: decimal;
+}
+.content-body li + li {
+  margin-block-start: var(--space-1);
+}
+.content-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.content-body blockquote {
+  margin-inline: 0;
+  padding-inline-start: var(--space-4);
+  border-inline-start: 3px solid var(--color-accent);
+  color: var(--color-text-muted);
+}
+.content-body code {
+  padding: 0.1rem 0.3rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  font-size: 0.9em;
+}
+.content-body pre code {
+  padding: 0;
+  background: none;
+}
+
 .content-body table {
   border-collapse: collapse;
 }

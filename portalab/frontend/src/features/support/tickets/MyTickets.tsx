@@ -1,7 +1,6 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import "../support.css";
 import { Link } from "react-router";
-import { ListItem } from "../../../design-system/components/Collections";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState } from "../../../design-system/components/Placeholders";
@@ -9,53 +8,76 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { type TicketCard, useMyTickets } from "./api";
+import { isActive, PriorityBadge, StateBadge } from "./TicketBadges";
 
-/** My tickets (spec 016 T025). */
+/**
+ * My tickets (spec 016 T025, 027 T095): one card per ticket — reference, title, state and priority badges,
+ * last update — filtered between the ones still in progress and the finished ones.
+ */
 export function TicketList({ items, label }: { items: TicketCard[]; label: string }) {
+  const t = useT();
   const format = useFormat();
   return (
-    <ul className="support-list ds-card" aria-label={label}>
+    <ul className="support-list" aria-label={label}>
       {items.map((ticket) => (
-        <ListItem
-          key={ticket.id}
-          leading={<Icon name="ticket" />}
-          title={
-            <Link to={`/support/tickets/${ticket.id}`}>
-              {ticket.reference} · {ticket.title}
+        <li key={ticket.id} className="support-card" data-active={isActive(ticket.state)}>
+          <span className="support-card__icon" aria-hidden="true">
+            <Icon name="ticket" size={20} />
+          </span>
+          <span className="support-card__main">
+            <span className="support-card__ref">{ticket.reference}</span>
+            <Link to={`/support/tickets/${ticket.id}`} className="support-card__title">
+              {ticket.title}
             </Link>
-          }
-          meta={format.dateTime(ticket.updated_at)}
-          trailing={<span className="ds-badge">{ticket.state}</span>}
-        />
+            <span className="support-meta">
+              {t("support:ticket.updated", {
+                when: format.relative((Date.parse(ticket.updated_at) - Date.now()) / 1000),
+              })}
+            </span>
+          </span>
+          <span className="support-card__badges">
+            <StateBadge state={ticket.state} />
+            {ticket.priority !== "normal" ? <PriorityBadge priority={ticket.priority} /> : null}
+          </span>
+        </li>
       ))}
     </ul>
   );
 }
 
+type Filter = "active" | "done" | "all";
+
 export function MyTickets() {
   const t = useT();
   const headingId = useId();
   const tickets = useMyTickets();
+  const [filter, setFilter] = useState<Filter>("active");
+  const all = tickets.data ?? [];
+  const pick = (f: Filter) =>
+    all.filter((ticket) => f === "all" || (f === "active") === isActive(ticket.state));
+  const shown = pick(filter);
   return (
-    <section aria-labelledby={headingId}>
+    <section aria-labelledby={headingId} className="support-page">
       <PageHeader
         titleId={headingId}
         level={2}
         icon="ticket"
         title={t("support:mine.title")}
+        context={t("support:mine.subtitle")}
         secondary={
-          <>
-            <Link className="ds-button ds-button--secondary" to="/feedback">
-              {t("support:mine.feedback")}
-            </Link>
-            <Link className="ds-button ds-button--primary" to="/support/new">
-              {t("support:mine.new")}
-            </Link>
-          </>
+          <Link className="ds-button ds-button--secondary" to="/feedback">
+            {t("support:mine.feedback")}
+          </Link>
+        }
+        primary={
+          <Link className="ds-button ds-button--primary" to="/support/new">
+            <Icon name="plus" size={18} />
+            {t("support:mine.new")}
+          </Link>
         }
       />
       {tickets.isPending ? <FunctionalState state="loading" /> : null}
-      {tickets.data && tickets.data.length === 0 ? (
+      {tickets.data && all.length === 0 ? (
         <EmptyState
           icon="lifebuoy"
           title={t("support:mine.empty")}
@@ -66,7 +88,18 @@ export function MyTickets() {
           }
         />
       ) : null}
-      {tickets.data ? <TicketList items={tickets.data} label={t("support:mine.title")} /> : null}
+      {all.length ? (
+        <>
+          <fieldset className="ds-subnav" aria-label={t("support:mine.title")}>
+            {(["active", "done", "all"] as const).map((f) => (
+              <button key={f} type="button" aria-pressed={filter === f} onClick={() => setFilter(f)}>
+                {t(`support:mine.${f}`)} · {pick(f).length}
+              </button>
+            ))}
+          </fieldset>
+          <TicketList items={shown} label={t("support:mine.title")} />
+        </>
+      ) : null}
     </section>
   );
 }

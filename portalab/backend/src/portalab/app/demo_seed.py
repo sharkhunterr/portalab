@@ -28,6 +28,7 @@ from portalab.capabilities.support import TicketRequest
 from portalab.core.authz_port import Principal
 from portalab.core.logging import get_logger
 from portalab.core.time import utc_now
+from portalab.modules.administration.firstrun.service import WizardRequest
 from portalab.modules.gamification.achievements.definition import parse_achievement
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.services.common import SYSTEM
@@ -352,6 +353,7 @@ class DemoSeeder:
             self.report.steps["admin"] = "failed (no Admin yet: run `portalab admin bootstrap` first)"
             return self.report
         self.people["admin"] = admin
+        await self._step("first run", self.first_run)
         await self._step("members", self.members)
         await self._step("gamification definitions", self.gamification_definitions)
         await self._step("progression", self.progression)
@@ -366,6 +368,14 @@ class DemoSeeder:
         await self._step("notifications", self.notifications)
         await self._step("leaderboards", self.leaderboards)
         return self.report
+
+    async def first_run(self) -> str:
+        """The Admin was bootstrapped from the command line: close the wizard as that Admin (no step)."""
+        wizard = self.platform.administration.first_run
+        if await wizard.completed():
+            return "already completed"
+        await wizard.run(WizardRequest(login="", password=""), existing_admin=self.people["admin"])
+        return "completed"
 
     async def members(self) -> str:
         identity = self.platform.identity
@@ -570,7 +580,16 @@ class DemoSeeder:
             )
             await articles.transition(self.admin, row.id, "publish")
             made += 1
-        return f"{made} articles published"
+        featured = 0
+        if not await self._scalar("SELECT 1 FROM news.articles WHERE featured_from IS NOT NULL LIMIT 1"):
+            for priority, (title, _, _) in enumerate(ARTICLES[:2]):  # a hero and a side article
+                article_id = await self._scalar(
+                    "SELECT id FROM news.articles WHERE title = :t AND status = 'published' LIMIT 1", t=title
+                )
+                if article_id is not None:
+                    await articles.feature(self.admin, article_id, None, None, len(ARTICLES) - priority)
+                    featured += 1
+        return f"{made} articles published, {featured} featured"
 
     async def wiki(self) -> str:
         pages = self.platform.wiki.pages

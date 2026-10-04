@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactElement, useId } from "react";
+import { Link } from "react-router";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../design-system/a11y/preferences";
 import { CheckboxField, SelectField } from "../../design-system/components/Field";
+import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { PolicyField, type PolicyState } from "../../design-system/components/PolicyField";
 import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
-import { presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
+import { parseTheme, presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 
 /**
@@ -52,6 +54,9 @@ export const appearanceStrings = {
   styles: { toast: "Toast", banner: "Banner" },
   campaignThemes: "Show seasonal campaign themes",
   forcedMotion: "Your administrator reduces motion for everyone.",
+  shopThemes: "More themes in the shop",
+  shopHint: "These themes are sold in the shop: buy one to use it.",
+  getIt: "Get it in the shop",
 } as const;
 
 interface View {
@@ -73,6 +78,44 @@ function usePolicyStates(): (key: string) => { state: PolicyState; retained: str
     if (!view?.locked) return { state: "free", retained: null };
     return { state: "locked", retained: view.user_value_retained ? String(view.user_value) : null };
   };
+}
+
+/** Themes sold in the shop the user does not own yet (027 US11): shown locked, with the way to get them. */
+function ShopThemes() {
+  const locked = useQuery({
+    queryKey: ["ui", "themes", "locked"],
+    retry: false,
+    queryFn: async () =>
+      (
+        (await api.GET("/api/v1/ui/themes")).data as unknown as {
+          locked?: Array<{ key: string; name: string; definition: unknown }>;
+        }
+      ).locked ?? [],
+  });
+  const themes = (locked.data ?? [])
+    .map((entry) => ({ entry, theme: parseTheme(entry.definition).theme }))
+    .filter((item): item is { entry: (typeof item)["entry"]; theme: ThemeDefinition } => Boolean(item.theme));
+  if (!themes.length) return null;
+  return (
+    <section aria-labelledby="theme-shop" className="theme-gallery">
+      <h3 id="theme-shop">{appearanceStrings.shopThemes}</h3>
+      <p className="ds-page-header__context">{appearanceStrings.shopHint}</p>
+      <ul className="theme-gallery__list">
+        {themes.map(({ entry, theme }) => (
+          <li key={entry.key}>
+            <Link className="theme-card" data-locked="true" to="/marketplace">
+              <ThemeMiniature theme={theme} />
+              <span className="theme-card__name">
+                <Icon name="lock" size={16} />
+                {entry.name}
+              </span>
+              <span className="theme-card__meta">{appearanceStrings.getIt}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 /** One card per theme family/theme with a miniature of its arrangement (027 T061): never data, only looks. */
@@ -125,7 +168,7 @@ function ThemeGallery({
   );
 }
 
-function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
+export function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
   const p = presentationOf(theme);
   const c = theme.colors;
   const bar = (
@@ -193,6 +236,7 @@ export function AppearanceSettings() {
           if (theme.family) set("colorMode")(theme.colorScheme);
         }}
       />
+      <ShopThemes />
       {field("ui.colorMode", (disabled) => (
         <SelectField
           label={appearanceStrings.colorMode}

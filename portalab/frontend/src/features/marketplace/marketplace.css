@@ -374,6 +374,10 @@
 }
 
 .shop-rarities {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);

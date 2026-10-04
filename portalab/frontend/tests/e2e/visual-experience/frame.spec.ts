@@ -62,6 +62,7 @@ test("personal pages live in the avatar menu", async ({ page }) => {
 });
 
 test("no horizontal scroll from 320 px, and the page survives a class change", async ({ page }) => {
+  test.setTimeout(90_000); // twelve full navigations on the dev server
   await page.setViewportSize({ width: 1440, height: 900 });
   await signIn(page);
   for (const width of [320, 390, 820, 1440]) {

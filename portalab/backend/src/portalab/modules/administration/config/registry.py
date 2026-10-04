@@ -8,7 +8,7 @@ settings — all owner-tagged so ``unregister(owner)`` removes a plugin's contri
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-from portalab.capabilities.administration import DynamicValidator
+from portalab.capabilities.administration import DynamicValidator, UserDynamicValidator
 from portalab.capabilities.config import SettingUpgrade
 from portalab.core.config_declaration import SettingCatalog, SettingDeclaration, default_catalog
 from portalab.core.errors import NotFound
@@ -46,6 +46,7 @@ class SettingRegistry:
         self.catalog = catalog
         self._upgrades: dict[tuple[str, int], tuple[SettingUpgrade, str]] = {}
         self._validators: dict[str, tuple[DynamicValidator, str]] = {}
+        self._user_validators: dict[str, tuple[UserDynamicValidator, str]] = {}
 
     def declaration(self, key: str) -> SettingDeclaration:
         for declaration in self.catalog.all():
@@ -74,9 +75,18 @@ class SettingRegistry:
     def register_validator(self, key: str, validator: DynamicValidator, *, owner: str) -> None:
         self._validators[key] = (validator, owner)
 
-    async def dynamic_errors(self, key: str, value: Any) -> list[str]:
-        entry = self._validators.get(key)
-        return await entry[0](value) if entry else []
+    def register_user_validator(self, key: str, validator: UserDynamicValidator, *, owner: str) -> None:
+        """A validator that also receives the user a ``user``-scope value is written for (``None`` for
+        other scopes) — 027 US11: a theme sold in the Marketplace may only be chosen by its owners."""
+        self._user_validators[key] = (validator, owner)
+
+    async def dynamic_errors(self, key: str, value: Any, *, user_ref: str | None = None) -> list[str]:
+        errors: list[str] = []
+        if (entry := self._validators.get(key)) is not None:
+            errors += await entry[0](value)
+        if (user_entry := self._user_validators.get(key)) is not None:
+            errors += await user_entry[0](value, user_ref)
+        return errors
 
     def declare_plugin_settings(self, plugin_id: str, settings: Iterable[Mapping[str, Any]]) -> list[str]:
         """Plugin-scope settings from a plugin manifest (F18): ``{key, type, default, description,
@@ -109,5 +119,8 @@ class SettingRegistry:
             removed += 1
         for key in [key for key, (_, who) in self._validators.items() if who == owner]:
             del self._validators[key]
+            removed += 1
+        for key in [key for key, (_, who) in self._user_validators.items() if who == owner]:
+            del self._user_validators[key]
             removed += 1
         return removed

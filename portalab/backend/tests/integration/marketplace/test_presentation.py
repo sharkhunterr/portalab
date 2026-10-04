@@ -75,3 +75,26 @@ async def test_presentation_at_creation(mk: MkHarness, client: AsyncClient) -> N
         "neon",
         False,
     )
+
+
+async def test_theme_entitlements(mk: MkHarness) -> None:
+    """027 US11: ``marketplace.theme_entitlements`` — themes sold by available products, and owned ones."""
+    from portalab.capabilities.themes import ENTITLEMENTS
+
+    reader = mk.module.capabilities.system_providers(ENTITLEMENTS)[0].provider
+    assert await reader.sold() == frozenset()
+    await published(mk, "theme_orbit", "theme", price_coins=10, payload={"theme": "orbit"})
+    await mk.module.catalog.create(
+        mk.p("boss"),
+        {
+            "key": "theme_draft",
+            "type": "theme",
+            "version": {"names": {"en": "Draft"}, "payload": {"theme": "draft"}},
+        },
+    )
+    assert await reader.sold() == frozenset({"orbit"})  # a draft product sells nothing
+    assert await reader.owned(mk.people["ursula"]) == frozenset()
+    await mk.coins("ursula", 50)
+    await mk.module.purchases.acquire(mk.p("ursula"), "theme_orbit", "buy-orbit")
+    assert await reader.owned(mk.people["ursula"]) == frozenset({"orbit"})
+    assert await reader.owned(mk.people["vera"]) == frozenset()
