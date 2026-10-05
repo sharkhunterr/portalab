@@ -133,6 +133,35 @@ describe("catalog and requests", () => {
         });
       }
       if (request.method === "POST") return json(200, { id: "r1", state: "cancelled" });
+      if (url.pathname === "/api/v1/me/media/requests/insights")
+        return json(200, {
+          period: { key: "365d", start: null },
+          summary: { total: 1, pending: 1, approved: 0, available: 0, declined: 0 },
+          previous_total: 0,
+          by_kind: { movie: 1, series: 0 },
+          timeline: { unit: "day", points: [{ date: "2026-10-01", count: 1, previous: 0 }] },
+          watched: { requested: 1, watched: 0, rate: 0 },
+          ranking: { position: 1, total: 3, count: 1, delta: null },
+          top_watched: [],
+          genres: { requested: [], watched: [] },
+          quota: { base_remaining: 2, extra_units: 1 },
+        });
+      if (url.pathname === "/api/v1/me/media/requests/list")
+        return json(200, {
+          items: [
+            {
+              request_id: "r1",
+              id: ID,
+              title: "Arrival",
+              kind: "movie",
+              state: "pending",
+              requested_at: AS_OF,
+              updated_at: AS_OF,
+              image_id: null,
+              route: `/media/${ID}`,
+            },
+          ],
+        });
       return json(200, {
         items: [
           {
@@ -158,9 +187,9 @@ describe("catalog and requests", () => {
     await waitFor(() =>
       expect(queries.some((q) => q.includes("q=arr") && q.includes("availability=available"))).toBe(true),
     );
-    renderAt("/media/requests", [{ path: "/media/requests", element: <RequestsPage /> }]);
-    expect(await screen.findByText(/2 requests left this period/)).toBeTruthy();
+    renderAt("/media/requests?tab=list", [{ path: "/media/requests", element: <RequestsPage /> }]);
+    expect(await screen.findByText("Requests left")).toBeTruthy();
     expect(screen.getByText(/1 extra request/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Cancel: Arrival" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel: Arrival" }));
   });
 });

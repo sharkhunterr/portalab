@@ -38,7 +38,8 @@ from portalab.modules.media.models import (
 )
 from portalab.modules.media.module import MediaModule
 from portalab.modules.media.permissions import MEDIA_MANAGE, MEDIA_READ, MEDIA_REQUEST, SELF
-from portalab.modules.media.providers.insight_widgets import posters
+from portalab.modules.media.providers.insight_widgets import posters, with_posters
+from portalab.modules.media.requests.insights import kind_of, lookup_of
 from portalab.modules.media.sections.service import SECTIONS
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
@@ -458,6 +459,47 @@ async def my_requests(principal: Requester, module: Module) -> MyMediaRequests:
     user = _me(principal)
     rows = await module.requests.mine(user)
     return MyMediaRequests(items=[_request(r) for r in rows], quota=await module.quota.summary(user))
+
+
+@router.get("/me/media/requests/insights")
+async def my_requests_insights(
+    principal: Requester,
+    module: Module,
+    period: Annotated[str, Query(pattern=INSIGHT_PERIOD)] = "365d",
+) -> dict[str, Any]:
+    """027: my requests over a period — funnel, kinds, over time, watched ratio, rank, top, genres."""
+    user = _me(principal)
+    data = await module.request_insights.overview(user, period)
+    data["top_watched"] = await with_posters(module.database, module.enricher, data["top_watched"])
+    data["quota"] = await module.quota.summary(user)
+    return data
+
+
+@router.get("/me/media/requests/list")
+async def my_requests_list(principal: Requester, module: Module) -> dict[str, Any]:
+    """027: every request of mine with its poster (catalog, else the metadata provider's)."""
+    rows = await module.request_insights.mine(_me(principal))
+    items = [
+        {
+            "request_id": str(r.id),
+            "id": str(r.object_id) if r.object_id else None,
+            "title": str((r.external_ref or {}).get("title") or "?"),
+            "kind": kind_of(r),
+            "state": r.state,
+            "requested_at": r.requested_at.isoformat(),
+            "updated_at": r.updated_at.isoformat(),
+            "_lookup": lookup_of(r),
+        }
+        for r in rows
+    ]
+    return {"items": await with_posters(module.database, module.enricher, items, lookups=60)}
+
+
+@router.get("/me/media/requests/soon")
+async def my_requests_soon(principal: Requester, module: Module) -> dict[str, Any]:
+    """027: my requests being downloaded or imported now, or with a release date coming."""
+    items = await module.request_insights.soon(_me(principal), limit=30)
+    return {"items": await with_posters(module.database, module.enricher, items)}
 
 
 @router.get("/me/media/links", response_model=list[MediaLinkOut])

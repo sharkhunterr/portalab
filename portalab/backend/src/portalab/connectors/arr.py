@@ -3,6 +3,7 @@
 * ``media.library`` (sync): what the manager tracks — Radarr movies, Sonarr series and their seasons —
   marked ``available`` when the files are on disk, with TMDB/IMDb/TVDB ids so Media merges them with what a
   media server reports.
+* ``media.downloads`` (027): the download queue (``/api/v3/queue``) — progress, state and expected time.
 * ``media.calendar`` (027): upcoming releases — Radarr's cinema, digital and physical release dates,
   Sonarr's episode air dates (``/api/v3/calendar``).
 * ``service.health_probe``: an authenticated ``/api/v3/system/status`` round trip.
@@ -23,7 +24,7 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import CALENDAR, LIBRARY, SourceRelease
+from portalab.capabilities.media import CALENDAR, DOWNLOADS, LIBRARY, SourceDownload, SourceRelease
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
 
@@ -42,6 +43,7 @@ class _ArrConnector(HttpConnector):
     provides: Sequence[CapabilityBinding] = (
         binding(LIBRARY, syncable=True),
         binding(CALENDAR),
+        binding(DOWNLOADS),
         binding(HEALTH_PROBE),
     )
     status_path = "/api/v3/system/status"
@@ -60,12 +62,61 @@ class _ArrConnector(HttpConnector):
             return _Covers(self, service)
         if capability == CALENDAR:
             return _Calendar(self, service)
+        if capability == DOWNLOADS:
+            return _Queue(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
         return None
 
     def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
         return []
+
+    def download(self, record: Mapping[str, Any]) -> SourceDownload | None:
+        return None
+
+
+def queue_state(record: Mapping[str, Any]) -> str:
+    tracked = str(record.get("trackedDownloadState") or "").lower()
+    status = str(record.get("status") or "").lower()
+    if tracked in ("importpending", "importing", "imported"):
+        return "importing"
+    if str(record.get("trackedDownloadStatus") or "").lower() in ("warning", "error"):
+        return "warning"
+    if status in ("paused", "failed", "queued", "delay", "downloadclientunavailable"):
+        return {"delay": "queued", "downloadclientunavailable": "warning"}.get(status, status)
+    return "downloading"
+
+
+def queue_progress(record: Mapping[str, Any]) -> float:
+    size, left = record.get("size"), record.get("sizeleft")
+    if isinstance(size, int | float) and size > 0 and isinstance(left, int | float):
+        return round(max(0.0, min(1.0, 1 - left / size)), 4)
+    return 0.0
+
+
+class _Queue:
+    def __init__(self, connector: _ArrConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def queue(self) -> Sequence[SourceDownload]:
+        page = await self.connector.get_json(
+            self.service,
+            "/api/v3/queue",
+            pageSize=200,
+            includeMovie="true",
+            includeSeries="true",
+            includeEpisode="true",
+        )
+        records = page.get("records") if isinstance(page, Mapping) else page
+        if not isinstance(records, list):
+            raise InvalidPayload("unexpected /queue payload")
+        out = []
+        for record in records:
+            if isinstance(record, Mapping):
+                item = self.connector.download(record)
+                if item is not None:
+                    out.append(item)
+        return out
 
 
 class _Calendar:
@@ -105,6 +156,22 @@ class RadarrConnector(_ArrConnector):
     app = "Radarr"
     description = "The films Radarr follows, and whether they are downloaded."
     icon = "film"
+
+    def download(self, record: Mapping[str, Any]) -> SourceDownload | None:
+        nested = record.get("movie")
+        movie: Mapping[str, Any] = nested if isinstance(nested, Mapping) else {}
+        if record.get("id") is None:
+            return None
+        ids = {"tmdb": str(movie["tmdbId"]) if movie.get("tmdbId") else "", "imdb": movie.get("imdbId") or ""}
+        return SourceDownload(
+            external_id=f"queue:{safe_id(record['id'])}",
+            kind="movie",
+            title=str(movie.get("title") or record.get("title") or "?")[:500],
+            status=queue_state(record),
+            progress=queue_progress(record),
+            ids={k: v for k, v in ids.items() if v},
+            eta=parse_time(record.get("estimatedCompletionTime")),
+        )
 
     def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
         if not item.get("title") or item.get("id") is None:
@@ -170,6 +237,31 @@ class SonarrConnector(_ArrConnector):
     app = "Sonarr"
     description = "The series Sonarr follows, season by season, and what is downloaded."
     icon = "film"
+
+    def download(self, record: Mapping[str, Any]) -> SourceDownload | None:
+        nested = record.get("series")
+        series: Mapping[str, Any] = nested if isinstance(nested, Mapping) else {}
+        episode_doc = record.get("episode")
+        episode: Mapping[str, Any] = episode_doc if isinstance(episode_doc, Mapping) else {}
+        if record.get("id") is None:
+            return None
+        ids = {
+            "tvdb": str(series["tvdbId"]) if series.get("tvdbId") else "",
+            "tmdb": str(series["tmdbId"]) if series.get("tmdbId") else "",
+            "imdb": series.get("imdbId") or "",
+        }
+        return SourceDownload(
+            external_id=f"queue:{safe_id(record['id'])}",
+            kind="episode",
+            title=str(episode.get("title") or record.get("title") or "?")[:500],
+            status=queue_state(record),
+            progress=queue_progress(record),
+            ids={k: v for k, v in ids.items() if v},
+            parent_title=str(series.get("title"))[:500] if series.get("title") else None,
+            season=episode.get("seasonNumber"),
+            episode=episode.get("episodeNumber"),
+            eta=parse_time(record.get("estimatedCompletionTime")),
+        )
 
     def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
         at = parse_time(item.get("airDateUtc"))

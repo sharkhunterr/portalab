@@ -26869,6 +26869,101 @@
         ]
       }
     },
+    "/api/v1/me/media/requests/insights": {
+      "get": {
+        "description": "027: my requests over a period \u2014 funnel, kinds, over time, watched ratio, rank, top, genres.",
+        "operationId": "my_requests_insights_api_v1_me_media_requests_insights_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "365d",
+              "pattern": "^(7d|30d|90d|365d|all|\\d{4})$",
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Requests Insights Api V1 Me Media Requests Insights Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Requests Insights",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/requests/list": {
+      "get": {
+        "description": "027: every request of mine with its poster (catalog, else the metadata provider's).",
+        "operationId": "my_requests_list_api_v1_me_media_requests_list_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Requests List Api V1 Me Media Requests List Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Requests List",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/requests/soon": {
+      "get": {
+        "description": "027: my requests being downloaded or imported now, or with a release date coming.",
+        "operationId": "my_requests_soon_api_v1_me_media_requests_soon_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Requests Soon Api V1 Me Media Requests Soon Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Requests Soon",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/me/navigation": {
       "get": {
         "operationId": "my_navigation_api_v1_me_navigation_get",

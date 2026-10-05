@@ -79,8 +79,10 @@ from portalab.modules.media.playback.poller import JOB as POLL_JOB
 from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
+    MY_SOON,
     RECENTLY_ADDED,
     RECENTLY_REQUESTED,
+    MySoonWidget,
     RecentlyAddedWidget,
     RecentlyRequestedWidget,
     StatsWidget,
@@ -104,6 +106,7 @@ from portalab.modules.media.providers.widgets import (
 from portalab.modules.media.providers.widgets import (
     REQUESTS as REQUESTS_WIDGET,
 )
+from portalab.modules.media.requests.insights import RequestInsights
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
 from portalab.modules.media.sections.service import Sections
@@ -200,6 +203,7 @@ class MediaModule:
         self.enricher = MetadataEnricher(database, capabilities, self.language, blobs=blobs, clock=clock)
         self.insights = InsightsQuery(database, clock=clock)
         self.upcoming = Upcoming(database, capabilities, clock=clock)
+        self.request_insights = RequestInsights(database, capabilities, self.upcoming, clock=clock)
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
 
     # --- configuration ---------------------------------------------------------------------------------
@@ -305,6 +309,7 @@ class MediaModule:
             (RECENTLY_REQUESTED, RecentlyRequestedWidget(self.database, self.clock, self.enricher)),
             (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
+            (MY_SOON, MySoonWidget(self.database, self.request_insights, self.clock, self.enricher)),
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:

@@ -106,6 +106,27 @@ PLEX: Routes = {
 RADARR: Routes = {
     "/api/v3/system/status": {"appName": "Radarr", "version": "5.14.0", "instanceName": "Radarr"},
     "/api/v3/calendar": lambda request: CALENDAR_RADARR,
+    "/api/v3/queue": lambda request: {
+        "records": [
+            {
+                "id": 31,
+                "movie": {"title": "Dune: Part Three", "tmdbId": 1170608},
+                "size": 1000,
+                "sizeleft": 250,
+                "status": "downloading",
+                "trackedDownloadState": "downloading",
+                "estimatedCompletionTime": "2026-10-05T12:00:00Z",
+            },
+            {
+                "id": 32,
+                "movie": {"title": "Heat", "tmdbId": 949},
+                "size": 10,
+                "sizeleft": 0,
+                "status": "completed",
+                "trackedDownloadState": "importPending",
+            },
+        ]
+    },
     "/api/v3/movie": [
         {
             "id": 1,
@@ -125,6 +146,17 @@ RADARR: Routes = {
 SONARR: Routes = {
     "/api/v3/system/status": {"appName": "Sonarr", "version": "4.0.10"},
     "/api/v3/calendar": lambda request: CALENDAR_SONARR,
+    "/api/v3/queue": lambda request: {
+        "records": [
+            {
+                "id": 41,
+                "series": {"title": "Andor", "tvdbId": 393189},
+                "episode": {"title": "Premiere", "seasonNumber": 3, "episodeNumber": 1},
+                "size": 0,
+                "status": "queued",
+            }
+        ]
+    },
     "/api/v3/series": [
         {
             "id": 5,

@@ -5,6 +5,8 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { useMeasures } from "../../media/insights/api";
+import type { SoonCard } from "../../media/requests/api";
+import { SoonList } from "../../media/requests/SoonList";
 import type { StatsPoint } from "./MediaStatsChart";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 
@@ -194,5 +196,12 @@ function Stats({ payload }: WidgetProps) {
   );
 }
 
+/** « Coming soon » (027): my requests downloading, importing or with a release date. */
+function Soon({ payload }: WidgetProps) {
+  const items = ((payload.data ?? {}) as { items?: SoonCard[] }).items ?? [];
+  return <SoonList items={items} compact />;
+}
+
 registerWidgetComponent("media.posters", Posters);
+registerWidgetComponent("media.soon", Soon);
 registerWidgetComponent("media.stats", Stats);

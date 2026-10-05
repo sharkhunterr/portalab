@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 import pytest
 
 from portalab.capabilities.connector_sdk import SourceRecord
-from portalab.capabilities.media import ACCOUNTS, ACTIVITY_HISTORY, CALENDAR, LIBRARY, METADATA
+from portalab.capabilities.media import ACCOUNTS, ACTIVITY_HISTORY, CALENDAR, DOWNLOADS, LIBRARY, METADATA
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.grimmory import GrimmoryConnector
@@ -117,3 +117,19 @@ def test_continuous_connectors_have_nothing_to_sync_now() -> None:
     }
     assert syncable["tautulli"] == [] and syncable["tmdb"] == []
     assert syncable["grimmory"] == [LIBRARY] and syncable["radarr"] == [LIBRARY]
+
+
+async def test_download_queues() -> None:
+    movies = await RadarrConnector().provider(DOWNLOADS, handle_for("radarr")).queue()
+    assert [(d.title, d.status, d.progress) for d in movies] == [
+        ("Dune: Part Three", "downloading", 0.75),
+        ("Heat", "importing", 1.0),
+    ]
+    assert movies[0].ids == {"tmdb": "1170608"} and movies[0].eta is not None
+    (episode,) = await SonarrConnector().provider(DOWNLOADS, handle_for("sonarr")).queue()
+    assert (episode.parent_title, episode.season, episode.episode, episode.status) == (
+        "Andor",
+        3,
+        1,
+        "queued",
+    )

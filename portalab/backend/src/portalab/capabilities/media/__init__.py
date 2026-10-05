@@ -10,6 +10,7 @@
   then followed incrementally; sources reporting the same plays (Plex and Tautulli) share a ``family``
   so the portal keeps one row per play, from the richest source.
 * ``media.calendar`` (027): upcoming releases (Radarr, Sonarr…).
+* ``media.downloads`` (027): what a download manager is fetching or importing now (Radarr, Sonarr queues).
 * ``media.metadata`` (027): a metadata provider (TMDB…) enriching catalog objects — backdrop, cast,
   collection, budget, revenue, genres… — and serving its images.
 
@@ -36,6 +37,7 @@ ACCOUNTS = "service.accounts"
 ACTIVITY_HISTORY = "media.activity_history"
 CALENDAR = "media.calendar"
 METADATA = "media.metadata"
+DOWNLOADS = "media.downloads"
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -230,6 +232,27 @@ class ReleaseCalendar(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
+class SourceDownload:
+    """An item a download manager is working on (027): queued, downloading or importing."""
+
+    external_id: str
+    kind: str  # movie, episode
+    title: str
+    status: str  # queued, downloading, importing, paused, warning, failed
+    progress: float  # 0..1
+    ids: Mapping[str, str] = field(default_factory=dict)
+    parent_title: str | None = None
+    season: int | None = None
+    episode: int | None = None
+    eta: datetime | None = None
+
+
+@runtime_checkable
+class DownloadQueue(Protocol):
+    async def queue(self) -> Sequence[SourceDownload]: ...
+
+
+@dataclass(frozen=True, slots=True)
 class MetadataPerson:
     name: str
     role: str | None = None  # character or job
@@ -292,4 +315,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(ACTIVITY_HISTORY, ActivityHistory, "Full play/read history of one service, paged (027)"),
     _spec(CALENDAR, ReleaseCalendar, "Upcoming releases announced by one service (027)"),
     _spec(METADATA, MetadataProvider, "Metadata provider enriching the catalog (027)"),
+    _spec(DOWNLOADS, DownloadQueue, "What a download manager is fetching or importing now (027)"),
 )
