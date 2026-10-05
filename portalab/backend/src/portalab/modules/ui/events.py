@@ -32,6 +32,7 @@ ACCESSIBILITY_KEYS = {
     "ui.notificationDurationSeconds",
     "ui.notificationStyle",
     "ui.notificationAnimation",
+    "ui.palette",
 }
 
 

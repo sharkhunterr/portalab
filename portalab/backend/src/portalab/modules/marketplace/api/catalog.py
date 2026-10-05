@@ -62,6 +62,25 @@ class MarketplaceProductOut(BaseModel):
     category: str | None = None
     theme: str | None = None  # 027 US11: the theme a ``theme`` product unlocks (shown before buying)
     eligibility: list[MarketplaceCheckOut] = []
+    preview: dict[str, Any] = Field(default_factory=dict)  # 027: what the shop previews before buying
+
+
+# 027: the payload fields a product's preview may show (never configuration or extension details)
+PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
+    "theme": ("theme",),
+    "widget": ("widget",),
+    "badge": ("label", "icon"),
+    "title": ("label",),
+    "effect": ("effect",),
+    "quota": ("kind", "units"),
+    "notification_style": ("style",),
+    "notification_animation": ("animation",),
+    "bundle": ("products",),
+    "profile_banner": ("banner",),
+    "avatar_frame": ("frame",),
+    "profile_backdrop": ("feature",),
+    "palette": ("palette",),
+}
 
 
 class MarketplaceOwnershipOut(BaseModel):
@@ -121,6 +140,11 @@ def product_out(
         icon=product.icon,
         category=(categories or {}).get(product.category_id) if product.category_id else None,
         theme=str(version.payload.get("theme")) if product.type == "theme" and version.payload else None,
+        preview={
+            field: (version.payload or {})[field]
+            for field in PREVIEW_FIELDS.get(product.type, ())
+            if field in (version.payload or {})
+        },
     )
 
 
@@ -246,3 +270,22 @@ async def refund(
     principal: Me, ownership_id: UUID, body: MarketplaceRefundIn, module: Module
 ) -> MarketplaceOwnershipOut:
     return await ownership_out(module, await module.refunds.refund(principal, ownership_id, body.reason))
+
+
+# --- 027: profile looks (banner, avatar frame, film backdrop) -------------------------------------------
+class ProfileLookIn(BaseModel):
+    slot: str = Field(pattern=r"^(banner|frame|backdrop)$")
+    value: Any = None
+
+
+@router.get("/me/profile-looks")
+async def my_profile_looks(principal: Me, module: Module) -> dict[str, Any]:
+    """The designs a member may wear on their profile (those sold and not owned are locked)."""
+    assert principal.user_id is not None
+    return await module.looks.catalog(principal.user_id)
+
+
+@router.put("/me/profile-looks")
+async def equip_profile_look(principal: Me, body: ProfileLookIn, module: Module) -> dict[str, Any]:
+    assert principal.user_id is not None
+    return {"equipped": await module.looks.equip(principal.user_id, body.slot, body.value)}

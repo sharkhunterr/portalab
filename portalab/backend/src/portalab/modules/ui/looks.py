@@ -7,7 +7,7 @@ from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.capabilities.themes import COSMETICS
+from portalab.capabilities.themes import COSMETICS, PALETTES
 
 STYLES = ("toast", "banner", "pill", "minimal", "glass", "neon")
 ANIMATIONS = ("slide", "fade", "pop", "zoom", "bounce", "flip", "swing")
@@ -16,6 +16,7 @@ FREE_ANIMATIONS = frozenset({"slide", "fade", "pop", "zoom"})
 KINDS = {
     "ui.notificationStyle": ("notification_style", "style", FREE_STYLES),
     "ui.notificationAnimation": ("notification_animation", "animation", FREE_ANIMATIONS),
+    "ui.palette": ("palette", "palette", frozenset({"theme"})),  # 027: colour palettes over the theme
 }
 
 
@@ -43,9 +44,11 @@ class NotificationLooks:
     async def catalog(self, user_id: UUID | None) -> dict[str, Any]:
         styles = await self.locked("ui.notificationStyle", user_id)
         animations = await self.locked("ui.notificationAnimation", user_id)
+        palettes = await self.locked("ui.palette", user_id)
         return {
             "styles": [{"key": k, "locked": k in styles} for k in STYLES],
             "animations": [{"key": k, "locked": k in animations} for k in ANIMATIONS],
+            "palettes": [{"key": k, "locked": k in palettes} for k in PALETTES],
         }
 
     def validator(self, setting: str) -> Any:

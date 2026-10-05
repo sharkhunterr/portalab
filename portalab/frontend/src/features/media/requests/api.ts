@@ -47,6 +47,7 @@ export interface RequestInsights {
     watched: Array<{ name: string; value: number }>;
   };
   quota: { base_remaining?: number; extra_units?: number; [key: string]: unknown };
+  acquisition?: Acquisition;
 }
 
 export function useRequestInsights(period: string) {
@@ -95,3 +96,22 @@ export const GROUP_OF: Record<string, "pending" | "approved" | "available" | "de
   failed: "declined",
   cancelled: "declined",
 };
+
+export interface AcquisitionPoint {
+  title: string;
+  kind: string;
+  hours: number;
+  asked_after_days: number | null;
+  moment: "before" | "month" | "year" | "catalog" | "unknown";
+  id: string | null;
+}
+
+export interface Acquisition {
+  buckets: Array<{ key: "hour" | "day" | "week" | "month" | "more"; count: number }>;
+  pending: number;
+  median_hours: number | null;
+  moments: Array<{ moment: AcquisitionPoint["moment"]; count: number; median_hours: number | null }>;
+  points: AcquisitionPoint[];
+  fastest: AcquisitionPoint[];
+  slowest: AcquisitionPoint[];
+}

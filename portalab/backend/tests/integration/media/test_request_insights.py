@@ -15,7 +15,7 @@ from portalab.capabilities.media import CALENDAR, DOWNLOADS, SourceDownload, Sou
 from portalab.capabilities.media.testkit import library_record
 from portalab.core.authz_port import Principal
 from portalab.core.time import FixedClock
-from portalab.modules.media.models import Activity, MediaObject, UserLink
+from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, UserLink
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 
@@ -33,7 +33,18 @@ def _request(
         source_system="seerr",
         external_id=external_id,
         kind="request",
-        payload={"title": title, "kind": kind, "ids": {"tmdb": tmdb}, "state": state, "requester": requester},
+        payload={
+            "title": title,
+            "kind": kind,
+            "ids": {"tmdb": tmdb},
+            "state": state,
+            "requester": requester,
+            **(
+                {"available_at": (clock.now() + timedelta(hours=2)).isoformat()}
+                if state == "available"
+                else {}
+            ),
+        },
         observed_at=clock.now(),
     )
 
@@ -90,6 +101,17 @@ async def test_my_requests_page_and_widgets(
     media.provide(CALENDAR, media.service(5, "radarr"), _Calendar())
     async with media.database.session() as session:
         dune = await session.scalar(select(MediaObject.id).where(MediaObject.title == "Dune"))
+    async with media.database.unit_of_work() as uow:  # TMDB knows when Dune came out
+        uow.session.add(
+            ObjectMetadata(
+                object_id=dune,
+                provider="tmdb",
+                status="found",
+                language="en",
+                data={"release_date": "2021-09-15"},
+                fetched_at=clock.now(),
+            )
+        )
     async with media.database.unit_of_work() as uow:  # Zoé watched one of her requests
         uow.session.add(
             Activity(
@@ -121,6 +143,11 @@ async def test_my_requests_page_and_widgets(
     )
     assert sum(p["count"] for p in data["timeline"]["points"]) == 4 and "quota" in data
     assert data["genres"]["requested"] == [{"name": "Sci-Fi", "value": 1}]
+    acquisition = data["acquisition"]  # Dune: asked years after release, available 2 hours later
+    assert {b["key"]: b["count"] for b in acquisition["buckets"]}["day"] == 1
+    assert acquisition["median_hours"] == 2 and acquisition["pending"] == 3
+    first = acquisition["points"][0]
+    assert first["moment"] == "catalog" and first["asked_after_days"] > 365
     assert data["top_watched"][0]["title"] == "Dune" and data["top_watched"][0]["route"] == f"/media/{dune}"
 
     listed = (await client.get("/api/v1/me/media/requests/list")).json()["items"]

@@ -17,6 +17,9 @@ class _Shop:
     async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:
         return frozenset({"neon"}) if user_id == OWNER and kind == "notification_style" else frozenset()
 
+    async def equipped(self, user_id: UUID) -> dict[str, object]:
+        return {}
+
 
 async def test_sold_looks_need_ownership() -> None:
     registry = CapabilityRegistry()

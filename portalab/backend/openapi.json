@@ -2800,6 +2800,11 @@
             "title": "Id",
             "type": "string"
           },
+          "looks": {
+            "additionalProperties": true,
+            "title": "Looks",
+            "type": "object"
+          },
           "sections": {
             "items": {
               "$ref": "#/components/schemas/CommunitySectionOut"
@@ -5716,6 +5721,11 @@
             "title": "Poster Effect",
             "type": "string"
           },
+          "preview": {
+            "additionalProperties": true,
+            "title": "Preview",
+            "type": "object"
+          },
           "price_coins": {
             "anyOf": [
               {
@@ -8184,6 +8194,23 @@
           "visibility"
         ],
         "title": "ProfileFieldOut",
+        "type": "object"
+      },
+      "ProfileLookIn": {
+        "properties": {
+          "slot": {
+            "pattern": "^(banner|frame|backdrop)$",
+            "title": "Slot",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "slot"
+        ],
+        "title": "ProfileLookIn",
         "type": "object"
       },
       "ProfileOut": {
@@ -27613,6 +27640,71 @@
         "summary": "Update Profile",
         "tags": [
           "identity"
+        ]
+      }
+    },
+    "/api/v1/me/profile-looks": {
+      "get": {
+        "description": "The designs a member may wear on their profile (those sold and not owned are locked).",
+        "operationId": "my_profile_looks_api_v1_me_profile_looks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Profile Looks Api V1 Me Profile Looks Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Profile Looks",
+        "tags": [
+          "marketplace"
+        ]
+      },
+      "put": {
+        "operationId": "equip_profile_look_api_v1_me_profile_looks_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileLookIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Equip Profile Look Api V1 Me Profile Looks Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Equip Profile Look",
+        "tags": [
+          "marketplace"
         ]
       }
     },

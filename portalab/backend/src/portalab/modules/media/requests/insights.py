@@ -8,7 +8,9 @@ import asyncio
 import time
 from collections import Counter
 from collections.abc import Sequence
-from datetime import UTC, datetime, timedelta
+from contextlib import suppress
+from datetime import UTC, date, datetime, timedelta
+from statistics import median
 from typing import Any
 from uuid import UUID
 
@@ -20,7 +22,7 @@ from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import strong_ids
 from portalab.modules.media.insights.stats import Window, window
-from portalab.modules.media.models import Activity, MediaObject, MediaRequest, ObjectTag
+from portalab.modules.media.models import Activity, MediaObject, MediaRequest, ObjectMetadata, ObjectTag
 
 GROUPS = {
     "pending": ("pending",),
@@ -58,10 +60,12 @@ class RequestInsights:
         upcoming: Any,
         *,
         clock: Clock | None = None,
+        enricher: Any = None,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
         self.upcoming = upcoming
+        self.enricher = enricher
         self.clock = clock
         self._queue: tuple[float, list[SourceDownload]] | None = None
 
@@ -80,6 +84,7 @@ class RequestInsights:
             top = await self._top_watched(session, win)
             genres = await self._genres(session, win, mine, user)
         timeline = self._timeline(win, mine, previous)
+        acquisition = await self._acquisition(mine)
         delta = (
             prev_rank["position"] - ranking["position"]
             if prev_rank and prev_rank["position"] and ranking["position"]
@@ -99,6 +104,7 @@ class RequestInsights:
             "ranking": {**ranking, "delta": delta},
             "top_watched": top,
             "genres": genres,
+            "acquisition": acquisition,
         }
 
     async def _requests(self, session: Any, win: Window, user: UUID | None) -> list[MediaRequest]:
@@ -195,6 +201,102 @@ class RequestInsights:
         return {
             "requested": [{"name": n, "value": v} for n, v in requested],
             "watched": [{"name": n, "value": v} for n, v in watched],
+        }
+
+    async def _release_dates(self, rows: Sequence[MediaRequest]) -> dict[UUID, date]:
+        """Release date of each request: the enriched catalog (TMDB) first, else a cached lookup."""
+        out: dict[UUID, date] = {}
+        objects = {r.object_id for r in rows if r.object_id}
+        if objects:
+            async with self.database.session() as session:
+                found = await session.execute(
+                    select(ObjectMetadata.object_id, ObjectMetadata.data["release_date"].astext).where(
+                        ObjectMetadata.object_id.in_(objects), ObjectMetadata.status == "found"
+                    )
+                )
+                known = {object_id: value for object_id, value in found.all() if value}
+        else:
+            known = {}
+        gate = asyncio.Semaphore(6)
+
+        async def one(row: MediaRequest) -> None:
+            raw = known.get(row.object_id) if row.object_id else None
+            if raw is None and self.enricher is not None:
+                async with gate:
+                    raw = (await self.enricher.brief(*lookup_of(row)))["release_date"]
+            if raw:
+                with suppress(ValueError):
+                    out[row.id] = date.fromisoformat(str(raw)[:10])
+
+        await asyncio.gather(*(one(r) for r in rows[:150]))  # bounded: lookups are cached afterwards
+        return out
+
+    async def _acquisition(self, mine: Sequence[MediaRequest]) -> dict[str, Any]:
+        """027: how long my requests took to become available, and when I asked compared with the release
+        (before release, its first month, its first year, or an older title)."""
+        released = await self._release_dates(mine)
+        buckets = {k: 0 for k in ("hour", "day", "week", "month", "more")}
+        moments: dict[str, list[float]] = {k: [] for k in ("before", "month", "year", "catalog", "unknown")}
+        points: list[dict[str, Any]] = []
+        delays: list[float] = []
+        pending = 0
+        for row in mine:
+            arrived = (row.external_ref or {}).get("available_at")
+            when = datetime.fromisoformat(arrived) if arrived else None
+            release = released.get(row.id)
+            asked_after = (row.requested_at.date() - release).days if release else None
+            moment = (
+                "unknown"
+                if asked_after is None
+                else "before"
+                if asked_after < 0
+                else "month"
+                if asked_after <= 31
+                else "year"
+                if asked_after <= 365
+                else "catalog"
+            )
+            if row.state != "available" or when is None:
+                pending += 1 if row.state in OPEN else 0
+                continue
+            hours = max(0.0, (when - row.requested_at).total_seconds() / 3600)
+            delays.append(hours)
+            moments[moment].append(hours)
+            bucket = (
+                "hour"
+                if hours <= 1
+                else "day"
+                if hours <= 24
+                else "week"
+                if hours <= 168
+                else "month"
+                if hours <= 720
+                else "more"
+            )
+            buckets[bucket] += 1
+            points.append(
+                {
+                    "title": str((row.external_ref or {}).get("title") or "?"),
+                    "kind": kind_of(row),
+                    "hours": round(hours, 2),
+                    "asked_after_days": asked_after,
+                    "moment": moment,
+                    "id": str(row.object_id) if row.object_id else None,
+                }
+            )
+        points.sort(key=lambda p: float(p["hours"]))
+        return {
+            "buckets": [{"key": k, "count": v} for k, v in buckets.items()],
+            "pending": pending,
+            "median_hours": round(median(delays), 2) if delays else None,
+            "moments": [
+                {"moment": k, "count": len(v), "median_hours": round(median(v), 2) if v else None}
+                for k, v in moments.items()
+                if v
+            ],
+            "points": points[:300],
+            "fastest": points[:3],
+            "slowest": list(reversed(points[-3:])),
         }
 
     def _timeline(

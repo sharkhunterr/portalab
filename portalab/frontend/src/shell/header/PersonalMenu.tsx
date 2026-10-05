@@ -35,8 +35,9 @@ export function PersonalMenu({
   showName = false,
 }: PersonalMenuProps) {
   const strings = useShellStrings();
+  const profile = userId ? `/community/members/${userId}` : "/account"; // 027: the profile with its banner
   const items: MenuItem[] = [
-    { key: "profile", label: strings.profile, icon: "user", onSelect: () => onNavigate("/account") },
+    { key: "profile", label: strings.profile, icon: "user", onSelect: () => onNavigate(profile) },
     {
       key: "progression",
       label: strings.progression,
@@ -44,7 +45,7 @@ export function PersonalMenu({
       onSelect: () => onNavigate("/progression"),
     },
     ...entries
-      .filter((entry) => entry.route && entry.route !== "/account")
+      .filter((entry) => entry.route && entry.route !== profile)
       .map((entry, index) => ({
         key: entry.key,
         label: strings.label(entry.label_key),

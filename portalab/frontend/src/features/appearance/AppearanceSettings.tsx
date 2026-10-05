@@ -12,6 +12,7 @@ import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
 import { parseTheme, presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { NotificationLooks } from "./NotificationLooks";
+import { PalettePicker } from "./PalettePicker";
 
 /**
  * Appearance & accessibility settings (spec 022): theme, density, text size, contrast, motion, sound and
@@ -346,6 +347,7 @@ export function AppearanceSettings() {
           ))}
         </SelectField>
       ))}
+      <PalettePicker />
       <NotificationLooks />
       {field("ui.campaignThemes", (disabled) => (
         <CheckboxField

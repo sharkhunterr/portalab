@@ -35,3 +35,32 @@ async def test_pack_grants_its_products_and_looks_follow_ownership(mk: MkHarness
     await published(mk, "pack_empty", "bundle", payload={"products": []})
     empty = await mk.module.purchases.acquire(max_, "pack_empty", "k3")
     assert empty.state != "active"  # an empty pack grants nothing and is not activated
+
+
+async def test_profile_looks_follow_ownership(mk: MkHarness) -> None:
+    from portalab.core.errors import ValidationFailed
+    from portalab.modules.marketplace.looks.service import LookLocked
+
+    await published(mk, "banner_synth", "profile_banner", payload={"banner": "synthwave"})
+    await published(mk, "frame_gold", "avatar_frame", payload={"frame": "gold"})
+    await published(mk, "backdrop_feature", "profile_backdrop", payload={"feature": "backdrop"})
+    ursula = mk.p("ursula")
+    user = ursula.user_id
+    assert user is not None
+    looks = mk.module.looks
+    assert (await looks.equip(user, "banner", "aurora"))["banner"] == "aurora"  # not sold: free
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "banner", "synthwave")
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "backdrop", {"object_id": str(user), "ref": "/backdrop.jpg"})
+    await mk.module.purchases.acquire(ursula, "banner_synth", "b1")
+    await mk.module.purchases.acquire(ursula, "backdrop_feature", "b2")
+    assert (await looks.equip(user, "banner", "synthwave"))["banner"] == "synthwave"
+    worn = await looks.equip(user, "backdrop", {"object_id": str(user), "ref": "/abc.jpg", "title": "Dune"})
+    assert worn["backdrop"]["ref"] == "/abc.jpg" and worn["backdrop"]["title"] == "Dune"
+    with pytest.raises(ValidationFailed):
+        await looks.equip(user, "backdrop", {"object_id": str(user), "ref": "https://evil.example/x.jpg"})
+    catalog = await looks.catalog(user)
+    frames = {f["key"]: f["locked"] for f in catalog["frames"]}
+    assert frames["gold"] is True and frames["simple"] is False and catalog["backdrop"]["unlocked"]
+    assert (await looks.equip(user, "banner", None)).get("banner") is None  # taken off

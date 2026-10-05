@@ -7,12 +7,12 @@ rows stay bound to the tombstoned user id with amounts only. Export lists the us
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.marketplace.models import ProjectFunding
+from portalab.modules.marketplace.models import Equipped, ProjectFunding
 
 
 class MarketplaceParticipant:
@@ -43,6 +43,8 @@ class MarketplaceParticipant:
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
+            # 027: what the member wore on their profile goes with the account
+            await uow.session.execute(delete(Equipped).where(Equipped.user_id == user_id))
             rows = (
                 await uow.session.execute(
                     select(ProjectFunding)

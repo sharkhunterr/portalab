@@ -57,6 +57,7 @@ from portalab.modules.marketplace.integrations import (
     catalog_tool,
     cosmetics_section,
 )
+from portalab.modules.marketplace.looks.service import ProfileLooks
 from portalab.modules.marketplace.models import Project, ProjectFunding
 from portalab.modules.marketplace.notify import CATEGORIES, notify_funders
 from portalab.modules.marketplace.observability import log, metrics
@@ -126,6 +127,8 @@ class MarketplaceModule:
             database, events, audit, capabilities, self.activation, self.refunds, clock=clock
         )
         self.entitlements = Entitlements(database)
+        self.cosmetics = CosmeticsReader(database)
+        self.looks = ProfileLooks(database, self.cosmetics, clock=clock)
 
     async def _grant_from_bundle(self, user: UUID, product_key: str, bundle: str) -> bool:
         """027: a pack grants each product it contains (one already owned is kept as is)."""
@@ -146,9 +149,7 @@ class MarketplaceModule:
                 THEME_ENTITLEMENTS, ThemeEntitlementsReader(self.database), instance_ref=INSTANCE, owner=OWNER
             )
         if not self.capabilities.system_providers(COSMETICS):
-            self.capabilities.provide(
-                COSMETICS, CosmeticsReader(self.database), instance_ref=INSTANCE, owner=OWNER
-            )
+            self.capabilities.provide(COSMETICS, self.cosmetics, instance_ref=INSTANCE, owner=OWNER)
         register_builtin_types(
             self.product_types,
             self.capabilities,

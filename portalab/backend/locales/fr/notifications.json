@@ -91,5 +91,15 @@
   "looks.animations.zoom": "Zoom",
   "looks.animations.bounce": "Rebond",
   "looks.animations.flip": "Pivot",
-  "looks.animations.swing": "Balancier"
+  "looks.animations.swing": "Balancier",
+  "palette.title": "Palette de couleurs",
+  "palette.hint": "Les couleurs d'accent posées sur votre thème, quel qu'il soit. Certaines se gagnent dans la boutique.",
+  "palette.names.theme": "Celle du thème",
+  "palette.names.ocean": "Océan",
+  "palette.names.forest": "Forêt",
+  "palette.names.sunset": "Coucher de soleil",
+  "palette.names.candy": "Bonbon",
+  "palette.names.royal": "Royale",
+  "palette.names.ember": "Braise",
+  "palette.names.matrix": "Matrix"
 }

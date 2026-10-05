@@ -4,6 +4,7 @@ import type { UiPolicy, UiPreferences } from "../a11y/preferences";
 import { effectiveTextScale } from "../a11y/textScale";
 import { BUILTIN_THEMES, builtinTheme, DEFAULT_THEME_KEY } from "./builtin";
 import { floorReport } from "./floor";
+import { paletteFor } from "./palettes";
 import { FUNCTIONAL_STATES, presentationOf, RARITIES, type ThemeDefinition } from "./schema";
 
 /**
@@ -118,6 +119,16 @@ export function applyToDocument(
     root.style.setProperty(variable, theme.colors[role as BaseColor]);
   }
   root.style.setProperty("--color-accent-alt", theme.colors.accentAlt ?? theme.colors.accent);
+  // 027: a colour palette over the theme (accents only), never in high contrast
+  const palette =
+    preferences.contrast === "high"
+      ? null
+      : paletteFor(preferences.palette, theme.colorScheme === "light" ? "light" : "dark");
+  if (palette) {
+    root.style.setProperty("--color-accent", palette.accent);
+    root.style.setProperty("--color-accent-alt", palette.accentAlt);
+    root.style.setProperty("--color-accent-contrast", palette.contrast);
+  }
   for (const rarity of RARITIES) {
     root.style.setProperty(`--rarity-${rarity}`, theme.colors.rarity?.[rarity] ?? theme.colors.accent);
   }
@@ -148,6 +159,7 @@ export function applyToDocument(
   root.dataset.celebration = effective.reducedMotion ? "none" : presentation.celebration;
   root.style.setProperty("--text-scale", String(effective.textScale));
   root.dataset.theme = theme.key;
+  root.dataset.palette = palette ? preferences.palette : "theme";
   root.dataset.colorScheme = theme.colorScheme;
   root.dataset.contrast = preferences.contrast;
   root.dataset.density = preferences.density;

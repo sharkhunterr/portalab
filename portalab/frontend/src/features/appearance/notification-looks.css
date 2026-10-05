@@ -134,3 +134,47 @@
   margin: 0;
   color: var(--color-text-muted);
 }
+
+/* 027: colour palettes */
+.palettes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.palettes__item {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.palettes__item[data-current] {
+  border-color: var(--color-accent);
+}
+.palettes__item[data-locked] {
+  cursor: default;
+  opacity: 0.85;
+}
+.palettes__item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.palettes__item:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.palettes__swatch {
+  display: flex;
+  block-size: 2.2rem;
+  border-radius: var(--radius-sm, 0.3rem);
+  overflow: hidden;
+}
+.palettes__swatch span {
+  flex: 1;
+}

@@ -7,7 +7,7 @@ from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor
 from portalab.core.authorization import require
@@ -54,6 +54,7 @@ class CommunityProfileOut(BaseModel):
     id: UUID
     display_name: str | None
     sections: list[CommunitySectionOut]
+    looks: dict[str, Any] = Field(default_factory=dict)  # 027: banner, avatar frame, film backdrop
 
 
 class CommunityFeedItemOut(BaseModel):
@@ -130,6 +131,7 @@ async def profile(principal: Reader, member_id: UUID, module: Module) -> Communi
         id=member_id,
         display_name=name if any(s.key == "identity" for s in sections) else None,
         sections=[section_out(s) for s in sections],
+        looks=await module.looks_of(member_id),
     )
 
 

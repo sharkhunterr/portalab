@@ -38,6 +38,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
 from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.capabilities.support import PROPOSALS
+from portalab.capabilities.themes import COSMETICS
 from portalab.capabilities.visibility import PREFERENCE_CAPABILITY
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer
@@ -231,3 +232,16 @@ class CommunityModule:
             "section_failures": int(snapshot.get("community.section.failed", 0)),
         }
         return CheckResult("ok", "community surfaces respond", facts)
+
+    async def looks_of(self, member: UUID) -> dict[str, Any]:
+        """027: what the member wears on their profile (read from the Marketplace's cosmetics)."""
+        try:
+            providers = self.capabilities.system_providers(COSMETICS)
+        except Exception:
+            return {}
+        if not providers:
+            return {}
+        try:
+            return dict(await providers[0].provider.equipped(member))
+        except Exception:
+            return {}

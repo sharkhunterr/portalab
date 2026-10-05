@@ -232,5 +232,17 @@
   "admin.packHint": "L'acheteur reçoit chacun de ces produits (ceux qu'il possède déjà sont conservés).",
   "admin.packEmpty": "Choisissez au moins un produit.",
   "shop.packContains": "Ce pack contient",
-  "admin.widget": "Widget"
+  "admin.widget": "Widget",
+  "type.profile_banner": "Bannière de profil",
+  "type.avatar_frame": "Cadre d'avatar",
+  "type.profile_backdrop": "Bannière de film",
+  "type.palette": "Palette de couleurs",
+  "preview.title": "Aperçu",
+  "preview.replay": "Rejouer",
+  "preview.details": "Voir la fiche complète",
+  "preview.backdrop": "Le backdrop de n'importe quel film ou série compatible en bannière de profil",
+  "shop.allTypes": "Tous les types",
+  "group.profile": "Profil",
+  "group.notifications": "Notifications",
+  "group.packs": "Packs"
 }

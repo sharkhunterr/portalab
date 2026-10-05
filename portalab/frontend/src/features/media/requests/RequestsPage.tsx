@@ -46,6 +46,7 @@ import {
 import "../../admin/admin.css";
 import "../media.css";
 import "./requests.css";
+import { AcquisitionView } from "./Acquisition";
 import { Poster, SoonList } from "./SoonList";
 
 /**
@@ -314,6 +315,16 @@ function Overview({ data }: { data: RequestInsights }) {
       >
         <OverTime data={data} />
       </AdminSection>
+      {data.acquisition ? (
+        <AdminSection
+          title={t("media:myRequests.acquisition")}
+          description={t("media:myRequests.acquisitionHint")}
+          icon="clock"
+          span="full"
+        >
+          <AcquisitionView data={data.acquisition} />
+        </AdminSection>
+      ) : null}
       <AdminSection
         title={t("media:myRequests.topWatched")}
         description={t("media:myRequests.topWatchedHint")}

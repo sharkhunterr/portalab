@@ -1,0 +1,185 @@
+/* 027 profile hero and looks picker (designs themselves live in design-system/themes/cosmetics.css) */
+.profile-hero {
+  position: relative;
+  border-radius: calc(var(--radius-md) * 2);
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+.profile-hero > .profile-banner {
+  display: block;
+  block-size: clamp(9rem, 22vw, 15rem);
+}
+.profile-hero__identity {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: 0 var(--space-6) var(--space-4);
+  margin-block-start: -3.5rem;
+  position: relative;
+}
+.profile-hero__identity .avatar-frame {
+  background-color: var(--color-surface-raised);
+}
+.profile-hero__identity .avatar-frame:not([data-frame]) {
+  padding: 4px;
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+.profile-hero__text {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+}
+.profile-hero__text h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+.profile-hero__caption {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+.profile-hero__customize {
+  margin-inline-start: auto;
+}
+
+/* picker */
+.looks-preview {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-block-end: var(--space-3);
+}
+.looks-preview > .profile-banner {
+  display: block;
+  block-size: 7rem;
+}
+.looks-preview > .avatar-frame {
+  position: absolute;
+  inset-inline-start: var(--space-4);
+  inset-block-end: var(--space-3);
+}
+.looks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--space-3);
+  margin-block: var(--space-3);
+}
+.looks-grid[data-slot="frame"] {
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+}
+.looks-grid__item {
+  display: grid;
+  gap: var(--space-1);
+}
+.looks-grid__item > button {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  padding: var(--space-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-easing),
+    transform var(--motion-duration-fast) var(--motion-easing);
+}
+.looks-grid__item > button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
+}
+.looks-grid__item > button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+.looks-grid__item > button:disabled {
+  cursor: not-allowed;
+}
+.looks-grid__item .profile-banner {
+  display: block;
+  inline-size: 100%;
+  block-size: 4rem;
+  border-radius: var(--radius-sm);
+}
+.looks-grid__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.85rem;
+}
+.looks-grid__shop {
+  font-size: 0.8rem;
+  text-align: center;
+}
+.backdrop-picker {
+  display: grid;
+  gap: var(--space-3);
+  margin-block: var(--space-3);
+}
+.backdrop-picker input[type="search"] {
+  inline-size: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.backdrop-picker__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--space-2);
+  max-block-size: 16rem;
+  overflow-y: auto;
+}
+.backdrop-picker__results button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: start;
+  cursor: pointer;
+}
+.backdrop-picker__results button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+.backdrop-picker__results img {
+  inline-size: 2.25rem;
+  block-size: 3.25rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+.backdrop-picker__preview {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+.backdrop-picker__preview img {
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  max-block-size: 14rem;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+.looks-grid__item[data-locked] .profile-banner,
+.looks-grid__item[data-locked] .avatar-frame {
+  filter: grayscale(0.6) brightness(0.8);
+}
+@media (prefers-reduced-motion: reduce) {
+  .looks-grid__item > button {
+    transition: none;
+  }
+}
+.backdrop-picker > button {
+  justify-self: start;
+}

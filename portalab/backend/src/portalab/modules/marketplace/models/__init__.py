@@ -213,3 +213,15 @@ class Refund(MarketplaceBase):
     reason: Mapped[str] = mapped_column(String(500), nullable=False, info=not_personal("a refund reason"))
     actor_user_id: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Equipped(MarketplaceBase):
+    """027 — what a member wears on their profile: a banner, an avatar frame, a film backdrop banner
+    (``{object_id, ref}``). Ownership is checked when equipping; the profile shows what is equipped."""
+
+    __tablename__ = "equipped"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    slot: Mapped[str] = mapped_column(String(16), primary_key=True)
+    value: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

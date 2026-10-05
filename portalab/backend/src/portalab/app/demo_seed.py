@@ -132,6 +132,8 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("packs", "Packs", "shop", 5),  # 027: bundles first in the shop
     ("looks", "Notifications", "bell", 40),  # 027: notification styles and animations
     ("widgets", "Widgets", "dashboard", 50),  # 027: dashboard widgets sold in the shop
+    ("profile", "Profile", "user", 35),  # 027: banners, avatar frames, film backdrop banner
+    ("palettes", "Palettes", "palette", 45),  # 027: colour palettes over the theme
 )
 PRESENTATION: dict[
     str, tuple[str, str, bool, str, str | None]
@@ -157,6 +159,21 @@ PRESENTATION: dict[
     "pack_neon_nights": ("legendary", "neon", True, "packs", "zap"),
     "pack_starter": ("rare", "shine", False, "packs", "star"),
     "pack_cinephile": ("epic", "glitch", True, "packs", "film"),
+    "banner_synthwave": ("rare", "neon", False, "profile", "image"),
+    "banner_starfield": ("epic", "shine", True, "profile", "star"),
+    "banner_sakura": ("rare", "shine", False, "profile", "image"),
+    "banner_halloween": ("epic", "blink", False, "halloween", "moon"),
+    "frame_gold": ("legendary", "shine", True, "profile", "trophy"),
+    "frame_neon": ("epic", "neon", False, "profile", "zap"),
+    "frame_flames": ("epic", "glitch", False, "profile", "bolt"),
+    "frame_rainbow": ("rare", "spin", False, "profile", "sparkles"),
+    "backdrop_banner": ("legendary", "glitch", True, "profile", "film"),
+    "palette_sunset": ("rare", "shine", False, "palettes", "palette"),
+    "palette_candy": ("rare", "shine", False, "palettes", "palette"),
+    "palette_royal": ("epic", "shine", False, "palettes", "palette"),
+    "palette_ember": ("epic", "glitch", False, "palettes", "palette"),
+    "palette_matrix": ("legendary", "neon", False, "palettes", "palette"),
+    "pack_profile_star": ("legendary", "neon", True, "packs", "user"),
 }
 
 QUESTS: dict[str, dict[str, Any]] = {
@@ -293,6 +310,70 @@ PRODUCTS: tuple[dict[str, Any], ...] = (
         "pack_cinephile", "bundle", 420, "Cinephile pack", "Pack Cinéphile",
         "The poster wall widget, the Cinephile title, flipping notifications and 5 extra requests.",
         {"products": ["widget_poster_wall", "title_cinephile", "notif_flip", "quota_requests"]},
+    ),
+    # 027: profile cosmetics (Steam-like) — banners, avatar frames, the film backdrop banner feature
+    _product(
+        "banner_synthwave", "profile_banner", 120, "Synthwave banner", "Bannière synthwave",
+        "A retro sunset grid at the top of your profile.", {"banner": "synthwave"},
+    ),
+    _product(
+        "banner_starfield", "profile_banner", 180, "Starfield banner", "Bannière champ d'étoiles",
+        "A slowly drifting field of stars.", {"banner": "starfield"},
+    ),
+    _product(
+        "banner_sakura", "profile_banner", 120, "Sakura banner", "Bannière sakura",
+        "Falling cherry blossom petals.", {"banner": "sakura"},
+    ),
+    _product(
+        "banner_halloween", "profile_banner", 150, "Haunted banner", "Bannière hantée",
+        "Pumpkins and a full moon for the spooky season.", {"banner": "halloween"},
+    ),
+    _product(
+        "frame_gold", "avatar_frame", 300, "Golden frame", "Cadre doré",
+        "A shining golden ring around your avatar.", {"frame": "gold"},
+    ),
+    _product(
+        "frame_neon", "avatar_frame", 200, "Neon frame", "Cadre néon",
+        "A glowing neon ring around your avatar.", {"frame": "neon"},
+    ),
+    _product(
+        "frame_flames", "avatar_frame", 220, "Flame frame", "Cadre de flammes",
+        "Your avatar surrounded by flames.", {"frame": "flames"},
+    ),
+    _product(
+        "frame_rainbow", "avatar_frame", 140, "Rainbow frame", "Cadre arc-en-ciel",
+        "A turning rainbow ring.", {"frame": "rainbow"},
+    ),
+    _product(
+        "backdrop_banner", "profile_backdrop", 350, "Film backdrop banner", "Bannière de film",
+        "Use the backdrop of any film or series of the library as your profile banner.",
+        {"feature": "backdrop"},
+    ),
+    # 027: colour palettes over any theme (Ocean and Forest are free)
+    _product(
+        "palette_sunset", "palette", 90, "Sunset palette", "Palette coucher de soleil",
+        "Warm orange and pink accents over your theme.", {"palette": "sunset"},
+    ),
+    _product(
+        "palette_candy", "palette", 90, "Candy palette", "Palette bonbon",
+        "Sweet pink and mint accents.", {"palette": "candy"},
+    ),
+    _product(
+        "palette_royal", "palette", 120, "Royal palette", "Palette royale",
+        "Deep purple and gold accents.", {"palette": "royal"},
+    ),
+    _product(
+        "palette_ember", "palette", 120, "Ember palette", "Palette braise",
+        "Glowing red and amber accents.", {"palette": "ember"},
+    ),
+    _product(
+        "palette_matrix", "palette", 160, "Matrix palette", "Palette Matrix",
+        "Green code-rain accents.", {"palette": "matrix"},
+    ),
+    _product(
+        "pack_profile_star", "bundle", 600, "Star profile pack", "Pack Profil star",
+        "The starfield banner, the golden frame and the film backdrop banner — 230 Coins saved.",
+        {"products": ["banner_starfield", "frame_gold", "backdrop_banner"]},
     ),
 )  # fmt: skip
 OWNED_BY_ADMIN = ("badge_pioneer", "effect_confetti")

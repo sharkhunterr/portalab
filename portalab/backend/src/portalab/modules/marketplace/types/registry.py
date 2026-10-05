@@ -205,6 +205,10 @@ def register_builtin_types(
         ("notification_style", owned, ("style",)),  # 027: notification looks sold in the shop
         ("notification_animation", owned, ("animation",)),
         ("bundle", BundleHandler(bundle_grant), ("products",)),  # 027: packs
+        ("profile_banner", owned, ("banner",)),  # 027: profile cosmetics (Steam-like)
+        ("avatar_frame", owned, ("frame",)),
+        ("profile_backdrop", owned, ("feature",)),  # unlocks every film backdrop as a banner
+        ("palette", owned, ("palette",)),  # colour palettes over the theme
     ):
         if registry.get(key) is None:
             registry.register(

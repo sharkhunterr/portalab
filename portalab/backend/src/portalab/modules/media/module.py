@@ -205,7 +205,9 @@ class MediaModule:
         self.enricher = MetadataEnricher(database, capabilities, self.language, blobs=blobs, clock=clock)
         self.insights = InsightsQuery(database, clock=clock)
         self.upcoming = Upcoming(database, capabilities, clock=clock)
-        self.request_insights = RequestInsights(database, capabilities, self.upcoming, clock=clock)
+        self.request_insights = RequestInsights(
+            database, capabilities, self.upcoming, clock=clock, enricher=self.enricher
+        )
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
 
     # --- configuration ---------------------------------------------------------------------------------

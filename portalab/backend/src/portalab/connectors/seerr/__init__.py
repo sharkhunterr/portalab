@@ -106,6 +106,12 @@ class SeerrConnector(HttpConnector):
                     "state": state,
                     "source_state": source_state,
                     "requester": str(requester) if requester else None,
+                    # 027: when it arrived in the library (time to availability on « My requests »)
+                    "available_at": (
+                        media.get("mediaAddedAt") or request.get("updatedAt")
+                        if state == "available"
+                        else None
+                    ),
                 }
                 yield self.record(
                     service,

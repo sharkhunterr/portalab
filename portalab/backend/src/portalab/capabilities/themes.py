@@ -1,7 +1,7 @@
 """``ui.theme_catalog`` (spec 022, consumed by Campaigns 014): the theme keys that exist and the Admin
 policy currently allows — campaigns may only name such a theme as an overlay."""
 
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilitySpec
@@ -48,6 +48,24 @@ ENTITLEMENTS_SPEC = CapabilitySpec(
 
 COSMETICS = "marketplace.cosmetics"
 
+# 027: profile and colour cosmetics — designs drawn by the interface (no image file), keys shared by the
+# Marketplace (what is sold) and the UI (what is shown). A design no product sells is free for everyone.
+PROFILE_BANNERS: tuple[str, ...] = (
+    "aurora",
+    "ocean",
+    "dusk",
+    "forest",
+    "sunset",
+    "synthwave",
+    "starfield",
+    "sakura",
+    "circuit",
+    "halloween",
+)
+AVATAR_FRAMES: tuple[str, ...] = ("none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel")
+PALETTES: tuple[str, ...] = ("theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix")
+PROFILE_SLOTS = {"banner": ("profile_banner", "banner"), "frame": ("avatar_frame", "frame")}
+
 
 @runtime_checkable
 class CosmeticEntitlements(Protocol):
@@ -58,6 +76,10 @@ class CosmeticEntitlements(Protocol):
     async def sold(self, kind: str, field: str) -> frozenset[str]: ...
 
     async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]: ...
+
+    async def equipped(self, user_id: UUID) -> dict[str, Any]:
+        """The profile cosmetics a member wears: ``banner``, ``frame``, ``backdrop`` ({object_id, ref})."""
+        ...
 
 
 COSMETICS_SPEC = CapabilitySpec(

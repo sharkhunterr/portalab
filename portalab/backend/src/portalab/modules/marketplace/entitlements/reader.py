@@ -2,6 +2,7 @@
 (themes), 017 (``product_owned`` unlocks) and Community cosmetics. Owning survives a failed activation
 (the ownership is kept and retried); refunded, revoked and expired ownerships do not count."""
 
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Select, select
@@ -93,3 +94,9 @@ class CosmeticsReader:
                 .where(Ownership.user_id == user_id, Ownership.state.in_(LIVE))
             )
             return frozenset(key for key in rows if key)
+
+    async def equipped(self, user_id: UUID) -> dict[str, Any]:
+        """027: the profile cosmetics a member wears (banner and frame keys, film backdrop)."""
+        from portalab.modules.marketplace.looks.service import equipped_of
+
+        return await equipped_of(self.database, user_id)

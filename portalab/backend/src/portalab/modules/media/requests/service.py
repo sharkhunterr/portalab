@@ -274,6 +274,8 @@ class RequestSink:
                     )
                     if payload.requester:  # kept so a later account link attributes the request (027)
                         ref = {**ref, "requester": payload.requester}
+                    if payload.available_at:
+                        ref = {**ref, "available_at": payload.available_at.isoformat()}
                     row = MediaRequest(
                         object_id=target,
                         external_ref=ref,
@@ -292,7 +294,7 @@ class RequestSink:
                     await self.requests.publish(session, row, "media.request_created")
                     added += 1
                     continue
-                attributed = await self._attribution(row, payload.requester, service)
+                attributed = await self._attribution(row, payload.requester, service, payload.available_at)
                 if row.state == payload.state and row.source_state == payload.source_state:
                     if attributed:  # who asked changed: no notification, nothing else moved
                         row.updated_at = now
@@ -301,6 +303,8 @@ class RequestSink:
                         ignored += 1
                     continue
                 became_available = payload.state == "available" and row.state != "available"
+                if became_available and not (row.external_ref or {}).get("available_at"):
+                    row.external_ref = {**(row.external_ref or {}), "available_at": now.isoformat()}
                 row.state, row.source_state, row.updated_at = payload.state, payload.source_state, now
                 await self.requests.publish(session, row, "media.request_updated")
                 if became_available:
@@ -308,9 +312,14 @@ class RequestSink:
                 modified += 1
         return SinkResult(added=added, modified=modified, ignored=ignored, errored=errored)
 
-    async def _attribution(self, row: MediaRequest, requester: str | None, service: ServiceRef) -> bool:
+    async def _attribution(
+        self, row: MediaRequest, requester: str | None, service: ServiceRef, available_at: Any = None
+    ) -> bool:
         """027: remember who asked on the service, and attribute the request once the account is linked."""
         changed = False
+        if available_at and (row.external_ref or {}).get("available_at") is None:
+            row.external_ref = {**(row.external_ref or {}), "available_at": available_at.isoformat()}
+            changed = True
         if requester and (row.external_ref or {}).get("requester") != requester:
             row.external_ref = {**(row.external_ref or {}), "requester": requester}
             changed = True

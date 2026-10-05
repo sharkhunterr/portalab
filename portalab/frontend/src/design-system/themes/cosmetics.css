@@ -1,0 +1,186 @@
+/*
+ * 027 profile cosmetics — banners and avatar frames drawn in CSS (no image file). Keys are shared with the
+ * backend (capabilities/themes.py); the ones a product sells are worn by their owners only.
+ */
+.profile-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt));
+}
+.profile-banner[data-banner="aurora"] {
+  background:
+    radial-gradient(60% 120% at 20% 0%, #34d39966, transparent 60%),
+    radial-gradient(50% 120% at 80% 10%, #818cf899, transparent 60%),
+    linear-gradient(160deg, #0b1026, #1e1b4b);
+}
+.profile-banner[data-banner="ocean"] {
+  background:
+    radial-gradient(80% 140% at 50% 120%, #0ea5e9aa, transparent 60%),
+    linear-gradient(180deg, #082f49, #0c4a6e 60%, #0369a1);
+}
+.profile-banner[data-banner="dusk"] {
+  background: linear-gradient(180deg, #1e1b4b, #7c3aed 55%, #f472b6);
+}
+.profile-banner[data-banner="forest"] {
+  background:
+    repeating-linear-gradient(100deg, #14532d00 0 30px, #14532d55 30px 34px),
+    linear-gradient(180deg, #052e16, #166534 70%, #4d7c0f);
+}
+.profile-banner[data-banner="sunset"] {
+  background:
+    radial-gradient(40% 70% at 50% 100%, #fde047, #f97316 45%, transparent 70%),
+    linear-gradient(180deg, #4c0519, #be123c 50%, #fb923c);
+}
+.profile-banner[data-banner="synthwave"] {
+  background:
+    linear-gradient(transparent 55%, #f0abfc22 55%),
+    repeating-linear-gradient(90deg, #f0abfc55 0 1px, transparent 1px 40px),
+    radial-gradient(circle 3rem at 50% 58%, #fb7185, #f97316 96%, transparent 98%),
+    linear-gradient(180deg, #1e0536, #4c1d95 50%, #be185d);
+}
+.profile-banner[data-banner="starfield"] {
+  background:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+    radial-gradient(2px 2px at 55% 30%, #fde68a, transparent),
+    radial-gradient(1px 1px at 70% 80%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 85% 15%, #bfdbfe, transparent),
+    radial-gradient(1px 1px at 92% 60%, #fff, transparent),
+    radial-gradient(60% 100% at 70% 50%, #312e8166, transparent), linear-gradient(180deg, #020617, #0f172a);
+  background-size:
+    200px 120px,
+    260px 140px,
+    300px 160px,
+    220px 130px,
+    280px 150px,
+    240px 110px,
+    auto,
+    auto;
+  animation: cosmetics-drift 60s linear infinite;
+}
+.profile-banner[data-banner="sakura"] {
+  background:
+    radial-gradient(6px 4px at 15% 30%, #fbcfe8, transparent),
+    radial-gradient(5px 4px at 45% 65%, #f9a8d4, transparent),
+    radial-gradient(6px 5px at 75% 25%, #fbcfe8, transparent),
+    radial-gradient(4px 3px at 88% 75%, #f9a8d4, transparent),
+    linear-gradient(180deg, #fdf2f8, #fbcfe8 60%, #f472b6);
+  background-size:
+    180px 120px,
+    220px 140px,
+    200px 130px,
+    160px 110px,
+    auto;
+  animation: cosmetics-fall 30s linear infinite;
+}
+.profile-banner[data-banner="circuit"] {
+  background:
+    repeating-linear-gradient(0deg, #22d3ee22 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, #22d3ee22 0 1px, transparent 1px 24px),
+    radial-gradient(40% 80% at 80% 50%, #0891b255, transparent), linear-gradient(135deg, #021b26, #083344);
+}
+.profile-banner[data-banner="halloween"] {
+  background:
+    radial-gradient(circle 1.8rem at 84% 32%, #fef3c7, #fde68a 85%, transparent 88%),
+    radial-gradient(70% 60% at 20% 110%, #f97316aa, transparent),
+    linear-gradient(180deg, #1c0a26, #3b0764 60%, #7c2d12);
+}
+.profile-banner[data-banner="backdrop"] {
+  background: #000;
+}
+.profile-banner > img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+@keyframes cosmetics-drift {
+  to {
+    background-position:
+      -400px 0,
+      -300px 0,
+      -200px 0,
+      -350px 0,
+      -250px 0,
+      -300px 0,
+      0 0,
+      0 0;
+  }
+}
+@keyframes cosmetics-fall {
+  to {
+    background-position:
+      60px 240px,
+      -40px 280px,
+      30px 260px,
+      -20px 220px,
+      0 0;
+  }
+}
+
+/* avatar frames */
+.avatar-frame {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  padding: 5px;
+  border-radius: 50%;
+  isolation: isolate;
+}
+.avatar-frame[data-frame="simple"] {
+  background: var(--color-surface-raised);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+.avatar-frame[data-frame="gold"] {
+  background: conic-gradient(#fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  box-shadow: 0 0 1rem #f59e0b66;
+}
+.avatar-frame[data-frame="neon"] {
+  background: #0b1026;
+  box-shadow:
+    0 0 0 3px #22d3ee,
+    0 0 1rem #22d3eeaa,
+    inset 0 0 0.6rem #22d3ee88;
+}
+.avatar-frame[data-frame="flames"] {
+  background: conic-gradient(#f97316, #ef4444, #facc15, #f97316, #dc2626, #f97316);
+  box-shadow: 0 -0.3rem 1.2rem #f97316aa;
+  animation: cosmetics-flicker 1.6s ease-in-out infinite;
+}
+.avatar-frame[data-frame="frost"] {
+  background: conic-gradient(#e0f2fe, #7dd3fc, #f0f9ff, #38bdf8, #e0f2fe);
+  box-shadow: 0 0 0.8rem #7dd3fc88;
+}
+.avatar-frame[data-frame="rainbow"] {
+  background: conic-gradient(#ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
+  animation: cosmetics-spin 6s linear infinite;
+}
+.avatar-frame[data-frame="rainbow"] > * {
+  animation: cosmetics-spin 6s linear infinite reverse;
+}
+.avatar-frame[data-frame="pixel"] {
+  border-radius: 0.4rem;
+  background: repeating-conic-gradient(#a3e635 0 25%, #4d7c0f 0 50%) 0 0 / 8px 8px;
+}
+@keyframes cosmetics-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes cosmetics-flicker {
+  50% {
+    box-shadow: 0 -0.5rem 1.6rem #fb923ccc;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner[data-banner],
+  .avatar-frame[data-frame],
+  .avatar-frame[data-frame] > * {
+    animation: none;
+  }
+}
+:root[data-motion="none"] .profile-banner[data-banner],
+:root[data-motion="none"] .avatar-frame[data-frame],
+:root[data-motion="none"] .avatar-frame[data-frame] > * {
+  animation: none;
+}

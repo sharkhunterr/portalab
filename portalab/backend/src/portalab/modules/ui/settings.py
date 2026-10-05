@@ -43,6 +43,12 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
         "Notification style (shape and layout); some are sold in the shop (027).",
     ),
     (
+        "ui.palette",
+        Literal["theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix"],
+        "theme",
+        "Colour palette over the theme (027); some palettes are sold in the shop.",
+    ),
+    (
         "ui.notificationAnimation",
         Literal["slide", "fade", "pop", "zoom", "bounce", "flip", "swing"],
         "slide",

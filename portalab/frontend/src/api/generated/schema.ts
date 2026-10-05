@@ -5121,6 +5121,27 @@ export interface paths {
         patch: operations["update_profile_api_v1_me_profile_patch"];
         trace?: never;
     };
+    "/api/v1/me/profile-looks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Profile Looks
+         * @description The designs a member may wear on their profile (those sold and not owned are locked).
+         */
+        get: operations["my_profile_looks_api_v1_me_profile_looks_get"];
+        /** Equip Profile Look */
+        put: operations["equip_profile_look_api_v1_me_profile_looks_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/progression": {
         parameters: {
             query?: never;
@@ -8076,6 +8097,10 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Looks */
+            looks?: {
+                [key: string]: unknown;
+            };
             /** Sections */
             sections: components["schemas"]["CommunitySectionOut"][];
         };
@@ -9128,6 +9153,10 @@ export interface components {
              * @default auto
              */
             poster_effect: string;
+            /** Preview */
+            preview?: {
+                [key: string]: unknown;
+            };
             /** Price Coins */
             price_coins: number | null;
             /**
@@ -10047,6 +10076,13 @@ export interface components {
              * @enum {string}
              */
             visibility: "public" | "community" | "leaderboard" | "private";
+        };
+        /** ProfileLookIn */
+        ProfileLookIn: {
+            /** Slot */
+            slot: string;
+            /** Value */
+            value?: unknown;
         };
         /** ProfileOut */
         ProfileOut: {
@@ -22052,6 +22088,63 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_profile_looks_api_v1_me_profile_looks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    equip_profile_look_api_v1_me_profile_looks_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileLookIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
             };
             /** @description Validation Error */
             422: {

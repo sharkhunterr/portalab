@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -12,17 +12,21 @@ import { PROGRESSION_KEY } from "../../../shell/header/useHeaderData";
 import type { Progression } from "../../gamification/api";
 import { type Category, type Product, useCategories, useProducts } from "../api";
 import { ProductCard } from "./ProductCard";
+import { ProductModal } from "./ProductModal";
 import { ProductPoster } from "./ProductPoster";
 import "../marketplace.css";
 
 /**
  * ``/marketplace`` (spec 015 T021, 027 US8): a game-style shop — featured banner, shelves by collection or
- * by type, rarity filter and search. Products are bought with Coins earned on the portal, never real money.
+ * by type, rarity filter and search; a product opens in a modal with its preview (027). Products are bought with Coins earned on the portal, never real money.
  */
 export const TYPE_GROUPS: Array<{ key: string; icon: string; types: string[] }> = [
   { key: "badges", icon: "star", types: ["badge", "title"] },
   { key: "animations", icon: "sparkles", types: ["effect"] },
-  { key: "themes", icon: "palette", types: ["theme"] },
+  { key: "themes", icon: "palette", types: ["theme", "palette"] },
+  { key: "profile", icon: "user", types: ["profile_banner", "avatar_frame", "profile_backdrop"] },
+  { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
+  { key: "packs", icon: "shop", types: ["bundle"] },
   { key: "features", icon: "zap", types: ["feature", "plugin", "widget", "statistic", "access"] },
   { key: "bonus", icon: "inbox", types: ["quota"] },
 ];
@@ -46,11 +50,17 @@ export default function CatalogPage() {
   const [view, setView] = useState<"collections" | "types">("collections");
   const [rarity, setRarity] = useState("");
   const [q, setQ] = useState("");
+  const [params, setParams] = useSearchParams();
+  const type = params.get("type") ?? ""; // 027: « in the shop » links land on one type
+  const [opened, setOpened] = useState<Product | null>(null);
   const categories = useCategories();
   const products = useProducts({ category: "", q: q.trim() });
   const all = useMemo(
-    () => (products.data ?? []).filter((p) => !rarity || p.rarity === rarity).sort(byRarity),
-    [products.data, rarity],
+    () =>
+      (products.data ?? [])
+        .filter((p) => (!rarity || p.rarity === rarity) && (!type || p.type === type))
+        .sort(byRarity),
+    [products.data, rarity, type],
   );
   const featured = all.filter((p) => p.featured);
   const shelves = useMemo(() => {
@@ -99,7 +109,18 @@ export default function CatalogPage() {
         }
       />
 
-      {featured.length && !q && !rarity ? (
+      {type ? (
+        <p className="shop-type-filter">
+          <Icon name="list" size={16} />
+          {t(`marketplace:type.${type}`)}
+          <Button variant="ghost" onClick={() => setParams({})}>
+            <Icon name="close" size={14} />
+            {t("marketplace:shop.allTypes")}
+          </Button>
+        </p>
+      ) : null}
+
+      {featured.length && !q && !rarity && !type ? (
         <section className="shop-featured" aria-labelledby="shop-featured">
           <h2 id="shop-featured" className="shop-shelf__title">
             <Icon name="sparkles" size={20} /> {t("marketplace:shop.featured")}
@@ -113,7 +134,16 @@ export default function CatalogPage() {
                     {t(`marketplace:rarity.${product.rarity ?? "common"}`)}
                   </span>
                   <h3>
-                    <Link to={`/marketplace/products/${product.key}`}>{product.name}</Link>
+                    <Link
+                      to={`/marketplace/products/${product.key}`}
+                      onClick={(event) => {
+                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+                        event.preventDefault();
+                        setOpened(product);
+                      }}
+                    >
+                      {product.name}
+                    </Link>
                   </h3>
                   {Object.values(product.descriptions)[0] ? (
                     <p>{Object.values(product.descriptions)[0]}</p>
@@ -197,11 +227,12 @@ export default function CatalogPage() {
           </h2>
           <ul className="shop-shelf__list">
             {shelf.items.map((product) => (
-              <ProductCard key={product.key} product={product} />
+              <ProductCard key={product.key} product={product} onOpen={setOpened} />
             ))}
           </ul>
         </section>
       ))}
+      {opened ? <ProductModal product={opened} onClose={() => setOpened(null)} /> : null}
     </div>
   );
 }

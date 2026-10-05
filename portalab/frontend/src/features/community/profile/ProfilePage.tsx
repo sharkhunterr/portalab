@@ -1,7 +1,10 @@
 import { Link, useParams } from "react-router";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
 import { type CommunitySection, useProfile } from "../api";
+import type { Equipped } from "./looks";
+import { ProfileHero } from "./ProfileHero";
 import { sectionView } from "./sections";
 
 function SectionFrame({ memberId, section }: { memberId: string; section: CommunitySection }) {
@@ -30,12 +33,14 @@ function SectionFrame({ memberId, section }: { memberId: string; section: Commun
 
 /**
  * ``/community/members/:memberId`` (spec 012 T008): only the sections the member's visibility lets this
- * viewer see — each in its own frame, failing alone. There is no follow, friend or message control.
+ * viewer see — each in its own frame, failing alone. There is no follow, friend or message control. 027: a
+ * hero on top — the member's banner (a design or a film backdrop) and framed avatar, customisable by them.
  */
 export function ProfilePage() {
   const t = useT();
   const { memberId = "" } = useParams();
   const profile = useProfile(memberId);
+  const me = useMe();
   if (profile.isPending) return <FunctionalState state="loading" />;
   if (profile.isError) return <FunctionalState state="unavailable" onRetry={() => profile.refetch()} />;
   if (!profile.data) {
@@ -48,7 +53,12 @@ export function ProfilePage() {
   }
   return (
     <div className="ds-stack">
-      <h1>{profile.data.display_name ?? t("community:feed.someone")}</h1>
+      <ProfileHero
+        memberId={memberId}
+        name={profile.data.display_name ?? t("community:feed.someone")}
+        looks={(profile.data.looks ?? {}) as Equipped}
+        own={me.data?.id === memberId}
+      />
       <div className="community-sections">
         {profile.data.sections.map((section) => (
           <SectionFrame key={section.key} memberId={memberId} section={section} />

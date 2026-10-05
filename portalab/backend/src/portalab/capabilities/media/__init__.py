@@ -102,6 +102,7 @@ class RequestPayload(BaseModel):
     state: RequestState = "pending"
     source_state: str = Field(default="", max_length=60)
     requester: str | None = Field(default=None, max_length=200)  # external user id on the service
+    available_at: datetime | None = None  # 027: when the media became available (time to availability)
 
 
 @dataclass(frozen=True, slots=True)

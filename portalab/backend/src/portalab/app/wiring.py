@@ -192,7 +192,7 @@ def wire_platform(
     ui = UiModule(database, events, authz.audit, capabilities)
     ui.register()
     administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
-    for setting in ("ui.notificationStyle", "ui.notificationAnimation"):  # 027: shop cosmetics
+    for setting in ("ui.notificationStyle", "ui.notificationAnimation", "ui.palette"):  # 027: shop cosmetics
         administration.registry.register_user_validator(
             setting, ui.looks.validator(setting), owner="module:ui"
         )

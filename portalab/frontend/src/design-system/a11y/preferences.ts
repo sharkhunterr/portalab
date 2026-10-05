@@ -7,6 +7,17 @@
 export type Density = "compact" | "comfortable" | "spacious";
 export type ReducedMotion = "system" | "on" | "off";
 
+export const PALETTE_KEYS = [
+  "theme",
+  "ocean",
+  "forest",
+  "sunset",
+  "candy",
+  "royal",
+  "ember",
+  "matrix",
+] as const;
+export type PaletteKey = (typeof PALETTE_KEYS)[number];
 export const NOTIFICATION_STYLES = ["toast", "banner", "pill", "minimal", "glass", "neon"] as const;
 export const NOTIFICATION_ANIMATIONS = ["slide", "fade", "pop", "zoom", "bounce", "flip", "swing"] as const;
 export type NotificationStyle = (typeof NOTIFICATION_STYLES)[number];
@@ -24,6 +35,8 @@ export interface UiPreferences {
   notificationStyle: NotificationStyle;
   /** 027: how notifications come in (some animations are sold in the shop). */
   notificationAnimation: NotificationAnimation;
+  /** 027: accent colours over the theme (some are sold in the shop). */
+  palette: PaletteKey;
   campaignThemes: "allow" | "ignore";
   /** Light/dark choice for theme families (027 R8): dark by default, or follow the device. */
   colorMode: "dark" | "light" | "system";
@@ -48,6 +61,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   notificationDurationSeconds: 6,
   notificationStyle: "toast",
   notificationAnimation: "slide",
+  palette: "theme",
   campaignThemes: "allow",
   colorMode: "dark",
 };
@@ -72,6 +86,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   notificationDurationSeconds: "ui.notificationDurationSeconds",
   notificationStyle: "ui.notificationStyle",
   notificationAnimation: "ui.notificationAnimation",
+  palette: "ui.palette",
   campaignThemes: "ui.campaignThemes",
   colorMode: "ui.colorMode",
 };
@@ -92,6 +107,7 @@ export function sanitize(input: object): UiPreferences {
   pick("notificationPosition", ["top-end", "top-start", "bottom-end", "bottom-start"]);
   pick("notificationStyle", NOTIFICATION_STYLES);
   pick("notificationAnimation", NOTIFICATION_ANIMATIONS);
+  pick("palette", PALETTE_KEYS);
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;

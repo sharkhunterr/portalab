@@ -4,6 +4,11 @@
   --req-approved: var(--color-accent);
   --req-pending: var(--state-partial-fg);
   --req-declined: var(--state-error-fg);
+  --moment-before: var(--color-accent-alt);
+  --moment-month: var(--color-accent);
+  --moment-year: var(--state-partial-fg);
+  --moment-catalog: var(--color-text-muted);
+  --moment-unknown: color-mix(in srgb, var(--color-text) 25%, transparent);
 }
 
 .requests-funnel {
@@ -293,4 +298,54 @@
   .requests-funnel {
     grid-template-columns: 1fr;
   }
+}
+
+.requests-cards--row {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+.requests-acquisition {
+  display: grid;
+  gap: var(--space-4);
+}
+.requests-acquisition__charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-4);
+}
+.requests-acquisition__charts figure {
+  margin: 0;
+}
+.requests-acquisition__charts figcaption {
+  margin-block-end: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.requests-moments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.requests-moments li {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+[data-moment="before"] > .requests-swatch {
+  background: var(--moment-before);
+}
+[data-moment="month"] > .requests-swatch {
+  background: var(--moment-month);
+}
+[data-moment="year"] > .requests-swatch {
+  background: var(--moment-year);
+}
+[data-moment="catalog"] > .requests-swatch {
+  background: var(--moment-catalog);
+}
+[data-moment="unknown"] > .requests-swatch {
+  background: var(--moment-unknown);
 }

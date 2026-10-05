@@ -91,5 +91,15 @@
   "looks.animations.zoom": "Zoom",
   "looks.animations.bounce": "Bounce",
   "looks.animations.flip": "Flip",
-  "looks.animations.swing": "Swing"
+  "looks.animations.swing": "Swing",
+  "palette.title": "Colour palette",
+  "palette.hint": "Accent colours laid over your theme, whichever it is. Some are earned in the shop.",
+  "palette.names.theme": "The theme's",
+  "palette.names.ocean": "Ocean",
+  "palette.names.forest": "Forest",
+  "palette.names.sunset": "Sunset",
+  "palette.names.candy": "Candy",
+  "palette.names.royal": "Royal",
+  "palette.names.ember": "Ember",
+  "palette.names.matrix": "Matrix"
 }
