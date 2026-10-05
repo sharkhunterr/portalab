@@ -21,6 +21,8 @@ export interface DialogProps {
   variant?: "dialog" | "drawer";
   /** ``lg``: a wider dialog for guided forms (027). */
   size?: "md" | "lg" | undefined;
+  /** 027: actions shown in a footer that stays visible, after the close button (e.g. « Buy »). */
+  footer?: ReactNode;
 }
 
 export function Dialog({
@@ -33,6 +35,7 @@ export function Dialog({
   onOpenChange,
   variant = "dialog",
   size = "md",
+  footer,
 }: DialogProps) {
   return (
     <DialogPrimitive.Root
@@ -53,9 +56,18 @@ export function Dialog({
             <DialogPrimitive.Description className="visually-hidden">{title}</DialogPrimitive.Description>
           )}
           {children}
-          <DialogPrimitive.Close asChild>
-            <Button variant="secondary">{closeLabel}</Button>
-          </DialogPrimitive.Close>
+          {footer !== undefined ? (
+            <div className="ds-dialog__footer">
+              <DialogPrimitive.Close asChild>
+                <Button variant="secondary">{closeLabel}</Button>
+              </DialogPrimitive.Close>
+              {footer}
+            </div>
+          ) : (
+            <DialogPrimitive.Close asChild>
+              <Button variant="secondary">{closeLabel}</Button>
+            </DialogPrimitive.Close>
+          )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

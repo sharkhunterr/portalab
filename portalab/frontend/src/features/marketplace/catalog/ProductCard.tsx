@@ -3,11 +3,12 @@ import { CoinBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Product } from "../api";
-import { ProductPoster } from "./ProductPoster";
+import { ProductArt } from "./ProductArt";
 
 /**
- * A product in the shop (spec 015 T021, 027 US8): a collectible card — rarity frame, animated poster,
- * name, type, rarity and price in text (never color alone), ownership stated.
+ * A product in the shop (spec 015 T021, 027 US8): a collectible card — rarity frame with a pre-rendering of
+ * the product and its type and copies left inside, name, rarity, level and purchase limit, price in text
+ * (never color alone), ownership stated.
  */
 export function ProductCard({
   product,
@@ -29,7 +30,7 @@ export function ProductCard({
       data-rarity={rarity}
       data-owned={product.owned ? "true" : undefined}
     >
-      <ProductPoster product={product} />
+      <ProductArt product={product} />
       <div className="product-card__body">
         <span className="product-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
         <h3 className="product-card__name">
@@ -44,7 +45,22 @@ export function ProductCard({
             {product.name}
           </Link>
         </h3>
-        <span className="product-card__type">{t(`marketplace:type.${product.type}`)}</span>
+        {product.min_level || (product.limit_count && product.limit_days) ? (
+          <span className="product-card__chips">
+            {product.min_level ? (
+              <span className="product-chip">
+                <Icon name="trophy" size={12} />
+                {t("marketplace:card.level", { level: product.min_level })}
+              </span>
+            ) : null}
+            {product.limit_count && product.limit_days ? (
+              <span className="product-chip">
+                <Icon name="clock" size={12} />
+                {t("marketplace:card.limit", { max: product.limit_count, days: product.limit_days })}
+              </span>
+            ) : null}
+          </span>
+        ) : null}
         <div className="product-card__footer">
           {product.owned ? (
             <span className="product-card__owned">

@@ -1,5 +1,6 @@
 """Acquisition (T024; R9, FR-006/010/011/013, CD-006): **one unit of work** — eligibility (strict AND,
-named), ownership check (a permanent product once; ``repeatable`` opt-in), the Coins spend through the 013
+named), ownership check (a permanent product once; ``repeatable`` opt-in), scarcity (027: copies left
+and purchases per period, under the product row lock), the Coins spend through the 013
 ledger in the same transaction, the ownership row with its snapshot (version, price paid, conditions) and
 ``marketplace.purchase``. A replayed ``Idempotency-Key`` returns the same ownership. Activation runs after
 the commit and never undoes it."""
@@ -19,6 +20,7 @@ from portalab.core.errors import Conflict, Forbidden
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.activation.service import LIVE, Activation
+from portalab.modules.marketplace.availability.service import Availability
 from portalab.modules.marketplace.eligibility.service import Eligibility
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 from portalab.modules.marketplace.notify import notify_owner
@@ -56,6 +58,7 @@ class Purchases:
         activation: Activation,
         resolution: Resolution,
         *,
+        availability: Availability | None = None,
         clock: Clock | None = None,
     ) -> None:
         self.database = database
@@ -64,6 +67,7 @@ class Purchases:
         self.eligibility = eligibility
         self.activation = activation
         self.resolution = resolution
+        self.availability = availability
         self.clock = clock
         self.after_spend: Any = None  # test hook (fault injection between the spend and the ownership)
 
@@ -112,6 +116,8 @@ class Purchases:
                     )
                     if owned is not None:
                         raise AlreadyOwned("You already own this product.")
+                if self.availability is not None:  # 027: copies left, purchases left in the period
+                    await self.availability.guard(session, user, product, version)
                 transaction = None
                 if price:
                     try:

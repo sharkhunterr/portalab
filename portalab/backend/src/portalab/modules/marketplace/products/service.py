@@ -19,6 +19,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.models import Category, Product, ProductVersion
 from portalab.modules.marketplace.products.definition import (
+    AvailabilityIn,
     PresentationIn,
     ProductVersionIn,
     check_payload,
@@ -162,6 +163,9 @@ class Catalog:
                 featured=data.presentation.featured,
                 poster_effect=data.presentation.poster_effect,
                 icon=data.presentation.icon,
+                supply=data.availability.supply,
+                limit_count=data.availability.limit_count,
+                limit_days=data.availability.limit_days,
                 created_by=actor_id(actor),
                 created_at=now,
                 updated_at=now,
@@ -216,6 +220,66 @@ class Catalog:
             product.category_id, product.updated_at = category_id, utc_now(self.clock)
             await self._audit(session, actor, "product_presented", product, rarity=presentation.rarity)
         return product
+
+    async def set_availability(
+        self, actor: Principal, key: str, availability: AvailabilityIn, min_level: int | None
+    ) -> Product:
+        """027: copies, purchase limit and minimum level. The level is a condition, so changing it makes a
+        new version (the current one copied with the new condition) — purchases keep their snapshot."""
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            product = await session.scalar(select(Product).where(Product.key == key).with_for_update())
+            if product is None:
+                raise ProductNotFound("This product does not exist.")
+            product.supply = availability.supply
+            product.limit_count, product.limit_days = availability.limit_count, availability.limit_days
+            product.updated_at = utc_now(self.clock)
+            current = await session.get(ProductVersion, (product.id, product.current_version))
+            assert current is not None
+            if min_level != self.min_level_of(current):
+                others = [c for c in current.conditions if c.get("kind") != "min_level"]
+                conditions = others + ([{"kind": "min_level", "level": min_level}] if min_level else [])
+                number = (
+                    int(
+                        await session.scalar(
+                            select(func.max(ProductVersion.version)).where(
+                                ProductVersion.product_id == product.id
+                            )
+                        )
+                        or 0
+                    )
+                    + 1
+                )
+                session.add(
+                    ProductVersion(
+                        product_id=product.id,
+                        version=number,
+                        price_coins=current.price_coins,
+                        conditions=conditions,
+                        refund_policy=dict(current.refund_policy),
+                        names=dict(current.names),
+                        descriptions=dict(current.descriptions),
+                        payload=dict(current.payload),
+                        config_required=current.config_required,
+                        effective_from=utc_now(self.clock),
+                        changed_by=actor_id(actor),
+                    )
+                )
+                product.current_version = number
+            await self._audit(
+                session,
+                actor,
+                "product_availability",
+                product,
+                **availability.model_dump(),
+                min_level=min_level,
+            )
+        return product
+
+    @staticmethod
+    def min_level_of(version: ProductVersion) -> int | None:
+        levels = [int(c["level"]) for c in version.conditions if c.get("kind") == "min_level"]
+        return max(levels) if levels else None
 
     async def move(self, actor: Principal, key: str, target: State) -> Product:
         async with self.database.unit_of_work() as uow:

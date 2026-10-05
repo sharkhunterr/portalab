@@ -176,6 +176,15 @@ PRESENTATION: dict[
     "pack_profile_star": ("legendary", "neon", True, "packs", "user"),
 }
 
+# 027 scarcity: own supply (None: the rarity's), purchase limit (count, days), minimum level
+AVAILABILITY: dict[str, tuple[int | None, int | None, int | None, int | None]] = {
+    "quota_requests": (None, 2, 30, None),  # common and unlimited, but two a month per member
+    "title_legend": (None, None, None, 10),  # only from level 10
+    "badge_ghost": (1, None, None, 5),  # one single copy on the whole portal
+    "theme_orbit": (None, None, None, 6),
+    "backdrop_banner": (5, None, None, None),  # legendary, but five copies instead of two
+}
+
 QUESTS: dict[str, dict[str, Any]] = {
     "daily_visit": {
         "kind": "daily",
@@ -264,10 +273,13 @@ PRODUCTS: tuple[dict[str, Any], ...] = (
         "badge_ghost", "badge", 500, "Ghost badge", "Badge Fantôme",
         "Only the bravest haunt the portal at night.", {"label": "Ghost", "icon": "moon"},
     ),
-    _product(
-        "quota_requests", "quota", 60, "+5 media requests", "+5 demandes de médias",
-        "Five extra media requests this month.", {"kind": "media_requests", "units": 5},
-    ),
+    {
+        **_product(
+            "quota_requests", "quota", 60, "+5 media requests", "+5 demandes de médias",
+            "Five extra media requests this month.", {"kind": "media_requests", "units": 5},
+        ),
+        "repeatable": True,  # bought again and again — but two a month at most (AVAILABILITY)
+    },
     # 027: notification looks (style = shape and layout, animation = how they come in)
     _product(
         "notif_glass", "notification_style", 120, "Frosted glass notifications", "Notifications verre dépoli",
@@ -625,7 +637,7 @@ class DemoSeeder:
         return f"{unlocked} newly unlocked"
 
     async def catalog(self) -> str:
-        from portalab.modules.marketplace.products.definition import PresentationIn
+        from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
 
         catalog = self.platform.marketplace.catalog
         for key, label, icon, position in COLLECTIONS:
@@ -651,6 +663,20 @@ class DemoSeeder:
                     product["key"],
                     PresentationIn(rarity=rarity, poster_effect=effect, featured=featured, icon=art),
                     collection,
+                )
+            if product.get("repeatable"):
+                async with self.database.unit_of_work() as uow:  # seeded before products could repeat
+                    await uow.session.execute(
+                        text("UPDATE marketplace.products SET repeatable = true WHERE key = :k"),
+                        {"k": product["key"]},
+                    )
+            if product["key"] in AVAILABILITY:
+                supply, count, days, level = AVAILABILITY[product["key"]]
+                await catalog.set_availability(
+                    self.admin,
+                    product["key"],
+                    AvailabilityIn(supply=supply, limit_count=count, limit_days=days),
+                    level,
                 )
         return f"{made} products published"
 

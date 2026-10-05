@@ -23,7 +23,7 @@ from portalab.modules.marketplace.api.catalog import (
 )
 from portalab.modules.marketplace.api.projects import Module
 from portalab.modules.marketplace.permissions import AUDIT, GRANT, MANAGE, REFUND, REVOKE
-from portalab.modules.marketplace.products.definition import PresentationIn
+from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
 
 router = APIRouter(prefix="/api/v1", tags=["marketplace-admin"])
 Manager = Annotated[Principal, require(MANAGE)]
@@ -50,6 +50,18 @@ class MarketplacePresentationIn(BaseModel):
 
     presentation: PresentationIn
     category: str | None = Field(default=None, max_length=64)
+
+
+class MarketplaceAvailabilityIn(BaseModel):
+    """027: copies, purchase limit per period and minimum level (a condition: a new version)."""
+
+    availability: AvailabilityIn
+    min_level: int | None = Field(default=None, ge=1, le=1000)
+    confirmation: str | None = None
+
+
+class MarketplaceRaritiesIn(BaseModel):
+    supply: dict[str, int | None]
 
 
 class MarketplaceConfirmIn(BaseModel):
@@ -85,7 +97,36 @@ class MarketplaceAuditPage(BaseModel):
 async def admin_products(_: Manager, module: Module) -> list[MarketplaceProductOut]:
     rows = await module.catalog.listing(states=("draft", "available", "unavailable", "archived"))
     keys = await category_keys(module)
-    return [product_out(p, v, False, categories=keys) for p, v in rows]
+    stock = await module.availability.stock(p for p, _ in rows)
+    return [product_out(p, v, False, categories=keys, stock=stock) for p, v in rows]
+
+
+@router.get("/admin/marketplace/rarities")
+async def rarities(_: Manager, module: Module) -> dict[str, int | None]:
+    """027: how many copies a product of each rarity may have (``null``: unlimited)."""
+    return await module.availability.rarities()
+
+
+@router.put("/admin/marketplace/rarities")
+async def set_rarities(
+    principal: Manager, body: MarketplaceRaritiesIn, module: Module
+) -> dict[str, int | None]:
+    return await module.availability.set_rarities(principal, body.supply)
+
+
+@router.put("/admin/marketplace/products/{key}/availability", response_model=MarketplaceProductOut)
+async def product_availability(
+    principal: Manager, key: str, body: MarketplaceAvailabilityIn, module: Module
+) -> MarketplaceProductOut:
+    product, version = await module.catalog.get(key)
+    if product.state != "draft" and body.min_level != module.catalog.min_level_of(version):
+        await _confirm_generic(  # a published product's conditions change is sensitive
+            module, principal, MANAGE, f"product:{key}", {"revise": key}, body.confirmation
+        )
+    await module.catalog.set_availability(principal, key, body.availability, body.min_level)
+    product, version = await module.catalog.get(key)
+    stock = await module.availability.stock([product])
+    return product_out(product, version, False, categories=await category_keys(module), stock=stock)
 
 
 @router.post("/admin/marketplace/categories", status_code=201)

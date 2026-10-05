@@ -8,11 +8,13 @@ import { Dialog } from "../../../design-system/components/Overlays";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Category, Product } from "../api";
-import { ProductPoster } from "../catalog/ProductPoster";
+import { ProductArt } from "../catalog/ProductArt";
+import { withConfirmation } from "./confirm";
 
 /**
  * Product editors (spec 027 US8): a real form instead of a JSON definition — the fields follow the product
- * type — and the shop presentation (rarity, poster animation, featured, collection, icon) with a live poster.
+ * type — and the shop presentation (rarity, featured, collection, icon) with a live poster;
+ * 027: availability (copies, purchase limit per period, minimum level).
  */
 export const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 export const EFFECTS = ["auto", "none", "shine", "glitch", "spin", "neon", "blink"] as const;
@@ -67,19 +69,6 @@ function PresentationFields({
         ))}
       </SelectField>
       <SelectField
-        label={t("marketplace:admin.posterEffect")}
-        value={value.poster_effect}
-        onChange={(e) =>
-          onChange({ ...value, poster_effect: e.target.value as Presentation["poster_effect"] })
-        }
-      >
-        {EFFECTS.map((effect) => (
-          <option key={effect} value={effect}>
-            {t(`marketplace:effect.${effect}`)}
-          </option>
-        ))}
-      </SelectField>
-      <SelectField
         label={t("marketplace:admin.collection")}
         value={category}
         onChange={(e) => onCategory(e.target.value)}
@@ -112,6 +101,64 @@ function PresentationFields({
   );
 }
 
+/** 027: copies (empty: from the rarity), purchase limit per period, minimum level — as typed. */
+export interface AvailabilityForm {
+  supply: string;
+  limitCount: string;
+  limitDays: string;
+  minLevel: string;
+}
+
+const EMPTY_AVAILABILITY: AvailabilityForm = { supply: "", limitCount: "", limitDays: "", minLevel: "" };
+
+function numberOrNull(value: string): number | null {
+  const parsed = Number(value);
+  return value.trim() && Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : null;
+}
+
+export function availabilityBody(value: AvailabilityForm) {
+  const count = numberOrNull(value.limitCount);
+  const days = numberOrNull(value.limitDays);
+  return {
+    availability: {
+      supply: numberOrNull(value.supply),
+      limit_count: count && days ? count : null,
+      limit_days: count && days ? days : null,
+    },
+    min_level: numberOrNull(value.minLevel),
+  };
+}
+
+function AvailabilityFields({
+  value,
+  onChange,
+}: {
+  value: AvailabilityForm;
+  onChange: (value: AvailabilityForm) => void;
+}) {
+  const t = useT();
+  const field = (key: keyof AvailabilityForm, label: string, max: number) => (
+    <TextField
+      label={label}
+      type="number"
+      min={1}
+      max={max}
+      value={value[key]}
+      onChange={(e) => onChange({ ...value, [key]: e.target.value })}
+    />
+  );
+  return (
+    <fieldset className="product-editor__fields">
+      <legend>{t("marketplace:admin.availability")}</legend>
+      {field("supply", t("marketplace:admin.supply"), 1000000)}
+      {field("minLevel", t("marketplace:admin.minLevel"), 1000)}
+      {field("limitCount", t("marketplace:admin.limitCount"), 1000)}
+      {field("limitDays", t("marketplace:admin.limitDays"), 366)}
+      <p className="ds-field__hint">{t("marketplace:admin.repeatHint")}</p>
+    </fieldset>
+  );
+}
+
 const DEFAULT_PRESENTATION: Presentation = {
   rarity: "common",
   poster_effect: "auto",
@@ -133,6 +180,7 @@ export function PresentationDialog({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<Presentation>(DEFAULT_PRESENTATION);
   const [category, setCategory] = useState("");
+  const [availability, setAvailability] = useState<AvailabilityForm>(EMPTY_AVAILABILITY);
   const [error, setError] = useState(false);
   const preview = { ...product, ...value } as Product;
   return (
@@ -148,6 +196,12 @@ export function PresentationDialog({
             icon: product.icon ?? null,
           });
           setCategory(product.category ?? "");
+          setAvailability({
+            supply: product.supply ? String(product.supply) : "",
+            limitCount: product.limit_count ? String(product.limit_count) : "",
+            limitDays: product.limit_days ? String(product.limit_days) : "",
+            minLevel: product.min_level ? String(product.min_level) : "",
+          });
           setError(false);
         }
       }}
@@ -166,7 +220,7 @@ export function PresentationDialog({
     >
       <div className="product-editor">
         <div className="product-editor__preview" data-rarity={value.rarity}>
-          <ProductPoster product={preview} />
+          <ProductArt product={preview} />
         </div>
         <PresentationFields
           value={value}
@@ -175,6 +229,7 @@ export function PresentationDialog({
           onChange={setValue}
           onCategory={setCategory}
         />
+        <AvailabilityFields value={availability} onChange={setAvailability} />
       </div>
       {error ? <p role="alert">{t("marketplace:admin.error")}</p> : null}
       <Button
@@ -184,6 +239,14 @@ export function PresentationDialog({
               params: { path: { key: product.key } },
               body: { presentation: value, category: category || null },
             });
+            await withConfirmation(
+              (confirmation) =>
+                api.PUT("/api/v1/admin/marketplace/products/{key}/availability", {
+                  params: { path: { key: product.key } },
+                  body: { ...availabilityBody(availability), confirmation: confirmation ?? null },
+                }),
+              () => window.confirm(t("marketplace:admin.confirm")),
+            );
             setOpen(false);
             onSaved();
           } catch {
@@ -227,6 +290,7 @@ export function NewProductDialog({
   const [packed, setPacked] = useState<string[]>([]);
   const [extra, setExtra] = useState("{}");
   const [presentation, setPresentation] = useState<Presentation>(DEFAULT_PRESENTATION);
+  const [availability, setAvailability] = useState<AvailabilityForm>(EMPTY_AVAILABILITY);
   const [category, setCategory] = useState("");
   const [error, setError] = useState<string | null>(null);
   const payload = (): Record<string, unknown> => {
@@ -253,7 +317,22 @@ export function NewProductDialog({
         return JSON.parse(extra || "{}") as Record<string, unknown>;
     }
   };
-  const preview = { key, type, name: nameEn, ...presentation, price_coins: price } as unknown as Product;
+  const safePayload = () => {
+    try {
+      return payload();
+    } catch {
+      return {};
+    }
+  };
+  const preview = {
+    key,
+    type,
+    name: nameEn,
+    ...presentation,
+    price_coins: price,
+    descriptions: {},
+    preview: safePayload(),
+  } as unknown as Product;
   const submit = async () => {
     setError(null);
     if (type === "bundle" && !packed.length) {
@@ -268,8 +347,15 @@ export function NewProductDialog({
             type,
             ...(category ? { category } : {}),
             presentation,
+            ...(() => {
+              const body = availabilityBody(availability);
+              return { availability: body.availability, repeatable: type === "quota" };
+            })(),
             version: {
               price_coins: price,
+              ...(numberOrNull(availability.minLevel)
+                ? { conditions: [{ kind: "min_level", level: numberOrNull(availability.minLevel) }] }
+                : {}),
               names: { en: nameEn, ...(nameFr ? { fr: nameFr } : {}) },
               descriptions: description ? { en: description } : {},
               payload: payload(),
@@ -304,7 +390,7 @@ export function NewProductDialog({
         }}
       >
         <div className="product-editor__preview" data-rarity={presentation.rarity}>
-          <ProductPoster product={preview} />
+          <ProductArt product={preview} />
         </div>
         <fieldset className="product-editor__fields">
           <SelectField
@@ -471,6 +557,7 @@ export function NewProductDialog({
           onChange={setPresentation}
           onCategory={setCategory}
         />
+        <AvailabilityFields value={availability} onChange={setAvailability} />
         {error ? <p role="alert">{error}</p> : null}
         <Button type="submit" disabled={!key || !nameEn}>
           {t("marketplace:admin.create")}

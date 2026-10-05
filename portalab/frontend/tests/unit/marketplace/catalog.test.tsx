@@ -5,7 +5,7 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
 // 015 T021/T024 — the product page lists every condition by name, met or not, in text; acquisition stays
-// disabled while one is unmet; the refund policy is stated before purchase.
+// impossible while one is unmet; the refund policy is stated before purchase.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -62,7 +62,7 @@ describe("marketplace product", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Night owl" })).toBeTruthy();
     expect(screen.getByText("Level 3 or more — not met")).toBeTruthy();
     expect(screen.getByText("50 Coins available — met")).toBeTruthy();
-    const acquire = await screen.findByRole("button", { name: "Acquire" });
-    expect((acquire as HTMLButtonElement).disabled).toBe(true);
+    expect(await screen.findByText("Conditions not met")).toBeTruthy(); // 027: no buy button then
+    expect(screen.queryByRole("button", { name: /Buy/ })).toBeNull();
   });
 });

@@ -3,8 +3,9 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
-// 027 — a product opens from the shop in a modal: name, type, rarity, description, price and a preview by
-// type (a pack lists what it contains; a notification style shows a sample notification).
+// 027 — a product opens from the shop in a modal: name, type, rarity, description, price and a
+// pre-rendering by type (a pack lists what it contains; a notification style shows a sample notification);
+// scarcity is shown (copies left, sold out) and « Buy » sits in the footer next to « Close ».
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -45,6 +46,7 @@ const PRODUCTS = [
   product("notif_neon", "notification_style", "Neon notifications", { style: "neon" }),
   product("frame_gold", "avatar_frame", "Gold frame", { frame: "gold" }, { owned: true }),
   product("pack_star", "bundle", "Star pack", { products: ["notif_neon", "frame_gold"] }),
+  product("crown", "title", "Crown", { label: "Royal" }, { rarity: "legendary", supply: 2, remaining: 0 }),
 ];
 
 function show() {
@@ -84,15 +86,31 @@ describe("shop product modal", () => {
     expect(within(dialog).getByText("Star pack description")).toBeTruthy();
     expect(within(dialog).getByText("Neon notifications")).toBeTruthy();
     expect(within(dialog).getByText("Gold frame")).toBeTruthy();
-    expect(await within(dialog).findByRole("button", { name: /Acquire/ })).toBeTruthy();
+    expect(await within(dialog).findByRole("button", { name: "Buy · 120 Coins" })).toBeTruthy();
+    expect(within(dialog).getByRole("button", { name: "Close" })).toBeTruthy();
+    expect(within(dialog).queryByText(/full page/)).toBeNull();
   });
 
   it("previews a notification style with a sample notification", async () => {
     show();
     fireEvent.click(await screen.findByRole("link", { name: "Neon notifications" }));
     const dialog = await screen.findByRole("dialog", { name: "Neon notifications" });
-    const stage = dialog.querySelector(".product-preview__stage");
+    const stage = dialog.querySelector(".product-art__notify");
     expect(stage?.getAttribute("data-style")).toBe("neon");
-    expect(within(dialog).getAllByRole("status").length).toBeGreaterThan(0);
+    expect(stage?.querySelector(".ds-notification__title")?.textContent).toBeTruthy(); // decorative sample
+  });
+});
+
+describe("shop scarcity", () => {
+  it("shows the copies left inside the card and refuses a sold-out product", async () => {
+    show();
+    const link = await screen.findByRole("link", { name: "Crown" });
+    const card = link.closest(".product-card") as HTMLElement;
+    expect(card.querySelector(".product-art__stock")?.textContent).toBe("Sold out");
+    expect(card.querySelector(".product-art__type")?.textContent).toBe("Title");
+    fireEvent.click(link);
+    const dialog = await screen.findByRole("dialog", { name: "Crown" });
+    expect(await within(dialog).findByText("Sold out: no copy left")).toBeTruthy();
+    expect(within(dialog).queryByRole("button", { name: /Buy/ })).toBeNull();
   });
 });

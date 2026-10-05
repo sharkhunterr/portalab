@@ -1281,6 +1281,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/marketplace/products/{key}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Product Availability */
+        put: operations["product_availability_api_v1_admin_marketplace_products__key__availability_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/marketplace/products/{key}/presentation": {
         parameters: {
             query?: never;
@@ -1309,6 +1326,27 @@ export interface paths {
         put?: never;
         /** Move Product */
         post: operations["move_product_api_v1_admin_marketplace_products__key___transition__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/rarities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rarities
+         * @description 027: how many copies a product of each rarity may have (``null``: unlimited).
+         */
+        get: operations["rarities_api_v1_admin_marketplace_rarities_get"];
+        /** Set Rarities */
+        put: operations["set_rarities_api_v1_admin_marketplace_rarities_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7594,6 +7632,18 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * AvailabilityIn
+         * @description 027: scarcity — copies (``None``: the rarity's supply) and a purchase limit per period.
+         */
+        AvailabilityIn: {
+            /** Limit Count */
+            limit_count?: number | null;
+            /** Limit Days */
+            limit_days?: number | null;
+            /** Supply */
+            supply?: number | null;
+        };
         /** BroadcastIn */
         BroadcastIn: {
             /** Action Url */
@@ -8995,6 +9045,17 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /**
+         * MarketplaceAvailabilityIn
+         * @description 027: copies, purchase limit per period and minimum level (a condition: a new version).
+         */
+        MarketplaceAvailabilityIn: {
+            availability: components["schemas"]["AvailabilityIn"];
+            /** Confirmation */
+            confirmation?: string | null;
+            /** Min Level */
+            min_level?: number | null;
+        };
         /** MarketplaceCategoryIn */
         MarketplaceCategoryIn: {
             /** Icon */
@@ -9140,6 +9201,12 @@ export interface components {
             icon?: string | null;
             /** Key */
             key: string;
+            /** Limit Count */
+            limit_count?: number | null;
+            /** Limit Days */
+            limit_days?: number | null;
+            /** Min Level */
+            min_level?: number | null;
             /** Name */
             name: string;
             /** Names */
@@ -9168,16 +9235,27 @@ export interface components {
             refund_policy: {
                 [key: string]: unknown;
             };
+            /** Remaining */
+            remaining?: number | null;
             /** Repeatable */
             repeatable: boolean;
             /** State */
             state: string;
+            /** Supply */
+            supply?: number | null;
             /** Theme */
             theme?: string | null;
             /** Type */
             type: string;
             /** Version */
             version: number;
+        };
+        /** MarketplaceRaritiesIn */
+        MarketplaceRaritiesIn: {
+            /** Supply */
+            supply: {
+                [key: string]: number | null;
+            };
         };
         /** MarketplaceRefundIn */
         MarketplaceRefundIn: {
@@ -14501,6 +14579,41 @@ export interface operations {
             };
         };
     };
+    product_availability_api_v1_admin_marketplace_products__key__availability_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarketplaceAvailabilityIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceProductOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     present_product_api_v1_admin_marketplace_products__key__presentation_put: {
         parameters: {
             query?: never;
@@ -14559,6 +14672,63 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarketplaceProductOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rarities_api_v1_admin_marketplace_rarities_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number | null;
+                    };
+                };
+            };
+        };
+    };
+    set_rarities_api_v1_admin_marketplace_rarities_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarketplaceRaritiesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number | null;
+                    };
                 };
             };
             /** @description Validation Error */

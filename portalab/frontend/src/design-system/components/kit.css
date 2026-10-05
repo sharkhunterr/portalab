@@ -543,6 +543,21 @@
 .ds-dialog {
   border-radius: var(--radius-xl);
 }
+/* 027: dialog actions stay in view at the bottom */
+.ds-dialog__footer {
+  position: sticky;
+  inset-block-end: calc(-1 * var(--space-6));
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin: var(--space-4) calc(-1 * var(--space-6)) calc(-1 * var(--space-6));
+  padding: var(--space-4) var(--space-6);
+  border-block-start: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
 .ds-menu,
 .ds-popover {
   z-index: calc(var(--z-overlay) + 2); /* also above an open dialog */

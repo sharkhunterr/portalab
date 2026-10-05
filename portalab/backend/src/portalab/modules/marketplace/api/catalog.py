@@ -63,6 +63,12 @@ class MarketplaceProductOut(BaseModel):
     theme: str | None = None  # 027 US11: the theme a ``theme`` product unlocks (shown before buying)
     eligibility: list[MarketplaceCheckOut] = []
     preview: dict[str, Any] = Field(default_factory=dict)  # 027: what the shop previews before buying
+    # 027 scarcity: copies in all (None: unlimited) and left, purchase limit per period, minimum level
+    supply: int | None = None
+    remaining: int | None = None
+    limit_count: int | None = None
+    limit_days: int | None = None
+    min_level: int | None = None
 
 
 # 027: the payload fields a product's preview may show (never configuration or extension details)
@@ -119,7 +125,10 @@ def product_out(
     owned: bool,
     language: str = "en",
     categories: Mapping[UUID, str] | None = None,
+    stock: Mapping[UUID, tuple[int | None, int | None]] | None = None,
 ) -> MarketplaceProductOut:
+    supply, remaining = (stock or {}).get(product.id, (None, None))
+    levels = [int(c["level"]) for c in version.conditions if c.get("kind") == "min_level"]
     return MarketplaceProductOut(
         key=product.key,
         type=product.type,
@@ -145,6 +154,11 @@ def product_out(
             for field in PREVIEW_FIELDS.get(product.type, ())
             if field in (version.payload or {})
         },
+        supply=supply,
+        remaining=remaining,
+        limit_count=product.limit_count,
+        limit_days=product.limit_days,
+        min_level=max(levels) if levels else None,
     )
 
 
@@ -207,7 +221,8 @@ async def products(
     mine = await owned_ids(module, _me(principal))
     rows = await module.catalog.listing(category=category, product_type=type, q=q, owned_ids=mine)
     keys = await category_keys(module)
-    return [product_out(p, v, p.id in mine, categories=keys) for p, v in rows]
+    stock = await module.availability.stock(p for p, _ in rows)
+    return [product_out(p, v, p.id in mine, categories=keys, stock=stock) for p, v in rows]
 
 
 @router.get("/marketplace/products/{key}", response_model=MarketplaceProductOut)
@@ -217,8 +232,13 @@ async def product_detail(principal: Reader, key: str, module: Module) -> Marketp
     mine = await owned_ids(module, user)
     if product.state in ("draft",) or (product.state == "archived" and product.id not in mine):
         raise ProductNotFound("This product does not exist.")
-    out = product_out(product, version, product.id in mine, categories=await category_keys(module))
+    stock = await module.availability.stock([product])
+    out = product_out(
+        product, version, product.id in mine, categories=await category_keys(module), stock=stock
+    )
     checks = await module.eligibility.checks(user, list(version.conditions), version.price_coins)
+    if product.id not in mine or product.repeatable:
+        checks += await module.availability.checks(user, product)
     out.eligibility = [
         MarketplaceCheckOut(name=c.name, value=c.value, met=c.met, reason=c.reason) for c in checks
     ]

@@ -184,3 +184,11 @@
 :root[data-motion="none"] .avatar-frame[data-frame] > * {
   animation: none;
 }
+
+/* shop art (027): the two surfaces a palette is shown on */
+.product-art__ui[data-scheme="dark"] {
+  background: #0b0d14;
+}
+.product-art__ui[data-scheme="light"] {
+  background: #f6f7fb;
+}

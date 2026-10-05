@@ -1447,6 +1447,53 @@
         "title": "AutomationUpdateIn",
         "type": "object"
       },
+      "AvailabilityIn": {
+        "additionalProperties": false,
+        "description": "027: scarcity \u2014 copies (``None``: the rarity's supply) and a purchase limit per period.",
+        "properties": {
+          "limit_count": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit Count"
+          },
+          "limit_days": {
+            "anyOf": [
+              {
+                "maximum": 366.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit Days"
+          },
+          "supply": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supply"
+          }
+        },
+        "title": "AvailabilityIn",
+        "type": "object"
+      },
       "BroadcastIn": {
         "additionalProperties": false,
         "properties": {
@@ -5316,6 +5363,43 @@
         "title": "MarketplaceAuditPage",
         "type": "object"
       },
+      "MarketplaceAvailabilityIn": {
+        "description": "027: copies, purchase limit per period and minimum level (a condition: a new version).",
+        "properties": {
+          "availability": {
+            "$ref": "#/components/schemas/AvailabilityIn"
+          },
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "min_level": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Level"
+          }
+        },
+        "required": [
+          "availability"
+        ],
+        "title": "MarketplaceAvailabilityIn",
+        "type": "object"
+      },
       "MarketplaceCategoryIn": {
         "properties": {
           "icon": {
@@ -5701,6 +5785,39 @@
             "title": "Key",
             "type": "string"
           },
+          "limit_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit Count"
+          },
+          "limit_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit Days"
+          },
+          "min_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Level"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -5747,6 +5864,17 @@
             "title": "Refund Policy",
             "type": "object"
           },
+          "remaining": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining"
+          },
           "repeatable": {
             "title": "Repeatable",
             "type": "boolean"
@@ -5754,6 +5882,17 @@
           "state": {
             "title": "State",
             "type": "string"
+          },
+          "supply": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supply"
           },
           "theme": {
             "anyOf": [
@@ -5791,6 +5930,29 @@
           "owned"
         ],
         "title": "MarketplaceProductOut",
+        "type": "object"
+      },
+      "MarketplaceRaritiesIn": {
+        "properties": {
+          "supply": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Supply",
+            "type": "object"
+          }
+        },
+        "required": [
+          "supply"
+        ],
+        "title": "MarketplaceRaritiesIn",
         "type": "object"
       },
       "MarketplaceRefundIn": {
@@ -16692,6 +16854,58 @@
         ]
       }
     },
+    "/api/v1/admin/marketplace/products/{key}/availability": {
+      "put": {
+        "operationId": "product_availability_api_v1_admin_marketplace_products__key__availability_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceAvailabilityIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Product Availability",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
     "/api/v1/admin/marketplace/products/{key}/presentation": {
       "put": {
         "operationId": "present_product_api_v1_admin_marketplace_products__key__presentation_put",
@@ -16805,6 +17019,89 @@
           }
         },
         "summary": "Move Product",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/rarities": {
+      "get": {
+        "description": "027: how many copies a product of each rarity may have (``null``: unlimited).",
+        "operationId": "rarities_api_v1_admin_marketplace_rarities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "title": "Response Rarities Api V1 Admin Marketplace Rarities Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Rarities",
+        "tags": [
+          "marketplace-admin"
+        ]
+      },
+      "put": {
+        "operationId": "set_rarities_api_v1_admin_marketplace_rarities_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceRaritiesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "title": "Response Set Rarities Api V1 Admin Marketplace Rarities Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Rarities",
         "tags": [
           "marketplace-admin"
         ]

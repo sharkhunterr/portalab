@@ -85,6 +85,22 @@ class PresentationIn(BaseModel):
     icon: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9-]{0,63}$")
 
 
+class AvailabilityIn(BaseModel):
+    """027: scarcity — copies (``None``: the rarity's supply) and a purchase limit per period."""
+
+    model_config = ConfigDict(extra="forbid")
+    supply: int | None = Field(default=None, ge=1, le=1_000_000)
+    limit_count: int | None = Field(default=None, ge=1, le=1000)
+    limit_days: int | None = Field(default=None, ge=1, le=366)
+
+    @field_validator("limit_days")
+    @classmethod
+    def _both(cls, value: int | None, info: Any) -> int | None:
+        if (value is None) != (info.data.get("limit_count") is None):
+            raise ValueError("a purchase limit needs both a count and a period")
+        return value
+
+
 class ProductIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     key: str = Field(pattern=r"^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$", max_length=96)
@@ -92,6 +108,7 @@ class ProductIn(BaseModel):
     category: str | None = Field(default=None, max_length=64)
     repeatable: bool = False
     presentation: PresentationIn = Field(default_factory=PresentationIn)
+    availability: AvailabilityIn = Field(default_factory=AvailabilityIn)
     version: ProductVersionIn
 
 

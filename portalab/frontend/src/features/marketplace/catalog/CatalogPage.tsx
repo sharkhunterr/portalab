@@ -11,9 +11,9 @@ import { useT } from "../../../i18n/hooks/useT";
 import { PROGRESSION_KEY } from "../../../shell/header/useHeaderData";
 import type { Progression } from "../../gamification/api";
 import { type Category, type Product, useCategories, useProducts } from "../api";
+import { ProductArt } from "./ProductArt";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
-import { ProductPoster } from "./ProductPoster";
 import "../marketplace.css";
 
 /**
@@ -128,7 +128,7 @@ export default function CatalogPage() {
           <ul className="shop-featured__list">
             {featured.map((product) => (
               <li key={product.key} className="shop-hero" data-rarity={product.rarity ?? "common"}>
-                <ProductPoster product={product} size="lg" />
+                <ProductArt product={product} />
                 <div className="shop-hero__text">
                   <span className="product-card__rarity">
                     {t(`marketplace:rarity.${product.rarity ?? "common"}`)}

@@ -1,0 +1,303 @@
+import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import { Icon } from "../../../design-system/components/Icon";
+import { Notification } from "../../../design-system/components/Notification";
+import { builtinTheme } from "../../../design-system/themes/builtin";
+import { PALETTE_COLORS } from "../../../design-system/themes/palettes";
+import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
+import { BannerArt, FramedAvatar } from "../../community/profile/ProfileHero";
+import { type Product, useProducts } from "../api";
+import { TYPE_ICONS } from "./ProductPoster";
+import "../../appearance/notification-looks.css";
+import "../product-art.css";
+
+/**
+ * A product's art (027): a small pre-rendering of what it is — a notification in that style or animation,
+ * the banner, the framed avatar, the palette or theme colours, the badge or title as worn, a celebration,
+ * a pack's contents — instead of a big icon; the icon stays for what cannot be drawn (features, plugins).
+ * Inside the rarity frame: the type badge, and how many copies are left. Decoration only (``aria-hidden``):
+ * the same facts are in the product's text.
+ */
+export type ArtSize = "card" | "sheet" | "mini";
+
+export const TYPE_BADGE_ICON: Record<string, string> = {
+  ...TYPE_ICONS,
+  bundle: "shop",
+  notification_style: "bell",
+  notification_animation: "sparkles",
+  profile_banner: "image",
+  avatar_frame: "user",
+  profile_backdrop: "film",
+  palette: "palette",
+};
+
+type Preview = Record<string, unknown>;
+
+function text(preview: Preview, field: string): string | undefined {
+  return typeof preview[field] === "string" ? (preview[field] as string) : undefined;
+}
+
+/** Replays an entrance animation every few seconds (the CSS stops it under reduced motion). */
+function useReplay(active: boolean, every = 2600): number {
+  const [run, setRun] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    const timer = window.setInterval(() => setRun((n) => n + 1), every);
+    return () => window.clearInterval(timer);
+  }, [active, every]);
+  return run;
+}
+
+function NotificationArt({
+  style,
+  animation,
+  size,
+}: {
+  style?: string | undefined;
+  animation?: string | undefined;
+  size: ArtSize;
+}) {
+  const t = useT();
+  const run = useReplay(Boolean(animation) && size !== "mini");
+  return (
+    <span
+      key={run}
+      className="ds-notifications product-art__notify"
+      data-style={style ?? "toast"}
+      data-animation={animation ?? "none"}
+    >
+      <Notification
+        item={{
+          id: "art",
+          severity: "success",
+          tone: "reward",
+          title: t("notifications:looks.sampleTitle"),
+          ...(size === "sheet" ? { body: t("notifications:looks.sampleBody") } : {}),
+          badge: t("notifications:badge.reward"),
+        }}
+      />
+    </span>
+  );
+}
+
+const SWATCH_KEYS = ["dark-accent", "dark-alt", "light-accent", "light-alt"] as const;
+const PARTICLES = Array.from({ length: 14 }, (_, i) => ({ key: `p${i}`, i }));
+
+function Swatches({ colors }: { colors: string[] }) {
+  return (
+    <span className="product-art__swatches">
+      {SWATCH_KEYS.map((key, index) => (
+        <span key={key} style={{ background: colors[index] }} />
+      ))}
+    </span>
+  );
+}
+
+function PaletteArt({ palette, fallback }: { palette: string | undefined; fallback: ReactNode }) {
+  const colors = PALETTE_COLORS[palette ?? ""];
+  if (!colors) return fallback;
+  const { dark, light } = colors;
+  return (
+    <span className="product-art__palette">
+      <span className="product-art__ui" data-scheme="dark">
+        <span style={{ background: dark.accent, color: dark.contrast }}>Aa</span>
+        <span style={{ background: dark.accentAlt }} />
+      </span>
+      <span className="product-art__ui" data-scheme="light">
+        <span style={{ background: light.accent, color: light.contrast }}>Aa</span>
+        <span style={{ background: light.accentAlt }} />
+      </span>
+      <Swatches colors={[dark.accent, dark.accentAlt, light.accent, light.accentAlt]} />
+    </span>
+  );
+}
+
+function ThemeArt({ theme, fallback }: { theme: string | undefined; fallback: ReactNode }) {
+  const definition = builtinTheme(theme ?? "");
+  const c = definition?.colors;
+  if (!c) return fallback;
+  return (
+    <span className="product-art__app" style={{ background: c.surface, borderColor: c.border }}>
+      <span className="product-art__app-bar" style={{ background: c.surfaceRaised }}>
+        <span style={{ background: c.accent }} />
+        <span style={{ background: c.textMuted }} />
+      </span>
+      <span className="product-art__app-body">
+        <span className="product-art__app-nav" style={{ background: c.surfaceRaised }}>
+          <span style={{ background: c.accent }} />
+          <span style={{ background: c.textMuted }} />
+          <span style={{ background: c.textMuted }} />
+        </span>
+        <span className="product-art__app-cards">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} style={{ background: c.surfaceRaised, borderColor: c.border }}>
+              <span style={{ background: i % 2 ? (c.accentAlt ?? c.accent) : c.accent }} />
+              <span style={{ background: c.text }} />
+            </span>
+          ))}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+function CelebrationArt({ effect, size }: { effect: string | undefined; size: ArtSize }) {
+  const run = useReplay(size !== "mini", 2400);
+  return (
+    <span key={run} className="product-art__burst" data-celebration={effect ?? "sparkle"}>
+      {PARTICLES.map(({ key, i }) => (
+        <span key={key} style={{ "--i": i, "--n": PARTICLES.length } as CSSProperties} />
+      ))}
+      <span className="product-art__burst-badge">+40 XP</span>
+    </span>
+  );
+}
+
+function PackArt({ keys, fallback }: { keys: string[]; fallback: ReactNode }) {
+  const products = useProducts({ category: "", q: "" });
+  const inner = keys
+    .map((key) => (products.data ?? []).find((p) => p.key === key))
+    .filter((p): p is Product => Boolean(p))
+    .slice(0, 4);
+  if (!inner.length) return fallback;
+  return (
+    <span className="product-art__pack" data-count={inner.length}>
+      {inner.map((item) => (
+        <ProductArt key={item.key} product={item} size="mini" />
+      ))}
+    </span>
+  );
+}
+
+function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize; fallback: ReactNode }) {
+  const t = useT();
+  const me = useMe();
+  const preview = (product.preview ?? {}) as Preview;
+  const name = me.data?.display_name ?? me.data?.login ?? "Portalab";
+  switch (product.type) {
+    case "notification_style":
+      return <NotificationArt style={text(preview, "style")} size={size} />;
+    case "notification_animation":
+      return <NotificationArt animation={text(preview, "animation")} size={size} />;
+    case "profile_banner":
+      return (
+        <span className="product-art__banner">
+          <BannerArt banner={text(preview, "banner") ?? null} />
+          {size !== "mini" ? (
+            <FramedAvatar name={name} userId={me.data?.id} size={size === "sheet" ? "lg" : "md"} />
+          ) : null}
+        </span>
+      );
+    case "avatar_frame":
+      return (
+        <span className="product-art__frame">
+          <FramedAvatar
+            frame={text(preview, "frame")}
+            name={name}
+            userId={me.data?.id}
+            size={size === "sheet" ? "xl" : size === "card" ? "lg" : "md"}
+          />
+        </span>
+      );
+    case "profile_backdrop":
+      return (
+        <span className="product-art__backdrop">
+          <span className="product-art__film">
+            {[0, 1, 2].map((i) => (
+              <span key={i} />
+            ))}
+          </span>
+          {size !== "mini" ? (
+            <span className="product-art__caption">{t("marketplace:art.backdrop")}</span>
+          ) : null}
+        </span>
+      );
+    case "palette":
+      return <PaletteArt palette={text(preview, "palette")} fallback={fallback} />;
+    case "theme":
+      return <ThemeArt theme={text(preview, "theme") ?? product.theme ?? undefined} fallback={fallback} />;
+    case "bundle":
+      return Array.isArray(preview.products) ? (
+        <PackArt keys={preview.products as string[]} fallback={fallback} />
+      ) : (
+        fallback
+      );
+    case "badge":
+      return (
+        <span className="product-art__badge">
+          <Icon name={text(preview, "icon") ?? product.icon ?? "star"} size={size === "sheet" ? 26 : 18} />
+          {text(preview, "label") ?? product.name}
+        </span>
+      );
+    case "title":
+      return (
+        <span className="product-art__title">
+          <span className="product-art__title-name">{name}</span>
+          <span className="product-art__title-text">{text(preview, "label") ?? product.name}</span>
+        </span>
+      );
+    case "effect":
+      return <CelebrationArt effect={text(preview, "effect")} size={size} />;
+    case "quota":
+      return (
+        <span className="product-art__quota">
+          <strong>+{String(preview.units ?? "")}</strong>
+          <span>{t("marketplace:art.requests")}</span>
+        </span>
+      );
+    case "widget":
+      return (
+        <span className="product-art__widget">
+          <span className="product-art__widget-head">
+            <Icon name={product.icon ?? "dashboard"} size={14} />
+            <span />
+          </span>
+          <span className="product-art__widget-tiles">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <span key={i} />
+            ))}
+          </span>
+        </span>
+      );
+    default:
+      return fallback; // what cannot be drawn (features, plugins, access…) keeps its icon
+  }
+}
+
+export function ProductArt({ product, size = "card" }: { product: Product; size?: ArtSize }) {
+  const t = useT();
+  const icon = product.icon ?? TYPE_ICONS[product.type] ?? "shop";
+  const fallback = (
+    <span className="product-art__icon">
+      <Icon name={icon} size={size === "sheet" ? 64 : size === "mini" ? 22 : 40} />
+    </span>
+  );
+  const left = product.remaining;
+  return (
+    <span
+      className="product-poster product-art"
+      data-rarity={product.rarity ?? "common"}
+      data-size={size}
+      data-kind={product.type}
+      aria-hidden="true"
+    >
+      <span className="product-poster__glow" />
+      <span className="product-art__stage">
+        <ArtBody product={product} size={size} fallback={fallback} />
+      </span>
+      {size !== "mini" ? (
+        <>
+          <span className="product-art__type">
+            <Icon name={TYPE_BADGE_ICON[product.type] ?? "shop"} size={12} />
+            {t(`marketplace:type.${product.type}`)}
+          </span>
+          {left !== null && left !== undefined ? (
+            <span className="product-art__stock" data-out={left === 0 || undefined}>
+              {left === 0 ? t("marketplace:stock.soldOut") : t("marketplace:stock.left", { count: left })}
+            </span>
+          ) : null}
+        </>
+      ) : null}
+    </span>
+  );
+}

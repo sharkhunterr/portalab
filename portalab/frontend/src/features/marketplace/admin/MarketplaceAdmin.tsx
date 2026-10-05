@@ -9,8 +9,9 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { type Category, type Product, useCategories } from "../api";
-import { ProductPoster } from "../catalog/ProductPoster";
+import { ProductArt } from "../catalog/ProductArt";
 import { NewProductDialog, PresentationDialog } from "./ProductEditor";
+import { RaritySupply } from "./RaritySupply";
 import "../marketplace.css";
 import { withConfirmation } from "./confirm";
 
@@ -80,13 +81,15 @@ export default function MarketplaceAdmin() {
         <ul className="admin-products">
           {((products.data ?? []) as Product[]).map((p) => (
             <li key={p.key} className="admin-product" data-rarity={p.rarity ?? "common"}>
-              <ProductPoster product={p} />
+              <ProductArt product={p} size="mini" />
               <div className="admin-product__body">
                 <strong>{p.name}</strong>
                 <span className="widget__meta">
                   {t(`marketplace:type.${p.type}`)} · {t(`marketplace:rarity.${p.rarity ?? "common"}`)} · v
                   {p.version}
                   {p.price_coins ? ` · ${p.price_coins} Coins` : ""}
+                  {p.supply ? ` · ${p.remaining ?? 0}/${p.supply}` : ""}
+                  {p.min_level ? ` · ${t("marketplace:card.level", { level: p.min_level })}` : ""}
                 </span>
                 <span className="ds-badge" data-state={p.state}>
                   {t(`marketplace:productState.${p.state}`)}
@@ -137,6 +140,7 @@ export default function MarketplaceAdmin() {
           ))}
         </ul>
       </AdminSection>
+      <RaritySupply />
       <AdminSection title={t("marketplace:shop.byCollection")} icon="star">
         <ul className="admin-collections">
           {((categories.data ?? []) as Category[]).map((c) => (

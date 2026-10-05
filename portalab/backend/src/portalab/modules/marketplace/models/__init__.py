@@ -135,8 +135,25 @@ class Product(MarketplaceBase):
         String(12), nullable=False, default="auto", server_default="auto"
     )
     icon: Mapped[str | None] = mapped_column(String(64))
+    # availability (027): how many may exist (None: the rarity's supply), how many one member may buy in a
+    # period (repeatable products) — scarcity, never priority
+    supply: Mapped[int | None] = mapped_column(Integer)
+    limit_count: Mapped[int | None] = mapped_column(Integer)
+    limit_days: Mapped[int | None] = mapped_column(Integer)
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Rarity(MarketplaceBase):
+    """027 — what a rarity means in the shop: how many copies of a product of that rarity may exist
+    (``None``: unlimited). Set by the marketplace administrators; a product may override it."""
+
+    __tablename__ = "rarities"
+    __table_args__ = (CheckConstraint("supply IS NULL OR supply >= 1", name="supply"),)
+
+    key: Mapped[str] = mapped_column(String(12), primary_key=True)
+    supply: Mapped[int | None] = mapped_column(Integer)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 

@@ -41,6 +41,7 @@ from portalab.core.permissions import PermissionRegistry, default_permissions
 from portalab.core.time import Clock
 from portalab.modules.marketplace import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.marketplace.activation.service import Activation
+from portalab.modules.marketplace.availability.service import Availability
 from portalab.modules.marketplace.eligibility.service import Eligibility
 from portalab.modules.marketplace.entitlements.reader import (
     CosmeticsReader,
@@ -115,9 +116,17 @@ class MarketplaceModule:
         self.permissions = permissions
         self.catalog = Catalog(database, events, audit, product_types, config, clock=clock)
         self.eligibility = Eligibility(capabilities)
+        self.availability = Availability(database, audit, clock=clock)
         self.activation = Activation(database, events, product_types, config, clock=clock)
         self.purchases = Purchases(
-            database, events, capabilities, self.eligibility, self.activation, self.resolution, clock=clock
+            database,
+            events,
+            capabilities,
+            self.eligibility,
+            self.activation,
+            self.resolution,
+            availability=self.availability,
+            clock=clock,
         )
         self.refunds = Refunds(
             database, events, audit, product_types, self.activation, self.resolution, clock=clock
