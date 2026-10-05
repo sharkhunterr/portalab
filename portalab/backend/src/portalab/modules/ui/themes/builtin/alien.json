@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 2,
+  "key": "alien",
+  "name": "Xeno",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#050a06",
+    "surfaceRaised": "#0d160f",
+    "text": "#dfffe0",
+    "textMuted": "#93b897",
+    "border": "#1f3a24",
+    "accent": "#8cff3c",
+    "accentContrast": "#061200",
+    "focus": "#c6ff8a",
+    "accentAlt": "#ffd23f",
+    "rarity": {
+      "common": "#93b897",
+      "rare": "#5fd3c8",
+      "epic": "#c58bff",
+      "legendary": "#ffd23f"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#232826",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#18281e",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#282618",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#262616",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#28211e",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#262221",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#202229",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#272223",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#202523",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#1a2627",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Exo 2\", sans-serif",
+    "headingFamily": "Syncopate, sans-serif",
+    "headingCase": "uppercase",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.1,
+    "md": 0.3
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "glow",
+    "fastMs": 140,
+    "normalMs": 280
+  },
+  "layout": {
+    "nav": {
+      "desktop": "terminal",
+      "tablet": "terminal",
+      "phone": "terminal"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "neon",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "satellite",
+      "film": "eye",
+      "media": "eye",
+      "compass": "telescope",
+      "server": "biohazard",
+      "users": "dna",
+      "shop": "package",
+      "lifebuoy": "bot",
+      "trophy": "hexagon",
+      "search": "scan",
+      "bell": "radio"
+    }
+  },
+  "background": {
+    "fallback": "#050a06",
+    "pattern": "scanlines",
+    "ambient": "spores"
+  },
+  "sounds": {
+    "notification": "asset:scifi/notification.wav",
+    "alert": "asset:scifi/alert.wav",
+    "success": "asset:scifi/success.wav",
+    "reward": "asset:scifi/reward.wav",
+    "levelUp": "asset:scifi/level-up.wav",
+    "ui": "asset:scifi/ui.wav"
+  },
+  "notification": {
+    "style": "terminal",
+    "animation": "drop"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Pont",
+      "nav:nav.section.home": "Pont",
+      "dashboard:title": "Pont",
+      "nav:nav.media": "Archives de bord",
+      "nav:nav.section.media": "Archives de bord",
+      "media:home.title": "Archives de bord",
+      "nav:nav.media_requests": "Requêtes à l'ordinateur",
+      "nav:nav.media_insights": "Rapports",
+      "media:insights.title": "Rapports",
+      "nav:nav.section.content": "Sondes",
+      "nav:nav.news": "Transmissions",
+      "news:title": "Transmissions",
+      "nav:nav.wiki": "Bestiaire",
+      "wiki:title": "Bestiaire",
+      "nav:nav.search": "Détecteur de mouvement",
+      "search:title": "Détecteur de mouvement",
+      "nav:nav.calendar": "Journal de vol",
+      "calendar:title": "Journal de vol",
+      "nav:nav.services": "Systèmes vitaux",
+      "nav:nav.section.services": "Systèmes vitaux",
+      "nav:nav.statistics": "Biométrie",
+      "statistics:title": "Biométrie",
+      "nav:nav.community": "L'équipage",
+      "nav:nav.section.community": "L'équipage",
+      "community:title": "L'équipage",
+      "nav:nav.progression": "Mon dossier",
+      "gamification:progression.title": "Mon dossier",
+      "nav:nav.campaigns": "Missions",
+      "campaigns:page.title": "Missions",
+      "nav:nav.marketplace": "Soute",
+      "nav:nav.section.marketplace": "Soute",
+      "marketplace:catalog.title": "Soute",
+      "nav:nav.projects": "Expériences",
+      "marketplace:projects.title": "Expériences",
+      "marketplace:owned.title": "Mon casier",
+      "nav:nav.support": "Infirmerie",
+      "nav:nav.section.support": "Infirmerie",
+      "nav:nav.incidents": "Brèches",
+      "support:incident.title": "Brèches",
+      "nav:nav.feedback": "Rapport d'équipage",
+      "support:feedback.title": "Rapport d'équipage",
+      "gamification:value.coins": "Unités",
+      "gamification:value.xp": "Échantillons"
+    },
+    "en": {
+      "nav:nav.home": "Bridge",
+      "nav:nav.section.home": "Bridge",
+      "dashboard:title": "Bridge",
+      "nav:nav.media": "Ship archives",
+      "nav:nav.section.media": "Ship archives",
+      "media:home.title": "Ship archives",
+      "nav:nav.media_requests": "Computer requests",
+      "nav:nav.media_insights": "Reports",
+      "media:insights.title": "Reports",
+      "nav:nav.section.content": "Probes",
+      "nav:nav.news": "Transmissions",
+      "news:title": "Transmissions",
+      "nav:nav.wiki": "Bestiary",
+      "wiki:title": "Bestiary",
+      "nav:nav.search": "Motion tracker",
+      "search:title": "Motion tracker",
+      "nav:nav.calendar": "Flight log",
+      "calendar:title": "Flight log",
+      "nav:nav.services": "Life support",
+      "nav:nav.section.services": "Life support",
+      "nav:nav.statistics": "Biometrics",
+      "statistics:title": "Biometrics",
+      "nav:nav.community": "The crew",
+      "nav:nav.section.community": "The crew",
+      "community:title": "The crew",
+      "nav:nav.progression": "My file",
+      "gamification:progression.title": "My file",
+      "nav:nav.campaigns": "Missions",
+      "campaigns:page.title": "Missions",
+      "nav:nav.marketplace": "Cargo",
+      "nav:nav.section.marketplace": "Cargo",
+      "marketplace:catalog.title": "Cargo",
+      "nav:nav.projects": "Experiments",
+      "marketplace:projects.title": "Experiments",
+      "marketplace:owned.title": "My locker",
+      "nav:nav.support": "Med bay",
+      "nav:nav.section.support": "Med bay",
+      "nav:nav.incidents": "Breaches",
+      "support:incident.title": "Breaches",
+      "nav:nav.feedback": "Crew report",
+      "support:feedback.title": "Crew report",
+      "gamification:value.coins": "Units",
+      "gamification:value.xp": "Samples"
+    }
+  }
+}

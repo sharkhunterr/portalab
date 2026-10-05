@@ -1,0 +1,534 @@
+/*
+ * 027 ambient layers — decorations behind the content (theme default, member choice, profile background).
+ * Particles get --x/--y (position), --size, --duration, --delay (negative: already in motion), --drift,
+ * --hue and --i from AmbientLayer. Transforms and opacity only; nothing under reduced motion. Physical
+ * offsets on purpose: decorations do not mirror, and vertical code columns would turn logical ones around.
+ */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.ambient[data-contained] {
+  position: absolute;
+  z-index: 0;
+  border-radius: inherit;
+}
+.ambient > span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: block;
+  will-change: transform, opacity;
+  animation-duration: var(--duration);
+  animation-delay: var(--delay);
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+/* snow: soft flakes falling and swaying */
+[data-ambient="snow"] > span {
+  top: -2vh;
+  inline-size: calc(0.5rem * var(--size));
+  block-size: calc(0.5rem * var(--size));
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0.75;
+  box-shadow: 0 0 6px #ffffffaa;
+  animation-name: ambient-fall;
+}
+@keyframes ambient-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * 0.5), 52vh, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), 106vh, 0);
+  }
+}
+
+/* embers: sparks rising from below */
+[data-ambient="embers"] > span {
+  top: auto;
+  bottom: -2vh;
+  inline-size: calc(0.35rem * var(--size));
+  block-size: calc(0.35rem * var(--size));
+  border-radius: 50%;
+  background: #ffb347;
+  box-shadow:
+    0 0 8px #ff7b00,
+    0 0 16px #ff3c00aa;
+  animation-name: ambient-rise, ambient-flicker;
+  animation-duration: var(--duration), 1.3s;
+}
+@keyframes ambient-rise {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(var(--drift), -105vh, 0) scale(0.3);
+    opacity: 0;
+  }
+}
+@keyframes ambient-flicker {
+  50% {
+    filter: brightness(1.6);
+  }
+}
+
+/* code rain: falling columns of glyphs */
+[data-ambient="code-rain"] > span {
+  top: -60vh;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  font-size: calc(0.75rem + 0.4rem * var(--size));
+  line-height: 1;
+  letter-spacing: 0.15em;
+  color: #22ff66;
+  opacity: 0.32;
+  text-shadow: 0 0 6px #00ff55;
+  mask-image: linear-gradient(to bottom, transparent, #000 70%, #fff);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  animation-name: ambient-code;
+  animation-duration: calc(var(--duration) * 0.6);
+}
+@keyframes ambient-code {
+  to {
+    transform: translateY(170vh);
+  }
+}
+
+/* fireflies: glowing dots wandering and pulsing */
+[data-ambient="fireflies"] > span,
+[data-ambient="spores"] > span {
+  inline-size: calc(0.35rem * var(--size));
+  block-size: calc(0.35rem * var(--size));
+  border-radius: 50%;
+  background: #f4ff7a;
+  box-shadow:
+    0 0 10px #e8ff59,
+    0 0 22px #d6ff3d88;
+  animation-name: ambient-wander, ambient-pulse;
+  animation-duration: var(--duration), 2.6s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate, alternate;
+}
+[data-ambient="spores"] > span {
+  background: #7dffb0;
+  box-shadow:
+    0 0 12px #2cff8f,
+    0 0 26px #00ff8a66;
+  filter: blur(0.5px);
+}
+@keyframes ambient-wander {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(calc(var(--drift) * 0.6), -6vh, 0);
+  }
+  66% {
+    transform: translate3d(calc(var(--drift) * -0.4), 4vh, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), -10vh, 0);
+  }
+}
+@keyframes ambient-pulse {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+
+/* starfield: twinkling stars */
+[data-ambient="starfield"] > span {
+  inline-size: calc(0.2rem * var(--size));
+  block-size: calc(0.2rem * var(--size));
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 4px #cfe3ff;
+  animation-name: ambient-twinkle;
+  animation-duration: calc(2s + var(--size) * 3s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+@keyframes ambient-twinkle {
+  from {
+    opacity: 0.15;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* warp: stars streaking out of the centre */
+[data-ambient="warp"] > span {
+  left: 50%;
+  top: 50%;
+  inline-size: calc(4rem * var(--size));
+  block-size: 2px;
+  background: linear-gradient(90deg, transparent, #bfe0ff);
+  transform-origin: 0 50%;
+  animation-name: ambient-warp;
+  animation-duration: calc(1.4s + var(--size) * 1.6s);
+  animation-timing-function: ease-in;
+}
+@keyframes ambient-warp {
+  from {
+    transform: rotate(calc(var(--hue) * 1deg)) translateX(2vmin) scaleX(0.2);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  to {
+    transform: rotate(calc(var(--hue) * 1deg)) translateX(75vmax) scaleX(1.4);
+    opacity: 0;
+  }
+}
+
+/* petals and leaves: tumbling as they fall */
+[data-ambient="petals"] > span,
+[data-ambient="leaves"] > span {
+  top: -4vh;
+  inline-size: calc(0.9rem * var(--size));
+  block-size: calc(0.6rem * var(--size));
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, #ffd1e8, #ff8fc4);
+  opacity: 0.85;
+  animation-name: ambient-tumble;
+}
+[data-ambient="leaves"] > span {
+  inline-size: calc(1.1rem * var(--size));
+  block-size: calc(1.1rem * var(--size));
+  background: linear-gradient(
+    135deg,
+    hsl(calc(15 + var(--hue) / 9) 85% 55%),
+    hsl(calc(var(--hue) / 12) 80% 38%)
+  );
+  clip-path: polygon(
+    50% 0,
+    62% 30%,
+    95% 25%,
+    72% 52%,
+    88% 85%,
+    52% 70%,
+    50% 100%,
+    48% 70%,
+    12% 85%,
+    28% 52%,
+    5% 25%,
+    38% 30%
+  );
+  border-radius: 0;
+}
+@keyframes ambient-tumble {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(calc(var(--drift) * 0.5), 27vh, 0) rotate(120deg);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.3), 54vh, 0) rotate(220deg);
+  }
+  to {
+    transform: translate3d(var(--drift), 108vh, 0) rotate(420deg);
+  }
+}
+
+/* bats: flapping across the page */
+[data-ambient="bats"] > span {
+  left: -10vw;
+  inline-size: calc(2.6rem * var(--size));
+  block-size: calc(1.2rem * var(--size));
+  background: #14081f;
+  opacity: 0.8;
+  clip-path: polygon(
+    0 20%,
+    15% 35%,
+    25% 25%,
+    38% 45%,
+    46% 30%,
+    50% 40%,
+    54% 30%,
+    62% 45%,
+    75% 25%,
+    85% 35%,
+    100% 20%,
+    92% 60%,
+    78% 55%,
+    66% 80%,
+    55% 62%,
+    50% 78%,
+    45% 62%,
+    34% 80%,
+    22% 55%,
+    8% 60%
+  );
+  animation-name: ambient-fly, ambient-flap;
+  animation-duration: calc(var(--duration) * 1.4), 0.35s;
+  animation-timing-function: linear, ease-in-out;
+  animation-direction: normal, alternate;
+}
+@keyframes ambient-fly {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(60vw, -12vh, 0);
+  }
+  to {
+    transform: translate3d(125vw, 6vh, 0);
+  }
+}
+@keyframes ambient-flap {
+  to {
+    scale: 1 0.45;
+  }
+}
+
+/* bubbles: rising and wobbling */
+[data-ambient="bubbles"] > span {
+  top: auto;
+  bottom: -6vh;
+  inline-size: calc(1.6rem * var(--size));
+  block-size: calc(1.6rem * var(--size));
+  border-radius: 50%;
+  border: 1.5px solid #ffffff99;
+  background: radial-gradient(circle at 30% 30%, #ffffffaa, #9fe7ff22 45%, transparent 60%);
+  animation-name: ambient-rise;
+  animation-duration: calc(var(--duration) * 1.2);
+  animation-timing-function: ease-in;
+}
+
+/* rain: slanted neon streaks */
+[data-ambient="rain"] > span {
+  top: -15vh;
+  inline-size: 1.5px;
+  block-size: calc(3rem + 3rem * var(--size));
+  background: linear-gradient(to bottom, transparent, hsl(calc(170 + var(--hue) / 4) 100% 70% / 0.8));
+  transform: rotate(12deg);
+  animation-name: ambient-rain;
+  animation-duration: calc(0.6s + var(--size) * 0.8s);
+}
+@keyframes ambient-rain {
+  to {
+    transform: translate3d(-22vh, 125vh, 0) rotate(12deg);
+  }
+}
+
+/* sparkles: four-point stars blinking in place */
+[data-ambient="sparkles"] > span {
+  inline-size: calc(1rem * var(--size));
+  block-size: calc(1rem * var(--size));
+  background: #fff6c2;
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 6px #ffe066);
+  animation-name: ambient-sparkle;
+  animation-duration: calc(1.8s + var(--size) * 2.5s);
+  animation-timing-function: ease-in-out;
+}
+@keyframes ambient-sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(90deg);
+  }
+}
+
+/* disco: coloured spots sweeping around */
+[data-ambient="disco"] > span {
+  inline-size: 38vmax;
+  block-size: 38vmax;
+  margin: -19vmax 0 0 -19vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--hue) 100% 60% / 0.24), transparent 62%);
+  mix-blend-mode: screen;
+  animation-name: ambient-disco;
+  animation-duration: calc(var(--duration) * 0.8);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+@keyframes ambient-disco {
+  from {
+    transform: translate3d(-20vw, -10vh, 0);
+  }
+  to {
+    transform: translate3d(25vw, 20vh, 0);
+  }
+}
+
+/* fog: big soft clouds drifting */
+[data-ambient="fog"] > span {
+  inline-size: 70vw;
+  block-size: 40vh;
+  margin-inline-start: -35vw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #c9cfe066, transparent);
+  filter: blur(18px);
+  animation-name: ambient-drift;
+  animation-duration: calc(var(--duration) * 3);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+@keyframes ambient-drift {
+  from {
+    transform: translate3d(-15vw, 0, 0);
+  }
+  to {
+    transform: translate3d(20vw, -4vh, 0);
+  }
+}
+
+/* sand: grains blown by the wind */
+[data-ambient="sand"] > span {
+  left: -5vw;
+  inline-size: calc(0.25rem * var(--size));
+  block-size: calc(0.25rem * var(--size));
+  border-radius: 50%;
+  background: #e8c27a;
+  opacity: 0.7;
+  animation-name: ambient-blow;
+  animation-duration: calc(var(--duration) * 0.5);
+}
+@keyframes ambient-blow {
+  to {
+    transform: translate3d(110vw, calc(var(--drift) * 0.4), 0);
+  }
+}
+
+/* hearts: floating up */
+[data-ambient="hearts"] > span {
+  top: auto;
+  bottom: -4vh;
+  inline-size: calc(1.1rem * var(--size));
+  block-size: calc(1rem * var(--size));
+  background: hsl(calc(330 + var(--hue) / 12) 90% 65%);
+  clip-path: path("M8 15 C-6 5 2 -3 8 3 C14 -3 22 5 8 15 Z");
+  scale: calc(var(--size) * 1.2);
+  opacity: 0.7;
+  animation-name: ambient-rise;
+  animation-duration: calc(var(--duration) * 1.1);
+}
+
+/* glitch: horizontal bars flickering now and then */
+[data-ambient="glitch"] > span {
+  left: 0;
+  inline-size: 100%;
+  block-size: calc(0.2rem + 1rem * var(--size));
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(calc(160 + var(--hue) / 2) 100% 60% / 0.35),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation-name: ambient-glitch;
+  animation-duration: calc(3s + var(--size) * 5s);
+  animation-timing-function: steps(1, end);
+}
+@keyframes ambient-glitch {
+  0%,
+  92% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  93% {
+    opacity: 1;
+    transform: translateX(-3vw);
+  }
+  95% {
+    opacity: 0.6;
+    transform: translateX(4vw);
+  }
+  97% {
+    opacity: 0;
+  }
+}
+
+/* lights: a string of festive bulbs along the top */
+[data-ambient="lights"] > span {
+  top: 0.25rem;
+  left: calc(var(--i) * 4% + 1%);
+  inline-size: 0.55rem;
+  block-size: 0.8rem;
+  border-radius: 50% 50% 45% 45%;
+  background: hsl(calc(var(--i) * 72deg) 95% 60%);
+  box-shadow: 0 0 10px hsl(calc(var(--i) * 72deg) 95% 60%);
+  animation-name: ambient-blink;
+  animation-duration: calc(0.8s + var(--size) * 1.2s);
+  animation-timing-function: steps(2, jump-none);
+}
+[data-ambient="lights"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.15rem;
+  block-size: 2px;
+  background: #1f3d23;
+}
+@keyframes ambient-blink {
+  50% {
+    opacity: 0.35;
+    box-shadow: none;
+  }
+}
+
+/* aurora: slow luminous bands */
+[data-ambient="aurora"] > span {
+  left: -25vw;
+  top: calc(-10vh + var(--i) * 12vh);
+  inline-size: 150vw;
+  block-size: 45vh;
+  background: linear-gradient(
+    100deg,
+    transparent 10%,
+    hsl(calc(140 + var(--i) * 60) 90% 60% / 0.18) 35%,
+    hsl(calc(260 + var(--i) * 30) 90% 65% / 0.16) 60%,
+    transparent 85%
+  );
+  filter: blur(24px);
+  animation-name: ambient-aurora;
+  animation-duration: calc(14s + var(--i) * 6s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+@keyframes ambient-aurora {
+  from {
+    transform: translate3d(-8vw, 0, 0) skewY(-4deg);
+  }
+  to {
+    transform: translate3d(8vw, 6vh, 0) skewY(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient {
+    display: none;
+  }
+}
+:root[data-motion="none"] .ambient {
+  display: none;
+}

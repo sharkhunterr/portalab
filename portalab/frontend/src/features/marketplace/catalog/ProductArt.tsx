@@ -1,11 +1,14 @@
 import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import type { Ambient } from "../../../design-system/a11y/preferences";
 import { Icon } from "../../../design-system/components/Icon";
 import { Notification } from "../../../design-system/components/Notification";
+import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { builtinTheme } from "../../../design-system/themes/builtin";
 import { PALETTE_COLORS } from "../../../design-system/themes/palettes";
 import { useT } from "../../../i18n/hooks/useT";
+import { ThemeMiniature } from "../../appearance/AppearanceSettings";
 import { useMe } from "../../auth/useAuth";
-import { BannerArt, FramedAvatar } from "../../community/profile/ProfileHero";
+import { BannerArt, FramedAvatar, StyledName, WornBadge } from "../../community/profile/ProfileHero";
 import { type Product, useProducts } from "../api";
 import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
@@ -22,6 +25,9 @@ export type ArtSize = "card" | "sheet" | "mini";
 
 export const TYPE_BADGE_ICON: Record<string, string> = {
   ...TYPE_ICONS,
+  ambient: "snowflake",
+  profile_background: "sparkles",
+  name_style: "feather",
   bundle: "shop",
   notification_style: "bell",
   notification_animation: "sparkles",
@@ -116,6 +122,19 @@ function ThemeArt({ theme, fallback }: { theme: string | undefined; fallback: Re
   const definition = builtinTheme(theme ?? "");
   const c = definition?.colors;
   if (!c) return fallback;
+  if (definition?.vocabulary || definition?.layout?.nav) {
+    return (
+      <span className="product-art__theme" style={{ background: c.surface, color: c.text }}>
+        <ThemeMiniature theme={definition} />
+        <span
+          className="product-art__theme-name"
+          style={{ fontFamily: definition.typography?.headingFamily, color: c.accent }}
+        >
+          {definition.name}
+        </span>
+      </span>
+    );
+  }
   return (
     <span className="product-art__app" style={{ background: c.surface, borderColor: c.border }}>
       <span className="product-art__app-bar" style={{ background: c.surfaceRaised }}>
@@ -224,16 +243,49 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       );
     case "badge":
       return (
-        <span className="product-art__badge">
-          <Icon name={text(preview, "icon") ?? product.icon ?? "star"} size={size === "sheet" ? 26 : 18} />
-          {text(preview, "label") ?? product.name}
+        <span className="product-art__badge-worn" data-size={size}>
+          <WornBadge
+            kind="badge"
+            item={{
+              key: product.key,
+              label: text(preview, "label") ?? product.name,
+              icon: text(preview, "icon") ?? product.icon ?? "star",
+              style: text(preview, "style") ?? null,
+            }}
+          />
         </span>
       );
     case "title":
       return (
         <span className="product-art__title">
           <span className="product-art__title-name">{name}</span>
-          <span className="product-art__title-text">{text(preview, "label") ?? product.name}</span>
+          <WornBadge
+            kind="title"
+            item={{
+              key: product.key,
+              label: text(preview, "label") ?? product.name,
+              style: text(preview, "style") ?? null,
+            }}
+          />
+        </span>
+      );
+    case "name_style":
+      return (
+        <span className="product-art__name" data-size={size}>
+          <StyledName name={name} style={text(preview, "style")} />
+        </span>
+      );
+    case "ambient":
+    case "profile_background":
+      return (
+        <span className="product-art__ambient">
+          <AmbientLayer
+            kind={(text(preview, "ambient") ?? text(preview, "background") ?? "none") as Ambient}
+            contained
+          />
+          {size !== "mini" && product.type === "profile_background" ? (
+            <FramedAvatar name={name} userId={me.data?.id} size={size === "sheet" ? "lg" : "md"} />
+          ) : null}
         </span>
       );
     case "effect":

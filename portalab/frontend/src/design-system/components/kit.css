@@ -877,6 +877,49 @@ fieldset.ds-subnav {
   border-radius: 50%;
   box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
 }
+/* 027: miniatures of the new navigation principles and of the theme's heading font */
+.theme-mini__font {
+  position: absolute;
+  inset-block-start: 14px;
+  inset-inline-end: 8px;
+  font-size: 1.05rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+.theme-mini[data-nav="tabs"] .theme-mini__side {
+  inline-size: 6%;
+  border-radius: 0 3px 3px 0;
+}
+.theme-mini__terminal {
+  flex: none;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  line-height: 1;
+}
+.theme-mini__dock {
+  position: absolute;
+  inset-inline: 30%;
+  inset-block-end: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid;
+  border-radius: 6px;
+}
+.theme-mini__dock span {
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 2px;
+}
+.theme-mini__launcher {
+  position: absolute;
+  inset-inline-start: 8px;
+  inset-block-end: 8px;
+  inline-size: 26px;
+  block-size: 9px;
+  border-radius: 999px;
+}
 /* native controls never push a page wider than the viewport (WCAG 1.4.10 reflow) */
 input,
 select,

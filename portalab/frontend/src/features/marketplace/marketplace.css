@@ -662,9 +662,22 @@
 .product-page__actions:empty {
   display: none;
 }
+.shop-hero {
+  flex-wrap: wrap;
+}
 .shop-hero > .product-art {
-  flex: none;
-  inline-size: 13rem;
+  flex: 1 1 12rem;
+  inline-size: auto;
+  max-inline-size: 18rem;
+}
+.shop-hero__text {
+  flex: 1 1 13rem;
+  min-inline-size: 0;
+}
+.shop-hero__text h3 {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 .rarity-supply {
   display: grid;

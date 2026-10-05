@@ -4,14 +4,38 @@ User values are validated by their schema (ranges, enums); the theme choice is a
 enabled and allowed themes by a dynamic validator registered at wiring. When a policy narrows, Administration
 keeps the stored user value and reports the effective one (``user_value_retained``)."""
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, cast
 
 from pydantic import Field
 
+from portalab.capabilities.themes import (
+    AMBIENTS,
+    CELEBRATIONS,
+    NOTIFICATION_ANIMATIONS,
+    NOTIFICATION_STYLES,
+    PALETTES,
+    UNIVERSE_THEMES,
+)
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:ui"
-BUILTIN_KEYS = ("portalab-dark", "portalab-light", "orbit", "studio", "light", "dark", "high-contrast")
+
+
+def _one_of(values: tuple[str, ...]) -> Any:
+    """``Literal[...]`` of a tuple of values (the cosmetics keys are shared constants)."""
+    return cast(Any, Literal)[values]
+
+
+BUILTIN_KEYS = (
+    "portalab-dark",
+    "portalab-light",
+    "orbit",
+    "studio",
+    "light",
+    "dark",
+    "high-contrast",
+    *UNIVERSE_THEMES,  # 027: universe themes (built in, most sold in the shop)
+)
 DEFAULT_THEME = "portalab"  # a theme family (spec 027 R8): resolved to its member for the color mode
 
 GLOBAL_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
@@ -38,21 +62,33 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.notificationDurationSeconds", Annotated[int, Field(ge=2, le=60)], 6, "How long notifications stay."),
     (
         "ui.notificationStyle",
-        Literal["toast", "banner", "pill", "minimal", "glass", "neon"],
-        "toast",
-        "Notification style (shape and layout); some are sold in the shop (027).",
+        _one_of(("theme", *NOTIFICATION_STYLES)),
+        "theme",
+        "Notification style (shape and layout; theme: the theme's); some are sold in the shop (027).",
     ),
     (
         "ui.palette",
-        Literal["theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix"],
+        _one_of(PALETTES),
         "theme",
         "Colour palette over the theme (027); some palettes are sold in the shop.",
     ),
     (
         "ui.notificationAnimation",
-        Literal["slide", "fade", "pop", "zoom", "bounce", "flip", "swing"],
-        "slide",
-        "How notifications enter; some animations are sold in the shop (027).",
+        _one_of(("theme", *NOTIFICATION_ANIMATIONS)),
+        "theme",
+        "How notifications enter (theme: the theme's); some animations are sold in the shop (027).",
+    ),
+    (
+        "ui.ambient",
+        _one_of(("theme", *AMBIENTS)),
+        "theme",
+        "Animated layer behind the portal (theme: the theme's); some are sold in the shop (027).",
+    ),
+    (
+        "ui.celebration",
+        _one_of(("theme", *CELEBRATIONS)),
+        "theme",
+        "Celebration effect for rewards (theme: the theme's); some are sold in the shop (027).",
     ),
     ("ui.layoutPresets", dict[str, Any], {}, "Saved layout presets (dashboard layouts are owned by 009)."),
     ("ui.campaignThemes", Literal["allow", "ignore"], "allow", "Apply campaign theme overlays."),

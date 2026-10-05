@@ -195,8 +195,8 @@ def register_builtin_types(
         ("widget", WidgetHandler(widgets), ("widget",)),
         ("theme", ThemeHandler(capabilities), ("theme",)),
         ("statistic", owned, ("statistic",)),
-        ("badge", owned, ("label", "icon")),
-        ("title", owned, ("label",)),
+        ("badge", owned, ("label", "icon", "style")),  # 027: ``style`` animates it
+        ("title", owned, ("label", "style")),
         ("effect", owned, ("effect",)),
         ("feature", ExtensionHandler(), ("extension", "config_required")),
         ("plugin", ExtensionHandler(capabilities), ("extension", "config_required")),
@@ -209,6 +209,9 @@ def register_builtin_types(
         ("avatar_frame", owned, ("frame",)),
         ("profile_backdrop", owned, ("feature",)),  # unlocks every film backdrop as a banner
         ("palette", owned, ("palette",)),  # colour palettes over the theme
+        ("ambient", owned, ("ambient",)),  # an animated layer behind the whole portal
+        ("profile_background", owned, ("background",)),  # an animated background behind the profile
+        ("name_style", owned, ("style",)),  # the name's font and effect on the profile
     ):
         if registry.get(key) is None:
             registry.register(

@@ -477,3 +477,76 @@
 .product-art[data-size="card"] .product-art[data-size="mini"] .product-art__quota span {
   display: none;
 }
+
+/* 027: universes — worn badges, styled names, ambient layers, theme miniature */
+.product-art__badge-worn[data-size="sheet"] .cosmetic-badge {
+  font-size: var(--font-size-lg);
+  padding: 0.5rem 1.2rem;
+}
+.product-art__badge-worn[data-size="mini"] .cosmetic-badge {
+  font-size: 0.55rem;
+  padding: 0.1rem 0.3rem;
+}
+.product-art__title .cosmetic-title {
+  font-size: var(--font-size-lg);
+}
+.product-art[data-size="sheet"] .product-art__title .cosmetic-title {
+  font-size: var(--font-size-2xl);
+}
+.product-art[data-size="mini"] .product-art__title .cosmetic-title {
+  font-size: 0.6rem;
+}
+.product-art__name {
+  font-size: 1.4rem;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  overflow: hidden;
+}
+.product-art__name[data-size="sheet"] {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+.product-art__name[data-size="mini"] {
+  font-size: 0.7rem;
+}
+.product-art__ambient {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 50% 30%,
+    color-mix(in srgb, var(--rarity) 18%, transparent),
+    var(--color-surface) 75%
+  );
+}
+.product-art__ambient .avatar-frame {
+  position: relative;
+  z-index: 1;
+}
+.product-art__theme {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-2);
+}
+.product-art__theme .theme-mini {
+  inline-size: min(100%, 22rem);
+}
+.product-art[data-size="sheet"] .product-art__theme .theme-mini {
+  block-size: 85%;
+}
+.product-art__theme-name {
+  position: absolute;
+  inset-block-end: 0.35rem;
+  inset-inline-end: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-bold);
+}
+.product-art[data-size="sheet"] .product-art__theme-name {
+  font-size: 1.6rem;
+}
+.product-art[data-size="mini"] .product-art__theme-name {
+  display: none;
+}

@@ -7,7 +7,17 @@ import { useTheme } from "../../design-system/themes/ThemeProvider";
  * theme chose for the current device class. Changing class (rotation, resize) or theme swaps the variant
  * beside the page outlet, which is never remounted — the page keeps its state.
  */
-export type NavVariant = "sidebar" | "topbar" | "rail" | "drawer" | "bottom-bar" | "orbit";
+export type NavVariant =
+  | "sidebar"
+  | "topbar"
+  | "rail"
+  | "drawer"
+  | "bottom-bar"
+  | "orbit"
+  | "dock"
+  | "tabs"
+  | "launcher"
+  | "terminal";
 
 export interface Arrangement {
   device: DeviceClass;

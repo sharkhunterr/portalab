@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { api } from "../../../api/client";
-import { NOTIFICATION_ANIMATIONS, NOTIFICATION_STYLES } from "../../../design-system/a11y/preferences";
+import {
+  AMBIENTS,
+  CELEBRATION_KEYS,
+  NOTIFICATION_ANIMATIONS,
+  NOTIFICATION_STYLES,
+  PALETTE_KEYS,
+} from "../../../design-system/a11y/preferences";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { ICONS, Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
+import { BANNER_KEYS, FRAME_KEYS, NAME_KEYS } from "../../../design-system/themes/cosmetics";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Category, Product } from "../api";
@@ -22,15 +29,46 @@ const TYPES = [
   "badge",
   "title",
   "effect",
+  "ambient",
   "theme",
+  "palette",
   "notification_style",
   "notification_animation",
+  "profile_banner",
+  "avatar_frame",
+  "profile_background",
+  "name_style",
   "widget",
   "bundle",
   "quota",
   "feature",
   "statistic",
 ] as const;
+/** 027: the designs each cosmetic type can sell (keys shared with the backend). */
+const DESIGNS: Partial<
+  Record<(typeof TYPES)[number], { field: string; values: readonly string[]; ns: string }>
+> = {
+  effect: { field: "effect", values: CELEBRATION_KEYS, ns: "notifications:universe.celebrations" },
+  ambient: { field: "ambient", values: AMBIENTS, ns: "notifications:universe.ambients" },
+  profile_background: { field: "background", values: AMBIENTS, ns: "notifications:universe.ambients" },
+  palette: { field: "palette", values: PALETTE_KEYS, ns: "notifications:palette.names" },
+  profile_banner: { field: "banner", values: BANNER_KEYS, ns: "community:looks.banner" },
+  avatar_frame: { field: "frame", values: FRAME_KEYS, ns: "community:looks.frame" },
+  name_style: { field: "style", values: NAME_KEYS, ns: "community:looks.name" },
+};
+const BADGE_STYLES = [
+  "none",
+  "shimmer",
+  "pulse",
+  "flame",
+  "glitch",
+  "rainbow",
+  "float",
+  "spin",
+  "frost",
+  "neon",
+  "gold",
+];
 const ICON_NAMES = Object.keys(ICONS).sort();
 
 export interface Presentation {
@@ -282,11 +320,12 @@ export function NewProductDialog({
   const [price, setPrice] = useState(100);
   const [label, setLabel] = useState("");
   const [icon, setIcon] = useState("star");
-  const [effect, setEffect] = useState("");
   const [theme, setTheme] = useState("");
   const [units, setUnits] = useState(5);
   const [look, setLook] = useState("");
   const [widget, setWidget] = useState("");
+  const [design, setDesign] = useState("");
+  const [style, setStyle] = useState("none");
   const [packed, setPacked] = useState<string[]>([]);
   const [extra, setExtra] = useState("{}");
   const [presentation, setPresentation] = useState<Presentation>(DEFAULT_PRESENTATION);
@@ -296,11 +335,9 @@ export function NewProductDialog({
   const payload = (): Record<string, unknown> => {
     switch (type) {
       case "badge":
-        return { label, icon };
+        return { label, icon, ...(style !== "none" ? { style } : {}) };
       case "title":
-        return { label };
-      case "effect":
-        return { effect };
+        return { label, ...(style !== "none" ? { style } : {}) };
       case "theme":
         return { theme };
       case "quota":
@@ -314,6 +351,10 @@ export function NewProductDialog({
       case "bundle":
         return { products: packed };
       default:
+        {
+          const designed = DESIGNS[type];
+          if (designed) return { [designed.field]: design };
+        }
         return JSON.parse(extra || "{}") as Record<string, unknown>;
     }
   };
@@ -456,13 +497,35 @@ export function NewProductDialog({
               ))}
             </SelectField>
           ) : null}
-          {type === "effect" ? (
-            <TextField
-              label={t("marketplace:admin.effect")}
-              value={effect}
+          {type === "badge" || type === "title" ? (
+            <SelectField
+              label={t("marketplace:admin.style")}
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+            >
+              {BADGE_STYLES.map((value) => (
+                <option key={value} value={value}>
+                  {t(`marketplace:badgeStyle.${value}`)}
+                </option>
+              ))}
+            </SelectField>
+          ) : null}
+          {DESIGNS[type] ? (
+            <SelectField
+              label={t("marketplace:admin.design")}
+              value={design}
               required
-              onChange={(e) => setEffect(e.target.value)}
-            />
+              onChange={(e) => setDesign(e.target.value)}
+            >
+              <option value="">—</option>
+              {(DESIGNS[type]?.values ?? [])
+                .filter((value) => value !== "none" && value !== "theme")
+                .map((value) => (
+                  <option key={value} value={value}>
+                    {t(`${DESIGNS[type]?.ns}.${value}`)}
+                  </option>
+                ))}
+            </SelectField>
           ) : null}
           {type === "notification_style" || type === "notification_animation" ? (
             <SelectField

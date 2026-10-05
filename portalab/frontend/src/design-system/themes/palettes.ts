@@ -38,6 +38,54 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#22c55e", accentAlt: "#86efac", contrast: "#021006" },
     light: { accent: "#15803d", accentAlt: "#166534", contrast: "#ffffff" },
   },
+  aurora: {
+    dark: { accent: "#5eead4", accentAlt: "#a78bfa", contrast: "#04121a" },
+    light: { accent: "#0f766e", accentAlt: "#6d28d9", contrast: "#ffffff" },
+  },
+  lagoon: {
+    dark: { accent: "#22d3ee", accentAlt: "#34d399", contrast: "#03141a" },
+    light: { accent: "#0e7490", accentAlt: "#047857", contrast: "#ffffff" },
+  },
+  lava: {
+    dark: { accent: "#ff6b35", accentAlt: "#ffd23f", contrast: "#1c0700" },
+    light: { accent: "#c2410c", accentAlt: "#a16207", contrast: "#ffffff" },
+  },
+  mint: {
+    dark: { accent: "#6ee7b7", accentAlt: "#a7f3d0", contrast: "#04170f" },
+    light: { accent: "#047857", accentAlt: "#0f766e", contrast: "#ffffff" },
+  },
+  gold: {
+    dark: { accent: "#fbbf24", accentAlt: "#fde68a", contrast: "#1c1300" },
+    light: { accent: "#a16207", accentAlt: "#92400e", contrast: "#ffffff" },
+  },
+  ice: {
+    dark: { accent: "#7dd3fc", accentAlt: "#e0f2fe", contrast: "#04121c" },
+    light: { accent: "#0369a1", accentAlt: "#0e7490", contrast: "#ffffff" },
+  },
+  rose: {
+    dark: { accent: "#fb7185", accentAlt: "#fda4af", contrast: "#1f0509" },
+    light: { accent: "#be123c", accentAlt: "#9f1239", contrast: "#ffffff" },
+  },
+  toxic: {
+    dark: { accent: "#a3e635", accentAlt: "#facc15", contrast: "#0f1702" },
+    light: { accent: "#4d7c0f", accentAlt: "#a16207", contrast: "#ffffff" },
+  },
+  midnight: {
+    dark: { accent: "#818cf8", accentAlt: "#38bdf8", contrast: "#070a1f" },
+    light: { accent: "#4338ca", accentAlt: "#0369a1", contrast: "#ffffff" },
+  },
+  coffee: {
+    dark: { accent: "#d6a77a", accentAlt: "#f2d0a4", contrast: "#1a0f06" },
+    light: { accent: "#8a4b2d", accentAlt: "#7c4a1e", contrast: "#ffffff" },
+  },
+  lavender: {
+    dark: { accent: "#c4b5fd", accentAlt: "#f0abfc", contrast: "#120a24" },
+    light: { accent: "#6d28d9", accentAlt: "#a21caf", contrast: "#ffffff" },
+  },
+  bubblegum: {
+    dark: { accent: "#f9a8d4", accentAlt: "#7dd3fc", contrast: "#1f0614" },
+    light: { accent: "#be185d", accentAlt: "#0369a1", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

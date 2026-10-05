@@ -129,11 +129,7 @@ class Availability:
         if product.limit_count and product.limit_days:
             used = await self.bought_recently(user, product)
             ok = used < product.limit_count
-            out.append(
-                Check(
-                    "purchase_limit", f"{used}/{product.limit_count}", ok, "" if ok else "unmet"
-                )
-            )
+            out.append(Check("purchase_limit", f"{used}/{product.limit_count}", ok, "" if ok else "unmet"))
         return out
 
     async def guard(

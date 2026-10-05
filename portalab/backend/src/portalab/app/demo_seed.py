@@ -22,6 +22,7 @@ from uuid import UUID
 
 from sqlalchemy import text
 
+from portalab.app.demo_shop import COLLECTIONS, SHOP, definition
 from portalab.app.wiring import Platform
 from portalab.capabilities.notifications import AllAuthenticated, CommunicationRequest
 from portalab.capabilities.support import TicketRequest
@@ -42,10 +43,10 @@ MEMBERS = (("alice", "Alice Martin"), ("bruno", "Bruno Lefèvre"), ("chloe", "Ch
 
 # Target progression (default curve: level n from 100*(n-1)^1.5 XP) — a portal that looks played.
 PROGRESSION: dict[str, dict[str, int]] = {
-    "admin": {"xp": 900, "coins": 450, "contribution": 3},  # level 5
-    "alice": {"xp": 1300, "coins": 380, "contribution": 5},  # level 6
-    "bruno": {"xp": 600, "coins": 240, "contribution": 2},  # level 4
-    "chloe": {"xp": 260, "coins": 120, "contribution": 1},  # level 2
+    "admin": {"xp": 900, "coins": 1500, "contribution": 3},  # level 5
+    "alice": {"xp": 1300, "coins": 1800, "contribution": 5},  # level 6
+    "bruno": {"xp": 600, "coins": 900, "contribution": 2},  # level 4
+    "chloe": {"xp": 260, "coins": 400, "contribution": 1},  # level 2
 }
 
 ACHIEVEMENTS: dict[str, dict[str, Any]] = {
@@ -124,66 +125,56 @@ ACHIEVEMENTS |= {
     },
 }
 
-# 027 US8: shop collections (marketplace categories) and presentation of each product
-COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
-    ("halloween", "Halloween", "moon", 10),
-    ("new_wave", "New Wave", "zap", 20),
-    ("essentials", "Essentials", "star", 30),
-    ("packs", "Packs", "shop", 5),  # 027: bundles first in the shop
-    ("looks", "Notifications", "bell", 40),  # 027: notification styles and animations
-    ("widgets", "Widgets", "dashboard", 50),  # 027: dashboard widgets sold in the shop
-    ("profile", "Profile", "user", 35),  # 027: banners, avatar frames, film backdrop banner
-    ("palettes", "Palettes", "palette", 45),  # 027: colour palettes over the theme
-)
-PRESENTATION: dict[
-    str, tuple[str, str, bool, str, str | None]
-] = {  # rarity, effect, featured, collection, icon
-    "badge_pioneer": ("common", "none", False, "essentials", "compass"),
-    "badge_night_owl": ("rare", "shine", False, "halloween", "moon"),
-    "title_legend": ("legendary", "neon", True, "essentials", "trophy"),
-    "title_cinephile": ("rare", "shine", False, "essentials", "film"),
-    "effect_confetti": ("epic", "spin", False, "new_wave", "sparkles"),
-    "effect_aurora": ("epic", "glitch", True, "new_wave", "sparkles"),
-    "theme_orbit": ("legendary", "neon", True, "new_wave", "compass"),
-    "theme_studio": ("rare", "shine", False, "essentials", "palette"),
-    "effect_pumpkin": ("epic", "blink", False, "halloween", "sparkles"),
-    "badge_ghost": ("legendary", "glitch", True, "halloween", "moon"),
-    "quota_requests": ("common", "none", False, "essentials", "inbox"),
-    # 027: notification looks, a premium widget and packs
-    "notif_glass": ("rare", "shine", False, "looks", "bell"),
-    "notif_neon": ("epic", "neon", True, "looks", "zap"),
-    "notif_bounce": ("common", "none", False, "looks", "sparkles"),
-    "notif_flip": ("rare", "spin", False, "looks", "sparkles"),
-    "notif_swing": ("rare", "shine", False, "looks", "sparkles"),
-    "widget_poster_wall": ("epic", "shine", True, "widgets", "image"),
-    "pack_neon_nights": ("legendary", "neon", True, "packs", "zap"),
-    "pack_starter": ("rare", "shine", False, "packs", "star"),
-    "pack_cinephile": ("epic", "glitch", True, "packs", "film"),
-    "banner_synthwave": ("rare", "neon", False, "profile", "image"),
-    "banner_starfield": ("epic", "shine", True, "profile", "star"),
-    "banner_sakura": ("rare", "shine", False, "profile", "image"),
-    "banner_halloween": ("epic", "blink", False, "halloween", "moon"),
-    "frame_gold": ("legendary", "shine", True, "profile", "trophy"),
-    "frame_neon": ("epic", "neon", False, "profile", "zap"),
-    "frame_flames": ("epic", "glitch", False, "profile", "bolt"),
-    "frame_rainbow": ("rare", "spin", False, "profile", "sparkles"),
-    "backdrop_banner": ("legendary", "glitch", True, "profile", "film"),
-    "palette_sunset": ("rare", "shine", False, "palettes", "palette"),
-    "palette_candy": ("rare", "shine", False, "palettes", "palette"),
-    "palette_royal": ("epic", "shine", False, "palettes", "palette"),
-    "palette_ember": ("epic", "glitch", False, "palettes", "palette"),
-    "palette_matrix": ("legendary", "neon", False, "palettes", "palette"),
-    "pack_profile_star": ("legendary", "neon", True, "packs", "user"),
-}
 
-# 027 scarcity: own supply (None: the rarity's), purchase limit (count, days), minimum level
-AVAILABILITY: dict[str, tuple[int | None, int | None, int | None, int | None]] = {
-    "quota_requests": (None, 2, 30, None),  # common and unlimited, but two a month per member
-    "title_legend": (None, None, None, 10),  # only from level 10
-    "badge_ghost": (1, None, None, 5),  # one single copy on the whole portal
-    "theme_orbit": (None, None, None, 6),
-    "backdrop_banner": (5, None, None, None),  # legendary, but five copies instead of two
-}
+# 027: more achievements — media, requests, shop, community, progression (rewards stay modest)
+def _count(event: str, count: int) -> list[dict[str, Any]]:
+    return [{"kind": "event_count", "event_type": event, "count": count}]
+
+
+ACHIEVEMENTS |= {
+    key: {"category": category, "label": label, "description": about, "icon": icon, "criteria": criteria,
+          "rewards": rewards}
+    for key, category, label, about, icon, criteria, rewards in (
+        ("popcorn_time", "service_usage", "Popcorn time", "Finish your first film or episode.", "popcorn",
+         _count("media.playback_finished", 1), [{"value": "xp", "amount": 10}]),
+        ("binge_watcher", "service_usage", "Binge-watcher", "Finish 50 films or episodes.", "tv",
+         _count("media.playback_finished", 50), [{"value": "coins", "amount": 40}]),
+        ("golden_cinephile", "service_usage", "Golden cinephile", "Finish 250 films or episodes.",
+         "clapperboard", _count("media.playback_finished", 250), [{"value": "coins", "amount": 150}]),
+        ("first_wish", "service_usage", "First wish", "Request a film or a series.", "inbox",
+         _count("media.request_created", 1), [{"value": "xp", "amount": 15}]),
+        ("wishlist_master", "service_usage", "Wishlist master", "Make 25 media requests.", "gift",
+         _count("media.request_created", 25), [{"value": "coins", "amount": 50}]),
+        ("bug_hunter", "community", "Bug hunter", "Send three pieces of feedback.", "bug",
+         _count("feedback.submitted", 3), [{"value": "contribution", "amount": 3}]),
+        ("quest_runner", "progression", "Quest runner", "Complete five quests.", "map",
+         _count("quest.completed", 5), [{"value": "coins", "amount": 40}]),
+        ("shopaholic", "purchase", "Shopaholic", "Buy ten things in the shop.", "store",
+         _count("marketplace.purchase", 10), [{"value": "xp", "amount": 60}]),
+        ("big_spender", "purchase", "Big spender", "Buy 25 things in the shop.", "gem",
+         _count("marketplace.purchase", 25), [{"value": "coins", "amount": 100}]),
+        ("patron", "community", "Patron of the arts", "Fund three community projects.", "handshake",
+         _count("project.funding_added", 3), [{"value": "contribution", "amount": 5}]),
+        ("stylist", "other", "Stylist", "Change your theme five times.", "palette",
+         _count("theme.changed", 5), [{"value": "xp", "amount": 20}]),
+        ("decorator", "other", "Interior decorator", "Rearrange your dashboard five times.", "dashboard",
+         _count("dashboard.layout_changed", 5), [{"value": "xp", "amount": 20}]),
+        ("seeker", "service_usage", "Seeker", "Search the portal twenty times.", "search",
+         _count("search.performed", 20), [{"value": "xp", "amount": 20}]),
+        ("achievement_hunter", "progression", "Achievement hunter", "Unlock ten achievements.", "trophy",
+         _count("achievement.unlocked", 10), [{"value": "coins", "amount": 75}]),
+        ("year_in_review", "content", "Year in review", "Open your yearly recap.", "sparkles",
+         _count("statistics.wrapped_generated", 1), [{"value": "xp", "amount": 30}]),
+        ("loyal", "service_usage", "Loyal", "Sign in on a hundred occasions.", "heart",
+         _count("user.signed_in", 100), [{"value": "coins", "amount": 120}]),
+        ("level_10", "progression", "Double digits", "Reach level 10.", "medal",
+         [{"kind": "level_at_least", "level": 10}], [{"value": "coins", "amount": 100}]),
+        ("level_20", "progression", "Living legend", "Reach level 20.", "crown",
+         [{"kind": "level_at_least", "level": 20}], [{"value": "coins", "amount": 250}]),
+        ("xp_10000", "progression", "Ten thousand", "Earn 10,000 XP.", "zap",
+         [{"kind": "value_at_least", "value": "xp", "amount": 10000}], [{"value": "coins", "amount": 150}]),
+    )
+}  # fmt: skip
 
 QUESTS: dict[str, dict[str, Any]] = {
     "daily_visit": {
@@ -232,162 +223,7 @@ def _product(key: str, kind: str, price: int, en: str, fr: str, desc: str, paylo
     }
 
 
-PRODUCTS: tuple[dict[str, Any], ...] = (
-    _product(
-        "badge_pioneer", "badge", 50, "Pioneer badge", "Badge Pionnier",
-        "For the first members of the portal.", {"label": "Pioneer", "icon": "compass"},
-    ),
-    _product(
-        "badge_night_owl", "badge", 120, "Night owl badge", "Badge Oiseau de nuit",
-        "For those who watch until dawn.", {"label": "Night owl", "icon": "moon"},
-    ),
-    _product(
-        "title_legend", "title", 300, "Title: Legend", "Titre : Légende",
-        "Show a legendary title on your profile.", {"label": "Legend"},
-    ),
-    _product(
-        "title_cinephile", "title", 150, "Title: Cinephile", "Titre : Cinéphile",
-        "For lovers of the big screen.", {"label": "Cinephile"},
-    ),
-    _product(
-        "effect_confetti", "effect", 80, "Confetti effect", "Effet confettis",
-        "Celebrate your level-ups with confetti.", {"effect": "confetti"},
-    ),
-    _product(
-        "effect_aurora", "effect", 200, "Aurora effect", "Effet aurore",
-        "A soft aurora behind your profile.", {"effect": "aurora"},
-    ),
-    _product(
-        "theme_orbit", "theme", 400, "Orbit theme", "Thème Orbite",
-        "Navigation in an orbiting bubble, header at the bottom, playful motion.", {"theme": "orbit"},
-    ),
-    _product(
-        "theme_studio", "theme", 250, "Studio theme", "Thème Studio",
-        "A calm studio: top bar, flat cards, narrow reading width.", {"theme": "studio"},
-    ),
-    _product(
-        "effect_pumpkin", "effect", 180, "Pumpkin glow", "Lueur citrouille",
-        "A flickering pumpkin glow for the spooky season.", {"effect": "pumpkin"},
-    ),
-    _product(
-        "badge_ghost", "badge", 500, "Ghost badge", "Badge Fantôme",
-        "Only the bravest haunt the portal at night.", {"label": "Ghost", "icon": "moon"},
-    ),
-    {
-        **_product(
-            "quota_requests", "quota", 60, "+5 media requests", "+5 demandes de médias",
-            "Five extra media requests this month.", {"kind": "media_requests", "units": 5},
-        ),
-        "repeatable": True,  # bought again and again — but two a month at most (AVAILABILITY)
-    },
-    # 027: notification looks (style = shape and layout, animation = how they come in)
-    _product(
-        "notif_glass", "notification_style", 120, "Frosted glass notifications", "Notifications verre dépoli",
-        "Translucent notifications that blur what is behind them.", {"style": "glass"},
-    ),
-    _product(
-        "notif_neon", "notification_style", 220, "Neon notifications", "Notifications néon",
-        "Glowing outlines in the colour of each notification.", {"style": "neon"},
-    ),
-    _product(
-        "notif_bounce", "notification_animation", 60, "Bouncing notifications", "Notifs rebondissantes",
-        "Notifications arrive with a little bounce.", {"animation": "bounce"},
-    ),
-    _product(
-        "notif_flip", "notification_animation", 140, "Flipping notifications", "Notifications qui pivotent",
-        "Notifications flip into view like a card.", {"animation": "flip"},
-    ),
-    _product(
-        "notif_swing", "notification_animation", 100, "Swinging notifications", "Notifications balancier",
-        "Notifications swing in like a hanging sign.", {"animation": "swing"},
-    ),
-    # 027: a dashboard widget sold in the shop
-    _product(
-        "widget_poster_wall", "widget", 250, "Poster wall widget", "Widget mur d'affiches",
-        "The 24 most watched titles of the month as a big poster wall on your dashboard.",
-        {"widget": "media.poster_wall"},
-    ),
-    # 027: packs — buying one grants every product it lists (configurable by administrators)
-    _product(
-        "pack_neon_nights", "bundle", 380, "Neon nights pack", "Pack Nuits néon",
-        "Neon notifications, the bouncing animation and the aurora effect — 60 Coins saved.",
-        {"products": ["notif_neon", "notif_bounce", "effect_aurora"]},
-    ),
-    _product(
-        "pack_starter", "bundle", 150, "Starter pack", "Pack Découverte",
-        "Frosted glass notifications, the swing animation and the Pioneer badge.",
-        {"products": ["notif_glass", "notif_swing", "badge_pioneer"]},
-    ),
-    _product(
-        "pack_cinephile", "bundle", 420, "Cinephile pack", "Pack Cinéphile",
-        "The poster wall widget, the Cinephile title, flipping notifications and 5 extra requests.",
-        {"products": ["widget_poster_wall", "title_cinephile", "notif_flip", "quota_requests"]},
-    ),
-    # 027: profile cosmetics (Steam-like) — banners, avatar frames, the film backdrop banner feature
-    _product(
-        "banner_synthwave", "profile_banner", 120, "Synthwave banner", "Bannière synthwave",
-        "A retro sunset grid at the top of your profile.", {"banner": "synthwave"},
-    ),
-    _product(
-        "banner_starfield", "profile_banner", 180, "Starfield banner", "Bannière champ d'étoiles",
-        "A slowly drifting field of stars.", {"banner": "starfield"},
-    ),
-    _product(
-        "banner_sakura", "profile_banner", 120, "Sakura banner", "Bannière sakura",
-        "Falling cherry blossom petals.", {"banner": "sakura"},
-    ),
-    _product(
-        "banner_halloween", "profile_banner", 150, "Haunted banner", "Bannière hantée",
-        "Pumpkins and a full moon for the spooky season.", {"banner": "halloween"},
-    ),
-    _product(
-        "frame_gold", "avatar_frame", 300, "Golden frame", "Cadre doré",
-        "A shining golden ring around your avatar.", {"frame": "gold"},
-    ),
-    _product(
-        "frame_neon", "avatar_frame", 200, "Neon frame", "Cadre néon",
-        "A glowing neon ring around your avatar.", {"frame": "neon"},
-    ),
-    _product(
-        "frame_flames", "avatar_frame", 220, "Flame frame", "Cadre de flammes",
-        "Your avatar surrounded by flames.", {"frame": "flames"},
-    ),
-    _product(
-        "frame_rainbow", "avatar_frame", 140, "Rainbow frame", "Cadre arc-en-ciel",
-        "A turning rainbow ring.", {"frame": "rainbow"},
-    ),
-    _product(
-        "backdrop_banner", "profile_backdrop", 350, "Film backdrop banner", "Bannière de film",
-        "Use the backdrop of any film or series of the library as your profile banner.",
-        {"feature": "backdrop"},
-    ),
-    # 027: colour palettes over any theme (Ocean and Forest are free)
-    _product(
-        "palette_sunset", "palette", 90, "Sunset palette", "Palette coucher de soleil",
-        "Warm orange and pink accents over your theme.", {"palette": "sunset"},
-    ),
-    _product(
-        "palette_candy", "palette", 90, "Candy palette", "Palette bonbon",
-        "Sweet pink and mint accents.", {"palette": "candy"},
-    ),
-    _product(
-        "palette_royal", "palette", 120, "Royal palette", "Palette royale",
-        "Deep purple and gold accents.", {"palette": "royal"},
-    ),
-    _product(
-        "palette_ember", "palette", 120, "Ember palette", "Palette braise",
-        "Glowing red and amber accents.", {"palette": "ember"},
-    ),
-    _product(
-        "palette_matrix", "palette", 160, "Matrix palette", "Palette Matrix",
-        "Green code-rain accents.", {"palette": "matrix"},
-    ),
-    _product(
-        "pack_profile_star", "bundle", 600, "Star profile pack", "Pack Profil star",
-        "The starfield banner, the golden frame and the film backdrop banner — 230 Coins saved.",
-        {"products": ["banner_starfield", "frame_gold", "backdrop_banner"]},
-    ),
-)  # fmt: skip
+PRODUCTS: tuple[dict[str, Any], ...] = tuple(definition(product) for product in SHOP)  # 027: demo_shop
 OWNED_BY_ADMIN = ("badge_pioneer", "effect_confetti")
 OWNED_BY_ALICE = ("badge_night_owl",)
 
@@ -637,48 +473,64 @@ class DemoSeeder:
         return f"{unlocked} newly unlocked"
 
     async def catalog(self) -> str:
+        """027: the demo shop (``demo_shop``) — new products are created and published, existing ones are
+        revised when their price, texts, contents or level changed (purchases keep their snapshot), then
+        their presentation and availability (copies, purchase limit) follow the catalog."""
         from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
 
         catalog = self.platform.marketplace.catalog
         for key, label, icon, position in COLLECTIONS:
             await catalog.add_category(key, label, position, icon)
-        made = 0
-        for product in PRODUCTS:
-            if not await self._scalar("SELECT 1 FROM marketplace.products WHERE key = :k", k=product["key"]):
-                await catalog.create(self.admin, product)
+        made = revised = 0
+        for product in SHOP:
+            raw = definition(product)
+            exists = await self._scalar("SELECT 1 FROM marketplace.products WHERE key = :k", k=product["key"])
+            if not exists:
+                await catalog.create(self.admin, raw)
                 await catalog.move(self.admin, product["key"], "available")
                 made += 1
-            presentation: tuple[str, str, bool, str, str | None] = PRESENTATION.get(
-                product["key"], ("common", "auto", False, "essentials", None)
+            else:
+                current, version = await catalog.get(product["key"])
+                wanted = raw["version"]
+                stored = {
+                    "price_coins": version.price_coins,
+                    "names": dict(version.names),
+                    "descriptions": dict(version.descriptions),
+                    "payload": dict(version.payload),
+                    "conditions": list(version.conditions),
+                }
+                if stored != wanted:
+                    await catalog.revise(self.admin, product["key"], wanted)
+                    revised += 1
+                if product["repeatable"] and not current.repeatable:
+                    async with self.database.unit_of_work() as uow:  # seeded before products could repeat
+                        await uow.session.execute(
+                            text("UPDATE marketplace.products SET repeatable = true WHERE key = :k"),
+                            {"k": product["key"]},
+                        )
+            current, _ = await catalog.get(product["key"])
+            presentation = PresentationIn(
+                rarity=product["rarity"],
+                poster_effect="none",
+                featured=product["featured"],
+                icon=product["icon"],
             )
-            rarity, effect, featured, collection, art = presentation
-            current = await self._scalar(
-                "SELECT rarity || '|' || poster_effect || '|' || featured::text || '|' || coalesce(icon, '') "
-                "FROM marketplace.products WHERE key = :k",
-                k=product["key"],
-            )
-            if current != f"{rarity}|{effect}|{str(featured).lower()}|{art or ''}":
-                await catalog.present(
-                    self.admin,
-                    product["key"],
-                    PresentationIn(rarity=rarity, poster_effect=effect, featured=featured, icon=art),
-                    collection,
-                )
-            if product.get("repeatable"):
-                async with self.database.unit_of_work() as uow:  # seeded before products could repeat
-                    await uow.session.execute(
-                        text("UPDATE marketplace.products SET repeatable = true WHERE key = :k"),
-                        {"k": product["key"]},
-                    )
-            if product["key"] in AVAILABILITY:
-                supply, count, days, level = AVAILABILITY[product["key"]]
+            if (current.rarity, current.poster_effect, current.featured, current.icon) != (
+                presentation.rarity,
+                presentation.poster_effect,
+                presentation.featured,
+                presentation.icon,
+            ) or current.category_id is None:
+                await catalog.present(self.admin, product["key"], presentation, product["collection"])
+            limit = product["limit"] or (None, None)
+            if (current.supply, current.limit_count, current.limit_days) != (product["supply"], *limit):
                 await catalog.set_availability(
                     self.admin,
                     product["key"],
-                    AvailabilityIn(supply=supply, limit_count=count, limit_days=days),
-                    level,
+                    AvailabilityIn(supply=product["supply"], limit_count=limit[0], limit_days=limit[1]),
+                    product["level"],
                 )
-        return f"{made} products published"
+        return f"{made} products published, {revised} revised"
 
     async def purchases(self) -> str:
         purchases = self.platform.marketplace.purchases

@@ -1,0 +1,602 @@
+/*
+ * 027 universe vocabulary implemented by the portal — themes only *choose* among these (data attributes on
+ * <html>): heading case and effect, a backdrop pattern, card styles, celebration shapes, notification
+ * styles and animations. Tokens first; the few raw colours (ink, paper, parchment) live here, in themes.
+ */
+
+/* ---------------------------------------------------------------- headings */
+h1,
+h2,
+h3,
+.ds-display {
+  font-family: var(--font-display);
+}
+[data-heading-case="uppercase"] :is(h1, h2, h3, .ds-display) {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+[data-heading-case="smallcaps"] :is(h1, h2, h3, .ds-display) {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+}
+[data-heading-effect="glow"] :is(h1, h2) {
+  text-shadow:
+    0 0 0.4em color-mix(in srgb, var(--color-accent) 70%, transparent),
+    0 0 1.2em color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+[data-heading-effect="neon"] :is(h1, h2) {
+  color: color-mix(in srgb, var(--color-accent) 35%, #ffffff);
+  text-shadow:
+    0 0 2px #ffffff,
+    0 0 0.35em var(--color-accent),
+    0 0 0.9em var(--color-accent),
+    0 0 1.6em var(--color-accent-alt);
+}
+[data-heading-effect="gradient"] h1 {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+[data-heading-effect="shadow"] :is(h1, h2) {
+  text-shadow: 0.06em 0.06em 0 color-mix(in srgb, var(--color-accent) 75%, transparent);
+}
+[data-heading-effect="outline"] h1 {
+  color: var(--color-accent-alt);
+  -webkit-text-stroke: 1.5px #111111;
+  paint-order: stroke fill;
+  text-shadow: 0.08em 0.08em 0 #111111;
+}
+[data-heading-effect="emboss"] :is(h1, h2) {
+  text-shadow:
+    0 1px 0 color-mix(in srgb, #ffffff 35%, transparent),
+    0 -1px 0 color-mix(in srgb, #000000 45%, transparent);
+}
+
+/* ---------------------------------------------------------------- backdrop patterns (behind the page) */
+[data-backdrop="stars"] body {
+  background:
+    radial-gradient(1px 1px at 20% 30%, #ffffffcc, transparent),
+    radial-gradient(1px 1px at 70% 20%, #ffffff99, transparent),
+    radial-gradient(1.5px 1.5px at 40% 80%, #ffffffaa, transparent),
+    radial-gradient(1px 1px at 85% 65%, #ffffff88, transparent),
+    radial-gradient(1px 1px at 10% 90%, #ffffff77, transparent), var(--ambient), var(--color-surface);
+  background-size:
+    240px 240px,
+    300px 300px,
+    360px 360px,
+    280px 280px,
+    320px 320px,
+    auto,
+    auto;
+  background-attachment: fixed;
+}
+[data-backdrop="grid"] body {
+  background:
+    linear-gradient(color-mix(in srgb, var(--color-accent) 9%, transparent) 1px, transparent 1px) 0 0 / 40px
+    40px,
+    linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 9%, transparent) 1px, transparent 1px) 0 0 /
+    40px 40px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="scanlines"] body {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--color-accent) 6%, transparent) 0 1px,
+      transparent 1px 4px
+    ),
+    var(--ambient), var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="halftone"] body {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--color-text) 11%, transparent) 1.5px, transparent 2px) 0 0
+    / 14px 14px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="dots"] body {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--color-accent) 16%, transparent) 1px, transparent 1.5px) 0
+    0 / 22px 22px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="parchment"] body {
+  background:
+    radial-gradient(ellipse at 20% 10%, #00000014, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, #0000001c, transparent 55%),
+    repeating-linear-gradient(8deg, #ffffff05 0 2px, transparent 2px 7px), var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="dunes"] body {
+  background:
+    radial-gradient(
+      140% 60% at 30% 115%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      120% 50% at 85% 120%,
+      color-mix(in srgb, var(--color-accent-alt) 18%, transparent),
+      transparent 60%
+    ),
+    repeating-radial-gradient(
+      ellipse at 50% 140%,
+      transparent 0 18px,
+      color-mix(in srgb, var(--color-text) 3%, transparent) 18px 20px
+    ),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="circuit"] body {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 10%, transparent) 2px, transparent 2px) 0 0
+    / 60px 60px,
+    linear-gradient(color-mix(in srgb, var(--color-accent) 7%, transparent) 2px, transparent 2px) 30px 30px /
+    60px 60px,
+    radial-gradient(circle, color-mix(in srgb, var(--color-accent-alt) 22%, transparent) 3px, transparent 4px)
+    0 0 / 60px 60px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="hexagons"] body {
+  background:
+    radial-gradient(
+      circle farthest-side at 0% 50%,
+      transparent 23.5%,
+      color-mix(in srgb, var(--color-accent) 9%, transparent) 24% 26%,
+      transparent 26.5%
+    )
+    0 0 / 40px 70px,
+    radial-gradient(
+      circle farthest-side at 100% 50%,
+      transparent 23.5%,
+      color-mix(in srgb, var(--color-accent) 9%, transparent) 24% 26%,
+      transparent 26.5%
+    )
+    20px 35px / 40px 70px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="stripes"] body {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent) 7%, transparent) 0 14px,
+      transparent 14px 28px
+    ),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="sunburst"] body,
+[data-backdrop="rays"] body {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 0%,
+      color-mix(in srgb, var(--color-accent) 9%, transparent) 0 6deg,
+      transparent 6deg 12deg
+    ),
+    var(--ambient), var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="rays"] body {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 45%,
+      color-mix(in srgb, var(--color-accent-alt) 10%, transparent) 0 4deg,
+      transparent 4deg 16deg
+    ),
+    radial-gradient(
+      circle at 50% 45%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 60%
+    ),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="checker"] body {
+  background:
+    repeating-conic-gradient(color-mix(in srgb, var(--color-text) 5%, transparent) 0 25%, transparent 0 50%) 0
+    0 / 48px 48px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="noise"] body {
+  background:
+    repeating-radial-gradient(circle at 17% 32%, #ffffff06 0 1px, transparent 1px 3px),
+    repeating-radial-gradient(circle at 83% 71%, #00000010 0 1px, transparent 1px 4px), var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="waves"] body {
+  background:
+    radial-gradient(
+      ellipse 60px 20px at 30px 20px,
+      transparent 60%,
+      color-mix(in srgb, var(--color-accent) 9%, transparent) 62% 70%,
+      transparent 72%
+    )
+    0 0 / 60px 40px,
+    var(--ambient),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="plaid"] body {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--color-accent) 8%, transparent) 0 18px,
+      transparent 18px 54px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-accent-alt) 8%, transparent) 0 18px,
+      transparent 18px 54px
+    ),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="webs"] body {
+  background:
+    repeating-radial-gradient(
+      circle at 0% 0%,
+      transparent 0 38px,
+      color-mix(in srgb, var(--color-text) 7%, transparent) 38px 39px
+    ),
+    repeating-conic-gradient(
+      from 0deg at 0% 0%,
+      color-mix(in srgb, var(--color-text) 6%, transparent) 0 0.6deg,
+      transparent 0.6deg 15deg
+    ),
+    var(--ambient), var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="speedlines"] body {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      color-mix(in srgb, var(--color-text) 7%, transparent) 0 0.8deg,
+      transparent 0.8deg 5deg
+    ),
+    radial-gradient(circle at 50% 50%, var(--color-surface) 25%, transparent 70%), var(--color-surface);
+  background-attachment: fixed;
+}
+[data-backdrop="marble"] body {
+  background:
+    radial-gradient(
+      ellipse at 10% 20%,
+      color-mix(in srgb, var(--color-text) 4%, transparent),
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 90% 70%,
+      color-mix(in srgb, var(--color-accent) 6%, transparent),
+      transparent 45%
+    ),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+
+/* ---------------------------------------------------------------- card styles */
+[data-cards="comic"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border: 3px solid #111111;
+  border-radius: var(--radius-md);
+  box-shadow: 6px 6px 0 #111111;
+}
+[data-cards="neon"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border: 1px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, transparent);
+  box-shadow:
+    0 0 0.6rem color-mix(in srgb, var(--color-accent) 45%, transparent),
+    inset 0 0 1.2rem color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+[data-cards="paper"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+  box-shadow:
+    0 1px 1px #0000000f,
+    0 6px 14px -6px #00000030;
+}
+[data-cards="pixel"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border-radius: 0;
+  border: 0;
+  box-shadow:
+    0 -4px 0 0 var(--color-border),
+    0 4px 0 0 var(--color-border),
+    -4px 0 0 0 var(--color-border),
+    4px 0 0 0 var(--color-border),
+    8px 8px 0 0 color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
+[data-cards="terminal"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border: 1px dashed color-mix(in srgb, var(--color-accent) 60%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-surface) 80%, #000000);
+  box-shadow: none;
+}
+[data-cards="ornate"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border: 1px solid color-mix(in srgb, var(--color-accent-alt) 55%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-accent-alt) 30%, transparent);
+  outline-offset: -6px;
+  box-shadow: var(--shadow-2);
+}
+[data-cards="hologram"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-surface-raised), var(--color-surface-raised)) padding-box,
+    linear-gradient(120deg, var(--color-accent), var(--color-accent-alt), #7cf7ff, var(--color-accent))
+    border-box;
+  box-shadow: 0 0 1.2rem color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+/* ---------------------------------------------------------------- celebration shapes */
+[data-celebration="snow"] .ds-celebration__particle {
+  background: #ffffff;
+  box-shadow: 0 0 6px #cfe8ff;
+}
+[data-celebration="bats"] .ds-celebration__particle {
+  inline-size: 1.4rem;
+  block-size: 0.7rem;
+  border-radius: 0;
+  background: #1a0b26;
+  clip-path: polygon(
+    0 20%,
+    25% 30%,
+    40% 0,
+    50% 35%,
+    60% 0,
+    75% 30%,
+    100% 20%,
+    80% 80%,
+    55% 60%,
+    50% 100%,
+    45% 60%,
+    20% 80%
+  );
+}
+[data-celebration="pixels"] .ds-celebration__particle {
+  border-radius: 0;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  background: hsl(calc(var(--i) * 50) 90% 60%);
+}
+[data-celebration="hearts"] .ds-celebration__particle,
+[data-celebration="petals"] .ds-celebration__particle {
+  inline-size: 0.9rem;
+  block-size: 0.8rem;
+  border-radius: 0;
+  background: #ff5c93;
+  clip-path: path("M7 13 C-5 4 2 -2 7 3 C12 -2 19 4 7 13 Z");
+}
+[data-celebration="petals"] .ds-celebration__particle {
+  background: #ffc2dc;
+  clip-path: none;
+  border-radius: 100% 0 100% 0;
+}
+[data-celebration="stars"] .ds-celebration__particle {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  border-radius: 0;
+  background: #ffe066;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+[data-celebration="coins"] .ds-celebration__particle {
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  background: radial-gradient(circle at 35% 35%, #fff2a8, #f5b700 60%, #a86b00);
+  box-shadow: 0 0 0 1px #8a5a00;
+}
+[data-celebration="lightning"] .ds-celebration__particle {
+  inline-size: 0.5rem;
+  block-size: 1.2rem;
+  border-radius: 0;
+  background: #fff35c;
+  clip-path: polygon(60% 0, 10% 55%, 45% 55%, 30% 100%, 90% 40%, 55% 40%);
+  filter: drop-shadow(0 0 4px #ffe600);
+}
+[data-celebration="bubbles"] .ds-celebration__particle {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  background: transparent;
+  border: 1.5px solid #bfefff;
+}
+
+/* ---------------------------------------------------------------- notification styles */
+.ds-notifications[data-style="comic"] .ds-notification {
+  border: 3px solid #111111;
+  border-radius: 0.4rem;
+  background: #fffbe6;
+  color: #111111;
+  box-shadow: 5px 5px 0 #111111;
+  transform: rotate(-0.6deg);
+}
+.ds-notifications[data-style="comic"] .ds-notification__title {
+  font-family: "Bangers", var(--font-display);
+  font-size: 1.15em;
+  letter-spacing: 0.04em;
+}
+.ds-notifications[data-style="comic"] .ds-notification__body {
+  color: #333333;
+}
+.ds-notifications[data-style="comic"] .ds-notification__icon {
+  border: 2px solid #111111;
+}
+.ds-notifications[data-style="comic"] .ds-notification::before,
+.ds-notifications[data-style="terminal"] .ds-notification::before,
+.ds-notifications[data-style="pixel"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="terminal"] .ds-notification {
+  border: 1px solid var(--tone);
+  border-radius: 2px;
+  background: #050a07;
+  color: #c8ffd8;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  box-shadow: 0 0 0.8rem color-mix(in srgb, var(--tone) 30%, transparent);
+}
+.ds-notifications[data-style="terminal"] .ds-notification__title::before {
+  content: "> ";
+  color: var(--tone);
+}
+.ds-notifications[data-style="terminal"] .ds-notification__body {
+  color: #8fd6a6;
+}
+.ds-notifications[data-style="parchment"] .ds-notification {
+  border: 1px solid #8a6b3d;
+  border-radius: 0.3rem;
+  background:
+    radial-gradient(ellipse at 10% 0%, #00000014, transparent 60%), linear-gradient(180deg, #f5e7c4, #e8d3a2);
+  color: #3b2a12;
+  font-family: "EB Garamond", Georgia, serif;
+  box-shadow:
+    0 6px 18px #00000055,
+    inset 0 0 1.4rem #8a6b3d33;
+}
+.ds-notifications[data-style="parchment"] .ds-notification__title {
+  font-family: "Cinzel", Georgia, serif;
+}
+.ds-notifications[data-style="parchment"] .ds-notification__body {
+  color: #5a4220;
+}
+.ds-notifications[data-style="hologram"] .ds-notification {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--color-surface) 85%, transparent),
+      color-mix(in srgb, var(--color-surface) 85%, transparent)
+    )
+    padding-box,
+    linear-gradient(120deg, #7cf7ff, #c58bff, #ff9be3, #7cf7ff) border-box;
+  background-size:
+    100% 100%,
+    300% 300%;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation:
+    var(--notify-in, ds-notify-slide) var(--motion-duration-slow) var(--motion-easing-out) both,
+    universe-holo 4s linear infinite;
+}
+@keyframes universe-holo {
+  to {
+    background-position:
+      0 0,
+      300% 0;
+  }
+}
+.ds-notifications[data-style="pixel"] .ds-notification {
+  border: 0;
+  border-radius: 0;
+  background: var(--color-surface-raised);
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  box-shadow:
+    0 -4px 0 0 var(--tone),
+    0 4px 0 0 var(--tone),
+    -4px 0 0 0 var(--tone),
+    4px 0 0 0 var(--tone),
+    6px 8px 0 0 #00000066;
+}
+.ds-notifications[data-style="paper"] .ds-notification {
+  border: 0;
+  border-radius: 0.2rem;
+  background: #fffdf6;
+  color: #2b2b2b;
+  box-shadow:
+    0 1px 2px #00000022,
+    0 12px 20px -10px #00000066;
+  transform: rotate(0.5deg);
+}
+.ds-notifications[data-style="paper"] .ds-notification__body {
+  color: #555555;
+}
+.ds-notifications[data-style="paper"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.5rem;
+  inset-inline-start: 45%;
+  inline-size: 3.5rem;
+  block-size: 1rem;
+  background: #ffe9a6cc;
+  transform: rotate(-3deg);
+}
+
+/* ---------------------------------------------------------------- notification animations */
+.ds-notifications[data-animation="glitch"] .ds-notification {
+  animation-name: universe-notify-glitch;
+  animation-duration: 0.5s;
+}
+.ds-notifications[data-animation="drop"] .ds-notification {
+  animation-name: universe-notify-drop;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ds-notifications[data-animation="spiral"] .ds-notification {
+  animation-name: universe-notify-spiral;
+  animation-duration: 0.7s;
+}
+.ds-notifications[data-animation="slam"] .ds-notification {
+  animation-name: universe-notify-slam;
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes universe-notify-glitch {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px) skewX(-12deg);
+    filter: hue-rotate(90deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(8px) skewX(8deg);
+  }
+  50% {
+    transform: translateX(-4px);
+    filter: hue-rotate(-60deg);
+  }
+  70% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes universe-notify-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+}
+@keyframes universe-notify-spiral {
+  from {
+    opacity: 0;
+    transform: rotate(-200deg) scale(0.2);
+  }
+}
+@keyframes universe-notify-slam {
+  0% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-notifications[data-style="hologram"] .ds-notification {
+    animation: none;
+  }
+}

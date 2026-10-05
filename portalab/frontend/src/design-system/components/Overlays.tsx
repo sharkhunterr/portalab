@@ -20,7 +20,7 @@ export interface DialogProps {
   onOpenChange?: (open: boolean) => void;
   variant?: "dialog" | "drawer";
   /** ``lg``: a wider dialog for guided forms (027). */
-  size?: "md" | "lg" | undefined;
+  size?: "md" | "lg" | "full" | undefined;
   /** 027: actions shown in a footer that stays visible, after the close button (e.g. « Buy »). */
   footer?: ReactNode;
 }

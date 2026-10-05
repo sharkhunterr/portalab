@@ -41,3 +41,27 @@ async def test_sold_looks_need_ownership() -> None:
 async def test_without_a_shop_everything_is_allowed() -> None:
     looks = NotificationLooks(CapabilityRegistry())
     assert await looks.validator("ui.notificationStyle")("neon", None) == []
+
+
+async def test_ambient_and_celebration_follow_ownership() -> None:
+    """027: the ambient layer and the celebration are cosmetics too — ``theme`` and ``none`` stay free."""
+
+    class _Ambients(_Shop):
+        async def sold(self, kind: str, field: str) -> frozenset[str]:
+            return frozenset({"snow"} if kind == "ambient" else {"coins"} if kind == "effect" else set())
+
+        async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:
+            return frozenset({"snow"}) if user_id == OWNER and kind == "ambient" else frozenset()
+
+    registry = CapabilityRegistry()
+    registry.declare(COSMETICS_SPEC)
+    registry.provide(COSMETICS, _Ambients(), instance_ref="shop", owner="test")
+    looks = NotificationLooks(registry)
+    ambient = looks.validator("ui.ambient")
+    assert await ambient("snow", str(OWNER)) == []
+    assert await ambient("snow", None) != []
+    assert await ambient("theme", None) == [] and await ambient("none", None) == []
+    celebration = looks.validator("ui.celebration")
+    assert await celebration("coins", str(OWNER)) != []
+    assert await celebration("sparkle", None) == []
+    assert set(NotificationLooks.SETTINGS) >= {"ui.ambient", "ui.celebration", "ui.palette"}

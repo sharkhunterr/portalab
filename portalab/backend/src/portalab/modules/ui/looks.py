@@ -7,20 +7,32 @@ from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.capabilities.themes import COSMETICS, PALETTES
+from portalab.capabilities.themes import (
+    AMBIENTS,
+    CELEBRATIONS,
+    COSMETICS,
+    NOTIFICATION_ANIMATIONS,
+    NOTIFICATION_STYLES,
+    PALETTES,
+)
 
-STYLES = ("toast", "banner", "pill", "minimal", "glass", "neon")
-ANIMATIONS = ("slide", "fade", "pop", "zoom", "bounce", "flip", "swing")
-FREE_STYLES = frozenset({"toast", "banner", "pill", "minimal"})
-FREE_ANIMATIONS = frozenset({"slide", "fade", "pop", "zoom"})
+STYLES = NOTIFICATION_STYLES
+ANIMATIONS = NOTIFICATION_ANIMATIONS
+FREE_STYLES = frozenset({"theme", "toast", "banner", "pill", "minimal"})
+FREE_ANIMATIONS = frozenset({"theme", "slide", "fade", "pop", "zoom"})
 KINDS = {
     "ui.notificationStyle": ("notification_style", "style", FREE_STYLES),
     "ui.notificationAnimation": ("notification_animation", "animation", FREE_ANIMATIONS),
     "ui.palette": ("palette", "palette", frozenset({"theme"})),  # 027: colour palettes over the theme
+    # 027: animated layer behind the portal and celebration effect (product types ``ambient``/``effect``)
+    "ui.ambient": ("ambient", "ambient", frozenset({"theme", "none"})),
+    "ui.celebration": ("effect", "effect", frozenset({"theme", "none", "sparkle", "glow"})),
 }
 
 
 class NotificationLooks:
+    SETTINGS = tuple(KINDS)
+
     def __init__(self, capabilities: CapabilityRegistry) -> None:
         self.capabilities = capabilities
 
@@ -45,10 +57,14 @@ class NotificationLooks:
         styles = await self.locked("ui.notificationStyle", user_id)
         animations = await self.locked("ui.notificationAnimation", user_id)
         palettes = await self.locked("ui.palette", user_id)
+        ambients = await self.locked("ui.ambient", user_id)
+        celebrations = await self.locked("ui.celebration", user_id)
         return {
             "styles": [{"key": k, "locked": k in styles} for k in STYLES],
             "animations": [{"key": k, "locked": k in animations} for k in ANIMATIONS],
             "palettes": [{"key": k, "locked": k in palettes} for k in PALETTES],
+            "ambients": [{"key": k, "locked": k in ambients} for k in AMBIENTS],
+            "celebrations": [{"key": k, "locked": k in celebrations} for k in CELEBRATIONS],
         }
 
     def validator(self, setting: str) -> Any:

@@ -13,6 +13,7 @@ import { parseTheme, presentationOf, type ThemeDefinition } from "../../design-s
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { NotificationLooks } from "./NotificationLooks";
 import { PalettePicker } from "./PalettePicker";
+import { UniverseLooks } from "./UniverseLooks";
 
 /**
  * Appearance & accessibility settings (spec 022): theme, density, text size, contrast, motion, sound and
@@ -33,6 +34,10 @@ export const appearanceStrings = {
     orbit: "Orbit bubble",
     "bottom-bar": "Bottom bar",
     drawer: "Drawer",
+    dock: "Dock",
+    tabs: "Book tabs",
+    launcher: "Launcher screen",
+    terminal: "Command line",
   } as Record<string, string>,
   footerHeader: "header at the bottom",
   theme: "Theme",
@@ -176,23 +181,39 @@ export function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
   const bar = (
     <span className="theme-mini__bar" style={{ background: c.surfaceRaised, borderColor: c.border }} />
   );
+  const nav = p.nav.desktop;
   return (
     <span
       className="theme-mini"
-      data-nav={p.nav.desktop}
+      data-nav={nav}
       data-cards={p.cards}
       aria-hidden="true"
       style={{ background: c.surface, color: c.text, borderColor: c.border }}
     >
       {p.headerPosition === "top" ? bar : null}
+      {nav === "terminal" ? (
+        <span className="theme-mini__terminal" style={{ color: c.accent }}>
+          {"> ~/ ▮"}
+        </span>
+      ) : null}
       <span className="theme-mini__body">
-        {p.nav.desktop === "sidebar" || p.nav.desktop === "rail" ? (
-          <span className="theme-mini__side" style={{ background: c.surfaceRaised }} />
+        {nav === "sidebar" || nav === "rail" || nav === "tabs" ? (
+          <span
+            className="theme-mini__side"
+            style={{ background: nav === "tabs" ? c.accent : c.surfaceRaised }}
+          />
         ) : null}
         <span className="theme-mini__content">
-          {p.nav.desktop === "topbar" ? (
-            <span className="theme-mini__tabs" style={{ background: c.accent }} />
-          ) : null}
+          {nav === "topbar" ? <span className="theme-mini__tabs" style={{ background: c.accent }} /> : null}
+          <span
+            className="theme-mini__font"
+            style={{
+              fontFamily: theme.typography?.headingFamily ?? theme.typography?.fontFamily,
+              color: c.text,
+            }}
+          >
+            Aa
+          </span>
           <span className="theme-mini__card" style={{ background: c.surfaceRaised, borderColor: c.border }}>
             <span style={{ background: c.accent }} />
           </span>
@@ -200,8 +221,16 @@ export function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
             <span style={{ background: c.accentAlt ?? c.accent }} />
           </span>
         </span>
-        {p.nav.desktop === "orbit" ? (
-          <span className="theme-mini__orbit" style={{ background: c.accent }} />
+        {nav === "orbit" ? <span className="theme-mini__orbit" style={{ background: c.accent }} /> : null}
+        {nav === "dock" ? (
+          <span className="theme-mini__dock" style={{ background: c.surfaceRaised, borderColor: c.border }}>
+            <span style={{ background: c.accent }} />
+            <span style={{ background: c.textMuted }} />
+            <span style={{ background: c.textMuted }} />
+          </span>
+        ) : null}
+        {nav === "launcher" ? (
+          <span className="theme-mini__launcher" style={{ background: c.accent }} />
         ) : null}
       </span>
       {p.headerPosition === "bottom" ? bar : null}
@@ -348,6 +377,7 @@ export function AppearanceSettings() {
         </SelectField>
       ))}
       <PalettePicker />
+      <UniverseLooks />
       <NotificationLooks />
       {field("ui.campaignThemes", (disabled) => (
         <CheckboxField

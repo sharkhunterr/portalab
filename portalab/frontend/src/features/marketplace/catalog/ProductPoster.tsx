@@ -16,6 +16,10 @@ export const TYPE_ICONS: Record<string, string> = {
   statistic: "chart",
   feature: "zap",
   access: "key",
+  bundle: "shop",
+  ambient: "snowflake",
+  profile_background: "sparkles",
+  name_style: "feather",
 };
 
 export function ProductPoster({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {

@@ -2,6 +2,7 @@ import { IntlMessageFormat } from "intl-messageformat";
 import { useContext, useMemo } from "react";
 import { IntlContext } from "react-intl";
 import { BUNDLED_MESSAGES } from "../bundled";
+import { useVocabulary } from "./vocabulary";
 
 /**
  * ``useT()`` (spec 026 T018): ``t("namespace:key", values)`` renders an ICU message of the active
@@ -29,9 +30,12 @@ function fallback(id: string, values?: Record<string, string | number>): string 
 
 export function useT(): Translate {
   const intl = useContext(IntlContext);
+  const vocabulary = useVocabulary();
   return useMemo<Translate>(() => {
     if (!intl) return fallback;
     return (id, values) => {
+      const themed = vocabulary[id]; // 027: the active theme's word for it
+      if (themed) return themed;
       if (!intl.messages[id]) return fallback(id, values);
       try {
         return intl.formatMessage({ id, defaultMessage: BUNDLED_MESSAGES[id] ?? id }, values) as string;
@@ -39,5 +43,5 @@ export function useT(): Translate {
         return fallback(id, values);
       }
     };
-  }, [intl]);
+  }, [intl, vocabulary]);
 }

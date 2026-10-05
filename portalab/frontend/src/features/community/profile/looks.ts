@@ -16,15 +16,34 @@ export interface Backdrop {
   title?: string;
 }
 
+/** A title or badge as worn: its label, icon and animated style. */
+export interface WornItem {
+  key: string;
+  label: string;
+  icon?: string | null;
+  style?: string | null;
+}
+
 export interface Equipped {
   banner?: string | null;
   frame?: string | null;
   backdrop?: Backdrop | null;
+  /** 027: an animated background behind the profile, the name's style, a title, a badge showcase. */
+  background?: string | null;
+  name?: string | null;
+  title?: WornItem | null;
+  badges?: { items: WornItem[] } | null;
 }
+
+export type Slot = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges";
 
 export interface LooksCatalog {
   banners: LookChoice[];
   frames: LookChoice[];
+  backgrounds: LookChoice[];
+  names: LookChoice[];
+  titles: WornItem[];
+  badges: WornItem[];
   backdrop: { unlocked: boolean };
   equipped: Equipped;
 }
@@ -43,7 +62,7 @@ export function useProfileLooks(enabled = true) {
 export function useEquipLook() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ slot, value }: { slot: "banner" | "frame" | "backdrop"; value: unknown }) =>
+    mutationFn: async ({ slot, value }: { slot: Slot; value: unknown }) =>
       (await api.PUT("/api/v1/me/profile-looks", { body: { slot, value } })).data,
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: KEY });

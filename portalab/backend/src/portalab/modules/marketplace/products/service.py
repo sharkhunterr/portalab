@@ -330,7 +330,7 @@ class Catalog:
         q: str | None = None,
         states: tuple[str, ...] = ("available",),
         owned_ids: set[UUID] | None = None,
-        limit: int = 100,
+        limit: int = 500,
     ) -> list[tuple[Product, ProductVersion]]:
         statement = (
             select(Product, ProductVersion)
@@ -340,7 +340,7 @@ class Catalog:
                 & (ProductVersion.version == Product.current_version),
             )
             .order_by(Product.key)
-            .limit(max(1, min(limit, 200)))
+            .limit(max(1, min(limit, 1000)))
         )
         if owned_ids is not None:
             statement = statement.where((Product.state.in_(states)) | (Product.id.in_(owned_ids)))

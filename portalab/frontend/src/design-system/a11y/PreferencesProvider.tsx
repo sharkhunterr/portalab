@@ -42,6 +42,9 @@ interface PreferencesContextValue {
   policy: UiPolicy;
   setPreference: <K extends keyof UiPreferences>(key: K, value: UiPreferences[K]) => void;
   synced: boolean;
+  /** 027: values tried on for a moment (the shop's « Try it »), never saved; ``null`` ends the trial. */
+  preview: Partial<UiPreferences> | null;
+  setPreview: (values: Partial<UiPreferences> | null) => void;
 }
 
 const PreferencesContext = createContext<PreferencesContextValue | null>(null);
@@ -152,9 +155,14 @@ export function PreferencesProvider({
     [backend],
   );
 
+  const [preview, setPreview] = useState<Partial<UiPreferences> | null>(null);
+  const preferences = useMemo(
+    () => (preview ? { ...state.preferences, ...preview } : state.preferences),
+    [state.preferences, preview],
+  );
   const value = useMemo(
-    () => ({ preferences: state.preferences, policy, setPreference, synced: state.synced }),
-    [state.preferences, policy, setPreference, state.synced],
+    () => ({ preferences, policy, setPreference, synced: state.synced, preview, setPreview }),
+    [preferences, policy, setPreference, state.synced, preview],
   );
   return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;
 }
@@ -173,5 +181,7 @@ export function usePreferences(): PreferencesContextValue {
     policy: DEFAULT_POLICY,
     setPreference: () => undefined,
     synced: true,
+    preview: null,
+    setPreview: () => undefined,
   };
 }

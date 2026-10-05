@@ -64,3 +64,39 @@ async def test_profile_looks_follow_ownership(mk: MkHarness) -> None:
     frames = {f["key"]: f["locked"] for f in catalog["frames"]}
     assert frames["gold"] is True and frames["simple"] is False and catalog["backdrop"]["unlocked"]
     assert (await looks.equip(user, "banner", None)).get("banner") is None  # taken off
+
+
+async def test_profile_background_name_title_and_badges(mk: MkHarness) -> None:
+    """027: an animated background and a name style follow ownership like banners; a member shows one of
+    their titles and up to three of their badges (with their animated style), never someone else's."""
+    from portalab.modules.marketplace.looks.service import LookLocked
+
+    await published(mk, "bg_snow", "profile_background", payload={"background": "snow"})
+    await published(mk, "name_fire", "name_style", payload={"style": "fire"})
+    await published(mk, "title_legend", "title", payload={"label": "Legend", "style": "gold"})
+    for key, label in (("b1", "One"), ("b2", "Two"), ("b3", "Three"), ("b4", "Four")):
+        await published(mk, key, "badge", payload={"label": label, "icon": "star", "style": "pulse"})
+    ursula = mk.p("ursula")
+    user = ursula.user_id
+    assert user is not None
+    looks = mk.module.looks
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "background", "snow")
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "title", "title_legend")
+    for key in ("bg_snow", "name_fire", "title_legend", "b1", "b2", "b3", "b4"):
+        await mk.module.purchases.acquire(ursula, key, f"k-{key}")
+    assert (await looks.equip(user, "background", "snow"))["background"] == "snow"
+    assert (await looks.equip(user, "name", "fire"))["name"] == "fire"
+    worn = await looks.equip(user, "title", "title_legend")
+    assert worn["title"] == {"key": "title_legend", "label": "Legend", "icon": None, "style": "gold"}
+    shown = await looks.equip(user, "badges", ["b1", "b2", "b3", "b4"])
+    assert [badge["label"] for badge in shown["badges"]["items"]] == ["One", "Two", "Three"]  # three at most
+    assert shown["badges"]["items"][0]["style"] == "pulse"
+    with pytest.raises(LookLocked):
+        await looks.equip(mk.people["ulrich"], "badges", ["b1"])  # not theirs
+    catalog = await looks.catalog(user)
+    assert {t["key"] for t in catalog["titles"]} == {"title_legend"}
+    assert len(catalog["badges"]) == 4
+    assert {b["key"]: b["locked"] for b in catalog["backgrounds"]}["snow"] is False
+    assert (await looks.equip(user, "badges", None)).get("badges") is None

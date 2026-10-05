@@ -51,20 +51,57 @@ COSMETICS = "marketplace.cosmetics"
 # 027: profile and colour cosmetics — designs drawn by the interface (no image file), keys shared by the
 # Marketplace (what is sold) and the UI (what is shown). A design no product sells is free for everyone.
 PROFILE_BANNERS: tuple[str, ...] = (
-    "aurora",
-    "ocean",
-    "dusk",
-    "forest",
-    "sunset",
-    "synthwave",
-    "starfield",
-    "sakura",
-    "circuit",
-    "halloween",
-)
-AVATAR_FRAMES: tuple[str, ...] = ("none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel")
-PALETTES: tuple[str, ...] = ("theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix")
-PROFILE_SLOTS = {"banner": ("profile_banner", "banner"), "frame": ("avatar_frame", "frame")}
+    "aurora", "ocean", "dusk", "forest", "sunset", "synthwave", "starfield", "sakura", "circuit", "halloween",
+    # 027 universes
+    "castle", "hyperspace", "code", "dunes", "bloodmoon", "snowfall", "pow", "speedlines", "toon", "cabin",
+    "neon-grid", "mono", "nebula", "skyline", "mirrorball", "night-city",
+)  # fmt: skip
+AVATAR_FRAMES: tuple[str, ...] = (
+    "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
+    "runes", "orbit", "code", "sand", "blood", "pumpkin", "holly", "pow", "chrome", "hologram", "cyber",
+    "hero", "disco", "toxic", "sakura",
+)  # fmt: skip
+PALETTES: tuple[str, ...] = (
+    "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
+    "aurora", "lagoon", "lava", "mint", "gold", "ice", "rose", "toxic", "midnight", "coffee", "lavender",
+    "bubblegum",
+)  # fmt: skip
+# animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
+AMBIENTS: tuple[str, ...] = (
+    "none", "snow", "embers", "code-rain", "fireflies", "starfield", "warp", "petals", "bats", "bubbles",
+    "rain", "sparkles", "disco", "fog", "sand", "leaves", "hearts", "glitch", "lights", "spores", "aurora",
+)  # fmt: skip
+CELEBRATIONS: tuple[str, ...] = (
+    "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
+    "petals", "bubbles",
+)  # fmt: skip
+NOTIFICATION_STYLES: tuple[str, ...] = (
+    "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
+    "pixel", "paper",
+)  # fmt: skip
+NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
+    "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
+)  # fmt: skip
+# the name shown big on a profile: a font and an effect (Steam-like « titles »)
+NAME_STYLES: tuple[str, ...] = (
+    "none", "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga",
+    "cartoon", "cozy", "futuristic", "minimal", "alien", "hero", "neowave", "disco", "cyberpunk", "pixel",
+    "handwritten", "fire", "ice", "rainbow", "royal",
+)  # fmt: skip
+# animated badges and titles (payload ``style`` of ``badge``/``title`` products)
+BADGE_STYLES: tuple[str, ...] = (
+    "none", "shimmer", "pulse", "flame", "glitch", "rainbow", "float", "spin", "frost", "neon", "gold",
+)  # fmt: skip
+UNIVERSE_THEMES: tuple[str, ...] = (
+    "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
+    "cozy", "futuristic", "minimal", "alien", "heroes", "neowave", "disco", "cyberpunk",
+)  # fmt: skip
+PROFILE_SLOTS = {
+    "banner": ("profile_banner", "banner"),
+    "frame": ("avatar_frame", "frame"),
+    "background": ("profile_background", "background"),
+    "name": ("name_style", "style"),
+}
 
 
 @runtime_checkable

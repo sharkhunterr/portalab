@@ -56,7 +56,29 @@ def _cmd_migrate(args: argparse.Namespace) -> int:
     if args.revision == "heads":
         created = asyncio.run(_sync_permission_catalog(settings.database_url.reveal()))
         log.info("permission catalog synchronised", extra={"fields": {"created": created}})
+        themes = asyncio.run(_sync_builtin_themes(settings.database_url.reveal()))
+        log.info("built-in themes synchronised", extra={"fields": {"changed": themes}})
     return 0
+
+
+async def _sync_builtin_themes(url: str) -> int:
+    """027: built-in themes follow their shipped files (a fix to a built-in theme reaches the portal)."""
+    from pathlib import Path
+
+    from portalab.app.composition import import_all_models
+    from portalab.capabilities.catalog import new_registry
+    from portalab.core.audit_port import LogAuditSink
+    from portalab.core.db import Database
+    from portalab.modules.ui import themes as themes_package
+    from portalab.modules.ui.themes.service import ThemeService
+
+    import_all_models()
+    database = Database.from_url(url)
+    try:
+        service = ThemeService(database, LogAuditSink(), new_registry())
+        return await service.sync_builtin(Path(themes_package.__file__).parent / "builtin")
+    finally:
+        await database.dispose()
 
 
 async def _sync_permission_catalog(url: str) -> int:

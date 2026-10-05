@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePreferences } from "../../../design-system/a11y/PreferencesProvider";
+import type { UiPreferences } from "../../../design-system/a11y/preferences";
 import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
+import { useNotify } from "../../../design-system/components/Notification";
+import { useCelebrate } from "../../../design-system/feedback/Celebration";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
-import { type Product, useAcquire, useProducts } from "../api";
+import { type Product, useAcquire, useDescribe, useProducts } from "../api";
 import { ProductArt, TYPE_BADGE_ICON } from "../catalog/ProductArt";
 import { ConditionsChecklist } from "./ConditionsChecklist";
 
@@ -16,7 +20,7 @@ import { ConditionsChecklist } from "./ConditionsChecklist";
  */
 function PackItem({ item }: { item: Product }) {
   const t = useT();
-  const description = Object.values(item.descriptions)[0];
+  const description = useDescribe()(item);
   return (
     <li className="pack-item" data-rarity={item.rarity ?? "common"}>
       <ProductArt product={item} size="mini" />
@@ -85,7 +89,7 @@ function Fact({ icon, label, children }: { icon: string; label: string; children
 export function ProductSheet({ product }: { product: Product }) {
   const t = useT();
   const rarity = product.rarity ?? "common";
-  const description = Object.values(product.descriptions)[0];
+  const description = useDescribe()(product);
   const policy = product.refund_policy as { refundable?: boolean; window_days?: number; percent?: number };
   const supply = product.supply ?? null;
   const remaining = product.remaining ?? null;
@@ -174,6 +178,74 @@ export function ProductSheet({ product }: { product: Product }) {
         </dl>
       </div>
     </div>
+  );
+}
+
+/** What « Try it » puts on for a moment, by product type (never saved). */
+function trialOf(product: Product): Partial<UiPreferences> | null {
+  const preview = (product.preview ?? {}) as Record<string, unknown>;
+  const value = (field: string) => (typeof preview[field] === "string" ? (preview[field] as string) : null);
+  switch (product.type) {
+    case "theme":
+      return value("theme") ? { theme: value("theme") } : null;
+    case "palette":
+      return value("palette") ? ({ palette: value("palette") } as Partial<UiPreferences>) : null;
+    case "ambient":
+      return value("ambient") ? ({ ambient: value("ambient") } as Partial<UiPreferences>) : null;
+    case "effect":
+      return value("effect") ? ({ celebration: value("effect") } as Partial<UiPreferences>) : null;
+    case "notification_style":
+      return value("style") ? ({ notificationStyle: value("style") } as Partial<UiPreferences>) : null;
+    case "notification_animation":
+      return value("animation")
+        ? ({ notificationAnimation: value("animation") } as Partial<UiPreferences>)
+        : null;
+    default:
+      return null;
+  }
+}
+
+/**
+ * « Try it » (027): the theme, palette, ambient animation, celebration or notification look is put on for
+ * as long as the product is open — on the whole portal, behind the sheet — and taken off on close.
+ */
+export function TryOn({ product }: { product: Product }) {
+  const t = useT();
+  const { preview, setPreview } = usePreferences();
+  const notify = useNotify();
+  const celebrate = useCelebrate();
+  const trial = trialOf(product);
+  const on = Boolean(preview && trial && Object.keys(trial).every((k) => k in preview));
+  useEffect(() => () => setPreview(null), [setPreview]); // taken off when the sheet closes
+  if (!trial) return null;
+  const show = () => {
+    if (product.type === "effect") celebrate({ kind: "reward", text: "+40 XP" });
+    if (product.type.startsWith("notification_")) {
+      notify({
+        severity: "success",
+        tone: "reward",
+        title: t("notifications:looks.sampleTitle"),
+        body: t("notifications:looks.sampleBody"),
+        badge: t("notifications:badge.reward"),
+      });
+    }
+  };
+  return (
+    <Button
+      variant="secondary"
+      aria-pressed={on}
+      onClick={() => {
+        if (on) {
+          setPreview(null);
+          return;
+        }
+        setPreview(trial);
+        setTimeout(show, 120);
+      }}
+    >
+      <Icon name={on ? "close" : "eye"} size={16} />
+      {on ? t("marketplace:buy.stopTrying") : t("marketplace:buy.try")}
+    </Button>
   );
 }
 

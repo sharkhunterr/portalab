@@ -13,7 +13,10 @@ import { createRouter } from "./shell/router/routes";
 import { ShellLayout } from "./shell/ShellLayout";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/plus-jakarta-sans";
+import "./design-system/fonts/universe-fonts";
 import "./styles.css";
+import "./design-system/themes/universe.css";
+import "./design-system/themes/cosmetics.css";
 
 /**
  * Entry point: first paint from mirrored preferences, then the sign-in gate (anonymous visitors never see

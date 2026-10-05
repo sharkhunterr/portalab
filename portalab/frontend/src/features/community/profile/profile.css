@@ -183,3 +183,67 @@
 .backdrop-picker > button {
   justify-self: start;
 }
+/* 027: animated profile background, styled name, title and badge showcase */
+.profile-page {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--radius-lg);
+}
+.profile-page > :not(.ambient) {
+  position: relative;
+  z-index: 1;
+}
+.profile-page[data-background] {
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+}
+.profile-hero__text {
+  display: grid;
+  gap: var(--space-1);
+}
+.profile-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.looks-grid[data-slot="name"] {
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+}
+.looks-grid__ambient {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 4rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-surface-raised), var(--color-surface));
+}
+.looks-grid__name-sample {
+  display: grid;
+  place-items: center;
+  min-block-size: 3.5rem;
+  font-size: 1.35rem;
+  font-weight: var(--font-weight-bold);
+  overflow: hidden;
+}
+.looks-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block: var(--space-3);
+}
+.looks-list > button {
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.looks-list > button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}

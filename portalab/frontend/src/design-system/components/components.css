@@ -88,6 +88,13 @@
 .ds-dialog[data-size="lg"] {
   width: min(48rem, calc(100vw - 2rem));
 }
+/* 027: a full-screen dialog (the launcher navigation) */
+.ds-dialog[data-size="full"] {
+  inset: var(--space-4);
+  transform: none;
+  width: auto;
+  max-height: none;
+}
 .ds-drawer {
   inset-block: 0;
   inset-inline-end: 0;

@@ -640,6 +640,31 @@
           "maxLength": 200,
           "pattern": "^[A-Za-z0-9 ,\"'-]+$"
         },
+        "headingFamily": {
+          "type": "string",
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9 ,\"'-]+$"
+        },
+        "headingCase": {
+          "type": "string",
+          "enum": [
+            "none",
+            "uppercase",
+            "smallcaps"
+          ]
+        },
+        "headingEffect": {
+          "type": "string",
+          "enum": [
+            "none",
+            "glow",
+            "gradient",
+            "shadow",
+            "outline",
+            "neon",
+            "emboss"
+          ]
+        },
         "scale": {
           "type": "object",
           "properties": {
@@ -721,7 +746,16 @@
             "none",
             "sparkle",
             "confetti",
-            "glow"
+            "glow",
+            "snow",
+            "bats",
+            "pixels",
+            "hearts",
+            "stars",
+            "coins",
+            "lightning",
+            "petals",
+            "bubbles"
           ]
         }
       },
@@ -739,7 +773,11 @@
                 "sidebar",
                 "topbar",
                 "rail",
-                "orbit"
+                "orbit",
+                "dock",
+                "tabs",
+                "launcher",
+                "terminal"
               ]
             },
             "tablet": {
@@ -748,7 +786,11 @@
                 "rail",
                 "topbar",
                 "drawer",
-                "orbit"
+                "orbit",
+                "dock",
+                "tabs",
+                "launcher",
+                "terminal"
               ]
             },
             "phone": {
@@ -756,7 +798,11 @@
               "enum": [
                 "bottom-bar",
                 "drawer",
-                "orbit"
+                "orbit",
+                "dock",
+                "tabs",
+                "launcher",
+                "terminal"
               ]
             }
           },
@@ -783,7 +829,14 @@
             "elevated",
             "flat",
             "outlined",
-            "glass"
+            "glass",
+            "comic",
+            "neon",
+            "paper",
+            "pixel",
+            "terminal",
+            "ornate",
+            "hologram"
           ]
         },
         "content": {
@@ -822,6 +875,17 @@
             "default",
             "outline"
           ]
+        },
+        "overrides": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,31}$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,31}$"
+          }
         }
       },
       "required": [
@@ -848,12 +912,83 @@
         "fallback": {
           "type": "string",
           "maxLength": 64
+        },
+        "pattern": {
+          "type": "string",
+          "enum": [
+            "none",
+            "stars",
+            "grid",
+            "scanlines",
+            "halftone",
+            "dots",
+            "parchment",
+            "dunes",
+            "circuit",
+            "hexagons",
+            "stripes",
+            "sunburst",
+            "checker",
+            "noise",
+            "waves",
+            "plaid",
+            "webs",
+            "speedlines",
+            "rays",
+            "marble"
+          ]
+        },
+        "ambient": {
+          "type": "string",
+          "enum": [
+            "none",
+            "snow",
+            "embers",
+            "code-rain",
+            "fireflies",
+            "starfield",
+            "warp",
+            "petals",
+            "bats",
+            "bubbles",
+            "rain",
+            "sparkles",
+            "disco",
+            "fog",
+            "sand",
+            "leaves",
+            "hearts",
+            "glitch",
+            "lights",
+            "spores",
+            "aurora"
+          ]
         }
       },
       "required": [
         "fallback"
       ],
       "additionalProperties": false
+    },
+    "vocabulary": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z]{2,3}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*:[a-zA-Z0-9_.-]{1,120}$"
+        },
+        "additionalProperties": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "pattern": "^[^{}<>]+$"
+        }
+      }
     },
     "sounds": {
       "type": "object",
@@ -894,7 +1029,33 @@
           "type": "string",
           "enum": [
             "toast",
-            "banner"
+            "banner",
+            "pill",
+            "minimal",
+            "glass",
+            "neon",
+            "comic",
+            "terminal",
+            "parchment",
+            "hologram",
+            "pixel",
+            "paper"
+          ]
+        },
+        "animation": {
+          "type": "string",
+          "enum": [
+            "slide",
+            "fade",
+            "pop",
+            "zoom",
+            "bounce",
+            "flip",
+            "swing",
+            "glitch",
+            "drop",
+            "spiral",
+            "slam"
           ]
         }
       },

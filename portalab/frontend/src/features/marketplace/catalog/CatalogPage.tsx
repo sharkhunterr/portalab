@@ -10,7 +10,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { PROGRESSION_KEY } from "../../../shell/header/useHeaderData";
 import type { Progression } from "../../gamification/api";
-import { type Category, type Product, useCategories, useProducts } from "../api";
+import { type Category, type Product, useCategories, useDescribe, useProducts } from "../api";
 import { ProductArt } from "./ProductArt";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
@@ -22,9 +22,13 @@ import "../marketplace.css";
  */
 export const TYPE_GROUPS: Array<{ key: string; icon: string; types: string[] }> = [
   { key: "badges", icon: "star", types: ["badge", "title"] },
-  { key: "animations", icon: "sparkles", types: ["effect"] },
+  { key: "animations", icon: "sparkles", types: ["effect", "ambient"] },
   { key: "themes", icon: "palette", types: ["theme", "palette"] },
-  { key: "profile", icon: "user", types: ["profile_banner", "avatar_frame", "profile_backdrop"] },
+  {
+    key: "profile",
+    icon: "user",
+    types: ["profile_banner", "avatar_frame", "profile_backdrop", "profile_background", "name_style"],
+  },
   { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
   { key: "packs", icon: "shop", types: ["bundle"] },
   { key: "features", icon: "zap", types: ["feature", "plugin", "widget", "statistic", "access"] },
@@ -53,6 +57,7 @@ export default function CatalogPage() {
   const [params, setParams] = useSearchParams();
   const type = params.get("type") ?? ""; // 027: « in the shop » links land on one type
   const [opened, setOpened] = useState<Product | null>(null);
+  const describe = useDescribe();
   const categories = useCategories();
   const products = useProducts({ category: "", q: q.trim() });
   const all = useMemo(
@@ -145,9 +150,7 @@ export default function CatalogPage() {
                       {product.name}
                     </Link>
                   </h3>
-                  {Object.values(product.descriptions)[0] ? (
-                    <p>{Object.values(product.descriptions)[0]}</p>
-                  ) : null}
+                  {describe(product) ? <p>{describe(product)}</p> : null}
                   {product.owned ? (
                     <span className="product-card__owned">
                       <Icon name="check" size={16} /> {t("marketplace:product.owned")}

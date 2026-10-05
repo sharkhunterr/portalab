@@ -11,6 +11,7 @@ import {
 import { Link, useInRouterContext } from "react-router";
 import { usePreferences } from "../a11y/PreferencesProvider";
 import { sound } from "../sound/SoundService";
+import { useTheme } from "../themes/ThemeProvider";
 import { Icon } from "./Icon";
 
 /**
@@ -167,6 +168,7 @@ const NotifyContext = createContext<NotifyContextValue>({ notify: () => undefine
 
 export function NotificationArea({ children }: { children: ReactNode }) {
   const { preferences } = usePreferences();
+  const { looks } = useTheme(); // 027: the member's look, or the theme's when they follow it
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [paused, setPaused] = useState(false);
   const counter = useRef(0);
@@ -189,7 +191,7 @@ export function NotificationArea({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [items, durationMs, dismiss, paused]);
   const value = useMemo(() => ({ notify }), [notify]);
-  const style = preferences.notificationStyle === "banner" ? " ds-notifications--banner" : "";
+  const style = looks.notificationStyle === "banner" ? " ds-notifications--banner" : "";
   return (
     <NotifyContext.Provider value={value}>
       {children}
@@ -197,8 +199,8 @@ export function NotificationArea({ children }: { children: ReactNode }) {
         className={`ds-notifications ds-notifications--${preferences.notificationPosition}${style}`}
         aria-label="Notifications"
         data-position={preferences.notificationPosition}
-        data-style={preferences.notificationStyle}
-        data-animation={preferences.notificationAnimation}
+        data-style={looks.notificationStyle}
+        data-animation={looks.notificationAnimation}
         data-paused={paused || undefined}
         onPointerEnter={() => setPaused(true)}
         onPointerLeave={() => setPaused(false)}

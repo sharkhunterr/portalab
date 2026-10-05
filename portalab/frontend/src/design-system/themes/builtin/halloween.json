@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "halloween",
+  "name": "Halloween",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#120a1c",
+    "surfaceRaised": "#1f1230",
+    "text": "#fff1e0",
+    "textMuted": "#d6b8e6",
+    "border": "#3d2557",
+    "accent": "#ff8c1a",
+    "accentContrast": "#1a0b00",
+    "focus": "#ffb35c",
+    "accentAlt": "#a974ef",
+    "rarity": {
+      "common": "#d6b8e6",
+      "rare": "#7fd1ff",
+      "epic": "#b98cff",
+      "legendary": "#ffb627"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2e2839",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#242831",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#33262b",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#312629",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#332131",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#312234",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2c223c",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#322236",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2b2536",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#26263a",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, sans-serif",
+    "headingFamily": "Griffy, cursive",
+    "headingCase": "none",
+    "headingEffect": "shadow"
+  },
+  "radii": {
+    "sm": 0.6,
+    "md": 1.2
+  },
+  "motion": {
+    "profile": "playful",
+    "celebration": "bats",
+    "fastMs": 160,
+    "normalMs": 320
+  },
+  "layout": {
+    "nav": {
+      "desktop": "orbit",
+      "tablet": "orbit",
+      "phone": "orbit"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "elevated",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "ghost",
+      "film": "popcorn",
+      "media": "popcorn",
+      "compass": "moon-star",
+      "server": "potion",
+      "users": "cat",
+      "shop": "candy",
+      "lifebuoy": "skull",
+      "trophy": "cookie",
+      "dashboard": "ghost"
+    }
+  },
+  "background": {
+    "fallback": "#120a1c",
+    "pattern": "webs",
+    "ambient": "bats"
+  },
+  "sounds": {
+    "notification": "asset:spooky/notification.wav",
+    "alert": "asset:spooky/alert.wav",
+    "success": "asset:spooky/success.wav",
+    "reward": "asset:spooky/reward.wav",
+    "levelUp": "asset:spooky/level-up.wav",
+    "ui": "asset:spooky/ui.wav"
+  },
+  "notification": {
+    "style": "pill",
+    "animation": "bounce"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Maison hantée",
+      "nav:nav.section.home": "Maison hantée",
+      "dashboard:title": "Maison hantée",
+      "nav:nav.media": "Ciné-frissons",
+      "nav:nav.section.media": "Ciné-frissons",
+      "media:home.title": "Ciné-frissons",
+      "nav:nav.media_requests": "Mes demandes de frissons",
+      "nav:nav.media_insights": "Compte des citrouilles",
+      "media:insights.title": "Compte des citrouilles",
+      "nav:nav.section.content": "Le cimetière",
+      "nav:nav.news": "Ragots de sorcières",
+      "news:title": "Ragots de sorcières",
+      "nav:nav.wiki": "Livre des sorts",
+      "wiki:title": "Livre des sorts",
+      "nav:nav.search": "Chasse aux fantômes",
+      "search:title": "Chasse aux fantômes",
+      "nav:nav.calendar": "Nuits d'Halloween",
+      "calendar:title": "Nuits d'Halloween",
+      "nav:nav.services": "Chaudron",
+      "nav:nav.section.services": "Chaudron",
+      "nav:nav.statistics": "Le grand décompte",
+      "statistics:title": "Le grand décompte",
+      "nav:nav.community": "Le Sabbat",
+      "nav:nav.section.community": "Le Sabbat",
+      "community:title": "Le Sabbat",
+      "nav:nav.progression": "Mon déguisement",
+      "gamification:progression.title": "Mon déguisement",
+      "nav:nav.campaigns": "Chasses aux bonbons",
+      "campaigns:page.title": "Chasses aux bonbons",
+      "nav:nav.marketplace": "Boutique de farces",
+      "nav:nav.section.marketplace": "Boutique de farces",
+      "marketplace:catalog.title": "Boutique de farces",
+      "nav:nav.projects": "Potions en cours",
+      "marketplace:projects.title": "Potions en cours",
+      "marketplace:owned.title": "Mon panier",
+      "nav:nav.support": "Sorcière de garde",
+      "nav:nav.section.support": "Sorcière de garde",
+      "nav:nav.incidents": "Mauvais sorts",
+      "support:incident.title": "Mauvais sorts",
+      "nav:nav.feedback": "Boîte à frissons",
+      "support:feedback.title": "Boîte à frissons",
+      "gamification:value.coins": "Bonbons",
+      "gamification:value.xp": "Frissons"
+    },
+    "en": {
+      "nav:nav.home": "Haunted house",
+      "nav:nav.section.home": "Haunted house",
+      "dashboard:title": "Haunted house",
+      "nav:nav.media": "Spooky cinema",
+      "nav:nav.section.media": "Spooky cinema",
+      "media:home.title": "Spooky cinema",
+      "nav:nav.media_requests": "My scare requests",
+      "nav:nav.media_insights": "Pumpkin count",
+      "media:insights.title": "Pumpkin count",
+      "nav:nav.section.content": "Graveyard",
+      "nav:nav.news": "Witch gossip",
+      "news:title": "Witch gossip",
+      "nav:nav.wiki": "Spellbook",
+      "wiki:title": "Spellbook",
+      "nav:nav.search": "Ghost hunt",
+      "search:title": "Ghost hunt",
+      "nav:nav.calendar": "Spooky nights",
+      "calendar:title": "Spooky nights",
+      "nav:nav.services": "Cauldron",
+      "nav:nav.section.services": "Cauldron",
+      "nav:nav.statistics": "The great count",
+      "statistics:title": "The great count",
+      "nav:nav.community": "The Coven",
+      "nav:nav.section.community": "The Coven",
+      "community:title": "The Coven",
+      "nav:nav.progression": "My costume",
+      "gamification:progression.title": "My costume",
+      "nav:nav.campaigns": "Trick or treat",
+      "campaigns:page.title": "Trick or treat",
+      "nav:nav.marketplace": "Prank shop",
+      "nav:nav.section.marketplace": "Prank shop",
+      "marketplace:catalog.title": "Prank shop",
+      "nav:nav.projects": "Brewing potions",
+      "marketplace:projects.title": "Brewing potions",
+      "marketplace:owned.title": "My basket",
+      "nav:nav.support": "Witch on duty",
+      "nav:nav.section.support": "Witch on duty",
+      "nav:nav.incidents": "Curses",
+      "support:incident.title": "Curses",
+      "nav:nav.feedback": "Scare box",
+      "support:feedback.title": "Scare box",
+      "gamification:value.coins": "Candies",
+      "gamification:value.xp": "Chills"
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "disco",
+  "name": "Disco",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#1a0f1f",
+    "surfaceRaised": "#2a1633",
+    "text": "#fff4e6",
+    "textMuted": "#e0c7d9",
+    "border": "#4a2a57",
+    "accent": "#ffb000",
+    "accentContrast": "#1a0f00",
+    "focus": "#ff7ad1",
+    "accentAlt": "#ff7ad1",
+    "rarity": {
+      "common": "#e0c7d9",
+      "rare": "#5ee7ff",
+      "epic": "#c48bff",
+      "legendary": "#ffd84d"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#352c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#2a2c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#3a2a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#382a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#3a2534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#382736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#32263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#392639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#322938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#2c2a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Poppins, sans-serif",
+    "headingFamily": "Shrikhand, cursive",
+    "headingCase": "none",
+    "headingEffect": "gradient"
+  },
+  "radii": {
+    "sm": 1.0,
+    "md": 1.6
+  },
+  "motion": {
+    "profile": "playful",
+    "celebration": "confetti",
+    "fastMs": 150,
+    "normalMs": 300
+  },
+  "layout": {
+    "nav": {
+      "desktop": "orbit",
+      "tablet": "orbit",
+      "phone": "orbit"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "glass",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "glass"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "disc",
+      "film": "tv",
+      "media": "tv",
+      "compass": "music",
+      "server": "radio",
+      "users": "party",
+      "shop": "gem",
+      "lifebuoy": "mic",
+      "trophy": "crown",
+      "search": "glasses"
+    }
+  },
+  "background": {
+    "fallback": "#1a0f1f",
+    "pattern": "sunburst",
+    "ambient": "disco"
+  },
+  "sounds": {
+    "notification": "asset:disco/notification.wav",
+    "alert": "asset:disco/alert.wav",
+    "success": "asset:disco/success.wav",
+    "reward": "asset:disco/reward.wav",
+    "levelUp": "asset:disco/level-up.wav",
+    "ui": "asset:disco/ui.wav"
+  },
+  "notification": {
+    "style": "glass",
+    "animation": "spiral"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "La piste",
+      "nav:nav.section.home": "La piste",
+      "dashboard:title": "La piste",
+      "nav:nav.media": "Drive-in",
+      "nav:nav.section.media": "Drive-in",
+      "media:home.title": "Drive-in",
+      "nav:nav.media_requests": "Mes demandes au DJ",
+      "nav:nav.media_insights": "Hit-parade",
+      "media:insights.title": "Hit-parade",
+      "nav:nav.section.content": "Juke-box",
+      "nav:nav.news": "Radio disco",
+      "news:title": "Radio disco",
+      "nav:nav.wiki": "Le livret",
+      "wiki:title": "Le livret",
+      "nav:nav.search": "Groove finder",
+      "search:title": "Groove finder",
+      "nav:nav.calendar": "Soirées",
+      "calendar:title": "Soirées",
+      "nav:nav.services": "La régie",
+      "nav:nav.section.services": "La régie",
+      "nav:nav.statistics": "Classements",
+      "statistics:title": "Classements",
+      "nav:nav.community": "Les danseurs",
+      "nav:nav.section.community": "Les danseurs",
+      "community:title": "Les danseurs",
+      "nav:nav.progression": "Mes pas de danse",
+      "gamification:progression.title": "Mes pas de danse",
+      "nav:nav.campaigns": "Soirées à thème",
+      "campaigns:page.title": "Soirées à thème",
+      "nav:nav.marketplace": "Friperie",
+      "nav:nav.section.marketplace": "Friperie",
+      "marketplace:catalog.title": "Friperie",
+      "nav:nav.projects": "Chorégraphies",
+      "marketplace:projects.title": "Chorégraphies",
+      "marketplace:owned.title": "Ma garde-robe",
+      "nav:nav.support": "Le videur sympa",
+      "nav:nav.section.support": "Le videur sympa",
+      "nav:nav.incidents": "Disque rayé",
+      "support:incident.title": "Disque rayé",
+      "nav:nav.feedback": "Dédicace au DJ",
+      "support:feedback.title": "Dédicace au DJ",
+      "gamification:value.coins": "Paillettes",
+      "gamification:value.xp": "Groove"
+    },
+    "en": {
+      "nav:nav.home": "Dance floor",
+      "nav:nav.section.home": "Dance floor",
+      "dashboard:title": "Dance floor",
+      "nav:nav.media": "Drive-in",
+      "nav:nav.section.media": "Drive-in",
+      "media:home.title": "Drive-in",
+      "nav:nav.media_requests": "DJ requests",
+      "nav:nav.media_insights": "Hit parade",
+      "media:insights.title": "Hit parade",
+      "nav:nav.section.content": "Jukebox",
+      "nav:nav.news": "Disco radio",
+      "news:title": "Disco radio",
+      "nav:nav.wiki": "Liner notes",
+      "wiki:title": "Liner notes",
+      "nav:nav.search": "Groove finder",
+      "search:title": "Groove finder",
+      "nav:nav.calendar": "Parties",
+      "calendar:title": "Parties",
+      "nav:nav.services": "Control booth",
+      "nav:nav.section.services": "Control booth",
+      "nav:nav.statistics": "Charts",
+      "statistics:title": "Charts",
+      "nav:nav.community": "Dancers",
+      "nav:nav.section.community": "Dancers",
+      "community:title": "Dancers",
+      "nav:nav.progression": "My moves",
+      "gamification:progression.title": "My moves",
+      "nav:nav.campaigns": "Theme nights",
+      "campaigns:page.title": "Theme nights",
+      "nav:nav.marketplace": "Vintage shop",
+      "nav:nav.section.marketplace": "Vintage shop",
+      "marketplace:catalog.title": "Vintage shop",
+      "nav:nav.projects": "Routines",
+      "marketplace:projects.title": "Routines",
+      "marketplace:owned.title": "My wardrobe",
+      "nav:nav.support": "Friendly bouncer",
+      "nav:nav.section.support": "Friendly bouncer",
+      "nav:nav.incidents": "Scratched record",
+      "support:incident.title": "Scratched record",
+      "nav:nav.feedback": "Shout-out to the DJ",
+      "support:feedback.title": "Shout-out to the DJ",
+      "gamification:value.coins": "Glitter",
+      "gamification:value.xp": "Groove"
+    }
+  }
+}

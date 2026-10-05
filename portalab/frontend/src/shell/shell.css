@@ -1,7 +1,8 @@
 /*
  * Shell frame (spec 004; redesigned by spec 027 US1–US3): tokens only, logical properties (RTL), reflows
  * from 320 px. The arrangement comes from the theme through data attributes on .shell:
- * data-nav (sidebar | rail | topbar | drawer | bottom-bar | orbit), data-header-position (top | bottom),
+ * data-nav (sidebar | rail | topbar | drawer | bottom-bar | orbit | dock | tabs | launcher | terminal),
+ * data-header-position (top | bottom),
  * data-device (phone | tablet | desktop).
  */
 
@@ -17,6 +18,17 @@
 }
 .shell[data-nav="bottom-bar"] {
   --frame-bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="dock"] {
+  --dock-offset: calc(env(safe-area-inset-bottom, 0px) + var(--space-3));
+  --frame-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="dock"][data-header-position="bottom"] {
+  --dock-offset: calc(var(--header-height) + env(safe-area-inset-bottom, 0px) + var(--space-2));
+  --frame-bottom: calc(var(--header-height) + 5.5rem + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="launcher"][data-device="phone"] {
+  --frame-bottom: 4.5rem;
 }
 .shell-body {
   display: flex;
@@ -631,4 +643,410 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* ---------------------------------------------------------------- 027: dock navigation */
+.shell-dock {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: var(--dock-offset);
+  z-index: var(--z-nav);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+.shell-dock > * {
+  pointer-events: auto;
+}
+.shell-dock__bar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  max-inline-size: calc(100vw - 2 * var(--space-3));
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  list-style: none;
+  overflow-x: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: calc(var(--radius-lg) + 0.5rem);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  box-shadow: var(--shadow-3);
+  scrollbar-width: none;
+}
+.shell-dock__item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  min-inline-size: 3.5rem;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+  cursor: pointer;
+  transform-origin: bottom center;
+  transition: transform var(--motion-duration-normal) var(--motion-easing-spring);
+}
+.shell-dock__item-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface-raised) 85%, transparent);
+  box-shadow: var(--shadow-1);
+}
+.shell-dock__item-label {
+  max-inline-size: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-dock__item[data-active] .shell-dock__item-icon,
+.shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+}
+.shell-dock__item[data-active]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.35rem;
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+@media (hover: hover) {
+  .shell-dock__item:hover,
+  .shell-dock__item:focus-visible {
+    transform: translateY(-0.5rem) scale(1.22);
+  }
+  li:has(> .shell-dock__item:hover) + li .shell-dock__item,
+  li:has(+ li > .shell-dock__item:hover) .shell-dock__item {
+    transform: translateY(-0.2rem) scale(1.08);
+  }
+}
+.shell-dock__panel,
+.shell-tabs__panel {
+  inline-size: min(20rem, calc(100vw - 2 * var(--space-4)));
+  max-block-size: 55dvh;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  animation: shell-panel-in var(--motion-duration-normal) var(--motion-easing-out) both;
+}
+.shell-dock__title {
+  margin: 0 0 var(--space-2);
+  font-weight: var(--font-weight-bold);
+}
+@keyframes shell-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.97);
+  }
+}
+.shell[data-device="phone"] .shell-dock__item {
+  min-inline-size: 3rem;
+}
+.shell[data-device="phone"] .shell-dock__item-label {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- 027: book tabs navigation */
+.shell-tabs {
+  position: sticky;
+  inset-block-start: calc(var(--frame-top) + var(--space-6));
+  z-index: var(--z-nav);
+  flex: none;
+  align-self: flex-start;
+  margin-block-start: var(--space-6);
+}
+.shell-tabs__list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-tabs__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 11.5rem;
+  min-block-size: 2.75rem;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start: 0;
+  border-start-end-radius: var(--radius-lg);
+  border-end-end-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface-raised) 90%, var(--color-accent) calc(var(--i, 0) * 2%));
+  color: var(--color-text-muted);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transform: translateX(-1.25rem);
+  transition:
+    transform var(--motion-duration-normal) var(--motion-easing-spring),
+    color var(--motion-duration-fast) var(--motion-easing);
+  box-shadow: var(--shadow-1);
+}
+[dir="rtl"] .shell-tabs__item {
+  transform: translateX(1.25rem);
+}
+.shell-tabs__item:hover,
+.shell-tabs__item:focus-visible,
+.shell-tabs__item[data-active],
+.shell-tabs__item[aria-expanded="true"] {
+  transform: translateX(0);
+  color: var(--color-text);
+}
+.shell-tabs__item[data-active] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-color: var(--color-accent);
+}
+.shell-tabs__item-icon {
+  display: grid;
+  flex: none;
+}
+.shell-tabs__item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-tabs__panel {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(100% + var(--space-2));
+}
+.shell[data-nav="tabs"][data-device="tablet"] .shell-tabs__item {
+  inline-size: 3.5rem;
+  transform: none;
+}
+.shell[data-nav="tabs"][data-device="tablet"] .shell-tabs__item-label {
+  display: none;
+}
+/* phones: the bookmarks become a scrolling strip under the header */
+.shell[data-nav="tabs"][data-device="phone"] .shell-body {
+  flex-direction: column;
+  align-items: stretch;
+}
+.shell[data-nav="tabs"][data-device="phone"] .shell-tabs {
+  inset-block-start: var(--frame-top);
+  margin: 0;
+  padding: var(--space-2) var(--space-3) 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-block-end: 1px solid var(--glass-border);
+}
+.shell[data-nav="tabs"][data-device="phone"] .shell-tabs__list {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shell[data-nav="tabs"][data-device="phone"] .shell-tabs__item {
+  inline-size: auto;
+  transform: none;
+  border: 1px solid var(--color-border);
+  border-block-end: 0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.shell[data-nav="tabs"][data-device="phone"] .shell-tabs__panel {
+  inset-block-start: 100%;
+  inset-inline: var(--space-3);
+}
+
+/* ---------------------------------------------------------------- 027: launcher navigation */
+.shell-launcher__start {
+  position: fixed;
+  inset-inline-start: var(--space-5);
+  inset-block-end: calc(var(--space-5) + var(--frame-bottom));
+  z-index: var(--z-nav);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 3.25rem;
+  padding: var(--space-2) var(--space-5) var(--space-2) var(--space-4);
+  border: 2px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+  border-radius: var(--radius-pill);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  box-shadow: var(--shadow-glow), var(--shadow-3);
+  cursor: pointer;
+}
+.shell-launcher__here {
+  padding-inline-start: var(--space-2);
+  border-inline-start: 1px solid color-mix(in srgb, var(--color-accent-contrast) 35%, transparent);
+  font-weight: var(--font-weight-medium);
+  opacity: 0.85;
+}
+.shell[data-device="phone"] .shell-launcher__start {
+  inset-inline: var(--space-4);
+  inset-block-end: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  justify-content: center;
+}
+.shell[data-header-position="bottom"] .shell-launcher__start {
+  inset-block-end: calc(var(--header-height) + var(--space-4));
+}
+.shell-launcher__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-launcher__tile {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      120% 90% at 0% 0%,
+      color-mix(in srgb, var(--color-accent) 18%, transparent),
+      transparent 60%
+    ),
+    var(--color-surface-raised);
+  animation: shell-tile-in var(--motion-duration-slow) var(--motion-easing-spring) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.shell-launcher__tile[data-active] {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow);
+}
+.shell-launcher__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+}
+.shell-launcher__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 3.25rem;
+  block-size: 3.25rem;
+  border-radius: var(--radius-md);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+}
+.shell-launcher__pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-launcher__pages .shell-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+}
+@keyframes shell-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.96);
+  }
+}
+
+/* ---------------------------------------------------------------- 027: terminal navigation */
+.shell-terminal {
+  position: sticky;
+  inset-block-start: var(--frame-top);
+  z-index: calc(var(--z-header) - 1);
+  padding: var(--space-2) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-family: var(--font-mono, ui-monospace, "Share Tech Mono", monospace);
+  font-size: var(--font-size-sm);
+}
+.shell-terminal__line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+.shell-terminal__line--sub {
+  padding-inline-start: var(--space-4);
+  font-size: var(--font-size-xs);
+}
+.shell-terminal__prompt {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+}
+.shell-terminal__command {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--target-min);
+  padding-inline: 0.25rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.shell-terminal__command::before {
+  content: "./";
+  opacity: 0.5;
+}
+.shell-terminal__command:hover,
+.shell-terminal__command:focus-visible {
+  color: var(--color-text);
+}
+.shell-terminal__command[data-active] {
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
+}
+.shell-terminal__line:not(.shell-terminal__line--sub)::after {
+  content: "";
+  inline-size: 0.55rem;
+  block-size: 1.05em;
+  background: var(--color-accent);
+  animation: shell-caret 1s steps(2, jump-none) infinite;
+}
+@keyframes shell-caret {
+  50% {
+    opacity: 0;
+  }
+}
+[data-motion="none"] .shell-terminal__line::after,
+[data-motion="none"] .shell-launcher__tile,
+[data-motion="none"] .shell-dock__panel,
+[data-motion="none"] .shell-tabs__panel {
+  animation: none;
+}
+[data-motion="none"] .shell-dock__item,
+[data-motion="none"] .shell-tabs__item {
+  transition: none;
 }

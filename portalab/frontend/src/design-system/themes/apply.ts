@@ -1,6 +1,13 @@
 import { themeKeyFor } from "../a11y/contrast";
 import { reducedMotionActive, systemPrefersReducedMotion } from "../a11y/motion";
-import type { UiPolicy, UiPreferences } from "../a11y/preferences";
+import type {
+  Ambient,
+  CelebrationKey,
+  NotificationAnimation,
+  NotificationStyle,
+  UiPolicy,
+  UiPreferences,
+} from "../a11y/preferences";
 import { effectiveTextScale } from "../a11y/textScale";
 import { BUILTIN_THEMES, builtinTheme, DEFAULT_THEME_KEY } from "./builtin";
 import { floorReport } from "./floor";
@@ -62,7 +69,13 @@ export function resolve(
   preferences: UiPreferences,
   policy: UiPolicy,
   available: readonly ThemeDefinition[],
-  options: { overlay?: CampaignOverlay | null; systemReducedMotion?: boolean; systemDark?: boolean } = {},
+  options: {
+    overlay?: CampaignOverlay | null;
+    systemReducedMotion?: boolean;
+    systemDark?: boolean;
+    /** 027: a theme tried on in the shop — shown even if not owned yet. */
+    trial?: ThemeDefinition | null;
+  } = {},
 ): Effective {
   const pool = available.length ? available : BUILTIN_THEMES;
   const allowed = (theme: ThemeDefinition) =>
@@ -79,6 +92,7 @@ export function resolve(
   const requested = preferences.theme;
   const chosen = usable(themeKeyFor(preferences, requested ?? policy.defaultTheme));
   const theme =
+    options.trial ??
     chosen ??
     usable(policy.defaultTheme) ??
     pool.find((t) => policy.allowedThemes.includes(t.key)) ?? // the first allowed theme (027)
@@ -109,6 +123,42 @@ export function resolve(
   };
 }
 
+/** 027: the member's choices resolved against the theme's defaults (``theme`` follows the theme). */
+export interface ResolvedLooks {
+  notificationStyle: NotificationStyle;
+  notificationAnimation: NotificationAnimation;
+  ambient: Ambient;
+  celebration: CelebrationKey;
+}
+
+export function resolveLooks(effective: Effective, preferences: UiPreferences): ResolvedLooks {
+  const theme = effective.theme;
+  const presentation = presentationOf(theme);
+  const ambient =
+    preferences.ambient === "theme" ? (theme.background?.ambient ?? "none") : preferences.ambient;
+  return {
+    notificationStyle:
+      preferences.notificationStyle === "theme"
+        ? (theme.notification?.style ?? "toast")
+        : preferences.notificationStyle,
+    notificationAnimation:
+      preferences.notificationAnimation === "theme"
+        ? (theme.notification?.animation ?? "slide")
+        : preferences.notificationAnimation,
+    ambient: effective.reducedMotion || preferences.contrast === "high" ? "none" : ambient,
+    celebration: effective.reducedMotion
+      ? "none"
+      : preferences.celebration === "theme"
+        ? presentation.celebration
+        : preferences.celebration,
+  };
+}
+
+function setOrRemove(root: HTMLElement, name: string, value: string | undefined): void {
+  if (value) root.style.setProperty(name, value);
+  else root.style.removeProperty(name);
+}
+
 export function applyToDocument(
   effective: Effective,
   preferences: UiPreferences,
@@ -136,11 +186,15 @@ export function applyToDocument(
     root.style.setProperty(`--state-${state}-fg`, theme.states[state].fg);
     root.style.setProperty(`--state-${state}-bg`, theme.states[state].bg);
   }
-  if (theme.typography?.fontFamily) root.style.setProperty("--font-sans", theme.typography.fontFamily);
-  if (theme.radii) {
-    root.style.setProperty("--radius-sm", `${theme.radii.sm}rem`);
-    root.style.setProperty("--radius-md", `${theme.radii.md}rem`);
-  }
+  // fonts: a theme's text and heading faces (027) — removed again when the next theme has none
+  setOrRemove(root, "--font-sans", theme.typography?.fontFamily);
+  setOrRemove(root, "--font-display", theme.typography?.headingFamily ?? theme.typography?.fontFamily);
+  root.dataset.headingCase = theme.typography?.headingCase ?? "none";
+  root.dataset.headingEffect =
+    preferences.contrast === "high" ? "none" : (theme.typography?.headingEffect ?? "none");
+  setOrRemove(root, "--radius-sm", theme.radii ? `${theme.radii.sm}rem` : undefined);
+  setOrRemove(root, "--radius-md", theme.radii ? `${theme.radii.md}rem` : undefined);
+  root.dataset.backdrop = preferences.contrast === "high" ? "none" : (theme.background?.pattern ?? "none");
   const presentation = presentationOf(theme);
   const motion = effective.reducedMotion ? { fastMs: 0, normalMs: 0 } : presentation;
   root.style.setProperty("--motion-duration-fast", `${motion.fastMs}ms`);
@@ -156,7 +210,9 @@ export function applyToDocument(
   root.dataset.corners = presentation.corners;
   root.dataset.widgetFrame = presentation.widgetFrame;
   root.dataset.motion = effective.reducedMotion ? "none" : presentation.motion;
-  root.dataset.celebration = effective.reducedMotion ? "none" : presentation.celebration;
+  const looks = resolveLooks(effective, preferences);
+  root.dataset.celebration = looks.celebration;
+  root.dataset.ambient = looks.ambient;
   root.style.setProperty("--text-scale", String(effective.textScale));
   root.dataset.theme = theme.key;
   root.dataset.palette = palette ? preferences.palette : "theme";

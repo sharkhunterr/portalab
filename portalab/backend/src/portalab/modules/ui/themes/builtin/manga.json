@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "manga",
+  "name": "Manga",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f8f6f2",
+    "surfaceRaised": "#ffffff",
+    "text": "#141414",
+    "textMuted": "#555555",
+    "border": "#2a2a2a",
+    "accent": "#c81d34",
+    "accentContrast": "#ffffff",
+    "focus": "#1d3557",
+    "accentAlt": "#1d3557",
+    "rarity": {
+      "common": "#555555",
+      "rare": "#1d4ed8",
+      "epic": "#9d4edd",
+      "legendary": "#c2410c"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#334155",
+      "bg": "#e4e4e2",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#166534",
+      "bg": "#e1e8df",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#92400e",
+      "bg": "#eee4db",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#854d0e",
+      "bg": "#ede5db",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#b91c1c",
+      "bg": "#f2e0dd",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#9f1239",
+      "bg": "#efdfe0",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#5b21b6",
+      "bg": "#e8e1ec",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#9d174d",
+      "bg": "#efe0e2",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#475569",
+      "bg": "#e6e6e4",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#075985",
+      "bg": "#e0e6e7",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"M PLUS Rounded 1c\", sans-serif",
+    "headingFamily": "\"Dela Gothic One\", sans-serif",
+    "headingCase": "none",
+    "headingEffect": "shadow"
+  },
+  "radii": {
+    "sm": 0.2,
+    "md": 0.4
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "petals",
+    "fastMs": 130,
+    "normalMs": 240
+  },
+  "layout": {
+    "nav": {
+      "desktop": "tabs",
+      "tablet": "tabs",
+      "phone": "tabs"
+    },
+    "header": "full",
+    "headerPosition": "top",
+    "cards": "paper",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "home",
+      "film": "tv",
+      "media": "tv",
+      "compass": "flower",
+      "server": "puzzle",
+      "users": "smile",
+      "shop": "store",
+      "lifebuoy": "heart",
+      "trophy": "sword",
+      "search": "eye"
+    }
+  },
+  "background": {
+    "fallback": "#f8f6f2",
+    "pattern": "speedlines",
+    "ambient": "petals"
+  },
+  "sounds": {
+    "notification": "asset:toon/notification.wav",
+    "alert": "asset:toon/alert.wav",
+    "success": "asset:toon/success.wav",
+    "reward": "asset:toon/reward.wav",
+    "levelUp": "asset:toon/level-up.wav",
+    "ui": "asset:toon/ui.wav"
+  },
+  "notification": {
+    "style": "comic",
+    "animation": "pop"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Mon dojo",
+      "nav:nav.section.home": "Mon dojo",
+      "dashboard:title": "Mon dojo",
+      "nav:nav.media": "Salle de visionnage",
+      "nav:nav.section.media": "Salle de visionnage",
+      "media:home.title": "Salle de visionnage",
+      "nav:nav.media_requests": "Ma wishlist",
+      "nav:nav.media_insights": "Mes stats de fan",
+      "media:insights.title": "Mes stats de fan",
+      "nav:nav.section.content": "Le konbini",
+      "nav:nav.news": "Shōnen hebdo",
+      "news:title": "Shōnen hebdo",
+      "nav:nav.wiki": "Encyclopédie otaku",
+      "wiki:title": "Encyclopédie otaku",
+      "nav:nav.search": "Recherche ninja",
+      "search:title": "Recherche ninja",
+      "nav:nav.calendar": "Planning des sorties",
+      "calendar:title": "Planning des sorties",
+      "nav:nav.services": "Les coulisses",
+      "nav:nav.section.services": "Les coulisses",
+      "nav:nav.statistics": "Statistiques ki",
+      "statistics:title": "Statistiques ki",
+      "nav:nav.community": "Le club",
+      "nav:nav.section.community": "Le club",
+      "community:title": "Le club",
+      "nav:nav.progression": "Mon arc",
+      "gamification:progression.title": "Mon arc",
+      "nav:nav.campaigns": "Arcs spéciaux",
+      "campaigns:page.title": "Arcs spéciaux",
+      "nav:nav.marketplace": "Boutique goodies",
+      "nav:nav.section.marketplace": "Boutique goodies",
+      "marketplace:catalog.title": "Boutique goodies",
+      "nav:nav.projects": "Doujin du club",
+      "marketplace:projects.title": "Doujin du club",
+      "marketplace:owned.title": "Mon étagère",
+      "nav:nav.support": "Senpai à l'aide",
+      "nav:nav.section.support": "Senpai à l'aide",
+      "nav:nav.incidents": "Rebondissements",
+      "support:incident.title": "Rebondissements",
+      "nav:nav.feedback": "Boîte à idées",
+      "support:feedback.title": "Boîte à idées",
+      "gamification:value.coins": "Yens",
+      "gamification:value.xp": "Ki"
+    },
+    "en": {
+      "nav:nav.home": "My dojo",
+      "nav:nav.section.home": "My dojo",
+      "dashboard:title": "My dojo",
+      "nav:nav.media": "Screening room",
+      "nav:nav.section.media": "Screening room",
+      "media:home.title": "Screening room",
+      "nav:nav.media_requests": "My wishlist",
+      "nav:nav.media_insights": "Fan stats",
+      "media:insights.title": "Fan stats",
+      "nav:nav.section.content": "The konbini",
+      "nav:nav.news": "Weekly shōnen",
+      "news:title": "Weekly shōnen",
+      "nav:nav.wiki": "Otaku wiki",
+      "wiki:title": "Otaku wiki",
+      "nav:nav.search": "Ninja search",
+      "search:title": "Ninja search",
+      "nav:nav.calendar": "Release schedule",
+      "calendar:title": "Release schedule",
+      "nav:nav.services": "Backstage",
+      "nav:nav.section.services": "Backstage",
+      "nav:nav.statistics": "Ki statistics",
+      "statistics:title": "Ki statistics",
+      "nav:nav.community": "The club",
+      "nav:nav.section.community": "The club",
+      "community:title": "The club",
+      "nav:nav.progression": "My arc",
+      "gamification:progression.title": "My arc",
+      "nav:nav.campaigns": "Special arcs",
+      "campaigns:page.title": "Special arcs",
+      "nav:nav.marketplace": "Goods shop",
+      "nav:nav.section.marketplace": "Goods shop",
+      "marketplace:catalog.title": "Goods shop",
+      "nav:nav.projects": "Club doujin",
+      "marketplace:projects.title": "Club doujin",
+      "marketplace:owned.title": "My shelf",
+      "nav:nav.support": "Senpai help",
+      "nav:nav.section.support": "Senpai help",
+      "nav:nav.incidents": "Plot twists",
+      "support:incident.title": "Plot twists",
+      "nav:nav.feedback": "Suggestion box",
+      "support:feedback.title": "Suggestion box",
+      "gamification:value.coins": "Yen",
+      "gamification:value.xp": "Ki"
+    }
+  }
+}

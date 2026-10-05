@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "christmas",
+  "name": "Noël",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0e1a14",
+    "surfaceRaised": "#16261e",
+    "text": "#fdf6ec",
+    "textMuted": "#c9d6c8",
+    "border": "#2c4a3a",
+    "accent": "#ff5a5a",
+    "accentContrast": "#1a0505",
+    "focus": "#ffd166",
+    "accentAlt": "#f6c344",
+    "rarity": {
+      "common": "#c9d6c8",
+      "rare": "#7fd3ff",
+      "epic": "#d4a5ff",
+      "legendary": "#ffd166"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2a3532",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#20362a",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#303325",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2e3422",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#302f2a",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2e302d",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#283035",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#2f2f2f",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#27332f",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#223434",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, sans-serif",
+    "headingFamily": "\"Mountains of Christmas\", cursive",
+    "headingCase": "none",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.6,
+    "md": 1.0
+  },
+  "motion": {
+    "profile": "playful",
+    "celebration": "snow",
+    "fastMs": 160,
+    "normalMs": 320
+  },
+  "layout": {
+    "nav": {
+      "desktop": "launcher",
+      "tablet": "launcher",
+      "phone": "launcher"
+    },
+    "header": "full",
+    "headerPosition": "top",
+    "cards": "paper",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "tree",
+      "film": "tv",
+      "media": "tv",
+      "compass": "snowflake",
+      "server": "hammer",
+      "users": "smile",
+      "shop": "gift",
+      "lifebuoy": "bell-ring",
+      "trophy": "star",
+      "search": "eye"
+    }
+  },
+  "background": {
+    "fallback": "#0e1a14",
+    "pattern": "plaid",
+    "ambient": "snow"
+  },
+  "sounds": {
+    "notification": "asset:magic/notification.wav",
+    "alert": "asset:magic/alert.wav",
+    "success": "asset:magic/success.wav",
+    "reward": "asset:magic/reward.wav",
+    "levelUp": "asset:magic/level-up.wav",
+    "ui": "asset:magic/ui.wav"
+  },
+  "notification": {
+    "style": "paper",
+    "animation": "drop"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le coin du feu",
+      "nav:nav.section.home": "Le coin du feu",
+      "dashboard:title": "Le coin du feu",
+      "nav:nav.media": "Veillée",
+      "nav:nav.section.media": "Veillée",
+      "media:home.title": "Veillée",
+      "nav:nav.media_requests": "Ma lettre au Père Noël",
+      "nav:nav.media_insights": "Le bilan de l'année",
+      "media:insights.title": "Le bilan de l'année",
+      "nav:nav.section.content": "Le marché de Noël",
+      "nav:nav.news": "La gazette du Pôle",
+      "news:title": "La gazette du Pôle",
+      "nav:nav.wiki": "Le livre des lutins",
+      "wiki:title": "Le livre des lutins",
+      "nav:nav.search": "Chasse aux cadeaux",
+      "search:title": "Chasse aux cadeaux",
+      "nav:nav.calendar": "Calendrier de l'Avent",
+      "calendar:title": "Calendrier de l'Avent",
+      "nav:nav.services": "L'atelier des lutins",
+      "nav:nav.section.services": "L'atelier des lutins",
+      "nav:nav.statistics": "La liste des sages",
+      "statistics:title": "La liste des sages",
+      "nav:nav.community": "Le village",
+      "nav:nav.section.community": "Le village",
+      "community:title": "Le village",
+      "nav:nav.progression": "Ma hotte",
+      "gamification:progression.title": "Ma hotte",
+      "nav:nav.campaigns": "Festivités",
+      "campaigns:page.title": "Festivités",
+      "nav:nav.marketplace": "La boutique des lutins",
+      "nav:nav.section.marketplace": "La boutique des lutins",
+      "marketplace:catalog.title": "La boutique des lutins",
+      "nav:nav.projects": "Cadeaux en préparation",
+      "marketplace:projects.title": "Cadeaux en préparation",
+      "marketplace:owned.title": "Sous le sapin",
+      "nav:nav.support": "Le traîneau de secours",
+      "nav:nav.section.support": "Le traîneau de secours",
+      "nav:nav.incidents": "Tempêtes de neige",
+      "support:incident.title": "Tempêtes de neige",
+      "nav:nav.feedback": "Lettre au Pôle Nord",
+      "support:feedback.title": "Lettre au Pôle Nord",
+      "gamification:value.coins": "Sucres d'orge",
+      "gamification:value.xp": "Joie"
+    },
+    "en": {
+      "nav:nav.home": "By the fireplace",
+      "nav:nav.section.home": "By the fireplace",
+      "dashboard:title": "By the fireplace",
+      "nav:nav.media": "Movie night",
+      "nav:nav.section.media": "Movie night",
+      "media:home.title": "Movie night",
+      "nav:nav.media_requests": "My letter to Santa",
+      "nav:nav.media_insights": "Year in review",
+      "media:insights.title": "Year in review",
+      "nav:nav.section.content": "Christmas market",
+      "nav:nav.news": "North Pole news",
+      "news:title": "North Pole news",
+      "nav:nav.wiki": "Elf handbook",
+      "wiki:title": "Elf handbook",
+      "nav:nav.search": "Gift hunt",
+      "search:title": "Gift hunt",
+      "nav:nav.calendar": "Advent calendar",
+      "calendar:title": "Advent calendar",
+      "nav:nav.services": "Elves' workshop",
+      "nav:nav.section.services": "Elves' workshop",
+      "nav:nav.statistics": "Nice list",
+      "statistics:title": "Nice list",
+      "nav:nav.community": "The village",
+      "nav:nav.section.community": "The village",
+      "community:title": "The village",
+      "nav:nav.progression": "My sack",
+      "gamification:progression.title": "My sack",
+      "nav:nav.campaigns": "Festivities",
+      "campaigns:page.title": "Festivities",
+      "nav:nav.marketplace": "Elf shop",
+      "nav:nav.section.marketplace": "Elf shop",
+      "marketplace:catalog.title": "Elf shop",
+      "nav:nav.projects": "Gifts in the making",
+      "marketplace:projects.title": "Gifts in the making",
+      "marketplace:owned.title": "Under the tree",
+      "nav:nav.support": "Rescue sleigh",
+      "nav:nav.section.support": "Rescue sleigh",
+      "nav:nav.incidents": "Blizzards",
+      "support:incident.title": "Blizzards",
+      "nav:nav.feedback": "Letter to the North Pole",
+      "support:feedback.title": "Letter to the North Pole",
+      "gamification:value.coins": "Candy canes",
+      "gamification:value.xp": "Cheer"
+    }
+  }
+}

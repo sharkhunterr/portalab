@@ -8361,7 +8361,7 @@
       "ProfileLookIn": {
         "properties": {
           "slot": {
-            "pattern": "^(banner|frame|backdrop)$",
+            "pattern": "^(banner|frame|backdrop|background|name|title|badges)$",
             "title": "Slot",
             "type": "string"
           },

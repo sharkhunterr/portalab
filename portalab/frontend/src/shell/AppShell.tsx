@@ -9,6 +9,7 @@ import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
+import { DockNav, LauncherNav, TabsNav, TerminalNav } from "./nav/PrincipleNavs";
 import { NavContent } from "./nav/SectionNav";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
@@ -20,7 +21,8 @@ import { useShellStrings } from "./strings";
 /**
  * Persistent shell (spec 004 T017; 027 US1–US3): one environment for every module — the personal header,
  * the section navigation in the arrangement the theme chose for the device (sidebar, rail, top bar,
- * drawer, phone bottom bar, orbit bubble; header on top or as a footer bar), the global status banner,
+ * drawer, phone bottom bar, orbit bubble, dock, book tabs, launcher screen, terminal line; header on top
+ * or as a footer bar), the global status banner,
  * breadcrumbs and the page outlet. Only the outlet changes on navigation, and a change of arrangement
  * never remounts it: the page keeps its state. Unknown to anonymous visitors (CD-025).
  */
@@ -125,7 +127,9 @@ export function AppShell({
             <NavContent variant="bar" />
           </nav>
         ) : null}
+        {nav === "terminal" ? <TerminalNav sections={sections} /> : null}
         <div className="shell-body">
+          {nav === "tabs" ? <TabsNav sections={sections} /> : null}
           {nav === "sidebar" || nav === "rail" ? (
             <nav aria-label={shellStrings.mainNav} className="shell-side" data-variant={nav}>
               <NavContent variant={nav === "rail" ? "rail" : "list"} />
@@ -134,7 +138,7 @@ export function AppShell({
           <main id="main-content" tabIndex={-1} className="shell-main ds-reflow">
             <div className="shell-content">
               <Breadcrumbs />
-              <HubTabs />
+              {nav === "terminal" ? null : <HubTabs />}
               <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
               <RelatedLinks />
             </div>
@@ -144,6 +148,8 @@ export function AppShell({
           <BottomBar unread={header.unread} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         ) : null}
         {nav === "orbit" ? <OrbitNav sections={sections} /> : null}
+        {nav === "dock" ? <DockNav sections={sections} /> : null}
+        {nav === "launcher" ? <LauncherNav sections={sections} /> : null}
         {drawerNav ? (
           <Drawer
             title={shellStrings.mainNav}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AMBIENTS, NOTIFICATION_ANIMATIONS, NOTIFICATION_STYLES } from "../a11y/preferences";
 import { isColor } from "./contrast";
 
 /**
@@ -49,17 +50,86 @@ export const COLOR_PICKER_FALLBACK = "#000000";
  * implements — including ones that change the arrangement principle (header as a footer bar, an orbit
  * bubble instead of a menu) — and never ships structure or code of its own.
  */
-export const NAV_DESKTOP = ["sidebar", "topbar", "rail", "orbit"] as const;
-export const NAV_TABLET = ["rail", "topbar", "drawer", "orbit"] as const;
-export const NAV_PHONE = ["bottom-bar", "drawer", "orbit"] as const;
+export const NAV_DESKTOP = [
+  "sidebar",
+  "topbar",
+  "rail",
+  "orbit",
+  "dock",
+  "tabs",
+  "launcher",
+  "terminal",
+] as const;
+export const NAV_TABLET = [
+  "rail",
+  "topbar",
+  "drawer",
+  "orbit",
+  "dock",
+  "tabs",
+  "launcher",
+  "terminal",
+] as const;
+export const NAV_PHONE = ["bottom-bar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal"] as const;
 export const HEADER_STYLES = ["full", "compact", "centered"] as const;
 export const HEADER_POSITIONS = ["top", "bottom"] as const;
-export const CARD_STYLES = ["elevated", "flat", "outlined", "glass"] as const;
+export const CARD_STYLES = [
+  "elevated",
+  "flat",
+  "outlined",
+  "glass",
+  "comic",
+  "neon",
+  "paper",
+  "pixel",
+  "terminal",
+  "ornate",
+  "hologram",
+] as const;
 export const CONTENT_WIDTHS = ["narrow", "wide", "full"] as const;
 export const CORNER_STYLES = ["square", "soft", "round"] as const;
 export const WIDGET_FRAMES = ["card", "plain", "glass"] as const;
 export const MOTION_PROFILES = ["none", "subtle", "lively", "playful"] as const;
-export const CELEBRATIONS = ["none", "sparkle", "confetti", "glow"] as const;
+export const CELEBRATIONS = [
+  "none",
+  "sparkle",
+  "confetti",
+  "glow",
+  "snow",
+  "bats",
+  "pixels",
+  "hearts",
+  "stars",
+  "coins",
+  "lightning",
+  "petals",
+  "bubbles",
+] as const;
+/** 027: what a theme draws behind the portal — a static pattern and an animated ambient layer. */
+export const BACKDROP_PATTERNS = [
+  "none",
+  "stars",
+  "grid",
+  "scanlines",
+  "halftone",
+  "dots",
+  "parchment",
+  "dunes",
+  "circuit",
+  "hexagons",
+  "stripes",
+  "sunburst",
+  "checker",
+  "noise",
+  "waves",
+  "plaid",
+  "webs",
+  "speedlines",
+  "rays",
+  "marble",
+] as const;
+export const HEADING_CASES = ["none", "uppercase", "smallcaps"] as const;
+export const HEADING_EFFECTS = ["none", "glow", "gradient", "shadow", "outline", "neon", "emboss"] as const;
 export const SOUND_EVENTS = ["notification", "alert", "success", "reward", "levelUp", "ui"] as const;
 export const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 
@@ -70,6 +140,18 @@ const rasterDataUri = z
   .max(200_000)
   .regex(/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/, "only raster data URIs are allowed");
 const labelKey = z.string().regex(/^[a-z][a-zA-Z0-9_.-]{0,127}$/);
+const iconName = z.string().regex(/^[a-z][a-z0-9-]{0,31}$/);
+/** 027: a theme's own words for the portal (navigation, page titles, currency) — plain text, no markup. */
+const vocabulary = z
+  .record(
+    z.string().regex(/^[a-z][a-z0-9_-]*:[a-zA-Z0-9_.-]{1,120}$/),
+    z
+      .string()
+      .min(1)
+      .max(60)
+      .regex(/^[^{}<>]+$/, "plain text only"),
+  )
+  .refine((value) => Object.keys(value).length <= 120, { message: "at most 120 terms" });
 const fontFamily = z
   .string()
   .max(200)
@@ -137,6 +219,10 @@ export const themeDefinitionSchema = z.strictObject({
   typography: z
     .strictObject({
       fontFamily: fontFamily.optional(),
+      /** 027: titles and headings — a display font, its case and effect. */
+      headingFamily: fontFamily.optional(),
+      headingCase: z.enum(HEADING_CASES).optional(),
+      headingEffect: z.enum(HEADING_EFFECTS).optional(),
       scale: z
         .strictObject({
           sm: z.number().min(0.75).max(1.25),
@@ -157,16 +243,35 @@ export const themeDefinitionSchema = z.strictObject({
     })
     .optional(),
   layout: layoutSchema.optional(),
-  icons: z.strictObject({ set: z.enum(["default", "outline"]) }).optional(),
+  icons: z
+    .strictObject({
+      set: z.enum(["default", "outline"]),
+      /** 027: the theme's own icons (``home`` → ``castle``), among the portal's icons. */
+      overrides: z
+        .record(iconName, iconName)
+        .refine((value) => Object.keys(value).length <= 60, { message: "at most 60 icons" })
+        .optional(),
+    })
+    .optional(),
   background: z
-    .strictObject({ image: z.union([asset, rasterDataUri]).optional(), fallback: color })
+    .strictObject({
+      image: z.union([asset, rasterDataUri]).optional(),
+      fallback: color,
+      pattern: z.enum(BACKDROP_PATTERNS).optional(),
+      ambient: z.enum(AMBIENTS).optional(),
+    })
+    .optional(),
+  vocabulary: z
+    .record(z.string().regex(/^[a-z]{2,3}$/), vocabulary)
+    .refine((value) => Object.keys(value).length <= 12, { message: "at most 12 languages" })
     .optional(),
   sounds: z.partialRecord(z.enum(SOUND_EVENTS), asset).optional(),
   notification: z
     .strictObject({
       position: z.enum(["top-end", "top-start", "bottom-end", "bottom-start"]).optional(),
       durationSeconds: z.number().int().min(2).max(60).optional(),
-      style: z.enum(["toast", "banner"]).optional(),
+      style: z.enum(NOTIFICATION_STYLES).optional(),
+      animation: z.enum(NOTIFICATION_ANIMATIONS).optional(),
     })
     .optional(),
 });

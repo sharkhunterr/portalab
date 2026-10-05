@@ -166,10 +166,97 @@ class Scale(_Closed):
     xl: Annotated[float, Field(le=3.5)]
 
 
+FontFamily = Annotated[str, StringConstraints(max_length=200, pattern=r"^[A-Za-z0-9 ,\"'-]+$")]
+IconName = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9-]{0,31}$")]
+VocabularyKey = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_-]*:[a-zA-Z0-9_.-]{1,120}$")]
+VocabularyText = Annotated[str, StringConstraints(min_length=1, max_length=60, pattern=r"^[^{}<>]+$")]
+Language = Annotated[str, StringConstraints(pattern=r"^[a-z]{2,3}$")]
+
+NOTIFICATION_STYLES = Literal[
+    "toast",
+    "banner",
+    "pill",
+    "minimal",
+    "glass",
+    "neon",
+    "comic",
+    "terminal",
+    "parchment",
+    "hologram",
+    "pixel",
+    "paper",
+]
+NOTIFICATION_ANIMATIONS = Literal[
+    "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam"
+]
+AMBIENTS = Literal[
+    "none",
+    "snow",
+    "embers",
+    "code-rain",
+    "fireflies",
+    "starfield",
+    "warp",
+    "petals",
+    "bats",
+    "bubbles",
+    "rain",
+    "sparkles",
+    "disco",
+    "fog",
+    "sand",
+    "leaves",
+    "hearts",
+    "glitch",
+    "lights",
+    "spores",
+    "aurora",
+]
+CELEBRATIONS = Literal[
+    "none",
+    "sparkle",
+    "confetti",
+    "glow",
+    "snow",
+    "bats",
+    "pixels",
+    "hearts",
+    "stars",
+    "coins",
+    "lightning",
+    "petals",
+    "bubbles",
+]
+PATTERNS = Literal[
+    "none",
+    "stars",
+    "grid",
+    "scanlines",
+    "halftone",
+    "dots",
+    "parchment",
+    "dunes",
+    "circuit",
+    "hexagons",
+    "stripes",
+    "sunburst",
+    "checker",
+    "noise",
+    "waves",
+    "plaid",
+    "webs",
+    "speedlines",
+    "rays",
+    "marble",
+]
+
+
 class Typography(_Closed):
-    fontFamily: Annotated[str, StringConstraints(max_length=200, pattern=r"^[A-Za-z0-9 ,\"'-]+$")] | None = (
-        None
-    )
+    fontFamily: FontFamily | None = None
+    # 027: titles and headings — a display font, its case and effect
+    headingFamily: FontFamily | None = None
+    headingCase: Literal["none", "uppercase", "smallcaps"] | None = None
+    headingEffect: Literal["none", "glow", "gradient", "shadow", "outline", "neon", "emboss"] | None = None
     scale: Scale | None = None
 
 
@@ -182,13 +269,16 @@ class Motion(_Closed):
     fastMs: Annotated[int, Field(ge=0, le=1000)] | None = None
     normalMs: Annotated[int, Field(ge=0, le=2000)] | None = None
     profile: Literal["none", "subtle", "lively", "playful"] | None = None
-    celebration: Literal["none", "sparkle", "confetti", "glow"] | None = None
+    celebration: CELEBRATIONS | None = None
 
 
 class Nav(_Closed):
-    desktop: Literal["sidebar", "topbar", "rail", "orbit"] | None = None
-    tablet: Literal["rail", "topbar", "drawer", "orbit"] | None = None
-    phone: Literal["bottom-bar", "drawer", "orbit"] | None = None
+    # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line
+    desktop: Literal["sidebar", "topbar", "rail", "orbit", "dock", "tabs", "launcher", "terminal"] | None = (
+        None
+    )
+    tablet: Literal["rail", "topbar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal"] | None = None
+    phone: Literal["bottom-bar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal"] | None = None
 
 
 class Layout(_Closed):
@@ -197,7 +287,22 @@ class Layout(_Closed):
     nav: Nav | None = None
     header: Literal["full", "compact", "centered"] | None = None
     headerPosition: Literal["top", "bottom"] | None = None
-    cards: Literal["elevated", "flat", "outlined", "glass"] | None = None
+    cards: (
+        Literal[
+            "elevated",
+            "flat",
+            "outlined",
+            "glass",
+            "comic",
+            "neon",
+            "paper",
+            "pixel",
+            "terminal",
+            "ornate",
+            "hologram",
+        ]
+        | None
+    ) = None
     content: Literal["narrow", "wide", "full"] | None = None
     corners: Literal["square", "soft", "round"] | None = None
     widgetFrame: Literal["card", "plain", "glass"] | None = None
@@ -205,11 +310,14 @@ class Layout(_Closed):
 
 class Icons(_Closed):
     set: Literal["default", "outline"]
+    overrides: dict[IconName, IconName] | None = Field(default=None, max_length=60)  # 027: home → castle
 
 
 class Background(_Closed):
     image: Asset | RasterUri | None = None
     fallback: Color
+    pattern: PATTERNS | None = None  # 027: a static pattern behind the portal
+    ambient: AMBIENTS | None = None  # 027: an animated layer (snow, code rain…), off with reduced motion
 
     _colors = field_validator("fallback")(_check_color)
 
@@ -226,7 +334,8 @@ class Sounds(_Closed):
 class NotificationAppearance(_Closed):
     position: Literal["top-end", "top-start", "bottom-end", "bottom-start"] | None = None
     durationSeconds: Annotated[int, Field(ge=2, le=60)] | None = None
-    style: Literal["toast", "banner"] | None = None
+    style: NOTIFICATION_STYLES | None = None
+    animation: NOTIFICATION_ANIMATIONS | None = None
 
 
 class ThemeDefinition(_Closed):
@@ -245,6 +354,17 @@ class ThemeDefinition(_Closed):
     background: Background | None = None
     sounds: Sounds | None = None
     notification: NotificationAppearance | None = None
+    # 027: the theme's own words for the portal (navigation, page titles, currency), per language
+    vocabulary: dict[Language, dict[VocabularyKey, VocabularyText]] | None = Field(
+        default=None, max_length=12
+    )
+
+    @field_validator("vocabulary")
+    @classmethod
+    def _terms(cls, value: dict[str, dict[str, str]] | None) -> dict[str, dict[str, str]] | None:
+        if value is not None and any(len(terms) > 120 for terms in value.values()):
+            raise ValueError("at most 120 terms per language")
+        return value
 
 
 SCHEMA_VERSION = 2

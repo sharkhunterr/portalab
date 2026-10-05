@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "galaxy",
+  "name": "Space Opera",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#070a14",
+    "surfaceRaised": "#111829",
+    "text": "#e8eefc",
+    "textMuted": "#a7b4cf",
+    "border": "#26324d",
+    "accent": "#4cc9f0",
+    "accentContrast": "#04121c",
+    "focus": "#8be0ff",
+    "accentAlt": "#ff6b6b",
+    "rarity": {
+      "common": "#9fb0cc",
+      "rare": "#4cc9f0",
+      "epic": "#b388ff",
+      "legendary": "#ffd166"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#242832",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#1a282a",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2a2625",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#282622",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#2a212a",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#28222d",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#222235",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#29222f",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#21252f",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#1c2634",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Exo 2\", sans-serif",
+    "headingFamily": "Orbitron, sans-serif",
+    "headingCase": "uppercase",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.2,
+    "md": 0.4
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "stars",
+    "fastMs": 140,
+    "normalMs": 280
+  },
+  "layout": {
+    "nav": {
+      "desktop": "dock",
+      "tablet": "dock",
+      "phone": "dock"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "hologram",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "glass"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "rocket",
+      "compass": "telescope",
+      "server": "satellite",
+      "users": "handshake",
+      "shop": "package",
+      "lifebuoy": "bot",
+      "trophy": "medal",
+      "search": "scan",
+      "chart": "orbit",
+      "newspaper": "radio"
+    }
+  },
+  "background": {
+    "fallback": "#070a14",
+    "pattern": "stars",
+    "ambient": "starfield"
+  },
+  "sounds": {
+    "notification": "asset:scifi/notification.wav",
+    "alert": "asset:scifi/alert.wav",
+    "success": "asset:scifi/success.wav",
+    "reward": "asset:scifi/reward.wav",
+    "levelUp": "asset:scifi/level-up.wav",
+    "ui": "asset:scifi/ui.wav"
+  },
+  "notification": {
+    "style": "hologram",
+    "animation": "zoom"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Pont de commandement",
+      "nav:nav.section.home": "Pont de commandement",
+      "dashboard:title": "Pont de commandement",
+      "nav:nav.media": "Holothèque",
+      "nav:nav.section.media": "Holothèque",
+      "media:home.title": "Holothèque",
+      "nav:nav.media_requests": "Transmissions",
+      "nav:nav.media_insights": "Journal de bord",
+      "media:insights.title": "Journal de bord",
+      "nav:nav.section.content": "Exploration",
+      "nav:nav.news": "Holonet",
+      "news:title": "Holonet",
+      "nav:nav.wiki": "Archives galactiques",
+      "wiki:title": "Archives galactiques",
+      "nav:nav.search": "Scanner",
+      "search:title": "Scanner",
+      "nav:nav.calendar": "Calendrier stellaire",
+      "calendar:title": "Calendrier stellaire",
+      "nav:nav.services": "Salle des machines",
+      "nav:nav.section.services": "Salle des machines",
+      "nav:nav.statistics": "Télémétrie",
+      "statistics:title": "Télémétrie",
+      "nav:nav.community": "L'Alliance",
+      "nav:nav.section.community": "L'Alliance",
+      "community:title": "L'Alliance",
+      "nav:nav.progression": "Mon grade",
+      "gamification:progression.title": "Mon grade",
+      "nav:nav.campaigns": "Missions",
+      "campaigns:page.title": "Missions",
+      "nav:nav.marketplace": "Soute cargo",
+      "nav:nav.section.marketplace": "Soute cargo",
+      "marketplace:catalog.title": "Soute cargo",
+      "nav:nav.projects": "Chantiers spatiaux",
+      "marketplace:projects.title": "Chantiers spatiaux",
+      "marketplace:owned.title": "Ma soute",
+      "nav:nav.support": "Droïde médical",
+      "nav:nav.section.support": "Droïde médical",
+      "nav:nav.incidents": "Avaries",
+      "support:incident.title": "Avaries",
+      "nav:nav.feedback": "Message à la flotte",
+      "support:feedback.title": "Message à la flotte",
+      "gamification:value.coins": "Crédits",
+      "gamification:value.xp": "Force"
+    },
+    "en": {
+      "nav:nav.home": "Command bridge",
+      "nav:nav.section.home": "Command bridge",
+      "dashboard:title": "Command bridge",
+      "nav:nav.media": "Holo-archive",
+      "nav:nav.section.media": "Holo-archive",
+      "media:home.title": "Holo-archive",
+      "nav:nav.media_requests": "Transmissions",
+      "nav:nav.media_insights": "Captain's log",
+      "media:insights.title": "Captain's log",
+      "nav:nav.section.content": "Exploration",
+      "nav:nav.news": "Holonet",
+      "news:title": "Holonet",
+      "nav:nav.wiki": "Galactic archives",
+      "wiki:title": "Galactic archives",
+      "nav:nav.search": "Scanner",
+      "search:title": "Scanner",
+      "nav:nav.calendar": "Star calendar",
+      "calendar:title": "Star calendar",
+      "nav:nav.services": "Engine room",
+      "nav:nav.section.services": "Engine room",
+      "nav:nav.statistics": "Telemetry",
+      "statistics:title": "Telemetry",
+      "nav:nav.community": "The Alliance",
+      "nav:nav.section.community": "The Alliance",
+      "community:title": "The Alliance",
+      "nav:nav.progression": "My rank",
+      "gamification:progression.title": "My rank",
+      "nav:nav.campaigns": "Missions",
+      "campaigns:page.title": "Missions",
+      "nav:nav.marketplace": "Cargo bay",
+      "nav:nav.section.marketplace": "Cargo bay",
+      "marketplace:catalog.title": "Cargo bay",
+      "nav:nav.projects": "Shipyards",
+      "marketplace:projects.title": "Shipyards",
+      "marketplace:owned.title": "My hold",
+      "nav:nav.support": "Med droid",
+      "nav:nav.section.support": "Med droid",
+      "nav:nav.incidents": "Damage reports",
+      "support:incident.title": "Damage reports",
+      "nav:nav.feedback": "Fleet message",
+      "support:feedback.title": "Fleet message",
+      "gamification:value.coins": "Credits",
+      "gamification:value.xp": "Force"
+    }
+  }
+}

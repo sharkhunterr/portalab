@@ -11,6 +11,7 @@ import {
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
+import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import "./notification-looks.css";
 
@@ -41,6 +42,7 @@ export function NotificationLooks() {
   const notify = useNotify();
   const { preferences, setPreference } = usePreferences();
   const looks = useLooks();
+  const themeStyle = useTheme().effective.theme.notification?.style ?? "toast";
   const locked = (list: Choice[] | undefined, key: string) =>
     Boolean(list?.find((c) => c.key === key)?.locked);
   const tryIt = () =>
@@ -65,8 +67,8 @@ export function NotificationLooks() {
       <p className="ds-page-header__context">{t("notifications:looks.hint")}</p>
       <fieldset className="looks__styles">
         <legend>{t("notifications:looks.style")}</legend>
-        {NOTIFICATION_STYLES.map((style) => {
-          const isLocked = locked(looks.data?.styles, style);
+        {(["theme", ...NOTIFICATION_STYLES] as const).map((style) => {
+          const isLocked = style !== "theme" && locked(looks.data?.styles, style);
           const current = preferences.notificationStyle === style;
           return (
             <label
@@ -81,9 +83,13 @@ export function NotificationLooks() {
                 value={style}
                 checked={current}
                 disabled={isLocked}
-                onChange={() => setPreference("notificationStyle", style as NotificationStyle)}
+                onChange={() => setPreference("notificationStyle", style as NotificationStyle | "theme")}
               />
-              <span className="looks__preview ds-notifications" data-style={style} aria-hidden="true">
+              <span
+                className="looks__preview ds-notifications"
+                data-style={style === "theme" ? themeStyle : style}
+                aria-hidden="true"
+              >
                 <span className="ds-notification" data-tone="info">
                   <span className="ds-notification__icon">
                     <Icon name="bell" size={14} />
@@ -95,7 +101,9 @@ export function NotificationLooks() {
                 </span>
               </span>
               <span className="looks__name">
-                {t(`notifications:looks.styles.${style}`)}
+                {style === "theme"
+                  ? t("notifications:universe.followTheme")
+                  : t(`notifications:looks.styles.${style}`)}
                 {isLocked ? <Icon name="lock" size={14} /> : null}
               </span>
               {isLocked ? (
@@ -109,8 +117,8 @@ export function NotificationLooks() {
       </fieldset>
       <fieldset className="looks__animations">
         <legend>{t("notifications:looks.animation")}</legend>
-        {NOTIFICATION_ANIMATIONS.map((animation) => {
-          const isLocked = locked(looks.data?.animations, animation);
+        {(["theme", ...NOTIFICATION_ANIMATIONS] as const).map((animation) => {
+          const isLocked = animation !== "theme" && locked(looks.data?.animations, animation);
           const current = preferences.notificationAnimation === animation;
           return (
             <label
@@ -126,12 +134,14 @@ export function NotificationLooks() {
                 checked={current}
                 disabled={isLocked}
                 onChange={() => {
-                  setPreference("notificationAnimation", animation as NotificationAnimation);
+                  setPreference("notificationAnimation", animation as NotificationAnimation | "theme");
                   setTimeout(tryIt, 50); // see it right away
                 }}
               />
               {isLocked ? <Icon name="lock" size={14} /> : <Icon name="sparkles" size={14} />}
-              {t(`notifications:looks.animations.${animation}`)}
+              {animation === "theme"
+                ? t("notifications:universe.followTheme")
+                : t(`notifications:looks.animations.${animation}`)}
             </label>
           );
         })}

@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "neowave",
+  "name": "Neowave",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0d0221",
+    "surfaceRaised": "#1a0b3b",
+    "text": "#fdf0ff",
+    "textMuted": "#c9b3e6",
+    "border": "#3b1f6e",
+    "accent": "#ff71ce",
+    "accentContrast": "#2a0020",
+    "focus": "#01cdfe",
+    "accentAlt": "#01cdfe",
+    "rarity": {
+      "common": "#c9b3e6",
+      "rare": "#01cdfe",
+      "epic": "#c58bff",
+      "legendary": "#fffb96"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#29213d",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#1f2135",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2f1f30",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2d1f2d",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#2f1a35",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2d1b38",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#271b40",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#2e1b3a",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#271e3a",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#211f3f",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Exo 2\", sans-serif",
+    "headingFamily": "Righteous, cursive",
+    "headingCase": "uppercase",
+    "headingEffect": "neon"
+  },
+  "radii": {
+    "sm": 0.3,
+    "md": 0.6
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "stars",
+    "fastMs": 140,
+    "normalMs": 260
+  },
+  "layout": {
+    "nav": {
+      "desktop": "topbar",
+      "tablet": "topbar",
+      "phone": "bottom-bar"
+    },
+    "header": "full",
+    "headerPosition": "bottom",
+    "cards": "neon",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "sunset",
+      "film": "tv",
+      "media": "tv",
+      "compass": "radio",
+      "server": "joystick",
+      "users": "headphones",
+      "shop": "disc",
+      "lifebuoy": "mic",
+      "trophy": "star",
+      "search": "scan"
+    }
+  },
+  "background": {
+    "fallback": "#0d0221",
+    "pattern": "grid",
+    "ambient": "none"
+  },
+  "sounds": {
+    "notification": "asset:chiptune/notification.wav",
+    "alert": "asset:chiptune/alert.wav",
+    "success": "asset:chiptune/success.wav",
+    "reward": "asset:chiptune/reward.wav",
+    "levelUp": "asset:chiptune/level-up.wav",
+    "ui": "asset:chiptune/ui.wav"
+  },
+  "notification": {
+    "style": "neon",
+    "animation": "zoom"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Station",
+      "nav:nav.section.home": "Station",
+      "dashboard:title": "Station",
+      "nav:nav.media": "Vidéoclub",
+      "nav:nav.section.media": "Vidéoclub",
+      "media:home.title": "Vidéoclub",
+      "nav:nav.media_requests": "Mes réservations VHS",
+      "nav:nav.media_insights": "High scores",
+      "media:insights.title": "High scores",
+      "nav:nav.section.content": "Arcade",
+      "nav:nav.news": "Ondes FM",
+      "news:title": "Ondes FM",
+      "nav:nav.wiki": "Manuel d'utilisation",
+      "wiki:title": "Manuel d'utilisation",
+      "nav:nav.search": "Rembobiner",
+      "search:title": "Rembobiner",
+      "nav:nav.calendar": "Programme TV",
+      "calendar:title": "Programme TV",
+      "nav:nav.services": "Le studio",
+      "nav:nav.section.services": "Le studio",
+      "nav:nav.statistics": "Égaliseur",
+      "statistics:title": "Égaliseur",
+      "nav:nav.community": "Le club",
+      "nav:nav.section.community": "Le club",
+      "community:title": "Le club",
+      "nav:nav.progression": "Mon high score",
+      "gamification:progression.title": "Mon high score",
+      "nav:nav.campaigns": "Nuits rétro",
+      "campaigns:page.title": "Nuits rétro",
+      "nav:nav.marketplace": "Disquaire",
+      "nav:nav.section.marketplace": "Disquaire",
+      "marketplace:catalog.title": "Disquaire",
+      "nav:nav.projects": "Démos",
+      "marketplace:projects.title": "Démos",
+      "marketplace:owned.title": "Mes cassettes",
+      "nav:nav.support": "Hotline",
+      "nav:nav.section.support": "Hotline",
+      "nav:nav.incidents": "Parasites",
+      "support:incident.title": "Parasites",
+      "nav:nav.feedback": "Dédicace",
+      "support:feedback.title": "Dédicace",
+      "gamification:value.coins": "Jetons",
+      "gamification:value.xp": "Watts"
+    },
+    "en": {
+      "nav:nav.home": "Station",
+      "nav:nav.section.home": "Station",
+      "dashboard:title": "Station",
+      "nav:nav.media": "Video store",
+      "nav:nav.section.media": "Video store",
+      "media:home.title": "Video store",
+      "nav:nav.media_requests": "My VHS holds",
+      "nav:nav.media_insights": "High scores",
+      "media:insights.title": "High scores",
+      "nav:nav.section.content": "Arcade",
+      "nav:nav.news": "FM waves",
+      "news:title": "FM waves",
+      "nav:nav.wiki": "User manual",
+      "wiki:title": "User manual",
+      "nav:nav.search": "Rewind",
+      "search:title": "Rewind",
+      "nav:nav.calendar": "TV guide",
+      "calendar:title": "TV guide",
+      "nav:nav.services": "The studio",
+      "nav:nav.section.services": "The studio",
+      "nav:nav.statistics": "Equalizer",
+      "statistics:title": "Equalizer",
+      "nav:nav.community": "The club",
+      "nav:nav.section.community": "The club",
+      "community:title": "The club",
+      "nav:nav.progression": "My high score",
+      "gamification:progression.title": "My high score",
+      "nav:nav.campaigns": "Retro nights",
+      "campaigns:page.title": "Retro nights",
+      "nav:nav.marketplace": "Record shop",
+      "nav:nav.section.marketplace": "Record shop",
+      "marketplace:catalog.title": "Record shop",
+      "nav:nav.projects": "Demos",
+      "marketplace:projects.title": "Demos",
+      "marketplace:owned.title": "My tapes",
+      "nav:nav.support": "Hotline",
+      "nav:nav.section.support": "Hotline",
+      "nav:nav.incidents": "Static",
+      "support:incident.title": "Static",
+      "nav:nav.feedback": "Shout-out",
+      "support:feedback.title": "Shout-out",
+      "gamification:value.coins": "Tokens",
+      "gamification:value.xp": "Watts"
+    }
+  }
+}

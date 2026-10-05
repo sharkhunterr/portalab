@@ -1,7 +1,7 @@
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Product, useProduct } from "../api";
-import { ProductSheet, PurchaseBar } from "../product/ProductSheet";
+import { ProductSheet, PurchaseBar, TryOn } from "../product/ProductSheet";
 
 /**
  * A product opened from the shop (027): its sheet — pre-rendering, rarity, type, description, pack
@@ -20,7 +20,12 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
       title={data.name}
       closeLabel={t("marketplace:purchase.close")}
       trigger={<span hidden />}
-      footer={<PurchaseBar product={data} />}
+      footer={
+        <>
+          <TryOn product={data} />
+          <PurchaseBar product={data} />
+        </>
+      }
     >
       <ProductSheet product={data} />
     </Dialog>

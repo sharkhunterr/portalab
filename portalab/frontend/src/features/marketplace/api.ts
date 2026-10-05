@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
+import { IntlContext } from "react-intl";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 
@@ -154,4 +156,12 @@ export function useOwnedActions() {
       onSuccess: refresh,
     }),
   };
+}
+
+/** 027: a product's description in the reader's language (else English, else the first one). */
+export function useDescribe(): (product: Pick<Product, "descriptions">) => string | undefined {
+  const intl = useContext(IntlContext); // absent outside the i18n provider (tests): English
+  const language = intl?.locale.split("-")[0] ?? "en";
+  return (product) =>
+    product.descriptions[language] ?? product.descriptions.en ?? Object.values(product.descriptions)[0];
 }

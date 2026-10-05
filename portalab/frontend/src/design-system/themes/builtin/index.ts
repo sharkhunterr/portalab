@@ -1,11 +1,29 @@
 import type { ThemeDefinition } from "../schema";
+import alien from "./alien.json";
+import cartoon from "./cartoon.json";
+import christmas from "./christmas.json";
+import comic from "./comic.json";
+import cozy from "./cozy.json";
+import cyberpunk from "./cyberpunk.json";
 import dark from "./dark.json";
+import desert from "./desert.json";
+import disco from "./disco.json";
+import futuristic from "./futuristic.json";
+import galaxy from "./galaxy.json";
+import halloween from "./halloween.json";
+import heroes from "./heroes.json";
 import highContrast from "./high-contrast.json";
+import horror from "./horror.json";
 import light from "./light.json";
+import manga from "./manga.json";
+import matrix from "./matrix.json";
+import minimal from "./minimal.json";
+import neowave from "./neowave.json";
 import orbit from "./orbit.json";
 import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
 import studio from "./studio.json";
+import wizard from "./wizard.json";
 
 /** Built-in themes (also seeded by the backend ``ui`` migrations; a test keeps both copies identical). */
 export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
@@ -16,6 +34,25 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   light,
   dark,
   highContrast,
+  // 027: universe themes
+  wizard,
+  galaxy,
+  matrix,
+  desert,
+  horror,
+  halloween,
+  christmas,
+  comic,
+  manga,
+  cartoon,
+  cozy,
+  futuristic,
+  minimal,
+  alien,
+  heroes,
+  neowave,
+  disco,
+  cyberpunk,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

@@ -11,6 +11,7 @@ from sqlalchemy import text
 
 from portalab.capabilities.events import ConsumerContext, Envelope
 from portalab.modules.administration.config.service import Change
+from portalab.modules.ui.settings import BUILTIN_KEYS
 from portalab.modules.ui.themes.service import FloorViolation, ThemeConflict
 from tests.authz_fixtures import SYSTEM_ACTOR, user
 from tests.authz_fixtures import make_admin as make_platform_admin
@@ -27,15 +28,8 @@ def ocean() -> dict[str, object]:
 
 async def test_registry_floor_policy_and_owner(ui: UiHarness) -> None:
     themes = ui.module.themes
-    assert {t["key"] for t in (await themes.catalog())["themes"]} == {
-        "portalab-dark",
-        "portalab-light",
-        "orbit",
-        "studio",
-        "light",
-        "dark",
-        "high-contrast",
-    }
+    # 027: the built-in themes, universe themes included
+    assert {t["key"] for t in (await themes.catalog())["themes"]} == set(BUILTIN_KEYS)
     pale = ocean()
     pale["states"] = {**pale["states"], "error": {"fg": "#2a1a1a", "bg": "#262b35"}}  # type: ignore[dict-item]
     with pytest.raises(FloorViolation) as refused:
@@ -217,3 +211,18 @@ async def test_sold_themes_need_ownership(app: FastAPI, client: httpx.AsyncClien
     assert "dark" in listed
     assert (await client.put("/api/v1/me/preferences", json={"ui.theme": "dark"})).status_code == 200
     assert "dark" in await ui.module.themes.allowed_keys()  # campaigns and activation see every theme
+
+
+async def test_builtin_themes_follow_their_files(ui: UiHarness) -> None:
+    """027: ``portalab migrate`` brings built-in themes in line with the files shipped with the portal."""
+    from sqlalchemy import update
+
+    from portalab.modules.ui.models import Theme
+
+    themes = ui.module.themes
+    async with ui.full.database.unit_of_work() as uow:
+        await uow.session.execute(update(Theme).where(Theme.key == "matrix").values(name="Stale"))
+    assert await themes.sync_builtin(BUILTIN) >= 1
+    row = await themes.get("matrix")
+    assert row.name == "Simulation" and row.version >= 2
+    assert await themes.sync_builtin(BUILTIN) == 0  # nothing left to change

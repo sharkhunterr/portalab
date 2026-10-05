@@ -1,5 +1,7 @@
 import { Link, useParams } from "react-router";
+import type { Ambient } from "../../../design-system/a11y/preferences";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
+import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { useT } from "../../../i18n/hooks/useT";
 import { useMe } from "../../auth/useAuth";
 import { type CommunitySection, useProfile } from "../api";
@@ -51,12 +53,16 @@ export function ProfilePage() {
       </div>
     );
   }
+  const looks = (profile.data.looks ?? {}) as Equipped;
   return (
-    <div className="ds-stack">
+    <div className="ds-stack profile-page" data-background={looks.background ?? undefined}>
+      {looks.background && looks.background !== "none" ? (
+        <AmbientLayer kind={looks.background as Ambient} contained />
+      ) : null}
       <ProfileHero
         memberId={memberId}
         name={profile.data.display_name ?? t("community:feed.someone")}
-        looks={(profile.data.looks ?? {}) as Equipped}
+        looks={looks}
         own={me.data?.id === memberId}
       />
       <div className="community-sections">

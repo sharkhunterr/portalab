@@ -75,8 +75,8 @@ class MarketplaceProductOut(BaseModel):
 PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "theme": ("theme",),
     "widget": ("widget",),
-    "badge": ("label", "icon"),
-    "title": ("label",),
+    "badge": ("label", "icon", "style"),
+    "title": ("label", "style"),
     "effect": ("effect",),
     "quota": ("kind", "units"),
     "notification_style": ("style",),
@@ -86,6 +86,9 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "avatar_frame": ("frame",),
     "profile_backdrop": ("feature",),
     "palette": ("palette",),
+    "ambient": ("ambient",),
+    "profile_background": ("background",),
+    "name_style": ("style",),
 }
 
 
@@ -294,7 +297,7 @@ async def refund(
 
 # --- 027: profile looks (banner, avatar frame, film backdrop) -------------------------------------------
 class ProfileLookIn(BaseModel):
-    slot: str = Field(pattern=r"^(banner|frame|backdrop)$")
+    slot: str = Field(pattern=r"^(banner|frame|backdrop|background|name|title|badges)$")
     value: Any = None
 
 

@@ -2,22 +2,33 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
+import type { Ambient } from "../../../design-system/a11y/preferences";
 import { AdminEmpty, AdminTabs } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { Dialog } from "../../../design-system/components/Overlays";
+import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { useT } from "../../../i18n/hooks/useT";
 import { imageUrl } from "../../media/api";
-import { backdropUrl, type LookChoice, useEquipLook, useProfileLooks } from "./looks";
-import { BannerArt, FramedAvatar } from "./ProfileHero";
+import { backdropUrl, type LookChoice, useEquipLook, useProfileLooks, type WornItem } from "./looks";
+import { BannerArt, FramedAvatar, StyledName, WornBadge } from "./ProfileHero";
 
 /**
  * Profile customisation (027), Steam-like: the banner (free designs, those bought in the shop or in a
- * theme pack), the avatar frame, and — once unlocked in the shop, for every compatible title — the backdrop
- * of a film or a series as the banner. Locked designs show a padlock and lead to the shop.
+ * theme pack), the avatar frame, the backdrop of a film or a series as the banner (unlocked once in the
+ * shop), an animated background, the name's font and effect, a title and a showcase of three badges.
+ * Locked designs show a padlock and lead to the shop.
  */
-type Tab = "banner" | "frame" | "backdrop";
+type Tab = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges";
+type DesignSlot = "banner" | "frame" | "background" | "name";
+const SHOP_TYPE: Record<DesignSlot, string> = {
+  banner: "profile_banner",
+  frame: "avatar_frame",
+  background: "profile_background",
+  name: "name_style",
+};
+const NONE: Partial<Record<DesignSlot, string>> = { frame: "none", background: "none", name: "none" };
 
 function Choices({
   slot,
@@ -25,7 +36,7 @@ function Choices({
   current,
   render,
 }: {
-  slot: "banner" | "frame";
+  slot: DesignSlot;
   choices: LookChoice[];
   current: string | null | undefined;
   render: (key: string) => React.ReactNode;
@@ -36,7 +47,7 @@ function Choices({
   return (
     <div className="looks-grid" data-slot={slot}>
       {choices.map((choice) => {
-        const selected = (current ?? (slot === "frame" ? "none" : null)) === choice.key;
+        const selected = (current ?? NONE[slot] ?? null) === choice.key;
         return (
           <div key={choice.key} className="looks-grid__item" data-locked={choice.locked || undefined}>
             <button
@@ -57,14 +68,13 @@ function Choices({
                 ) : selected ? (
                   <Icon name="check" size={14} />
                 ) : null}
-                {t(`community:looks.${slot}.${choice.key}`)}
+                {slot === "background"
+                  ? t(`notifications:universe.ambients.${choice.key}`)
+                  : t(`community:looks.${slot}.${choice.key}`)}
               </span>
             </button>
             {choice.locked ? (
-              <Link
-                className="looks-grid__shop"
-                to={`/marketplace?type=${slot === "banner" ? "profile_banner" : "avatar_frame"}`}
-              >
+              <Link className="looks-grid__shop" to={`/marketplace?type=${SHOP_TYPE[slot]}`}>
                 {t("community:looks.inShop")}
               </Link>
             ) : null}
@@ -195,6 +205,73 @@ function BackdropPicker({ unlocked, current }: { unlocked: boolean; current: str
   );
 }
 
+/** One of my titles under my name (or none). */
+function TitlePicker({ titles, current }: { titles: WornItem[]; current: string | null | undefined }) {
+  const t = useT();
+  const equip = useEquipLook();
+  if (!titles.length) return <OwnedEmpty type="title" />;
+  return (
+    <div className="looks-list">
+      {[null, ...titles].map((item) => (
+        <button
+          key={item?.key ?? "none"}
+          type="button"
+          aria-pressed={(current ?? null) === (item?.key ?? null)}
+          disabled={equip.isPending}
+          onClick={() => equip.mutate({ slot: "title", value: item?.key ?? null })}
+        >
+          {item ? <WornBadge item={item} kind="title" /> : t("community:looks.noTitle")}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Up to three of my badges next to my name. */
+function BadgePicker({ badges, current }: { badges: WornItem[]; current: string[] }) {
+  const t = useT();
+  const equip = useEquipLook();
+  if (!badges.length) return <OwnedEmpty type="badge" />;
+  const toggle = (key: string) => {
+    const next = current.includes(key) ? current.filter((k) => k !== key) : [...current, key].slice(-3);
+    equip.mutate({ slot: "badges", value: next.length ? next : null });
+  };
+  return (
+    <>
+      <p className="admin-muted">{t("community:looks.badgesHint")}</p>
+      <div className="looks-list">
+        {badges.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            aria-pressed={current.includes(item.key)}
+            disabled={equip.isPending}
+            onClick={() => toggle(item.key)}
+          >
+            <WornBadge item={item} kind="badge" />
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function OwnedEmpty({ type }: { type: "title" | "badge" }) {
+  const t = useT();
+  return (
+    <AdminEmpty
+      icon={type === "title" ? "trophy" : "star"}
+      title={t(type === "title" ? "community:looks.noTitles" : "community:looks.noBadges")}
+      action={
+        <Link className="ds-button ds-button--secondary" to={`/marketplace?type=${type}`}>
+          <Icon name="shop" size={16} />
+          {t("community:looks.toShop")}
+        </Link>
+      }
+    />
+  );
+}
+
 export function ProfileCustomizer({ name, memberId }: { name: string; memberId: string }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -234,6 +311,10 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           { key: "banner", label: t("community:looks.tab.banner") },
           { key: "frame", label: t("community:looks.tab.frame") },
           { key: "backdrop", label: t("community:looks.tab.backdrop") },
+          { key: "background", label: t("community:looks.tab.background") },
+          { key: "name", label: t("community:looks.tab.name") },
+          { key: "title", label: t("community:looks.tab.title") },
+          { key: "badges", label: t("community:looks.tab.badges") },
         ]}
       />
       {!looks.data ? (
@@ -254,6 +335,35 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           choices={looks.data.frames}
           current={equipped.frame}
           render={(key) => <FramedAvatar frame={key} name={name} userId={memberId} size="md" />}
+        />
+      ) : tab === "background" ? (
+        <Choices
+          slot="background"
+          choices={looks.data.backgrounds}
+          current={equipped.background}
+          render={(key) => (
+            <span className="looks-grid__ambient">
+              <AmbientLayer kind={key as Ambient} contained />
+            </span>
+          )}
+        />
+      ) : tab === "name" ? (
+        <Choices
+          slot="name"
+          choices={looks.data.names}
+          current={equipped.name}
+          render={(key) => (
+            <span className="looks-grid__name-sample">
+              <StyledName name={name} style={key} />
+            </span>
+          )}
+        />
+      ) : tab === "title" ? (
+        <TitlePicker titles={looks.data.titles} current={equipped.title?.key} />
+      ) : tab === "badges" ? (
+        <BadgePicker
+          badges={looks.data.badges}
+          current={(equipped.badges?.items ?? []).map((item) => item.key)}
         />
       ) : (
         <BackdropPicker unlocked={looks.data.backdrop.unlocked} current={equipped.backdrop?.ref} />

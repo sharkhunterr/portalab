@@ -4,7 +4,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useProduct } from "../api";
 import "../marketplace.css";
-import { ProductSheet, PurchaseBar } from "./ProductSheet";
+import { ProductSheet, PurchaseBar, TryOn } from "./ProductSheet";
 
 /**
  * ``/marketplace/products/:key`` (spec 015 T021; 027 sheet): the product sheet — pre-rendering, rarity,
@@ -37,6 +37,7 @@ export function ProductDetail() {
       />
       <ProductSheet product={data} />
       <div className="product-page__actions">
+        <TryOn product={data} />
         <PurchaseBar product={data} />
       </div>
     </div>

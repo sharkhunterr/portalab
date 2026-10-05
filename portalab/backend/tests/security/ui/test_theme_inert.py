@@ -9,6 +9,7 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
+from portalab.modules.ui.settings import BUILTIN_KEYS
 from tests.integration.identity.helpers import create_user, login, module_of
 from tests.ui_fixtures import UiHarness
 
@@ -31,15 +32,7 @@ async def test_matrix(app: FastAPI, client: httpx.AsyncClient, ui: UiHarness) ->
     for method, path in ADMIN_ROUTES:
         assert (await client.request(method, path, json={"definition": {}})).status_code == 403, path
     catalog = (await client.get("/api/v1/ui/themes")).json()
-    assert {t["key"] for t in catalog["themes"]} == {
-        "portalab-dark",
-        "portalab-light",
-        "orbit",
-        "studio",
-        "light",
-        "dark",
-        "high-contrast",
-    }
+    assert {t["key"] for t in catalog["themes"]} == set(BUILTIN_KEYS)  # 027: with the universe themes
     assert catalog["policy"]["defaultTheme"] == "portalab"
 
 

@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "key": "cozy",
+  "name": "Cozy",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#fbf3e6",
+    "surfaceRaised": "#fffaf2",
+    "text": "#3b2a1e",
+    "textMuted": "#6b5444",
+    "border": "#e2cdb4",
+    "accent": "#a84d27",
+    "accentContrast": "#ffffff",
+    "focus": "#8a4b2d",
+    "accentAlt": "#557a3c",
+    "rarity": {
+      "common": "#6b5444",
+      "rare": "#3e7cb1",
+      "epic": "#8e5ba8",
+      "legendary": "#9a6416"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#334155",
+      "bg": "#e7e1d8",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#166534",
+      "bg": "#e4e5d4",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#92400e",
+      "bg": "#f0e1d0",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#854d0e",
+      "bg": "#efe2d0",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#b91c1c",
+      "bg": "#f4ded2",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#9f1239",
+      "bg": "#f2ddd5",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#5b21b6",
+      "bg": "#ebdee1",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#9d174d",
+      "bg": "#f2ddd7",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#475569",
+      "bg": "#e9e3da",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#075985",
+      "bg": "#e3e4dc",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, sans-serif",
+    "headingFamily": "Pacifico, cursive",
+    "headingCase": "none",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.8,
+    "md": 1.2
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "hearts",
+    "fastMs": 180,
+    "normalMs": 340
+  },
+  "layout": {
+    "nav": {
+      "desktop": "sidebar",
+      "tablet": "drawer",
+      "phone": "bottom-bar"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "paper",
+    "content": "narrow",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "sofa",
+      "film": "popcorn",
+      "media": "popcorn",
+      "compass": "coffee",
+      "server": "lamp",
+      "users": "handshake",
+      "shop": "store",
+      "lifebuoy": "heart",
+      "trophy": "book-heart",
+      "search": "glasses"
+    }
+  },
+  "background": {
+    "fallback": "#fbf3e6",
+    "pattern": "plaid",
+    "ambient": "leaves"
+  },
+  "sounds": {
+    "notification": "asset:soft/notification.wav",
+    "alert": "asset:soft/alert.wav",
+    "success": "asset:soft/success.wav",
+    "reward": "asset:soft/reward.wav",
+    "levelUp": "asset:soft/level-up.wav",
+    "ui": "asset:soft/ui.wav"
+  },
+  "notification": {
+    "style": "paper",
+    "animation": "fade"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le salon",
+      "nav:nav.section.home": "Le salon",
+      "dashboard:title": "Le salon",
+      "nav:nav.media": "Soirée plaid",
+      "nav:nav.section.media": "Soirée plaid",
+      "media:home.title": "Soirée plaid",
+      "nav:nav.media_requests": "Ma liste à regarder",
+      "nav:nav.media_insights": "Mon carnet",
+      "media:insights.title": "Mon carnet",
+      "nav:nav.section.content": "La bibliothèque",
+      "nav:nav.news": "Le bulletin du coin",
+      "news:title": "Le bulletin du coin",
+      "nav:nav.wiki": "Le carnet de recettes",
+      "wiki:title": "Le carnet de recettes",
+      "nav:nav.search": "Fouiller",
+      "search:title": "Fouiller",
+      "nav:nav.calendar": "L'agenda",
+      "calendar:title": "L'agenda",
+      "nav:nav.services": "La chaufferie",
+      "nav:nav.section.services": "La chaufferie",
+      "nav:nav.statistics": "Petites statistiques",
+      "statistics:title": "Petites statistiques",
+      "nav:nav.community": "Les voisins",
+      "nav:nav.section.community": "Les voisins",
+      "community:title": "Les voisins",
+      "nav:nav.progression": "Mon nid",
+      "gamification:progression.title": "Mon nid",
+      "nav:nav.campaigns": "Saisons",
+      "campaigns:page.title": "Saisons",
+      "nav:nav.marketplace": "La brocante",
+      "nav:nav.section.marketplace": "La brocante",
+      "marketplace:catalog.title": "La brocante",
+      "nav:nav.projects": "Ouvrages en cours",
+      "marketplace:projects.title": "Ouvrages en cours",
+      "marketplace:owned.title": "Mes trésors",
+      "nav:nav.support": "Une tasse de thé ?",
+      "nav:nav.section.support": "Une tasse de thé ?",
+      "nav:nav.incidents": "Petits soucis",
+      "support:incident.title": "Petits soucis",
+      "nav:nav.feedback": "Un petit mot",
+      "support:feedback.title": "Un petit mot",
+      "gamification:value.coins": "Biscuits",
+      "gamification:value.xp": "Douceur"
+    },
+    "en": {
+      "nav:nav.home": "Living room",
+      "nav:nav.section.home": "Living room",
+      "dashboard:title": "Living room",
+      "nav:nav.media": "Blanket night",
+      "nav:nav.section.media": "Blanket night",
+      "media:home.title": "Blanket night",
+      "nav:nav.media_requests": "My watch list",
+      "nav:nav.media_insights": "My journal",
+      "media:insights.title": "My journal",
+      "nav:nav.section.content": "The bookshelf",
+      "nav:nav.news": "Neighborhood news",
+      "news:title": "Neighborhood news",
+      "nav:nav.wiki": "Recipe book",
+      "wiki:title": "Recipe book",
+      "nav:nav.search": "Rummage",
+      "search:title": "Rummage",
+      "nav:nav.calendar": "Planner",
+      "calendar:title": "Planner",
+      "nav:nav.services": "Boiler room",
+      "nav:nav.section.services": "Boiler room",
+      "nav:nav.statistics": "Little stats",
+      "statistics:title": "Little stats",
+      "nav:nav.community": "Neighbors",
+      "nav:nav.section.community": "Neighbors",
+      "community:title": "Neighbors",
+      "nav:nav.progression": "My nest",
+      "gamification:progression.title": "My nest",
+      "nav:nav.campaigns": "Seasons",
+      "campaigns:page.title": "Seasons",
+      "nav:nav.marketplace": "Flea market",
+      "nav:nav.section.marketplace": "Flea market",
+      "marketplace:catalog.title": "Flea market",
+      "nav:nav.projects": "Works in progress",
+      "marketplace:projects.title": "Works in progress",
+      "marketplace:owned.title": "My treasures",
+      "nav:nav.support": "A cup of tea?",
+      "nav:nav.section.support": "A cup of tea?",
+      "nav:nav.incidents": "Little hiccups",
+      "support:incident.title": "Little hiccups",
+      "nav:nav.feedback": "A little note",
+      "support:feedback.title": "A little note",
+      "gamification:value.coins": "Cookies",
+      "gamification:value.xp": "Warmth"
+    }
+  }
+}

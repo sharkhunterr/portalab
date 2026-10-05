@@ -4,6 +4,28 @@
  * motion) constrains the *effective* value while the stored preference is retained (CD-011).
  */
 
+/** 027: the universe themes (built in, most of them sold in the shop). */
+export const UNIVERSE_THEMES = [
+  "wizard",
+  "galaxy",
+  "matrix",
+  "desert",
+  "horror",
+  "halloween",
+  "christmas",
+  "comic",
+  "manga",
+  "cartoon",
+  "cozy",
+  "futuristic",
+  "minimal",
+  "alien",
+  "heroes",
+  "neowave",
+  "disco",
+  "cyberpunk",
+] as const;
+
 export type Density = "compact" | "comfortable" | "spacious";
 export type ReducedMotion = "system" | "on" | "off";
 
@@ -16,10 +38,89 @@ export const PALETTE_KEYS = [
   "royal",
   "ember",
   "matrix",
+  "aurora",
+  "lagoon",
+  "lava",
+  "mint",
+  "gold",
+  "ice",
+  "rose",
+  "toxic",
+  "midnight",
+  "coffee",
+  "lavender",
+  "bubblegum",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
-export const NOTIFICATION_STYLES = ["toast", "banner", "pill", "minimal", "glass", "neon"] as const;
-export const NOTIFICATION_ANIMATIONS = ["slide", "fade", "pop", "zoom", "bounce", "flip", "swing"] as const;
+/** ``theme``: the theme's own default (027). */
+export const NOTIFICATION_STYLES = [
+  "toast",
+  "banner",
+  "pill",
+  "minimal",
+  "glass",
+  "neon",
+  "comic",
+  "terminal",
+  "parchment",
+  "hologram",
+  "pixel",
+  "paper",
+] as const;
+export const NOTIFICATION_ANIMATIONS = [
+  "slide",
+  "fade",
+  "pop",
+  "zoom",
+  "bounce",
+  "flip",
+  "swing",
+  "glitch",
+  "drop",
+  "spiral",
+  "slam",
+] as const;
+/** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
+export const AMBIENTS = [
+  "none",
+  "snow",
+  "embers",
+  "code-rain",
+  "fireflies",
+  "starfield",
+  "warp",
+  "petals",
+  "bats",
+  "bubbles",
+  "rain",
+  "sparkles",
+  "disco",
+  "fog",
+  "sand",
+  "leaves",
+  "hearts",
+  "glitch",
+  "lights",
+  "spores",
+  "aurora",
+] as const;
+export const CELEBRATION_KEYS = [
+  "none",
+  "sparkle",
+  "confetti",
+  "glow",
+  "snow",
+  "bats",
+  "pixels",
+  "hearts",
+  "stars",
+  "coins",
+  "lightning",
+  "petals",
+  "bubbles",
+] as const;
+export type Ambient = (typeof AMBIENTS)[number];
+export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];
 export type NotificationStyle = (typeof NOTIFICATION_STYLES)[number];
 export type NotificationAnimation = (typeof NOTIFICATION_ANIMATIONS)[number];
 
@@ -32,9 +133,13 @@ export interface UiPreferences {
   soundEnabled: boolean;
   notificationPosition: "top-end" | "top-start" | "bottom-end" | "bottom-start";
   notificationDurationSeconds: number;
-  notificationStyle: NotificationStyle;
-  /** 027: how notifications come in (some animations are sold in the shop). */
-  notificationAnimation: NotificationAnimation;
+  notificationStyle: NotificationStyle | "theme";
+  /** 027: how notifications come in (some animations are sold in the shop); ``theme``: the theme's. */
+  notificationAnimation: NotificationAnimation | "theme";
+  /** 027: animated layer behind the portal — ``theme`` (the theme's), none, or one bought in the shop. */
+  ambient: Ambient | "theme";
+  /** 027: celebration effect for rewards — ``theme`` (the theme's) or one bought in the shop. */
+  celebration: CelebrationKey | "theme";
   /** 027: accent colours over the theme (some are sold in the shop). */
   palette: PaletteKey;
   campaignThemes: "allow" | "ignore";
@@ -59,15 +164,26 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   soundEnabled: true,
   notificationPosition: "top-end",
   notificationDurationSeconds: 6,
-  notificationStyle: "toast",
-  notificationAnimation: "slide",
+  notificationStyle: "theme",
+  notificationAnimation: "theme",
+  ambient: "theme",
+  celebration: "theme",
   palette: "theme",
   campaignThemes: "allow",
   colorMode: "dark",
 };
 
 export const DEFAULT_POLICY: UiPolicy = {
-  allowedThemes: ["portalab-dark", "portalab-light", "orbit", "studio", "light", "dark", "high-contrast"],
+  allowedThemes: [
+    "portalab-dark",
+    "portalab-light",
+    "orbit",
+    "studio",
+    "light",
+    "dark",
+    "high-contrast",
+    ...UNIVERSE_THEMES,
+  ],
   defaultTheme: "portalab",
   textScaleMin: 0.85,
   textScaleMax: 2,
@@ -86,6 +202,8 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   notificationDurationSeconds: "ui.notificationDurationSeconds",
   notificationStyle: "ui.notificationStyle",
   notificationAnimation: "ui.notificationAnimation",
+  ambient: "ui.ambient",
+  celebration: "ui.celebration",
   palette: "ui.palette",
   campaignThemes: "ui.campaignThemes",
   colorMode: "ui.colorMode",
@@ -105,8 +223,10 @@ export function sanitize(input: object): UiPreferences {
   pick("contrast", ["default", "high"]);
   pick("reducedMotion", ["system", "on", "off"]);
   pick("notificationPosition", ["top-end", "top-start", "bottom-end", "bottom-start"]);
-  pick("notificationStyle", NOTIFICATION_STYLES);
-  pick("notificationAnimation", NOTIFICATION_ANIMATIONS);
+  pick("notificationStyle", ["theme", ...NOTIFICATION_STYLES]);
+  pick("notificationAnimation", ["theme", ...NOTIFICATION_ANIMATIONS]);
+  pick("ambient", ["theme", ...AMBIENTS]);
+  pick("celebration", ["theme", ...CELEBRATION_KEYS]);
   pick("palette", PALETTE_KEYS);
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);

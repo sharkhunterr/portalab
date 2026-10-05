@@ -1,7 +1,7 @@
 import { Avatar } from "../../../design-system/components/Avatar";
+import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
-import "../../../design-system/themes/cosmetics.css";
-import { backdropUrl, type Equipped } from "./looks";
+import { backdropUrl, type Equipped, type WornItem } from "./looks";
 import { ProfileCustomizer } from "./ProfileCustomizer";
 import "./profile.css";
 
@@ -38,6 +38,28 @@ export function FramedAvatar({
   );
 }
 
+/** A name in the member's chosen style (font and effect). */
+export function StyledName({ name, style }: { name: string; style?: string | null | undefined }) {
+  return (
+    <span className="name-style" data-name={style && style !== "none" ? style : undefined}>
+      {name}
+    </span>
+  );
+}
+
+/** A title or badge as worn, with its animated style. */
+export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "title" }) {
+  return (
+    <span
+      className={kind === "badge" ? "cosmetic-badge" : "cosmetic-title"}
+      data-style={item.style && item.style !== "none" ? item.style : undefined}
+    >
+      {kind === "badge" ? <Icon name={item.icon ?? "star"} size={14} /> : null}
+      {item.label}
+    </span>
+  );
+}
+
 /**
  * The top of a profile (027): the banner the member chose (a design, or a film's backdrop), their framed
  * avatar and name over it; on one's own profile, « Customise » opens the looks picker.
@@ -65,7 +87,19 @@ export function ProfileHero({
           src={`/api/v1/users/${memberId}/avatar`}
         />
         <div className="profile-hero__text">
-          <h1>{name}</h1>
+          <h1>
+            <StyledName name={name} style={looks.name} />
+          </h1>
+          {looks.title ? <WornBadge item={looks.title} kind="title" /> : null}
+          {looks.badges?.items?.length ? (
+            <ul className="profile-hero__badges">
+              {looks.badges.items.map((badge) => (
+                <li key={badge.key}>
+                  <WornBadge item={badge} kind="badge" />
+                </li>
+              ))}
+            </ul>
+          ) : null}
           {looks.backdrop?.title ? (
             <p className="profile-hero__caption">
               {t("community:looks.backdropOf", { title: looks.backdrop.title })}
