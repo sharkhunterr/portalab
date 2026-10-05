@@ -29,6 +29,7 @@ from portalab.capabilities.observability import (
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.search import SearchRegistry, default_search
+from portalab.capabilities.themes import COSMETICS
 from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer, Principal
@@ -41,7 +42,11 @@ from portalab.core.time import Clock
 from portalab.modules.marketplace import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.marketplace.activation.service import Activation
 from portalab.modules.marketplace.eligibility.service import Eligibility
-from portalab.modules.marketplace.entitlements.reader import Entitlements, ThemeEntitlementsReader
+from portalab.modules.marketplace.entitlements.reader import (
+    CosmeticsReader,
+    Entitlements,
+    ThemeEntitlementsReader,
+)
 from portalab.modules.marketplace.events import register_event_types
 from portalab.modules.marketplace.funding.service import Fundings
 from portalab.modules.marketplace.grants.service import Grants
@@ -58,13 +63,14 @@ from portalab.modules.marketplace.observability import log, metrics
 from portalab.modules.marketplace.privacy.participant import MarketplaceParticipant
 from portalab.modules.marketplace.products.service import Catalog
 from portalab.modules.marketplace.projects.service import Projects
-from portalab.modules.marketplace.purchase.service import Purchases
+from portalab.modules.marketplace.purchase.service import AlreadyOwned, Purchases
 from portalab.modules.marketplace.refunds.service import Refunds
 from portalab.modules.marketplace.resolution.service import Resolution
 from portalab.modules.marketplace.revocation.service import Revocations
 from portalab.modules.marketplace.settings import SETTINGS, MarketplaceConfig
 from portalab.modules.marketplace.types.registry import register_builtin_types
 
+SYSTEM_PRINCIPAL = Principal(channel="system")
 OWNER = "module:marketplace"
 INSTANCE = "marketplace"
 
@@ -121,6 +127,14 @@ class MarketplaceModule:
         )
         self.entitlements = Entitlements(database)
 
+    async def _grant_from_bundle(self, user: UUID, product_key: str, bundle: str) -> bool:
+        """027: a pack grants each product it contains (one already owned is kept as is)."""
+        try:
+            await self.grants.grant(SYSTEM_PRINCIPAL, user, product_key, f"pack:{bundle}")
+        except AlreadyOwned:
+            return False
+        return True
+
     def register(self) -> None:
         register_event_types(self.event_types)
         if not self.capabilities.system_providers(LIFECYCLE):
@@ -131,8 +145,17 @@ class MarketplaceModule:
             self.capabilities.provide(
                 THEME_ENTITLEMENTS, ThemeEntitlementsReader(self.database), instance_ref=INSTANCE, owner=OWNER
             )
+        if not self.capabilities.system_providers(COSMETICS):
+            self.capabilities.provide(
+                COSMETICS, CosmeticsReader(self.database), instance_ref=INSTANCE, owner=OWNER
+            )
         register_builtin_types(
-            self.product_types, self.capabilities, self.widgets, self.permissions, lambda: self.config
+            self.product_types,
+            self.capabilities,
+            self.widgets,
+            self.permissions,
+            lambda: self.config,
+            bundle_grant=self._grant_from_bundle,
         )
         if self.search.provider("product") is None:
             self.search.register(ProductSearchProvider(self.catalog, self.authorizer), owner=OWNER)

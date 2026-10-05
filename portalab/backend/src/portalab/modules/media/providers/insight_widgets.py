@@ -38,6 +38,7 @@ def _definition(
     schema: Mapping[str, Any] | None = None,
     defaults: Mapping[str, Any] | None = None,
     permission: str = MEDIA_READ,
+    product: str | None = None,
 ) -> WidgetDefinition:
     name = key.split(".", 1)[1]
     return WidgetDefinition(
@@ -47,6 +48,7 @@ def _definition(
         description_key=f"media:widget.{name}.description",
         icon=icon,
         required_permission=permission,
+        product=product,
         size=size,
         multiple=bool(schema),
         refresh=Refresh(mode="event", events=events) if events else Refresh(mode="interval", interval_s=900),
@@ -97,6 +99,13 @@ RECENTLY_REQUESTED = _definition(
         "additionalProperties": False,
     },
     defaults={"scope": "all", "period": "30d", "kind": "all", "state": "all"},
+)
+POSTER_WALL = _definition(  # 027: a Marketplace widget — owners only (product « widget_poster_wall »)
+    "media.poster_wall",
+    component="media.wall",
+    icon="image",
+    size=SizeLimits(default=Size(12, 4), min=Size(6, 3), max=Size(12, 8)),
+    product="widget_poster_wall",
 )
 MY_SOON = _definition(
     "media.my_soon",
@@ -350,6 +359,20 @@ class TopWidget(_Base):
                 "plays": w["plays"],
                 "seconds": w["seconds"],
             }
+            for w in data["top_works"]
+        ]
+        return self.payload({"items": await self.cards(items)})
+
+
+class PosterWallWidget(TopWidget):
+    """The server's 24 most watched titles of the month as a poster mosaic (sold in the shop)."""
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        data = await self.insights.overview(period="30d", category="all", user=None, manager=False, top=24)
+        items = [
+            {"id": w["id"], "title": w["title"], "kind": w["kind"], "plays": w["plays"]}
             for w in data["top_works"]
         ]
         return self.payload({"items": await self.cards(items)})

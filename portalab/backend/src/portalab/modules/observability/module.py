@@ -168,16 +168,25 @@ class ObservabilityModule:
         await self.collector.flush()
         before = {row.component: (row.technical, row.functional) for row in await self.evaluator.all()}
         evaluations = await self.evaluator.evaluate_all()
+        named = {c.name: c for c in await self.evaluator.registry.components()}
         for evaluation in evaluations:
             previous = before.get(evaluation.component)
             severe = evaluation.technical == "down" or evaluation.functional == "failing"
             was_severe = previous is not None and (previous[0] == "down" or previous[1] == "failing")
             if severe and not was_severe:
+                # 027: alerts speak of « Radarr », not of « connector:01a1… »
+                component = named.get(evaluation.component)
+                label = (component.label if component else None) or evaluation.component
                 await self.alerts.raise_alert(
                     f"component:{evaluation.component}",
-                    f"{evaluation.component} is {evaluation.status}",
+                    f"{label} is {evaluation.status}",
                     "critical" if evaluation.component in ("portal", "db") else "warning",
                     evaluation.component,
+                    {
+                        "label": label,
+                        "kind": component.kind if component else "component",
+                        "status": evaluation.status,
+                    },
                 )
         await self.escalation.observe(await self.detectors.detect())
         await self.escalation.retry_pending()

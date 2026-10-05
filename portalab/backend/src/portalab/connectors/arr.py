@@ -26,7 +26,14 @@ from portalab.capabilities.connector_sdk import (
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import CALENDAR, DOWNLOADS, LIBRARY, SourceDownload, SourceRelease
 from portalab.capabilities.results import InvalidPayload
-from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
+from portalab.connectors.http_base import (
+    LIBRARY_LISTING_BYTES,
+    HttpConnector,
+    _Probe,
+    binding,
+    parse_time,
+    safe_id,
+)
 
 
 def _overview(item: Mapping[str, Any]) -> str | None:
@@ -202,7 +209,7 @@ class RadarrConnector(_ArrConnector):
     async def sync(
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None
     ) -> AsyncIterator[SourceRecord | SyncProgress]:
-        movies = await self.get_json(ctx.service, "/api/v3/movie")
+        movies = await self.request(ctx.service, "GET", "/api/v3/movie", max_bytes=LIBRARY_LISTING_BYTES)
         if not isinstance(movies, list):
             raise InvalidPayload("unexpected /movie payload")
         yield SyncProgress(cursor={}, total=len(movies))
@@ -293,7 +300,9 @@ class SonarrConnector(_ArrConnector):
     async def sync(
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None
     ) -> AsyncIterator[SourceRecord | SyncProgress]:
-        series_list = await self.get_json(ctx.service, "/api/v3/series")
+        series_list = await self.request(
+            ctx.service, "GET", "/api/v3/series", max_bytes=LIBRARY_LISTING_BYTES
+        )
         if not isinstance(series_list, list):
             raise InvalidPayload("unexpected /series payload")
         seasons = sum(

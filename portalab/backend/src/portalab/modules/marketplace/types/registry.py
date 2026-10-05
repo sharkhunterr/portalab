@@ -5,8 +5,9 @@ user; 023 activation is a stub until step 27), ``access`` (a scoped grant limite
 never an Admin-reserved permission, removed on revoke) and ``quota`` (units credited by Media's
 ``RequestQuotaService``; Marketplace never measures nor consumes quota, never sells priority)."""
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any
+from uuid import UUID
 
 from portalab.capabilities.dashboard import WidgetRegistry
 from portalab.capabilities.marketplace import (
@@ -23,7 +24,7 @@ from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.core.permissions import PermissionRegistry
 
 OWNER = "module:marketplace"
-NOT_REFUNDABLE = frozenset({"plugin", "access", "quota"})
+NOT_REFUNDABLE = frozenset({"plugin", "access", "quota", "bundle"})
 
 
 def _port(capabilities: CapabilityRegistry, name: str) -> Any | None:
@@ -157,12 +158,37 @@ class QuotaHandler(Owned):
         return True
 
 
+class BundleHandler(Owned):
+    """``bundle`` (027): a pack — buying it grants each product it lists (``payload.products``), one
+    already owned staying as it is. A pack is not refundable (its products live on their own)."""
+
+    def __init__(self, grant: Callable[[UUID, str, str], Awaitable[bool]] | None) -> None:
+        self.grant = grant
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        products = [str(p) for p in ownership.payload.get("products") or [] if p]
+        if not products:
+            return ActivationResult("incompatible", "empty pack")
+        if self.grant is None:
+            return ActivationResult("failed", "grants unavailable")
+        for key in products:
+            if key == ownership.product_key:
+                continue  # a pack never contains itself
+            try:
+                await self.grant(ownership.user_id, key, ownership.product_key)
+            except Exception:  # noqa: S112 — an unknown product is skipped, the others are granted
+                continue
+        return ActivationResult("active")
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
     widgets: WidgetRegistry,
     permissions: PermissionRegistry,
     config: Callable[[], Any],
+    *,
+    bundle_grant: Callable[[UUID, str, str], Awaitable[bool]] | None = None,
 ) -> None:
     owned = Owned()
     for key, handler, fields in (
@@ -176,6 +202,9 @@ def register_builtin_types(
         ("plugin", ExtensionHandler(capabilities), ("extension", "config_required")),
         ("access", AccessHandler(capabilities, permissions, config), ("permission",)),
         ("quota", QuotaHandler(capabilities, config), ("kind", "units")),
+        ("notification_style", owned, ("style",)),  # 027: notification looks sold in the shop
+        ("notification_animation", owned, ("animation",)),
+        ("bundle", BundleHandler(bundle_grant), ("products",)),  # 027: packs
     ):
         if registry.get(key) is None:
             registry.register(

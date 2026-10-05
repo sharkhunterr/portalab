@@ -87,6 +87,8 @@ class CatalogEntryOut(BaseModel):
     key: str
     placed: bool
     widget: WidgetMeta
+    locked: bool = False  # 027: sold in the Marketplace and not owned yet
+    product: str | None = None
 
 
 class AddWidgetIn(BaseModel):
@@ -232,6 +234,14 @@ async def catalog(principal: User, module: Module) -> list[CatalogEntryOut]:
         meta = _meta(module, definition.key)
         if meta is not None:
             out.append(CatalogEntryOut(key=definition.key, placed=placed, widget=meta))
+    for definition in await module.service.in_shop(principal):
+        meta = _meta(module, definition.key)
+        if meta is not None:
+            out.append(
+                CatalogEntryOut(
+                    key=definition.key, placed=False, widget=meta, locked=True, product=definition.product
+                )
+            )
     return out
 
 

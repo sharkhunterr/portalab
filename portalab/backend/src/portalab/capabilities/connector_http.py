@@ -82,6 +82,8 @@ class ConnectorHttpClient:
         method = method.upper()
         url = urljoin(self.base_url, path.lstrip("/"))
         headers = {**self.default_headers, **kwargs.pop("headers", {})}
+        # 027: a full library listing may exceed the default cap (Radarr's /movie): the caller raises it
+        limit = int(kwargs.pop("max_response_bytes", None) or self.max_bytes)
         correlation = get_correlation_id()
         if correlation:
             headers["X-Correlation-Id"] = correlation
@@ -90,7 +92,7 @@ class ConnectorHttpClient:
         for attempt in range(attempts):
             try:
                 with Timer("external_wait", "connectors", "http.request", {"method": method}):
-                    response = await self._send(method, url, headers, kwargs, redirects=5)
+                    response = await self._send(method, url, headers, kwargs, redirects=5, limit=limit)
                 if response.status_code >= 500 and attempt < attempts - 1:
                     await asyncio.sleep(self.backoff * 2**attempt)
                     continue
@@ -102,8 +104,16 @@ class ConnectorHttpClient:
         raise ConnectorHttpError(redact_text(f"{type(last_error).__name__}: {last_error}"))
 
     async def _send(
-        self, method: str, url: str, headers: dict[str, str], kwargs: dict[str, Any], *, redirects: int
+        self,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        kwargs: dict[str, Any],
+        *,
+        redirects: int,
+        limit: int | None = None,
     ) -> HttpResponse:
+        cap = limit or self.max_bytes
         async with (
             self._client() as client,
             client.stream(method, url, headers=headers, **kwargs) as response,
@@ -121,15 +131,16 @@ class ConnectorHttpClient:
                     headers,
                     kwargs,
                     redirects=redirects - 1,
+                    limit=cap,
                 )
             declared = response.headers.get("content-length")
-            if declared and declared.isdigit() and int(declared) > self.max_bytes:
-                raise ResponseTooLarge(f"response larger than {self.max_bytes} bytes")
+            if declared and declared.isdigit() and int(declared) > cap:
+                raise ResponseTooLarge(f"response larger than {cap} bytes")
             chunks, size = [], 0
             async for chunk in response.aiter_bytes():
                 size += len(chunk)
-                if size > self.max_bytes:
-                    raise ResponseTooLarge(f"response larger than {self.max_bytes} bytes")
+                if size > cap:
+                    raise ResponseTooLarge(f"response larger than {cap} bytes")
                 chunks.append(chunk)
             return HttpResponse(response.status_code, dict(response.headers), b"".join(chunks))
 

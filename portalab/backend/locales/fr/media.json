@@ -358,5 +358,7 @@
   "widget.recently_requested.config.state.pending": "En attente",
   "widget.recently_requested.config.state.approved": "En cours",
   "widget.recently_requested.config.state.available": "Disponibles",
-  "widget.recently_requested.config.state.declined": "Refusées"
+  "widget.recently_requested.config.state.declined": "Refusées",
+  "widget.poster_wall.title": "Mur d'affiches",
+  "widget.poster_wall.description": "Les 24 titres les plus regardés du mois, en grand mur d'affiches."
 }

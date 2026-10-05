@@ -44,6 +44,14 @@ async def themes(
     return await module.themes.catalog(principal.user_id)
 
 
+@router.get("/ui/notification-looks")
+async def notification_looks(
+    principal: Annotated[Principal, require("users.self.manage")], module: Module
+) -> dict[str, Any]:
+    """027: the notification styles and animations, those sold in the shop marked locked unless owned."""
+    return await module.looks.catalog(principal.user_id)
+
+
 @router.get("/admin/ui/themes")
 async def all_themes(_: Manager, module: Module) -> dict[str, Any]:
     return {"items": [theme_out(row, admin=True) for row in await module.themes.all()]}

@@ -129,6 +129,9 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("halloween", "Halloween", "moon", 10),
     ("new_wave", "New Wave", "zap", 20),
     ("essentials", "Essentials", "star", 30),
+    ("packs", "Packs", "shop", 5),  # 027: bundles first in the shop
+    ("looks", "Notifications", "bell", 40),  # 027: notification styles and animations
+    ("widgets", "Widgets", "dashboard", 50),  # 027: dashboard widgets sold in the shop
 )
 PRESENTATION: dict[
     str, tuple[str, str, bool, str, str | None]
@@ -144,6 +147,16 @@ PRESENTATION: dict[
     "effect_pumpkin": ("epic", "blink", False, "halloween", "sparkles"),
     "badge_ghost": ("legendary", "glitch", True, "halloween", "moon"),
     "quota_requests": ("common", "none", False, "essentials", "inbox"),
+    # 027: notification looks, a premium widget and packs
+    "notif_glass": ("rare", "shine", False, "looks", "bell"),
+    "notif_neon": ("epic", "neon", True, "looks", "zap"),
+    "notif_bounce": ("common", "none", False, "looks", "sparkles"),
+    "notif_flip": ("rare", "spin", False, "looks", "sparkles"),
+    "notif_swing": ("rare", "shine", False, "looks", "sparkles"),
+    "widget_poster_wall": ("epic", "shine", True, "widgets", "image"),
+    "pack_neon_nights": ("legendary", "neon", True, "packs", "zap"),
+    "pack_starter": ("rare", "shine", False, "packs", "star"),
+    "pack_cinephile": ("epic", "glitch", True, "packs", "film"),
 }
 
 QUESTS: dict[str, dict[str, Any]] = {
@@ -237,6 +250,49 @@ PRODUCTS: tuple[dict[str, Any], ...] = (
     _product(
         "quota_requests", "quota", 60, "+5 media requests", "+5 demandes de médias",
         "Five extra media requests this month.", {"kind": "media_requests", "units": 5},
+    ),
+    # 027: notification looks (style = shape and layout, animation = how they come in)
+    _product(
+        "notif_glass", "notification_style", 120, "Frosted glass notifications", "Notifications verre dépoli",
+        "Translucent notifications that blur what is behind them.", {"style": "glass"},
+    ),
+    _product(
+        "notif_neon", "notification_style", 220, "Neon notifications", "Notifications néon",
+        "Glowing outlines in the colour of each notification.", {"style": "neon"},
+    ),
+    _product(
+        "notif_bounce", "notification_animation", 60, "Bouncing notifications", "Notifs rebondissantes",
+        "Notifications arrive with a little bounce.", {"animation": "bounce"},
+    ),
+    _product(
+        "notif_flip", "notification_animation", 140, "Flipping notifications", "Notifications qui pivotent",
+        "Notifications flip into view like a card.", {"animation": "flip"},
+    ),
+    _product(
+        "notif_swing", "notification_animation", 100, "Swinging notifications", "Notifications balancier",
+        "Notifications swing in like a hanging sign.", {"animation": "swing"},
+    ),
+    # 027: a dashboard widget sold in the shop
+    _product(
+        "widget_poster_wall", "widget", 250, "Poster wall widget", "Widget mur d'affiches",
+        "The 24 most watched titles of the month as a big poster wall on your dashboard.",
+        {"widget": "media.poster_wall"},
+    ),
+    # 027: packs — buying one grants every product it lists (configurable by administrators)
+    _product(
+        "pack_neon_nights", "bundle", 380, "Neon nights pack", "Pack Nuits néon",
+        "Neon notifications, the bouncing animation and the aurora effect — 60 Coins saved.",
+        {"products": ["notif_neon", "notif_bounce", "effect_aurora"]},
+    ),
+    _product(
+        "pack_starter", "bundle", 150, "Starter pack", "Pack Découverte",
+        "Frosted glass notifications, the swing animation and the Pioneer badge.",
+        {"products": ["notif_glass", "notif_swing", "badge_pioneer"]},
+    ),
+    _product(
+        "pack_cinephile", "bundle", 420, "Cinephile pack", "Pack Cinéphile",
+        "The poster wall widget, the Cinephile title, flipping notifications and 5 extra requests.",
+        {"products": ["widget_poster_wall", "title_cinephile", "notif_flip", "quota_requests"]},
     ),
 )  # fmt: skip
 OWNED_BY_ADMIN = ("badge_pioneer", "effect_confetti")

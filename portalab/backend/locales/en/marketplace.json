@@ -222,5 +222,15 @@
   "type.title": "Title",
   "type.widget": "Widget",
   "widget.featured.description": "A few products you can acquire with Coins.",
-  "widget.featured.title": "Marketplace"
+  "widget.featured.title": "Marketplace",
+  "type.notification_style": "Notification style",
+  "type.notification_animation": "Notification animation",
+  "type.bundle": "Pack",
+  "admin.style": "Style",
+  "admin.animation": "Animation",
+  "admin.packProducts": "Products in the pack",
+  "admin.packHint": "The buyer receives each of these products (those already owned are kept).",
+  "admin.packEmpty": "Pick at least one product.",
+  "shop.packContains": "This pack contains",
+  "admin.widget": "Widget"
 }

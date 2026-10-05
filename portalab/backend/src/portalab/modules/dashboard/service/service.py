@@ -185,6 +185,27 @@ class DashboardService:
         async with self.database.session() as session:
             return await session.get(UserDashboard, _user(principal)) is not None
 
+    async def in_shop(self, principal: Principal) -> list[WidgetDefinition]:
+        """027: Marketplace widgets the user may not add yet only because they do not own them — shown in
+        the gallery as « in the shop » (permission and policy still apply)."""
+        policies = self.config().widget_policies
+        out = []
+        for widget in self.registry.widgets():
+            definition = widget.definition
+            if definition.product is None or policy_class(policies, definition.key) == "disabled":
+                continue
+            if await self.gateway.allowed(widget, principal):
+                continue  # already owned: in the normal catalog
+            try:
+                permitted = await self.gateway.authorizer.is_allowed(
+                    principal, definition.required_permission
+                )
+            except Exception:
+                permitted = False
+            if permitted:
+                out.append(definition)
+        return out
+
     async def catalog(self, principal: Principal) -> list[tuple[WidgetDefinition, bool]]:
         """Widgets the user may add: permitted, enabled, entitled, not disabled, condition holding.
         The flag says whether an instance is already placed (single-instance widgets)."""

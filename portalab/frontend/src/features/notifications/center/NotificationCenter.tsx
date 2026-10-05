@@ -1,11 +1,12 @@
 import { useId, useState } from "react";
 import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
+import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { type CenterFilter, type NotificationItem, useNotificationActions, useNotifications } from "../api";
-import { severityOf } from "../presentation";
+import { lookOf, severityOf } from "../presentation";
 import "../notifications.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 
@@ -25,45 +26,92 @@ function Item({ item }: { item: NotificationItem }) {
   const format = useFormat();
   const actions = useNotificationActions();
   const severity = severityOf(item);
+  const look = lookOf(item);
+  const ago = format.relative((Date.parse(item.updated_at) - Date.now()) / 1000);
   return (
-    <li className="notification-item" data-read={item.read} data-kind={item.kind} data-severity={severity}>
-      <div className="notification-item__head">
-        <FunctionalState
-          state={severity === "critical" ? "error" : severity === "warning" ? "partial" : "available"}
-          label={t(`notifications:kind.${item.kind}`)}
-        />
-        <span className="notification-item__priority">{t(`notifications:priority.${item.priority}`)}</span>
-        {item.read ? null : <span className="ds-badge">{t("notifications:center.filter.unread")}</span>}
+    <li
+      className="notification-item"
+      data-read={item.read}
+      data-kind={item.kind}
+      data-severity={severity}
+      data-tone={look.tone}
+    >
+      <span className="notification-item__icon" aria-hidden="true">
+        <Icon name={look.icon} size={20} />
+      </span>
+      <div className="notification-item__main">
+        <p className="notification-item__head">
+          {item.read ? null : (
+            <span className="notification-item__dot" title={t("notifications:center.filter.unread")} />
+          )}
+          {item.kind === "alert" ? (
+            <span className="notification-item__badge" data-priority="critical">
+              {t("notifications:kind.alert")}
+            </span>
+          ) : (
+            <span className="visually-hidden">{t(`notifications:kind.${item.kind}`)}</span>
+          )}
+          <strong className="notification-item__title">
+            {item.action_url ? <Link to={item.action_url}>{item.title}</Link> : item.title}
+          </strong>
+          {item.count > 1 ? (
+            <span className="notification-item__count">
+              {t("notifications:repeated", { count: item.count })}
+            </span>
+          ) : null}
+        </p>
+        {item.body ? <p className="notification-item__body">{item.body}</p> : null}
+        <p className="notification-item__meta">
+          <time dateTime={item.updated_at} title={format.dateTime(item.updated_at)}>
+            {ago}
+          </time>
+          {look.badge ? (
+            <span className="notification-item__badge">{t(`notifications:badge.${look.badge}`)}</span>
+          ) : null}
+          {item.priority === "high" || item.priority === "critical" ? (
+            <span className="notification-item__badge" data-priority={item.priority}>
+              {t(`notifications:priority.${item.priority}`)}
+            </span>
+          ) : null}
+        </p>
       </div>
-      <h3 className="notification-item__title">
-        {item.action_url ? <Link to={item.action_url}>{item.title}</Link> : item.title}
-        {item.count > 1 ? (
-          <span className="notification-item__count">
-            {" "}
-            {t("notifications:repeated", { count: item.count })}
-          </span>
-        ) : null}
-      </h3>
-      {item.body ? <p>{item.body}</p> : null}
-      <p className="notification-item__meta">
-        <time dateTime={item.updated_at}>{format.dateTime(item.updated_at)}</time>
-      </p>
-      <div className="ds-stack ds-stack--row">
+      <div className="notification-item__actions">
         {item.read ? null : (
-          <Button variant="secondary" onClick={() => actions.read.mutate(item.id)}>
-            {t("notifications:center.read")}
-            <span className="visually-hidden">: {item.title}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => actions.read.mutate(item.id)}
+            title={t("notifications:center.read")}
+          >
+            <Icon name="check" size={16} />
+            <span className="visually-hidden">
+              {t("notifications:center.read")}: {item.title}
+            </span>
           </Button>
         )}
         {item.archived ? null : (
-          <Button variant="secondary" onClick={() => actions.archive.mutate(item.id)}>
-            {t("notifications:center.archive")}
-            <span className="visually-hidden">: {item.title}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => actions.archive.mutate(item.id)}
+            title={t("notifications:center.archive")}
+          >
+            <Icon name="inbox" size={16} />
+            <span className="visually-hidden">
+              {t("notifications:center.archive")}: {item.title}
+            </span>
           </Button>
         )}
-        <Button variant="danger" onClick={() => actions.remove.mutate(item.id)}>
-          {t("notifications:center.delete")}
-          <span className="visually-hidden">: {item.title}</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => actions.remove.mutate(item.id)}
+          title={t("notifications:center.delete")}
+        >
+          <Icon name="trash" size={16} />
+          <span className="visually-hidden">
+            {t("notifications:center.delete")}: {item.title}
+          </span>
         </Button>
       </div>
     </li>

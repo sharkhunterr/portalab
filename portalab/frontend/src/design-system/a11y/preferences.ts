@@ -7,6 +7,11 @@
 export type Density = "compact" | "comfortable" | "spacious";
 export type ReducedMotion = "system" | "on" | "off";
 
+export const NOTIFICATION_STYLES = ["toast", "banner", "pill", "minimal", "glass", "neon"] as const;
+export const NOTIFICATION_ANIMATIONS = ["slide", "fade", "pop", "zoom", "bounce", "flip", "swing"] as const;
+export type NotificationStyle = (typeof NOTIFICATION_STYLES)[number];
+export type NotificationAnimation = (typeof NOTIFICATION_ANIMATIONS)[number];
+
 export interface UiPreferences {
   theme: string | null;
   density: Density;
@@ -16,7 +21,9 @@ export interface UiPreferences {
   soundEnabled: boolean;
   notificationPosition: "top-end" | "top-start" | "bottom-end" | "bottom-start";
   notificationDurationSeconds: number;
-  notificationStyle: "toast" | "banner";
+  notificationStyle: NotificationStyle;
+  /** 027: how notifications come in (some animations are sold in the shop). */
+  notificationAnimation: NotificationAnimation;
   campaignThemes: "allow" | "ignore";
   /** Light/dark choice for theme families (027 R8): dark by default, or follow the device. */
   colorMode: "dark" | "light" | "system";
@@ -40,6 +47,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   notificationPosition: "top-end",
   notificationDurationSeconds: 6,
   notificationStyle: "toast",
+  notificationAnimation: "slide",
   campaignThemes: "allow",
   colorMode: "dark",
 };
@@ -63,6 +71,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   notificationPosition: "ui.notificationPosition",
   notificationDurationSeconds: "ui.notificationDurationSeconds",
   notificationStyle: "ui.notificationStyle",
+  notificationAnimation: "ui.notificationAnimation",
   campaignThemes: "ui.campaignThemes",
   colorMode: "ui.colorMode",
 };
@@ -81,7 +90,8 @@ export function sanitize(input: object): UiPreferences {
   pick("contrast", ["default", "high"]);
   pick("reducedMotion", ["system", "on", "off"]);
   pick("notificationPosition", ["top-end", "top-start", "bottom-end", "bottom-start"]);
-  pick("notificationStyle", ["toast", "banner"]);
+  pick("notificationStyle", NOTIFICATION_STYLES);
+  pick("notificationAnimation", NOTIFICATION_ANIMATIONS);
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;

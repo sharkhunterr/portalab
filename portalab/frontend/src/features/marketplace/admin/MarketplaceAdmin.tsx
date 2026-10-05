@@ -66,7 +66,13 @@ export default function MarketplaceAdmin() {
       icon="shop"
       title={t("marketplace:admin.title")}
       description={t("marketplace:admin.description")}
-      primary={<NewProductDialog categories={(categories.data ?? []) as Category[]} onCreated={refresh} />}
+      primary={
+        <NewProductDialog
+          categories={(categories.data ?? []) as Category[]}
+          products={(products.data ?? []) as Product[]}
+          onCreated={refresh}
+        />
+      }
     >
       {message ? <p role="status">{message}</p> : null}
       <AdminSection title={t("marketplace:admin.products")} icon="shop">

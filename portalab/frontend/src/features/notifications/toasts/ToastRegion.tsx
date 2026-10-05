@@ -2,8 +2,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { connectStream, type LiveEvent } from "../../../api/stream";
 import { useNotify } from "../../../design-system/components/Notification";
+import { useT } from "../../../i18n/hooks/useT";
 import { fetchLatest } from "../api";
-import { severityOf } from "../presentation";
+import { lookOf, severityOf } from "../presentation";
 
 /**
  * Live toasts (spec 010 T019): the content-free ``notification.created`` ping triggers a refetch; the new
@@ -18,6 +19,7 @@ export interface ToastRegionProps {
 
 export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
   const notify = useNotify();
+  const t = useT();
   const client = useQueryClient();
   const shown = useRef(new Set<string>());
   useEffect(() => {
@@ -32,15 +34,20 @@ export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
           const item = items.find((candidate) => candidate.id === id);
           if (!item || shown.current.has(id)) return;
           shown.current.add(id);
+          const look = lookOf(item);
           notify({
             severity: severityOf(item),
+            tone: look.tone,
+            icon: look.icon,
             title: item.title,
             ...(item.body ? { body: item.body } : {}),
+            ...(look.badge ? { badge: t(`notifications:badge.${look.badge}`) } : {}),
+            ...(item.action_url ? { href: item.action_url, linkLabel: t("notifications:open") } : {}),
           });
         });
       },
     });
     return () => handle.close();
-  }, [connect, client, notify]);
+  }, [connect, client, notify, t]);
   return null;
 }

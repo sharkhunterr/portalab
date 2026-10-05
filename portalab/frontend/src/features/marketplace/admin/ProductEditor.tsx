@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../../../api/client";
+import { NOTIFICATION_ANIMATIONS, NOTIFICATION_STYLES } from "../../../design-system/a11y/preferences";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { ICONS, Icon } from "../../../design-system/components/Icon";
@@ -15,7 +16,19 @@ import { ProductPoster } from "../catalog/ProductPoster";
  */
 export const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 export const EFFECTS = ["auto", "none", "shine", "glitch", "spin", "neon", "blink"] as const;
-const TYPES = ["badge", "title", "effect", "theme", "quota", "feature", "widget", "statistic"] as const;
+const TYPES = [
+  "badge",
+  "title",
+  "effect",
+  "theme",
+  "notification_style",
+  "notification_animation",
+  "widget",
+  "bundle",
+  "quota",
+  "feature",
+  "statistic",
+] as const;
 const ICON_NAMES = Object.keys(ICONS).sort();
 
 export interface Presentation {
@@ -187,9 +200,12 @@ export function PresentationDialog({
 /** New product: the payload fields follow the type; advanced settings stay available as JSON. */
 export function NewProductDialog({
   categories,
+  products = [],
   onCreated,
 }: {
   categories: readonly Category[];
+  /** 027: what a pack may contain. */
+  products?: readonly Product[];
   onCreated: () => void;
 }) {
   const t = useT();
@@ -206,6 +222,9 @@ export function NewProductDialog({
   const [effect, setEffect] = useState("");
   const [theme, setTheme] = useState("");
   const [units, setUnits] = useState(5);
+  const [look, setLook] = useState("");
+  const [widget, setWidget] = useState("");
+  const [packed, setPacked] = useState<string[]>([]);
   const [extra, setExtra] = useState("{}");
   const [presentation, setPresentation] = useState<Presentation>(DEFAULT_PRESENTATION);
   const [category, setCategory] = useState("");
@@ -222,6 +241,14 @@ export function NewProductDialog({
         return { theme };
       case "quota":
         return { kind: "media_requests", units };
+      case "notification_style":
+        return { style: look };
+      case "notification_animation":
+        return { animation: look };
+      case "widget":
+        return { widget };
+      case "bundle":
+        return { products: packed };
       default:
         return JSON.parse(extra || "{}") as Record<string, unknown>;
     }
@@ -229,6 +256,10 @@ export function NewProductDialog({
   const preview = { key, type, name: nameEn, ...presentation, price_coins: price } as unknown as Product;
   const submit = async () => {
     setError(null);
+    if (type === "bundle" && !packed.length) {
+      setError(t("marketplace:admin.packEmpty"));
+      return;
+    }
     try {
       await api.POST("/api/v1/admin/marketplace/products", {
         body: {
@@ -346,6 +377,55 @@ export function NewProductDialog({
               required
               onChange={(e) => setEffect(e.target.value)}
             />
+          ) : null}
+          {type === "notification_style" || type === "notification_animation" ? (
+            <SelectField
+              label={t(
+                type === "notification_style" ? "marketplace:admin.style" : "marketplace:admin.animation",
+              )}
+              value={look}
+              required
+              onChange={(e) => setLook(e.target.value)}
+            >
+              <option value="">—</option>
+              {(type === "notification_style" ? NOTIFICATION_STYLES : NOTIFICATION_ANIMATIONS).map(
+                (value) => (
+                  <option key={value} value={value}>
+                    {t(
+                      `notifications:looks.${type === "notification_style" ? "styles" : "animations"}.${value}`,
+                    )}
+                  </option>
+                ),
+              )}
+            </SelectField>
+          ) : null}
+          {type === "widget" ? (
+            <TextField
+              label={t("marketplace:admin.widget")}
+              value={widget}
+              required
+              pattern="[a-z][a-z0-9_.:-]*"
+              placeholder="media.poster_wall"
+              onChange={(e) => setWidget(e.target.value)}
+            />
+          ) : null}
+          {type === "bundle" ? (
+            <fieldset className="product-editor__pack">
+              <legend>{t("marketplace:admin.packProducts")}</legend>
+              <p className="ds-field__hint">{t("marketplace:admin.packHint")}</p>
+              {products
+                .filter((p) => p.type !== "bundle")
+                .map((p) => (
+                  <CheckboxField
+                    key={p.key}
+                    label={`${p.name} · ${t(`marketplace:type.${p.type}`)}`}
+                    checked={packed.includes(p.key)}
+                    onChange={(e) =>
+                      setPacked(e.target.checked ? [...packed, p.key] : packed.filter((k) => k !== p.key))
+                    }
+                  />
+                ))}
+            </fieldset>
           ) : null}
           {type === "theme" ? (
             <SelectField

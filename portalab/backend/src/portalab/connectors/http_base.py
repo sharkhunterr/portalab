@@ -35,6 +35,7 @@ from portalab.capabilities.media import SPECS as MEDIA_SPECS
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 
 EPOCH = datetime(2000, 1, 1, tzinfo=UTC)
+LIBRARY_LISTING_BYTES = 100 * 1024 * 1024  # 027: whole-library answers (Radarr /movie) of large libraries
 SPECS = {spec.name: spec for spec in (*HEALTH_SPECS, *MEDIA_SPECS)}
 SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
@@ -145,8 +146,11 @@ class HttpConnector:
         params: Mapping[str, Any] | None = None,
         json_body: Any = None,
         headers: Mapping[str, str] | None = None,
+        max_bytes: int | None = None,
     ) -> Any:
         kwargs: dict[str, Any] = {"headers": {"Accept": "application/json", **self.auth_headers(service)}}
+        if max_bytes:
+            kwargs["max_response_bytes"] = max_bytes
         if headers:
             kwargs["headers"].update(headers)
         if params:

@@ -72,6 +72,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *campaigns.SPECS,
     themes.SPEC,
     themes.ENTITLEMENTS_SPEC,
+    themes.COSMETICS_SPEC,
 )
 
 

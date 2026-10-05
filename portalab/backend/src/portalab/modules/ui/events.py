@@ -31,6 +31,7 @@ ACCESSIBILITY_KEYS = {
     "ui.notificationPosition",
     "ui.notificationDurationSeconds",
     "ui.notificationStyle",
+    "ui.notificationAnimation",
 }
 
 

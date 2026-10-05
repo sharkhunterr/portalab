@@ -113,14 +113,16 @@ async def test_widget_products_need_an_entitlement(
     buyer = await create_user(module_of(app), "buyer")
     await create_user(module_of(app), "other")
     await login(client, "buyer")
-    assert key not in {
-        c["key"] for c in (await client.get("/api/v1/dashboard/catalog")).json()
-    }  # 015 absent: nobody
+    gallery = (await client.get("/api/v1/dashboard/catalog")).json()
+    # 027: a product widget not owned shows as « in the shop » (locked), never as addable
+    assert {c["key"]: c["locked"] for c in gallery}[key] is True
     dash.full.identity.capabilities.provide(
         ENTITLEMENTS, Entitlements({buyer}), instance_ref="t", owner="module:marketplace"
     )
-    assert key in {c["key"] for c in (await client.get("/api/v1/dashboard/catalog")).json()}
+    gallery = (await client.get("/api/v1/dashboard/catalog")).json()
+    assert {c["key"]: c["locked"] for c in gallery}[key] is False
     assert (await client.get(f"/api/v1/widgets/{key}/data")).json()["state"] == "available"
     await login(client, "other")
-    assert key not in {c["key"] for c in (await client.get("/api/v1/dashboard/catalog")).json()}
+    gallery = (await client.get("/api/v1/dashboard/catalog")).json()
+    assert {c["key"]: c["locked"] for c in gallery}[key] is True
     assert (await client.get(f"/api/v1/widgets/{key}/data")).json()["state"] == "unauthorized"

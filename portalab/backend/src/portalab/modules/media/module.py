@@ -80,9 +80,11 @@ from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
     MY_SOON,
+    POSTER_WALL,
     RECENTLY_ADDED,
     RECENTLY_REQUESTED,
     MySoonWidget,
+    PosterWallWidget,
     RecentlyAddedWidget,
     RecentlyRequestedWidget,
     StatsWidget,
@@ -310,6 +312,7 @@ class MediaModule:
             (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
             (MY_SOON, MySoonWidget(self.database, self.request_insights, self.clock, self.enricher)),
+            (POSTER_WALL, PosterWallWidget(self.database, self.insights, self.clock)),
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:

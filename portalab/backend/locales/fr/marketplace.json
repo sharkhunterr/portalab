@@ -222,5 +222,15 @@
   "type.title": "Titre",
   "type.widget": "Widget",
   "widget.featured.description": "Quelques produits à obtenir avec vos Coins.",
-  "widget.featured.title": "Boutique"
+  "widget.featured.title": "Boutique",
+  "type.notification_style": "Style de notifications",
+  "type.notification_animation": "Animation de notifications",
+  "type.bundle": "Pack",
+  "admin.style": "Style",
+  "admin.animation": "Animation",
+  "admin.packProducts": "Produits du pack",
+  "admin.packHint": "L'acheteur reçoit chacun de ces produits (ceux qu'il possède déjà sont conservés).",
+  "admin.packEmpty": "Choisissez au moins un produit.",
+  "shop.packContains": "Ce pack contient",
+  "admin.widget": "Widget"
 }

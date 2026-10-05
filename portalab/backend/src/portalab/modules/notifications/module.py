@@ -77,19 +77,31 @@ class AlertPort:
         self.module = module
 
     async def send_alert(self, alert: Alert) -> None:
+        # 027: readable alerts — the service by its name, a message per kind, a link to where it is fixed
+        kind = str(alert.facts.get("kind") or "")
+        template, url = {
+            "connector": ("notifications:observability.service", "/admin/services"),
+            "sync": ("notifications:observability.sync", "/admin/services"),
+        }.get(kind, ("notifications:observability.alert", "/admin/observability"))
+        label = str(alert.facts.get("label") or alert.component)[:120]
         await self.module.send(
             CommunicationRequest(
                 category="system.health",
-                template_key="notifications:observability.alert",
+                template_key=template,
                 audience=WithPermission("observability.read"),
                 dedup_key=f"alert:{alert.key}:{alert.raised_at.isoformat()}",
                 kind="alert",
                 priority="critical" if alert.severity == "critical" else "high",
-                params={"title": alert.title[:200], "component": alert.component},
+                params={
+                    "title": alert.title[:200],
+                    "component": label,
+                    "name": label,
+                    "status": str(alert.facts.get("status") or "degraded"),
+                },
                 source="system",
                 subject_ref=f"alert:{alert.component}",
                 required_permission="observability.read",
-                action_url="/admin/observability",
+                action_url=url,
             )
         )
 

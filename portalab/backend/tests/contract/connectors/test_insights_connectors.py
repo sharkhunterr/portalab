@@ -133,3 +133,17 @@ async def test_download_queues() -> None:
         1,
         "queued",
     )
+
+
+async def test_large_libraries_are_read_whole() -> None:
+    """A Radarr library larger than the default 5 MB answer cap is still synchronised (027)."""
+    movies = [
+        {"id": i, "title": f"Film {i}", "tmdbId": i, "overview": "x" * 3000, "hasFile": True}
+        for i in range(2100)
+    ]
+    routes = {"/api/v3/system/status": {"appName": "Radarr", "version": "5"}, "/api/v3/movie": movies}
+    handle = handle_for("radarr", routes=routes)
+    found = [r async for r in RadarrConnector().sync(_Ctx(handle), None) if isinstance(r, SourceRecord)]
+    assert len(found) == 2100
+    with pytest.raises(ConnectionError):  # other calls keep the default cap
+        await RadarrConnector().get_json(handle, "/api/v3/movie")

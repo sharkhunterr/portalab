@@ -2024,9 +2024,25 @@
             "title": "Key",
             "type": "string"
           },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
+          },
           "placed": {
             "title": "Placed",
             "type": "boolean"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
           },
           "widget": {
             "$ref": "#/components/schemas/WidgetMeta"
@@ -31977,6 +31993,30 @@
         "summary": "Transition",
         "tags": [
           "support"
+        ]
+      }
+    },
+    "/api/v1/ui/notification-looks": {
+      "get": {
+        "description": "027: the notification styles and animations, those sold in the shop marked locked unless owned.",
+        "operationId": "notification_looks_api_v1_ui_notification_looks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Notification Looks Api V1 Ui Notification Looks Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Notification Looks",
+        "tags": [
+          "ui"
         ]
       }
     },

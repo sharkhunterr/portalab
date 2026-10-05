@@ -37,7 +37,15 @@ from portalab.capabilities.media import (
     SourceActivity,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
-from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
+from portalab.connectors.http_base import (
+    LIBRARY_LISTING_BYTES,
+    BaseConfig,
+    HttpConnector,
+    _Probe,
+    binding,
+    parse_time,
+    safe_id,
+)
 
 AUDIOBOOK = "AUDIOBOOK"
 BOOKS_PER_PAGE = 20  # books whose sessions are read per activity page
@@ -226,17 +234,15 @@ class GrimmoryConnector(HttpConnector):
         params: Mapping[str, Any] | None = None,
         json_body: Any = None,
         headers: Mapping[str, str] | None = None,
+        max_bytes: int | None = None,
     ) -> Any:
         await self._ensure(service)
+        call = {"params": params, "json_body": json_body, "headers": headers, "max_bytes": max_bytes}
         try:
-            return await super().request(
-                service, method, path, params=params, json_body=json_body, headers=headers
-            )
+            return await super().request(service, method, path, **call)
         except ProviderAuthError:
             await self._login(service)  # the token may have been revoked: one fresh attempt
-            return await super().request(
-                service, method, path, params=params, json_body=json_body, headers=headers
-            )
+            return await super().request(service, method, path, **call)
 
     async def get_bytes(self, service: ServiceHandle, path: str, **params: Any) -> bytes:
         await self._ensure(service)
@@ -256,7 +262,15 @@ class GrimmoryConnector(HttpConnector):
 
     # --- library --------------------------------------------------------------------------------------
     async def books(self, service: ServiceHandle) -> list[Mapping[str, Any]]:
-        return _content(await self.get_json(service, "/api/v1/books", stripForListView="false"))
+        return _content(
+            await self.request(
+                service,
+                "GET",
+                "/api/v1/books",
+                params={"stripForListView": "false"},
+                max_bytes=LIBRARY_LISTING_BYTES,
+            )
+        )
 
     async def sync(
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None

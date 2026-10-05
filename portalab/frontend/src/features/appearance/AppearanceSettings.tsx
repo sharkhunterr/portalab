@@ -11,6 +11,7 @@ import { PolicyField, type PolicyState } from "../../design-system/components/Po
 import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
 import { parseTheme, presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
+import { NotificationLooks } from "./NotificationLooks";
 
 /**
  * Appearance & accessibility settings (spec 022): theme, density, text size, contrast, motion, sound and
@@ -345,22 +346,7 @@ export function AppearanceSettings() {
           ))}
         </SelectField>
       ))}
-      {field("ui.notificationStyle", (disabled) => (
-        <SelectField
-          label={appearanceStrings.notificationStyle}
-          value={preferences.notificationStyle}
-          disabled={disabled}
-          onChange={(event) =>
-            set("notificationStyle")(event.target.value as UiPreferences["notificationStyle"])
-          }
-        >
-          {Object.entries(appearanceStrings.styles).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </SelectField>
-      ))}
+      <NotificationLooks />
       {field("ui.campaignThemes", (disabled) => (
         <CheckboxField
           label={appearanceStrings.campaignThemes}

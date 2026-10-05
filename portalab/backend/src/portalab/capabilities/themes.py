@@ -44,3 +44,26 @@ ENTITLEMENTS_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Themes sold in the Marketplace and the ones a user owns (027 US11)",
 )
+
+
+COSMETICS = "marketplace.cosmetics"
+
+
+@runtime_checkable
+class CosmeticEntitlements(Protocol):
+    """027 (provided by Marketplace 015): cosmetic choices sold as products — notification styles and
+    animations… — are chosen by their owners only. ``kind`` is the product type, ``field`` the payload key
+    naming the choice (e.g. ``notification_style`` / ``style``)."""
+
+    async def sold(self, kind: str, field: str) -> frozenset[str]: ...
+
+    async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]: ...
+
+
+COSMETICS_SPEC = CapabilitySpec(
+    name=COSMETICS,
+    version="1.0",
+    protocol=CosmeticEntitlements,
+    multi_provider=False,
+    description="Cosmetic choices sold in the Marketplace and the ones a user owns (027)",
+)

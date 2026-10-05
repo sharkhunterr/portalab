@@ -6499,6 +6499,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ui/notification-looks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Notification Looks
+         * @description 027: the notification styles and animations, those sold in the shop marked locked unless owned.
+         */
+        get: operations["notification_looks_api_v1_ui_notification_looks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ui/themes": {
         parameters: {
             query?: never;
@@ -7763,8 +7783,15 @@ export interface components {
         CatalogEntryOut: {
             /** Key */
             key: string;
+            /**
+             * Locked
+             * @default false
+             */
+            locked: boolean;
             /** Placed */
             placed: boolean;
+            /** Product */
+            product?: string | null;
             widget: components["schemas"]["WidgetMeta"];
         };
         /** CategoryPolicyIn */
@@ -24820,6 +24847,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    notification_looks_api_v1_ui_notification_looks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

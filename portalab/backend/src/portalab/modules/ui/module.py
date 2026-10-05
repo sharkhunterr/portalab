@@ -16,6 +16,7 @@ from portalab.core.time import Clock
 from portalab.modules.ui import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.ui import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.ui.events import CONSUMER, preference_consumer, register_event_types
+from portalab.modules.ui.looks import NotificationLooks
 from portalab.modules.ui.themes.service import ThemeService
 
 OWNER = "module:ui"
@@ -37,6 +38,7 @@ class UiModule:
         self.events = events
         self.capabilities = capabilities
         self.themes = ThemeService(database, audit, capabilities, clock=clock)
+        self.looks = NotificationLooks(capabilities)
         self.event_types = event_types
         self.consumers = consumers
 

@@ -358,5 +358,7 @@
   "widget.recently_requested.config.state.pending": "Pending",
   "widget.recently_requested.config.state.approved": "In progress",
   "widget.recently_requested.config.state.available": "Available",
-  "widget.recently_requested.config.state.declined": "Declined"
+  "widget.recently_requested.config.state.declined": "Declined",
+  "widget.poster_wall.title": "Poster wall",
+  "widget.poster_wall.description": "The 24 most watched titles of the month as a big poster wall."
 }

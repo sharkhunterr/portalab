@@ -8,30 +8,34 @@ import {
   useRef,
   useState,
 } from "react";
+import { Link, useInRouterContext } from "react-router";
 import { usePreferences } from "../a11y/PreferencesProvider";
 import { sound } from "../sound/SoundService";
-import { FunctionalState } from "../state/FunctionalState";
-import type { FunctionalStateName } from "../state/stateMap";
+import { Icon } from "./Icon";
 
 /**
- * Notification appearance primitives (spec 022 T035; delivery belongs to 010). Position, duration and
- * style come from the user's preferences; severity is always icon + text (style/position never change the
- * meaning); reduced motion removes the entrance animation through the shared tokens; sounds go through the
- * ``SoundService`` (sound-off honoured, no autoplay before a gesture).
+ * Notifications (spec 022 T035; 027 redesign — delivery belongs to 010). A card with a coloured icon by
+ * tone, a title, a short description, an optional image, badge and link, and a countdown bar until it goes
+ * away. Its *style* (card, banner, capsule, minimal, frosted glass, neon) and *animation* (slide, fade,
+ * pop, zoom, bounce, flip, swing) are the member's choice, independent of the theme — some are sold in the
+ * shop. Severity is always icon + text (never colour alone); reduced motion removes every animation;
+ * sounds go through the ``SoundService`` (sound-off honoured, no autoplay before a gesture).
  */
 export type Severity = "info" | "success" | "warning" | "critical";
+export type NotificationTone = Severity | "reward";
 
-const SEVERITY_STATE: Record<Severity, FunctionalStateName> = {
-  info: "available",
-  success: "available",
-  warning: "partial",
-  critical: "error",
-};
 const SEVERITY_LABEL: Record<Severity, string> = {
   info: "Information",
   success: "Success",
   warning: "Warning",
   critical: "Critical",
+};
+const TONE_ICON: Record<NotificationTone, string> = {
+  info: "bell",
+  success: "check",
+  warning: "warning",
+  critical: "alert",
+  reward: "trophy",
 };
 
 export interface NotificationItem {
@@ -39,29 +43,117 @@ export interface NotificationItem {
   severity: Severity;
   title: string;
   body?: string;
+  /** 027: richer cards — colour family, icon, link, image (a portal URL) and a short badge. */
+  tone?: NotificationTone | undefined;
+  icon?: string | undefined;
+  href?: string | undefined;
+  linkLabel?: string | undefined;
+  image?: string | undefined;
+  badge?: string | undefined;
 }
 
-export function Notification({ item, onDismiss }: { item: NotificationItem; onDismiss?: () => void }) {
+/** The notification area lives outside the router: navigate through it when present, else a plain link. */
+function NotificationLink({
+  href,
+  label,
+  onFollow,
+}: {
+  href: string;
+  label: string;
+  onFollow?: (() => void) | undefined;
+}) {
+  const routed = useInRouterContext();
+  const body = (
+    <>
+      {label}
+      <Icon name="chevron-right" size={14} />
+    </>
+  );
+  if (!routed) {
+    return (
+      <a
+        className="ds-notification__link"
+        href={href}
+        onClick={(event) => {
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+          event.preventDefault(); // stay in the app: the router follows history changes
+          window.history.pushState({}, "", href);
+          window.dispatchEvent(new PopStateEvent("popstate"));
+          onFollow?.();
+        }}
+      >
+        {body}
+      </a>
+    );
+  }
+  return (
+    <RoutedLink href={href} onFollow={onFollow}>
+      {body}
+    </RoutedLink>
+  );
+}
+
+function RoutedLink({
+  href,
+  onFollow,
+  children,
+}: {
+  href: string;
+  onFollow?: (() => void) | undefined;
+  children: ReactNode;
+}) {
+  return (
+    <Link className="ds-notification__link" to={href} onClick={onFollow}>
+      {children}
+    </Link>
+  );
+}
+
+export function Notification({
+  item,
+  onDismiss,
+  durationMs,
+}: {
+  item: NotificationItem;
+  onDismiss?: () => void;
+  durationMs?: number | undefined;
+}) {
+  const tone = item.tone ?? item.severity;
+  const internal = item.href?.startsWith("/") && !item.href.startsWith("//");
   return (
     <div
       className="ds-notification"
       data-severity={item.severity}
+      data-tone={tone}
       role={item.severity === "critical" ? "alert" : "status"}
     >
-      <FunctionalState state={SEVERITY_STATE[item.severity]} label={SEVERITY_LABEL[item.severity]} />
-      <div>
-        <strong>{item.title}</strong>
-        {item.body ? <p>{item.body}</p> : null}
+      <span className="ds-notification__icon" aria-hidden="true">
+        <Icon name={item.icon ?? TONE_ICON[tone]} size={20} />
+      </span>
+      <div className="ds-notification__content">
+        <p className="ds-notification__head">
+          <span className="visually-hidden">{SEVERITY_LABEL[item.severity]}: </span>
+          <strong className="ds-notification__title">{item.title}</strong>
+          {item.badge ? <span className="ds-notification__badge">{item.badge}</span> : null}
+        </p>
+        {item.body ? <p className="ds-notification__body">{item.body}</p> : null}
+        {item.href && internal ? (
+          <NotificationLink href={item.href} label={item.linkLabel ?? "Open"} onFollow={onDismiss} />
+        ) : null}
       </div>
+      {item.image ? <img className="ds-notification__image" src={item.image} alt="" /> : null}
       {onDismiss ? (
         <button
           type="button"
-          className="ds-button ds-button--secondary"
+          className="ds-notification__close"
           onClick={onDismiss}
           aria-label={`Dismiss: ${item.title}`}
         >
-          ×
+          <Icon name="close" size={16} />
         </button>
+      ) : null}
+      {durationMs && item.severity !== "critical" ? (
+        <span className="ds-notification__timer" style={{ animationDuration: `${durationMs}ms` }} />
       ) : null}
     </div>
   );
@@ -76,23 +168,26 @@ const NotifyContext = createContext<NotifyContextValue>({ notify: () => undefine
 export function NotificationArea({ children }: { children: ReactNode }) {
   const { preferences } = usePreferences();
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const [paused, setPaused] = useState(false);
   const counter = useRef(0);
   sound.enabled = preferences.soundEnabled;
   const dismiss = useCallback((id: string) => setItems((current) => current.filter((i) => i.id !== id)), []);
   const notify = useCallback((item: Omit<NotificationItem, "id">) => {
     counter.current += 1;
     const id = `n${counter.current}`;
-    setItems((current) => [...current, { ...item, id }]);
-    void sound.play(item.severity === "critical" ? "alert" : "notification");
+    setItems((current) => [...current, { ...item, id }].slice(-5)); // never more than five at once
+    void sound.play(
+      item.severity === "critical" ? "alert" : item.tone === "reward" ? "reward" : "notification",
+    );
   }, []);
   const durationMs = preferences.notificationDurationSeconds * 1000;
   useEffect(() => {
-    if (!items.length) return;
+    if (!items.length || paused) return;
     const oldest = items.find((i) => i.severity !== "critical");
     if (!oldest) return; // critical notifications stay until dismissed
     const timer = setTimeout(() => dismiss(oldest.id), durationMs);
     return () => clearTimeout(timer);
-  }, [items, durationMs, dismiss]);
+  }, [items, durationMs, dismiss, paused]);
   const value = useMemo(() => ({ notify }), [notify]);
   const style = preferences.notificationStyle === "banner" ? " ds-notifications--banner" : "";
   return (
@@ -102,9 +197,21 @@ export function NotificationArea({ children }: { children: ReactNode }) {
         className={`ds-notifications ds-notifications--${preferences.notificationPosition}${style}`}
         aria-label="Notifications"
         data-position={preferences.notificationPosition}
+        data-style={preferences.notificationStyle}
+        data-animation={preferences.notificationAnimation}
+        data-paused={paused || undefined}
+        onPointerEnter={() => setPaused(true)}
+        onPointerLeave={() => setPaused(false)}
+        onFocus={() => setPaused(true)}
+        onBlur={() => setPaused(false)}
       >
         {items.map((item) => (
-          <Notification key={item.id} item={item} onDismiss={() => dismiss(item.id)} />
+          <Notification
+            key={item.id}
+            item={item}
+            onDismiss={() => dismiss(item.id)}
+            durationMs={durationMs}
+          />
         ))}
       </section>
     </NotifyContext.Provider>

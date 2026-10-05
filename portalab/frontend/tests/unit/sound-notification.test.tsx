@@ -68,3 +68,21 @@ describe("notification appearance", () => {
     expect(notification).toHaveTextContent("Disk almost full");
   });
 });
+
+describe("notification links (027)", () => {
+  it("renders an in-portal link even outside the router", () => {
+    render(
+      <Notification
+        item={{
+          id: "2",
+          severity: "success",
+          tone: "reward",
+          title: "Level up",
+          href: "/progression",
+          linkLabel: "Open",
+        }}
+      />,
+    );
+    expect(screen.getByRole("link", { name: /Open/ })).toHaveAttribute("href", "/progression");
+  });
+});

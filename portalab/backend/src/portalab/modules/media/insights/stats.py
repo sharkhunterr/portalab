@@ -109,6 +109,7 @@ class InsightsQuery:
         user: UUID | None,
         manager: bool,
         tz: str = "UTC",
+        top: int = TOP,
     ) -> dict[str, Any]:
         now = utc_now(self.clock)
         win = window(period, now)
@@ -176,7 +177,7 @@ class InsightsQuery:
             ]
             timeline = await self._timeline(session, win, kinds, user)
             heatmap = await self._heatmap(session, win, kinds, user, zone)
-            top_works = await self._top_works(session, win, kinds, user, show_members=user is None)
+            top_works = await self._top_works(session, win, kinds, user, show_members=user is None, limit=top)
             genres = await self._tags(session, win, kinds, user, "genre")
             people = await self._tags(session, win, kinds, user, "person")
             decades = await self._decades(session, win, kinds, user)
@@ -282,7 +283,14 @@ class InsightsQuery:
         ]
 
     async def _top_works(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None, *, show_members: bool
+        self,
+        session: Any,
+        win: Window,
+        kinds: Sequence[str],
+        user: UUID | None,
+        *,
+        show_members: bool,
+        limit: int = TOP,
     ) -> list[dict[str, Any]]:
         label = func.coalesce(MediaObject.title, func.max(Activity.parent_title), func.max(Activity.title))
         key = func.coalesce(
@@ -308,7 +316,7 @@ class InsightsQuery:
                 .outerjoin(MediaObject, MediaObject.id == Activity.work_id)
                 .group_by(key, Activity.work_id, MediaObject.title)
                 .order_by(func.sum(Activity.watched_s).desc(), func.count().desc())
-                .limit(TOP)
+                .limit(limit)
             )
         ).all()
         return [

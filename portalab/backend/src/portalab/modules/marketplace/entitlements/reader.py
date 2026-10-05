@@ -63,3 +63,33 @@ class ThemeEntitlementsReader:
                 .where(Ownership.user_id == user_id, Ownership.state.in_(LIVE))
             )
             return frozenset(key for key in rows if key)
+
+
+class CosmeticsReader:
+    """``marketplace.cosmetics`` (027): any cosmetic choice sold through a product type whose current
+    version names it in ``payload[field]`` — notification styles and animations — and the ones a member
+    owns (directly, or through a pack)."""
+
+    def __init__(self, database: Database) -> None:
+        self.database = database
+
+    def _choices(self, kind: str, field: str) -> Select[tuple[str]]:
+        return (
+            select(ProductVersion.payload[field].astext)
+            .join(Product, Product.id == ProductVersion.product_id)
+            .where(Product.type == kind, ProductVersion.version == Product.current_version)
+        )
+
+    async def sold(self, kind: str, field: str) -> frozenset[str]:
+        async with self.database.session() as session:
+            rows = await session.scalars(self._choices(kind, field).where(Product.state == "available"))
+            return frozenset(key for key in rows if key)
+
+    async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:
+        async with self.database.session() as session:
+            rows = await session.scalars(
+                self._choices(kind, field)
+                .join(Ownership, Ownership.product_id == Product.id)
+                .where(Ownership.user_id == user_id, Ownership.state.in_(LIVE))
+            )
+            return frozenset(key for key in rows if key)
