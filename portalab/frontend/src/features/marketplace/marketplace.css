@@ -690,3 +690,26 @@
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--rarity) 8%, transparent);
 }
+/* 027: sold-out products stay in the shop, clearly marked */
+.product-card[data-soldout] .product-art {
+  filter: grayscale(0.85) brightness(0.75);
+}
+.product-card[data-soldout] .product-card__name {
+  opacity: 0.8;
+}
+.product-card__soldout {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 1.4rem;
+  inset-inline-end: -2.4rem;
+  padding: 0.25rem 2.6rem;
+  transform: rotate(35deg);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+  border-block: 1px solid var(--state-error-fg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+}

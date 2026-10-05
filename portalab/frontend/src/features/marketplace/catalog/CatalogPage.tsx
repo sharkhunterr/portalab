@@ -31,7 +31,11 @@ export const TYPE_GROUPS: Array<{ key: string; icon: string; types: string[] }> 
   },
   { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
   { key: "packs", icon: "shop", types: ["bundle"] },
-  { key: "features", icon: "zap", types: ["feature", "plugin", "widget", "statistic", "access"] },
+  {
+    key: "features",
+    icon: "zap",
+    types: ["feature", "plugin", "widget", "widget_option", "statistic", "access", "project_launch"],
+  },
   { key: "bonus", icon: "inbox", types: ["quota"] },
 ];
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
@@ -42,8 +46,11 @@ function groupOf(type: string): string {
 }
 
 function byRarity(a: Product, b: Product): number {
+  const soldOut = (p: Product) => (p.remaining === 0 && !p.owned ? 1 : 0); // 027: sold out last, still shown
   return (
-    (RANK[a.rarity ?? "common"] ?? 3) - (RANK[b.rarity ?? "common"] ?? 3) || a.name.localeCompare(b.name)
+    soldOut(a) - soldOut(b) ||
+    (RANK[a.rarity ?? "common"] ?? 3) - (RANK[b.rarity ?? "common"] ?? 3) ||
+    a.name.localeCompare(b.name)
   );
 }
 

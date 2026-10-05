@@ -10,10 +10,50 @@ import { type OwnershipRow, useOwnedActions, usePurchases } from "../api";
 import "../marketplace.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 
+/** 027: a bought project launch — name the project and pitch it; it opens as a community proposal. */
+function ProjectLaunchForm({ row }: { row: OwnershipRow }) {
+  const t = useT();
+  const { configure } = useOwnedActions();
+  const [title, setTitle] = useState("");
+  const [pitch, setPitch] = useState("");
+  return (
+    <form
+      className="ds-stack project-launch"
+      onSubmit={(event) => {
+        event.preventDefault();
+        configure.mutate({ id: row.id, configuration: { title, pitch } });
+      }}
+    >
+      <p className="ds-field__hint">{t("marketplace:owned.launchHint")}</p>
+      <TextField
+        label={t("marketplace:owned.launchTitle")}
+        value={title}
+        required
+        maxLength={200}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <div className="ds-field">
+        <label htmlFor={`pitch-${row.id}`}>{t("marketplace:owned.launchPitch")}</label>
+        <textarea
+          id={`pitch-${row.id}`}
+          rows={4}
+          maxLength={2000}
+          value={pitch}
+          onChange={(e) => setPitch(e.target.value)}
+        />
+      </div>
+      <Button type="submit" disabled={!title.trim() || configure.isPending}>
+        {t("marketplace:owned.launch")}
+      </Button>
+    </form>
+  );
+}
+
 function NeedsConfiguration({ row }: { row: OwnershipRow }) {
   const t = useT();
   const { configure } = useOwnedActions();
   const [value, setValue] = useState("");
+  if (row.product_type === "project_launch") return <ProjectLaunchForm row={row} />;
   return (
     <form
       className="ds-stack--row"

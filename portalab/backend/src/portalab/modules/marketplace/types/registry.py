@@ -24,7 +24,7 @@ from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.core.permissions import PermissionRegistry
 
 OWNER = "module:marketplace"
-NOT_REFUNDABLE = frozenset({"plugin", "access", "quota", "bundle"})
+NOT_REFUNDABLE = frozenset({"plugin", "access", "quota", "bundle", "project_launch"})
 
 
 def _port(capabilities: CapabilityRegistry, name: str) -> Any | None:
@@ -181,6 +181,29 @@ class BundleHandler(Owned):
         return ActivationResult("active")
 
 
+class ProjectLaunchHandler(Owned):
+    """``project_launch`` (027): buying it launches a community project for something the member wants —
+    they name it and pitch it (the owner's configuration ``title`` and ``pitch``), then it starts as a
+    proposal the community funds. Not refundable once launched."""
+
+    def __init__(self, launch: Callable[[UUID, UUID, str, str], Awaitable[None]] | None) -> None:
+        self.launch = launch
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        title = str(ownership.configuration.get("title") or "").strip()
+        if not title:
+            return ActivationResult("needs_configuration")
+        if self.launch is None:
+            return ActivationResult("failed", "projects unavailable")
+        await self.launch(
+            ownership.user_id,
+            ownership.id,
+            title[:200],
+            str(ownership.configuration.get("pitch") or "")[:2000],
+        )
+        return ActivationResult("active")
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
@@ -189,6 +212,7 @@ def register_builtin_types(
     config: Callable[[], Any],
     *,
     bundle_grant: Callable[[UUID, str, str], Awaitable[bool]] | None = None,
+    project_launch: Callable[[UUID, UUID, str, str], Awaitable[None]] | None = None,
 ) -> None:
     owned = Owned()
     for key, handler, fields in (
@@ -212,6 +236,8 @@ def register_builtin_types(
         ("ambient", owned, ("ambient",)),  # an animated layer behind the whole portal
         ("profile_background", owned, ("background",)),  # an animated background behind the profile
         ("name_style", owned, ("style",)),  # the name's font and effect on the profile
+        ("widget_option", owned, ("option",)),  # a widget setting value: ``<widget>:<field>=<value>``
+        ("project_launch", ProjectLaunchHandler(project_launch), ("kind",)),  # a community project
     ):
         if registry.get(key) is None:
             registry.register(

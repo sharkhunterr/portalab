@@ -147,6 +147,12 @@ class MarketplaceModule:
             return False
         return True
 
+    async def _launch_project(self, user: UUID, ownership: UUID, title: str, pitch: str) -> None:
+        """027: a ``project_launch`` purchase opens a community project as a proposal (once)."""
+        project = await self.projects.register(f"purchase:{ownership}", user, title)
+        if project.state == "idea":
+            await self.transition(SYSTEM_PRINCIPAL, project.id, "proposal", note=pitch or None)
+
     def register(self) -> None:
         register_event_types(self.event_types)
         if not self.capabilities.system_providers(LIFECYCLE):
@@ -166,6 +172,7 @@ class MarketplaceModule:
             self.permissions,
             lambda: self.config,
             bundle_grant=self._grant_from_bundle,
+            project_launch=self._launch_project,
         )
         if self.search.provider("product") is None:
             self.search.register(ProductSearchProvider(self.catalog, self.authorizer), owner=OWNER)

@@ -382,5 +382,14 @@
   "myRequests.moment.month": "Release month",
   "myRequests.moment.year": "Release year",
   "myRequests.moment.catalog": "Older title",
-  "myRequests.moment.unknown": "Release unknown"
+  "myRequests.moment.unknown": "Release unknown",
+  "insights.locked.when": "When you watch",
+  "insights.locked.genres": "Your favourite genres",
+  "insights.locked.people": "Actors and directors",
+  "insights.locked.decades": "By decade",
+  "insights.locked.records": "Your records",
+  "insights.locked.box_office": "Your films' box office",
+  "insights.locked.platforms": "Your platforms",
+  "insights.locked.hint": "This statistic unlocks in the shop.",
+  "insights.locked.toShop": "See in the shop"
 }

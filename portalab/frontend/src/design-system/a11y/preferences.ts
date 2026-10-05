@@ -118,6 +118,12 @@ export const CELEBRATION_KEYS = [
   "lightning",
   "petals",
   "bubbles",
+  "assemble",
+  "burn",
+  "shatter",
+  "freeze",
+  "glitch",
+  "portal",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

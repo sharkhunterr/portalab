@@ -9,6 +9,7 @@ from sqlalchemy import func, select
 
 from portalab.capabilities.activity import CAPABILITY as ACTIVITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.content import CalendarSourceRegistry, default_calendar_sources
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.events import (
     ConsumerRegistry,
@@ -64,6 +65,7 @@ from portalab.modules.media.images.service import JOB as IMAGE_JOB
 from portalab.modules.media.images.service import ImageService
 from portalab.modules.media.insights.aggregate import JOB as AGGREGATE_JOB
 from portalab.modules.media.insights.aggregate import ActivityAggregator
+from portalab.modules.media.insights.calendar_source import MediaReleaseCalendarSource
 from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
@@ -147,6 +149,7 @@ class MediaModule:
         types: MediaTypeRegistry = default_media_types,
         blocks: DetailBlockRegistry = default_detail_blocks,
         widgets: WidgetRegistry = default_widgets,
+        calendar: CalendarSourceRegistry = default_calendar_sources,
         search: SearchRegistry = default_search,
         categories: CategoryRegistry = default_categories,
         observables: ObservableRegistry = default_observables,
@@ -205,6 +208,7 @@ class MediaModule:
         self.enricher = MetadataEnricher(database, capabilities, self.language, blobs=blobs, clock=clock)
         self.insights = InsightsQuery(database, clock=clock)
         self.upcoming = Upcoming(database, capabilities, clock=clock)
+        self.calendar = calendar
         self.request_insights = RequestInsights(
             database, capabilities, self.upcoming, clock=clock, enricher=self.enricher
         )
@@ -271,6 +275,8 @@ class MediaModule:
     # --- registration ----------------------------------------------------------------------------------
     def register(self) -> None:
         register_baseline(self.types, OWNER)
+        if self.calendar.get(MediaReleaseCalendarSource.kind) is None:  # 027: releases in the calendar
+            self.calendar.register(MediaReleaseCalendarSource(self.upcoming), owner=OWNER)
         register_event_types(self.event_types)
         for capability, sink in ((LIBRARY, self.library), (REQUESTS, self.request_sink)):
             if self.sinks.get(capability) is None:

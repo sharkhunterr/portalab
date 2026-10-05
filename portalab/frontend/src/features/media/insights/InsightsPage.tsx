@@ -324,6 +324,23 @@ function BoxOffice({ data }: { data: NonNullable<Insights["box_office"]> }) {
   );
 }
 
+/** 027: a statistic sold in the shop and not unlocked yet: its title, what it shows, the way to it. */
+function LockedStat({ name, icon }: { name: string; icon: string }) {
+  const t = useT();
+  return (
+    <AdminSection title={t(`media:insights.locked.${name}`)} icon={icon}>
+      <div className="insights-locked">
+        <Icon name="lock" size={28} />
+        <p>{t("media:insights.locked.hint")}</p>
+        <Link className="ds-button ds-button--secondary" to="/marketplace?type=statistic">
+          <Icon name="shop" size={16} />
+          {t("media:insights.locked.toShop")}
+        </Link>
+      </div>
+    </AdminSection>
+  );
+}
+
 export default function InsightsPage() {
   const t = useT();
   const format = useFormat();
@@ -343,6 +360,7 @@ export default function InsightsPage() {
   };
   const years = Array.from({ length: 4 }, (_, i) => String(new Date().getFullYear() - i));
   const data = insights.data;
+  const locked = (name: string) => Boolean(data?.locked?.includes(name)); // 027: sold in the shop
   return (
     <AdminPage
       icon="chart"
@@ -446,9 +464,13 @@ export default function InsightsPage() {
               <AdminSection title={t("media:insights.top")} icon="trophy" span="full" flush>
                 <TopWorks data={data} />
               </AdminSection>
-              <AdminSection title={t("media:insights.when")} icon="clock">
-                <Heatmap data={data} />
-              </AdminSection>
+              {locked("when") ? (
+                <LockedStat name="when" icon="clock" />
+              ) : (
+                <AdminSection title={t("media:insights.when")} icon="clock">
+                  <Heatmap data={data} />
+                </AdminSection>
+              )}
               <AdminSection title={t("media:insights.byKind")} icon="list">
                 <Bars
                   rows={data.by_kind.map((k) => ({
@@ -460,16 +482,19 @@ export default function InsightsPage() {
                   value={measures.duration}
                 />
               </AdminSection>
+              {locked("genres") ? <LockedStat name="genres" icon="palette" /> : null}
               {data.genres.length ? (
                 <AdminSection title={t("media:insights.genres")} icon="palette">
                   <Bars rows={ranked(data.genres, t)} value={measures.hours} />
                 </AdminSection>
               ) : null}
+              {locked("people") ? <LockedStat name="people" icon="user" /> : null}
               {data.people.length ? (
                 <AdminSection title={t("media:insights.people")} icon="user">
                   <Bars rows={ranked(data.people, t)} value={measures.hours} />
                 </AdminSection>
               ) : null}
+              {locked("decades") ? <LockedStat name="decades" icon="calendar" /> : null}
               {data.decades.length ? (
                 <AdminSection title={t("media:insights.decades")} icon="calendar">
                   <Bars
@@ -483,9 +508,14 @@ export default function InsightsPage() {
                   />
                 </AdminSection>
               ) : null}
-              <AdminSection title={t("media:insights.records.title")} icon="star">
-                <Records data={data} />
-              </AdminSection>
+              {locked("records") ? (
+                <LockedStat name="records" icon="star" />
+              ) : (
+                <AdminSection title={t("media:insights.records.title")} icon="star">
+                  <Records data={data} />
+                </AdminSection>
+              )}
+              {locked("box_office") ? <LockedStat name="box_office" icon="coins" /> : null}
               {data.box_office ? (
                 <AdminSection
                   title={t("media:insights.box.title")}
@@ -507,6 +537,7 @@ export default function InsightsPage() {
                   />
                 </AdminSection>
               ) : null}
+              {locked("platforms") ? <LockedStat name="platforms" icon="gauge" /> : null}
               {data.platforms?.length ? (
                 <AdminSection title={t("media:insights.platforms")} icon="gauge">
                   <Bars

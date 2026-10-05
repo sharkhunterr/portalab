@@ -20,6 +20,8 @@ export const TYPE_ICONS: Record<string, string> = {
   ambient: "snowflake",
   profile_background: "sparkles",
   name_style: "feather",
+  widget_option: "settings",
+  project_launch: "lightbulb",
 };
 
 export function ProductPoster({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {

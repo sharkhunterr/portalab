@@ -89,6 +89,9 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "ambient": ("ambient",),
     "profile_background": ("background",),
     "name_style": ("style",),
+    "widget_option": ("option",),
+    "project_launch": ("kind",),
+    "statistic": ("statistic",),
 }
 
 

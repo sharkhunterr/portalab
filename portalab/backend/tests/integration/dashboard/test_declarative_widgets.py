@@ -18,7 +18,7 @@ from portalab.modules.dashboard.invalidate.bridge import invalidation_consumer
 from portalab.modules.dashboard.registry.plugin_widgets import plugin_state_consumer, register_plugin_widget
 from tests.integration.dashboard.conftest import DashboardHarness
 from tests.integration.identity.helpers import create_user, login, module_of
-from tests.unit.dashboard.fakes import FakeWidget
+from tests.unit.dashboard.fakes import FakeWidget, definition
 
 pytestmark = pytest.mark.integration
 
@@ -126,3 +126,49 @@ async def test_widget_products_need_an_entitlement(
     gallery = (await client.get("/api/v1/dashboard/catalog")).json()
     assert {c["key"]: c["locked"] for c in gallery}[key] is True
     assert (await client.get(f"/api/v1/widgets/{key}/data")).json()["state"] == "unauthorized"
+
+
+class _Shop:
+    """027: the Marketplace cosmetics port — an existing widget and a widget setting sold in the shop."""
+
+    def __init__(self, owners: set[UUID]) -> None:
+        self.owners = owners
+
+    async def sold(self, kind: str, field: str) -> frozenset[str]:
+        return frozenset(
+            {"t.sold"} if kind == "widget" else {"t.sold:limit=9"} if kind == "widget_option" else set()
+        )
+
+    async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:
+        if user_id not in self.owners:
+            return frozenset()
+        return await self.sold(kind, field)
+
+    async def equipped(self, user_id: UUID) -> dict[str, object]:
+        return {}
+
+
+async def test_existing_widgets_and_settings_sold_in_the_shop(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
+) -> None:
+    from portalab.capabilities.themes import COSMETICS
+
+    dash.registry.register(definition("t.sold"), FakeWidget())
+    buyer = await create_user(module_of(app), "buyer")
+    await create_user(module_of(app), "other")
+    dash.full.identity.capabilities.provide(
+        COSMETICS, _Shop({buyer}), instance_ref="t", owner="module:marketplace"
+    )
+    await login(client, "other")
+    gallery = {c["key"]: c["locked"] for c in (await client.get("/api/v1/dashboard/catalog")).json()}
+    assert gallery["t.sold"] is True  # sold: shown « in the shop », never addable
+    assert (await client.get("/api/v1/widgets/t.sold/data")).json()["state"] == "unauthorized"
+    await login(client, "buyer")
+    gallery = {c["key"]: c["locked"] for c in (await client.get("/api/v1/dashboard/catalog")).json()}
+    assert gallery["t.sold"] is False
+    added = await client.post(
+        "/api/v1/dashboard/widgets", json={"widget_key": "t.sold", "config": {"limit": 9}}
+    )
+    assert added.status_code == 201, added.text  # the buyer owns the setting too
+    await login(client, "other")
+    assert (await client.get("/api/v1/dashboard/locked-options")).json() == {"locked": ["t.sold:limit=9"]}

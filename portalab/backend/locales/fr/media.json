@@ -382,5 +382,14 @@
   "myRequests.moment.month": "Le mois de la sortie",
   "myRequests.moment.year": "L'année de la sortie",
   "myRequests.moment.catalog": "Titre plus ancien",
-  "myRequests.moment.unknown": "Sortie inconnue"
+  "myRequests.moment.unknown": "Sortie inconnue",
+  "insights.locked.when": "Vos moments de visionnage",
+  "insights.locked.genres": "Vos genres préférés",
+  "insights.locked.people": "Acteurs et réalisateurs",
+  "insights.locked.decades": "Par décennie",
+  "insights.locked.records": "Vos records",
+  "insights.locked.box_office": "Box-office de vos films",
+  "insights.locked.platforms": "Vos plateformes",
+  "insights.locked.hint": "Cette statistique se débloque dans la boutique.",
+  "insights.locked.toShop": "Voir dans la boutique"
 }

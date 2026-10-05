@@ -226,6 +226,12 @@ CELEBRATIONS = Literal[
     "lightning",
     "petals",
     "bubbles",
+    "assemble",
+    "burn",
+    "shatter",
+    "freeze",
+    "glitch",
+    "portal",
 ]
 PATTERNS = Literal[
     "none",

@@ -87,5 +87,7 @@
   "health.degraded": "Degraded",
   "health.unavailable": "Unavailable",
   "health.maintenance": "Maintenance",
-  "health.unknown": "Unknown"
+  "health.unknown": "Unknown",
+  "inShop": "in the shop",
+  "moreOptions": "More settings in the shop"
 }

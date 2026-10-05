@@ -84,7 +84,7 @@
   },
   "motion": {
     "profile": "subtle",
-    "celebration": "glow",
+    "celebration": "freeze",
     "fastMs": 140,
     "normalMs": 280
   },

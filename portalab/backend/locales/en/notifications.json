@@ -162,5 +162,11 @@
   "universe.hint": "A discreet animation behind the portal and the effect played for your rewards — the theme's, none, or ones from the shop.",
   "universe.ambient": "Ambient animation",
   "universe.celebration": "Reward celebration",
-  "universe.followTheme": "Follow the theme"
+  "universe.followTheme": "Follow the theme",
+  "universe.celebrations.assemble": "Pixel rain",
+  "universe.celebrations.burn": "Burning bubble",
+  "universe.celebrations.shatter": "Shatter",
+  "universe.celebrations.freeze": "Freeze",
+  "universe.celebrations.glitch": "Glitch",
+  "universe.celebrations.portal": "Portal"
 }

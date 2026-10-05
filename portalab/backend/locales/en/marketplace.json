@@ -286,7 +286,7 @@
   "what.quota": "Media requests on top of your quota.",
   "what.feature": "An extra portal feature.",
   "what.plugin": "A portal extension.",
-  "what.statistic": "An extra statistic.",
+  "what.statistic": "One more statistic in Media › Statistics.",
   "what.access": "Extra access on the portal.",
   "admin.rarities": "Rarities and copies",
   "admin.raritiesHint": "How many copies of a product of each rarity may exist. Empty: unlimited. A product may have its own number.",
@@ -318,5 +318,14 @@
   "buy.stopTrying": "Stop trying",
   "what.ambient": "A discreet animation behind the whole portal (snow, code rain, fireflies…), chosen in Appearance.",
   "what.profile_background": "An animated background behind your profile, seen by every member.",
-  "what.name_style": "A font and an effect for your name on your profile."
+  "what.name_style": "A font and an effect for your name on your profile.",
+  "owned.launchHint": "Describe the feature or project you want: it opens as a proposal in the community projects, where everyone can fund it.",
+  "owned.launchTitle": "Project title",
+  "owned.launchPitch": "Why this project? (pitch)",
+  "owned.launch": "Launch the project",
+  "type.project_launch": "Project launch",
+  "type.widget_option": "Widget option",
+  "what.project_launch": "You describe a feature or a project; it opens as a proposal in the community projects, funded by members.",
+  "what.widget_option": "One more setting for a dashboard widget (another chart, a longer period…).",
+  "art.launch": "Your idea, funded by the community"
 }

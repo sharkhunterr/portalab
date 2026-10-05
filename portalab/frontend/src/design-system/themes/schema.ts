@@ -104,6 +104,12 @@ export const CELEBRATIONS = [
   "lightning",
   "petals",
   "bubbles",
+  "assemble",
+  "burn",
+  "shatter",
+  "freeze",
+  "glitch",
+  "portal",
 ] as const;
 /** 027: what a theme draws behind the portal — a static pattern and an animated ambient layer. */
 export const BACKDROP_PATTERNS = [

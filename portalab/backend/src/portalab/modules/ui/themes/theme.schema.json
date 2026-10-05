@@ -755,7 +755,13 @@
             "coins",
             "lightning",
             "petals",
-            "bubbles"
+            "bubbles",
+            "assemble",
+            "burn",
+            "shatter",
+            "freeze",
+            "glitch",
+            "portal"
           ]
         }
       },

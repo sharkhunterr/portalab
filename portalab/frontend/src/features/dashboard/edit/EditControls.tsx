@@ -1,4 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router";
+import { api } from "../../../api/client";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
@@ -175,6 +178,19 @@ function ConfigDialog({
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Record<string, unknown>>(instance.config);
   const properties = (instance.widget?.config_schema.properties ?? {}) as Record<string, SchemaProperty>;
+  // 027: settings sold in the shop (another chart, a longer period…) stay visible, locked
+  const lockedOptions = useQuery({
+    queryKey: ["dashboard", "locked-options"],
+    enabled: open,
+    retry: false,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/dashboard/locked-options")).data as unknown as { locked: string[] }).locked,
+  });
+  const isLocked = (name: string, option: unknown) =>
+    Boolean(lockedOptions.data?.includes(`${instance.widget_key}:${name}=${String(option)}`));
+  const hasLocked = Object.entries(properties).some(([name, schema]) =>
+    (schema.enum ?? []).some((option) => isLocked(name, option)),
+  );
   // 027: labels from the widget's catalog (« <ns>:widget.<name>.config.<field>[.<option>] »), else raw
   const [ns, ...rest] = instance.widget_key.split(".");
   const base = `${ns}:widget.${rest.join(".")}.config`;
@@ -220,8 +236,10 @@ function ConfigDialog({
                 onChange={(e) => setDraft({ ...draft, [name]: e.target.value })}
               >
                 {schema.enum.map((option) => (
-                  <option key={String(option)} value={String(option)}>
+                  <option key={String(option)} value={String(option)} disabled={isLocked(name, option)}>
+                    {isLocked(name, option) ? "🔒 " : ""}
                     {label(`${base}.${name}.${String(option)}`, String(option))}
+                    {isLocked(name, option) ? ` · ${t("dashboard:inShop")}` : ""}
                   </option>
                 ))}
               </SelectField>
@@ -257,6 +275,11 @@ function ConfigDialog({
             />
           );
         })}
+        {hasLocked ? (
+          <p className="ds-field__hint">
+            <Link to="/marketplace?type=widget_option">{t("dashboard:moreOptions")}</Link>
+          </p>
+        ) : null}
         <Button type="submit">{t("dashboard:save")}</Button>
       </form>
     </Dialog>

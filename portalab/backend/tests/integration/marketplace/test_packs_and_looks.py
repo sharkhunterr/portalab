@@ -100,3 +100,31 @@ async def test_profile_background_name_title_and_badges(mk: MkHarness) -> None:
     assert len(catalog["badges"]) == 4
     assert {b["key"]: b["locked"] for b in catalog["backgrounds"]}["snow"] is False
     assert (await looks.equip(user, "badges", None)).get("badges") is None
+
+
+async def test_project_launch_opens_a_community_proposal(mk: MkHarness) -> None:
+    """027: buying a project launch asks for a title and a pitch, then opens the project as a proposal."""
+    from sqlalchemy import select
+
+    from portalab.modules.marketplace.models import Project
+
+    await published(mk, "launch", "project_launch", payload={"kind": "feature"})
+    ursula = mk.p("ursula")
+    ownership = await mk.module.purchases.acquire(ursula, "launch", "l1")
+    assert ownership.state == "needs_configuration"
+    done = await mk.module.activation.configure(
+        ursula, ownership.id, {"title": "Dark mode for the wiki", "pitch": "Reading at night."}
+    )
+    assert done.state == "active"
+    async with mk.database.session() as session:
+        project = await session.scalar(
+            select(Project).where(Project.proposal_ref == f"purchase:{ownership.id}")
+        )
+    assert project is not None
+    assert (project.title, project.state, project.proposer_id) == (
+        "Dark mode for the wiki",
+        "proposal",
+        mk.people["ursula"],
+    )
+    again = await mk.module.activation.activate(ownership.id)  # re-activation never opens a second project
+    assert again.state == "active"

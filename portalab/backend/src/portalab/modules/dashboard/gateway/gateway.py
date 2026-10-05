@@ -25,6 +25,7 @@ from portalab.capabilities.dashboard import (
 )
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.themes import COSMETICS
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.time import Clock, utc_now
 from portalab.modules.dashboard.observability import log, metric_part, metrics
@@ -66,6 +67,7 @@ class WidgetGateway:
         self.capabilities = capabilities
         self.config = config
         self.clock = clock
+        self._sold_cache: dict[tuple[str, str], tuple[float, frozenset[str]]] = {}
 
     def _provider(self, name: str) -> Any | None:
         try:
@@ -88,9 +90,49 @@ class WidgetGateway:
                 user = principal.acting_for or principal.user_id
                 if entitlements is None or user is None or not await entitlements.owns(user, product):
                     return False
+            elif widget.definition.key in await self.sold_widgets():
+                # 027: an existing widget sold by a ``widget`` product is for its owners only
+                user = principal.acting_for or principal.user_id
+                shop = self._provider(COSMETICS)
+                if shop is None or user is None:
+                    return False
+                if widget.definition.key not in await shop.owned(user, "widget", "widget"):
+                    return False
         except Exception:
             return False  # fail closed
         return True
+
+    async def sold_widgets(self) -> frozenset[str]:
+        """027: widget keys sold by available ``widget`` products (read at most every 10 s)."""
+        return await self._sold("widget", "widget")
+
+    async def locked_options(self, principal: Principal) -> frozenset[str]:
+        """027: widget setting values sold in the shop (``widget_option``: ``<widget>:<field>=<value>``)
+        that this member does not own."""
+        sold = await self._sold("widget_option", "option")
+        if not sold:
+            return frozenset()
+        shop = self._provider(COSMETICS)
+        user = principal.acting_for or principal.user_id
+        if shop is None or user is None:
+            return sold
+        try:
+            return frozenset(sold - await shop.owned(user, "widget_option", "option"))
+        except Exception:
+            return sold  # fail closed
+
+    async def _sold(self, kind: str, field: str) -> frozenset[str]:
+        now = time.monotonic()
+        cached = self._sold_cache.get((kind, field))
+        if cached is not None and now - cached[0] < 10:
+            return cached[1]
+        shop = self._provider(COSMETICS)
+        try:
+            sold = frozenset(await shop.sold(kind, field)) if shop is not None else frozenset()
+        except Exception:
+            sold = frozenset()
+        self._sold_cache[(kind, field)] = (now, sold)
+        return sold
 
     async def load(
         self,

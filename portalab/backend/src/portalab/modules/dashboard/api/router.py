@@ -245,6 +245,12 @@ async def catalog(principal: User, module: Module) -> list[CatalogEntryOut]:
     return out
 
 
+@router.get("/dashboard/locked-options")
+async def locked_options(principal: User, module: Module) -> dict[str, list[str]]:
+    """027: widget settings sold in the shop that this member does not own (``<widget>:<field>=<value>``)."""
+    return {"locked": sorted(await module.service.gateway.locked_options(principal))}
+
+
 @router.post("/dashboard/widgets", response_model=VersionOut, status_code=status.HTTP_201_CREATED)
 async def add_widget(
     principal: User, body: AddWidgetIn, module: Module, if_match: IfMatch = None

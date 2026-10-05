@@ -49,6 +49,11 @@ class WidgetUnavailableError(ValidationFailed):
     default_title = "Widget not available"
 
 
+class OptionLocked(ValidationFailed):
+    default_code = "dashboard.option_locked"
+    default_title = "Sold in the shop"
+
+
 class ConfigInvalid(ValidationFailed):
     default_code = "dashboard.config_invalid"
     default_title = "Invalid widget settings"
@@ -190,9 +195,12 @@ class DashboardService:
         the gallery as « in the shop » (permission and policy still apply)."""
         policies = self.config().widget_policies
         out = []
+        sold = await self.gateway.sold_widgets()  # 027: existing widgets sold by a product too
         for widget in self.registry.widgets():
             definition = widget.definition
-            if definition.product is None or policy_class(policies, definition.key) == "disabled":
+            if (definition.product is None and definition.key not in sold) or policy_class(
+                policies, definition.key
+            ) == "disabled":
                 continue
             if await self.gateway.allowed(widget, principal):
                 continue  # already owned: in the normal catalog
@@ -288,6 +296,22 @@ class DashboardService:
             raise WidgetUnavailableError("This widget is not available.")
         return widget
 
+    async def _check_options(
+        self, principal: Principal, widget: RegisteredWidget, values: Mapping[str, Any]
+    ) -> None:
+        """027: a setting value sold in the shop (another chart, a longer period…) needs its owner."""
+        locked = await self.gateway.locked_options(principal)
+        if not locked:
+            return
+        key = widget.definition.key
+        refused = sorted(
+            f"{field}={value}" for field, value in values.items() if f"{key}:{field}={value}" in locked
+        )
+        if refused:
+            raise OptionLocked(
+                "This setting is sold in the shop: buy it to use it.", extensions={"options": refused}
+            )
+
     def _check_config(self, widget: RegisteredWidget, config: Mapping[str, Any]) -> dict[str, Any]:
         merged = {**widget.definition.config_defaults, **config}
         errors = config_errors(widget, merged)
@@ -312,6 +336,7 @@ class DashboardService:
         policies = self.config().widget_policies
         locked = policy_class(policies, key) == "locked"
         values = self._check_config(widget, {} if locked else (config or {}))
+        await self._check_options(principal, widget, values)
         size = (
             widget.definition.size.default
             if locked
@@ -564,7 +589,9 @@ class DashboardService:
             if config is not None:
                 if widget is None:
                     raise WidgetUnavailableError("This widget is not available.")
-                row.config = self._check_config(widget, config)
+                checked = self._check_config(widget, config)
+                await self._check_options(principal, widget, checked)
+                row.config = checked
                 row.config_schema_version = widget.definition.schema_version
             row.updated_at = utc_now(self.clock)
             if position is not None:  # legacy ordered write (deprecated): new size, then flow by order

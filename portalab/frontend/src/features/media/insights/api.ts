@@ -66,6 +66,8 @@ export interface Insights {
     top: Array<{ id: string; title: string; revenue: number; image_id: string | null }>;
   } | null;
   platforms: Ranked[] | null;
+  /** 027: sections sold in the shop that this member has not unlocked (their data is left out). */
+  locked?: string[];
   recent: Array<{
     title: string;
     parent_title: string | null;

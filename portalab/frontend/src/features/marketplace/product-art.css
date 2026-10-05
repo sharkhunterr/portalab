@@ -550,3 +550,40 @@
 .product-art[data-size="mini"] .product-art__theme-name {
   display: none;
 }
+.product-art__option strong {
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+.product-art__stat-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  block-size: 3rem;
+}
+.product-art__stat-bars span {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, var(--rarity), var(--color-accent));
+}
+.product-art__stat-bars span:nth-child(1) {
+  block-size: 40%;
+}
+.product-art__stat-bars span:nth-child(2) {
+  block-size: 75%;
+}
+.product-art__stat-bars span:nth-child(3) {
+  block-size: 55%;
+}
+.product-art__stat-bars span:nth-child(4) {
+  block-size: 95%;
+}
+.product-art__stat-bars span:nth-child(5) {
+  block-size: 65%;
+}
+.product-art__launch {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  color: var(--rarity);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--rarity) 60%, transparent));
+}

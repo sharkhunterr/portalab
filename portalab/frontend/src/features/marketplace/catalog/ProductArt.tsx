@@ -290,6 +290,37 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       );
     case "effect":
       return <CelebrationArt effect={text(preview, "effect")} size={size} />;
+    case "widget_option": {
+      const option = text(preview, "option") ?? "";
+      const [widget, setting] = option.split(":");
+      return (
+        <span className="product-art__widget product-art__option">
+          <span className="product-art__widget-head">
+            <Icon name="settings" size={14} />
+            <span />
+          </span>
+          <strong>{setting?.replace("=", " · ") ?? option}</strong>
+          <span className="product-art__caption">{widget}</span>
+        </span>
+      );
+    }
+    case "statistic":
+      return (
+        <span className="product-art__widget product-art__stat">
+          <span className="product-art__stat-bars">
+            {["s1", "s2", "s3", "s4", "s5"].map((key) => (
+              <span key={key} />
+            ))}
+          </span>
+        </span>
+      );
+    case "project_launch":
+      return (
+        <span className="product-art__launch">
+          <Icon name="lightbulb" size={size === "sheet" ? 56 : 34} />
+          <span className="product-art__caption">{t("marketplace:art.launch")}</span>
+        </span>
+      );
     case "quota":
       return (
         <span className="product-art__quota">

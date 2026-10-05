@@ -286,7 +286,7 @@
   "what.quota": "Des demandes de médias en plus de votre quota.",
   "what.feature": "Une fonctionnalité supplémentaire du portail.",
   "what.plugin": "Une extension du portail.",
-  "what.statistic": "Une statistique supplémentaire.",
+  "what.statistic": "Une statistique de plus dans Médias › Statistiques.",
   "what.access": "Un accès supplémentaire sur le portail.",
   "admin.rarities": "Raretés et exemplaires",
   "admin.raritiesHint": "Combien d'exemplaires d'un produit de chaque rareté peuvent exister. Vide : illimité. Un produit peut avoir son propre nombre.",
@@ -318,5 +318,14 @@
   "buy.stopTrying": "Arrêter l'essai",
   "what.ambient": "Une animation discrète derrière tout le portail (neige, pluie de code, lucioles…), à choisir dans Apparence.",
   "what.profile_background": "Un fond animé derrière votre profil, vu par tous les membres.",
-  "what.name_style": "Une police et un effet pour votre nom sur votre profil."
+  "what.name_style": "Une police et un effet pour votre nom sur votre profil.",
+  "owned.launchHint": "Décrivez la fonctionnalité ou le projet que vous voulez : il s'ouvrira en proposition dans les projets de la communauté, où chacun pourra le financer.",
+  "owned.launchTitle": "Titre du projet",
+  "owned.launchPitch": "Pourquoi ce projet ? (pitch)",
+  "owned.launch": "Lancer le projet",
+  "type.project_launch": "Lancement de projet",
+  "type.widget_option": "Option de widget",
+  "what.project_launch": "Vous décrivez une fonctionnalité ou un projet ; il s'ouvre en proposition dans les projets de la communauté, financé par les membres.",
+  "what.widget_option": "Une option de réglage en plus pour un widget du tableau de bord (un autre graphique, une période plus longue…).",
+  "art.launch": "Votre idée, financée par la communauté"
 }

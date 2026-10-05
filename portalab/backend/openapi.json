@@ -24477,6 +24477,35 @@
         ]
       }
     },
+    "/api/v1/dashboard/locked-options": {
+      "get": {
+        "description": "027: widget settings sold in the shop that this member does not own (``<widget>:<field>=<value>``).",
+        "operationId": "locked_options_api_v1_dashboard_locked_options_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Response Locked Options Api V1 Dashboard Locked Options Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Locked Options",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
     "/api/v1/dashboard/since-last-login": {
       "get": {
         "operationId": "since_last_login_api_v1_dashboard_since_last_login_get",

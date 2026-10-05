@@ -73,7 +73,7 @@ AMBIENTS: tuple[str, ...] = (
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
-    "petals", "bubbles",
+    "petals", "bubbles", "assemble", "burn", "shatter", "freeze", "glitch", "portal",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",

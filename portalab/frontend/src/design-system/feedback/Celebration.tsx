@@ -9,8 +9,10 @@ import {
   useState,
 } from "react";
 import { useAnnounce } from "../a11y/Announce";
+import { Icon } from "../components/Icon";
 import { sound } from "../sound/SoundService";
 import { useTheme } from "../themes/ThemeProvider";
+import "../themes/celebration.css";
 
 /**
  * Celebrations (spec 027 FR-007, R17): rewards and level-ups are acknowledged by a short, non-blocking
@@ -54,8 +56,40 @@ export function useCelebrate(): Celebrate {
   return useContext(CelebrationContext);
 }
 
-const DURATION_MS = { reward: 1400, level: 2600 } as const;
-const PARTICLES = 18;
+const DURATION_MS = { reward: 2000, level: 3000 } as const;
+
+/**
+ * 027: each celebration has its own particles, motion and badge — sparkles twinkle around the badge,
+ * confetti and coins rain down, snow and petals drift down, hearts and bubbles rise, stars burst, bats fly
+ * away, pixels explode on a grid, lightning flashes, glow pulses. Decorative only.
+ */
+const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "screen" }> = {
+  sparkle: { count: 14, icon: "sparkle", layer: "badge" },
+  confetti: { count: 40, layer: "screen" },
+  glow: { count: 0, layer: "badge" },
+  snow: { count: 34, icon: "snowflake", layer: "screen" },
+  bats: { count: 12, layer: "badge" },
+  pixels: { count: 36, layer: "badge" },
+  hearts: { count: 18, icon: "heart", layer: "screen" },
+  stars: { count: 16, icon: "star", layer: "badge" },
+  coins: { count: 28, icon: "coins", layer: "screen" },
+  lightning: { count: 4, icon: "zap", layer: "screen" },
+  petals: { count: 26, layer: "screen" },
+  bubbles: { count: 22, layer: "screen" },
+  // the bubble itself plays: pixels rain down and build it, it burns, shatters, freezes, glitches, opens
+  assemble: { count: 48, layer: "badge" },
+  burn: { count: 16, icon: "flame", layer: "badge" },
+  shatter: { count: 20, layer: "badge" },
+  freeze: { count: 12, icon: "snowflake", layer: "badge" },
+  glitch: { count: 10, layer: "badge" },
+  portal: { count: 22, layer: "badge" },
+};
+const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
+
+function seeded(i: number, n: number): number {
+  const x = Math.sin(i * 12.9898 + n * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 export function CelebrationProvider({ children }: { children: ReactNode }) {
   const queue = useRef(new CelebrationQueue());
@@ -88,26 +122,47 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
 }
 
 function CelebrationLayer({ event, reduced }: { event: CelebrationEvent; reduced: boolean }) {
+  const { looks } = useTheme();
+  const effect = looks.celebration;
+  const spec = EFFECTS[effect] ?? { count: 0, layer: "badge" as const };
+  const count = event.kind === "level" ? Math.round(spec.count * 1.5) : spec.count;
+  const particles = Array.from({ length: count }, (_, i) => ({
+    key: `${effect}-${i}`,
+    style: {
+      "--i": i,
+      "--n": count,
+      "--x": `${(seeded(i, 1) * 100).toFixed(1)}%`,
+      "--d": `${(seeded(i, 2) * 0.6).toFixed(2)}s`,
+      "--s": (0.7 + seeded(i, 3) * 0.8).toFixed(2),
+      "--r": `${Math.round(seeded(i, 4) * 720 - 360)}deg`,
+      "--h": Math.round(seeded(i, 5) * 360),
+      "--cx": `${((i % GRID) - (GRID - 1) / 2) * 0.95}rem`,
+      "--cy": `${(Math.floor(i / GRID) - 1.5) * 0.95}rem`,
+    } as React.CSSProperties,
+  }));
+  const fx = particles.map((particle) => (
+    <span key={particle.key} className="celebration-fx" style={particle.style}>
+      {spec.icon ? <Icon name={spec.icon} size={22} /> : null}
+    </span>
+  ));
   return (
     <div
       className="ds-celebration"
       data-kind={event.kind}
+      data-effect={effect}
       data-reduced={reduced ? "true" : undefined}
       aria-hidden="true"
     >
-      {reduced ? null : (
-        <div className="ds-celebration__particles">
-          {Array.from({ length: PARTICLES }, (_, index) => (
-            <span
-              // biome-ignore lint/suspicious/noArrayIndexKey: decorative particles
-              key={index}
-              className="ds-celebration__particle"
-              style={{ "--i": index, "--n": PARTICLES } as React.CSSProperties}
-            />
-          ))}
-        </div>
+      {reduced || !count ? null : spec.layer === "screen" ? (
+        <div className="celebration-screen">{fx}</div>
+      ) : (
+        <div className="ds-celebration__particles">{fx}</div>
       )}
-      <span className="ds-celebration__badge">{event.text}</span>
+      {effect === "lightning" && !reduced ? <span className="celebration-flash" /> : null}
+      {effect === "portal" && !reduced ? <span className="celebration-portal" /> : null}
+      <span className="ds-celebration__badge" data-text={event.text}>
+        {event.text}
+      </span>
     </div>
   );
 }

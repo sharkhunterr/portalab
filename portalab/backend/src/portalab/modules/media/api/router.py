@@ -13,6 +13,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.themes import COSMETICS
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
@@ -313,6 +314,41 @@ def _zone(tz: str) -> str:
         raise ValidationFailed("Unknown time zone.", code="media.invalid_time_zone") from exc
 
 
+# 027: statistics a member unlocks in the shop (``statistic`` products, ``media.insights.<name>``) — the
+# server leaves their data out for the others
+LOCKABLE_INSIGHTS: dict[str, tuple[str, Any]] = {
+    "when": ("heatmap", []),
+    "genres": ("genres", []),
+    "people": ("people", []),
+    "decades": ("decades", []),
+    "records": ("records", {}),
+    "box_office": ("box_office", None),
+    "platforms": ("platforms", []),
+}
+
+
+async def _locked_insights(module: Any, principal: Principal) -> list[str]:
+    try:
+        providers = module.capabilities.system_providers(COSMETICS)
+    except Exception:
+        return []
+    if not providers:
+        return []
+    shop = providers[0].provider
+    sold = {
+        value.removeprefix("media.insights.")
+        for value in await shop.sold("statistic", "statistic")
+        if value.startswith("media.insights.")
+    }
+    if not sold:
+        return []
+    owned = {
+        value.removeprefix("media.insights.")
+        for value in await shop.owned(_me(principal), "statistic", "statistic")
+    }
+    return sorted(name for name in sold - owned if name in LOCKABLE_INSIGHTS)
+
+
 @router.get("/media/insights")
 async def insights(
     principal: Reader,
@@ -331,6 +367,11 @@ async def insights(
         manager=manager,
         tz=_zone(tz),
     )
+    locked = await _locked_insights(module, principal)
+    for name in locked:
+        key, empty = LOCKABLE_INSIGHTS[name]
+        data[key] = empty
+    data["locked"] = locked
     if scope == "all" and manager and (data.get("members") or data.get("recent")):
         names = {str(m.id): m.display_name or m.login for m in await module.accounts.members()}
         for row in data.get("members") or []:

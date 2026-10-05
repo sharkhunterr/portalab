@@ -195,6 +195,12 @@ for key, value, en, fr, rarity, price, level in (
     ("effect_lightning", "lightning", "Lightning", "Éclairs", "epic", 600, 5),
     ("effect_petals", "petals", "Petals", "Pétales", "rare", 300, None),
     ("effect_bubbles", "bubbles", "Bubbles", "Bulles", "common", 180, None),
+    ("effect_assemble", "assemble", "Pixel rain", "Pluie de pixels", "epic", 700, 6),
+    ("effect_burn", "burn", "Burning bubble", "Bulle en flammes", "epic", 750, 7),
+    ("effect_shatter", "shatter", "Shatter", "Éclats", "rare", 400, None),
+    ("effect_freeze", "freeze", "Freeze", "Gel", "rare", 400, None),
+    ("effect_glitch", "glitch", "Glitch", "Glitch", "rare", 450, None),
+    ("effect_portal", "portal", "Portal", "Portail", "legendary", 1200, 12),
 ):  # fmt: skip
     _p(key, "effect", price, rarity, f"{en} celebration", f"Célébration {fr.lower()}",
        f"{en} burst out when you earn a reward or level up.",
@@ -541,6 +547,59 @@ _p("quota_requests", "quota", 150, "common", "+5 media requests", "+5 demandes d
    {"kind": "media_requests", "units": 5}, collection="essentials", icon="inbox", limit=(2, 30),
    repeatable=True)  # fmt: skip
 
+# --------------------------------------------------------------------------------- dashboard and statistics
+for key, widget, en, fr, about_en, about_fr, rarity, price, level in (
+    ("widget_calendar", "calendar.month", "Calendar widget", "Widget Calendrier",
+     "The month at a glance on your dashboard: events, maintenance, news and film and episode releases.",
+     "Le mois en un coup d'œil sur votre tableau de bord : événements, maintenances, actualités et sorties de films et d'épisodes.",
+     "epic", 600, 3),
+    ("widget_media_top", "media.top", "Top of the week widget", "Widget Top de la semaine",
+     "The most watched titles of the week with their posters.", "Les titres les plus vus de la semaine, avec leurs affiches.",
+     "rare", 400, None),
+    ("widget_media_upcoming", "media.upcoming", "Upcoming releases widget", "Widget Prochaines sorties",
+     "The films and episodes coming to the library.", "Les films et épisodes qui arrivent dans la bibliothèque.",
+     "rare", 350, None),
+    ("widget_my_soon", "media.my_soon", "My requests coming soon widget", "Widget Mes demandes bientôt là",
+     "Your requests about to arrive: downloading, importing, coming out.",
+     "Vos demandes sur le point d'arriver : en téléchargement, en import, bientôt dans les salles.",
+     "common", 200, None),
+):  # fmt: skip
+    _p(key, "widget", price, rarity, en, fr, about_en, about_fr, {"widget": widget}, collection="widgets",
+       icon="dashboard", level=level)  # fmt: skip
+
+for key, option, en, fr, rarity, price in (
+    ("opt_stats_area", "media.stats:chart=area", "Area chart for « My statistics »", "Graphique en aires pour « Mes statistiques »", "rare", 250),
+    ("opt_stats_donut", "media.stats:chart=donut", "Donut chart for « My statistics »", "Graphique en anneau pour « Mes statistiques »", "rare", 300),
+    ("opt_stats_top", "media.stats:chart=top", "Top list for « My statistics »", "Classement pour « Mes statistiques »", "epic", 450),
+    ("opt_stats_year", "media.stats:period=365d", "One-year period for « My statistics »", "Période d'un an pour « Mes statistiques »", "rare", 250),
+    ("opt_stats_all", "media.stats:period=all", "All-time period for « My statistics »", "Depuis toujours pour « Mes statistiques »", "epic", 500),
+    ("opt_stats_server", "media.stats:scope=all", "Whole server for « My statistics »", "Tout le serveur pour « Mes statistiques »", "rare", 300),
+    ("opt_requests_server", "media.recently_requested:scope=all", "Whole server for « Recently requested »", "Tout le serveur pour « Demandes récentes »", "rare", 250),
+):  # fmt: skip
+    _p(key, "widget_option", price, rarity, en, fr,
+       "One more setting for this dashboard widget — chosen in its settings once bought.",
+       "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée.",
+       {"option": option}, collection="widgets", icon="settings")  # fmt: skip
+
+for name, en, fr, rarity, price, level in (
+    ("when", "When you watch", "Vos moments de visionnage", "rare", 300, None),
+    ("genres", "Your favourite genres", "Vos genres préférés", "rare", 300, None),
+    ("people", "Actors and directors", "Acteurs et réalisateurs", "epic", 500, 4),
+    ("decades", "By decade", "Par décennie", "common", 200, None),
+    ("records", "Your records", "Vos records", "rare", 350, None),
+    ("box_office", "Box office of your films", "Box-office de vos films", "epic", 600, 5),
+    ("platforms", "Your platforms", "Vos plateformes", "common", 200, None),
+):  # fmt: skip
+    _p(f"stat_{name}", "statistic", price, rarity, f"Statistic: {en}", f"Statistique : {fr}",
+       f"Unlocks « {en} » in the Media statistics.", f"Débloque « {fr} » dans les statistiques Médias.",
+       {"statistic": f"media.insights.{name}"}, collection="statistics", icon="chart", level=level)  # fmt: skip
+
+_p("project_launch", "project_launch", 1500, "epic", "Launch a community project", "Lancer un projet communautaire",
+   "Ask for a feature or a project: name it and pitch it, it opens as a proposal in the community projects for everyone to fund.",
+   "Demandez une fonctionnalité ou un projet : donnez-lui un titre et un pitch, il s'ouvre en proposition dans les projets de la communauté pour que chacun le finance.",
+   {"kind": "feature"}, collection="essentials", icon="lightbulb", featured=True, level=5, limit=(1, 30),
+   repeatable=True)  # fmt: skip
+
 # --------------------------------------------------------------------------------- packs
 UNIVERSES = {  # theme: banner, frame, name, notification style or animation, celebration, ambient, badge, title
     "wizard": (
@@ -558,7 +617,7 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "frame_orbit",
         "name_galaxy",
         "notif_hologram",
-        "effect_aurora",
+        "effect_portal",
         "ambient_starfield",
         "badge_ace_pilot",
         "title_star_keeper",
@@ -568,7 +627,7 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "frame_code",
         "name_matrix",
         "notif_terminal",
-        "effect_pixels",
+        "effect_assemble",
         "ambient_code_rain",
         "badge_the_one",
         "title_awakened",
@@ -588,7 +647,7 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "frame_blood",
         "name_horror",
         "notif_glitch",
-        "effect_pumpkin",
+        "effect_burn",
         "ambient_fog",
         "badge_survivor",
         "title_damned",
@@ -658,7 +717,7 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "frame_chrome",
         "name_futuristic",
         "notif_hologram",
-        "effect_lightning",
+        "effect_shatter",
         "ambient_warp",
         "badge_engineer",
         None,
@@ -678,7 +737,7 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "frame_toxic",
         "name_alien",
         "notif_terminal",
-        "effect_lightning",
+        "effect_freeze",
         "ambient_spores",
         "badge_xenobiologist",
         None,
@@ -718,7 +777,7 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "frame_cyber",
         "name_cyberpunk",
         "notif_glitch",
-        "effect_lightning",
+        "effect_glitch",
         "ambient_rain",
         "badge_netrunner",
         "title_night_city",
@@ -769,6 +828,16 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Confetti, hearts, bubbles, petals and a coin shower for every reward.",
      "Confettis, cœurs, bulles, pétales et pluie de pièces pour chaque récompense.",
      ["effect_confetti", "effect_hearts", "effect_bubbles", "effect_petals", "effect_coins"], "epic", 6),
+    ("pack_statistics", "Statistician pack", "Pack Statisticien",
+     "Every Media statistic and every setting of « My statistics ».",
+     "Toutes les statistiques Médias et toutes les options de « Mes statistiques ».",
+     ["stat_when", "stat_genres", "stat_people", "stat_decades", "stat_records", "stat_box_office",
+      "stat_platforms", "opt_stats_area", "opt_stats_donut", "opt_stats_top", "opt_stats_year",
+      "opt_stats_all", "opt_stats_server"], "legendary", 8),
+    ("pack_dashboard", "Dashboard pack", "Pack Tableau de bord",
+     "The calendar, top of the week, upcoming releases and coming-soon widgets.",
+     "Les widgets calendrier, top de la semaine, prochaines sorties et demandes bientôt là.",
+     ["widget_calendar", "widget_media_top", "widget_media_upcoming", "widget_my_soon"], "epic", 4),
     ("pack_animated_profile", "Living profile pack", "Pack Profil vivant",
      "An aurora background, the hologram frame, the rainbow name and the nebula banner.",
      "Un fond aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse.",
@@ -806,6 +875,7 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("celebrations", "Celebrations", "party", 43),
     ("palettes", "Palettes", "palette", 45),
     ("widgets", "Widgets", "dashboard", 50),
+    ("statistics", "Statistics", "chart", 52),
 )
 
 

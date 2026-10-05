@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { usePreferences } from "../../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../../design-system/a11y/preferences";
 import { CoinBadge } from "../../../design-system/components/Badges";
@@ -264,6 +265,9 @@ export function PurchaseBar({ product }: { product: Product }) {
       <p role="status" className="purchase-bar__done">
         <Icon name="check" size={16} />
         {t(`marketplace:purchase.done.${acquire.data?.state ?? "active"}`)}
+        {acquire.data?.state === "needs_configuration" ? (
+          <Link to="/marketplace/owned">{t("marketplace:owned.configure")}</Link>
+        ) : null}
       </p>
     );
   }

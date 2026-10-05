@@ -299,3 +299,15 @@
 .insights-metadata__progress {
   max-inline-size: 36rem;
 }
+/* 027: a statistic sold in the shop */
+.insights-locked {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.insights-locked p {
+  margin: 0;
+}

@@ -34,5 +34,17 @@
   "view.month": "Month",
   "view.week": "Week",
   "widget.upcoming.description": "What is coming in the next two weeks.",
-  "widget.upcoming.title": "Upcoming"
+  "widget.upcoming.title": "Upcoming",
+  "widget.month.title": "Calendar",
+  "widget.month.description": "The month at a glance: events, maintenance, news and film and episode releases.",
+  "widget.month.show.all": "Everything",
+  "widget.month.show.media": "Media releases",
+  "widget.month.show.events": "Portal events",
+  "widget.month.config.show": "Show",
+  "widget.month.config.show.all": "Everything",
+  "widget.month.config.show.media": "Media releases",
+  "widget.month.config.show.events": "Portal events",
+  "widget.month.next": "Coming up",
+  "widget.month.none": "Nothing planned",
+  "source.media_release": "Media releases"
 }

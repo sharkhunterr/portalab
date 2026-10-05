@@ -29,7 +29,11 @@ export function ProductCard({
       data-type={product.type}
       data-rarity={rarity}
       data-owned={product.owned ? "true" : undefined}
+      data-soldout={product.remaining === 0 && !product.owned ? "true" : undefined}
     >
+      {product.remaining === 0 && !product.owned ? (
+        <span className="product-card__soldout">{t("marketplace:stock.soldOut")}</span>
+      ) : null}
       <ProductArt product={product} />
       <div className="product-card__body">
         <span className="product-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>

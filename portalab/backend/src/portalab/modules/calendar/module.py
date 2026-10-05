@@ -86,6 +86,72 @@ class UpcomingWidget:
         return WidgetPayload("available", as_of=now, data={"items": items})
 
 
+MONTH = WidgetDefinition(
+    key="calendar.month",
+    owner=OWNER,
+    title_key="calendar:widget.month.title",
+    description_key="calendar:widget.month.description",
+    icon="calendar",
+    required_permission=CALENDAR_READ,
+    size=SizeLimits(default=Size(6, 6), min=Size(4, 5), max=Size(12, 8)),
+    refresh=Refresh(),
+    stale_after_s=900,
+    component_id="calendar.month",
+    config_schema={
+        "type": "object",
+        "properties": {"show": {"type": "string", "enum": ["all", "media", "events"]}},
+        "additionalProperties": False,
+    },
+    config_defaults={"show": "all"},
+)
+
+
+class MonthWidget:
+    """027: this month as a calendar grid (marks on the days with something) and what comes next —
+    portal events, maintenance, news and media releases (films and episodes)."""
+
+    def __init__(self, aggregator: CalendarAggregator, clock: Clock | None = None) -> None:
+        self.aggregator = aggregator
+        self.clock = clock
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        now = utc_now(self.clock)
+        first = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end = (first + timedelta(days=32)).replace(day=1) + timedelta(days=7)
+        view = await self.aggregator.view(principal, first, end, ctx)
+        show = str(config.get("show") or "all")
+        items = [
+            i for i in view.items if show == "all" or (i.source_kind == "media_release") == (show == "media")
+        ]
+        days: dict[str, list[dict[str, Any]]] = {}
+        upcoming: list[dict[str, Any]] = []
+        for item in items:
+            day = item.date or (item.starts_at.date() if item.starts_at else None)
+            if day is None:
+                continue
+            entry = {
+                "title": item.title,
+                "kind": item.source_kind,
+                "time": None if item.all_day or item.starts_at is None else item.starts_at.isoformat(),
+                "route": item.url_ref if item.url_ref and item.url_ref.startswith("/") else "/calendar",
+                "date": day.isoformat(),
+            }
+            days.setdefault(day.isoformat(), []).append(entry)
+            if day >= now.date() and len(upcoming) < 6:
+                upcoming.append(entry)
+        data = {
+            "month": first.date().isoformat(),
+            "today": now.date().isoformat(),
+            "days": days,
+            "upcoming": upcoming,
+        }
+        if any(s != "ok" for s in view.source_states.values()):
+            return WidgetPayload("partial", as_of=now, data=data)
+        return WidgetPayload("available", as_of=now, data=data)
+
+
 class _Participant:
     def __init__(self, reminders: ReminderService) -> None:
         self.reminders = reminders
@@ -140,6 +206,8 @@ class CalendarModule:
                 self.capabilities.provide(capability, participant, instance_ref="calendar", owner=OWNER)
         if self.widgets.get(UPCOMING.key) is None:
             self.widgets.register(UPCOMING, UpcomingWidget(self.aggregator, self.clock), owner=OWNER)
+        if self.widgets.get(MONTH.key) is None:
+            self.widgets.register(MONTH, MonthWidget(self.aggregator, self.clock), owner=OWNER)
         if self.categories.get("calendar.reminder") is None:
             declare_category(
                 "calendar.reminder", OWNER, "calendar:category.reminder", registry=self.categories

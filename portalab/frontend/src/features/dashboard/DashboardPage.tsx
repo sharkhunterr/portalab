@@ -24,6 +24,7 @@ import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
 import "./widgets/media";
+import "./widgets/calendar";
 import "../gamification/widget";
 import "../community/widget";
 import "../marketplace/widget";

@@ -34,5 +34,17 @@
   "view.month": "Mois",
   "view.week": "Semaine",
   "widget.upcoming.description": "Ce qui arrive dans les deux prochaines semaines.",
-  "widget.upcoming.title": "À venir"
+  "widget.upcoming.title": "À venir",
+  "widget.month.title": "Calendrier",
+  "widget.month.description": "Le mois en un coup d'œil : événements, maintenances, actualités et sorties de films et d'épisodes.",
+  "widget.month.show.all": "Tout",
+  "widget.month.show.media": "Sorties médias",
+  "widget.month.show.events": "Événements du portail",
+  "widget.month.config.show": "Afficher",
+  "widget.month.config.show.all": "Tout",
+  "widget.month.config.show.media": "Sorties médias",
+  "widget.month.config.show.events": "Événements du portail",
+  "widget.month.next": "À venir",
+  "widget.month.none": "Rien de prévu",
+  "source.media_release": "Sorties médias"
 }

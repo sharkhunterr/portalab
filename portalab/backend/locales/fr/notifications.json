@@ -162,5 +162,11 @@
   "universe.hint": "Une animation discrète derrière le portail et l'effet joué pour vos récompenses — celles du thème, aucune, ou celles de la boutique.",
   "universe.ambient": "Animation d'ambiance",
   "universe.celebration": "Célébration des récompenses",
-  "universe.followTheme": "Selon le thème"
+  "universe.followTheme": "Selon le thème",
+  "universe.celebrations.assemble": "Pluie de pixels",
+  "universe.celebrations.burn": "Bulle en flammes",
+  "universe.celebrations.shatter": "Éclats",
+  "universe.celebrations.freeze": "Gel",
+  "universe.celebrations.glitch": "Glitch",
+  "universe.celebrations.portal": "Portail"
 }
