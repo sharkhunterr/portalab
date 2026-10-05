@@ -61,6 +61,19 @@ SERVICES_SUMMARY = WidgetDefinition(
     component_id="health.services_summary",
 )
 
+SERVICE_LINKS = WidgetDefinition(
+    key="health.service_links",
+    owner=OWNER,
+    title_key="dashboard:widget.links.title",
+    description_key="dashboard:widget.links.description",
+    icon="link",
+    required_permission=SERVICES_READ,
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    refresh=Refresh(mode="event", events=(STATUS_CHANGED,)),
+    stale_after_s=600,
+    component_id="health.service_links",
+)
+
 NEXT_STEPS: tuple[dict[str, str], ...] = (
     {"label_key": "nav.search", "route": "/search"},
     {"label_key": "nav.services", "route": "/services"},
@@ -150,6 +163,36 @@ class ServicesSummaryProvider:
         )
 
 
+class ServiceLinksProvider(ServicesSummaryProvider):
+    """027: the configured services as quick links — each one's public address (set by an administrator,
+    or its https address) and its state; a service without an address leads to its status page."""
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        states = _provider(self.capabilities, SERVICE_STATE)
+        directory = _provider(self.capabilities, SERVICE_DIRECTORY)
+        if states is None or directory is None:
+            raise WidgetUnavailable("health is not available")
+        views, services = await asyncio.gather(states.all(), directory.services())
+        by_id = {view.service_id: view for view in views}
+        items = [
+            {
+                "id": service.id,
+                "name": service.name,
+                "connector": service.connector,
+                "state": by_id[service.id].state if service.id in by_id else "unknown",
+                "link": service.link,
+                "route": f"/services/{service.id}",
+            }
+            for service in services
+            if service.state != "disconnected"
+        ]
+        if not items:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
+
+
 class ServicesChanges:
     """Service state changes since the boundary, for principals holding ``services.read``."""
 
@@ -193,4 +236,6 @@ def register_builtin(
     registry.register(WELCOME, WelcomeProvider(clock), owner=OWNER)
     services = ServicesSummaryProvider(capabilities, authorizer, clock)
     registry.register(SERVICES_SUMMARY, services, owner=OWNER)
+    if registry.get(SERVICE_LINKS.key) is None:
+        registry.register(SERVICE_LINKS, ServiceLinksProvider(capabilities, authorizer, clock), owner=OWNER)
     registry.register_summary(ServicesChanges(services), owner=OWNER)

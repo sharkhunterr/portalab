@@ -441,7 +441,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "lightbulb",
         "route": "/projects",
         "group": "marketplace",
-        "order_hint": 59,
+        "order_hint": 62,  # 027: the shop first — the section opens on it
         "required_permission": "marketplace.read",
     },
     {

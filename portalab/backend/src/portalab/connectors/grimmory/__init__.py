@@ -122,7 +122,8 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
         "language": (str(meta.get("language"))[:16] if meta.get("language") else None),
         "pages": int(meta["pageCount"]) if str(meta.get("pageCount") or "").isdigit() else None,
         "duration_s": float(meta["audiobookDuration"]) if meta.get("audiobookDuration") else None,
-        "image": str(book["id"]),
+        # an audiobook's cover is served apart (027): ``a-<id>`` names it
+        "image": f"a-{book['id']}" if kind_of(book) == "audiobook" else str(book["id"]),
         "series": (str(meta.get("seriesName"))[:200] if meta.get("seriesName") else None),
         "series_position": meta.get("seriesNumber"),
         "publisher": (str(meta.get("publisher"))[:200] if meta.get("publisher") else None),
@@ -322,6 +323,10 @@ class _Covers:
         self.connector, self.service = connector, service
 
     async def fetch_image(self, ref: str) -> bytes:
+        if ref.startswith("a-"):  # an audiobook (027): its own cover endpoint
+            return await self.connector.get_bytes(
+                self.service, f"/api/v1/media/book/{safe_id(ref[2:])}/audiobook-cover"
+            )
         return await self.connector.get_bytes(self.service, f"/api/v1/media/book/{safe_id(ref)}/cover")
 
 

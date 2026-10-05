@@ -3,7 +3,7 @@ import { CoinBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Product } from "../api";
-import { ProductArt } from "./ProductArt";
+import { LazyArt } from "./LazyArt";
 
 /**
  * A product in the shop (spec 015 T021, 027 US8): a collectible card — rarity frame with a pre-rendering of
@@ -34,7 +34,7 @@ export function ProductCard({
       {product.remaining === 0 && !product.owned ? (
         <span className="product-card__soldout">{t("marketplace:stock.soldOut")}</span>
       ) : null}
-      <ProductArt product={product} />
+      <LazyArt product={product} />
       <div className="product-card__body">
         <span className="product-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
         <h3 className="product-card__name">

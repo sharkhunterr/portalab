@@ -128,3 +128,20 @@ async def test_project_launch_opens_a_community_proposal(mk: MkHarness) -> None:
     )
     again = await mk.module.activation.activate(ownership.id)  # re-activation never opens a second project
     assert again.state == "active"
+
+
+async def test_shop_window_widget_leaves_out_what_the_viewer_owns(mk: MkHarness) -> None:
+    """027: the dashboard's shop window shows what is for sale — never what the viewer already owns, nor a
+    project launch — with its rarity and price, and how many products the shop holds."""
+    from portalab.capabilities.i18n import LocaleContext
+    from portalab.modules.marketplace.integrations import FeaturedWidget
+
+    for key in ("badge_a", "badge_b"):
+        await published(mk, key, "badge")
+    await published(mk, "launch", "project_launch", payload={"kind": "feature"})
+    ursula = mk.p("ursula")
+    await mk.module.purchases.acquire(ursula, "badge_a", "w1")
+    loaded = await FeaturedWidget(mk.module.catalog).load(ursula, {}, LocaleContext())
+    assert loaded.data is not None
+    assert [i["key"] for i in loaded.data["items"]] == ["badge_b"] and loaded.data["total"] == 1
+    assert {"rarity", "price", "type", "featured"} <= set(loaded.data["items"][0])

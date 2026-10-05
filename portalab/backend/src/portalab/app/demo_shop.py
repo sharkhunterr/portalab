@@ -846,6 +846,20 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
     _p(key, "bundle", None, rarity, en, fr, about_en, about_fr, {"products": contents},
        collection="packs", icon="shop", featured=key == "pack_cinephile", level=level)  # fmt: skip
 
+# rarities stay rare: legendary for a handful of flagship items, the cheaper « rare » ones are common
+# 027: a handful of legendaries (the flagships), rare from 600 Coins, epic from 1000 — most of the shop common
+LEGENDARY = {
+    "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
+    "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal",
+}  # fmt: skip
+for product in SHOP:
+    if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:
+        product["rarity"] = "epic"
+    elif product["rarity"] == "rare" and (product["price"] or 0) < 600:
+        product["rarity"] = "common"
+    if product["rarity"] == "epic" and (product["price"] or 0) < 1000 and product["type"] != "bundle":
+        product["rarity"] = "rare" if (product["price"] or 0) >= 600 else "common"
+
 _BY_KEY = {product["key"]: product for product in SHOP}
 for product in SHOP:
     if product["type"] == "bundle" and product["price"] is None:

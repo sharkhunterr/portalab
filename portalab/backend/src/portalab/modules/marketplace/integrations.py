@@ -8,6 +8,8 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import select
+
 from portalab.capabilities.ai import AITool, SourceRef, ToolResult
 from portalab.capabilities.community import ProfileSection, SectionResult
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
@@ -17,7 +19,7 @@ from portalab.capabilities.search.fts import snippet
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.entitlements.reader import Entitlements
-from portalab.modules.marketplace.models import Product, ProductVersion
+from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 from portalab.modules.marketplace.permissions import READ
 from portalab.modules.marketplace.products.service import Catalog
 
@@ -94,24 +96,53 @@ FEATURED_WIDGET = WidgetDefinition(
 
 
 class FeaturedWidget:
+    """``marketplace.featured`` (027 redesign): the shop window — featured products first, then the
+    newest, never one the viewer already owns; with rarity, price and how many are left."""
+
     def __init__(self, catalog: Catalog, clock: Clock | None = None) -> None:
         self.catalog = catalog
         self.clock = clock
 
+    async def _owned(self, user: UUID | None) -> set[UUID]:
+        if user is None:
+            return set()
+        async with self.catalog.database.session() as session:
+            rows = await session.scalars(
+                select(Ownership.product_id).where(
+                    Ownership.user_id == user, Ownership.state.in_(("active", "needs_configuration"))
+                )
+            )
+            return set(rows)
+
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
-        rows = (await self.catalog.listing(limit=50))[:5]
+        owned = await self._owned(principal.acting_for or principal.user_id)
+        rows = [
+            (p, v)
+            for p, v in await self.catalog.listing(limit=1000)
+            if p.id not in owned and p.type != "project_launch"
+        ]
         if not rows:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        rows.sort(key=lambda row: (not row[0].featured, -row[0].created_at.timestamp()))
         return WidgetPayload(
             "available",
             as_of=utc_now(self.clock),
             data={
+                "total": len(rows),
                 "items": [
-                    {"key": p.key, "name": name_of(v, ctx.language), "type": p.type, "price": v.price_coins}
-                    for p, v in rows
-                ]
+                    {
+                        "key": p.key,
+                        "name": name_of(v, ctx.language),
+                        "type": p.type,
+                        "rarity": p.rarity,
+                        "icon": p.icon,
+                        "featured": p.featured,
+                        "price": v.price_coins,
+                    }
+                    for p, v in rows[:6]
+                ],
             },
         )
 

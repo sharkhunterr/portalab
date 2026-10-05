@@ -16,6 +16,8 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { imageUrl } from "../api";
+import { metadataImage } from "../detail/Enrichment";
+import { KIND_ICONS } from "../MediaGrid";
 import {
   CATEGORIES,
   type Category,
@@ -203,11 +205,15 @@ function TopWorks({ data }: { data: Insights }) {
   return (
     <ol className="insights-posters">
       {data.top_works.map((work, index) => {
-        const poster = imageUrl(work.image_id);
+        const poster = imageUrl(work.image_id) ?? metadataImage(work.poster_ref, "w342");
         const body = (
           <>
             <span className="insights-poster__art">
-              {poster ? <img src={poster} alt="" loading="lazy" /> : <Icon name="film" size={28} />}
+              {poster ? (
+                <img src={poster} alt="" loading="lazy" />
+              ) : (
+                <Icon name={KIND_ICONS[work.kind] ?? "film"} size={28} />
+              )}
               <span className="insights-poster__rank">{index + 1}</span>
             </span>
             <span className="insights-poster__title">{work.title}</span>
@@ -591,29 +597,39 @@ export default function InsightsPage() {
               {data.recent?.length ? (
                 <AdminSection title={t("media:insights.recent")} icon="activity" flush span="full">
                   <ul className="admin-list">
-                    {data.recent.map((r) => (
-                      <li key={`${r.at}-${r.title}`}>
-                        <span className="admin-list__main">
-                          <strong>
-                            {r.work_id ? (
-                              <Link to={`/media/${r.work_id}`}>{r.parent_title ?? r.title}</Link>
+                    {data.recent.map((r) => {
+                      // a series' episode or a show on live TV: the show first; a book: its title, then the author
+                      const grouped = r.parent_title && !["book", "audiobook"].includes(r.kind);
+                      const head = grouped ? (r.parent_title as string) : r.title;
+                      const sub = grouped ? r.title : r.parent_title;
+                      const thumb = imageUrl(r.image_id) ?? metadataImage(r.poster_ref, "w185");
+                      return (
+                        <li key={`${r.at}-${r.title}`} className="insights-play">
+                          <span className="insights-play__thumb" aria-hidden="true">
+                            {thumb ? (
+                              <img src={thumb} alt="" loading="lazy" />
                             ) : (
-                              (r.parent_title ?? r.title)
+                              <Icon name={KIND_ICONS[r.kind] ?? "film"} size={18} />
                             )}
-                          </strong>
-                          <span className="admin-muted">
-                            {r.parent_title ? `${r.title} · ` : ""}
-                            {t(`media:insights.kind.${r.kind}`)} · {format.dateTime(r.at)} ·{" "}
-                            {measures.duration(r.seconds)}
-                            {r.member ? ` · ${r.member}` : ""}
-                            {r.platform ? ` · ${r.platform}` : ""}
                           </span>
-                        </span>
-                        {r.progress !== null ? (
-                          <span className="admin-muted">{format.percent(r.progress)}</span>
-                        ) : null}
-                      </li>
-                    ))}
+                          <span className="admin-list__main">
+                            <strong>
+                              {r.work_id ? <Link to={`/media/${r.work_id}`}>{head}</Link> : head}
+                            </strong>
+                            <span className="admin-muted">
+                              {sub ? `${sub} · ` : ""}
+                              {t(`media:insights.kind.${r.kind}`)} · {format.dateTime(r.at)} ·{" "}
+                              {measures.duration(r.seconds)}
+                              {r.member ? ` · ${r.member}` : ""}
+                              {r.platform ? ` · ${r.platform}` : ""}
+                            </span>
+                          </span>
+                          {r.progress !== null ? (
+                            <span className="admin-muted">{format.percent(r.progress)}</span>
+                          ) : null}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </AdminSection>
               ) : null}

@@ -1,5 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
@@ -8,98 +7,144 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { PROGRESSION_KEY } from "../../../shell/header/useHeaderData";
-import type { Progression } from "../../gamification/api";
-import { type Category, type Product, useCategories, useDescribe, useProducts } from "../api";
-import { ProductArt } from "./ProductArt";
+import { type Product, useDescribe, useProducts } from "../api";
+import { LazyArt } from "./LazyArt";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
 import "../marketplace.css";
 
 /**
- * ``/marketplace`` (spec 015 T021, 027 US8): a game-style shop — featured banner, shelves by collection or
- * by type, rarity filter and search; a product opens in a modal with its preview (027). Products are bought with Coins earned on the portal, never real money.
+ * ``/marketplace`` (spec 015 T021, 027 US8): a shop in three departments — looks (themes, profile,
+ * notifications, effects, badges), features (widgets and their settings, statistics, bonuses, project
+ * launches) and packs — each a few shelves by kind, the first items shown and « see all » for the rest;
+ * art is drawn when a card comes near the screen. A product opens in a modal. Bought with Coins earned on
+ * the portal, never real money.
  */
-export const TYPE_GROUPS: Array<{ key: string; icon: string; types: string[] }> = [
-  { key: "badges", icon: "star", types: ["badge", "title"] },
-  { key: "animations", icon: "sparkles", types: ["effect", "ambient"] },
-  { key: "themes", icon: "palette", types: ["theme", "palette"] },
+export interface Shelf {
+  key: string;
+  icon: string;
+  types: string[];
+}
+
+export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }> = [
   {
-    key: "profile",
-    icon: "user",
-    types: ["profile_banner", "avatar_frame", "profile_backdrop", "profile_background", "name_style"],
+    key: "looks",
+    icon: "palette",
+    shelves: [
+      { key: "themes", icon: "palette", types: ["theme"] },
+      { key: "palettes", icon: "palette", types: ["palette"] },
+      {
+        key: "profile",
+        icon: "user",
+        types: ["profile_banner", "avatar_frame", "profile_backdrop", "profile_background", "name_style"],
+      },
+      { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
+      { key: "effects", icon: "sparkles", types: ["effect", "ambient"] },
+      { key: "badges", icon: "star", types: ["badge", "title"] },
+    ],
   },
-  { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
-  { key: "packs", icon: "shop", types: ["bundle"] },
   {
     key: "features",
     icon: "zap",
-    types: ["feature", "plugin", "widget", "widget_option", "statistic", "access", "project_launch"],
+    shelves: [
+      { key: "widgets", icon: "dashboard", types: ["widget"] },
+      { key: "widgetOptions", icon: "settings", types: ["widget_option"] },
+      { key: "statistics", icon: "chart", types: ["statistic"] },
+      { key: "community", icon: "lightbulb", types: ["project_launch"] },
+      { key: "bonus", icon: "inbox", types: ["quota", "feature", "plugin", "access"] },
+    ],
   },
-  { key: "bonus", icon: "inbox", types: ["quota"] },
+  {
+    key: "packs",
+    icon: "shop",
+    shelves: [{ key: "packs", icon: "shop", types: ["bundle"] }],
+  },
 ];
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
+const FIRST = 8; // shown per shelf before « see all »
 
-function groupOf(type: string): string {
-  return TYPE_GROUPS.find((g) => g.types.includes(type))?.key ?? "other";
+export function departmentOf(type: string): string {
+  return DEPARTMENTS.find((d) => d.shelves.some((s) => s.types.includes(type)))?.key ?? "features";
 }
 
-function byRarity(a: Product, b: Product): number {
-  const soldOut = (p: Product) => (p.remaining === 0 && !p.owned ? 1 : 0); // 027: sold out last, still shown
+/** Shelf order (027): what is for sale first (sold out last, still shown), featured first, then from the
+ * most affordable — rarity is not the order, so a shelf is not a wall of legendaries. */
+function shelfOrder(a: Product, b: Product): number {
+  const soldOut = (p: Product) => (p.remaining === 0 && !p.owned ? 1 : 0);
   return (
     soldOut(a) - soldOut(b) ||
+    Number(b.featured) - Number(a.featured) ||
+    (a.price_coins ?? 0) - (b.price_coins ?? 0) ||
     (RANK[a.rarity ?? "common"] ?? 3) - (RANK[b.rarity ?? "common"] ?? 3) ||
     a.name.localeCompare(b.name)
   );
 }
 
+function ShelfView({
+  shelf,
+  items,
+  onOpen,
+}: {
+  shelf: Shelf;
+  items: Product[];
+  onOpen: (product: Product) => void;
+}) {
+  const t = useT();
+  const [all, setAll] = useState(false);
+  const shown = all ? items : items.slice(0, FIRST);
+  return (
+    <section className="shop-shelf" aria-labelledby={`shelf-${shelf.key}`}>
+      <h2 id={`shelf-${shelf.key}`} className="shop-shelf__title">
+        <Icon name={shelf.icon} size={20} /> {t(`marketplace:shelf.${shelf.key}`)}
+        <span className="shop-shelf__count">{items.length}</span>
+        {items.length > FIRST ? (
+          <Button variant="ghost" className="shop-shelf__more" onClick={() => setAll(!all)}>
+            {all ? t("marketplace:shop.less") : t("marketplace:shop.seeAll", { count: items.length })}
+          </Button>
+        ) : null}
+      </h2>
+      <ul className="shop-shelf__list" data-all={all || undefined}>
+        {shown.map((product) => (
+          <ProductCard key={product.key} product={product} onOpen={onOpen} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export default function CatalogPage() {
   const t = useT();
-  const client = useQueryClient();
-  const coins = client.getQueryData<Progression>(PROGRESSION_KEY)?.coins;
-  const [view, setView] = useState<"collections" | "types">("collections");
+  const describe = useDescribe();
+  const [params, setParams] = useSearchParams();
+  const type = params.get("type") ?? ""; // « in the shop » links land on one type
+  const department = params.get("department") ?? (type ? departmentOf(type) : "looks");
   const [rarity, setRarity] = useState("");
   const [q, setQ] = useState("");
-  const [params, setParams] = useSearchParams();
-  const type = params.get("type") ?? ""; // 027: « in the shop » links land on one type
   const [opened, setOpened] = useState<Product | null>(null);
-  const describe = useDescribe();
-  const categories = useCategories();
   const products = useProducts({ category: "", q: q.trim() });
+  const current =
+    DEPARTMENTS.find((d) => d.key === department) ?? (DEPARTMENTS[0] as (typeof DEPARTMENTS)[0]);
   const all = useMemo(
     () =>
       (products.data ?? [])
         .filter((p) => (!rarity || p.rarity === rarity) && (!type || p.type === type))
-        .sort(byRarity),
+        .sort(shelfOrder),
     [products.data, rarity, type],
   );
-  const featured = all.filter((p) => p.featured);
-  const shelves = useMemo(() => {
-    if (view === "types") {
-      return [
-        ...TYPE_GROUPS.map((g) => ({ key: g.key, icon: g.icon, title: t(`marketplace:group.${g.key}`) })),
-        { key: "other", icon: "more", title: t("marketplace:group.other") },
-      ]
-        .map((g) => ({ ...g, items: all.filter((p) => groupOf(p.type) === g.key) }))
-        .filter((g) => g.items.length);
-    }
-    const known = (categories.data ?? []) as Category[];
-    return [
-      ...known.map((c) => ({
-        key: c.key,
-        icon: c.icon ?? "star",
-        title: t(c.label_key),
-        items: all.filter((p) => p.category === c.key),
-      })),
-      {
-        key: "_other",
-        icon: "more",
-        title: t("marketplace:shop.otherCollection"),
-        items: all.filter((p) => !p.category || !known.some((c) => c.key === p.category)),
-      },
-    ].filter((g) => g.items.length);
-  }, [view, all, categories.data, t]);
+  const inDepartment = all.filter((p) => departmentOf(p.type) === current.key);
+  const featured = inDepartment.filter((p) => p.featured).slice(0, 3);
+  const counts = Object.fromEntries(
+    DEPARTMENTS.map((d) => [d.key, all.filter((p) => departmentOf(p.type) === d.key).length]),
+  );
+  const go = (key: string) => setParams(key === "looks" ? {} : { department: key });
+  const wanted = params.get("product"); // a product sheet opened from elsewhere (the shop window widget)
+  useEffect(() => {
+    if (!wanted || !products.data) return;
+    const found = products.data.find((p) => p.key === wanted);
+    if (found) setOpened(found);
+    setParams(found ? { department: departmentOf(found.type) } : {}, { replace: true });
+  }, [wanted, products.data, setParams]);
 
   return (
     <div className="shop">
@@ -107,80 +152,28 @@ export default function CatalogPage() {
         icon="shop"
         title={t("marketplace:catalog.title")}
         context={t("marketplace:catalog.intro")}
-        secondary={
-          <>
-            {coins !== undefined ? <CoinBadge amount={coins} label={t("gamification:value.coins")} /> : null}
-            <Link className="ds-button ds-button--secondary" to="/projects">
-              {t("marketplace:shop.projects")}
-            </Link>
-            <Link className="ds-button ds-button--primary" to="/marketplace/owned">
-              <Icon name="star" size={18} />
-              {t("marketplace:shop.myItems")}
-            </Link>
-          </>
-        }
       />
 
-      {type ? (
-        <p className="shop-type-filter">
-          <Icon name="list" size={16} />
-          {t(`marketplace:type.${type}`)}
-          <Button variant="ghost" onClick={() => setParams({})}>
-            <Icon name="close" size={14} />
-            {t("marketplace:shop.allTypes")}
-          </Button>
-        </p>
-      ) : null}
-
-      {featured.length && !q && !rarity && !type ? (
-        <section className="shop-featured" aria-labelledby="shop-featured">
-          <h2 id="shop-featured" className="shop-shelf__title">
-            <Icon name="sparkles" size={20} /> {t("marketplace:shop.featured")}
-          </h2>
-          <ul className="shop-featured__list">
-            {featured.map((product) => (
-              <li key={product.key} className="shop-hero" data-rarity={product.rarity ?? "common"}>
-                <ProductArt product={product} />
-                <div className="shop-hero__text">
-                  <span className="product-card__rarity">
-                    {t(`marketplace:rarity.${product.rarity ?? "common"}`)}
-                  </span>
-                  <h3>
-                    <Link
-                      to={`/marketplace/products/${product.key}`}
-                      onClick={(event) => {
-                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
-                        event.preventDefault();
-                        setOpened(product);
-                      }}
-                    >
-                      {product.name}
-                    </Link>
-                  </h3>
-                  {describe(product) ? <p>{describe(product)}</p> : null}
-                  {product.owned ? (
-                    <span className="product-card__owned">
-                      <Icon name="check" size={16} /> {t("marketplace:product.owned")}
-                    </span>
-                  ) : product.price_coins ? (
-                    <CoinBadge amount={product.price_coins} label={t("gamification:value.coins")} />
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <nav className="shop-departments" aria-label={t("marketplace:shop.departments")}>
+        {DEPARTMENTS.map((d) => (
+          <button
+            key={d.key}
+            type="button"
+            className="shop-department"
+            aria-pressed={d.key === current.key}
+            onClick={() => go(d.key)}
+          >
+            <Icon name={d.icon} size={22} />
+            <span className="shop-department__text">
+              <strong>{t(`marketplace:department.${d.key}`)}</strong>
+              <span>{t(`marketplace:department.${d.key}Hint`)}</span>
+            </span>
+            <span className="shop-department__count">{counts[d.key] ?? 0}</span>
+          </button>
+        ))}
+      </nav>
 
       <div className="shop-toolbar">
-        <fieldset className="ds-subnav" aria-label={t("marketplace:catalog.title")}>
-          <button type="button" aria-pressed={view === "collections"} onClick={() => setView("collections")}>
-            <Icon name="star" size={16} /> {t("marketplace:shop.byCollection")}
-          </button>
-          <button type="button" aria-pressed={view === "types"} onClick={() => setView("types")}>
-            <Icon name="list" size={16} /> {t("marketplace:shop.byType")}
-          </button>
-        </fieldset>
         <fieldset className="shop-rarities" aria-label={t("marketplace:shop.rarity")}>
           <button type="button" aria-pressed={!rarity} onClick={() => setRarity("")}>
             {t("marketplace:shop.allRarities")}
@@ -210,9 +203,55 @@ export default function CatalogPage() {
         </label>
       </div>
 
+      {type ? (
+        <p className="shop-type-filter">
+          <Icon name="list" size={16} />
+          {t(`marketplace:type.${type}`)}
+          <Button variant="ghost" onClick={() => setParams({ department: current.key })}>
+            <Icon name="close" size={14} />
+            {t("marketplace:shop.allTypes")}
+          </Button>
+        </p>
+      ) : null}
+
+      {featured.length && !q && !rarity && !type ? (
+        <ul className="shop-featured__list" aria-label={t("marketplace:shop.featured")}>
+          {featured.map((product) => (
+            <li key={product.key} className="shop-hero" data-rarity={product.rarity ?? "common"}>
+              <LazyArt product={product} />
+              <div className="shop-hero__text">
+                <span className="product-card__rarity">
+                  {t(`marketplace:rarity.${product.rarity ?? "common"}`)}
+                </span>
+                <h3>
+                  <Link
+                    to={`/marketplace/products/${product.key}`}
+                    onClick={(event) => {
+                      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+                      event.preventDefault();
+                      setOpened(product);
+                    }}
+                  >
+                    {product.name}
+                  </Link>
+                </h3>
+                {describe(product) ? <p>{describe(product)}</p> : null}
+                {product.owned ? (
+                  <span className="product-card__owned">
+                    <Icon name="check" size={16} /> {t("marketplace:product.owned")}
+                  </span>
+                ) : product.price_coins ? (
+                  <CoinBadge amount={product.price_coins} label={t("gamification:value.coins")} />
+                ) : null}
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       {products.isPending ? <Skeleton shape="tile" count={6} label={t("marketplace:catalog.title")} /> : null}
       {products.isError ? <FunctionalState state="unavailable" onRetry={() => products.refetch()} /> : null}
-      {products.data && all.length === 0 ? (
+      {products.data && inDepartment.length === 0 ? (
         <EmptyState
           icon="shop"
           title={t("marketplace:shop.nothing")}
@@ -222,6 +261,7 @@ export default function CatalogPage() {
               onClick={() => {
                 setQ("");
                 setRarity("");
+                setParams({ department: current.key });
               }}
             >
               {t("marketplace:shop.reset")}
@@ -229,19 +269,12 @@ export default function CatalogPage() {
           }
         />
       ) : null}
-      {shelves.map((shelf) => (
-        <section key={shelf.key} className="shop-shelf" aria-labelledby={`shelf-${shelf.key}`}>
-          <h2 id={`shelf-${shelf.key}`} className="shop-shelf__title">
-            <Icon name={shelf.icon} size={20} /> {shelf.title}
-            <span className="shop-shelf__count">{shelf.items.length}</span>
-          </h2>
-          <ul className="shop-shelf__list">
-            {shelf.items.map((product) => (
-              <ProductCard key={product.key} product={product} onOpen={setOpened} />
-            ))}
-          </ul>
-        </section>
-      ))}
+      {current.shelves.map((shelf) => {
+        const items = inDepartment.filter((p) => shelf.types.includes(p.type));
+        return items.length ? (
+          <ShelfView key={shelf.key} shelf={shelf} items={items} onOpen={setOpened} />
+        ) : null;
+      })}
       {opened ? <ProductModal product={opened} onClose={() => setOpened(null)} /> : null}
     </div>
   );

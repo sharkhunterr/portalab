@@ -9965,6 +9965,19 @@
             ],
             "title": "Name"
           },
+          "public_url": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "pattern": "^(https?://[^\\s]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Url"
+          },
           "secrets": {
             "anyOf": [
               {
@@ -27034,6 +27047,30 @@
           }
         },
         "summary": "My History",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/journal": {
+      "get": {
+        "description": "027 \u2014 the media home's own shelves, from the services' history (Plex/Tautulli, Grimmory\u2026): what I am\nin the middle of and what I opened lately, with posters (the library's, else the metadata provider's).",
+        "operationId": "my_journal_api_v1_me_media_journal_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Journal Api V1 Me Media Journal Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Journal",
         "tags": [
           "media"
         ]

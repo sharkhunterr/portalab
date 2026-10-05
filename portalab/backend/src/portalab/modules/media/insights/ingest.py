@@ -332,6 +332,10 @@ class ActivityIngestor:
                             "watched_s": statement.excluded.watched_s,
                             "duration_s": statement.excluded.duration_s,
                             "progress": statement.excluded.progress,
+                            # 027: a connector learning more (live TV's show) completes stored plays
+                            "parent_title": func.coalesce(
+                                statement.excluded.parent_title, Activity.parent_title
+                            ),
                             "user_id": statement.excluded.user_id,
                             "object_id": func.coalesce(statement.excluded.object_id, Activity.object_id),
                             "work_id": func.coalesce(statement.excluded.work_id, Activity.work_id),

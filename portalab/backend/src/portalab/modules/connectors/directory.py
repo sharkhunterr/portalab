@@ -10,6 +10,15 @@ from portalab.modules.connectors.models import Service, SyncRun, SyncState
 from portalab.modules.connectors.services.manager import ServiceManager
 
 
+def _link(row: Service) -> str | None:
+    """027: the public address set by an administrator, else the connection address when it is https
+    (a plain-http or internal address is not offered to members)."""
+    if row.public_url:
+        return row.public_url
+    base = str((row.config or {}).get("base_url") or "")
+    return base if base.startswith("https://") else None
+
+
 class ConnectorServiceDirectory:
     def __init__(self, manager: ServiceManager) -> None:
         self.manager = manager
@@ -24,6 +33,7 @@ class ConnectorServiceDirectory:
             last_sync_success_at=state.last_success_at if state else None,
             last_sync_attempt_at=state.last_attempt_at if state else None,
             last_sync_error=last_error,
+            link=_link(row),
         )
 
     async def services(self) -> list[ServiceInfo]:

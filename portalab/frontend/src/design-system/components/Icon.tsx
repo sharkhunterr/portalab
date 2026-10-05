@@ -123,6 +123,7 @@ import {
   Palette,
   PartyPopper,
   Pizza,
+  Play,
   Plug,
   Plus,
   Popcorn,
@@ -163,6 +164,7 @@ import {
   Trash2,
   TreePine,
   Trees,
+  TrendingUp,
   Trophy,
   Tv,
   User,
@@ -184,6 +186,8 @@ import { useTheme } from "../themes/ThemeProvider";
  */
 export const ICONS: Record<string, LucideIcon> = {
   activity: Activity,
+  play: Play,
+  trending: TrendingUp,
   "arrow-up": ArrowUp,
   "arrow-down": ArrowDown,
   wider: ChevronsLeftRight,

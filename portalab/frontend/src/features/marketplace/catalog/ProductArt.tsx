@@ -1,7 +1,8 @@
-import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import type { Ambient } from "../../../design-system/a11y/preferences";
 import { Icon } from "../../../design-system/components/Icon";
 import { Notification } from "../../../design-system/components/Notification";
+import { CelebrationScene } from "../../../design-system/feedback/Celebration";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { builtinTheme } from "../../../design-system/themes/builtin";
 import { PALETTE_COLORS } from "../../../design-system/themes/palettes";
@@ -87,7 +88,6 @@ function NotificationArt({
 }
 
 const SWATCH_KEYS = ["dark-accent", "dark-alt", "light-accent", "light-alt"] as const;
-const PARTICLES = Array.from({ length: 14 }, (_, i) => ({ key: `p${i}`, i }));
 
 function Swatches({ colors }: { colors: string[] }) {
   return (
@@ -161,13 +161,17 @@ function ThemeArt({ theme, fallback }: { theme: string | undefined; fallback: Re
 }
 
 function CelebrationArt({ effect, size }: { effect: string | undefined; size: ArtSize }) {
-  const run = useReplay(size !== "mini", 2400);
+  // 027: the real effect (the one played with the « +XP » bubble), replayed in the box
+  const run = useReplay(size !== "mini", 2600);
   return (
-    <span key={run} className="product-art__burst" data-celebration={effect ?? "sparkle"}>
-      {PARTICLES.map(({ key, i }) => (
-        <span key={key} style={{ "--i": i, "--n": PARTICLES.length } as CSSProperties} />
-      ))}
-      <span className="product-art__burst-badge">+40 XP</span>
+    <span className="product-art__celebration">
+      <CelebrationScene
+        key={run}
+        effect={effect ?? "sparkle"}
+        event={{ kind: "reward", text: "+40 XP" }}
+        contained
+        reduced={size === "mini"}
+      />
     </span>
   );
 }
@@ -374,7 +378,12 @@ export function ProductArt({ product, size = "card" }: { product: Product; size?
             <Icon name={TYPE_BADGE_ICON[product.type] ?? "shop"} size={12} />
             {t(`marketplace:type.${product.type}`)}
           </span>
-          {left !== null && left !== undefined ? (
+          {product.owned ? (
+            <span className="product-art__acquired">
+              <Icon name="check" size={12} />
+              {t("marketplace:product.owned")}
+            </span>
+          ) : left !== null && left !== undefined ? (
             <span className="product-art__stock" data-out={left === 0 || undefined}>
               {left === 0 ? t("marketplace:stock.soldOut") : t("marketplace:stock.left", { count: left })}
             </span>

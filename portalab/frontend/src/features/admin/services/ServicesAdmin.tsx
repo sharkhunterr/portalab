@@ -61,6 +61,7 @@ interface ServiceItem {
   health: string;
   stale: boolean;
   secrets_set?: string[];
+  public_url?: string | null;
   sync: {
     status: string;
     last_success_at: string | null;
@@ -390,6 +391,73 @@ function SyncHistory({ service }: { service: ServiceItem }) {
 
 type Action = "enable" | "disable" | "disconnect" | "sync";
 
+/** The address members open the service at (027: the quick-access widget). */
+function PublicLink({ service }: { service: ServiceItem }) {
+  const t = useT();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(service.public_url ?? "");
+  const save = useMutation({
+    mutationFn: async () =>
+      unwrap<ServiceItem>(
+        api.PATCH("/api/v1/services/{service_id}", {
+          params: { path: { service_id: service.id } },
+          body: { public_url: value.trim() },
+        }),
+      ),
+    onSuccess: () => {
+      setOpen(false);
+      void queryClient.invalidateQueries({ queryKey: SERVICES_KEY });
+    },
+  });
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next) setValue(service.public_url ?? "");
+      }}
+      title={t("admin:services.link.title", { name: service.name })}
+      closeLabel={t("admin:services.close")}
+      trigger={
+        <Button type="button" variant="ghost">
+          <Icon name="link" size={16} />
+          {t("admin:services.link")}
+        </Button>
+      }
+    >
+      <form
+        className="services-admin__form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          save.mutate();
+        }}
+      >
+        <TextField
+          label={t("admin:services.link.field")}
+          hint={t("admin:services.link.hint")}
+          inputMode="url"
+          type="url"
+          placeholder="https://plex.example.org"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+        />
+        {save.isError ? (
+          <p role="alert" className="services-admin__ko">
+            {save.error instanceof ApiError ? save.error.message : t("admin:services.refused")}
+          </p>
+        ) : null}
+        <FormActions>
+          <Button type="submit" disabled={save.isPending}>
+            <Icon name="check" size={16} />
+            {t("admin:services.save")}
+          </Button>
+        </FormActions>
+      </form>
+    </Dialog>
+  );
+}
+
 function ServiceActions({
   service,
   connector,
@@ -450,6 +518,7 @@ function ServiceActions({
           </Button>
         </>
       ) : null}
+      <PublicLink service={service} />
       <Dialog
         title={t("admin:services.historyOf", { name: service.name })}
         closeLabel={t("admin:services.close")}

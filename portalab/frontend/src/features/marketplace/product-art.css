@@ -358,54 +358,6 @@
 .product-art[data-size="mini"] .product-art__title-name {
   display: none;
 }
-.product-art__burst {
-  position: relative;
-  display: grid;
-  place-items: center;
-  inline-size: 100%;
-  block-size: 100%;
-}
-.product-art__burst > span:not(.product-art__burst-badge) {
-  position: absolute;
-  inline-size: 0.4rem;
-  block-size: 0.4rem;
-  border-radius: 50%;
-  background: var(--color-accent-alt);
-  --angle: calc(360deg / var(--n) * var(--i));
-  animation: product-art-burst 1.6s var(--motion-easing) infinite;
-}
-.product-art__burst > span:nth-child(3n) {
-  background: var(--color-accent);
-}
-.product-art__burst > span:nth-child(3n + 1) {
-  background: var(--rarity);
-}
-.product-art__burst[data-celebration="confetti"] > span:not(.product-art__burst-badge) {
-  border-radius: 1px;
-  block-size: 0.65rem;
-}
-.product-art__burst-badge {
-  padding: 0.2rem 0.7rem;
-  border-radius: var(--radius-pill);
-  background: var(--xp-gradient);
-  color: var(--color-accent-contrast);
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-bold);
-}
-.product-art[data-size="mini"] .product-art__burst-badge {
-  font-size: 0.5rem;
-  padding: 0.05rem 0.25rem;
-}
-@keyframes product-art-burst {
-  0% {
-    transform: rotate(var(--angle)) translateY(0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(var(--angle)) translateY(-3.2rem) scale(0.4);
-    opacity: 0;
-  }
-}
 .product-art__quota {
   display: grid;
   justify-items: center;
@@ -465,12 +417,10 @@
   background: linear-gradient(200deg, var(--color-accent-alt), var(--color-surface));
 }
 @media (prefers-reduced-motion: reduce) {
-  .product-art__burst > span:not(.product-art__burst-badge),
   .product-art .ds-notification {
     animation: none;
   }
 }
-:root[data-motion="none"] .product-art__burst > span:not(.product-art__burst-badge),
 :root[data-motion="none"] .product-art .ds-notification {
   animation: none;
 }
@@ -586,4 +536,26 @@
   gap: var(--space-2);
   color: var(--rarity);
   filter: drop-shadow(0 0 10px color-mix(in srgb, var(--rarity) 60%, transparent));
+}
+.product-art__celebration {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+/* 027: an owned product — a green « acquired » badge inside the frame */
+.product-art__acquired {
+  position: absolute;
+  z-index: 2;
+  inset-block-end: 0.5rem;
+  inset-inline-end: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-available-fg);
+  color: var(--color-surface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-surface) 60%, transparent);
 }

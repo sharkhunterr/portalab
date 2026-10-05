@@ -276,6 +276,7 @@ def _tautulli(request: httpx.Request) -> Any:
                 "media_type": "episode",
                 "live": 1,
                 "title": "Journal",
+                "grandparent_title": "Le 20h",
             },
             {"id": 4, "started": None, "user_id": 1234, "media_type": "movie"},
         ]
@@ -449,7 +450,9 @@ def transport(
             return httpx.Response(
                 200, content=b"<html>login page</html>", headers={"content-type": "text/html"}
             )
-        if request.url.path.endswith(("/thumb", "/Images/Primary", "/poster.jpg", ".png", "/cover")):
+        if request.url.path.endswith(
+            ("/thumb", "/Images/Primary", "/poster.jpg", ".png", "/cover", "/audiobook-cover")
+        ):
             return httpx.Response(200, content=b"\x89PNG-image")
         body = routes.get(request.url.path)
         if body is None:

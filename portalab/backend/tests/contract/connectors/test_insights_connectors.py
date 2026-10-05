@@ -26,7 +26,8 @@ async def test_tautulli_history_and_accounts() -> None:
     handle = handle_for("tautulli")
     page = await connector.provider(ACTIVITY_HISTORY, handle).history(since=None, cursor=None)
     assert [a.kind for a in page.items] == ["movie", "episode", "live"]  # the row without a time is skipped
-    dune, kassa, _live = page.items
+    dune, kassa, live = page.items
+    assert live.parent_title == "Le 20h"  # live TV keeps the programme's show (027)
     assert dune.ids == {"tmdb": "438631", "imdb": "tt1160419"} and dune.watched_s == 8400
     assert dune.progress == pytest.approx(0.96) and dune.device == "Living room TV"
     assert dune.family == "plex" and dune.priority == 20 and dune.external_user_id == "1234"
@@ -72,11 +73,13 @@ async def test_grimmory_books_sessions_and_accounts() -> None:
     assert dune["ids"] == {"isbn": "9780441172719"} and dune["people"] == ["Frank Herbert"]
     assert dune["year"] == 1965 and dune["pages"] == 688 and dune["genres"] == ["Science Fiction"]
     assert found[1].payload["people"] == ["Andy Weir", "Ray Porter"]
+    assert dune["image"] == "1" and found[1].payload["image"] == "a-2"  # an audiobook's cover is apart
     page = await connector.provider(ACTIVITY_HISTORY, handle).history(since=None, cursor=None)
     (session,) = page.items
     assert session.external_user_id == "9" and session.kind == "book" and session.watched_s == 3600
     assert session.progress == pytest.approx(0.25) and session.parent_title == "Frank Herbert"
     assert (await connector.provider(LIBRARY, handle).fetch_image("1")).startswith(b"\x89PNG")
+    assert (await connector.provider(LIBRARY, handle).fetch_image("a-2")).startswith(b"\x89PNG")
     with pytest.raises(InvalidPayload):
         await connector.provider(LIBRARY, handle).fetch_image("../../etc")
     accounts = await connector.provider(ACCOUNTS, handle).list_accounts()

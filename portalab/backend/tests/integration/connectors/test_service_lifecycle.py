@@ -79,3 +79,28 @@ async def test_unknown_secret_field_and_bad_config_rejected(cn: ConnectorsHarnes
         await cn.module.manager.configure(
             cn.admin, connector_key="fake", name="x", config={"base_url": "http://x"}, secrets={"other": "v"}
         )
+
+
+async def test_public_address_is_set_validated_cleared_and_offered(
+    app: FastAPI, client: httpx.AsyncClient, cn: ConnectorsHarness
+) -> None:
+    """027 — the address members open a service at (the quick-access widget): set by an administrator, only
+    http(s), cleared with an empty value; without one, an https connection address is offered, never a plain
+    http one."""
+    from portalab.modules.connectors.directory import ConnectorServiceDirectory
+
+    await admin_client(app, client, cn)
+    created = await client.post(
+        "/api/v1/services",
+        json={"connector": "fake", "name": "Media", "config": {"base_url": cn.base_url}, "secrets": {}},
+    )
+    service_id = created.json()["id"]
+    directory = ConnectorServiceDirectory(cn.module.manager)
+    assert (await directory.service(service_id)).link is None  # type: ignore[union-attr]  # plain http
+    bad = await client.patch(f"/api/v1/services/{service_id}", json={"public_url": "javascript:alert(1)"})
+    assert bad.status_code == 422
+    set_ = await client.patch(f"/api/v1/services/{service_id}", json={"public_url": "https://media.example"})
+    assert set_.status_code == 200 and set_.json()["public_url"] == "https://media.example"
+    assert (await directory.service(service_id)).link == "https://media.example"  # type: ignore[union-attr]
+    cleared = await client.patch(f"/api/v1/services/{service_id}", json={"public_url": ""})
+    assert cleared.status_code == 200 and cleared.json()["public_url"] is None

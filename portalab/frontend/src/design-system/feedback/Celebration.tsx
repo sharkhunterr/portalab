@@ -123,9 +123,26 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
 
 function CelebrationLayer({ event, reduced }: { event: CelebrationEvent; reduced: boolean }) {
   const { looks } = useTheme();
-  const effect = looks.celebration;
+  return <CelebrationScene effect={looks.celebration} event={event} reduced={reduced} />;
+}
+
+/**
+ * One celebration as it plays (027) — the real one over the page, or ``contained`` in a box (the shop's
+ * preview of an effect, scaled down to the box).
+ */
+export function CelebrationScene({
+  effect,
+  event,
+  reduced = false,
+  contained = false,
+}: {
+  effect: string;
+  event: CelebrationEvent;
+  reduced?: boolean;
+  contained?: boolean;
+}) {
   const spec = EFFECTS[effect] ?? { count: 0, layer: "badge" as const };
-  const count = event.kind === "level" ? Math.round(spec.count * 1.5) : spec.count;
+  const count = Math.round((event.kind === "level" ? spec.count * 1.5 : spec.count) * (contained ? 0.6 : 1));
   const particles = Array.from({ length: count }, (_, i) => ({
     key: `${effect}-${i}`,
     style: {
@@ -151,6 +168,7 @@ function CelebrationLayer({ event, reduced }: { event: CelebrationEvent; reduced
       data-kind={event.kind}
       data-effect={effect}
       data-reduced={reduced ? "true" : undefined}
+      data-contained={contained || undefined}
       aria-hidden="true"
     >
       {reduced || !count ? null : spec.layer === "screen" ? (

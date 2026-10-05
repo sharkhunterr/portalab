@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReactElement, useId } from "react";
-import { Link } from "react-router";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../design-system/a11y/preferences";
@@ -9,8 +8,9 @@ import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { PolicyField, type PolicyState } from "../../design-system/components/PolicyField";
 import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
-import { parseTheme, presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
+import { presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
+import { InShop } from "./InShop";
 import { NotificationLooks } from "./NotificationLooks";
 import { PalettePicker } from "./PalettePicker";
 import { UniverseLooks } from "./UniverseLooks";
@@ -61,9 +61,9 @@ export const appearanceStrings = {
   styles: { toast: "Toast", banner: "Banner" },
   campaignThemes: "Show seasonal campaign themes",
   forcedMotion: "Your administrator reduces motion for everyone.",
-  shopThemes: "More themes in the shop",
-  shopHint: "These themes are sold in the shop: buy one to use it.",
-  getIt: "Get it in the shop",
+  display: "Display",
+  displayHint: "Light or dark, density, text size and motion: how the portal reads for you.",
+  notifications: "Notifications",
 } as const;
 
 interface View {
@@ -87,42 +87,16 @@ function usePolicyStates(): (key: string) => { state: PolicyState; retained: str
   };
 }
 
-/** Themes sold in the shop the user does not own yet (027 US11): shown locked, with the way to get them. */
-function ShopThemes() {
+/** How many themes the shop sells that the member does not own yet (027): said in one line, not listed. */
+function useShopThemeCount(): number {
   const locked = useQuery({
     queryKey: ["ui", "themes", "locked"],
     retry: false,
     queryFn: async () =>
-      (
-        (await api.GET("/api/v1/ui/themes")).data as unknown as {
-          locked?: Array<{ key: string; name: string; definition: unknown }>;
-        }
-      ).locked ?? [],
+      ((await api.GET("/api/v1/ui/themes")).data as unknown as { locked?: Array<{ key: string }> }).locked ??
+      [],
   });
-  const themes = (locked.data ?? [])
-    .map((entry) => ({ entry, theme: parseTheme(entry.definition).theme }))
-    .filter((item): item is { entry: (typeof item)["entry"]; theme: ThemeDefinition } => Boolean(item.theme));
-  if (!themes.length) return null;
-  return (
-    <section aria-labelledby="theme-shop" className="theme-gallery">
-      <h3 id="theme-shop">{appearanceStrings.shopThemes}</h3>
-      <p className="ds-page-header__context">{appearanceStrings.shopHint}</p>
-      <ul className="theme-gallery__list">
-        {themes.map(({ entry, theme }) => (
-          <li key={entry.key}>
-            <Link className="theme-card" data-locked="true" to="/marketplace">
-              <ThemeMiniature theme={theme} />
-              <span className="theme-card__name">
-                <Icon name="lock" size={16} />
-                {entry.name}
-              </span>
-              <span className="theme-card__meta">{appearanceStrings.getIt}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+  return locked.data?.length ?? 0;
 }
 
 /** One card per theme family/theme with a miniature of its arrangement (027 T061): never data, only looks. */
@@ -140,9 +114,7 @@ function ThemeGallery({
   );
   const currentTheme = themes.find((t) => t.key === current);
   return (
-    <section aria-labelledby="theme-gallery" className="theme-gallery">
-      <h3 id="theme-gallery">{appearanceStrings.gallery}</h3>
-      <p className="ds-page-header__context">{appearanceStrings.galleryHint}</p>
+    <>
       <ul className="theme-gallery__list">
         {shown.map((theme) => {
           const p = presentationOf(theme);
@@ -163,7 +135,12 @@ function ThemeGallery({
                 <ThemeMiniature theme={theme} />
                 <span className="theme-card__name">
                   {name}
-                  {active ? <span className="ds-badge">{appearanceStrings.current}</span> : null}
+                  {active ? (
+                    <span className="theme-card__current">
+                      <Icon name="check" size={12} />
+                      {appearanceStrings.current}
+                    </span>
+                  ) : null}
                 </span>
                 <span className="theme-card__meta">{layout}</span>
               </button>
@@ -171,7 +148,7 @@ function ThemeGallery({
           );
         })}
       </ul>
-    </section>
+    </>
   );
 }
 
@@ -243,6 +220,7 @@ export function AppearanceSettings() {
   const { preferences, policy, setPreference } = usePreferences();
   const { themes, effective } = useTheme();
   const policyOf = usePolicyStates();
+  const shopThemes = useShopThemeCount();
   const set =
     <K extends keyof UiPreferences>(key: K) =>
     (value: UiPreferences[K]) =>
@@ -256,137 +234,158 @@ export function AppearanceSettings() {
     );
   };
   return (
-    <section aria-labelledby={headingId} className="account-page">
+    <section aria-labelledby={headingId} className="account-page appearance-page">
       <PageHeader titleId={headingId} level={2} icon="palette" title={appearanceStrings.title} />
       {effective.fallback ? <p role="status">{appearanceStrings.themeFallback}</p> : null}
-      <ThemeGallery
-        themes={themes}
-        current={effective.theme.key}
-        onChoose={(theme) => {
-          set("theme")(theme.family ?? theme.key);
-          if (theme.family) set("colorMode")(theme.colorScheme);
-        }}
-      />
-      <ShopThemes />
-      {field("ui.colorMode", (disabled) => (
-        <SelectField
-          label={appearanceStrings.colorMode}
-          value={preferences.colorMode}
-          disabled={disabled}
-          onChange={(event) => set("colorMode")(event.target.value as UiPreferences["colorMode"])}
-        >
-          {Object.entries(appearanceStrings.colorModes).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
+      <section className="appearance-card" aria-labelledby="theme-gallery">
+        <h3 id="theme-gallery">{appearanceStrings.gallery}</h3>
+        <p className="ds-page-header__context">{appearanceStrings.galleryHint}</p>
+        <ThemeGallery
+          themes={themes}
+          current={effective.theme.key}
+          onChoose={(theme) => {
+            set("theme")(theme.family ?? theme.key);
+            if (theme.family) set("colorMode")(theme.colorScheme);
+          }}
+        />
+        <div className="appearance-row">
+          {field("ui.theme", (disabled, describedBy) => (
+            <SelectField
+              label={appearanceStrings.theme}
+              value={preferences.theme ?? ""}
+              disabled={disabled}
+              aria-describedby={describedBy}
+              onChange={(event) => set("theme")(event.target.value || null)}
+            >
+              <option value="">{appearanceStrings.themeDefault}</option>
+              {themes.map((theme) => (
+                <option key={theme.key} value={theme.key}>
+                  {theme.name}
+                </option>
+              ))}
+            </SelectField>
           ))}
-        </SelectField>
-      ))}
-      {field("ui.theme", (disabled, describedBy) => (
-        <SelectField
-          label={appearanceStrings.theme}
-          value={preferences.theme ?? ""}
-          disabled={disabled}
-          aria-describedby={describedBy}
-          onChange={(event) => set("theme")(event.target.value || null)}
-        >
-          <option value="">{appearanceStrings.themeDefault}</option>
-          {themes.map((theme) => (
-            <option key={theme.key} value={theme.key}>
-              {theme.name}
-            </option>
+          {field("ui.colorMode", (disabled) => (
+            <SelectField
+              label={appearanceStrings.colorMode}
+              value={preferences.colorMode}
+              disabled={disabled}
+              onChange={(event) => set("colorMode")(event.target.value as UiPreferences["colorMode"])}
+            >
+              {Object.entries(appearanceStrings.colorModes).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </SelectField>
           ))}
-        </SelectField>
-      ))}
-      {field("ui.density", (disabled) => (
-        <SelectField
-          label={appearanceStrings.density}
-          value={preferences.density}
-          disabled={disabled}
-          onChange={(event) => set("density")(event.target.value as UiPreferences["density"])}
-        >
-          {Object.entries(appearanceStrings.densities).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </SelectField>
-      ))}
-      {field("ui.textScale", (disabled) => (
-        <div className="ds-field">
-          <label htmlFor="ui-text-scale">{appearanceStrings.textScale}</label>
-          <input
-            id="ui-text-scale"
-            type="range"
-            min={policy.textScaleMin}
-            max={policy.textScaleMax}
-            step={0.05}
-            value={preferences.textScale}
-            disabled={disabled}
-            aria-valuetext={`${Math.round(preferences.textScale * 100)}%`}
-            onChange={(event) => set("textScale")(Number(event.target.value))}
-          />
-          <output htmlFor="ui-text-scale">{Math.round(effective.textScale * 100)}%</output>
         </div>
-      ))}
-      {field("ui.contrast", (disabled) => (
-        <CheckboxField
-          label={appearanceStrings.contrast}
-          checked={preferences.contrast === "high"}
-          disabled={disabled}
-          onChange={(event) => set("contrast")(event.target.checked ? "high" : "default")}
-        />
-      ))}
-      {field("ui.reducedMotion", (disabled) => (
-        <SelectField
-          label={appearanceStrings.reducedMotion}
-          value={preferences.reducedMotion}
-          disabled={disabled || policy.forceReducedMotion}
-          hint={policy.forceReducedMotion ? appearanceStrings.forcedMotion : undefined}
-          onChange={(event) => set("reducedMotion")(event.target.value as UiPreferences["reducedMotion"])}
-        >
-          {Object.entries(appearanceStrings.motions).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </SelectField>
-      ))}
-      {field("ui.soundEnabled", (disabled) => (
-        <CheckboxField
-          label={appearanceStrings.sound}
-          checked={preferences.soundEnabled}
-          disabled={disabled}
-          onChange={(event) => set("soundEnabled")(event.target.checked)}
-        />
-      ))}
-      {field("ui.notificationPosition", (disabled) => (
-        <SelectField
-          label={appearanceStrings.notificationPosition}
-          value={preferences.notificationPosition}
-          disabled={disabled}
-          onChange={(event) =>
-            set("notificationPosition")(event.target.value as UiPreferences["notificationPosition"])
-          }
-        >
-          {Object.entries(appearanceStrings.positions).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </SelectField>
-      ))}
+        <InShop count={shopThemes} type="theme" />
+        {field("ui.campaignThemes", (disabled) => (
+          <CheckboxField
+            label={appearanceStrings.campaignThemes}
+            checked={preferences.campaignThemes === "allow"}
+            disabled={disabled}
+            onChange={(event) => set("campaignThemes")(event.target.checked ? "allow" : "ignore")}
+          />
+        ))}
+      </section>
       <PalettePicker />
+      <section className="appearance-card" aria-labelledby="appearance-display">
+        <h3 id="appearance-display">{appearanceStrings.display}</h3>
+        <p className="ds-page-header__context">{appearanceStrings.displayHint}</p>
+        <div className="appearance-row">
+          {field("ui.density", (disabled) => (
+            <SelectField
+              label={appearanceStrings.density}
+              value={preferences.density}
+              disabled={disabled}
+              onChange={(event) => set("density")(event.target.value as UiPreferences["density"])}
+            >
+              {Object.entries(appearanceStrings.densities).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </SelectField>
+          ))}
+          {field("ui.reducedMotion", (disabled) => (
+            <SelectField
+              label={appearanceStrings.reducedMotion}
+              value={preferences.reducedMotion}
+              disabled={disabled || policy.forceReducedMotion}
+              hint={policy.forceReducedMotion ? appearanceStrings.forcedMotion : undefined}
+              onChange={(event) => set("reducedMotion")(event.target.value as UiPreferences["reducedMotion"])}
+            >
+              {Object.entries(appearanceStrings.motions).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </SelectField>
+          ))}
+        </div>
+        {field("ui.textScale", (disabled) => (
+          <div className="ds-field appearance-scale">
+            <label htmlFor="ui-text-scale">{appearanceStrings.textScale}</label>
+            <span className="appearance-scale__row">
+              <span aria-hidden="true">A</span>
+              <input
+                id="ui-text-scale"
+                type="range"
+                min={policy.textScaleMin}
+                max={policy.textScaleMax}
+                step={0.05}
+                value={preferences.textScale}
+                disabled={disabled}
+                aria-valuetext={`${Math.round(preferences.textScale * 100)}%`}
+                onChange={(event) => set("textScale")(Number(event.target.value))}
+              />
+              <span aria-hidden="true" className="appearance-scale__big">
+                A
+              </span>
+              <output htmlFor="ui-text-scale">{Math.round(effective.textScale * 100)}%</output>
+            </span>
+          </div>
+        ))}
+        <div className="appearance-toggles">
+          {field("ui.contrast", (disabled) => (
+            <CheckboxField
+              label={appearanceStrings.contrast}
+              checked={preferences.contrast === "high"}
+              disabled={disabled}
+              onChange={(event) => set("contrast")(event.target.checked ? "high" : "default")}
+            />
+          ))}
+          {field("ui.soundEnabled", (disabled) => (
+            <CheckboxField
+              label={appearanceStrings.sound}
+              checked={preferences.soundEnabled}
+              disabled={disabled}
+              onChange={(event) => set("soundEnabled")(event.target.checked)}
+            />
+          ))}
+        </div>
+      </section>
       <UniverseLooks />
-      <NotificationLooks />
-      {field("ui.campaignThemes", (disabled) => (
-        <CheckboxField
-          label={appearanceStrings.campaignThemes}
-          checked={preferences.campaignThemes === "allow"}
-          disabled={disabled}
-          onChange={(event) => set("campaignThemes")(event.target.checked ? "allow" : "ignore")}
-        />
-      ))}
+      <NotificationLooks
+        position={field("ui.notificationPosition", (disabled) => (
+          <SelectField
+            label={appearanceStrings.notificationPosition}
+            value={preferences.notificationPosition}
+            disabled={disabled}
+            onChange={(event) =>
+              set("notificationPosition")(event.target.value as UiPreferences["notificationPosition"])
+            }
+          >
+            {Object.entries(appearanceStrings.positions).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </SelectField>
+        ))}
+      />
     </section>
   );
 }

@@ -311,3 +311,30 @@
 .insights-locked p {
   margin: 0;
 }
+
+/* 027: latest plays with their poster */
+.insights-play {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.insights-play .admin-list__main {
+  flex: 1;
+  min-inline-size: 0;
+}
+.insights-play__thumb {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.4rem;
+  block-size: 3.6rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text-muted);
+}
+.insights-play__thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}

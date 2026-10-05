@@ -1,4 +1,5 @@
 import { NavLink, useParams } from "react-router";
+import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { QuestBoard } from "./achievements/QuestBoard";
 import { Showcase } from "./achievements/Showcase";
@@ -14,13 +15,13 @@ import "./community.css";
 import { PageHeader } from "../../design-system/components/PageHeader";
 
 const TABS = [
-  { to: "/community", key: "discover", end: true },
-  { to: "/community/members", key: "members", end: true },
-  { to: "/community/feed", key: "feed", end: true },
-  { to: "/community/proposals", key: "proposals", end: false },
-  { to: "/community/leaderboards", key: "leaderboards", end: true },
-  { to: "/community/achievements", key: "achievements", end: true },
-  { to: "/community/events", key: "events", end: true },
+  { to: "/community", key: "discover", end: true, icon: "compass" },
+  { to: "/community/members", key: "members", end: true, icon: "users" },
+  { to: "/community/feed", key: "feed", end: true, icon: "activity" },
+  { to: "/community/proposals", key: "proposals", end: false, icon: "lightbulb" },
+  { to: "/community/leaderboards", key: "leaderboards", end: true, icon: "medal" },
+  { to: "/community/achievements", key: "achievements", end: true, icon: "trophy" },
+  { to: "/community/events", key: "events", end: true, icon: "calendar" },
 ] as const;
 
 /** ``/community/*`` (spec 012, slice A): discovery, members, activity and events. */
@@ -43,13 +44,13 @@ export default function CommunityPage({
   if (view === "profile" && memberId) return <ProfilePage />;
   if (view === "proposal") return <ProposalDetail />;
   return (
-    <div className="ds-stack">
-      <PageHeader icon="users" title={t("community:title")} />
-      <p>{t("community:intro")}</p>
+    <div className="ds-stack community-page">
+      <PageHeader icon="users" title={t("community:title")} context={t("community:intro")} />
       <nav aria-label={t("community:title")} className="community-tabs">
         {TABS.map((tab) => (
           <NavLink key={tab.key} to={tab.to} end={tab.end}>
-            {t(`community:nav.${tab.key}`)}
+            <Icon name={tab.icon} size={16} />
+            <span>{t(`community:nav.${tab.key}`)}</span>
           </NavLink>
         ))}
       </nav>

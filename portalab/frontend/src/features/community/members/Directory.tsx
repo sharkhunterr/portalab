@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { Avatar } from "../../../design-system/components/Avatar";
 import { Button } from "../../../design-system/components/Button";
-import { TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
+import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useMembers } from "../api";
 
-/** ``/community/members`` (spec 012 T008): active members the viewer may see, searchable by name. */
+/** ``/community/members`` (spec 012 T008; 027 redesign): the active members the viewer may see, as cards
+ * with their avatar, searchable by name. */
 export function Directory() {
   const t = useT();
   const format = useFormat();
@@ -15,31 +18,47 @@ export function Directory() {
   const members = useMembers(query.trim());
   const items = members.data?.pages.flatMap((page) => page.items) ?? [];
   return (
-    <section aria-labelledby="community-members" className="ds-stack">
-      <h2 id="community-members">{t("community:members.title")}</h2>
-      <TextField
-        type="search"
-        label={t("community:members.search")}
-        value={query}
-        maxLength={64}
-        onChange={(event) => setQuery(event.target.value)}
-      />
+    <section aria-label={t("community:members.title")} className="ds-stack">
+      <label className="community-search">
+        <Icon name="search" size={18} />
+        <span className="visually-hidden">{t("community:members.search")}</span>
+        <input
+          type="search"
+          value={query}
+          maxLength={64}
+          placeholder={t("community:members.search")}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
+      {members.isPending ? <Skeleton shape="tile" count={4} label={t("community:members.title")} /> : null}
       {members.isError ? <FunctionalState state="unavailable" onRetry={() => members.refetch()} /> : null}
       {members.isSuccess && items.length === 0 ? (
-        <p>
-          {t("community:members.empty")}{" "}
-          <Button variant="secondary" onClick={() => setQuery("")}>
-            {t("community:members.emptyAction")}
-          </Button>
-        </p>
+        <EmptyState
+          icon="users"
+          title={t("community:members.empty")}
+          action={
+            <Button variant="secondary" onClick={() => setQuery("")}>
+              {t("community:members.emptyAction")}
+            </Button>
+          }
+        />
       ) : null}
       <ul className="community-members">
         {items.map((member) => (
-          <li key={member.id} className="ds-card">
-            <Link to={`/community/members/${member.id}`}>{member.display_name}</Link>
-            <span className="community-meta">
-              {t("community:members.joined", { date: format.date(member.joined_at) })}
-            </span>
+          <li key={member.id}>
+            <Link to={`/community/members/${member.id}`} className="community-member">
+              <Avatar
+                name={member.display_name}
+                userId={member.id}
+                src={`/api/v1/users/${member.id}/avatar`}
+                size="lg"
+                decorative
+              />
+              <strong>{member.display_name}</strong>
+              <span className="community-meta">
+                {t("community:members.joined", { date: format.date(member.joined_at) })}
+              </span>
+            </Link>
           </li>
         ))}
       </ul>

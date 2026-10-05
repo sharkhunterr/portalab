@@ -120,7 +120,7 @@ function AvatarSection({ me }: { me: Me }) {
   );
 }
 
-function ExportSection() {
+export function ExportSection() {
   const titleId = useId();
   const [job, setJob] = useState<ExportOut | null>(null);
   const request = useMutation({
@@ -159,7 +159,7 @@ function ExportSection() {
   );
 }
 
-function DeletionSection() {
+export function DeletionSection() {
   const ids = { password: useId(), title: useId(), warning: useId() };
   const queryClient = useQueryClient();
   const [password, setPassword] = useState("");

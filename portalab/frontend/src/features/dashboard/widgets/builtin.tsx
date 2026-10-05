@@ -78,5 +78,79 @@ function ServicesHealth({ payload }: WidgetProps) {
   );
 }
 
+const CONNECTOR_ICON: Record<string, string> = {
+  plex: "film",
+  jellyfin: "film",
+  emby: "film",
+  tautulli: "chart",
+  radarr: "clapperboard",
+  sonarr: "tv",
+  lidarr: "music",
+  seerr: "inbox",
+  overseerr: "inbox",
+  jellyseerr: "inbox",
+  grimmory: "book",
+  audiobookshelf: "headphones",
+  romm: "joystick",
+  tmdb: "database",
+};
+
+/** Service links (027): the configured services as tiles — open the service, see its state at a glance. */
+function ServiceLinks({ payload }: WidgetProps) {
+  const t = useT();
+  const items =
+    (
+      (payload.data ?? {}) as {
+        items?: Array<{
+          id: string;
+          name: string;
+          connector: string;
+          state: string;
+          link: string | null;
+          route: string;
+        }>;
+      }
+    ).items ?? [];
+  return (
+    <ul className="widget-links">
+      {items.map((item) => {
+        const body = (
+          <>
+            <span className="widget-links__icon" aria-hidden="true">
+              <Icon name={CONNECTOR_ICON[item.connector] ?? "server"} size={22} />
+              <span
+                className="widget-links__dot status-dot"
+                data-tone={HEALTH_TONES[item.state] ?? "neutral"}
+              />
+            </span>
+            <span className="widget-links__name">{item.name}</span>
+            <span className="widget-links__state">
+              {t(`dashboard:health.${HEALTH_TONES[item.state] ? item.state : "unknown"}`)}
+            </span>
+          </>
+        );
+        return (
+          <li key={item.id}>
+            {item.link ? (
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={t("dashboard:widget.links.open", { name: item.name })}
+              >
+                {body}
+                <Icon name="link" size={12} className="widget-links__external" />
+              </a>
+            ) : (
+              <Link to={item.route}>{body}</Link>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 registerWidgetComponent("dashboard.welcome", Welcome);
+registerWidgetComponent("health.service_links", ServiceLinks);
 registerWidgetComponent("health.services_summary", ServicesHealth);

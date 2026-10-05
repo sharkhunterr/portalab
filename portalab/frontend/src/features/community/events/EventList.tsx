@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { Badge } from "../../../design-system/components/Content";
+import { Icon } from "../../../design-system/components/Icon";
+import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -19,50 +21,71 @@ export function EventList() {
   const manager = useHasPermission("community.events.manage");
   const [editing, setEditing] = useState<CommunityEvent | "new" | null>(null);
   return (
-    <section aria-labelledby="community-events" className="ds-stack">
-      <h2 id="community-events">{t("community:events.title")}</h2>
+    <section aria-label={t("community:events.title")} className="ds-stack">
       {manager && editing === null ? (
-        <Button onClick={() => setEditing("new")}>{t("community:events.create")}</Button>
+        <div className="community-actions">
+          <Button onClick={() => setEditing("new")}>
+            <Icon name="plus" size={16} />
+            {t("community:events.create")}
+          </Button>
+        </div>
       ) : null}
       {editing !== null ? (
         <EventEditor event={editing === "new" ? null : editing} onDone={() => setEditing(null)} />
       ) : null}
       {events.isError ? <FunctionalState state="unavailable" onRetry={() => events.refetch()} /> : null}
       {events.isSuccess && events.data.length === 0 ? (
-        <p>
-          {t("community:events.empty")} <Link to="/calendar">{t("community:events.emptyAction")}</Link>
-        </p>
+        <EmptyState
+          icon="calendar"
+          title={t("community:events.empty")}
+          action={
+            <Link className="ds-button ds-button--secondary" to="/calendar">
+              {t("community:events.emptyAction")}
+            </Link>
+          }
+        />
       ) : null}
-      <ul className="ds-stack">
+      <ul className="community-events">
         {(events.data ?? []).map((event) => (
-          <li key={event.id} id={`event-${event.id}`} className="ds-card ds-stack">
-            <h3>
-              {event.title}{" "}
-              {event.status === "cancelled" ? <Badge>{t("community:events.cancelled")}</Badge> : null}
-            </h3>
-            <p className="community-meta">
-              {event.all_day
-                ? `${format.date(event.starts_at)} · ${t("community:events.allDay")}`
-                : format.dateTime(event.starts_at)}
-              {" · "}
-              {t(`community:events.audience.${event.audience}`)}
-            </p>
-            <SafeHtml html={event.rendered_html} diagrams={false} />
-            {manager && event.status !== "cancelled" ? (
-              <div className="ds-stack--row">
-                <Button variant="secondary" onClick={() => setEditing(event)}>
-                  {t("community:events.edit")}
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    if (window.confirm(t("community:events.cancelConfirm"))) cancel.mutate(event.id);
-                  }}
-                >
-                  {t("community:events.cancel")}
-                </Button>
-              </div>
-            ) : null}
+          <li
+            key={event.id}
+            id={`event-${event.id}`}
+            className="community-event"
+            data-cancelled={event.status === "cancelled" || undefined}
+          >
+            <span className="community-event__date" aria-hidden="true">
+              <strong>{format.dayMonth(event.starts_at).day}</strong>
+              <span>{format.dayMonth(event.starts_at).month}</span>
+            </span>
+            <div className="community-event__body ds-stack">
+              <h3>
+                {event.title}{" "}
+                {event.status === "cancelled" ? <Badge>{t("community:events.cancelled")}</Badge> : null}
+              </h3>
+              <p className="community-meta">
+                {event.all_day
+                  ? `${format.date(event.starts_at)} · ${t("community:events.allDay")}`
+                  : format.dateTime(event.starts_at)}
+                {" · "}
+                {t(`community:events.audience.${event.audience}`)}
+              </p>
+              <SafeHtml html={event.rendered_html} diagrams={false} />
+              {manager && event.status !== "cancelled" ? (
+                <div className="ds-stack--row">
+                  <Button variant="secondary" onClick={() => setEditing(event)}>
+                    {t("community:events.edit")}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      if (window.confirm(t("community:events.cancelConfirm"))) cancel.mutate(event.id);
+                    }}
+                  >
+                    {t("community:events.cancel")}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
           </li>
         ))}
       </ul>

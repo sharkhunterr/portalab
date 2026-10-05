@@ -204,17 +204,28 @@
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
 }
-.status-badge[data-tone="ok"] {
+.status-badge[data-tone="ok"],
+.status-dot[data-tone="ok"] {
   --tone: var(--state-available-fg);
 }
-.status-badge[data-tone="warn"] {
+.status-badge[data-tone="warn"],
+.status-dot[data-tone="warn"] {
   --tone: var(--state-partial-fg);
 }
-.status-badge[data-tone="bad"] {
+.status-badge[data-tone="bad"],
+.status-dot[data-tone="bad"] {
   --tone: var(--state-error-fg);
 }
-.status-badge[data-tone="info"] {
+.status-badge[data-tone="info"],
+.status-dot[data-tone="info"] {
   --tone: var(--color-accent);
+}
+/* a bare dot in the same tones (027: service links) */
+.status-dot {
+  --tone: var(--admin-neutral, var(--color-text-muted));
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--tone);
 }
 .status-badge__dot {
   inline-size: 0.5rem;

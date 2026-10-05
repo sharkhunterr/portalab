@@ -60,6 +60,10 @@ class Service(ConnectorsBase):
     disabled_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     disconnected_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     sync_interval_seconds: Mapped[int | None] = mapped_column(Integer)
+    # 027: where members open the service (quick links); the connection URL may be internal
+    public_url: Mapped[str | None] = mapped_column(
+        String(512), info=not_personal("a service's public address")
+    )
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

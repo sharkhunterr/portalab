@@ -21,7 +21,7 @@
 }
 
 .auth-form button,
-.account-page button {
+.account-page button:not([class]) {
   justify-self: start;
   min-block-size: 2.5rem;
   padding: var(--space-2) var(--space-5);

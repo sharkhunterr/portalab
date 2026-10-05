@@ -224,3 +224,90 @@
   border-radius: var(--radius-sm);
   background: linear-gradient(180deg, var(--color-surface-raised), var(--color-surface));
 }
+
+/* 027: the appearance page as cards — only what the member owns, the rest one line away */
+.appearance-page {
+  display: grid;
+  gap: var(--space-4);
+}
+.appearance-card {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4) var(--space-5, 1.25rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
+}
+.appearance-card > h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.appearance-card > .ds-page-header__context {
+  margin: 0;
+}
+.appearance-card .theme-gallery__list {
+  margin: 0;
+}
+.appearance-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-3);
+}
+.appearance-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+}
+.appearance-scale__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.appearance-scale__row input {
+  flex: 1;
+}
+.appearance-scale__big {
+  font-size: 1.4em;
+  font-weight: var(--font-weight-bold);
+}
+.appearance-scale__row output {
+  min-inline-size: 3rem;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+.in-shop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  font-size: var(--font-size-sm);
+}
+.in-shop > .ds-icon {
+  color: var(--color-accent);
+}
+.in-shop a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-inline-start: auto;
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+.theme-card__current {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-available-bg);
+  color: var(--state-available-fg);
+  font-size: var(--font-size-xs);
+}

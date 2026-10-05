@@ -84,6 +84,7 @@ class ServiceInfo:
     last_sync_success_at: datetime | None = None
     last_sync_attempt_at: datetime | None = None
     last_sync_error: str | None = None
+    link: str | None = None  # 027: where members open it (its public URL, or its https address)
 
 
 @runtime_checkable

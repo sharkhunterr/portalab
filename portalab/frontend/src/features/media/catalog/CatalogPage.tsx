@@ -1,4 +1,5 @@
 import { type FormEvent, useId, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -9,13 +10,15 @@ import "../media.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 
 /** Catalog browse (spec 024 T014): text, kind, genre, year and availability filters; cursor pagination. */
-const KINDS = ["movie", "series", "book", "game", "album"];
+const KINDS = ["movie", "series", "book", "audiobook", "game", "album"];
 
 export function CatalogPage() {
   const t = useT();
   const headingId = useId();
-  const [draft, setDraft] = useState<CatalogFilters>({});
-  const [filters, setFilters] = useState<CatalogFilters>({});
+  const [params] = useSearchParams();
+  const initial: CatalogFilters = params.get("kind") ? { kind: params.get("kind") as string } : {}; // 027
+  const [draft, setDraft] = useState<CatalogFilters>(initial);
+  const [filters, setFilters] = useState<CatalogFilters>(initial);
   const page = useCatalogPage(filters);
   const items = (page.data?.pages ?? []).flatMap((p) => p.items);
   const submit = (event: FormEvent) => {

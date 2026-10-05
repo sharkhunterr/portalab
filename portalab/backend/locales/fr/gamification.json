@@ -65,6 +65,7 @@
   "category.level_up": "Niveaux",
   "category.quest": "Quêtes",
   "category.reward": "Récompenses",
+  "daily.done": "{done} / {count, plural, one {# objectif} other {# objectifs}}",
   "history.all": "Toutes les valeurs",
   "history.empty": "Aucune opération pour l'instant.",
   "history.filter": "Valeur",

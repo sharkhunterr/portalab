@@ -396,3 +396,93 @@ def _widget(media: MediaHarness, key: str) -> Any:
     registered = media.widgets.get(key)
     assert registered is not None
     return registered.provider
+
+
+async def test_media_home_journal_and_posters_of_titles_outside_the_library(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """027 — the media home's own rows come from the services' history: what I am in the middle of (not
+    finished, live TV left out) and what I opened lately (a series once); Statistics gives a title the
+    library does not hold — live TV's show — the metadata provider's poster."""
+    from portalab.capabilities.i18n import LocaleContext
+    from portalab.core.authz_port import Principal
+
+    people = await users(app, media, "zoe")
+    now = clock.now()
+    history = media.service(2, "tautulli")
+    media.provide(METADATA, media.service(9, "tmdb"), _Tmdb())
+    media.provide(
+        ACTIVITY_HISTORY,
+        history,
+        _History(
+            [
+                play("a", now - timedelta(hours=9), priority=20, title="Arrival", progress=0.4, item=None),
+                play(
+                    "b",
+                    now - timedelta(hours=8),
+                    priority=20,
+                    kind="episode",
+                    item=None,
+                    title="Kassa",
+                    parent_title="Andor",
+                    progress=0.97,
+                ),
+                play(
+                    "c",
+                    now - timedelta(hours=7),
+                    priority=20,
+                    kind="episode",
+                    item=None,
+                    title="Aldhani",
+                    parent_title="Andor",
+                    progress=0.96,
+                ),
+                play(
+                    "d",
+                    now - timedelta(hours=6),
+                    priority=20,
+                    kind="live",
+                    item=None,
+                    title="Morituri",
+                    parent_title="Dune",
+                    progress=None,
+                ),
+            ]
+        ),
+    )
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(
+            UserLink(
+                user_id=people["zoe"],
+                service_id=history.service_id,
+                external_user_id="1",
+                verified=True,
+                created_at=now,
+            )
+        )
+    await media.module.ingestor.run()
+    while await media.module.aggregator.run():
+        pass
+
+    await login(client, "zoe")
+    journal = (await client.get("/api/v1/me/media/journal")).json()
+    assert [(i["title"], i["progress"]) for i in journal["continue"]] == [("Arrival", 0.4)]
+    assert journal["continue"][0]["route"] is None  # not in the library: nothing to open
+    assert [(i["kind"], i["title"]) for i in journal["recent"]] == [
+        ("episode", "Andor"),
+        ("movie", "Arrival"),
+    ]
+    continuing = await _widget(media, "media.continue").load(
+        Principal(user_id=people["zoe"]), {}, LocaleContext()
+    )
+    assert [i["title"] for i in continuing.data["items"]] == ["Arrival"]
+
+    stats = (await client.get("/api/v1/media/insights", params={"period": "30d"})).json()
+    live = next(w for w in stats["top_works"] if w["kind"] == "live")
+    assert live["title"] == "Dune" and live["poster_ref"] == "/poster.jpg"  # grouped by the show
+    latest = stats["recent"][0]
+    assert (
+        latest["kind"] == "live"
+        and latest["parent_title"] == "Dune"
+        and latest["poster_ref"] == "/poster.jpg"
+    )

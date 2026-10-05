@@ -35,8 +35,13 @@
   "notify.announcement": "{campaign} has started! {message}",
   "page.boosts": "Boosts",
   "page.empty": "No campaign right now.",
+  "page.ended": "ended",
+  "page.endsIn": "ends {when}",
+  "page.intro": "Special periods when some actions earn more: make the most of them while they last.",
+  "page.live": "Live",
   "page.title": "Campaigns",
-  "page.windows": "Upcoming windows",
+  "page.toCommunity": "Back to the community",
+  "page.windows": "Next periods",
   "widget.active.description": "Themed events running now",
   "widget.active.title": "Active campaigns"
 }

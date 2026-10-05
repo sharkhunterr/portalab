@@ -85,6 +85,67 @@ function Posters({ payload }: WidgetProps) {
   );
 }
 
+const KIND_ICON: Record<string, string> = {
+  movie: "film",
+  episode: "tv",
+  book: "book",
+  audiobook: "headphones",
+  track: "music",
+};
+
+/** « Continue » (027): what I am in the middle of — poster, title, episode or author, a progress bar. */
+function Continue({ payload }: WidgetProps) {
+  const t = useT();
+  const items = ((payload.data ?? {}) as { items?: Array<Card & { progress?: number | null }> }).items ?? [];
+  return (
+    <ul className="widget-continue">
+      {items.map((card, index) => {
+        const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
+        const percent =
+          card.progress !== null && card.progress !== undefined ? Math.round(card.progress * 100) : null;
+        const body = (
+          <>
+            <span className="widget-continue__art">
+              {src ? (
+                <img src={src} alt="" loading="lazy" />
+              ) : (
+                <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={26} />
+              )}
+              <span className="widget-continue__kind" aria-hidden="true">
+                <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={12} />
+              </span>
+            </span>
+            <span className="widget-continue__text">
+              <span className="widget-continue__title">{card.title}</span>
+              {card.subtitle ? <span className="widget-continue__meta">{card.subtitle}</span> : null}
+              {percent !== null ? (
+                <span
+                  className="widget-continue__bar"
+                  role="progressbar"
+                  aria-valuenow={percent}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={card.title}
+                >
+                  <span style={{ inlineSize: `${percent}%` }} />
+                </span>
+              ) : (
+                <span className="widget-continue__meta">{t(`media:kind.${card.kind ?? "movie"}`)}</span>
+              )}
+            </span>
+          </>
+        );
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may share a title
+          <li key={`${card.id ?? card.title}-${index}`}>
+            {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 interface StatsData {
   scope: "me" | "all";
   period: string;
@@ -204,4 +265,5 @@ function Soon({ payload }: WidgetProps) {
 
 registerWidgetComponent("media.posters", Posters);
 registerWidgetComponent("media.soon", Soon);
+registerWidgetComponent("media.continue", Continue);
 registerWidgetComponent("media.stats", Stats);

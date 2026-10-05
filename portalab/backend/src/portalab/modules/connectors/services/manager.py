@@ -95,6 +95,7 @@ class ServiceView:
     stale: bool
     created_at: datetime
     updated_at: datetime
+    public_url: str | None = None  # 027: where members open it
 
     @property
     def display_state(self) -> str:
@@ -217,6 +218,7 @@ class ServiceManager:
             stale=row.state != "enabled",
             created_at=row.created_at,
             updated_at=row.updated_at,
+            public_url=row.public_url,
         )
 
     async def list(self) -> list[ServiceView]:
@@ -374,6 +376,7 @@ class ServiceManager:
         secrets: Mapping[str, str | None] | None = None,
         sync_interval_seconds: int | None = None,
         capabilities: Mapping[str, Mapping[str, Any]] | None = None,
+        public_url: str | None = None,
     ) -> ServiceView:
         async with self.database.unit_of_work() as uow:
             row = await self._row(uow.session, service_id, lock=True)
@@ -393,6 +396,9 @@ class ServiceManager:
             if sync_interval_seconds is not None:
                 row.sync_interval_seconds = sync_interval_seconds or None
                 changed.append("sync_interval")
+            if public_url is not None and (public_url or None) != row.public_url:  # "" clears it
+                row.public_url = public_url or None
+                changed.append("public_url")
             for capability, values in (capabilities or {}).items():
                 cap = (
                     await uow.session.execute(

@@ -2,6 +2,7 @@
 history, continue, requests and account links; administration of identity (match candidates, merge, split,
 overrides) and unlinked activity. Personal data is the caller's own; admin views carry metadata only."""
 
+import asyncio
 from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -24,6 +25,7 @@ from portalab.modules.media.discovery.shelves import SHELVES
 from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.images.service import CONTENT_TYPE
+from portalab.modules.media.insights.continuing import in_progress, recently
 from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
 from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
 from portalab.modules.media.insights.progress import history_task
@@ -381,11 +383,46 @@ async def insights(
     works = [UUID(w["id"]) for w in data["top_works"] if w.get("id")]
     if data.get("box_office"):
         works += [UUID(f["id"]) for f in data["box_office"]["top"]]
+    works += [UUID(r["work_id"]) for r in data.get("recent") or [] if r.get("work_id")]
     images = await posters(module.database, works)
     for work in [*data["top_works"], *((data.get("box_office") or {}).get("top") or [])]:
         work["image_id"] = images.get(UUID(work["id"])) if work.get("id") else None
+    for row in data.get("recent") or []:
+        row["image_id"] = images.get(UUID(row["work_id"])) if row.get("work_id") else None
+    await _provider_posters(module, data)
     data["manager"] = manager
     return data
+
+
+LOOKUP_KIND = {"movie": "movie", "series": "series", "episode": "series"}
+
+
+async def _provider_posters(module: MediaModule, data: dict[str, Any]) -> None:
+    """027: titles the library does not hold (live TV, a film seen elsewhere…) get the metadata provider's
+    poster — looked up a few at a time, then remembered by the enricher."""
+    gate = asyncio.Semaphore(6)
+
+    async def fill(row: dict[str, Any], kinds: tuple[str, ...], title: str) -> None:
+        async with gate:
+            for kind in kinds:  # live TV: a show, else a film shown on a channel
+                row["poster_ref"] = await module.enricher.poster(kind, {}, title, row.get("year"))
+                if row["poster_ref"]:
+                    break
+
+    def kinds_of(row: dict[str, Any]) -> tuple[str, ...]:
+        if row["kind"] == "live":
+            return ("series", "movie")
+        known = LOOKUP_KIND.get(row["kind"])
+        return (known,) if known else ()
+
+    pending = []
+    for row in data["top_works"]:
+        if row.get("image_id") is None and kinds_of(row) and row.get("title"):
+            pending.append(fill(row, kinds_of(row), row["title"]))
+    for row in data.get("recent") or []:
+        if row.get("image_id") is None and kinds_of(row):
+            pending.append(fill(row, kinds_of(row), row.get("parent_title") or row["title"]))
+    await asyncio.gather(*pending[:30])
 
 
 @router.get("/media/upcoming")
@@ -493,6 +530,20 @@ async def my_continue(principal: User, module: Module) -> list[MediaContinueOut]
         )
         for p, o in rows
     ]
+
+
+@router.get("/me/media/journal")
+async def my_journal(principal: User, module: Module) -> dict[str, Any]:
+    """027 — the media home's own shelves, from the services' history (Plex/Tautulli, Grimmory…): what I am
+    in the middle of and what I opened lately, with posters (the library's, else the metadata provider's)."""
+    now = utc_now(module.clock)
+    user = _me(principal)
+    going = await in_progress(module.database, user, now, limit=12)
+    lately = await recently(module.database, user, now, limit=16)
+    return {
+        "continue": await with_posters(module.database, module.enricher, going, lookups=12),
+        "recent": await with_posters(module.database, module.enricher, lately, lookups=16),
+    }
 
 
 @router.get("/me/media/requests", response_model=MyMediaRequests)

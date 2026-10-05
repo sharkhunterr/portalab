@@ -305,3 +305,137 @@
 .achievement__step .gamification-meta {
   white-space: nowrap;
 }
+
+/* 027: daily objectives widget */
+.daily-objectives {
+  --done: var(--state-available-fg);
+  display: grid;
+  gap: var(--space-2);
+}
+.daily-objectives__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+}
+.daily-objectives__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: var(--font-weight-bold);
+}
+.daily-objectives[data-done] .daily-objectives__count {
+  color: var(--done);
+}
+.daily-objectives__track,
+.daily-objective__bar {
+  display: block;
+  block-size: 0.35rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.daily-objectives__track > span,
+.daily-objective__bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: inline-size var(--motion-duration-slow, 0.4s) var(--motion-easing);
+}
+.daily-objectives[data-done] .daily-objectives__track > span {
+  background: var(--done);
+}
+.daily-objectives__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.daily-objective {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  padding-inline-end: 4.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 3%, transparent);
+}
+.daily-objective[data-done] {
+  border-color: color-mix(in srgb, var(--done) 45%, transparent);
+  background: color-mix(in srgb, var(--done) 10%, transparent);
+}
+.daily-objective__check {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+}
+.daily-objective[data-done] .daily-objective__check {
+  background: var(--done);
+  color: var(--color-surface);
+}
+.daily-objective__body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.25rem var(--space-2);
+  min-inline-size: 0;
+}
+.daily-objective__label {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.daily-objective__count {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+.daily-objective[data-done] .daily-objective__count {
+  color: var(--done);
+  font-weight: var(--font-weight-semibold);
+}
+.daily-objective[data-done] .daily-objective__bar > span {
+  background: var(--done);
+}
+.daily-objective__rewards {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+.daily-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.daily-reward[data-value="coins"] {
+  background: color-mix(in srgb, var(--rarity-legendary, var(--color-accent)) 18%, transparent);
+}
+.daily-objective[data-done] .daily-reward {
+  background: var(--done);
+  color: var(--color-surface);
+}

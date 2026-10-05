@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../../api/client";
-import { SelectField } from "../../../design-system/components/Field";
+import { Avatar } from "../../../design-system/components/Avatar";
+import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -9,7 +11,40 @@ import {
   LEADERBOARD_PERIODS,
   Leaderboard,
   type LeaderboardPeriod,
+  type RankRow,
 } from "../../gamification/leaderboards/Leaderboard";
+
+/** The first three on steps (027): second, first, third — avatar, name and score. */
+function Podium({ rows }: { rows: RankRow[] }) {
+  const t = useT();
+  const format = useFormat();
+  const top = rows.filter((r) => r.rank <= 3).slice(0, 3);
+  if (!top.length) return null;
+  const order = [top[1], top[0], top[2]].filter((r): r is RankRow => Boolean(r));
+  return (
+    <ol className="community-podium" aria-label={t("community:leaderboards.podium")}>
+      {order.map((row) => (
+        <li key={row.user_id} data-rank={row.rank} data-me={row.me || undefined}>
+          <Link to={`/community/members/${row.user_id}`} className="community-podium__who">
+            <span className="community-podium__medal" aria-hidden="true">
+              <Icon name={row.rank === 1 ? "crown" : "medal"} size={16} />
+            </span>
+            <Avatar
+              name={row.display_name ?? ""}
+              userId={row.user_id}
+              src={`/api/v1/users/${row.user_id}/avatar`}
+              size={row.rank === 1 ? "xl" : "lg"}
+              decorative
+            />
+            <strong>{row.display_name ?? t("gamification:leaderboard.member")}</strong>
+            <span className="community-meta">{format.number(row.score)}</span>
+          </Link>
+          <span className="community-podium__step">#{row.rank}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 /**
  * ``/community/leaderboards`` (spec 012 T018): 013's leaderboards as the viewer may see them — metric and
@@ -39,36 +74,38 @@ export function LeaderboardPage() {
   });
   const heading = t("community:leaderboards.title");
   return (
-    <section aria-labelledby="community-leaderboards" className="ds-stack">
-      <h2 id="community-leaderboards">{heading}</h2>
+    <section aria-label={heading} className="ds-stack">
       {metrics.isSuccess && available.length === 0 ? (
         <FunctionalState state="unavailable" label={t("community:leaderboards.unavailable")} />
       ) : null}
       {available.length ? (
-        <div className="ds-stack--row community-filters">
-          <SelectField
-            label={t("community:leaderboards.metric")}
-            value={current}
-            onChange={(e) => setMetric(e.target.value)}
-          >
+        <div className="community-filters">
+          <fieldset className="ds-subnav" aria-label={t("community:leaderboards.metric")}>
             {available.map((value) => (
-              <option key={value} value={value}>
+              <button
+                key={value}
+                type="button"
+                aria-pressed={value === current}
+                onClick={() => setMetric(value)}
+              >
                 {t(`community:leaderboards.metric.${value}`)}
-              </option>
+              </button>
             ))}
-          </SelectField>
-          <SelectField
-            label={t("community:leaderboards.period")}
-            value={effectivePeriod}
-            disabled={current === "level"}
-            onChange={(e) => setPeriod(e.target.value as LeaderboardPeriod)}
-          >
-            {LEADERBOARD_PERIODS.map((value) => (
-              <option key={value} value={value}>
-                {t(`community:leaderboards.period.${value}`)}
-              </option>
-            ))}
-          </SelectField>
+          </fieldset>
+          {current !== "level" ? (
+            <fieldset className="ds-subnav" aria-label={t("community:leaderboards.period")}>
+              {LEADERBOARD_PERIODS.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={value === effectivePeriod}
+                  onClick={() => setPeriod(value)}
+                >
+                  {t(`community:leaderboards.period.${value}`)}
+                </button>
+              ))}
+            </fieldset>
+          ) : null}
         </div>
       ) : null}
       {board.isError || board.data?.state === "unavailable" ? (
@@ -76,6 +113,7 @@ export function LeaderboardPage() {
       ) : null}
       {board.data && board.data.state !== "unavailable" ? (
         <>
+          <Podium rows={board.data.entries} />
           <Leaderboard
             caption={`${heading} — ${t(`community:leaderboards.metric.${current}`)}`}
             rows={board.data.entries}

@@ -2,6 +2,7 @@
 ``media.requests`` — the viewer's own data only, as declarative lists."""
 
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import Any
 
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
@@ -34,7 +35,11 @@ def _definition(key: str, permission: str, events: tuple[str, ...]) -> WidgetDef
     )
 
 
-CONTINUE = _definition("media.continue", MEDIA_READ, ("media.playback_paused", "media.playback_finished"))
+CONTINUE = replace(
+    _definition("media.continue", MEDIA_READ, ("media.playback_paused", "media.playback_finished")),
+    component_id="media.continue",  # 027: posters with a progress bar
+    refresh=Refresh(),
+)
 RECENT = _definition("media.recent", MEDIA_READ, ("media.added",))
 NOW_PLAYING = _definition(
     "media.now_playing", MEDIA_READ, ("media.playback_started", "media.playback_finished")
@@ -53,28 +58,47 @@ class _Base:
 
 
 class ContinueWidget(_Base):
-    def __init__(self, history: HistoryProjection, clock: Clock | None = None) -> None:
+    """What I am in the middle of: the portal's own playback progress and (027) the services' history —
+    films and episodes from Plex/Tautulli, books and audiobooks from Grimmory — with posters."""
+
+    def __init__(self, history: HistoryProjection, clock: Clock | None = None, enricher: Any = None) -> None:
         super().__init__(clock)
         self.history = history
+        self.enricher = enricher
 
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
+        from portalab.modules.media.insights.continuing import in_progress
+        from portalab.modules.media.providers.insight_widgets import with_posters
+
         user = principal.acting_for or principal.user_id
-        rows = await self.history.continue_items(user, limit=8) if user else []
+        if user is None:
+            return self.payload([])
+        rows = await self.history.continue_items(user, limit=8)
         images = await posters(self.history.database, (o.id for _, o in rows))
-        return self.payload(
-            [
-                {
-                    "title": o.title,
-                    "route": f"/media/{o.id}",
-                    "meta": f"{round(p.percent * 100)} %",
-                    "progress": p.percent,  # 027: a bar under the title
-                    "image_id": images.get(o.id),
-                }
-                for p, o in rows
-            ]
+        items = [
+            {
+                "title": o.title,
+                "route": f"/media/{o.id}",
+                "meta": f"{round(p.percent * 100)} %",
+                "progress": p.percent,  # 027: a bar under the title
+                "image_id": images.get(o.id),
+            }
+            for p, o in rows
+        ]
+        known = {item["route"] for item in items}
+        history = await with_posters(
+            self.history.database,
+            self.enricher,
+            await in_progress(self.history.database, user, utc_now(self.clock), limit=12),
+            lookups=12,
         )
+        for row in history:
+            if row.get("route") and row["route"] in known:
+                continue
+            items.append({**row, "route": row.get("route") or "/media/insights"})
+        return self.payload(items[:10])
 
 
 class RecentWidget(_Base):

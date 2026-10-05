@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router";
+import type { ReactNode } from "react";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import {
@@ -13,12 +13,13 @@ import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
+import { InShop } from "./InShop";
 import "./notification-looks.css";
 
 /**
  * Notification looks (027): the style (shape and layout) and the animation of notifications, chosen with a
- * live preview, independent of the theme. Those sold in the shop are shown locked with a link to buy them
- * (the server refuses them to non-owners anyway). « Try it » shows a sample notification right away.
+ * live preview, independent of the theme — only the member's own (the server refuses the others anyway);
+ * how many more the shop sells is said in one line. « Try it » shows a sample notification right away.
  */
 interface Choice {
   key: string;
@@ -37,7 +38,7 @@ function useLooks() {
   });
 }
 
-export function NotificationLooks() {
+export function NotificationLooks({ position }: { position?: ReactNode }) {
   const t = useT();
   const notify = useNotify();
   const { preferences, setPreference } = usePreferences();
@@ -55,8 +56,15 @@ export function NotificationLooks() {
       href: "/progression",
       linkLabel: t("notifications:open"),
     });
+  const lockedCount = (list: Choice[] | undefined) => (list ?? []).filter((c) => c.locked).length;
+  const styles = (["theme", ...NOTIFICATION_STYLES] as const).filter(
+    (style) => style === "theme" || !locked(looks.data?.styles, style),
+  );
+  const animations = (["theme", ...NOTIFICATION_ANIMATIONS] as const).filter(
+    (animation) => animation === "theme" || !locked(looks.data?.animations, animation),
+  );
   return (
-    <section className="looks" aria-labelledby="notification-looks">
+    <section className="looks appearance-card" aria-labelledby="notification-looks">
       <div className="looks__head">
         <h3 id="notification-looks">{t("notifications:looks.title")}</h3>
         <Button variant="secondary" onClick={tryIt}>
@@ -65,24 +73,18 @@ export function NotificationLooks() {
         </Button>
       </div>
       <p className="ds-page-header__context">{t("notifications:looks.hint")}</p>
+      {position}
       <fieldset className="looks__styles">
         <legend>{t("notifications:looks.style")}</legend>
-        {(["theme", ...NOTIFICATION_STYLES] as const).map((style) => {
-          const isLocked = style !== "theme" && locked(looks.data?.styles, style);
+        {styles.map((style) => {
           const current = preferences.notificationStyle === style;
           return (
-            <label
-              key={style}
-              className="looks__style"
-              data-current={current || undefined}
-              data-locked={isLocked || undefined}
-            >
+            <label key={style} className="looks__style" data-current={current || undefined}>
               <input
                 type="radio"
                 name="notification-style"
                 value={style}
                 checked={current}
-                disabled={isLocked}
                 onChange={() => setPreference("notificationStyle", style as NotificationStyle | "theme")}
               />
               <span
@@ -104,41 +106,29 @@ export function NotificationLooks() {
                 {style === "theme"
                   ? t("notifications:universe.followTheme")
                   : t(`notifications:looks.styles.${style}`)}
-                {isLocked ? <Icon name="lock" size={14} /> : null}
               </span>
-              {isLocked ? (
-                <Link className="looks__shop" to="/marketplace?type=notification_style">
-                  {t("notifications:looks.inShop")}
-                </Link>
-              ) : null}
             </label>
           );
         })}
       </fieldset>
+      <InShop count={lockedCount(looks.data?.styles)} type="notification_style" />
       <fieldset className="looks__animations">
         <legend>{t("notifications:looks.animation")}</legend>
-        {(["theme", ...NOTIFICATION_ANIMATIONS] as const).map((animation) => {
-          const isLocked = animation !== "theme" && locked(looks.data?.animations, animation);
+        {animations.map((animation) => {
           const current = preferences.notificationAnimation === animation;
           return (
-            <label
-              key={animation}
-              className="looks__chip"
-              data-current={current || undefined}
-              data-locked={isLocked || undefined}
-            >
+            <label key={animation} className="looks__chip" data-current={current || undefined}>
               <input
                 type="radio"
                 name="notification-animation"
                 value={animation}
                 checked={current}
-                disabled={isLocked}
                 onChange={() => {
                   setPreference("notificationAnimation", animation as NotificationAnimation | "theme");
                   setTimeout(tryIt, 50); // see it right away
                 }}
               />
-              {isLocked ? <Icon name="lock" size={14} /> : <Icon name="sparkles" size={14} />}
+              <Icon name="sparkles" size={14} />
               {animation === "theme"
                 ? t("notifications:universe.followTheme")
                 : t(`notifications:looks.animations.${animation}`)}
@@ -146,12 +136,7 @@ export function NotificationLooks() {
           );
         })}
       </fieldset>
-      {[...(looks.data?.styles ?? []), ...(looks.data?.animations ?? [])].some((c) => c.locked) ? (
-        <p className="looks__more">
-          <Icon name="shop" size={16} />
-          {t("notifications:looks.more")} <Link to="/marketplace">{t("notifications:looks.toShop")}</Link>
-        </p>
-      ) : null}
+      <InShop count={lockedCount(looks.data?.animations)} type="notification_animation" />
     </section>
   );
 }

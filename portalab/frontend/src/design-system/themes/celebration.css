@@ -51,7 +51,7 @@
 /* confetti: coloured strips raining over the page */
 [data-effect="confetti"] .celebration-fx {
   left: var(--x);
-  top: -5vh;
+  top: calc(var(--fx-vh, 1vh) * -5);
   inline-size: 0.5rem;
   block-size: 1rem;
   border-radius: 2px;
@@ -66,14 +66,19 @@
   }
   100% {
     opacity: 0.9;
-    transform: translate3d(calc((var(--s) - 1.1) * 30vw), 110vh, 0) rotate(var(--r));
+    transform: translate3d(
+        calc((var(--s) - 1.1) * calc(var(--fx-vw, 1vw) * 30)),
+        calc(var(--fx-vh, 1vh) * 110),
+        0
+      )
+      rotate(var(--r));
   }
 }
 
 /* coins: golden coins falling and bouncing */
 [data-effect="coins"] .celebration-fx {
   left: var(--x);
-  top: -6vh;
+  top: calc(var(--fx-vh, 1vh) * -6);
   color: #f5b700;
   filter: drop-shadow(0 2px 0 #8a5a00) drop-shadow(0 0 6px #ffd54a);
   animation-name: fx-coins;
@@ -86,21 +91,21 @@
   }
   80% {
     opacity: 1;
-    transform: translateY(95vh) rotateY(720deg);
+    transform: translateY(calc(var(--fx-vh, 1vh) * 95)) rotateY(720deg);
   }
   90% {
-    transform: translateY(88vh) rotateY(800deg);
+    transform: translateY(calc(var(--fx-vh, 1vh) * 88)) rotateY(800deg);
   }
   100% {
     opacity: 0;
-    transform: translateY(95vh) rotateY(900deg);
+    transform: translateY(calc(var(--fx-vh, 1vh) * 95)) rotateY(900deg);
   }
 }
 
 /* snow: flakes drifting down */
 [data-effect="snow"] .celebration-fx {
   left: var(--x);
-  top: -4vh;
+  top: calc(var(--fx-vh, 1vh) * -4);
   color: #ffffff;
   filter: drop-shadow(0 0 4px #bfe3ff);
   animation-name: fx-snow;
@@ -115,18 +120,18 @@
     opacity: 1;
   }
   50% {
-    transform: translate3d(3vw, 40vh, 0) rotate(120deg);
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 3), calc(var(--fx-vh, 1vh) * 40), 0) rotate(120deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(-2vw, 85vh, 0) rotate(240deg);
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * 85), 0) rotate(240deg);
   }
 }
 
 /* petals: pink petals tumbling */
 [data-effect="petals"] .celebration-fx {
   left: var(--x);
-  top: -4vh;
+  top: calc(var(--fx-vh, 1vh) * -4);
   inline-size: 1rem;
   block-size: 0.7rem;
   border-radius: 100% 0 100% 0;
@@ -144,7 +149,12 @@
   }
   100% {
     opacity: 0;
-    transform: translate3d(calc((var(--s) - 1.1) * 25vw), 90vh, 0) rotate(var(--r));
+    transform: translate3d(
+        calc((var(--s) - 1.1) * calc(var(--fx-vw, 1vw) * 25)),
+        calc(var(--fx-vh, 1vh) * 90),
+        0
+      )
+      rotate(var(--r));
   }
 }
 
@@ -153,7 +163,7 @@
 [data-effect="bubbles"] .celebration-fx {
   left: var(--x);
   top: auto;
-  bottom: -5vh;
+  bottom: calc(var(--fx-vh, 1vh) * -5);
   animation-name: fx-rise;
   animation-timing-function: ease-out;
 }
@@ -180,11 +190,11 @@
     opacity: 1;
   }
   50% {
-    transform: translate3d(2vw, -45vh, 0) scale(1);
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 2), calc(var(--fx-vh, 1vh) * -45), 0) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translate3d(-2vw, -95vh, 0) scale(1.1);
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * -95), 0) scale(1.1);
   }
 }
 
@@ -286,7 +296,7 @@
 /* lightning: bolts striking around the page, with a flash */
 [data-effect="lightning"] .celebration-fx {
   left: calc(10% + var(--i) * 25%);
-  top: 10vh;
+  top: calc(var(--fx-vh, 1vh) * 10);
   color: #fff35c;
   filter: drop-shadow(0 0 10px #ffe600) drop-shadow(0 0 22px #fff7a8);
   scale: calc(3 + var(--s) * 2);
@@ -419,7 +429,11 @@
 @keyframes fx-assemble {
   0% {
     opacity: 1;
-    transform: translate(calc(var(--cx) + (var(--s) - 1.1) * 40vw), -70vh) rotate(var(--r));
+    transform: translate(
+        calc(var(--cx) + (var(--s) - 1.1) * calc(var(--fx-vw, 1vw) * 40)),
+        calc(var(--fx-vh, 1vh) * -70)
+      )
+      rotate(var(--r));
   }
   65% {
     opacity: 1;
@@ -700,4 +714,19 @@
   .celebration-portal {
     display: none;
   }
+}
+
+/* a celebration contained in a box (the shop's preview): same effect, scaled to the box */
+.ds-celebration[data-contained] {
+  --fx-vh: 0.16rem;
+  --fx-vw: 0.12rem;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: auto;
+  zoom: 0.62;
+}
+.ds-celebration[data-contained] .celebration-screen,
+.ds-celebration[data-contained] .celebration-flash {
+  position: absolute;
 }

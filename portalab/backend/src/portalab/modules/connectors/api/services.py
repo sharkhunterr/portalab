@@ -59,6 +59,8 @@ class ServicePatch(BaseModel):
     secrets: dict[str, str | None] | None = None  # null or "" clears one secret
     sync_interval_seconds: int | None = Field(default=None, ge=0, le=7 * 86400)
     capabilities: dict[str, CapabilityPatch] | None = None
+    # 027: where members open the service ("" clears it)
+    public_url: str | None = Field(default=None, max_length=512, pattern=r"^(https?://[^\s]+)?$")
 
 
 class TestIn(BaseModel):
@@ -122,6 +124,7 @@ def service_out(view: ServiceView, *, details: bool = True) -> dict[str, Any]:
         "historical": view.historical,
         "stale": view.stale,
         "sync_interval_seconds": view.sync_interval_seconds,
+        "public_url": view.public_url,
         "capabilities": view.capabilities,
         "sync": view.sync,
         "created_at": view.created_at.isoformat(),
@@ -189,6 +192,7 @@ async def update_service(
         secrets=body.secrets,
         sync_interval_seconds=body.sync_interval_seconds,
         capabilities=_patches(body.capabilities),
+        public_url=body.public_url,
     )
     return service_out(view)
 

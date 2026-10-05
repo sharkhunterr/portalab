@@ -57,7 +57,8 @@ describe("privacy screens", () => {
         deletion_endpoint: "/api/v1/me/deletion",
       });
     const { container } = render(withClient(<PrivacyCenter />));
-    expect(await screen.findByRole("rowheader", { name: "Optional profile fields" })).toBeInTheDocument();
+    expect(await screen.findByText("Optional profile fields")).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).toBeNull(); // locked by the administrator: no choice offered
     expect(screen.getByText(/your own choice is kept/)).toBeInTheDocument();
     await expectAccessible(container);
   });

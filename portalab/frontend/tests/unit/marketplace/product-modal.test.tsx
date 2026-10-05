@@ -81,6 +81,7 @@ function show() {
 describe("shop product modal", () => {
   it("opens a pack with its contents and price", async () => {
     show();
+    fireEvent.click(await screen.findByRole("button", { name: /^Packs/ })); // 027: the packs department
     fireEvent.click(await screen.findByRole("link", { name: "Star pack" }));
     const dialog = await screen.findByRole("dialog", { name: "Star pack" });
     expect(within(dialog).getByText("Star pack description")).toBeTruthy();

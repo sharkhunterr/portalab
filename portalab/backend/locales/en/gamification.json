@@ -65,6 +65,7 @@
   "category.level_up": "Level-ups",
   "category.quest": "Quests",
   "category.reward": "Rewards",
+  "daily.done": "{done} / {count, plural, one {# objective} other {# objectives}}",
   "history.all": "All values",
   "history.empty": "No transactions yet.",
   "history.filter": "Value",

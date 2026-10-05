@@ -1,0 +1,184 @@
+/* 027: the privacy center */
+.privacy-page {
+  display: grid;
+  gap: var(--space-4);
+}
+.privacy-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.privacy-summary li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.1rem var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.privacy-summary .ds-icon {
+  grid-row: span 2;
+  color: var(--color-accent);
+}
+.privacy-summary strong {
+  font-size: var(--font-size-xl);
+  line-height: 1.1;
+}
+.privacy-summary span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.privacy-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 32rem), 1fr));
+  gap: var(--space-4);
+}
+.privacy-group {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
+}
+.privacy-group h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+.privacy-group__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 1.9rem;
+  block-size: 1.9rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.privacy-data {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.privacy-datum {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-block-start: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+.privacy-datum:first-child {
+  border-block-start: 0;
+}
+.privacy-datum__level {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  color: var(--color-text-muted);
+}
+.privacy-datum[data-level="public"] .privacy-datum__level,
+.privacy-datum[data-level="community"] .privacy-datum__level {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.privacy-datum__text {
+  display: grid;
+  gap: 0.25rem;
+  min-inline-size: 0;
+}
+.privacy-datum__text strong {
+  font-size: var(--font-size-sm);
+}
+.privacy-datum__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.privacy-datum__badges .ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: var(--font-size-xs);
+}
+.privacy-datum__lock,
+.privacy-datum__saved {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.privacy-datum__select {
+  max-inline-size: 11rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+.privacy-datum__fixed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+.privacy-mine {
+  display: grid;
+  gap: var(--space-2);
+}
+.privacy-mine h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.privacy-mine > .ds-page-header__context {
+  margin: 0;
+}
+.privacy-mine__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-4);
+}
+.privacy-mine__card {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.privacy-mine__card[data-danger] {
+  border-color: color-mix(in srgb, var(--state-error-fg) 40%, var(--color-border));
+}
+.privacy-mine__card[data-danger] button[type="submit"] {
+  background: var(--state-error-fg);
+  color: var(--color-surface);
+}
+.privacy-mine__card h2 {
+  margin-block-start: 0;
+  font-size: var(--font-size-md);
+}
+@media (max-width: 40rem) {
+  .privacy-datum {
+    grid-template-columns: auto 1fr;
+  }
+  .privacy-datum__select,
+  .privacy-datum__fixed {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

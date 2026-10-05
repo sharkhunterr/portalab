@@ -4776,6 +4776,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Journal
+         * @description 027 — the media home's own shelves, from the services' history (Plex/Tautulli, Grimmory…): what I am
+         *     in the middle of and what I opened lately, with posters (the library's, else the metadata provider's).
+         */
+        get: operations["my_journal_api_v1_me_media_journal_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/links": {
         parameters: {
             query?: never;
@@ -10745,6 +10766,8 @@ export interface components {
             } | null;
             /** Name */
             name?: string | null;
+            /** Public Url */
+            public_url?: string | null;
             /** Secrets */
             secrets?: {
                 [key: string]: string | null;
@@ -21599,6 +21622,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_journal_api_v1_me_media_journal_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

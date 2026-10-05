@@ -18,6 +18,8 @@ export interface Work {
   members: number | null;
   last_at: string | null;
   image_id: string | null;
+  /** 027: the metadata provider's poster when the library has none (live TV, a title seen elsewhere). */
+  poster_ref?: string | null;
 }
 
 export interface Ranked {
@@ -78,6 +80,8 @@ export interface Insights {
     progress: number | null;
     member?: string | null;
     platform: string | null;
+    image_id?: string | null;
+    poster_ref?: string | null;
   }> | null;
   members: Array<{
     user_id: string | null;

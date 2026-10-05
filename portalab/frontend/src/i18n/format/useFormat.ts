@@ -12,6 +12,18 @@ export function useFormat() {
       new Intl.DateTimeFormat(ctx.locale, { dateStyle: style, timeZone: ctx.time_zone }).format(
         new Date(value),
       ),
+    /** 027: a calendar leaf — the day and the short month apart (``{ day: "5", month: "oct." }``). */
+    dayMonth: (value: Date | string) => {
+      const parts = new Intl.DateTimeFormat(ctx.locale, {
+        day: "numeric",
+        month: "short",
+        timeZone: ctx.time_zone,
+      }).formatToParts(new Date(value));
+      return {
+        day: parts.find((p) => p.type === "day")?.value ?? "",
+        month: parts.find((p) => p.type === "month")?.value ?? "",
+      };
+    },
     time: (value: Date | string) =>
       new Intl.DateTimeFormat(ctx.locale, {
         hour: "numeric",

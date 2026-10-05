@@ -77,7 +77,8 @@ def map_history_row(row: Mapping[str, Any]) -> SourceActivity | None:
         duration_s=_float(row.get("media_duration")),  # rarely given: the play length is ``duration``
         progress=min(1.0, percent / 100) if percent is not None else None,
         item_external_id=str(row["rating_key"]) if row.get("rating_key") else None,
-        parent_title=str(grandparent)[:500] if grandparent and kind in ("episode", "track") else None,
+        # live TV (027): the programme's show, when the guide names one, groups its episodes
+        parent_title=str(grandparent)[:500] if grandparent and kind in ("episode", "track", "live") else None,
         ids=_ids(row),
         year=int(row["year"]) if str(row.get("year") or "").isdigit() else None,
         device=(row.get("player") or row.get("product") or None),
