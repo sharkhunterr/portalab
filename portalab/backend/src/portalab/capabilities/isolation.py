@@ -22,8 +22,10 @@ from portalab.capabilities.results import (
     HealthResult,
     InvalidPayload,
     InvalidResponse,
+    NotFound,
     Provenance,
     ProviderAuthError,
+    ProviderNotFound,
     Stale,
     Timeout,
     Unavailable,
@@ -95,6 +97,8 @@ class ProviderGuard:
                 failure = Timeout(detail="provider did not answer in time")
             except ProviderAuthError as exc:
                 return AuthenticationFailed(detail=redact_text(str(exc)) or None)
+            except ProviderNotFound as exc:  # the service answered: nothing to retry
+                return NotFound(detail=redact_text(str(exc)) or None)
             except InvalidPayload as exc:
                 return self._fallback(cache_key, InvalidResponse(detail=redact_text(str(exc))))
             except Exception as exc:

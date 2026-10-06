@@ -164,8 +164,8 @@ class ServiceManager:
                     "category": str(getattr(connector, "category", "other")),
                     "version": connector.manifest.version,
                     "provides": [binding.spec.name for binding in connector.provides],
-                    # 027: what « sync now » runs; the others are read continuously (history, metadata…)
-                    "syncable": [binding.spec.name for binding in connector.provides if binding.syncable],
+                    # 027: what « sync now » runs (records, or history and metadata the portal pulls itself)
+                    "syncable": [b.spec.name for b in connector.provides if b.syncable or b.driven],
                     "config_schema": connector.config_schema.model_json_schema(),
                     "secret_fields": sorted(connector.secret_fields),
                     "compatibility": {"result": compatibility.result, "reasons": compatibility.reasons},
@@ -604,6 +604,18 @@ class ServiceManager:
     def _usable(self, service_id: str) -> bool:
         return self._states.get(service_id) not in ("error", "maintenance")
 
+    async def _answered(self, service_id: str) -> None:
+        """027: a service marked unavailable that answers again is back — even when its circuit never
+        reopened in this process (a restart while it was out leaves a closed circuit and a stale state)."""
+        if self._states.get(service_id) != "unavailable":
+            return
+        try:
+            if not await self.set_condition(UUID(service_id), "enabled", reason="service recovered"):
+                async with self.database.session() as session:  # another process recovered it already
+                    self._states[service_id] = (await self._row(session, UUID(service_id))).state
+        except Exception:
+            log.warning("service condition not recorded", extra={"fields": {"service_id": service_id}})
+
     def _withdraw(self, service_id: UUID) -> None:
         self.capabilities.unregister(owner_of(service_id))
         self._states.pop(str(service_id), None)
@@ -655,6 +667,7 @@ class ServiceManager:
                 ),
                 breaker=self.breakers.get(key),
                 usable=lambda key=key: self._usable(key),  # type: ignore[misc]
+                answered=lambda key=key: self._answered(key),  # type: ignore[misc]
             )
             self.capabilities.provide(
                 binding.spec.name,

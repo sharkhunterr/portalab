@@ -30,6 +30,8 @@ FIELDS = (
     "series",  # 027: books (Grimmory)
     "series_position",
     "publisher",
+    "released",
+    "tags",
 )
 ADMIN = "admin"
 Priorities = Callable[[str], Awaitable[Mapping[str, Sequence[str]]]]

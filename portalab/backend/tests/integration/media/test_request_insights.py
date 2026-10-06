@@ -4,6 +4,7 @@ dates) — and the configurable « recently requested » and « coming soon » w
 
 from datetime import timedelta
 from typing import Any
+from uuid import UUID
 
 import httpx
 from fastapi import FastAPI
@@ -157,6 +158,19 @@ async def test_my_requests_page_and_widgets(
         "approved",
         "pending",
     }
+    stages = {i["title"]: i.get("stage") for i in listed}  # 027: the journey's words, not « processing »
+    assert stages == {
+        "Dune": "available",
+        "Heat": "downloading",
+        "Arrival": "awaiting_release",
+        "Andor": "pending",
+    }
+    assert next(i for i in listed if i["title"] == "Heat")["id"]  # opens the title's page
+    # titles no library holds yet get their own page too (not available), of the right kind
+    assert all(i["id"] and i["route"] == f"/media/{i['id']}" for i in listed)
+    async with media.database.session() as session:
+        andor = await session.get(MediaObject, UUID(next(i["id"] for i in listed if i["title"] == "Andor")))
+    assert andor is not None and andor.kind == "series" and not andor.available
     soon = (await client.get("/api/v1/me/media/requests/soon")).json()["items"]
     assert [(i["title"], i["phase"]) for i in soon] == [("Heat", "downloading"), ("Arrival", "release")]
     assert soon[0]["progress"] == 0.4 and soon[1]["release_type"] == "digital"

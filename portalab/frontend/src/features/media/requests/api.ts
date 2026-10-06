@@ -13,6 +13,11 @@ export interface RequestCard {
   image_id: string | null;
   poster_ref?: string | null;
   route: string | null;
+  /** 027: where it stands, in the words of the title's journey */
+  stage?: string;
+  progress?: number;
+  at?: string;
+  release_type?: string;
 }
 
 export interface SoonCard extends RequestCard {

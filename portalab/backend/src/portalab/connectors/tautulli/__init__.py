@@ -96,7 +96,7 @@ class TautulliConnector(HttpConnector):
     category = "media"
     secret_fields: frozenset[str] = frozenset({"api_key"})
     provides: Sequence[CapabilityBinding] = (
-        binding(ACTIVITY_HISTORY),
+        binding(ACTIVITY_HISTORY, driven=True),
         binding(ACCOUNTS),
         binding(HEALTH_PROBE),
     )

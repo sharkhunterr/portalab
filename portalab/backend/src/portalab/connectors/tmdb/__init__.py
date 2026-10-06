@@ -198,7 +198,7 @@ class TmdbConnector(HttpConnector):
     category = "metadata"
     config_schema: type[BaseModel] = TmdbConfig
     secret_fields: frozenset[str] = frozenset({"api_key"})
-    provides: Sequence[CapabilityBinding] = (binding(METADATA), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (binding(METADATA, driven=True), binding(HEALTH_PROBE))
     status_path = "/3/configuration"
     public_path = None
 

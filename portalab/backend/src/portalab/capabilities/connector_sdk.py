@@ -30,6 +30,9 @@ class Manifest:
 class CapabilityBinding:
     spec: CapabilitySpec
     syncable: bool = False  # True when ``sync`` produces records for this capability
+    # 027: the consuming module pulls this capability itself (history, metadata enrichment) through the
+    # ``SyncDriver`` it registered — « sync now » and the scheduled sync run it, with live progress
+    driven: bool = False
 
 
 @dataclass(frozen=True, slots=True)

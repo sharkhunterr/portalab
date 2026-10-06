@@ -420,7 +420,7 @@ function PublicLink({ service }: { service: ServiceItem }) {
       title={t("admin:services.link.title", { name: service.name })}
       closeLabel={t("admin:services.close")}
       trigger={
-        <Button type="button" variant="ghost">
+        <Button type="button" variant="ghost" title={service.public_url ?? t("admin:services.link.none")}>
           <Icon name="link" size={16} />
           {t("admin:services.link")}
         </Button>
@@ -613,6 +613,17 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
                 <span className="services-admin__name">
                   <strong>{s.name}</strong>
                   <span className="admin-muted">{names.get(s.connector) ?? s.connector}</span>
+                  {s.public_url ? (
+                    <a
+                      className="services-admin__public"
+                      href={s.public_url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Icon name="link" size={12} />
+                      {s.public_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                    </a>
+                  ) : null}
                 </span>
               ),
             },

@@ -65,6 +65,8 @@
   "health.unknown": "Inconnu",
   "hidden": "Widgets masqués",
   "hide": "Masquer",
+  "hideWhenEmpty": "Masquer quand il n'y a rien à afficher",
+  "hideWhenEmptyHint": "Le bloc disparaît tant qu'il est vide et revient dès qu'il a du contenu.",
   "inShop": "dans la boutique",
   "layoutMode.label": "Une disposition par écran",
   "layoutMode.per_device.done": "Chaque écran a maintenant sa propre disposition.",

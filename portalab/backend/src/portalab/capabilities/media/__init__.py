@@ -40,6 +40,7 @@ METADATA = "media.metadata"
 DOWNLOADS = "media.downloads"
 ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one title (Radarr, Sonarr)
 DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
+ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -97,6 +98,7 @@ class LibraryPayload(BaseModel):
     series: str | None = Field(default=None, max_length=200)
     series_position: float | None = Field(default=None, ge=0, le=100_000)
     publisher: str | None = Field(default=None, max_length=200)
+    tags: list[str] = Field(default_factory=list, max_length=40)  # moods and themes (Grimmory)
 
 
 class RequestPayload(BaseModel):
@@ -343,6 +345,14 @@ class DownloadClient(Protocol):
     async def torrents(self, hashes: Sequence[str]) -> Sequence[TorrentState]: ...
 
 
+@runtime_checkable
+class ItemLinks(Protocol):
+    async def item_path(self, external_id: str, kind: str) -> str | None:
+        """The path (and fragment) of a title's page in the service, joined to its public address — or a
+        whole ``https://`` address when the service has a universal one (Plex's web app)."""
+        ...
+
+
 @dataclass(frozen=True, slots=True)
 class MetadataPerson:
     name: str
@@ -437,6 +447,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(DOWNLOADS, DownloadQueue, "What a download manager is fetching or importing now (027)"),
     _spec(ACQUISITION, Acquisition, "Where a download manager stands on one title, and its search (027)"),
     _spec(DOWNLOAD_CLIENTS, DownloadClient, "Transfers of a torrent client, by hash (027)"),
+    _spec(ITEM_LINKS, ItemLinks, "Where a title opens in its service (027)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

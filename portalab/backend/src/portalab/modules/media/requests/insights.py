@@ -22,7 +22,14 @@ from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import strong_ids
 from portalab.modules.media.insights.stats import Window, window
-from portalab.modules.media.models import Activity, MediaObject, MediaRequest, ObjectMetadata, ObjectTag
+from portalab.modules.media.models import (
+    Activity,
+    MediaObject,
+    MediaRequest,
+    ObjectMetadata,
+    ObjectTag,
+)
+from portalab.modules.media.requests.service import catalog_title
 
 GROUPS = {
     "pending": ("pending",),
@@ -333,7 +340,7 @@ class RequestInsights:
     # --- list ----------------------------------------------------------------------------------------
     async def mine(self, user: UUID, limit: int = 300) -> list[MediaRequest]:
         async with self.database.session() as session:
-            return list(
+            rows = list(
                 (
                     await session.execute(
                         select(MediaRequest)
@@ -343,6 +350,92 @@ class RequestInsights:
                     )
                 ).scalars()
             )
+        await self.link_objects(rows)
+        return rows
+
+    async def link_objects(self, rows: Sequence[MediaRequest]) -> None:
+        """027: requests made before their title reached the catalog are tied to it now (same strong id
+        and same kind), so every request opens its title's page."""
+        loose = [r for r in rows if r.object_id is None and ids_of(r)]
+        if not loose:
+            return
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            for row in loose:
+                ref = row.external_ref or {}
+                found = await catalog_title(
+                    uow.session, ref.get("ids") or {}, str(ref.get("kind") or ""), ref.get("title"), now
+                )
+                if found is not None:
+                    stored = await uow.session.get(MediaRequest, row.id)
+                    if stored is not None:
+                        stored.object_id = found
+                    row.object_id = found
+
+    async def stages(self, rows: Sequence[MediaRequest]) -> dict[UUID, dict[str, Any]]:
+        """027: where each request stands, in the words of the title's journey — cheap signals only (no
+        call per title): the request's state, the catalog, the managers' queues, the release calendars."""
+        open_rows = [r for r in rows if r.state in OPEN]
+        downloads = await self.queue() if open_rows else []
+        releases = await self.upcoming.list(120) if open_rows and self.upcoming is not None else []
+        objects = {r.object_id for r in rows if r.object_id}
+        available: set[UUID] = set()
+        future: dict[UUID, str] = {}
+        if objects:
+            async with self.database.session() as session:
+                available = set(
+                    (
+                        await session.execute(
+                            select(MediaObject.id).where(
+                                MediaObject.id.in_(objects), MediaObject.available.is_(True)
+                            )
+                        )
+                    ).scalars()
+                )
+                today = utc_now(self.clock).date().isoformat()
+                for object_id, value in (
+                    await session.execute(
+                        select(ObjectMetadata.object_id, ObjectMetadata.data["release_date"].astext).where(
+                            ObjectMetadata.object_id.in_(objects), ObjectMetadata.status == "found"
+                        )
+                    )
+                ).all():
+                    if value and str(value)[:10] > today:
+                        future[object_id] = str(value)[:10]
+        out: dict[UUID, dict[str, Any]] = {}
+        for row in rows:
+            if row.state == "pending":
+                out[row.id] = {"stage": "pending"}
+                continue
+            if row.state in ("declined", "cancelled", "failed"):
+                out[row.id] = {"stage": row.state}
+                continue
+            if row.state == "available" or (row.object_id in available):
+                out[row.id] = {"stage": "available"}
+                continue
+            ids = ids_of(row)
+            same = ("movie",) if kind_of(row) == "movie" else ("episode", "series", "season")
+            fetching = [d for d in downloads if d.kind in same and ids & set(strong_ids(d.ids).items())]
+            if fetching:
+                blocked = any(d.attention in ("import_blocked", "failed", "warning") for d in fetching)
+                importing = any(d.status == "importing" for d in fetching)
+                out[row.id] = {
+                    "stage": "import_blocked" if blocked else "importing" if importing else "downloading",
+                    "progress": round(sum(d.progress for d in fetching) / len(fetching), 3),
+                }
+                continue
+            coming = [r for r in releases if ids & set(strong_ids(r.get("ids") or {}).items())]
+            if coming:
+                out[row.id] = {
+                    "stage": "awaiting_release",
+                    "at": coming[0]["at"],
+                    "release_type": coming[0]["type"],
+                }
+            elif row.object_id in future:
+                out[row.id] = {"stage": "awaiting_release", "at": future[row.object_id]}
+            else:
+                out[row.id] = {"stage": "searching"}
+        return out
 
     # --- coming soon ---------------------------------------------------------------------------------
     async def queue(self) -> list[SourceDownload]:
@@ -376,6 +469,7 @@ class RequestInsights:
             )
         if not rows:
             return []
+        await self.link_objects(rows)  # 027: each one opens its title's page
         downloads = await self.queue()
         releases = await self.upcoming.list(60) if self.upcoming is not None else []
         out: list[dict[str, Any]] = []

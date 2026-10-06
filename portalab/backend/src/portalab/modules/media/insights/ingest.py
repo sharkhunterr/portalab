@@ -24,6 +24,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.media import ACTIVITY_HISTORY, ACTIVITY_KINDS, ActivityPage, SourceActivity, unwrap
+from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.logging import redact_text
@@ -47,6 +48,7 @@ JOB = "media.activity_sync"
 PAGE_TIMEOUT = 60
 BACKFILL_PAGES = 40  # per run and service: a large history is caught up over a few runs
 INCREMENTAL_PAGES = 10
+MAX_DRIVEN_RUNS = 100  # « sync now »: up to 4,000 pages of history in one go
 OVERLAP = timedelta(hours=6)
 WORKS = frozenset({"movie", "series", "album", "book", "audiobook", "game"})
 
@@ -188,6 +190,7 @@ class ActivityIngestor:
         self.capabilities = capabilities
         self.clock = clock
         self.progress = Progress(database)
+        self._locks: dict[UUID, asyncio.Lock] = {}
 
     def providers(self) -> list[tuple[UUID, Any]]:
         try:
@@ -208,8 +211,11 @@ class ActivityIngestor:
         with_history: set[UUID] = set()
         for service_id, provider in self.providers():
             with_history.add(service_id)
+            if self._lock(service_id).locked():
+                continue  # « sync now » is reading this history right now
             try:
-                stored += await self._history(service_id, provider)
+                async with self._lock(service_id):
+                    stored += await self._history(service_id, provider)
             except Exception as exc:  # one failing service never stops the others
                 await self._failed(service_id, "history", exc)
         stored += await self._sessions(with_history)
@@ -218,6 +224,35 @@ class ActivityIngestor:
             await self.dedup(family)
         metrics.increment("media.activity.stored", stored)
         return stored
+
+    def _lock(self, service_id: UUID) -> asyncio.Lock:
+        return self._locks.setdefault(service_id, asyncio.Lock())
+
+    async def drive(self, service: ServiceRef, kind: str, report: Report) -> SinkResult:
+        """027: « sync now » (and the scheduled sync) of a history service, from the services page: the
+        whole history is read — the backfill to its end, then what is new — with its progress; a full
+        resync starts the history over."""
+        provider = dict(self.providers()).get(service.service_id)
+        if provider is None:
+            return SinkResult()
+        stored = 0
+        async with self._lock(service.service_id):
+            if kind == "resync_full":
+                await self.reset(service.service_id)
+            try:
+                for _ in range(MAX_DRIVEN_RUNS):
+                    stored += await self._history(service.service_id, provider, report)
+                    async with self.database.session() as session:
+                        state = await session.get(ActivityCursor, service.service_id)
+                    if state is None or state.mode != "backfill":
+                        break
+            except Exception as exc:
+                await self._failed(service.service_id, "history", exc)
+                raise
+        for family in await self._families_touched():
+            await self.dedup(family)
+        metrics.increment("media.activity.stored", stored)
+        return SinkResult(added=stored)
 
     # --- history providers -----------------------------------------------------------------------------
     async def _cursor(self, session: AsyncSession, service_id: UUID, source: str) -> ActivityCursor:
@@ -228,7 +263,7 @@ class ActivityIngestor:
             await session.flush()
         return row
 
-    async def _history(self, service_id: UUID, provider: Any) -> int:
+    async def _history(self, service_id: UUID, provider: Any, report: Report | None = None) -> int:
         async with self.database.unit_of_work() as uow:
             state = await self._cursor(uow.session, service_id, "history")
             mode, cursor, watermark = state.mode, state.cursor, state.watermark
@@ -248,6 +283,8 @@ class ActivityIngestor:
             await self.progress.set(
                 task, utc_now(self.clock), running=True, done=page.position, total=page.total
             )
+            if report is not None:
+                await report(page.position if page.position is not None else stored, page.total)
             for item in page.items:
                 if latest is None or item.started_at > latest:
                     latest = item.started_at

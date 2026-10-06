@@ -4,6 +4,7 @@ health** (006 ``health.service_state``) and its **sync state** (005 directory: l
 error class). A service outage or a failed sync changes none of the catalog facts; stale data is marked
 with its ``as_of``."""
 
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -12,6 +13,7 @@ from uuid import UUID
 from sqlalchemy import select
 
 from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE
+from portalab.capabilities.media import ITEM_LINKS, unwrap
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
@@ -34,6 +36,7 @@ class SourceStatus:
     last_sync_error: str | None
     last_sync_attempt_at: datetime | None = None  # 027: an error only counts when no success came after
     link: str | None = None
+    item_link: str | None = None  # 027: this title's page in the service, at its public address
 
 
 class AvailabilityService:
@@ -48,6 +51,26 @@ class AvailabilityService:
         except Exception:
             return None
         return providers[0].provider if providers else None
+
+    async def _item_link(self, item: SourceItem, base: str | None) -> str | None:
+        """027: the service's public address joined to the title's own page in it (Jellyfin, Grimmory…), or
+        the service's universal address for it (Plex)."""
+        try:
+            providers = self.capabilities.system_providers(ITEM_LINKS)
+        except Exception:
+            return None
+        provider = next((p.provider for p in providers if p.instance_ref == str(item.service_id)), None)
+        if provider is None:
+            return None
+        try:
+            path = unwrap(await asyncio.wait_for(provider.item_path(item.external_id, item.kind), timeout=5))
+        except Exception:
+            return None
+        if isinstance(path, str) and path.startswith("https://"):
+            return path
+        if not base or not isinstance(path, str) or not path.startswith("/"):
+            return None
+        return f"{base.rstrip('/')}{path}"
 
     async def sources(self, object_id: UUID) -> tuple[bool, list[SourceStatus], datetime]:
         async with self.database.session() as session:
@@ -91,6 +114,7 @@ class AvailabilityService:
                     last_sync_error=getattr(info, "last_sync_error", None),
                     last_sync_attempt_at=getattr(info, "last_sync_attempt_at", None),
                     link=getattr(info, "link", None),
+                    item_link=await self._item_link(item, getattr(info, "link", None)),
                 )
             )
         as_of = max((s.last_seen_at for s in out), default=utc_now(self.clock))

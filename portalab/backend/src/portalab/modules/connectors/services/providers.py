@@ -8,11 +8,11 @@ class exposing the capability's members, so runtime protocol checks hold.
 """
 
 import inspect
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 from portalab.capabilities.isolation import ProviderGuard
-from portalab.capabilities.results import Available, CapabilityResult, Partial, Unavailable
+from portalab.capabilities.results import Available, CapabilityResult, NotFound, Partial, Unavailable
 from portalab.modules.connectors.breaker.breaker import CircuitBreaker
 from portalab.modules.connectors.observability import metric_part, metrics
 
@@ -32,6 +32,7 @@ def guarded_provider(
     guard: ProviderGuard,
     breaker: CircuitBreaker,
     usable: Callable[[], bool],
+    answered: Callable[[], Awaitable[None]] | None = None,
 ) -> Any:
     namespace: dict[str, Any] = {"__slots__": (), "inner": inner}
     for name in _members(protocol, inner):
@@ -41,7 +42,7 @@ def guarded_provider(
         if not inspect.iscoroutinefunction(member):
             namespace[name] = staticmethod(member) if callable(member) else member
             continue
-        namespace[name] = _guarded_method(name, inner, capability, guard, breaker, usable)
+        namespace[name] = _guarded_method(name, inner, capability, guard, breaker, usable, answered)
     proxy_type = type(f"Guarded{type(inner).__name__}", (), namespace)
     return proxy_type()
 
@@ -53,6 +54,7 @@ def _guarded_method(
     guard: ProviderGuard,
     breaker: CircuitBreaker,
     usable: Callable[[], bool],
+    answered: Callable[[], Awaitable[None]] | None = None,
 ) -> Callable[..., Any]:
     metric = f"connectors.calls.{metric_part(capability)}"
 
@@ -64,9 +66,11 @@ def _guarded_method(
         result: CapabilityResult[Any] = await guard.call(
             lambda: getattr(inner, name)(*args, **kwargs), cache_key=key
         )
-        if isinstance(result, Available | Partial):
+        if isinstance(result, Available | Partial | NotFound):  # « no such item » is an answer
             await breaker.record_success()
             metrics.increment(f"{metric}.ok")
+            if answered is not None:
+                await answered()
         else:
             await breaker.record_failure()
             metrics.increment(f"{metric}.failed")

@@ -14,8 +14,10 @@ import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Instance, useWidgetData } from "../api";
+import { keyOf } from "../edit/EditSession";
 import { TEMPLATES } from "../templates/Templates";
 import { widgetComponent } from "../widgets/registry";
+import { useEmptyReport } from "./emptiness";
 
 /**
  * One widget in its own frame (spec 009 T012; R3, R12): own query, own error boundary and Suspense — a
@@ -43,6 +45,12 @@ function Body({ instance }: { instance: Instance }) {
   const widget = instance.widget;
   const interval = widget?.refresh_mode === "interval" ? (widget.refresh_interval_s ?? null) : null;
   const query = useWidgetData(instance.widget_key, instance.id ?? null, interval);
+  const report = useEmptyReport();
+  const hideWhenEmpty = Boolean((instance.config as Record<string, unknown> | undefined)?._hide_empty);
+  const empty = hideWhenEmpty && query.data?.state === "no-data";
+  useEffect(() => {
+    report(keyOf(instance), empty);
+  }, [report, instance, empty]);
   if (query.isPending) return <FunctionalState state="loading" />;
   if (query.isError) return <FunctionalState state="error" onRetry={() => query.refetch()} />;
   const payload = query.data;

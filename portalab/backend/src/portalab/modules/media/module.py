@@ -17,7 +17,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
-from portalab.capabilities.media import DIGEST, LIBRARY, REQUESTS
+from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, METADATA, REQUESTS
 from portalab.capabilities.media_core import (
     CATALOG,
     HISTORY,
@@ -295,6 +295,10 @@ class MediaModule:
         for capability, sink in ((LIBRARY, self.library), (REQUESTS, self.request_sink)):
             if self.sinks.get(capability) is None:
                 self.sinks.register(capability, sink, owner=OWNER)
+        # 027: history and metadata are pulled by the module, yet synced from the services page like the rest
+        for capability, driver in ((ACTIVITY_HISTORY, self.ingestor), (METADATA, self.enricher)):
+            if self.sinks.driver(capability) is None:
+                self.sinks.register_driver(capability, driver, owner=OWNER)
         ports: tuple[tuple[str, Any], ...] = (
             (CATALOG, self.catalog_port),
             (HISTORY, self.history_reader),
@@ -378,6 +382,9 @@ class MediaModule:
         async def enrich() -> None:
             await self.enricher.run()
 
+        async def images() -> None:  # 027: covers whose fetch failed are tried again
+            await self.images.backfill()
+
         return [
             self.start,
             register_periodic(jobs, self.database, POLL_JOB, timedelta(seconds=15), poll, owner=OWNER),
@@ -392,6 +399,9 @@ class MediaModule:
             ),
             register_periodic(
                 jobs, self.database, AGGREGATE_JOB, timedelta(minutes=2), aggregate, owner=OWNER
+            ),
+            register_periodic(
+                jobs, self.database, "media.images_backfill", timedelta(hours=1), images, owner=OWNER
             ),
             register_periodic(
                 jobs,

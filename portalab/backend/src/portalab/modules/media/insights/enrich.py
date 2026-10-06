@@ -7,14 +7,15 @@ case the provider learns about the title. Images are served by the portal (fetch
 import asyncio
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import asdict
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, exists, or_, select
+from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.media import METADATA, MetadataRecord, unwrap
+from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
@@ -32,6 +33,7 @@ REFRESH = timedelta(days=30)
 RETRY = timedelta(days=3)
 MAX_ATTEMPTS = 5
 KINDS = ("movie", "series")
+DRIVEN_LIMIT = 20_000  # « sync now »: titles looked up in one go
 
 
 def record_data(record: MetadataRecord) -> dict[str, Any]:
@@ -65,31 +67,86 @@ class MetadataEnricher:
             return None
         return (registrations[0].instance_ref, registrations[0].provider) if registrations else None
 
-    async def due(self, limit: int = BATCH) -> list[MediaObject]:
+    def _due(self, before: datetime | None) -> Any:
+        """Titles to look up: never looked up, found a month ago, missed a few days ago — or, for a full
+        resync, everything not looked up since ``before``."""
         now = utc_now(self.clock)
         meta = ObjectMetadata
+        stale = (
+            meta.fetched_at < before
+            if before is not None
+            else or_(
+                and_(meta.status == "found", meta.fetched_at < now - REFRESH),
+                and_(meta.status != "found", meta.attempts < MAX_ATTEMPTS, meta.fetched_at < now - RETRY),
+            )
+        )
+        return and_(
+            MediaObject.kind.in_(KINDS),
+            MediaObject.status == "active",
+            or_(meta.object_id.is_(None), stale),
+        )
+
+    async def due(self, limit: int = BATCH, *, before: datetime | None = None) -> list[MediaObject]:
         played = exists().where(Activity.work_id == MediaObject.id)
         async with self.database.session() as session:
             query = (
                 select(MediaObject)
-                .outerjoin(meta, meta.object_id == MediaObject.id)
-                .where(
-                    MediaObject.kind.in_(KINDS),
-                    MediaObject.status == "active",
-                    or_(
-                        meta.object_id.is_(None),
-                        and_(meta.status == "found", meta.fetched_at < now - REFRESH),
-                        and_(
-                            meta.status != "found",
-                            meta.attempts < MAX_ATTEMPTS,
-                            meta.fetched_at < now - RETRY,
-                        ),
-                    ),
-                )
+                .outerjoin(ObjectMetadata, ObjectMetadata.object_id == MediaObject.id)
+                .where(self._due(before))
                 .order_by(played.desc(), MediaObject.first_seen_at.desc())
                 .limit(limit)
             )
             return list((await session.execute(query)).scalars())
+
+    async def drive(self, service: ServiceRef, kind: str, report: Report) -> SinkResult:
+        """027: « sync now » (and the scheduled sync) of the metadata service, from the services page:
+        every title due is looked up, with its progress; a resync looks the whole catalog up again."""
+        found = self.provider()
+        if found is None or found[0] != str(service.service_id):
+            return SinkResult()
+        provider_ref, provider = found
+        language = await self.language()
+        before = utc_now(self.clock) if kind in ("resync_partial", "resync_full") else None
+        async with self.database.session() as session:
+            total = int(
+                await session.scalar(
+                    select(func.count())
+                    .select_from(MediaObject)
+                    .outerjoin(ObjectMetadata, ObjectMetadata.object_id == MediaObject.id)
+                    .where(self._due(before))
+                )
+                or 0
+            )
+        total = min(total, DRIVEN_LIMIT)
+        statuses: dict[str, int] = {}
+        done = 0
+        await report(0, total)
+        await self.progress.set(TASK, utc_now(self.clock), running=True, done=0, total=total)
+        gate = asyncio.Semaphore(CONCURRENCY)
+
+        async def one(obj: MediaObject) -> None:
+            async with gate:
+                status = await self.enrich(obj, provider_ref, provider, language)
+                statuses[status] = statuses.get(status, 0) + 1
+
+        try:
+            while done < total:
+                due = await self.due(min(BATCH, total - done), before=before)
+                if not due:
+                    break
+                await asyncio.gather(*(one(obj) for obj in due))
+                done += len(due)
+                await report(done, total)
+                await self.progress.set(TASK, utc_now(self.clock), running=True, done=done, total=total)
+        finally:
+            await self.progress.set(TASK, utc_now(self.clock), running=False)
+        if done and statuses.get("error", 0) == done:
+            raise LookupError("the metadata service answered none of the lookups")
+        return SinkResult(
+            modified=statuses.get("found", 0),
+            ignored=statuses.get("missing", 0),
+            errored=statuses.get("error", 0),
+        )
 
     async def run(self) -> int:
         found = self.provider()

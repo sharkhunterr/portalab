@@ -9,7 +9,9 @@ from datetime import timedelta
 import pytest
 from sqlalchemy import select, text
 
-from portalab.connectors.fake import EPOCH
+from portalab.capabilities.connector_sdk import CapabilityBinding
+from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
+from portalab.connectors.fake import EPOCH, SPEC
 from portalab.modules.connectors.models import SyncRun, SyncState
 from portalab.modules.connectors.services.common import SyncInProgress
 from portalab.modules.connectors.sync.runner import source_ref
@@ -146,3 +148,31 @@ async def test_progress_is_visible_while_running_and_cleared_after(cn: Connector
         and state.progress is None
         and (await cn.module.manager.get(service_id)).sync["progress"] is None
     )
+
+
+async def test_driven_capability_reports_progress(cn: ConnectorsHarness) -> None:
+    """027: a capability the consuming module pulls itself (history, metadata) is synced from the services
+    page like the others: the runner calls its driver, keeps its progress live and records the run."""
+    seen: list[dict[str, object] | None] = []
+
+    class _Driver:
+        async def drive(self, service: ServiceRef, kind: str, report: Report) -> SinkResult:
+            await report(1, 3)
+            async with cn.full.database.session() as session:
+                state = await session.get(SyncState, service.service_id)
+            seen.append(state.progress if state else None)
+            await report(3, 3)
+            return SinkResult(modified=2, ignored=1)
+
+    connector = cn.connectors.get("fake")
+    assert connector is not None
+    connector.provides = (CapabilityBinding(SPEC, driven=True),)  # type: ignore[misc]
+    cn.sinks.register_driver(SPEC.name, _Driver(), owner="test:connectors")
+    service_id = await cn.enabled()
+    assert next(c for c in cn.module.manager.catalog() if c["key"] == "fake")["syncable"] == [SPEC.name]
+    outcome = await cn.module.runner.run(service_id, kind="manual")
+    assert outcome is not None and (outcome.status, outcome.modified, outcome.ignored) == ("succeeded", 2, 1)
+    assert seen[0] is not None and (seen[0]["done"], seen[0]["total"]) == (1, 3)
+    async with cn.full.database.session() as session:
+        state = await session.get(SyncState, service_id)
+    assert state is not None and state.status == "idle" and state.progress is None

@@ -31,6 +31,7 @@ from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
+    ITEM_LINKS,
     LIBRARY,
     ActivityPage,
     ServiceAccount,
@@ -128,6 +129,7 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
         "series": (str(meta.get("seriesName"))[:200] if meta.get("seriesName") else None),
         "series_position": meta.get("seriesNumber"),
         "publisher": (str(meta.get("publisher"))[:200] if meta.get("publisher") else None),
+        "tags": list(dict.fromkeys(_names(meta.get("moods")) + _names(meta.get("tags"))))[:40],
     }
     return safe_id(book["id"]), kind_of(book), payload
 
@@ -179,9 +181,10 @@ class GrimmoryConnector(HttpConnector):
     secret_fields: frozenset[str] = frozenset({"password"})
     provides: Sequence[CapabilityBinding] = (
         binding(LIBRARY, syncable=True),
-        binding(ACTIVITY_HISTORY),
+        binding(ACTIVITY_HISTORY, driven=True),
         binding(ACCOUNTS),
         binding(HEALTH_PROBE),
+        binding(ITEM_LINKS),
     )
     status_path = "/api/v1/libraries"
     public_path = "/api/v1/healthcheck"
@@ -316,7 +319,16 @@ class GrimmoryConnector(HttpConnector):
             return _Accounts(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
+        if capability == ITEM_LINKS:
+            return _Links()
         return None
+
+
+class _Links:
+    """027: a book's page in Grimmory — ``/book/<id>?tab=view``."""
+
+    async def item_path(self, external_id: str, kind: str) -> str | None:
+        return f"/book/{safe_id(external_id)}?tab=view"
 
 
 class _Covers:

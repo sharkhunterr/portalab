@@ -21,7 +21,13 @@ from uuid import UUID
 from sqlalchemy import select, text
 
 from portalab.capabilities.connector_sdk import Connector, ServiceHandle, SourceRecord, SyncProgress
-from portalab.capabilities.record_sink import RecordSink, ServiceRef, SinkRegistry, default_sinks
+from portalab.capabilities.record_sink import (
+    RecordSink,
+    ServiceRef,
+    SinkRegistry,
+    SyncDriver,
+    default_sinks,
+)
 from portalab.core.authz_port import Principal
 from portalab.core.ids import new_id
 from portalab.core.logging import redact_text
@@ -177,10 +183,23 @@ class SyncRunner:
         fresh = kind in ("resync_partial", "resync_full")
         for binding in connector.provides:
             name = binding.spec.name
-            if not binding.syncable or (only and name != only):
+            if not (binding.syncable or binding.driven) or (only and name != only):
                 continue
             cap = caps.get(name)
             if cap is None or not cap.enabled:
+                continue
+            if binding.driven:
+                driver = self.sinks.driver(name)
+                if driver is None:
+                    continue
+                outcome.capabilities.append(name)
+                try:
+                    await self._drive(driver, ref, name, kind, outcome)
+                except _Failed as exc:
+                    outcome.status = "failed"
+                    outcome.last_error = redact_text(str(exc))[:1000]
+                    source_failed = exc.source
+                    break
                 continue
             sink = self.sinks.get(name)
             if sink is None:
@@ -311,6 +330,24 @@ class SyncRunner:
                 doomed.extend(m for m in missing if m not in doomed)
         if doomed:
             outcome.removed += await sink.deactivate(doomed, ref)
+
+    async def _drive(
+        self, driver: SyncDriver, ref: ServiceRef, capability: str, kind: RunKind, outcome: RunOutcome
+    ) -> None:
+        """027: a capability the consuming module pulls itself (history, metadata), with its progress."""
+        await self._progress(ref.service_id, capability, 0, None)
+
+        async def report(done: int, total: int | None) -> None:
+            await self._progress(ref.service_id, capability, done, total)
+
+        try:
+            result = await driver.drive(ref, kind, report)
+        except Exception as exc:
+            raise _Failed(f"the {capability} sync failed ({type(exc).__name__}: {exc})", source=True) from exc
+        outcome.added += result.added
+        outcome.modified += result.modified
+        outcome.ignored += result.ignored
+        outcome.errored += result.errored
 
     async def _progress(self, service_id: UUID, capability: str, done: int, total: int | None) -> None:
         """027: how far the running sync got, for the live progress bar of the services page."""

@@ -92,16 +92,26 @@ function BookFacts({ data }: { data: Data }) {
     data.language ? { key: "language", value: String(data.language).toUpperCase() } : null,
     data.isbn ? { key: "isbn", value: String(data.isbn) } : null,
   ].filter((row) => row !== null);
-  if (!rows.length) return null;
+  const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
+  if (!rows.length && !tags.length) return null;
   return (
-    <dl className="media-facts">
-      {rows.map((row) => (
-        <div key={row.key}>
-          <dt>{t(`media:facts.${row.key}`)}</dt>
-          <dd>{row.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <>
+      <dl className="media-facts">
+        {rows.map((row) => (
+          <div key={row.key}>
+            <dt>{t(`media:facts.${row.key}`)}</dt>
+            <dd>{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {tags.length ? (
+        <ul className="media-enriched__chips" aria-label={t("media:facts.tags")}>
+          {tags.map((tag) => (
+            <li key={tag}>{tag}</li>
+          ))}
+        </ul>
+      ) : null}
+    </>
   );
 }
 
@@ -358,6 +368,38 @@ function SectionFrame({ objectId, name, enriched }: { objectId: string; name: st
   );
 }
 
+const WATCH = ["plex", "jellyfin", "emby"];
+const READ = ["grimmory", "romm"];
+
+/** 027: open the title where it is played or read — its own page in Plex, Jellyfin, Grimmory… */
+function OpenIn({ objectId, kind }: { objectId: string; kind: string }) {
+  const t = useT();
+  const sources = useSection(objectId, "sources");
+  const items = list((sources.data?.data as Data | undefined)?.sources).filter(
+    (s) => s.item_link && s.availability === "available",
+  );
+  const rank = (s: Data) => {
+    const connector = String(s.connector ?? "");
+    const order = [...WATCH, ...READ].indexOf(connector);
+    return order === -1 ? 99 : order;
+  };
+  const best = [...items].sort((a, b) => rank(a) - rank(b))[0];
+  if (!best || rank(best) === 99) return null;
+  const connector = String(best.connector ?? "");
+  const verb = READ.includes(connector) ? (kind === "audiobook" ? "listen" : "read") : "watch";
+  return (
+    <a
+      className="ds-button ds-button--primary media-open-in"
+      href={String(best.item_link)}
+      target="_blank"
+      rel="noopener noreferrer external"
+    >
+      <Icon name={verb === "watch" ? "play" : "book"} size={18} />
+      {t(`media:detail.openIn.${verb}`, { service: String(best.service_name ?? connector) })}
+    </a>
+  );
+}
+
 function RequestButton({ objectId }: { objectId: string }) {
   const t = useT();
   const { submit } = useRequestActions();
@@ -412,7 +454,13 @@ export function DetailPage() {
             {media.genres.length ? ` · ${media.genres.join(", ")}` : ""}
           </>
         }
-        primary={media.available || requested ? null : <RequestButton objectId={media.id} />}
+        primary={
+          media.available ? (
+            <OpenIn objectId={media.id} kind={media.kind} />
+          ) : requested ? null : (
+            <RequestButton objectId={media.id} />
+          )
+        }
       />
       <RequestJourney objectId={media.id} />
       <Enrichment objectId={media.id} />

@@ -65,6 +65,8 @@
   "health.unknown": "Unknown",
   "hidden": "Hidden widgets",
   "hide": "Hide",
+  "hideWhenEmpty": "Hide when there is nothing to show",
+  "hideWhenEmptyHint": "The block disappears while it is empty and comes back as soon as it has content.",
   "inShop": "in the shop",
   "layoutMode.label": "One layout per screen",
   "layoutMode.per_device.done": "Each screen now has its own layout.",

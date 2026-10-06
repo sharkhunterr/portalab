@@ -888,3 +888,10 @@ a.media-card__link:focus-visible .media-card__frame {
   gap: 0.25rem;
   font-size: var(--font-size-sm);
 }
+
+/* 027: open the title where it plays — a clear call to action on the artwork */
+.media-open-in {
+  box-shadow: var(--shadow-glow, var(--shadow-2));
+  font-size: var(--font-size-md);
+  padding-inline: var(--space-5);
+}

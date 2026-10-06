@@ -27,6 +27,8 @@ interface DashboardGridProps {
   columns: number;
   arranger?: Arranger | null;
   render: (instance: Instance, handles: ReactNode) => ReactNode;
+  /** 027: widgets with nothing to show that asked to be hidden (kept mounted, out of the layout). */
+  collapsed?: ReadonlySet<string>;
 }
 
 type Mode = "move" | "east" | "south" | "corner";
@@ -65,7 +67,15 @@ export function closeEmptyRows(items: Item[]): Item[] {
   return items.map((item) => ({ ...item, y: shift(item.y) }));
 }
 
-export function DashboardGrid({ label, instances, cells, columns, arranger, render }: DashboardGridProps) {
+export function DashboardGrid({
+  label,
+  instances,
+  cells,
+  columns,
+  arranger,
+  render,
+  collapsed = new Set<string>(),
+}: DashboardGridProps) {
   const t = useT();
   const announce = useAnnounce();
   const grid = useRef<HTMLOListElement>(null);
@@ -83,9 +93,13 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
           : { w: drag.target.w, h: drag.target.h },
       ) ?? placed;
   }
-  // 027: outside editing, rows no widget covers (left by a removed widget) are closed up
-  const shown = readingOrder(arranger ? placed : closeEmptyRows(placed));
-  const bottom = Math.max(0, ...shown.map((item) => item.y + item.h));
+  // 027: outside editing, rows no widget covers (left by a removed or an empty, hidden widget) close up
+  const away = arranger ? [] : placed.filter((item) => collapsed.has(item.id));
+  const shown = [
+    ...readingOrder(arranger ? placed : closeEmptyRows(placed.filter((item) => !collapsed.has(item.id)))),
+    ...away,
+  ];
+  const bottom = Math.max(0, ...shown.filter((item) => !away.includes(item)).map((item) => item.y + item.h));
   const rows = bottom + (arranger ? SPARE_ROWS : 0);
   const ghost = drag ? shown.find((item) => item.id === drag.key) : undefined;
   const titleOf = (instance: Instance) =>
@@ -247,6 +261,7 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
           return (
             <li
               key={item.id}
+              hidden={away.includes(item) || undefined}
               className="dashboard-grid__cell"
               data-dragging={dragging ? "true" : undefined}
               data-grabbed={grabbed === item.id ? "true" : undefined}

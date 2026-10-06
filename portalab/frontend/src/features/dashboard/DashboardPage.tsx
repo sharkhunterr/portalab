@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useId, useMemo } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
 import { useAnnounce } from "../../design-system/a11y/Announce";
@@ -16,6 +16,7 @@ import { type Change, DASHBOARD_KEY, type Instance, useDashboard, useDashboardWr
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
 import { cellsFor, type LayoutMode, useEditSession } from "./edit/EditSession";
+import { EmptyWidgets } from "./frame/emptiness";
 import { WidgetFrame } from "./frame/WidgetFrame";
 import { DashboardGrid } from "./grid/DashboardGrid";
 import { VIEW_COLUMNS, type View } from "./grid/engine";
@@ -101,6 +102,17 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
     void client.invalidateQueries({ queryKey: DASHBOARD_KEY });
   });
   const arranging = session.editing;
+  // 027: widgets set to « hide when empty » that have nothing to show right now
+  const [emptyWidgets, setEmptyWidgets] = useState<ReadonlySet<string>>(new Set());
+  const reportEmpty = useCallback((key: string, empty: boolean) => {
+    setEmptyWidgets((current) => {
+      if (current.has(key) === empty) return current;
+      const next = new Set(current);
+      if (empty) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }, []);
   const isEditing = arranging;
   const shownView: View = arranging ? session.view : deviceView;
   const columns = VIEW_COLUMNS[shownView];
@@ -261,20 +273,23 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
         data-view={shownView}
         data-preview={shownView !== deviceView || undefined}
       >
-        <DashboardGrid
-          label={t("dashboard:title")}
-          instances={visible}
-          cells={cells}
-          columns={columns}
-          arranger={arranging ? session : null}
-          render={(instance, handles) => (
-            <WidgetFrame
-              instance={instance}
-              handles={handles}
-              controls={isEditing ? <EditControls instance={instance} apply={apply} /> : null}
-            />
-          )}
-        />
+        <EmptyWidgets.Provider value={reportEmpty}>
+          <DashboardGrid
+            label={t("dashboard:title")}
+            instances={visible}
+            cells={cells}
+            columns={columns}
+            arranger={arranging ? session : null}
+            collapsed={emptyWidgets}
+            render={(instance, handles) => (
+              <WidgetFrame
+                instance={instance}
+                handles={handles}
+                controls={isEditing ? <EditControls instance={instance} apply={apply} /> : null}
+              />
+            )}
+          />
+        </EmptyWidgets.Provider>
       </div>
       {isEditing && hidden.length ? (
         <section className="ds-panel" aria-label={t("dashboard:hidden")}>

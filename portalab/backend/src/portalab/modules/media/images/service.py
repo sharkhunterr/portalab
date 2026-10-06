@@ -6,6 +6,7 @@ A failed fetch leaves the placeholder; it never breaks the catalog."""
 import asyncio
 import io
 import warnings
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
@@ -27,6 +28,9 @@ from portalab.modules.media.models import Image, MediaObject, SourceItem
 from portalab.modules.media.observability import log, metrics
 
 JOB = "media.fetch_image"
+PER_SOURCE = 2
+RETRY_LATER = timedelta(minutes=10)
+BACKFILL_SPACING = timedelta(seconds=3)
 MAX_BYTES = 8 * 1024 * 1024
 MAX_SIDE = 8000
 OUTPUT_SIDE = 1000
@@ -77,6 +81,33 @@ class ImageService:
         self.capabilities = capabilities
         self.blobs = blobs
         self.clock = clock
+        self._gates: dict[UUID, asyncio.Semaphore] = {}
+
+    def _gate(self, service_id: UUID) -> asyncio.Semaphore:
+        """027: a few covers at a time per source — a whole library at once would trip its guard."""
+        return self._gates.setdefault(service_id, asyncio.Semaphore(PER_SOURCE))
+
+    async def later(self, object_id: UUID) -> None:
+        """027: the source is busy or out: try this cover again in a while — without spending the job's
+        attempts, so a long outage does not leave placeholders for good."""
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await enqueue(
+                uow.session,
+                kind=JOB,
+                payload={"object": str(object_id)},
+                dedup_key=f"{JOB}:{object_id}:later:{now.strftime('%Y%m%d%H')}{now.minute // 10}",
+                run_at=now + RETRY_LATER,
+                clock=self.clock,
+            )
+
+    async def _postpone(self, object_id: UUID, exc: Exception) -> bool:
+        """A busy or unreachable source: the cover is tried again later instead of leaving the placeholder
+        for good — and without hammering the source meanwhile."""
+        metrics.increment("media.images.retried")
+        log.info("media image fetch postponed", extra={"reason": type(exc).__name__})
+        await self.later(object_id)
+        return False
 
     async def schedule(self, session: AsyncSession, object_id: UUID) -> None:
         row = await session.get(MediaObject, object_id)
@@ -138,12 +169,21 @@ class ImageService:
             # the source service is not provided in this process (yet): retried by the job queue
             raise LookupError("the image source is not available in this process")
         try:
-            raw = unwrap(await asyncio.wait_for(provider.fetch_image(ref), timeout=20))
+            async with self._gate(item.service_id):
+                raw = unwrap(await asyncio.wait_for(provider.fetch_image(ref), timeout=20))
             data = normalize_image(bytes(raw))
-        except (SourceUnavailable, InvalidImage, TimeoutError, ConnectionError, OSError) as exc:
+        except SourceUnavailable as exc:
+            if exc.state != "not_found":
+                return await self._postpone(object_id, exc)
+            metrics.increment("media.images.failed")  # the source has no such image: final
+            log.info("media image not fetched", extra={"reason": "not_found"})
+            return False
+        except InvalidImage as exc:  # the source's image itself is unusable: final
             metrics.increment("media.images.failed")
             log.info("media image not fetched", extra={"reason": type(exc).__name__})
             return False
+        except (TimeoutError, ConnectionError, OSError) as exc:
+            return await self._postpone(object_id, exc)
         stored = await self.blobs.put("media", data, content_type=CONTENT_TYPE)
         values = {
             "blob_key": stored.key,
@@ -160,6 +200,39 @@ class ImageService:
             )
         metrics.increment("media.images.stored")
         return True
+
+    async def backfill(self, limit: int = 300) -> int:
+        """027: titles with an image reference but no stored image (a failed fetch) are queued again."""
+        async with self.database.unit_of_work() as uow:
+            missing = (
+                (
+                    await uow.session.execute(
+                        select(MediaObject.id)
+                        .outerjoin(Image, (Image.object_id == MediaObject.id) & (Image.role == "poster"))
+                        .where(
+                            Image.id.is_(None),
+                            MediaObject.status == "active",
+                            MediaObject.effective["image"].astext.is_not(None),
+                        )
+                        .limit(limit)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            now = utc_now(self.clock)
+            day = now.strftime("%Y%m%d%H")
+            for index, object_id in enumerate(missing):
+                await enqueue(
+                    uow.session,
+                    kind=JOB,
+                    payload={"object": str(object_id)},
+                    dedup_key=f"{JOB}:{object_id}:backfill:{day}",
+                    # spread out: the other jobs (syncs, health probes) keep their turn in the queue
+                    run_at=now + BACKFILL_SPACING * index,
+                    clock=self.clock,
+                )
+        return len(missing)
 
     async def run(self, payload: dict[str, object]) -> None:
         await self.fetch(UUID(str(payload["object"])))

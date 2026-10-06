@@ -369,6 +369,20 @@ function Overview({ data }: { data: RequestInsights }) {
   );
 }
 
+// 027: the request's stage, in the words of the title's journey
+const STAGE_TONE: Record<string, "ok" | "info" | "warn" | "bad" | "neutral"> = {
+  available: "ok",
+  downloading: "info",
+  importing: "info",
+  import_blocked: "warn",
+  awaiting_release: "neutral",
+  searching: "neutral",
+  pending: "neutral",
+  declined: "bad",
+  failed: "bad",
+  cancelled: "neutral",
+};
+
 function RequestRow({ card }: { card: RequestCard }) {
   const t = useT();
   const format = useFormat();
@@ -392,7 +406,14 @@ function RequestRow({ card }: { card: RequestCard }) {
   return (
     <li className="requests-row">
       {card.route ? <Link to={card.route}>{body}</Link> : <span className="requests-row__link">{body}</span>}
-      <StatusBadge tone={TONE[group] ?? "neutral"}>{t(`media:requests.state.${card.state}`)}</StatusBadge>
+      <StatusBadge tone={STAGE_TONE[card.stage ?? ""] ?? TONE[group] ?? "neutral"}>
+        {card.stage
+          ? t(`media:myRequests.stage.${card.stage}`, {
+              percent: Math.round((card.progress ?? 0) * 100),
+              date: card.at ? format.date(card.at.slice(0, 10), "medium") : "",
+            })
+          : t(`media:requests.state.${card.state}`)}
+      </StatusBadge>
       {card.state === "pending" ? (
         <Button variant="ghost" onClick={() => cancel.mutate(card.request_id)}>
           {t("media:requests.cancel")}

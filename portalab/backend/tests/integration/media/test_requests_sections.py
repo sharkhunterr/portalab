@@ -4,7 +4,7 @@ failing source degrades only its own; requests go through the request service wi
 extra units credited idempotently), failures give the quota back, the source of truth updates the mirror;
 search and discovery are permission/privacy bounded."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import httpx
 import pytest
@@ -16,7 +16,7 @@ from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE, Servi
 from portalab.capabilities.media.testkit import PNG_1PX, library_record
 from portalab.capabilities.search.testkit import ProviderWorld, SearchProviderContractKit
 from portalab.core.authz_port import Principal
-from portalab.core.time import FixedClock
+from portalab.core.time import FixedClock, utc_now
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 
@@ -259,5 +259,15 @@ async def test_poster_waits_for_its_source(app: FastAPI, media: MediaHarness) ->
     object_id = (await media.module.catalog.browse(Principal(user_id=people["kim"])))[0][0][0].id
     with pytest.raises(LookupError):
         await media.module.images.fetch(object_id)
-    media.library(one).images["p"] = PNG_1PX
+    library = media.library(one)
+    library.down = True  # a busy or unreachable source: the cover is postponed, attempts are not spent
+    assert not await media.module.images.fetch(object_id)
+    async with media.database.session() as session:
+        later = await session.scalar(
+            text("SELECT run_at FROM core.job WHERE dedup_key LIKE :key"),
+            {"key": f"media.fetch_image:{object_id}:later:%"},
+        )
+    assert later is not None and later > utc_now(media.module.images.clock) + timedelta(minutes=5)
+    library.down = False
+    library.images["p"] = PNG_1PX
     assert await media.module.images.fetch(object_id)

@@ -32,7 +32,7 @@ from portalab.capabilities.connector_sdk import (
 from portalab.capabilities.health import HEALTH_PROBE, ProbeResult
 from portalab.capabilities.health import SPECS as HEALTH_SPECS
 from portalab.capabilities.media import SPECS as MEDIA_SPECS
-from portalab.capabilities.results import InvalidPayload, ProviderAuthError
+from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
 
 EPOCH = datetime(2000, 1, 1, tzinfo=UTC)
 LIBRARY_LISTING_BYTES = 100 * 1024 * 1024  # 027: whole-library answers (Radarr /movie) of large libraries
@@ -55,8 +55,8 @@ class BaseConfig(BaseModel):
     verify_tls: bool = Field(default=True, title="Check the HTTPS certificate")
 
 
-def binding(name: str, *, syncable: bool = False) -> CapabilityBinding:
-    return CapabilityBinding(SPECS[name], syncable=syncable)
+def binding(name: str, *, syncable: bool = False, driven: bool = False) -> CapabilityBinding:
+    return CapabilityBinding(SPECS[name], syncable=syncable, driven=driven)
 
 
 def safe_id(value: Any) -> str:
@@ -163,6 +163,8 @@ class HttpConnector:
             raise ConnectionError(str(exc)) from exc
         if response.status_code in (401, 403):
             raise ProviderAuthError("the service rejected the credentials")
+        if response.status_code in (404, 410):
+            raise ProviderNotFound(f"the service has no such item (HTTP {response.status_code})")
         if response.status_code >= 400:
             raise ConnectionError(f"the service answered HTTP {response.status_code}")
         if not response.content:
@@ -184,6 +186,8 @@ class HttpConnector:
             raise ConnectionError(str(exc)) from exc
         if response.status_code in (401, 403):
             raise ProviderAuthError("the service rejected the credentials")
+        if response.status_code in (404, 410):
+            raise ProviderNotFound(f"the service has no such item (HTTP {response.status_code})")
         if response.status_code >= 400:
             raise ConnectionError(f"the service answered HTTP {response.status_code}")
         return response.content

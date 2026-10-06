@@ -54,3 +54,15 @@ async def test_scheduled_sync_skipped_while_open(cn: ConnectorsHarness) -> None:
         assert outcome is not None and outcome.status == "failed"
     assert (await cn.module.manager.get(service_id)).state == "unavailable"
     assert await cn.module.runner.run(service_id) is None
+
+
+async def test_restart_while_unavailable_recovers_on_the_first_answer(cn: ConnectorsHarness) -> None:
+    """027: the portal restarted while a service was out — its circuit starts closed, so it never
+    « recovers » through the breaker; the first answer of the service brings it back to ``enabled``."""
+    service_id = await cn.enabled()
+    assert await cn.module.manager.set_condition(service_id, "unavailable", reason="circuit breaker open")
+    cn.module.manager.breakers.forget(str(service_id))  # what a restart leaves: a fresh, closed circuit
+    cn.remote.put("a", title="A")
+    assert isinstance(await _provider(cn, service_id).list_items(), Available)  # type: ignore[attr-defined]
+    view = await cn.module.manager.get(service_id)
+    assert view.state == "enabled" and view.state_reason == "service recovered"

@@ -166,6 +166,12 @@ function ConfigDialog({
             />
           );
         })}
+        <CheckboxField
+          label={t("dashboard:hideWhenEmpty")}
+          hint={t("dashboard:hideWhenEmptyHint")}
+          checked={Boolean(draft._hide_empty)}
+          onChange={(e) => setDraft({ ...draft, _hide_empty: e.target.checked })}
+        />
         {hasLocked ? (
           <p className="ds-field__hint">
             <Link to="/marketplace?type=widget_option">{t("dashboard:moreOptions")}</Link>

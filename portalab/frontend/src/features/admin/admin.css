@@ -187,6 +187,19 @@
 .services-admin__name {
   display: flex;
   flex-direction: column;
+  min-inline-size: 10rem;
+}
+.services-admin__public {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+/* many actions per service: they wrap instead of squeezing the name */
+.admin-table:has(.services-admin__name) .admin-table__actions {
+  white-space: normal;
+  text-align: end;
 }
 .services-admin__runs {
   margin: 0 0 var(--space-3);

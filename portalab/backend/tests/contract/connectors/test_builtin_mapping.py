@@ -9,10 +9,18 @@ import httpx
 import pytest
 
 from portalab.capabilities.connector_sdk import SourceRecord
-from portalab.capabilities.media import LIBRARY, PLAYBACK, REQUESTS, LibraryPayload, RequestPayload
+from portalab.capabilities.media import (
+    ITEM_LINKS,
+    LIBRARY,
+    PLAYBACK,
+    REQUESTS,
+    LibraryPayload,
+    RequestPayload,
+)
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.builtin import builtin_connectors, register_builtin
+from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.http_base import parse_time, safe_id
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
@@ -157,3 +165,14 @@ def test_builtin_catalog_registers_once() -> None:
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
     }
+
+
+async def test_item_links_open_the_title_page() -> None:
+    """027: « Watch on Plex » opens the title in Plex's universal web app (machine identifier, nothing to
+    configure); Grimmory opens the book's own page, joined to the service's address."""
+    plex = PlexConnector().provider(ITEM_LINKS, handle_for("plex"))
+    assert await plex.item_path("123", "movie") == (
+        "https://app.plex.tv/desktop/#!/server/abc/details?key=%2Flibrary%2Fmetadata%2F123"
+    )
+    grimmory = GrimmoryConnector().provider(ITEM_LINKS, handle_for("grimmory"))
+    assert await grimmory.item_path("42", "book") == "/book/42?tab=view"

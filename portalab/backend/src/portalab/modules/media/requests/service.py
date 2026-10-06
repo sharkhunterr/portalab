@@ -5,11 +5,13 @@ priority exists anywhere in the flow."""
 
 import asyncio
 from collections.abc import Mapping, Sequence
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from pydantic import ValidationError
-from sqlalchemy import delete, select
+from sqlalchemy import and_, delete, or_, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.connector_sdk import SourceRecord
@@ -20,10 +22,10 @@ from portalab.core.db import Database
 from portalab.core.errors import Unavailable, ValidationFailed
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.common import strong_ids
+from portalab.modules.media.common import sort_title, strong_ids
 from portalab.modules.media.identity.resolver import MediaNotFound, live_object
 from portalab.modules.media.links.service import UserLinkService
-from portalab.modules.media.models import ExternalId, MediaRequest, UserLink
+from portalab.modules.media.models import ExternalId, MediaObject, MediaRequest, UserLink
 from portalab.modules.media.observability import metrics
 from portalab.modules.media.requests.quota import RequestQuota
 
@@ -103,13 +105,13 @@ class Requests:
         kind = str((ref or {}).get("kind") or "").strip()[:40]
         if not ids or not title or not kind:
             raise ValidationFailed("Give the media's ids, kind and title.", code="media.invalid")
-        for scheme, value in ids.items():
-            found = await session.scalar(
-                select(ExternalId.object_id).where(ExternalId.scheme == scheme, ExternalId.value == value)
-            )
-            if found is not None:
-                return found, {"ids": ids, "kind": kind, "title": title}
-        return None, {"ids": ids, "kind": kind, "title": title}
+        found = await self.resolve(session, ids, kind, title)
+        return found, {"ids": ids, "kind": kind, "title": title}
+
+    async def resolve(
+        self, session: AsyncSession, ids: Mapping[str, str], kind: str, title: str | None = None
+    ) -> UUID | None:
+        return await catalog_title(session, ids, kind, title, utc_now(self.clock))
 
     async def submit(
         self,
@@ -294,6 +296,12 @@ class RequestSink:
                     await self.requests.publish(session, row, "media.request_created")
                     added += 1
                     continue
+                if row.object_id is None and strong_ids(
+                    payload.ids
+                ):  # 027: the title arrived in the catalog later
+                    row.object_id = await self.requests.resolve(
+                        session, payload.ids, payload.kind, payload.title
+                    )
                 attributed = await self._attribution(row, payload.requester, service, payload.available_at)
                 if row.state == payload.state and row.source_state == payload.source_state:
                     if attributed:  # who asked changed: no notification, nothing else moved
@@ -349,3 +357,62 @@ class RequestSink:
                 delete(MediaRequest).where(MediaRequest.service_id == service.service_id)
             )
             return int(getattr(result, "rowcount", 0) or 0)
+
+
+SERIES_KINDS = ("tv", "series", "season", "episode")
+
+
+async def catalog_title(
+    session: AsyncSession, ids: Mapping[str, str], kind: str, title: str | None, now: datetime
+) -> UUID | None:
+    """The catalog title a request is about (027): same strong id **and** same kind of title — a film
+    and a series may share a TMDB number. A film or series no library holds yet gets its own title, not
+    available, so every request opens a page (the enriched details and the journey live there); the
+    library's copy joins it later through the same id."""
+    strong = strong_ids(ids)
+    wanted = ("series", "season") if kind in SERIES_KINDS else ("movie",)
+    for scheme, value in strong.items():
+        found = await session.scalar(
+            select(ExternalId.object_id)
+            .join(MediaObject, MediaObject.id == ExternalId.object_id)
+            .where(
+                ExternalId.scheme == scheme,
+                ExternalId.value == value,
+                MediaObject.kind.in_(wanted),
+                MediaObject.status == "active",
+            )
+            .limit(1)
+        )
+        if found is not None:
+            return found
+    name = (title or "").strip()[:500]
+    if not strong or not name or kind not in ("movie", *SERIES_KINDS[:2]):
+        return None
+    owned = await session.scalar(
+        select(ExternalId.object_id).where(
+            or_(*(and_(ExternalId.scheme == s, ExternalId.value == v) for s, v in strong.items()))
+        )
+    )
+    if owned is not None:  # the id belongs to another kind of title: never steal it
+        return None
+    row = MediaObject(
+        kind="movie" if kind == "movie" else "series",
+        title=name,
+        sort_title=sort_title(name),
+        available=False,
+        effective={},
+        field_provenance={},
+        status="active",
+        first_seen_at=now,
+        created_at=now,
+        updated_at=now,
+    )
+    session.add(row)
+    await session.flush()
+    for scheme, value in strong.items():
+        await session.execute(
+            insert(ExternalId)
+            .values(scheme=scheme, value=value, object_id=row.id)
+            .on_conflict_do_nothing(index_elements=["scheme", "value"])
+        )
+    return row.id

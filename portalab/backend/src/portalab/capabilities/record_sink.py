@@ -5,7 +5,7 @@ records. Sinks upsert idempotently by ``(source_system, external_id)``, deactiva
 provenance and **never delete** (a purge is the separate, authorized 021 action).
 """
 
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
@@ -38,9 +38,22 @@ class RecordSink(Protocol):
     async def purge(self, service: ServiceRef) -> int: ...
 
 
+Report = Callable[[int, int | None], Awaitable[None]]
+
+
+@runtime_checkable
+class SyncDriver(Protocol):
+    """027: a capability the consuming module pulls itself rather than receiving records (watch history,
+    metadata enrichment). The sync runner calls ``drive`` for « sync now » and the scheduled sync; the
+    driver reports how far it got (done, total when known) for the live progress bar."""
+
+    async def drive(self, service: ServiceRef, kind: str, report: Report) -> SinkResult: ...
+
+
 class SinkRegistry:
     def __init__(self) -> None:
         self._sinks: dict[str, tuple[RecordSink, str]] = {}
+        self._drivers: dict[str, tuple[SyncDriver, str]] = {}
 
     def register(self, capability: str, sink: RecordSink, *, owner: str) -> None:
         if capability in self._sinks:
@@ -51,6 +64,15 @@ class SinkRegistry:
         entry = self._sinks.get(capability)
         return entry[0] if entry else None
 
+    def register_driver(self, capability: str, driver: SyncDriver, *, owner: str) -> None:
+        if capability in self._drivers:
+            raise ValueError(f"a sync driver is already registered for {capability!r}")
+        self._drivers[capability] = (driver, owner)
+
+    def driver(self, capability: str) -> SyncDriver | None:
+        entry = self._drivers.get(capability)
+        return entry[0] if entry else None
+
     def all(self) -> list[tuple[str, RecordSink]]:
         return [(capability, sink) for capability, (sink, _) in sorted(self._sinks.items())]
 
@@ -58,11 +80,15 @@ class SinkRegistry:
         doomed = [key for key, (_, who) in self._sinks.items() if who == owner]
         for key in doomed:
             del self._sinks[key]
-        return len(doomed)
+        drivers = [key for key, (_, who) in self._drivers.items() if who == owner]
+        for key in drivers:
+            del self._drivers[key]
+        return len(doomed) + len(drivers)
 
 
 default_sinks = SinkRegistry()
 register_sink: Callable[..., None] = default_sinks.register
+register_driver: Callable[..., None] = default_sinks.register_driver
 
 
 @dataclass(frozen=True, slots=True)

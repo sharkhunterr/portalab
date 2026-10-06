@@ -125,6 +125,7 @@ class Sections:
             "series_position",
             "publisher",
             "released",
+            "tags",
         )
         data = {k: view.effective.get(k) for k in keep if view.effective.get(k) not in (None, "", [])}
         if view.ids.get("isbn"):
@@ -180,7 +181,8 @@ class Sections:
                         "sync_failed_at": s.last_sync_attempt_at.isoformat()
                         if s.last_sync_attempt_at
                         else None,
-                        "link": s.link,
+                        "link": s.item_link or s.link,
+                        "item_link": s.item_link,
                     }
                     for s in sources
                 ],

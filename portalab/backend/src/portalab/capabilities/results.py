@@ -18,6 +18,7 @@ ResultState = Literal[
     "invalid_response",
     "authentication_failed",
     "no_provider",
+    "not_found",
 ]
 
 
@@ -27,6 +28,12 @@ class ProviderAuthError(Exception):
 
 class InvalidPayload(Exception):
     """Raised by connectors (or validators) when an external payload does not match the contract."""
+
+
+class ProviderNotFound(ConnectionError):
+    """Raised by connectors when the service answered that the item asked for does not exist (HTTP 404):
+    the service is fine — a book without a cover is no outage (027). A ``ConnectionError`` for callers
+    that treat any unanswered call alike."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -129,6 +136,15 @@ class AuthenticationFailed[T](_Failure[T]):
     @property
     def state(self) -> ResultState:
         return "authentication_failed"
+
+
+@dataclass(frozen=True, slots=True)
+class NotFound[T](_Failure[T]):
+    """The service answered: no such item. Not a failure of the service (its circuit stays closed)."""
+
+    @property
+    def state(self) -> ResultState:
+        return "not_found"
 
 
 @dataclass(frozen=True, slots=True)

@@ -597,6 +597,7 @@ async def my_requests_insights(
 async def my_requests_list(principal: Requester, module: Module) -> dict[str, Any]:
     """027: every request of mine with its poster (catalog, else the metadata provider's)."""
     rows = await module.request_insights.mine(_me(principal))
+    stages = await module.request_insights.stages(rows)  # 027: the journey's words, not « processing »
     items = [
         {
             "request_id": str(r.id),
@@ -606,6 +607,7 @@ async def my_requests_list(principal: Requester, module: Module) -> dict[str, An
             "state": r.state,
             "requested_at": r.requested_at.isoformat(),
             "updated_at": r.updated_at.isoformat(),
+            **stages.get(r.id, {}),
             "_lookup": lookup_of(r),
         }
         for r in rows

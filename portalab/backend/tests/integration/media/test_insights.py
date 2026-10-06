@@ -24,6 +24,7 @@ from portalab.capabilities.media import (
     SourceRelease,
 )
 from portalab.capabilities.media.testkit import PNG_1PX, library_record
+from portalab.capabilities.record_sink import SinkResult
 from portalab.core.time import FixedClock
 from portalab.modules.media.insights.stats import window
 from portalab.modules.media.models import Activity, ActivityCursor, MediaObject, UserLink
@@ -156,6 +157,17 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     media.provide(ACCOUNTS, tautulli, _Accounts())
 
     assert await media.module.ingestor.run() == 7
+    # 027: « sync now » of a history service from the services page reads its whole history over again
+    reports: list[tuple[int, int | None]] = []
+
+    async def report(done: int, total: int | None) -> None:
+        reports.append((done, total))
+
+    assert await media.module.ingestor.drive(media.service(77), "manual", report) == SinkResult()
+    await media.module.ingestor.drive(tautulli, "resync_full", report)
+    async with media.database.session() as session:
+        cursor = await session.get(ActivityCursor, tautulli.service_id)
+    assert reports and cursor is not None and cursor.mode == "incremental"
     while await media.module.aggregator.run():
         pass
     async with media.database.session() as session:
@@ -280,7 +292,7 @@ class _Calendar:
 
 
 async def test_metadata_enrichment_and_upcoming(
-    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
 ) -> None:
     await users(app, media, "zoe")
     one = media.service(1)
@@ -296,6 +308,17 @@ async def test_metadata_enrichment_and_upcoming(
     media.provide(CALENDAR, media.service(3, "radarr"), _Calendar())
     assert await media.module.enricher.run() == 2
     assert await media.module.enricher.run() == 0  # nothing due until the retry delay
+    # 027: « sync now » from the services page — nothing due; a resync looks every title up again
+    reports: list[tuple[int, int | None]] = []
+
+    async def report(done: int, total: int | None) -> None:
+        reports.append((done, total))
+
+    service = media.service(9, "tmdb")
+    assert await media.module.enricher.drive(service, "manual", report) == SinkResult()
+    clock.advance(timedelta(minutes=1))
+    resync = await media.module.enricher.drive(service, "resync_partial", report)
+    assert (resync.modified, resync.ignored) == (1, 1) and reports[-1] == (2, 2)
     assert {(kind, ids.get("tmdb")) for kind, ids, _ in tmdb.asked} == {("movie", "438631"), ("movie", None)}
     async with media.database.session() as session:
         dune = await session.scalar(select(MediaObject.id).where(MediaObject.title == "Dune"))

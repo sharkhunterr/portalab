@@ -28,6 +28,7 @@ from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
+    ITEM_LINKS,
     LIBRARY,
     PLAYBACK,
     ActivityPage,
@@ -94,7 +95,8 @@ class PlexConnector(HttpConnector):
         binding(PLAYBACK),
         binding(HEALTH_PROBE),
         binding(ACCOUNTS),
-        binding(ACTIVITY_HISTORY),
+        binding(ACTIVITY_HISTORY, driven=True),
+        binding(ITEM_LINKS),
     )
     status_path = "/"
     public_path = "/identity"
@@ -195,6 +197,8 @@ class PlexConnector(HttpConnector):
             return _Accounts(self, service)
         if capability == ACTIVITY_HISTORY:
             return _History(self, service)
+        if capability == ITEM_LINKS:
+            return _Links(self, service)
         return None
 
 
@@ -339,3 +343,29 @@ class _Accounts:
             for a in container.get("Account") or []
             if a.get("id") and a.get("name")  # id 0 is the anonymous system account
         ]
+
+
+class _Links:
+    """027: a title's page in Plex — the universal web app (``app.plex.tv``) addressed by the server's
+    machine identifier, which opens for every member signed in to Plex, at home or away, whatever address
+    the server answers on; nothing to configure."""
+
+    def __init__(self, connector: Any, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def item_path(self, external_id: str, kind: str) -> str | None:
+        machine = _MACHINES.get(self.service.service_id)
+        if machine is None:
+            machine = str(
+                _container(await self.connector.get_json(self.service, "/identity")).get("machineIdentifier")
+                or ""
+            )
+            if not machine:
+                return None
+            _MACHINES[self.service.service_id] = machine
+        key = safe_id(external_id)
+        return f"{PLEX_APP}/server/{machine}/details?key=%2Flibrary%2Fmetadata%2F{key}"
+
+
+_MACHINES: dict[Any, str] = {}
+PLEX_APP = "https://app.plex.tv/desktop/#!"

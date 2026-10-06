@@ -23,6 +23,7 @@ from portalab.capabilities.connector_sdk import (
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
+    ITEM_LINKS,
     LIBRARY,
     PLAYBACK,
     ServiceAccount,
@@ -77,6 +78,7 @@ class JellyfinConnector(HttpConnector):
         binding(PLAYBACK),
         binding(HEALTH_PROBE),
         binding(ACCOUNTS),
+        binding(ITEM_LINKS),
     )
     status_path = "/System/Info"
     public_path = "/System/Info/Public"
@@ -149,7 +151,28 @@ class JellyfinConnector(HttpConnector):
             return _Probe(self, service)
         if capability == ACCOUNTS:
             return _Accounts(self, service)
+        if capability == ITEM_LINKS:
+            return _Links(self, service)
         return None
+
+
+class _Links:
+    """027: a title's page in Jellyfin Web — ``/web/#/details?id=…&serverId=…``."""
+
+    def __init__(self, connector: "JellyfinConnector", service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def item_path(self, external_id: str, kind: str) -> str | None:
+        server = _SERVERS.get(self.service.service_id)
+        if server is None:
+            info = await self.connector.get_json(self.service, "/System/Info/Public")
+            server = str(info.get("Id") or "") if isinstance(info, dict) else ""
+            _SERVERS[self.service.service_id] = server
+        item = safe_id(external_id)
+        return f"/web/#/details?id={item}" + (f"&serverId={server}" if server else "")
+
+
+_SERVERS: dict[Any, str] = {}
 
 
 class _Library:
