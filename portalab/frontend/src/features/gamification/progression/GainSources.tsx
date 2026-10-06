@@ -1,17 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import { AdminTabs } from "../../../design-system/admin/AdminKit";
@@ -59,9 +48,13 @@ function useStreak() {
   });
 }
 
+/** Axis ticks: 1.2k, 500k, 3M — never cut. */
+const compact = (value: number) =>
+  new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
+
 /**
  * Where my gains come from (027, progression page): the share of each source — plays, quests, streak and
- * campaign bonuses, achievements, the shop, support… — as a ring, and day by day as stacked bars; my
+ * campaign bonuses, achievements, the shop, support… — as one stacked bar, and day by day as stacked bars; my
  * current play streak beside it. A table alternative is one click away.
  */
 export function GainSources() {
@@ -117,33 +110,26 @@ export function GainSources() {
       {data && !sources.length ? <p className="admin-muted">{t("gamification:sources.empty")}</p> : null}
       {sources.length ? (
         <div className="gain-sources__charts">
-          <figure className="gain-sources__ring">
-            <div aria-hidden="true" className="gain-sources__ring-plot">
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie
-                    data={sources}
-                    dataKey="amount"
-                    nameKey="source"
-                    innerRadius="58%"
-                    outerRadius="90%"
-                    paddingAngle={2}
-                  >
-                    {sources.map((s) => (
-                      <Cell
-                        key={s.source}
-                        fill={SOURCES[s.source]?.color ?? "var(--cal-other)"}
-                        stroke="none"
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(amount, source) => [`${amount} ${unit}`, label(String(source))]} />
-                </PieChart>
-              </ResponsiveContainer>
-              <span className="gain-sources__total">
-                <strong>{format.number(data?.total ?? 0)}</strong>
-                <span>{unit}</span>
-              </span>
+          <figure className="gain-stack">
+            <p className="gain-stack__total">
+              <strong>{format.number(data?.total ?? 0)}</strong> {unit}
+            </p>
+            <div
+              className="gain-stack__bar"
+              role="img"
+              aria-label={sources.map((s) => `${label(s.source)} ${s.amount}`).join(", ")}
+            >
+              {sources.map((s) => (
+                <span
+                  key={s.source}
+                  className="gain-stack__part"
+                  title={`${label(s.source)} · ${s.amount} ${unit}`}
+                  style={{
+                    inlineSize: `${(s.amount / Math.max(1, data?.total ?? 1)) * 100}%`,
+                    background: SOURCES[s.source]?.color ?? "var(--cal-other)",
+                  }}
+                />
+              ))}
             </div>
             <figcaption>
               <ul className="gain-sources__legend">
@@ -175,7 +161,7 @@ export function GainSources() {
                 <BarChart data={bars}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
                   <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                  <YAxis stroke="var(--color-text-muted)" fontSize={12} width={44} />
+                  <YAxis stroke="var(--color-text-muted)" fontSize={12} width={44} tickFormatter={compact} />
                   <Tooltip />
                   {keys.map((key, index) => (
                     <Bar

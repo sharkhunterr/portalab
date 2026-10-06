@@ -267,12 +267,40 @@
   position: absolute;
   inset-block-end: var(--space-2);
   inset-inline-end: var(--space-3);
-  padding: 0.05rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: 1.6rem;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--color-accent) 18%, var(--color-surface));
   color: var(--color-text);
+  font: inherit;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+.widget-frame__more:hover {
+  transform: scale(1.06);
+  background: color-mix(in srgb, var(--color-accent) 30%, var(--color-surface));
+}
+@media (pointer: coarse) {
+  /* a comfortable target on touch screens, drawn small */
+  .widget-frame__more::after {
+    content: "";
+    position: absolute;
+    inset: -0.6rem;
+  }
+}
+
+/* 027: the whole widget, nothing left out */
+.widget-frame__full {
+  container-type: inline-size;
+  min-block-size: 12rem;
+  max-block-size: 70vh;
+  overflow: auto;
 }
 
 .widget-frame__header {
@@ -1010,4 +1038,9 @@
     inline-size: 2rem;
     block-size: 2rem;
   }
+}
+.widget-frame__full .widget-posters {
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  overflow: visible;
 }

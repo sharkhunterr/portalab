@@ -36,6 +36,10 @@ function shortDay(day: string): string {
   return day.slice(5);
 }
 
+/** Axis ticks: 1.2k, 500k, 3M — never cut. */
+const compact = (value: number) =>
+  new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
+
 /**
  * Overview (027): how members progress — gains day by day, the running total of the members who progress
  * most, where gains come from — with the key figures of the economy (rules in force, streak, rewards).
@@ -162,7 +166,12 @@ export function Overview({ onOpen }: { onOpen: (tab: string) => void }) {
                   <BarChart data={daily}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                     <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                    <YAxis stroke="var(--color-text-muted)" fontSize={12} width={48} />
+                    <YAxis
+                      stroke="var(--color-text-muted)"
+                      fontSize={12}
+                      width={48}
+                      tickFormatter={compact}
+                    />
                     <Tooltip />
                     <Bar dataKey="amount" name={unit} fill="var(--color-accent)" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -176,7 +185,12 @@ export function Overview({ onOpen }: { onOpen: (tab: string) => void }) {
                   <LineChart data={running}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                     <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                    <YAxis stroke="var(--color-text-muted)" fontSize={12} width={56} />
+                    <YAxis
+                      stroke="var(--color-text-muted)"
+                      fontSize={12}
+                      width={56}
+                      tickFormatter={compact}
+                    />
                     <Tooltip />
                     <Legend />
                     {data.members.map((member, index) => (

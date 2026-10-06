@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { Icon } from "../../../design-system/components/Icon";
+import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Instance, useWidgetData } from "../api";
@@ -81,7 +82,8 @@ function Body({ instance }: { instance: Instance }) {
 
 /**
  * 027: the content fits its block — list items that would spill over the bottom are left out (no inner
- * scrollbar) and counted; recomputed when the block is resized or the content changes.
+ * scrollbar) and counted; recomputed when the block is resized or the content changes. The count opens
+ * the whole widget in a dialog, where nothing is left out.
  */
 function useFit(ref: RefObject<HTMLElement | null>): number {
   const [hidden, setHidden] = useState(0);
@@ -164,10 +166,31 @@ export function WidgetFrame({
           <FunctionalState state="unavailable" label={t("dashboard:unavailableWidget")} />
         )}
       </div>
-      {hidden ? (
-        <span className="widget-frame__more" title={t("dashboard:moreItems", { count: hidden })}>
-          +{hidden}
-        </span>
+      {hidden && instance.available ? (
+        <Dialog
+          size="lg"
+          title={title}
+          closeLabel={t("dashboard:close")}
+          trigger={
+            <button
+              type="button"
+              className="widget-frame__more"
+              aria-label={t("dashboard:seeAll", { count: hidden })}
+              title={t("dashboard:seeAll", { count: hidden })}
+            >
+              +{hidden}
+              <Icon name="maximize" size={12} />
+            </button>
+          }
+        >
+          <div className="widget-frame__full" data-widget={instance.widget_key}>
+            <FrameBoundary fallback={<FunctionalState state="error" />}>
+              <Suspense fallback={<FunctionalState state="loading" />}>
+                <Body instance={instance} />
+              </Suspense>
+            </FrameBoundary>
+          </div>
+        </Dialog>
       ) : null}
     </section>
   );
