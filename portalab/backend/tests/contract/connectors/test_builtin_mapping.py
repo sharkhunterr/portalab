@@ -154,4 +154,6 @@ def test_builtin_catalog_registers_once() -> None:
         "tautulli",
         "grimmory",
         "tmdb",
+        "qbittorrent",  # 027: torrent clients behind the download managers
+        "deluge",
     }

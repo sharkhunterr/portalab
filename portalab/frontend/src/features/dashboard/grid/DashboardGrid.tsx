@@ -57,6 +57,14 @@ function metrics(grid: HTMLElement, columns: number) {
 
 const SPARE_ROWS = 3;
 
+/** Rows where nothing sits are dropped (display only: the stored layout keeps its coordinates). */
+export function closeEmptyRows(items: Item[]): Item[] {
+  const used = new Set<number>();
+  for (const item of items) for (let row = item.y; row < item.y + item.h; row++) used.add(row);
+  const shift = (y: number) => [...used].filter((row) => row < y).length;
+  return items.map((item) => ({ ...item, y: shift(item.y) }));
+}
+
 export function DashboardGrid({ label, instances, cells, columns, arranger, render }: DashboardGridProps) {
   const t = useT();
   const announce = useAnnounce();
@@ -75,7 +83,8 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
           : { w: drag.target.w, h: drag.target.h },
       ) ?? placed;
   }
-  const shown = readingOrder(placed);
+  // 027: outside editing, rows no widget covers (left by a removed widget) are closed up
+  const shown = readingOrder(arranger ? placed : closeEmptyRows(placed));
   const bottom = Math.max(0, ...shown.map((item) => item.y + item.h));
   const rows = bottom + (arranger ? SPARE_ROWS : 0);
   const ghost = drag ? shown.find((item) => item.id === drag.key) : undefined;

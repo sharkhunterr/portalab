@@ -46,8 +46,7 @@ class OpenIncidentsWidget:
             for v in await self.incidents.list(state="resolved", limit=3)
             if v.resolved_at is not None and (now - v.resolved_at).days < 7
         ]
-        if not views and not resolved:
-            return WidgetPayload("no-data", as_of=now)
+        # 027: nothing open nor recently resolved is news too: « everything works » (data with no items)
         items = [
             {
                 "id": str(v.id),

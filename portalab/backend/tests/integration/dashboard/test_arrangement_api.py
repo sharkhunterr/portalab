@@ -69,7 +69,7 @@ async def test_arrangement(app: FastAPI, client: httpx.AsyncClient, dash: Dashbo
     big = [{**target, "w": 12, "h": 9}]  # beyond the widget's limits (max 8 by 4): clamped, never refused
     assert (await client.put("/api/v1/dashboard/arrangement", json={"items": big})).status_code == 200
     view = await board(client)
-    assert cells(view)["t.one"][2:] == (8, 4) and len(cells(view)) == 3  # omitted widgets are kept
+    assert cells(view)["t.one"][2:] == (8, 4) and len(cells(view)) == 4  # omitted widgets are kept
     outside = [{**target, "x": 12}]
     assert (await client.put("/api/v1/dashboard/arrangement", json={"items": outside})).status_code == 422
 

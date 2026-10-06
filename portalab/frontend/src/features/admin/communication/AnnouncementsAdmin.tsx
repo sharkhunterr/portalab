@@ -13,7 +13,7 @@ import {
   StatusBadge,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -40,6 +40,16 @@ function Broadcast() {
   const [priority, setPriority] = useState("normal");
   const [kind, setKind] = useState("notification");
   const [link, setLink] = useState("");
+  // 027: where it goes — any of a notification, an e-mail, a banner (until a date)
+  const [channels, setChannels] = useState<string[]>(["notification"]);
+  const [tone, setTone] = useState("info");
+  const [until, setUntil] = useState(() => {
+    const date = new Date(Date.now() + 7 * 86_400_000);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  });
+  const toggle = (channel: string, on: boolean) =>
+    setChannels(on ? [...new Set([...channels, channel])] : channels.filter((c) => c !== channel));
   const send = useMutation({
     mutationFn: async () =>
       (
@@ -51,6 +61,9 @@ function Broadcast() {
             kind: kind as "notification",
             dedup_key: `announcement:${Date.now()}`,
             action_url: link || null,
+            channels: channels as Array<"notification" | "email" | "banner">,
+            tone: tone as "info",
+            banner_until: channels.includes("banner") && until ? new Date(until).toISOString() : null,
           },
         })
       ).data as { recipients: number },
@@ -58,6 +71,7 @@ function Broadcast() {
       setTitle("");
       setBody("");
       void client.invalidateQueries({ queryKey: ["admin", "notifications"] });
+      void client.invalidateQueries({ queryKey: ["announcements"] });
     },
   });
   const submit = (event: FormEvent) => {
@@ -110,6 +124,17 @@ function Broadcast() {
             value={link}
             onChange={(e) => setLink(e.target.value)}
           />
+          <SelectField
+            label={t("admin:announce.tone")}
+            value={tone}
+            onChange={(e) => setTone(e.target.value)}
+          >
+            {["info", "success", "warning", "critical"].map((value) => (
+              <option key={value} value={value}>
+                {t(`admin:announce.tones.${value}`)}
+              </option>
+            ))}
+          </SelectField>
           <div className="ds-field" data-span="full">
             <label htmlFor="announce-body">{t("admin:announce.body")}</label>
             <textarea
@@ -121,6 +146,26 @@ function Broadcast() {
             />
           </div>
         </FormGrid>
+        <fieldset className="announce-channels">
+          <legend>{t("admin:announce.channels.title")}</legend>
+          {(["notification", "email", "banner"] as const).map((channel) => (
+            <CheckboxField
+              key={channel}
+              label={t(`admin:announce.channels.${channel}`)}
+              hint={t(`admin:announce.channels.${channel}Hint`)}
+              checked={channels.includes(channel)}
+              onChange={(e) => toggle(channel, e.target.checked)}
+            />
+          ))}
+          {channels.includes("banner") ? (
+            <TextField
+              label={t("admin:announce.bannerUntil")}
+              type="datetime-local"
+              value={until}
+              onChange={(e) => setUntil(e.target.value)}
+            />
+          ) : null}
+        </fieldset>
         {send.data ? (
           <p role="status" className="services-admin__ok">
             {t("admin:announce.sent", { count: send.data.recipients })}
@@ -132,12 +177,85 @@ function Broadcast() {
           </p>
         ) : null}
         <FormActions>
-          <Button type="submit" disabled={send.isPending}>
+          <Button type="submit" disabled={send.isPending || !channels.length}>
             <Icon name="bell" size={16} />
             {t("admin:announce.send")}
           </Button>
         </FormActions>
       </form>
+    </AdminSection>
+  );
+}
+
+interface AnnouncementRow {
+  id: string;
+  title: string;
+  tone: string;
+  channels: string[];
+  banner: boolean;
+  banner_until: string | null;
+  recipients: number;
+  created_at: string;
+  ended_at: string | null;
+}
+
+/** 027: the latest announcements — through which channels, whether the banner still shows (and end it). */
+function History() {
+  const t = useT();
+  const format = useFormat();
+  const client = useQueryClient();
+  const rows = useQuery({
+    queryKey: ["admin", "notifications", "announcements"],
+    retry: false,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/admin/announcements")).data ?? []) as unknown as AnnouncementRow[],
+  });
+  const end = useMutation({
+    mutationFn: async (id: string) =>
+      api.POST("/api/v1/admin/announcements/{announcement_id}/end", {
+        params: { path: { announcement_id: id } },
+      }),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ["admin", "notifications", "announcements"] });
+      void client.invalidateQueries({ queryKey: ["announcements"] });
+    },
+  });
+  const now = Date.now();
+  return (
+    <AdminSection title={t("admin:announce.history")} icon="megaphone" span="full" flush>
+      {rows.data && !rows.data.length ? (
+        <p className="admin-muted admin-pad">{t("admin:announce.noHistory")}</p>
+      ) : null}
+      <ul className="admin-list">
+        {(rows.data ?? []).map((row) => {
+          const live =
+            row.banner && !row.ended_at && (!row.banner_until || Date.parse(row.banner_until) > now);
+          return (
+            <li key={row.id}>
+              <span className="admin-list__main">
+                <strong>{row.title}</strong>
+                <span className="admin-muted">
+                  {format.dateTime(row.created_at)} ·{" "}
+                  {row.channels.map((c) => t(`admin:announce.channels.${c}`)).join(" · ")}
+                  {row.recipients ? ` · ${t("admin:announce.sent", { count: row.recipients })}` : ""}
+                </span>
+              </span>
+              {live ? (
+                <>
+                  <StatusBadge tone="ok">
+                    {row.banner_until
+                      ? t("admin:announce.bannerLiveUntil", { date: format.dateTime(row.banner_until) })
+                      : t("admin:announce.bannerLive")}
+                  </StatusBadge>
+                  <Button variant="secondary" disabled={end.isPending} onClick={() => end.mutate(row.id)}>
+                    {t("admin:announce.endBanner")}
+                  </Button>
+                </>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
     </AdminSection>
   );
 }
@@ -245,6 +363,7 @@ export default function AnnouncementsAdmin() {
             <Broadcast />
             <Deliveries status={status.data} />
           </AdminGrid>
+          <History />
         </>
       ) : null}
       {tab === "maintenance" ? <MaintenancePanel /> : null}

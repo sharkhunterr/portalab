@@ -44,9 +44,12 @@ async def test_summary(app: FastAPI, client: httpx.AsyncClient, dash: DashboardH
     await login(client, "alex")
     summary = (await client.get("/api/v1/dashboard/since-last-login")).json()
     titles = [i["title"] or i["title_args"].get("name") for i in summary["items"]]
-    # service changes first (priority, the outage highest); the 40-day-old item is outside the lookback
-    assert titles == ["Books", "Media", "News 2", "News 10"]
+    # the outage first; services back to normal make one line (027), in time order with the news; the
+    # 40-day-old item is outside the lookback
+    assert titles == ["Books", "News 2", None, "News 10"]
     assert summary["items"][0]["title_key"] == "dashboard:summary.serviceState"
+    back = summary["items"][2]
+    assert back["title_key"] == "dashboard:summary.servicesBack" and back["detail"] == "Media"
     seen = (
         await client.post(
             "/api/v1/dashboard/since-last-login/seen", json={"until": (NOW - timedelta(days=5)).isoformat()}
@@ -58,7 +61,7 @@ async def test_summary(app: FastAPI, client: httpx.AsyncClient, dash: DashboardH
     )
     assert older.json()["since"] == seen["since"]  # never backwards (another session acknowledged later)
     after = (await client.get("/api/v1/dashboard/since-last-login")).json()
-    assert [i["ref"] for i in after["items"]] == ["/services/s2", "/services/s1", "/news/2"]
+    assert [i["ref"] for i in after["items"]] == ["/services/s2", "/news/2", "/services"]
     dash.module.config = replace(dash.module.config, max_items=1)
     assert len((await client.get("/api/v1/dashboard/since-last-login")).json()["items"]) == 1
 

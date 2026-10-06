@@ -37,10 +37,13 @@ from portalab.modules.dashboard.gateway.gateway import WidgetGateway, config_err
 from portalab.modules.dashboard.models import UserDashboard, WidgetInstance
 from portalab.modules.dashboard.observability import log, metrics
 from portalab.modules.dashboard.overlay.overlay import (
+    LOCKED,
+    MANDATORY,
     EffectiveInstance,
     Overlay,
     StoredInstance,
     effective,
+    pin_of,
     policy_class,
 )
 from portalab.modules.dashboard.settings import DashboardConfig
@@ -430,7 +433,7 @@ class DashboardService:
             row.h,
             GridSize(limits.min.w, limits.min.h) if limits else None,
             GridSize(limits.max.w, limits.max.h) if limits else None,
-            policy_class(policies, row.widget_key) == "locked",
+            policy_class(policies, row.widget_key) in LOCKED,
         )
 
     async def _rearrange(
@@ -454,9 +457,16 @@ class DashboardService:
         )
         policies = self.config().widget_policies
         active = [r for r in rows if r.status == "active"]
+        for row in active:  # 027: pinned widgets always sit at the administrator's place
+            pin = pin_of(policies, row.widget_key)
+            if pin is not None:
+                row.x, row.y, row.w, row.h = pin
         if by_position:  # an ordered list (legacy layout/position writes, starter): flow it into rows
             ordered = sorted(active, key=lambda r: (r.position, str(r.id)))
-            items = flow([self._grid(r, policies) for r in ordered])
+            pinned = [self._grid(r, policies) for r in ordered if pin_of(policies, r.widget_key)]
+            others = [r for r in ordered if not pin_of(policies, r.widget_key)]
+            # pinned widgets keep their place; the others flow in order and settle around them
+            items = normalize([*pinned, *flow([self._grid(r, policies) for r in others])])
         else:
             items = [self._grid(r, policies) for r in active]
         if move_to is not None:
@@ -516,6 +526,7 @@ class DashboardService:
                 if item.id is None:
                     if widget is None or policy_class(policies, item.widget_key) not in (
                         "mandatory",
+                        "pinned",
                         "default",
                     ):
                         raise WidgetUnavailableError("This widget is not available.")
@@ -542,6 +553,10 @@ class DashboardService:
                             "This widget is not on your dashboard.", code="dashboard.instance_not_found"
                         )
                     row = found
+                pin = pin_of(policies, row.widget_key)
+                if pin is not None:  # 027: pinned — always at the administrator's place
+                    row.x, row.y, row.w, row.h = pin
+                    continue
                 if policy_class(policies, row.widget_key) == "locked":
                     if (item.x, item.y, item.w, item.h) != (
                         row.x,
@@ -695,12 +710,12 @@ class DashboardService:
             if status is not None:
                 if status not in ("active", "hidden"):
                     raise ValidationFailed("Unknown status.", code="dashboard.invalid_status")
-                if status == "hidden" and cls == "mandatory":
+                if status == "hidden" and cls in MANDATORY:
                     raise PolicyLocked("This widget is required by your administrator.")
                 if status == "active" and widget is None:
                     raise WidgetUnavailableError("This widget is not available.")
                 row.status = status
-            if cls in ("locked",) and any(v is not None for v in (position, w, h, x, y, config)):
+            if cls in LOCKED and any(v is not None for v in (position, w, h, x, y, config)):
                 raise PolicyLocked("This widget is locked by your administrator.")
             if position is not None:
                 await self._move(session, user, row, position)
@@ -721,6 +736,7 @@ class DashboardService:
             if position is not None:  # legacy ordered write (deprecated): new size, then flow by order
                 if resize_to is not None:
                     row.w, row.h = resize_to[1], resize_to[2]
+                    row.x = min(row.x, 12 - row.w)  # stays inside the grid until the flow places it
                 await self._rearrange(session, user, by_position=True)
             elif resize_to is not None:
                 if x is not None or y is not None:
@@ -756,7 +772,7 @@ class DashboardService:
     async def _check_locked_order(self, ordered: Sequence[WidgetInstance]) -> None:
         policies = self.config().widget_policies
         for index, item in enumerate(ordered):
-            if policy_class(policies, item.widget_key) == "locked" and item.position != index:
+            if policy_class(policies, item.widget_key) in LOCKED and item.position != index:
                 raise PolicyLocked("A locked widget cannot be moved.")
 
     async def remove(self, principal: Principal, instance_id: UUID, *, if_match: int | None = None) -> int:
@@ -765,7 +781,7 @@ class DashboardService:
             session = uow.session
             board = await self._board_for_update(session, user, if_match)
             row = await self._owned(session, user, instance_id)
-            if policy_class(self.config().widget_policies, row.widget_key) == "mandatory":
+            if policy_class(self.config().widget_policies, row.widget_key) in MANDATORY:
                 raise PolicyLocked("This widget is required by your administrator.")
             await session.delete(row)  # removal discards the configuration (hide keeps it)
             await session.flush()
@@ -795,6 +811,7 @@ class DashboardService:
                 if item.id is None:
                     if widget is None or policy_class(policies, item.widget_key) not in (
                         "mandatory",
+                        "pinned",
                         "default",
                     ):
                         raise WidgetUnavailableError("This widget is not available.")
@@ -820,10 +837,11 @@ class DashboardService:
                             "This widget is not on your dashboard.", code="dashboard.instance_not_found"
                         )
                     row = found
-                locked = policy_class(policies, row.widget_key) == "locked"
+                locked = policy_class(policies, row.widget_key) in LOCKED
                 if widget is not None and not locked:
                     size = widget.definition.size.clamp(item.w, item.h)
                     row.w, row.h = size.w, size.h
+                    row.x = min(row.x, 12 - row.w)
                 elif locked and (item.w, item.h) != (row.w, row.h):
                     raise PolicyLocked("A locked widget cannot be resized.")
                 row.updated_at = now
@@ -837,7 +855,21 @@ class DashboardService:
             return await self._bump(session, board, principal)
 
     # --- starter -------------------------------------------------------------------------------------
-    async def apply_starter(self, principal: Principal) -> bool:
+    async def reset(self, principal: Principal, *, if_match: int | None = None) -> int:
+        """027: back to the default dashboard — every widget of mine (and my per-screen places) goes, the
+        starter layout is applied again; pinned widgets come back at their place."""
+        user = _user(principal)
+        async with self.database.unit_of_work() as uow:
+            board = await self._board_for_update(uow.session, user, if_match)
+            await uow.session.execute(delete(WidgetInstance).where(WidgetInstance.user_id == user))
+            board.starter_applied_at = None
+            board.layout_mode = "shared"  # one layout for every screen, like a first visit
+        await self.apply_starter(principal, again=True)
+        async with self.database.session() as session:
+            refreshed = await session.get(UserDashboard, user)
+        return int(refreshed.layout_version) if refreshed else 0
+
+    async def apply_starter(self, principal: Principal, *, again: bool = False) -> bool:
         """Apply the starter layout once (idempotent); filtered by permission, policy and availability. A
         failing widget definition never blocks the others."""
         user = _user(principal)
@@ -846,7 +878,12 @@ class DashboardService:
         widgets = {w.definition.key: w for w in self.registry.widgets()}
         chosen: list[tuple[RegisteredWidget, int, int]] = []
         roles_ok = await self._roles(principal)
-        for entry in layout:
+        pinned = [
+            {"widget_key": key, "w": pin[2], "h": pin[3]}
+            for key in sorted(policies)
+            if (pin := pin_of(policies, key)) is not None
+        ]
+        for entry in [*pinned, *layout]:
             try:
                 key = str(entry.get("widget_key", ""))
                 widget = widgets.get(key)
@@ -915,7 +952,8 @@ class DashboardService:
                 occurred_at=now,
                 actor=principal,
                 source="dashboard",
-                dedup_key=f"dashboard.starter:{hashlib.sha256(str(user).encode()).hexdigest()[:20]}",
+                dedup_key=f"dashboard.starter:{hashlib.sha256(str(user).encode()).hexdigest()[:20]}"
+                + (f":{int(now.timestamp())}" if again else ""),
             )
         metrics.increment("dashboard.starter_applied")
         return True

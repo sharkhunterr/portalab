@@ -176,6 +176,7 @@ class ChangeItemOut(BaseModel):
     title_key: str | None
     title_args: dict[str, Any]
     priority: int
+    detail: str | None = None
 
 
 class SummaryOut(BaseModel):
@@ -357,6 +358,16 @@ async def put_layout(principal: User, body: LayoutIn, module: Module, if_match: 
     )
 
 
+@router.post("/dashboard/reset", response_model=VersionOut)
+async def reset(
+    principal: User,
+    module: Module,
+    if_match: IfMatch = None,
+) -> VersionOut:
+    """027: back to the default dashboard (the starter layout and the pinned widgets)."""
+    return VersionOut(layout_version=await module.service.reset(principal, if_match=version_of(if_match)))
+
+
 @router.post("/dashboard/starter")
 async def apply_starter(principal: User, module: Module) -> dict[str, bool]:
     return {"applied": await module.service.apply_starter(principal)}
@@ -413,6 +424,7 @@ async def since_last_login(principal: User, module: Module) -> SummaryOut:
                 title_key=i.title_key,
                 title_args=dict(i.title_args),
                 priority=i.priority,
+                detail=i.detail,
             )
             for i in summary.items
         ],

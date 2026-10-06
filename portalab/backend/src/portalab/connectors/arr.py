@@ -4,6 +4,9 @@
   marked ``available`` when the files are on disk, with TMDB/IMDb/TVDB ids so Media merges them with what a
   media server reports.
 * ``media.downloads`` (027): the download queue (``/api/v3/queue``) — progress, state and expected time.
+* ``media.acquisition`` (027): where the manager stands on one title — followed, monitored, released,
+  searchable, files, quality, its history (grabbed, failed, imported) — and an on-demand interactive search
+  of the indexers (``/api/v3/release``), for the request journey of a title's page.
 * ``media.calendar`` (027): upcoming releases — Radarr's cinema, digital and physical release dates,
   Sonarr's episode air dates (``/api/v3/calendar``).
 * ``service.health_probe``: an authenticated ``/api/v3/system/status`` round trip.
@@ -24,7 +27,17 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import CALENDAR, DOWNLOADS, LIBRARY, SourceDownload, SourceRelease
+from portalab.capabilities.media import (
+    ACQUISITION,
+    CALENDAR,
+    DOWNLOADS,
+    LIBRARY,
+    AcquisitionEvent,
+    FoundRelease,
+    SourceAcquisition,
+    SourceDownload,
+    SourceRelease,
+)
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import (
     LIBRARY_LISTING_BYTES,
@@ -51,6 +64,7 @@ class _ArrConnector(HttpConnector):
         binding(LIBRARY, syncable=True),
         binding(CALENDAR),
         binding(DOWNLOADS),
+        binding(ACQUISITION),
         binding(HEALTH_PROBE),
     )
     status_path = "/api/v3/system/status"
@@ -71,6 +85,8 @@ class _ArrConnector(HttpConnector):
             return _Calendar(self, service)
         if capability == DOWNLOADS:
             return _Queue(self, service)
+        if capability == ACQUISITION:
+            return _Acquisition(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
         return None
@@ -80,6 +96,127 @@ class _ArrConnector(HttpConnector):
 
     def download(self, record: Mapping[str, Any]) -> SourceDownload | None:
         return None
+
+    # --- 027: one title's acquisition ---------------------------------------------------------------
+    async def find(
+        self, service: ServiceHandle, kind: str, ids: Mapping[str, str]
+    ) -> Mapping[str, Any] | None:
+        return None
+
+    def acquisition(
+        self, service: ServiceHandle, item: Mapping[str, Any], history: Sequence[Mapping[str, Any]]
+    ) -> SourceAcquisition:
+        raise NotImplementedError
+
+    async def history(self, service: ServiceHandle, item: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+        return []
+
+    async def releases_found(self, service: ServiceHandle, item: Mapping[str, Any]) -> Any:
+        return []
+
+
+def queue_attention(record: Mapping[str, Any]) -> str | None:
+    """Why a download waits (027): an import someone must confirm, a failed one, a client warning."""
+    tracked = str(record.get("trackedDownloadState") or "").lower()
+    status = str(record.get("trackedDownloadStatus") or "").lower()
+    if tracked == "importblocked":
+        return "import_blocked"
+    if tracked in ("failedpending", "failed"):
+        return "failed"
+    if tracked == "importpending":
+        return "import_pending"
+    if status in ("warning", "error"):
+        return "warning"
+    return None
+
+
+def queue_messages(record: Mapping[str, Any]) -> tuple[str, ...]:
+    out: list[str] = []
+    if record.get("errorMessage"):
+        out.append(str(record["errorMessage"])[:300])
+    for message in record.get("statusMessages") or []:
+        if isinstance(message, Mapping):
+            for line in message.get("messages") or []:
+                if isinstance(line, str) and line.strip():
+                    out.append(line.strip()[:300])
+    return tuple(dict.fromkeys(out))[:5]
+
+
+def queue_extra(record: Mapping[str, Any]) -> dict[str, Any]:
+    """What every *arr queue record tells about the transfer behind it (027)."""
+    size = record.get("size")
+    return {
+        "download_id": str(record["downloadId"]).lower()[:80] if record.get("downloadId") else None,
+        "client": str(record["downloadClient"])[:100] if record.get("downloadClient") else None,
+        "release": str(record["title"])[:300] if record.get("title") else None,
+        "attention": queue_attention(record),
+        "messages": queue_messages(record),
+        "size": int(size) if isinstance(size, int | float) else None,
+    }
+
+
+EVENTS = {
+    "grabbed": "grabbed",
+    "downloadfailed": "failed",
+    "downloadfolderimported": "imported",
+    "episodefileimported": "imported",
+    "moviefileimported": "imported",
+    "moviefiledeleted": "deleted",
+    "episodefiledeleted": "deleted",
+    "moviefilerenamed": "renamed",
+    "episodefilerenamed": "renamed",
+    "downloadignored": "ignored",
+    "downloadimportfailed": "failed",
+}
+
+
+def acquisition_events(records: Sequence[Mapping[str, Any]]) -> tuple[AcquisitionEvent, ...]:
+    out = []
+    for record in records:
+        event = EVENTS.get(str(record.get("eventType") or "").lower())
+        at = parse_time(record.get("date"))
+        if event is None or at is None:
+            continue
+        data = record.get("data") if isinstance(record.get("data"), Mapping) else {}
+        detail = (data or {}).get("message") or (data or {}).get("reason")
+        out.append(
+            AcquisitionEvent(
+                event=event,
+                at=at,
+                release=str(record.get("sourceTitle"))[:300] if record.get("sourceTitle") else None,
+                client=str((data or {}).get("downloadClient"))[:100]
+                if (data or {}).get("downloadClient")
+                else None,
+                detail=str(detail)[:300] if detail else None,
+            )
+        )
+    return tuple(sorted(out, key=lambda e: e.at, reverse=True)[:12])
+
+
+def found_release(record: Mapping[str, Any]) -> FoundRelease | None:
+    if not record.get("title"):
+        return None
+    quality = (
+        (record.get("quality") or {}).get("quality") if isinstance(record.get("quality"), Mapping) else None
+    )
+    size = record.get("size")
+    seeders = record.get("seeders")
+    return FoundRelease(
+        title=str(record["title"])[:300],
+        indexer=str(record["indexer"])[:100] if record.get("indexer") else None,
+        size=int(size) if isinstance(size, int | float) else None,
+        quality=str(quality.get("name"))[:60]
+        if isinstance(quality, Mapping) and quality.get("name")
+        else None,
+        seeders=int(seeders) if isinstance(seeders, int) else None,
+        approved=bool(record.get("approved")),
+        rejections=tuple(str(r)[:200] for r in (record.get("rejections") or []) if r)[:5],
+    )
+
+
+def page_link(service: ServiceHandle, path: str) -> str | None:
+    base = str(service.config.get("base_url") or "").rstrip("/")
+    return f"{base}{path}" if base else None
 
 
 def queue_state(record: Mapping[str, Any]) -> str:
@@ -124,6 +261,29 @@ class _Queue:
                 if item is not None:
                     out.append(item)
         return out
+
+
+class _Acquisition:
+    def __init__(self, connector: _ArrConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def status(self, kind: str, ids: Mapping[str, str]) -> SourceAcquisition | None:
+        item = await self.connector.find(self.service, kind, ids)
+        if item is None:
+            return None
+        return self.connector.acquisition(
+            self.service, item, await self.connector.history(self.service, item)
+        )
+
+    async def search(self, kind: str, ids: Mapping[str, str]) -> Sequence[FoundRelease]:
+        item = await self.connector.find(self.service, kind, ids)
+        if item is None:
+            return []
+        records = await self.connector.releases_found(self.service, item)
+        if not isinstance(records, list):
+            raise InvalidPayload("unexpected /release payload")
+        found = [f for r in records if isinstance(r, Mapping) and (f := found_release(r)) is not None]
+        return sorted(found, key=lambda f: (not f.approved, -(f.seeders or 0)))[:30]
 
 
 class _Calendar:
@@ -178,6 +338,65 @@ class RadarrConnector(_ArrConnector):
             progress=queue_progress(record),
             ids={k: v for k, v in ids.items() if v},
             eta=parse_time(record.get("estimatedCompletionTime")),
+            **queue_extra(record),
+        )
+
+    async def find(
+        self, service: ServiceHandle, kind: str, ids: Mapping[str, str]
+    ) -> Mapping[str, Any] | None:
+        if kind not in ("movie", "film"):
+            return None
+        if ids.get("tmdb"):
+            found = await self.get_json(service, "/api/v3/movie", tmdbId=ids["tmdb"])
+            if isinstance(found, list) and found and isinstance(found[0], Mapping):
+                return found[0]
+        if ids.get("imdb"):
+            found = await self.get_json(service, "/api/v3/movie/lookup", term=f"imdb:{ids['imdb']}")
+            for item in found if isinstance(found, list) else []:
+                if isinstance(item, Mapping) and item.get("id"):
+                    return item
+        return None
+
+    async def history(self, service: ServiceHandle, item: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+        found = await self.get_json(service, "/api/v3/history/movie", movieId=safe_id(item["id"]))
+        return [r for r in found if isinstance(r, Mapping)] if isinstance(found, list) else []
+
+    async def releases_found(self, service: ServiceHandle, item: Mapping[str, Any]) -> Any:
+        return await self.request(service, "GET", "/api/v3/release", params={"movieId": safe_id(item["id"])})
+
+    def acquisition(
+        self, service: ServiceHandle, item: Mapping[str, Any], history: Sequence[Mapping[str, Any]]
+    ) -> SourceAcquisition:
+        file = item.get("movieFile") if isinstance(item.get("movieFile"), Mapping) else {}
+        quality = ((file or {}).get("quality") or {}).get("quality") or {}
+        releases = {
+            name: at
+            for name, field in (
+                ("cinema", "inCinemas"),
+                ("digital", "digitalRelease"),
+                ("physical", "physicalRelease"),
+            )
+            if (at := parse_time(item.get(field))) is not None
+        }
+        size = (file or {}).get("size") or item.get("sizeOnDisk")
+        slug = item.get("titleSlug") or item.get("tmdbId")
+        return SourceAcquisition(
+            service_name=service.name,
+            tracked=True,
+            monitored=bool(item.get("monitored")),
+            has_file=bool(item.get("hasFile")),
+            status=str(item.get("status") or "") or None,
+            searchable=item.get("isAvailable") if isinstance(item.get("isAvailable"), bool) else None,
+            added_at=parse_time(item.get("added")),
+            releases=releases,
+            files=1 if item.get("hasFile") else 0,
+            expected=1,
+            size=int(size) if isinstance(size, int | float) and size else None,
+            quality=str(quality.get("name"))[:60]
+            if isinstance(quality, Mapping) and quality.get("name")
+            else None,
+            link=page_link(service, f"/movie/{slug}") if slug else None,
+            history=acquisition_events(history),
         )
 
     def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:
@@ -268,6 +487,67 @@ class SonarrConnector(_ArrConnector):
             season=episode.get("seasonNumber"),
             episode=episode.get("episodeNumber"),
             eta=parse_time(record.get("estimatedCompletionTime")),
+            **queue_extra(record),
+        )
+
+    async def find(
+        self, service: ServiceHandle, kind: str, ids: Mapping[str, str]
+    ) -> Mapping[str, Any] | None:
+        if kind not in ("series", "season", "episode", "tv"):
+            return None
+        if ids.get("tvdb"):
+            found = await self.get_json(service, "/api/v3/series", tvdbId=ids["tvdb"])
+            if isinstance(found, list) and found and isinstance(found[0], Mapping):
+                return found[0]
+        everything = await self.request(service, "GET", "/api/v3/series", max_bytes=LIBRARY_LISTING_BYTES)
+        for item in everything if isinstance(everything, list) else []:
+            if not isinstance(item, Mapping):
+                continue
+            if (ids.get("tmdb") and str(item.get("tmdbId")) == ids["tmdb"]) or (
+                ids.get("imdb") and item.get("imdbId") == ids["imdb"]
+            ):
+                return item
+        return None
+
+    async def history(self, service: ServiceHandle, item: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+        found = await self.get_json(service, "/api/v3/history/series", seriesId=safe_id(item["id"]))
+        return [r for r in found if isinstance(r, Mapping)] if isinstance(found, list) else []
+
+    async def releases_found(self, service: ServiceHandle, item: Mapping[str, Any]) -> Any:
+        seasons: list[int] = [
+            int(s["seasonNumber"])
+            for s in item.get("seasons") or []
+            if isinstance(s, Mapping) and isinstance(s.get("seasonNumber"), int) and s["seasonNumber"] > 0
+        ]
+        params: dict[str, Any] = {"seriesId": safe_id(item["id"])}
+        if seasons:
+            params["seasonNumber"] = max(seasons)  # the latest season: what a request usually waits for
+        return await self.request(service, "GET", "/api/v3/release", params=params)
+
+    def acquisition(
+        self, service: ServiceHandle, item: Mapping[str, Any], history: Sequence[Mapping[str, Any]]
+    ) -> SourceAcquisition:
+        stats = item.get("statistics") if isinstance(item.get("statistics"), Mapping) else {}
+        files = int((stats or {}).get("episodeFileCount") or 0)
+        releases = {
+            name: at
+            for name, field in (("first_aired", "firstAired"), ("next_airing", "nextAiring"))
+            if (at := parse_time(item.get(field))) is not None
+        }
+        size = (stats or {}).get("sizeOnDisk")
+        return SourceAcquisition(
+            service_name=service.name,
+            tracked=True,
+            monitored=bool(item.get("monitored")),
+            has_file=files > 0,
+            status=str(item.get("status") or "") or None,
+            added_at=parse_time(item.get("added")),
+            releases=releases,
+            files=files,
+            expected=int((stats or {}).get("episodeCount") or 0),
+            size=int(size) if isinstance(size, int | float) and size else None,
+            link=page_link(service, f"/series/{item['titleSlug']}") if item.get("titleSlug") else None,
+            history=acquisition_events(history),
         )
 
     def releases(self, item: Mapping[str, Any], start: datetime, end: datetime) -> list[SourceRelease]:

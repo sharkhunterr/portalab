@@ -109,8 +109,26 @@ class Sections:
         return viewer.acting_for or viewer.user_id
 
     async def _info(self, object_id: UUID, view: Any, viewer: Principal) -> Section:
-        keep = ("title", "original_title", "overview", "year", "genres", "language", "duration_s", "pages")
+        keep = (
+            "title",
+            "original_title",
+            "overview",
+            "year",
+            "genres",
+            "language",
+            "duration_s",
+            "pages",
+            # 027: what a book or an audiobook's page tells (Grimmory): authors and narrator, series,
+            # publisher, publication date
+            "people",
+            "series",
+            "series_position",
+            "publisher",
+            "released",
+        )
         data = {k: view.effective.get(k) for k in keep if view.effective.get(k) not in (None, "", [])}
+        if view.ids.get("isbn"):
+            data["isbn"] = view.ids["isbn"]
         data.update(
             kind=view.kind,
             parent_id=str(view.parent_id) if view.parent_id else None,
@@ -149,7 +167,20 @@ class Sections:
                         "last_sync_success_at": s.last_sync_success_at.isoformat()
                         if s.last_sync_success_at
                         else None,
-                        "sync_error": bool(s.last_sync_error),
+                        # 027: failing now — an error after the last success — not an old error
+                        "sync_error": bool(s.last_sync_error)
+                        and (
+                            s.sync_status == "failed"
+                            or s.last_sync_success_at is None
+                            or (
+                                s.last_sync_attempt_at is not None
+                                and s.last_sync_attempt_at > s.last_sync_success_at
+                            )
+                        ),
+                        "sync_failed_at": s.last_sync_attempt_at.isoformat()
+                        if s.last_sync_attempt_at
+                        else None,
+                        "link": s.link,
                     }
                     for s in sources
                 ],

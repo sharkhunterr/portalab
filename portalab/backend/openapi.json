@@ -877,6 +877,97 @@
         "title": "AiUsageOut",
         "type": "object"
       },
+      "AnnouncementOut": {
+        "properties": {
+          "banner": {
+            "title": "Banner",
+            "type": "boolean"
+          },
+          "banner_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Banner Until"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "channels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Channels",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          },
+          "recipients": {
+            "title": "Recipients",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tone": {
+            "title": "Tone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "link",
+          "tone",
+          "channels",
+          "banner",
+          "banner_until",
+          "recipients",
+          "created_at",
+          "ended_at"
+        ],
+        "title": "AnnouncementOut",
+        "type": "object"
+      },
       "AnomalyDecisionIn": {
         "additionalProperties": false,
         "properties": {
@@ -1510,11 +1601,37 @@
             ],
             "title": "Action Url"
           },
+          "banner_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Banner Until"
+          },
           "body": {
             "default": "",
             "maxLength": 2000,
             "title": "Body",
             "type": "string"
+          },
+          "channels": {
+            "items": {
+              "enum": [
+                "notification",
+                "email",
+                "banner"
+              ],
+              "type": "string"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Channels",
+            "type": "array"
           },
           "dedup_key": {
             "maxLength": 120,
@@ -1546,6 +1663,17 @@
             "maxLength": 200,
             "minLength": 3,
             "title": "Title",
+            "type": "string"
+          },
+          "tone": {
+            "default": "info",
+            "enum": [
+              "info",
+              "success",
+              "warning",
+              "critical"
+            ],
+            "title": "Tone",
             "type": "string"
           }
         },
@@ -2221,6 +2349,17 @@
       },
       "ChangeItemOut": {
         "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
           "kind": {
             "title": "Kind",
             "type": "string"
@@ -14472,6 +14611,76 @@
         ]
       }
     },
+    "/api/v1/admin/announcements": {
+      "get": {
+        "description": "027: the latest announcements and how they went out.",
+        "operationId": "announcements_api_v1_admin_announcements_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnnouncementOut"
+                  },
+                  "title": "Response Announcements Api V1 Admin Announcements Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Announcements",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/admin/announcements/{announcement_id}/end": {
+      "post": {
+        "description": "027: take a banner down now.",
+        "operationId": "end_announcement_api_v1_admin_announcements__announcement_id__end_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "announcement_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Announcement Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "End Announcement",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/api/v1/admin/automations": {
       "get": {
         "operationId": "list_automations_api_v1_admin_automations_get",
@@ -23898,6 +24107,32 @@
         ]
       }
     },
+    "/api/v1/announcements/banners": {
+      "get": {
+        "description": "027: announcements shown as a banner right now.",
+        "operationId": "banners_api_v1_announcements_banners_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnnouncementOut"
+                  },
+                  "title": "Response Banners Api V1 Announcements Banners Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Banners",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/api/v1/audit": {
       "get": {
         "operationId": "search_audit_api_v1_audit_get",
@@ -26528,6 +26763,57 @@
           }
         },
         "summary": "Locked Options",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/reset": {
+      "post": {
+        "description": "027: back to the default dashboard (the starter layout and the pinned widgets).",
+        "operationId": "reset_api_v1_dashboard_reset_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reset",
         "tags": [
           "dashboard"
         ]
@@ -31108,6 +31394,98 @@
           }
         },
         "summary": "Detail",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/journey": {
+      "get": {
+        "description": "027: where this title's request stands \u2014 asked, approved, released, searched, downloading,\nimported, available \u2014 with the download managers' and torrent clients' facts.",
+        "operationId": "journey_api_v1_media__object_id__journey_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Journey Api V1 Media  Object Id  Journey Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Journey",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/journey/search": {
+      "post": {
+        "description": "027: what the indexers offer for this title now (the download managers' interactive search; kept\n30 minutes \u2014 it is slow and loads the indexers).",
+        "operationId": "journey_search_api_v1_media__object_id__journey_search_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Journey Search Api V1 Media  Object Id  Journey Search Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Journey Search",
         "tags": [
           "media"
         ]

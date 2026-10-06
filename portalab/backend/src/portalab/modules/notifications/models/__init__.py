@@ -149,3 +149,29 @@ class DigestState(NotifyBase):
 
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
     last_digest_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Announcement(NotifyBase):
+    """027: an announcement as the administrator wrote it — sent as a notification, an e-mail and/or shown
+    as a banner across the portal (until a date, or until ended)."""
+
+    __tablename__ = "announcements"
+    __table_args__ = (
+        CheckConstraint("tone IN ('info', 'success', 'warning', 'critical')", name="tone"),
+        Index("ix_announcements_banner", "banner", "banner_until"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    title: Mapped[str] = mapped_column(String(200), nullable=False, info=not_personal("announcement title"))
+    body: Mapped[str] = mapped_column(
+        Text, nullable=False, default="", info=not_personal("announcement text")
+    )
+    link: Mapped[str | None] = mapped_column(String(256))
+    tone: Mapped[str] = mapped_column(String(10), nullable=False, default="info")
+    channels: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    banner: Mapped[bool] = mapped_column(nullable=False, default=False)
+    banner_until: Mapped[datetime | None] = mapped_column(TZDateTime)
+    recipients: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_by: Mapped[UUID | None] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    ended_at: Mapped[datetime | None] = mapped_column(TZDateTime)

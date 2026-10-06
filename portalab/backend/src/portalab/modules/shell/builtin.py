@@ -712,6 +712,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "wiki.publish",
     },
     {
+        "key": "dashboard.admin",
+        "owner": "module:dashboard",
+        "kind": "entry",
+        "label_key": "nav.admin.dashboard",
+        "icon": "dashboard",
+        "route": "/admin/dashboard",
+        "group": "admin",
+        "topic": "communication",
+        "order_hint": 3,
+        "required_permission": "dashboard.manage",
+    },
+    {
         "key": "notifications.announcements",
         "owner": "module:notifications",
         "kind": "entry",

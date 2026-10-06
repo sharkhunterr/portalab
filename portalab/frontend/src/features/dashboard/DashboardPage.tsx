@@ -12,7 +12,6 @@ import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useMe } from "../auth/useAuth";
-import { IncidentBanner } from "../support/incidents/IncidentBanner";
 import { type Change, DASHBOARD_KEY, type Instance, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
@@ -30,7 +29,6 @@ import "../community/widget";
 import "../marketplace/widget";
 import "../support/incidents/widget";
 import "../campaigns/widget";
-import { ActiveCampaignBanner } from "../campaigns/banner/ActiveCampaignBanner";
 
 const ONBOARDED = "portalab.onboarding.dashboard";
 
@@ -137,6 +135,14 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
     }
     await session.save();
   };
+  /** 027: back to the default dashboard (asks first: my arrangement and widgets are replaced). */
+  const restoreDefault = async () => {
+    if (!window.confirm(t("dashboard:defaultConfirm"))) return;
+    await session.cancel();
+    await api.POST("/api/v1/dashboard/reset", {});
+    await fresh();
+    announce(t("dashboard:defaultDone"));
+  };
   const switchMode = async (next: LayoutMode) => {
     if (session.dirty) await session.save();
     await fresh();
@@ -185,8 +191,6 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
         }
       />
       <WelcomeCard />
-      <ActiveCampaignBanner />
-      <IncidentBanner />
       <SinceLastLoginCard />
       {dashboard.isPending ? <FunctionalState state="loading" /> : null}
       {dashboard.isError ? <FunctionalState state="error" onRetry={() => dashboard.refetch()} /> : null}
@@ -238,6 +242,12 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
             <Button variant="secondary" onClick={() => session.autofit()}>
               <Icon name="maximize" size={16} />
               {t("dashboard:autofit")}
+            </Button>
+          ) : null}
+          {arranging ? (
+            <Button variant="ghost" disabled={session.saving} onClick={() => void restoreDefault()}>
+              <Icon name="sync" size={16} />
+              {t("dashboard:default")}
             </Button>
           ) : null}
           <p className="dashboard-page__hint">

@@ -36,7 +36,8 @@ async def test_personalization(app: FastAPI, client: httpx.AsyncClient, dash: Da
     await login(client, "alex")
     first = await board(client)
     starter = [i["widget_key"] for i in first["instances"]]  # type: ignore[index, union-attr]
-    assert starter == ["dashboard.welcome", "health.services_summary"]  # starter applied on first view
+    # starter applied on first view: the widgets this member can use, in the starter's order (027)
+    assert starter == ["dashboard.welcome", "health.services_summary", "health.service_links"]
     version = first["layout_version"]
     added = await client.post(
         "/api/v1/dashboard/widgets",
@@ -147,3 +148,42 @@ async def test_policies(app: FastAPI, client: httpx.AsyncClient, dash: Dashboard
     }  # prior state back
     assert "t.two" not in restored and "dashboard.welcome" in restored
     assert restored["health.services_summary"]["config"]["show"] == "all"
+
+
+async def test_pinned_and_reset(app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness) -> None:
+    """027: a pinned widget is on every dashboard at the administrator's place — not removable, hideable
+    or movable; « default » brings the starter dashboard back."""
+    register(dash)
+    boss = await create_user(module_of(app), "boss")
+    await make_admin(dash.full, boss)
+    await login(client, "boss")
+    pins = {
+        "t.one": {"class": "pinned", "x": 0, "y": 0, "w": 6, "h": 2},
+        "t.two": {"class": "pinned", "x": 6, "y": 0, "w": 6, "h": 2},
+    }
+    assert (await client.put("/api/v1/admin/dashboard/policies", json=pins)).status_code == 200
+
+    await create_user(module_of(app), "alex")
+    await login(client, "alex")
+    view = by_key(await board(client))
+    assert (view["t.one"]["x"], view["t.one"]["y"], view["t.two"]["x"], view["t.two"]["y"]) == (0, 0, 6, 0)
+    assert view["t.one"]["mandatory"] and view["t.one"]["locked"]
+    assert all(i["y"] >= 2 for k, i in view.items() if k not in pins)  # the others start below
+    one = view["t.one"]["id"]
+    assert (await client.delete(f"/api/v1/dashboard/widgets/{one}")).status_code == 409
+    assert (await client.patch(f"/api/v1/dashboard/widgets/{one}", json={"x": 4})).status_code == 409
+    moved = await client.put(
+        "/api/v1/dashboard/arrangement",
+        json={"items": [{"id": one, "widget_key": "t.one", "x": 2, "y": 5, "w": 4, "h": 3}]},
+    )
+    assert moved.status_code == 200
+    view = by_key(await board(client))
+    assert (view["t.one"]["x"], view["t.one"]["y"], view["t.one"]["w"]) == (0, 0, 6)  # stays put
+
+    welcome = view["dashboard.welcome"]["id"]
+    assert (await client.delete(f"/api/v1/dashboard/widgets/{welcome}")).status_code == 200
+    assert (await client.post("/api/v1/dashboard/widgets", json={"widget_key": "t.many"})).status_code == 201
+    reset = await client.post("/api/v1/dashboard/reset")
+    assert reset.status_code == 200, reset.text
+    view = by_key(await board(client))
+    assert "dashboard.welcome" in view and "t.many" not in view and view["t.two"]["x"] == 6

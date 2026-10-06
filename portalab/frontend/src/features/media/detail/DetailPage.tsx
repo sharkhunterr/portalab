@@ -17,6 +17,7 @@ import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { Backdrop, Enrichment, useMetadata } from "./Enrichment";
+import { RequestJourney, useJourney } from "./Journey";
 
 /**
  * Media detail (spec 024 T017/T020): a header and independent section frames — each section loads, fails
@@ -63,7 +64,58 @@ function list(value: unknown): Data[] {
   return Array.isArray(value) ? (value as Data[]) : [];
 }
 
-function SectionBody({ name, section }: { name: string; section: MediaSection }) {
+/** A book's or an audiobook's facts (027, Grimmory): authors, series, publisher, pages, length… */
+function BookFacts({ data }: { data: Data }) {
+  const t = useT();
+  const format = useFormat();
+  const people = Array.isArray(data.people) ? (data.people as string[]) : [];
+  const hours = data.duration_s ? Number(data.duration_s) / 3600 : 0;
+  const rows = [
+    people.length ? { key: "authors", value: people.join(", ") } : null,
+    data.series
+      ? {
+          key: "series",
+          value: data.series_position
+            ? t("media:facts.seriesAt", {
+                series: String(data.series),
+                position: String(data.series_position),
+              })
+            : String(data.series),
+        }
+      : null,
+    data.publisher ? { key: "publisher", value: String(data.publisher) } : null,
+    data.released
+      ? { key: "released", value: format.date(`${String(data.released)}T12:00:00Z`, "long") }
+      : null,
+    data.pages ? { key: "pages", value: t("media:facts.pageCount", { count: Number(data.pages) }) } : null,
+    hours ? { key: "length", value: t("media:facts.hours", { hours: Math.round(hours * 10) / 10 }) } : null,
+    data.language ? { key: "language", value: String(data.language).toUpperCase() } : null,
+    data.isbn ? { key: "isbn", value: String(data.isbn) } : null,
+  ].filter((row) => row !== null);
+  if (!rows.length) return null;
+  return (
+    <dl className="media-facts">
+      {rows.map((row) => (
+        <div key={row.key}>
+          <dt>{t(`media:facts.${row.key}`)}</dt>
+          <dd>{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+const BOOKS = ["book", "audiobook"];
+
+function SectionBody({
+  name,
+  section,
+  enriched,
+}: {
+  name: string;
+  section: MediaSection;
+  enriched: boolean;
+}) {
   const t = useT();
   const format = useFormat();
   const data = section.data as Data;
@@ -71,7 +123,9 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
     case "info":
       return (
         <>
-          {data.overview ? <p>{String(data.overview)}</p> : null}
+          {/* the enriched details already tell the story: no second summary (027) */}
+          {data.overview && !enriched ? <p>{String(data.overview)}</p> : null}
+          {BOOKS.includes(String(data.kind)) ? <BookFacts data={data} /> : null}
           {list(data.children).length ? (
             <>
               <h4>{t("media:detail.children")}</h4>
@@ -92,6 +146,16 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
           {list(data.sources).map((source) => (
             <li key={String(source.service_id)} className="media-source">
               <strong>{String(source.service_name ?? source.connector ?? source.service_id)}</strong>
+              {source.link ? (
+                <a
+                  className="media-source__link"
+                  href={String(source.link)}
+                  target="_blank"
+                  rel="noopener noreferrer external"
+                >
+                  {t("media:detail.source.open")} <Icon name="link" size={12} />
+                </a>
+              ) : null}
               <span className="media-source__badges">
                 <StatusBadge tone={source.availability === "available" ? "ok" : "neutral"}>
                   {source.availability === "available"
@@ -102,7 +166,15 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
                   <StatusBadge tone="warn">{t("media:detail.source.gone")}</StatusBadge>
                 ) : null}
                 {source.sync_error ? (
-                  <StatusBadge tone="bad">{t("media:detail.source.syncError")}</StatusBadge>
+                  <span title={t("media:detail.source.syncErrorHint")}>
+                    <StatusBadge tone="warn">
+                      {source.last_sync_success_at
+                        ? t("media:detail.source.syncStale", {
+                            date: format.dateTime(String(source.last_sync_success_at)),
+                          })
+                        : t("media:detail.source.syncError")}
+                    </StatusBadge>
+                  </span>
                 ) : null}
                 {source.service_state && source.service_state !== "operational" ? (
                   <StatusBadge tone="warn">
@@ -215,10 +287,15 @@ function SectionBody({ name, section }: { name: string; section: MediaSection })
 }
 
 /** Whether a section has something to show (027: empty sections are left out instead of « No data »). */
-function hasContent(name: string, data: Data): boolean {
+function hasContent(name: string, data: Data, enriched = false): boolean {
   switch (name) {
     case "info":
-      return Boolean(data.overview) || list(data.children).length > 0;
+      return (
+        (Boolean(data.overview) && !enriched) ||
+        list(data.children).length > 0 ||
+        (BOOKS.includes(String(data.kind)) &&
+          Boolean(data.people || data.series || data.publisher || data.pages))
+      );
     case "history":
       return list(data.mine).length > 0 || list(data.concerned_users).length > 0;
     case "requests":
@@ -240,7 +317,7 @@ function hasContent(name: string, data: Data): boolean {
   }
 }
 
-function SectionFrame({ objectId, name }: { objectId: string; name: string }) {
+function SectionFrame({ objectId, name, enriched }: { objectId: string; name: string; enriched: boolean }) {
   const t = useT();
   const headingId = useId();
   const section = useSection(objectId, name);
@@ -248,7 +325,8 @@ function SectionFrame({ objectId, name }: { objectId: string; name: string }) {
   // nothing to tell: the section is left out (while loading too, to avoid a page of spinners)
   if (section.isPending) return null;
   if (state === "no-data" || state === "insufficient_data") return null;
-  if (section.data && state !== "unavailable" && !hasContent(name, section.data.data as Data)) return null;
+  if (section.data && state !== "unavailable" && !hasContent(name, section.data.data as Data, enriched))
+    return null;
   let body: ReactNode = null;
   if (section.isPending) body = <FunctionalState state="loading" />;
   else if (section.isError) body = <FunctionalState state="unavailable" onRetry={() => section.refetch()} />;
@@ -265,7 +343,7 @@ function SectionFrame({ objectId, name }: { objectId: string; name: string }) {
           {state === "partial" || state === "stale" ? (
             <FunctionalState state={state} asOf={new Date(section.data.as_of)} />
           ) : null}
-          <SectionBody name={name} section={section.data} />
+          <SectionBody name={name} section={section.data} enriched={enriched} />
         </>
       );
   }
@@ -309,6 +387,7 @@ export function DetailPage() {
   const detail = useMediaDetail(objectId);
   // with enriched details (TMDB), the cast and the technical timeline would only repeat or distract
   const enriched = Boolean(useMetadata(objectId).data);
+  const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;
@@ -333,12 +412,17 @@ export function DetailPage() {
             {media.genres.length ? ` · ${media.genres.join(", ")}` : ""}
           </>
         }
-        primary={media.available ? null : <RequestButton objectId={media.id} />}
+        primary={media.available || requested ? null : <RequestButton objectId={media.id} />}
       />
+      <RequestJourney objectId={media.id} />
       <Enrichment objectId={media.id} />
       <div className="media-sections">
-        {SECTIONS.filter((name) => !(enriched && (name === "people" || name === "events"))).map((name) => (
-          <SectionFrame key={name} objectId={media.id} name={name} />
+        {SECTIONS.filter(
+          (name) =>
+            !(enriched && (name === "people" || name === "events")) &&
+            !(BOOKS.includes(media.kind) && name === "people"), // a book's authors are in its facts
+        ).map((name) => (
+          <SectionFrame key={name} objectId={media.id} name={name} enriched={enriched} />
         ))}
       </div>
     </article>

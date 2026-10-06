@@ -537,3 +537,17 @@
     justify-content: flex-start;
   }
 }
+
+/* 027: where an announcement goes */
+.announce-channels {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0;
+  display: grid;
+  gap: var(--space-1);
+}
+.announce-channels legend {
+  font-weight: var(--font-weight-semibold);
+  padding-inline: var(--space-1);
+}

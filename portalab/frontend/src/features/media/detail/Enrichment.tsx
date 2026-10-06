@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -41,6 +42,8 @@ interface Metadata {
   backdrop: string | null;
   people: Person[];
   keywords: string[];
+  backdrops: string[];
+  posters: string[];
 }
 
 const JOBS: Record<string, string> = {
@@ -86,6 +89,8 @@ function normalize(raw: Partial<Metadata>): Metadata {
     backdrop: raw.backdrop ?? null,
     people: list(raw.people),
     keywords: list(raw.keywords),
+    backdrops: list(raw.backdrops),
+    posters: list(raw.posters),
   };
 }
 
@@ -107,13 +112,84 @@ export function useMetadata(objectId: string) {
   });
 }
 
+/**
+ * The artwork at the top of a title's page (027): the backdrop, then the other backdrops and posters —
+ * swiped on a touch screen, with arrows and dots elsewhere; images load as they come into view.
+ */
 export function Backdrop({ objectId }: { objectId: string }) {
+  const t = useT();
   const metadata = useMetadata(objectId);
-  const src = metadataImage(metadata.data?.backdrop, "w1280");
-  if (!src) return null;
+  const strip = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const data = metadata.data;
+  const slides = [
+    ...[data?.backdrop, ...(data?.backdrops ?? [])]
+      .filter(Boolean)
+      .map((ref) => ({ ref: ref as string, poster: false })),
+    ...(data?.posters ?? []).map((ref) => ({ ref, poster: true })),
+  ];
+  if (!slides.length) return null;
+  const go = (next: number) => {
+    const target = Math.max(0, Math.min(slides.length - 1, next));
+    const box = strip.current;
+    if (box) box.scrollTo({ left: target * box.clientWidth, behavior: "smooth" });
+  };
   return (
-    <div className="media-backdrop" aria-hidden="true">
-      <img src={src} alt="" />
+    <div className="media-backdrop">
+      <div
+        ref={strip}
+        className="media-backdrop__strip"
+        onScroll={(event) => {
+          const box = event.currentTarget;
+          setIndex(Math.round(box.scrollLeft / Math.max(1, box.clientWidth)));
+        }}
+      >
+        {slides.map((slide, i) => (
+          <div key={slide.ref} className="media-backdrop__slide" data-poster={slide.poster || undefined}>
+            {slide.poster ? (
+              <img
+                className="media-backdrop__blur"
+                src={metadataImage(slide.ref, "w342") ?? ""}
+                alt=""
+                aria-hidden="true"
+              />
+            ) : null}
+            <img
+              src={metadataImage(slide.ref, slide.poster ? "w500" : "w1280") ?? ""}
+              alt=""
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          </div>
+        ))}
+      </div>
+      {slides.length > 1 ? (
+        <div className="media-backdrop__nav">
+          <button
+            type="button"
+            aria-label={t("media:gallery.previous")}
+            disabled={index === 0}
+            onClick={() => go(index - 1)}
+          >
+            <Icon name="chevron-left" size={18} />
+          </button>
+          <span className="media-backdrop__dots">
+            <span className="visually-hidden">
+              {t("media:gallery.position", { index: index + 1, count: slides.length })}
+            </span>
+            {slides.map((slide, i) => (
+              <span key={slide.ref} aria-hidden="true" data-on={i === index || undefined} />
+            ))}
+          </span>
+          <button
+            type="button"
+            aria-label={t("media:gallery.next")}
+            disabled={index === slides.length - 1}
+            onClick={() => go(index + 1)}
+          >
+            <Icon name="chevron-right" size={18} />
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

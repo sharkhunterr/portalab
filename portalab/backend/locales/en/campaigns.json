@@ -78,5 +78,7 @@
   "page.toCommunity": "Back to the community",
   "page.windows": "Next periods",
   "widget.active.description": "Themed events running now",
-  "widget.active.title": "Active campaigns"
+  "widget.active.title": "Active campaigns",
+  "widget.next": "No campaign running · next: {name} on {when}",
+  "widget.none": "No campaign running or planned."
 }

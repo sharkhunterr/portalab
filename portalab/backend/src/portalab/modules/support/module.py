@@ -55,6 +55,7 @@ from portalab.modules.support.models import Incident, Ticket
 from portalab.modules.support.participant import SupportParticipant
 from portalab.modules.support.precheck.service import Precheck
 from portalab.modules.support.settings import SETTINGS, SupportConfig
+from portalab.modules.support.summary import SupportChanges
 from portalab.modules.support.tickets.integrations import (
     ACTIONS,
     MY_TICKETS,
@@ -164,6 +165,8 @@ class SupportModule:
         for definition, queue in ((MY_TICKETS, False), (QUEUE, True)):
             if self.widgets.get(definition.key) is None:
                 self.widgets.register(definition, TicketsWidget(self.tickets, queue, self.clock), owner=OWNER)
+        if not any(p.kind == "support" for p in self.widgets.summaries()):  # 027: since your last visit
+            self.widgets.register_summary(SupportChanges(self.database), owner=OWNER)
         if self.search.provider("tickets") is None:
             self.search.register(TicketSearchProvider(self.tickets), owner=OWNER)
             self.search.register(FeedbackSearchProvider(self.tickets), owner=OWNER)

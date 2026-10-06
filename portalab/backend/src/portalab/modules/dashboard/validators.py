@@ -22,9 +22,10 @@ class DashboardValidators:
             cls = policy.get("class") if isinstance(policy, dict) else None
             if cls not in POLICY_CLASSES:
                 errors.append(f"{key}: class must be one of {', '.join(POLICY_CLASSES)}")
-            extra = (
-                set(policy) - {"class", "condition", "lockedConfig"} if isinstance(policy, dict) else set()
+            allowed = {"class", "condition", "lockedConfig"} | (
+                {"x", "y", "w", "h"} if cls == "pinned" else set()
             )
+            extra = set(policy) - allowed if isinstance(policy, dict) else set()
             if extra:
                 errors.append(f"{key}: unknown fields {sorted(extra)}")
             if cls == "conditional":
@@ -33,6 +34,14 @@ class DashboardValidators:
                     errors.append(
                         f"{key}: a conditional policy needs a condition of type {', '.join(CONDITION_TYPES)}"
                     )
+            if cls == "pinned":
+                place = {k: policy.get(k) for k in ("x", "y", "w", "h")}
+                if any(not isinstance(v, int) or isinstance(v, bool) for v in place.values()):
+                    errors.append(f"{key}: a pinned widget needs whole numbers x, y, w and h")
+                elif not (place["x"] >= 0 and 1 <= place["w"] <= 12 and place["x"] + place["w"] <= 12):
+                    errors.append(f"{key}: a pinned widget stays inside the 12 columns")
+                elif not (place["y"] >= 0 and 1 <= place["h"] <= 12):
+                    errors.append(f"{key}: a pinned widget needs a row and a height")
             if "lockedConfig" in policy and not isinstance(policy["lockedConfig"], dict):
                 errors.append(f"{key}: lockedConfig must be an object")
         return errors

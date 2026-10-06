@@ -206,21 +206,39 @@ class ServicesChanges:
     ) -> Sequence[ChangeItem]:
         if not await self.provider.authorizer.is_allowed(principal, SERVICES_READ):
             return []
-        items = []
+        # 027: a service in trouble now is news on its own; the ones back to normal make one line
+        items: list[ChangeItem] = []
+        recovered: list[tuple[datetime, str]] = []
         for row in await self.provider._rows():
             if row["since"] is None:
                 continue
             at = datetime.fromisoformat(row["since"])
             if at <= since:
                 continue
+            if row["state"] in ("unavailable", "degraded"):
+                items.append(
+                    ChangeItem(
+                        kind=self.kind,
+                        occurred_at=at,
+                        ref=f"/services/{row['id']}",
+                        title_key="dashboard:summary.serviceState",
+                        title_args={"name": row["name"], "state": row["state"]},
+                        priority=4,
+                    )
+                )
+            else:
+                recovered.append((at, str(row["name"])))
+        if recovered:
+            recovered.sort(reverse=True)
             items.append(
                 ChangeItem(
                     kind=self.kind,
-                    occurred_at=at,
-                    ref=f"/services/{row['id']}",
-                    title_key="dashboard:summary.serviceState",
-                    title_args={"name": row["name"], "state": row["state"]},
-                    priority=2 if row["state"] in ("unavailable", "degraded") else 1,
+                    occurred_at=recovered[0][0],
+                    ref="/services",
+                    title_key="dashboard:summary.servicesBack",
+                    title_args={"count": len(recovered)},
+                    detail=", ".join(name for _, name in recovered[:6]),
+                    priority=0,
                 )
             )
         items.sort(key=lambda item: item.occurred_at, reverse=True)

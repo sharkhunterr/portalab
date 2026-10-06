@@ -91,6 +91,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Announcements
+         * @description 027: the latest announcements and how they went out.
+         */
+        get: operations["announcements_api_v1_admin_announcements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/announcements/{announcement_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Announcement
+         * @description 027: take a banner down now.
+         */
+        post: operations["end_announcement_api_v1_admin_announcements__announcement_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/automations": {
         parameters: {
             query?: never;
@@ -3303,6 +3343,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/announcements/banners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Banners
+         * @description 027: announcements shown as a banner right now.
+         */
+        get: operations["banners_api_v1_announcements_banners_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit": {
         parameters: {
             query?: never;
@@ -4104,6 +4164,26 @@ export interface paths {
         get: operations["locked_options_api_v1_dashboard_locked_options_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset
+         * @description 027: back to the default dashboard (the starter layout and the pinned widgets).
+         */
+        post: operations["reset_api_v1_dashboard_reset_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5807,6 +5887,48 @@ export interface paths {
         get: operations["detail_api_v1_media__object_id__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/journey": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Journey
+         * @description 027: where this title's request stands — asked, approved, released, searched, downloading,
+         *     imported, available — with the download managers' and torrent clients' facts.
+         */
+        get: operations["journey_api_v1_media__object_id__journey_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/journey/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Journey Search
+         * @description 027: what the indexers offer for this title now (the download managers' interactive search; kept
+         *     30 minutes — it is slow and loads the indexers).
+         */
+        post: operations["journey_search_api_v1_media__object_id__journey_search_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7783,6 +7905,37 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** AnnouncementOut */
+        AnnouncementOut: {
+            /** Banner */
+            banner: boolean;
+            /** Banner Until */
+            banner_until: string | null;
+            /** Body */
+            body: string;
+            /** Channels */
+            channels: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Ended At */
+            ended_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Link */
+            link: string | null;
+            /** Recipients */
+            recipients: number;
+            /** Title */
+            title: string;
+            /** Tone */
+            tone: string;
+        };
         /** AnomalyDecisionIn */
         AnomalyDecisionIn: {
             /** Reason */
@@ -8024,11 +8177,15 @@ export interface components {
         BroadcastIn: {
             /** Action Url */
             action_url?: string | null;
+            /** Banner Until */
+            banner_until?: string | null;
             /**
              * Body
              * @default
              */
             body: string;
+            /** Channels */
+            channels?: ("notification" | "email" | "banner")[];
             /** Dedup Key */
             dedup_key: string;
             /**
@@ -8045,6 +8202,12 @@ export interface components {
             priority: "low" | "normal" | "high" | "critical";
             /** Title */
             title: string;
+            /**
+             * Tone
+             * @default info
+             * @enum {string}
+             */
+            tone: "info" | "success" | "warning" | "critical";
         };
         /** CalendarItemOut */
         CalendarItemOut: {
@@ -8293,6 +8456,8 @@ export interface components {
         };
         /** ChangeItemOut */
         ChangeItemOut: {
+            /** Detail */
+            detail?: string | null;
             /** Kind */
             kind: string;
             /** Occurred At */
@@ -12825,6 +12990,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiUsageOut"];
+                };
+            };
+        };
+    };
+    announcements_api_v1_admin_announcements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementOut"][];
+                };
+            };
+        };
+    };
+    end_announcement_api_v1_admin_announcements__announcement_id__end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -19555,6 +19771,26 @@ export interface operations {
             };
         };
     };
+    banners_api_v1_announcements_banners_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementOut"][];
+                };
+            };
+        };
+    };
     search_audit_api_v1_audit_get: {
         parameters: {
             query?: {
@@ -21180,6 +21416,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: string[];
                     };
+                };
+            };
+        };
+    };
+    reset_api_v1_dashboard_reset_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -24369,6 +24636,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    journey_api_v1_media__object_id__journey_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    journey_search_api_v1_media__object_id__journey_search_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

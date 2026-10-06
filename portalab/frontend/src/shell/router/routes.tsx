@@ -53,6 +53,7 @@ const TicketPage = lazy(() => import("../../features/support/tickets/TicketPage"
 const SupportQueue = lazy(() => import("../../features/support/staff/Queue"));
 const FeedbackReview = lazy(() => import("../../features/support/feedback/ReviewQueue"));
 const FeedbackPage = lazy(() => import("../../features/support/feedback/FeedbackPage"));
+const DashboardAdmin = lazy(() => import("../../features/dashboard/admin/DashboardAdmin"));
 const SupportDefinitions = lazy(() => import("../../features/support/admin/Definitions"));
 const AiAdmin = lazy(() => import("../../features/ai/admin/AiAdminPage"));
 const Automations = lazy(() => import("../../features/automations/AutomationsPage"));
@@ -325,6 +326,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "themes", element: <ThemeStudio />, handle: h({ crumb: "Theme studio" }) },
             { path: "members", element: <MembersAdmin />, handle: h({ crumb: "Members" }) },
             { path: "announcements", element: <AnnouncementsAdmin />, handle: h({ crumb: "Announcements" }) },
+            { path: "dashboard", element: <DashboardAdmin />, handle: h({ crumb: "Members' dashboard" }) },
             { path: "maintenance", element: <Navigate to="/admin/announcements?tab=maintenance" replace /> },
             { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },

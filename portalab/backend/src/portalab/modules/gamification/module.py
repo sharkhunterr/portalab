@@ -71,6 +71,7 @@ from portalab.modules.gamification.notify import CATEGORIES, Notifier
 from portalab.modules.gamification.observability import log
 from portalab.modules.gamification.privacy.participant import GamificationParticipant
 from portalab.modules.gamification.progression.service import ProgressionService
+from portalab.modules.gamification.progression.summary import ProgressionChanges
 from portalab.modules.gamification.quests.service import Quests
 from portalab.modules.gamification.rules.store import RuleStore
 from portalab.modules.gamification.settings import SETTINGS, EconomyConfig
@@ -218,6 +219,8 @@ class GamificationModule:
             self.widgets.register(PROGRESS_WIDGET, ProgressWidget(self.progression, self.clock), owner=OWNER)
         if self.widgets.get(DAILY_WIDGET.key) is None:
             self.widgets.register(DAILY_WIDGET, DailyObjectivesWidget(self.quests, self.clock), owner=OWNER)
+        if not any(p.kind == "progression" for p in self.widgets.summaries()):  # 027: since last visit
+            self.widgets.register_summary(ProgressionChanges(self.database, self.progression), owner=OWNER)
         register_tools(self.tools, self.progression, self.clock)
         register_actions(self.rewards, self.actions)
         self.observables.declare(

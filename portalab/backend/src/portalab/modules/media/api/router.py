@@ -486,6 +486,20 @@ async def detail(principal: Reader, object_id: UUID, module: Module) -> MediaDet
     return _detail(await module.catalog.get(principal, object_id))
 
 
+@router.get("/media/{object_id}/journey")
+async def journey(principal: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
+    """027: where this title's request stands — asked, approved, released, searched, downloading,
+    imported, available — with the download managers' and torrent clients' facts."""
+    return await module.journey.journey(principal, object_id)
+
+
+@router.post("/media/{object_id}/journey/search")
+async def journey_search(principal: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
+    """027: what the indexers offer for this title now (the download managers' interactive search; kept
+    30 minutes — it is slow and loads the indexers)."""
+    return await module.journey.search(principal, object_id)
+
+
 @router.get("/media/{object_id}/sections/{name}", response_model=MediaSectionOut)
 async def section(principal: Reader, object_id: UUID, name: str, module: Module) -> MediaSectionOut:
     if name not in SECTIONS:

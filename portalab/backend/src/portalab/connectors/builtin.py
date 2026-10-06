@@ -9,6 +9,7 @@ from portalab.connectors.romm import RommConnector
 from portalab.connectors.seerr import SeerrConnector
 from portalab.connectors.tautulli import TautulliConnector
 from portalab.connectors.tmdb import TmdbConnector
+from portalab.connectors.torrents import DelugeConnector, QBittorrentConnector
 
 OWNER = "core:connectors"
 
@@ -24,6 +25,8 @@ def builtin_connectors() -> list[Connector]:
         TautulliConnector(),
         GrimmoryConnector(),
         TmdbConnector(),
+        QBittorrentConnector(),
+        DelugeConnector(),
     ]
 
 

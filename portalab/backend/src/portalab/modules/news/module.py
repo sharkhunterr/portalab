@@ -50,6 +50,7 @@ from portalab.modules.news.newsletters import CATEGORY as NEWSLETTER_CATEGORY
 from portalab.modules.news.newsletters import Newsletters
 from portalab.modules.news.participant import NewsParticipant
 from portalab.modules.news.settings import SETTINGS, NewsConfig
+from portalab.modules.news.summary import NewsChanges
 
 OWNER = "module:news"
 SWEEP_JOB = "news.publish_sweep"
@@ -112,6 +113,8 @@ class NewsModule:
                 self.widgets.register(
                     definition, NewsWidget(self.articles, featured, self.clock), owner=OWNER
                 )
+        if not any(p.kind == "news" for p in self.widgets.summaries()):  # 027: since your last visit
+            self.widgets.register_summary(NewsChanges(self.articles), owner=OWNER)
         if self.categories.get("news.published") is None:
             declare_category("news.published", OWNER, "news:category.published", registry=self.categories)
         if self.categories.get(NEWSLETTER_CATEGORY) is None:  # 027: newsletters, by e-mail only

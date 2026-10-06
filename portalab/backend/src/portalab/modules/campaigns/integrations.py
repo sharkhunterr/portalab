@@ -1,6 +1,7 @@
 """Dashboard widget ``campaigns.active`` (009): the campaigns active now for the viewer."""
 
 from collections.abc import Mapping
+from datetime import timedelta
 from typing import Any
 
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
@@ -38,7 +39,27 @@ class ActiveWidget:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
         active = await self.presentation.active_for_user(user)
         if not active:
-            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+            # 027: nothing running — say what is coming next (a pinned block is never empty)
+            now = utc_now(self.clock)
+            upcoming = await self.presentation.items(now, now + timedelta(days=120), principal, ctx)
+            nxt = next(
+                (i for i in upcoming.items if i.starts_at and i.starts_at > now and i.status != "cancelled"),
+                None,
+            )
+            return WidgetPayload(
+                "available",
+                as_of=now,
+                data={
+                    "items": [],
+                    "next": {
+                        "title": nxt.title,
+                        "starts_at": nxt.starts_at.isoformat() if nxt.starts_at else None,
+                        "route": nxt.url_ref,
+                    }
+                    if nxt
+                    else None,
+                },
+            )
         items = []
         for c in active:
             view = await self.presentation.public_view(c.key)

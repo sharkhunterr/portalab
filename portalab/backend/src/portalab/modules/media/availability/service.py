@@ -32,6 +32,8 @@ class SourceStatus:
     sync_status: str  # 005: idle | running | failed | … (unknown without a directory)
     last_sync_success_at: datetime | None
     last_sync_error: str | None
+    last_sync_attempt_at: datetime | None = None  # 027: an error only counts when no success came after
+    link: str | None = None
 
 
 class AvailabilityService:
@@ -87,6 +89,8 @@ class AvailabilityService:
                     sync_status=getattr(info, "sync_status", "unknown"),
                     last_sync_success_at=getattr(info, "last_sync_success_at", None),
                     last_sync_error=getattr(info, "last_sync_error", None),
+                    last_sync_attempt_at=getattr(info, "last_sync_attempt_at", None),
+                    link=getattr(info, "link", None),
                 )
             )
         as_of = max((s.last_seen_at for s in out), default=utc_now(self.clock))

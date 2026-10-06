@@ -38,6 +38,8 @@ ACTIVITY_HISTORY = "media.activity_history"
 CALENDAR = "media.calendar"
 METADATA = "media.metadata"
 DOWNLOADS = "media.downloads"
+ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one title (Radarr, Sonarr)
+DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -91,6 +93,10 @@ class LibraryPayload(BaseModel):
     available: bool = True
     # 027: release date (a film's, a book's) or air date (an episode's), for « Recent releases »
     released: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    # 027: a book's series and publisher (Grimmory)
+    series: str | None = Field(default=None, max_length=200)
+    series_position: float | None = Field(default=None, ge=0, le=100_000)
+    publisher: str | None = Field(default=None, max_length=200)
 
 
 class RequestPayload(BaseModel):
@@ -248,11 +254,93 @@ class SourceDownload:
     season: int | None = None
     episode: int | None = None
     eta: datetime | None = None
+    # 027: what the request journey shows — the client's name and id (a torrent hash), the release, why
+    # it waits (« manual import needed », a client error…)
+    download_id: str | None = None
+    client: str | None = None
+    release: str | None = None
+    attention: str | None = None  # import_blocked | import_pending | failed | warning
+    messages: tuple[str, ...] = ()
+    size: int | None = None
 
 
 @runtime_checkable
 class DownloadQueue(Protocol):
     async def queue(self) -> Sequence[SourceDownload]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class AcquisitionEvent:
+    """One step a download manager went through for a title: grabbed, failed, imported, deleted…"""
+
+    event: str  # grabbed | failed | imported | deleted | renamed | ignored
+    at: datetime
+    release: str | None = None
+    client: str | None = None
+    detail: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SourceAcquisition:
+    """027: where a download manager stands on one title (Radarr's film, Sonarr's series)."""
+
+    service_name: str
+    tracked: bool
+    monitored: bool = False
+    has_file: bool = False
+    status: str | None = None  # announced | inCinemas | released | continuing | ended | upcoming
+    searchable: bool | None = None  # Radarr's « is available » (minimum availability reached)
+    added_at: datetime | None = None
+    releases: Mapping[str, datetime] = field(default_factory=dict)  # cinema, digital, physical, air
+    files: int = 0
+    expected: int = 0  # episodes (series) or 1 (film)
+    size: int | None = None
+    quality: str | None = None
+    link: str | None = None  # the title's page in the manager
+    history: tuple[AcquisitionEvent, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class FoundRelease:
+    title: str
+    indexer: str | None
+    size: int | None
+    quality: str | None
+    seeders: int | None
+    approved: bool
+    rejections: tuple[str, ...] = ()
+
+
+@runtime_checkable
+class Acquisition(Protocol):
+    async def status(self, kind: str, ids: Mapping[str, str]) -> SourceAcquisition | None:
+        """``None`` when this manager does not follow the title."""
+        ...
+
+    async def search(self, kind: str, ids: Mapping[str, str]) -> Sequence[FoundRelease]:
+        """An interactive search on the indexers — slow: called on demand only."""
+        ...
+
+
+@dataclass(frozen=True, slots=True)
+class TorrentState:
+    """027: a transfer as the torrent client sees it (matched to a download manager's queue by hash)."""
+
+    download_id: str  # lower-case info hash
+    name: str
+    state: str  # downloading | stalled | queued | paused | checking | seeding | error | metadata
+    progress: float
+    download_speed: int = 0  # bytes/s
+    upload_speed: int = 0
+    eta_s: int | None = None
+    seeds: int | None = None
+    peers: int | None = None
+    client: str = ""
+
+
+@runtime_checkable
+class DownloadClient(Protocol):
+    async def torrents(self, hashes: Sequence[str]) -> Sequence[TorrentState]: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -293,6 +381,9 @@ class MetadataRecord:
     backdrop: str | None = None
     people: Sequence[MetadataPerson] = ()
     keywords: Sequence[str] = ()
+    # 027: other artwork, swiped through at the top of the title's page
+    backdrops: Sequence[str] = ()
+    posters: Sequence[str] = ()
 
 
 @runtime_checkable
@@ -344,6 +435,8 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CALENDAR, ReleaseCalendar, "Upcoming releases announced by one service (027)"),
     _spec(METADATA, MetadataProvider, "Metadata provider enriching the catalog (027)"),
     _spec(DOWNLOADS, DownloadQueue, "What a download manager is fetching or importing now (027)"),
+    _spec(ACQUISITION, Acquisition, "Where a download manager stands on one title, and its search (027)"),
+    _spec(DOWNLOAD_CLIENTS, DownloadClient, "Transfers of a torrent client, by hash (027)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

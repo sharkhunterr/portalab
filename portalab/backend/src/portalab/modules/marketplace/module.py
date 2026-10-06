@@ -70,6 +70,7 @@ from portalab.modules.marketplace.refunds.service import Refunds
 from portalab.modules.marketplace.resolution.service import Resolution
 from portalab.modules.marketplace.revocation.service import Revocations
 from portalab.modules.marketplace.settings import SETTINGS, MarketplaceConfig
+from portalab.modules.marketplace.summary import ShopChanges
 from portalab.modules.marketplace.types.registry import register_builtin_types
 
 SYSTEM_PRINCIPAL = Principal(channel="system")
@@ -195,6 +196,8 @@ class MarketplaceModule:
             self.search.register(ProductSearchProvider(self.catalog, self.authorizer), owner=OWNER)
         if self.widgets.get(FEATURED_WIDGET.key) is None:
             self.widgets.register(FEATURED_WIDGET, FeaturedWidget(self.catalog, self.clock), owner=OWNER)
+        if not any(p.kind == "shop" for p in self.widgets.summaries()):  # 027: since your last visit
+            self.widgets.register_summary(ShopChanges(self.database, self.authorizer), owner=OWNER)
         if self.tools.get("marketplace.catalog") is None:
             self.tools.register(catalog_tool(self.catalog, self.clock))
         if self.sections.get("cosmetics") is None:

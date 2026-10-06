@@ -124,6 +124,7 @@ class ChangeItem:
     title_key: str | None = None  # a catalog key (with ``title_args``)
     title_args: Mapping[str, Any] = field(default_factory=dict)
     priority: int = 0  # higher first
+    detail: str | None = None  # 027: a second line (a few titles, a level…), already localized or plain
 
 
 @runtime_checkable

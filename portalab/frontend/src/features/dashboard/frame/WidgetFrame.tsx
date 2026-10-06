@@ -151,8 +151,16 @@ export function WidgetFrame({
           {instance.widget?.icon ? <Icon name={instance.widget.icon} size={18} /> : null}
           {title}
         </h3>
-        {instance.mandatory ? <span className="widget__badge">{t("dashboard:mandatory")}</span> : null}
-        {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
+        {instance.mandatory && instance.locked ? (
+          <span className="widget__badge" title={t("dashboard:pinnedHint")}>
+            <Icon name="lock" size={11} /> {t("dashboard:pinned")}
+          </span>
+        ) : (
+          <>
+            {instance.mandatory ? <span className="widget__badge">{t("dashboard:mandatory")}</span> : null}
+            {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
+          </>
+        )}
         {controls}
       </header>
       <div className="widget-frame__body" ref={body}>

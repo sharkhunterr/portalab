@@ -21,7 +21,31 @@ const VALUE_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", co
 function CampaignsWidget({ payload }: WidgetProps) {
   const t = useT();
   const format = useFormat();
-  const items = ((payload.data ?? {}) as { items?: Item[] }).items ?? [];
+  const data = (payload.data ?? {}) as {
+    items?: Item[];
+    next?: { title: string; starts_at: string | null; route: string } | null;
+  };
+  const items = data.items ?? [];
+  if (!items.length) {
+    // 027: nothing running — what comes next (a pinned block is never empty)
+    return (
+      <div className="campaigns-widget__calm">
+        <span className="campaigns-widget__icon" aria-hidden="true">
+          <Icon name="star" size={16} />
+        </span>
+        {data.next ? (
+          <Link to={data.next.route}>
+            {t("campaigns:widget.next", {
+              name: data.next.title,
+              when: data.next.starts_at ? format.date(data.next.starts_at, "medium") : "",
+            })}
+          </Link>
+        ) : (
+          <span>{t("campaigns:widget.none")}</span>
+        )}
+      </div>
+    );
+  }
   return (
     <ul className="campaigns-widget">
       {items.map((item) => {

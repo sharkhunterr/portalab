@@ -130,6 +130,14 @@ class DashboardModule:
                     "title_key": w.definition.title_key,
                     "owner": w.owner,
                     "required_permission": w.definition.required_permission,
+                    # 027: what the administration page needs to place it
+                    "icon": w.definition.icon,
+                    "size": {
+                        "default": {"w": w.definition.size.default.w, "h": w.definition.size.default.h},
+                        "min": {"w": w.definition.size.min.w, "h": w.definition.size.min.h},
+                        "max": {"w": w.definition.size.max.w, "h": w.definition.size.max.h},
+                    },
+                    "sold": w.definition.product is not None,
                 }
                 for w in self.registry.widgets()
             ],

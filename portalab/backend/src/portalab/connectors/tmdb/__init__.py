@@ -167,7 +167,27 @@ def map_document(document: Mapping[str, Any], kind: str, country: str = "FR") ->
         backdrop=image_ref(document.get("backdrop_path")),
         people=people,
         keywords=_names(keywords.get("keywords") or keywords.get("results"))[:20],
+        backdrops=_artwork(document, "backdrops", 12),
+        posters=_artwork(document, "posters", 8),
     )
+
+
+def _artwork(document: Mapping[str, Any], key: str, limit: int) -> list[str]:
+    """027: the best-rated other images (textless backdrops first), without the main one."""
+    images = (document.get("images") or {}).get(key) or []
+    ranked = sorted(
+        (i for i in images if isinstance(i, Mapping)),
+        key=lambda i: (i.get("iso_639_1") is not None, -(i.get("vote_average") or 0)),
+    )
+    out: list[str] = []
+    main = document.get("backdrop_path" if key == "backdrops" else "poster_path")
+    for image in ranked:
+        ref = image_ref(image.get("file_path"))
+        if ref and ref != main and ref not in out:
+            out.append(ref)
+        if len(out) >= limit:
+            break
+    return out
 
 
 class TmdbConnector(HttpConnector):
@@ -226,15 +246,16 @@ class _Metadata:
     async def _document(self, kind: str, tmdb_id: str, language: str) -> Mapping[str, Any] | None:
         movie = kind == "movie"
         appended = (
-            "credits,keywords,external_ids,release_dates"
+            "credits,keywords,external_ids,release_dates,images"
             if movie
-            else "aggregate_credits,keywords,external_ids,content_ratings"
+            else "aggregate_credits,keywords,external_ids,content_ratings,images"
         )
         document = await self.connector.get_json(
             self.service,
             f"/3/{'movie' if movie else 'tv'}/{int(tmdb_id)}",
             language=language,
             append_to_response=appended,
+            include_image_language=f"{language.split('-')[0]},en,null" if language else "en,null",
         )
         return document if isinstance(document, Mapping) and document.get("id") else None
 

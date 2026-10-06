@@ -67,6 +67,15 @@ BUILTIN = (
     ("system.health", "notifications:category.health", "critical", ("portal",), (), True),
     ("account.security", "notifications:category.security", "high", ("portal", "email"), ("portal",), False),
     ("communications.broadcast", "notifications:category.broadcast", "normal", ("portal",), (), True),
+    # 027: an announcement the administrator chose to e-mail (members may still turn it off)
+    (
+        "communications.announcement_email",
+        "notifications:category.announcementEmail",
+        "normal",
+        ("email",),
+        (),
+        True,
+    ),
 )
 
 

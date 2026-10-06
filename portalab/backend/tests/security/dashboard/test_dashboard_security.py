@@ -49,7 +49,12 @@ async def test_export_erase_and_events(
         p.provider for p in capabilities.system_providers(EXPORT_CAPABILITY) if p.instance_ref == "dashboard"
     ]
     records = await exporter.export(alex)
-    assert {r.data["widget"] for r in records} == {"dashboard.welcome", "health.services_summary"}
+    # the starter widgets this member can use (027 starter)
+    assert {r.data["widget"] for r in records} == {
+        "dashboard.welcome",
+        "health.services_summary",
+        "health.service_links",
+    }
     async with dash.full.database.session() as session:
         rows = (
             await session.execute(

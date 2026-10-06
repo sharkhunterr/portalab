@@ -1,6 +1,8 @@
 """Notifications API (T012, T016, T024, T026, T027): the user's notification center and preferences, the
 category list, and administration (broadcast, e-mail transport, category policy, delivery metadata)."""
 
+import html
+from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
@@ -17,7 +19,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
-from portalab.modules.notifications.models import Delivery, Notification
+from portalab.modules.notifications.models import Announcement, Delivery, Notification
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.notifications.permissions import NOTIFICATIONS_BROADCAST, NOTIFICATIONS_MANAGE, SELF
 from portalab.modules.notifications.preferences.resolver import MandatoryChannel, decide, validate_update
@@ -91,6 +93,10 @@ class NotificationPreferencesIn(BaseModel):
     digest: Literal["off", "daily", "weekly"] | None = None
 
 
+Channel = Literal["notification", "email", "banner"]
+DEFAULT_CHANNELS: tuple[Channel, ...] = ("notification",)
+
+
 class BroadcastIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     title: str = Field(min_length=3, max_length=200)
@@ -99,6 +105,52 @@ class BroadcastIn(BaseModel):
     kind: Literal["notification", "alert"] = "notification"
     dedup_key: str = Field(min_length=3, max_length=120)
     action_url: str | None = Field(default=None, max_length=256, pattern=r"^/[A-Za-z0-9/_:.\-?=&]*$")
+    # 027: where it goes — any of a notification, an e-mail, a banner across the portal (until a date)
+    channels: list[Channel] = Field(
+        default_factory=lambda: list(DEFAULT_CHANNELS), min_length=1, max_length=3
+    )
+    banner_until: datetime | None = None
+    tone: Literal["info", "success", "warning", "critical"] = "info"
+
+
+class AnnouncementOut(BaseModel):
+    id: UUID
+    title: str
+    body: str
+    link: str | None
+    tone: str
+    channels: list[str]
+    banner: bool
+    banner_until: datetime | None
+    recipients: int
+    created_at: datetime
+    ended_at: datetime | None
+
+
+def _announcement_out(row: Announcement) -> AnnouncementOut:
+    return AnnouncementOut(
+        id=row.id,
+        title=row.title,
+        body=row.body,
+        link=row.link,
+        tone=row.tone,
+        channels=list(row.channels or []),
+        banner=row.banner,
+        banner_until=row.banner_until,
+        recipients=row.recipients,
+        created_at=row.created_at,
+        ended_at=row.ended_at,
+    )
+
+
+def _email_of(body: BroadcastIn) -> dict[str, str]:
+    text = body.body + (f"\n\n{body.action_url}" if body.action_url else "")
+    paragraphs = "".join(f"<p>{html.escape(p)}</p>" for p in body.body.split("\n\n") if p.strip())
+    return {
+        "subject": body.title,
+        "text": text,
+        "html": f"<h1>{html.escape(body.title)}</h1>{paragraphs}",
+    }
 
 
 class EmailConfigIn(BaseModel):
@@ -362,28 +414,119 @@ async def _audit(
 async def broadcast(principal: Broadcaster, body: BroadcastIn, module: Module) -> dict[str, Any]:
     if body.kind == "alert" and body.priority not in ("high", "critical"):
         raise ValidationFailed("An alert has priority high or critical.", code="notifications.invalid")
-    ref = await module.send(
-        CommunicationRequest(
-            category="communications.broadcast",
-            template_key="notifications:broadcast.message",
-            audience=AllAuthenticated(),
-            dedup_key=body.dedup_key,
-            kind=body.kind,
-            priority=body.priority,
-            params={"title": body.title, "body": body.body},
-            source="admin_rule",
-            action_url=body.action_url,
-        ),
-        caller=principal,
-    )
+    now = utc_now(module.clock)
+    if "banner" in body.channels and body.banner_until is not None and body.banner_until <= now:
+        raise ValidationFailed("A banner ends in the future.", code="notifications.invalid")
+    channels = list(dict.fromkeys(body.channels))
+    recipients, created, reference = 0, True, None
+    if "notification" in channels:
+        ref = await module.send(
+            CommunicationRequest(
+                category="communications.broadcast",
+                template_key="notifications:broadcast.message",
+                audience=AllAuthenticated(),
+                dedup_key=body.dedup_key,
+                kind=body.kind,
+                priority=body.priority,
+                params={"title": body.title, "body": body.body},
+                source="admin_rule",
+                action_url=body.action_url,
+            ),
+            caller=principal,
+        )
+        recipients, created, reference = ref.recipients, ref.created, ref.id
+    if "email" in channels:
+        mail = await module.send(
+            CommunicationRequest(
+                category="communications.announcement_email",
+                template_key="notifications:broadcast.message",
+                audience=AllAuthenticated(),
+                dedup_key=f"{body.dedup_key}:email",
+                priority=body.priority,
+                params={"title": body.title, "body": body.body},
+                source="admin_rule",
+                action_url=body.action_url,
+                email_body=_email_of(body),
+            ),
+            caller=principal,
+        )
+        recipients = max(recipients, mail.recipients)
+        reference = reference or mail.id
+    async with module.database.unit_of_work() as uow:
+        row = Announcement(
+            title=body.title,
+            body=body.body,
+            link=body.action_url,
+            tone=body.tone,
+            channels=channels,
+            banner="banner" in channels,
+            banner_until=body.banner_until if "banner" in channels else None,
+            recipients=recipients,
+            created_by=principal.acting_for or principal.user_id,
+            created_at=now,
+        )
+        uow.session.add(row)
+        await uow.session.flush()
+        announcement = row.id
     await _audit(
         module,
         principal,
         "notifications.broadcast",
-        str(ref.id),
-        {"recipients": ref.recipients, "created": ref.created},
+        str(reference or announcement),
+        {"recipients": recipients, "created": created, "channels": channels},
     )
-    return {"communication": str(ref.id), "created": ref.created, "recipients": ref.recipients}
+    return {
+        "communication": str(reference) if reference else None,
+        "announcement": str(announcement),
+        "created": created,
+        "recipients": recipients,
+    }
+
+
+@router.get("/admin/announcements", response_model=list[AnnouncementOut])
+async def announcements(_: Broadcaster, module: Module) -> list[AnnouncementOut]:
+    """027: the latest announcements and how they went out."""
+    async with module.database.session() as session:
+        rows = (
+            await session.execute(
+                select(Announcement)
+                .order_by(Announcement.created_at.desc(), Announcement.id.desc())
+                .limit(50)
+            )
+        ).scalars()
+        return [_announcement_out(r) for r in rows]
+
+
+@router.post("/admin/announcements/{announcement_id}/end", response_model=AnnouncementOut)
+async def end_announcement(principal: Broadcaster, announcement_id: UUID, module: Module) -> AnnouncementOut:
+    """027: take a banner down now."""
+    async with module.database.unit_of_work() as uow:
+        row = await uow.session.get(Announcement, announcement_id, with_for_update=True)
+        if row is None:
+            raise NotFound("This announcement does not exist.", code="notifications.not_found")
+        if row.ended_at is None:
+            row.ended_at = utc_now(module.clock)
+        return _announcement_out(row)
+
+
+@router.get("/announcements/banners", response_model=list[AnnouncementOut])
+async def banners(_: User, module: Module) -> list[AnnouncementOut]:
+    """027: announcements shown as a banner right now."""
+    now = utc_now(module.clock)
+    async with module.database.session() as session:
+        rows = (
+            await session.execute(
+                select(Announcement)
+                .where(
+                    Announcement.banner.is_(True),
+                    Announcement.ended_at.is_(None),
+                    (Announcement.banner_until.is_(None)) | (Announcement.banner_until > now),
+                )
+                .order_by(Announcement.created_at.desc())
+                .limit(5)
+            )
+        ).scalars()
+        return [_announcement_out(r) for r in rows]
 
 
 @router.get("/admin/notifications/status")

@@ -9,17 +9,45 @@ from portalab.core.config_declaration import SettingCatalog, declare_setting, de
 OWNER = "module:dashboard"
 POLICIES = "dashboard.widgetPolicies"
 STARTER = "dashboard.starterLayout"
-POLICY_CLASSES: tuple[str, ...] = ("free", "default", "mandatory", "locked", "conditional", "disabled")
+POLICY_CLASSES: tuple[str, ...] = (
+    "free",
+    "default",
+    "mandatory",
+    "locked",
+    "pinned",
+    "conditional",
+    "disabled",
+)
 
+# 027: what matters to everyone sits pinned on the first row — incidents and the current campaign
+DEFAULT_POLICIES: dict[str, dict[str, Any]] = {
+    "support.open_incidents": {"class": "pinned", "x": 0, "y": 0, "w": 6, "h": 2},
+    "campaigns.active": {"class": "pinned", "x": 6, "y": 0, "w": 6, "h": 2},
+}
+
+# 027: a first visit shows the essentials, in rows of 12 columns (widgets a member cannot use yet are
+# skipped): where to start and how I progress, today's objectives, the services and their links, what is
+# new in the library and what I was watching, the news and what is coming up
 DEFAULT_STARTER: list[dict[str, Any]] = [
     {"widget_key": "dashboard.welcome", "w": 6, "h": 2},
-    {"widget_key": "health.services_summary", "w": 6, "h": 2},
+    {"widget_key": "gamification.progress", "w": 3, "h": 2},
+    {"widget_key": "gamification.daily_objectives", "w": 3, "h": 2},
+    {"widget_key": "health.services_summary", "w": 6, "h": 3},
+    {"widget_key": "health.service_links", "w": 6, "h": 3},
+    {"widget_key": "media.continue", "w": 12, "h": 3},
+    {"widget_key": "media.recent", "w": 12, "h": 3},
+    {"widget_key": "news.latest", "w": 6, "h": 3},
+    {"widget_key": "calendar.upcoming", "w": 6, "h": 3},
+    {"widget_key": "media.requests", "w": 6, "h": 3},
+    {"widget_key": "support.my_tickets", "w": 6, "h": 3},
 ]
 
 
 @dataclass(frozen=True, slots=True)
 class DashboardConfig:
-    widget_policies: dict[str, dict[str, Any]] = field(default_factory=dict)
+    widget_policies: dict[str, dict[str, Any]] = field(
+        default_factory=lambda: {k: dict(v) for k, v in DEFAULT_POLICIES.items()}
+    )
     starter_layout: list[dict[str, Any]] = field(default_factory=lambda: [dict(i) for i in DEFAULT_STARTER])
     lookback_days: int = 30
     max_items: int = 20
@@ -49,8 +77,8 @@ _SCHEMAS: dict[str, Any] = {
 }
 
 _DESCRIPTIONS = {
-    "widget_policies": "Per-widget policy: {key: {class: free|default|mandatory|locked|conditional|disabled, "
-    "condition?, lockedConfig?}}.",
+    "widget_policies": "Per-widget policy: {key: {class: free|default|mandatory|locked|pinned|conditional|"
+    "disabled, condition?, lockedConfig?, x?, y?, w?, h? (pinned)}}.",
     "starter_layout": "Starter dashboard applied at onboarding: [{widget_key, w, h, roles?}].",
     "lookback_days": "How far back “Since last login” looks (days).",
     "max_items": "Maximum items shown in “Since last login”.",

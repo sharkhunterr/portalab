@@ -100,6 +100,7 @@ from portalab.modules.media.providers.insight_widgets import TOP as TOP_WIDGET
 from portalab.modules.media.providers.insight_widgets import UPCOMING as UPCOMING_WIDGET
 from portalab.modules.media.providers.ports import HistoryReader, MediaActivityAttributes
 from portalab.modules.media.providers.search import ACTIONS, MediaResolver, MediaSearchProvider
+from portalab.modules.media.providers.summary import MediaChanges
 from portalab.modules.media.providers.widgets import (
     CONTINUE,
     NOW_PLAYING,
@@ -113,6 +114,7 @@ from portalab.modules.media.providers.widgets import (
     REQUESTS as REQUESTS_WIDGET,
 )
 from portalab.modules.media.requests.insights import RequestInsights
+from portalab.modules.media.requests.journey import RequestJourney
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
 from portalab.modules.media.sections.service import Sections
@@ -213,6 +215,9 @@ class MediaModule:
         self.calendar = calendar
         self.request_insights = RequestInsights(
             database, capabilities, self.upcoming, clock=clock, enricher=self.enricher
+        )
+        self.journey = RequestJourney(  # 027: a title's request journey (media page)
+            database, capabilities, self.catalog, self.request_insights, clock=clock
         )
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
 
@@ -335,6 +340,8 @@ class MediaModule:
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:
                 self.widgets.register(definition, widget, owner=OWNER)
+        if not any(p.kind == "media" for p in self.widgets.summaries()):  # 027: since your last visit
+            self.widgets.register_summary(MediaChanges(self.database, self.authorizer), owner=OWNER)
         if self.search.provider("media") is None:
             self.search.register(MediaSearchProvider(self.catalog, self.authorizer), owner=OWNER)
             self.search.register_resolver(MediaResolver(self.catalog_port), owner=OWNER)

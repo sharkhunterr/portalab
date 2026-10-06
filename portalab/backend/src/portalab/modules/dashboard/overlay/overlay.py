@@ -4,7 +4,8 @@ user's choices and relaxing it restores them (CD-016 preserve/restore).
 
 Classes: ``disabled`` (absent), ``mandatory`` (present, cannot be hidden/removed), ``locked`` (cannot be
 moved/resized/reconfigured; ``lockedConfig`` forced), ``default`` (offered once when not yet placed),
-``conditional`` (only when its condition holds), ``free``.
+``conditional`` (only when its condition holds), ``free``; 027 ``pinned`` — present for everyone at the
+administrator's place and size (``x``, ``y``, ``w``, ``h``): neither removed, hidden, moved nor resized.
 """
 
 from collections.abc import Mapping, Sequence
@@ -68,6 +69,27 @@ def policy_class(policies: Mapping[str, Mapping[str, Any]], key: str) -> str:
     return value if isinstance(value, str) else "free"
 
 
+MANDATORY = ("mandatory", "pinned")  # cannot be removed or hidden
+LOCKED = ("locked", "pinned")  # cannot be moved, resized or reconfigured
+
+
+def pin_of(policies: Mapping[str, Mapping[str, Any]], key: str) -> tuple[int, int, int, int] | None:
+    """027: the place of a pinned widget (``x``, ``y`` on the 12-column grid, ``w``, ``h``)."""
+    raw = policies.get(key) or {}
+    if raw.get("class") != "pinned":
+        return None
+    try:
+        w = max(1, min(12, int(raw.get("w", 6))))
+        return (
+            max(0, min(12 - w, int(raw.get("x", 0)))),
+            max(0, int(raw.get("y", 0))),
+            w,
+            max(1, int(raw.get("h", 2))),
+        )
+    except (TypeError, ValueError):
+        return 0, 0, 6, 2
+
+
 def effective(
     rows: Sequence[StoredInstance],
     policies: Mapping[str, Mapping[str, Any]],
@@ -91,10 +113,11 @@ def effective(
             continue  # permission/module/entitlement withdrawn: hidden, the row is kept
         if cls == "conditional" and not conditions.get(key, True):
             continue
-        mandatory, locked = cls == "mandatory", cls == "locked"
+        mandatory, locked = cls in MANDATORY, cls in LOCKED
         status = "active" if mandatory else row.status
         config: Mapping[str, Any] = row.config
         w, h = row.w, row.h
+        x, y = row.x, row.y
         if definition is not None:
             size = definition.size.clamp(w, h)
             w, h = size.w, size.h
@@ -104,6 +127,9 @@ def effective(
                 config = {**config, **locked_config}
             if definition is not None:
                 w, h = definition.size.default.w, definition.size.default.h
+        pin = pin_of(policies, key)
+        if pin is not None:
+            x, y, w, h = pin
         out.instances.append(
             EffectiveInstance(
                 row.id,
@@ -117,33 +143,41 @@ def effective(
                 locked,
                 mandatory,
                 definition is not None,
-                row.x,
-                row.y,
+                x,
+                y,
             )
         )
         placed.add(key)
     next_position = max((i.position for i in out.instances), default=-1) + 1
     for key, definition in sorted(definitions.items()):
         cls = policy_class(policies, key)
-        if key in placed or cls not in ("mandatory", "default", "locked") or not allowed.get(key, False):
+        if (
+            key in placed
+            or cls not in ("mandatory", "pinned", "default", "locked")
+            or not allowed.get(key, False)
+        ):
             continue
         if cls == "default" and starter_applied:
             continue  # defaults are offered with the starter dashboard, then left to the user
         if cls == "locked":
             continue  # locked ≠ forced: only constrains instances the user has
         default_size: Size = definition.size.default
+        pin = pin_of(policies, key)
         out.instances.append(
             EffectiveInstance(
                 None,
                 key,
                 "active",
                 next_position,
-                default_size.w,
-                default_size.h,
+                pin[2] if pin else default_size.w,
+                pin[3] if pin else default_size.h,
                 dict(definition.config_defaults),
                 cls,
-                False,
-                cls == "mandatory",
+                pin is not None,
+                cls in MANDATORY,
+                True,
+                pin[0] if pin else 0,
+                pin[1] if pin else 0,
             )
         )
         next_position += 1
@@ -160,7 +194,10 @@ def _arranged(
     active = [i for i in instances if i.status == "active"]
     stored = [_item(index, i, definitions) for index, i in enumerate(active) if i.id is not None]
     for index, instance in enumerate(active):
-        if instance.id is None:
+        if instance.id is None and instance.policy == "pinned":
+            stored.append(_item(index, instance, definitions))
+    for index, instance in enumerate(active):
+        if instance.id is None and instance.policy != "pinned":
             x, y = first_free(stored, instance.w, instance.h)
             stored.append(_item(index, replace(instance, x=x, y=y), definitions))
     by_key = {str(index): instance for index, instance in enumerate(active)}

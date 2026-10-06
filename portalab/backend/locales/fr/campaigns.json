@@ -78,5 +78,7 @@
   "page.toCommunity": "Retour à la communauté",
   "page.windows": "Prochaines périodes",
   "widget.active.description": "Les événements thématiques du moment",
-  "widget.active.title": "Campagnes en cours"
+  "widget.active.title": "Campagnes en cours",
+  "widget.next": "Aucune campagne en cours · prochaine : {name} le {when}",
+  "widget.none": "Aucune campagne en cours ni prévue."
 }
