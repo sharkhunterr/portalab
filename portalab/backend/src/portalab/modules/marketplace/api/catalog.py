@@ -3,7 +3,7 @@ type, price, conditions **with the viewer's eligibility by name**, refund policy
 ownership), ``marketplace.purchase`` to acquire (``Idempotency-Key``), and the member's own purchases,
 owned products, configuration and refunds."""
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from typing import Annotated, Any
 from uuid import UUID, uuid4
@@ -12,14 +12,17 @@ from fastapi import APIRouter, Header, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
+from portalab.capabilities.campaigns import ShopDiscount
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
+from portalab.core.time import utc_now
 from portalab.modules.marketplace.activation.service import LIVE
 from portalab.modules.marketplace.api.projects import Module
 from portalab.modules.marketplace.integrations import name_of
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 from portalab.modules.marketplace.module import MarketplaceModule
 from portalab.modules.marketplace.permissions import PURCHASE, READ
+from portalab.modules.marketplace.pricing import active_discounts, price_now
 from portalab.modules.marketplace.products.service import ProductNotFound
 
 router = APIRouter(prefix="/api/v1", tags=["marketplace"])
@@ -39,6 +42,14 @@ class MarketplaceCheckOut(BaseModel):
     value: Any
     met: bool
     reason: str
+
+
+class MarketplaceDiscountOut(BaseModel):
+    percent: int
+    campaign: str
+    name: str
+    names: dict[str, str] = Field(default_factory=dict)
+    ends_at: datetime | None = None
 
 
 class MarketplaceProductOut(BaseModel):
@@ -69,6 +80,9 @@ class MarketplaceProductOut(BaseModel):
     limit_count: int | None = None
     limit_days: int | None = None
     min_level: int | None = None
+    # 027: the price now and the campaign reduction behind it (None: the catalog price applies)
+    price_now: int | None = None
+    discount: MarketplaceDiscountOut | None = None
 
 
 # 027: the payload fields a product's preview may show (never configuration or extension details)
@@ -132,8 +146,11 @@ def product_out(
     language: str = "en",
     categories: Mapping[UUID, str] | None = None,
     stock: Mapping[UUID, tuple[int | None, int | None]] | None = None,
+    discounts: Sequence[ShopDiscount] = (),
 ) -> MarketplaceProductOut:
     supply, remaining = (stock or {}).get(product.id, (None, None))
+    category = (categories or {}).get(product.category_id) if product.category_id else None
+    now, discount = price_now(discounts, product.key, category, version.price_coins)
     levels = [int(c["level"]) for c in version.conditions if c.get("kind") == "min_level"]
     return MarketplaceProductOut(
         key=product.key,
@@ -153,7 +170,7 @@ def product_out(
         featured=product.featured,
         poster_effect=product.poster_effect,
         icon=product.icon,
-        category=(categories or {}).get(product.category_id) if product.category_id else None,
+        category=category,
         theme=str(version.payload.get("theme")) if product.type == "theme" and version.payload else None,
         preview={
             field: (version.payload or {})[field]
@@ -165,6 +182,16 @@ def product_out(
         limit_count=product.limit_count,
         limit_days=product.limit_days,
         min_level=max(levels) if levels else None,
+        price_now=now,
+        discount=MarketplaceDiscountOut(
+            percent=discount.percent,
+            campaign=discount.campaign,
+            name=discount.names.get(language) or discount.name,
+            names=dict(discount.names),
+            ends_at=discount.ends_at,
+        )
+        if discount
+        else None,
     )
 
 
@@ -228,7 +255,10 @@ async def products(
     rows = await module.catalog.listing(category=category, product_type=type, q=q, owned_ids=mine)
     keys = await category_keys(module)
     stock = await module.availability.stock(p for p, _ in rows)
-    return [product_out(p, v, p.id in mine, categories=keys, stock=stock) for p, v in rows]
+    discounts = await active_discounts(module.capabilities, utc_now(module.clock))
+    return [
+        product_out(p, v, p.id in mine, categories=keys, stock=stock, discounts=discounts) for p, v in rows
+    ]
 
 
 @router.get("/marketplace/products/{key}", response_model=MarketplaceProductOut)
@@ -239,10 +269,16 @@ async def product_detail(principal: Reader, key: str, module: Module) -> Marketp
     if product.state in ("draft",) or (product.state == "archived" and product.id not in mine):
         raise ProductNotFound("This product does not exist.")
     stock = await module.availability.stock([product])
+    discounts = await active_discounts(module.capabilities, utc_now(module.clock))
     out = product_out(
-        product, version, product.id in mine, categories=await category_keys(module), stock=stock
+        product,
+        version,
+        product.id in mine,
+        categories=await category_keys(module),
+        stock=stock,
+        discounts=discounts,
     )
-    checks = await module.eligibility.checks(user, list(version.conditions), version.price_coins)
+    checks = await module.eligibility.checks(user, list(version.conditions), out.price_now)
     if product.id not in mine or product.repeatable:
         checks += await module.availability.checks(user, product)
     out.eligibility = [

@@ -48,6 +48,12 @@ class SupportFormIn(BaseModel):
     label: str = Field(min_length=1, max_length=120)
     fields: list[dict[str, Any]] = Field(default_factory=list, max_length=40)
     enabled: bool = True
+    # 027: a request asked of members between two dates (one answer each)
+    description: str = Field(default="", max_length=2000)
+    icon: str | None = Field(default=None, max_length=40)
+    requested: bool = False
+    opens_at: datetime | None = None
+    closes_at: datetime | None = None
 
 
 class SupportFormOut(SupportFormIn):
@@ -106,19 +112,38 @@ async def put_workflow(
 
 @router.get("/admin/support/forms", response_model=list[SupportFormOut])
 async def list_forms(principal: Configurer, module: Module) -> list[SupportFormOut]:
-    return [
-        SupportFormOut(
-            key=f.key, kind=f.kind, label=f.label, fields=f.fields, enabled=f.enabled, version=f.version
-        )
-        for f in await module.definitions.forms(enabled_only=False)
-    ]
+    return [_form_out(f) for f in await module.definitions.forms(enabled_only=False)]
 
 
 @router.put("/admin/support/forms/{key}", response_model=SupportFormOut)
 async def put_form(principal: Configurer, key: str, body: SupportFormIn, module: Module) -> SupportFormOut:
     f = await module.definitions.save_form(
-        principal, key[:60], body.kind, body.label, body.fields, body.enabled
+        principal,
+        key[:60],
+        body.kind,
+        body.label,
+        body.fields,
+        body.enabled,
+        description=body.description,
+        icon=body.icon,
+        requested=body.requested,
+        opens_at=body.opens_at,
+        closes_at=body.closes_at,
     )
+    return _form_out(f)
+
+
+def _form_out(f: Any) -> SupportFormOut:
     return SupportFormOut(
-        key=f.key, kind=f.kind, label=f.label, fields=f.fields, enabled=f.enabled, version=f.version
+        key=f.key,
+        kind=f.kind,
+        label=f.label,
+        fields=f.fields,
+        enabled=f.enabled,
+        version=f.version,
+        description=f.description or "",
+        icon=f.icon,
+        requested=f.requested,
+        opens_at=f.opens_at,
+        closes_at=f.closes_at,
     )

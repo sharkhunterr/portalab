@@ -7,7 +7,7 @@ from dataclasses import replace
 from datetime import datetime, timedelta
 from typing import Any
 
-from portalab.capabilities.campaigns import CONTENT, READER
+from portalab.capabilities.campaigns import CONTENT, DISCOUNTS, READER
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import CalendarSourceRegistry, default_calendar_sources
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
@@ -33,6 +33,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.campaigns import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.campaigns.content.provider import CampaignContent
 from portalab.modules.campaigns.definitions.service import Definitions
+from portalab.modules.campaigns.discounts.provider import CampaignDiscounts
 from portalab.modules.campaigns.events import register_event_types
 from portalab.modules.campaigns.integrations import ACTIVE_WIDGET, ActiveWidget
 from portalab.modules.campaigns.intervals.manager import Intervals
@@ -90,6 +91,7 @@ class CampaignsModule:
             self.resolver, Matcher(capabilities, database, record_failures=False, clock=clock)
         )
         self.content = CampaignContent(self.resolver)
+        self.discounts = CampaignDiscounts(self.resolver)
         self.presentation = Presentation(
             database, self.resolver, self.matcher, capabilities, authorizer, clock=clock
         )
@@ -113,6 +115,7 @@ class CampaignsModule:
             (DEFINITION_SOURCES, self.content),
             (READER, self.presentation),
             (CONTENT, self.content),
+            (DISCOUNTS, self.discounts),
         ):
             registered = self.capabilities.system_providers(name)
             mine = any(p.instance_ref == INSTANCE for p in registered)

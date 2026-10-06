@@ -120,6 +120,7 @@ class SupportModule:
         self.attachments = AttachmentService(self.tickets, blobs, capabilities, lambda: self.config)
         self.precheck = Precheck(self.incidents, capabilities, authorizer, lambda: self.config)
         self.feedback = FeedbackService(database, events, authorizer, self.definitions, clock=clock)
+        self.feedback.notifier = self.ticket_notifier
         self.conversion = ConversionService(self.tickets, events, capabilities, authorizer, clock=clock)
         self.diagnosis = DiagnosisOrchestrator(
             database, capabilities, self.precheck, lambda: self.config, clock=clock

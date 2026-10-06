@@ -56,7 +56,7 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
     assert after_first["users"] == 1 + len(MEMBERS)
     assert after_first["products"] == len(PRODUCTS) and after_first["ownerships"] >= 3
     assert after_first["projects"] == 2 and after_first["fundings"] >= 5
-    assert after_first["achievements"] >= 10 and after_first["campaigns"] == 1
+    assert after_first["achievements"] >= 10 and after_first["campaigns"] == 4  # demo + 3 seasonal (027)
     assert after_first["articles"] == 3 and after_first["pages"] >= 3
     assert after_first["tickets"] == 2 and after_first["feedback"] == 2
 

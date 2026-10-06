@@ -989,3 +989,40 @@ input[type="file"] {
   inline-size: fit-content;
   align-self: flex-start;
 }
+
+/* ---------------------------------------------------------------- checkboxes and radios
+   A compact box (1.25rem); the whole row — box and label — is the target, at least --target-min tall
+   (WCAG 2.5.8), so the box itself never grows to the touch size. */
+.ds-field input[type="checkbox"],
+.ds-field input[type="radio"],
+.ds-stack--row input[type="checkbox"],
+.ds-check input {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  flex: none;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+.ds-field.ds-check {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  padding-block: 0.125rem;
+  gap: var(--space-2) var(--space-3);
+  min-height: var(--target-min);
+}
+.ds-check__text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+.ds-check__text label {
+  cursor: pointer;
+  line-height: 1.25rem;
+}

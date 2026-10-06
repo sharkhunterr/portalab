@@ -80,3 +80,32 @@ async def test_atomic_idempotent_acquisition(mk: MkHarness, client: AsyncClient)
     assert {o["product_key"] for o in owned} == {"owl", "boost_pack"}
     assert (await client.post(path)).json()["code"] == "marketplace.not_available"
     assert len(await mk.events("marketplace.purchase")) == 4
+
+
+class _Discounts:
+    def __init__(self, percent: int) -> None:
+        self.percent = percent
+
+    async def active_discounts(self, at: object) -> list[object]:
+        from portalab.capabilities.campaigns import ShopDiscount
+
+        return [
+            ShopDiscount("halloween", "Halloween", "campaign:halloween:1:x", self.percent, products=("owl",))
+        ]
+
+
+async def test_campaign_discount_is_charged(mk: MkHarness, client: AsyncClient) -> None:
+    """027: an active campaign's reduction is shown on the product and charged at purchase."""
+    from portalab.capabilities.campaigns import DISCOUNTS
+
+    mk.ev.full.identity.capabilities.provide(DISCOUNTS, _Discounts(20), instance_ref="test", owner="test")
+    await published(mk, "owl", "badge", price_coins=45, payload={"label": "Owl"})
+    await published(mk, "plain", "badge", price_coins=10, payload={"label": "Plain"})
+    await mk.coins("ursula", 100)
+    await login(client, "ursula")
+    shown = {p["key"]: p for p in (await client.get("/api/v1/marketplace/products")).json()}
+    assert shown["owl"]["price_now"] == 36 and shown["owl"]["discount"]["percent"] == 20
+    assert shown["plain"]["price_now"] == 10 and shown["plain"]["discount"] is None
+    bought = await client.post("/api/v1/marketplace/products/owl/acquire", headers={"Idempotency-Key": "d1"})
+    assert bought.status_code == 201 and bought.json()["price_paid"] == 36
+    assert await mk.balance("ursula") == 64

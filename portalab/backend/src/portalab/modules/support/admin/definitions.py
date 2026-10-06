@@ -5,6 +5,7 @@ admin change is validated (closed schemas) and audited. The baseline (workflow `
 seeded idempotently at start-up."""
 
 from collections.abc import Mapping, Sequence
+from datetime import datetime
 from typing import Any
 
 from sqlalchemy import func, select
@@ -207,8 +208,16 @@ class Definitions:
         label: str,
         fields: Sequence[Mapping[str, Any]],
         enabled: bool,
+        *,
+        description: str = "",
+        icon: str | None = None,
+        requested: bool = False,
+        opens_at: datetime | None = None,
+        closes_at: datetime | None = None,
     ) -> FeedbackForm:
         defs = parse_fields(fields)
+        if opens_at and closes_at and closes_at <= opens_at:
+            raise ValidationFailed("A request closes after it opens.", code="feedback.request_window")
         async with self.database.unit_of_work() as uow:
             row = await uow.session.get(FeedbackForm, key, with_for_update=True)
             payload = [d.model_dump() for d in defs]
@@ -226,5 +235,7 @@ class Definitions:
             else:
                 row.kind, row.label, row.fields, row.enabled = kind, label, payload, enabled
                 row.version, row.updated_at = row.version + 1, utc_now(self.clock)
+            row.description, row.icon, row.requested = description, icon, requested
+            row.opens_at, row.closes_at = opens_at, closes_at
             await self._audit(uow.session, actor, "support.form_saved", key, {"version": row.version})
             return row

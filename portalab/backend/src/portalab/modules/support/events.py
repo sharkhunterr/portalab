@@ -59,7 +59,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     automatable=True,
                 )
             )
-    for name in ("feedback.submitted", "feedback.converted"):
+    for name in ("feedback.submitted", "feedback.converted", "feedback.replied"):
         if registry.get(name) is None:
             registry.register(
                 EventType(
@@ -71,6 +71,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     retention_class="business",
                     visibility_class="restricted",
                     aggregatable=frozenset({"kind", "target"}),
+                    rewardable=frozenset({"kind", "target"}),
                     automatable=True,
                 )
             )

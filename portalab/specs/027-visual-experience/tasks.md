@@ -275,6 +275,12 @@ lossless migration.
 - [X] T133 [US10] System page redesigned (settings explorer by area with search, typed controls, reset) with SMTP/e-mail settings and portal URL
 - [X] T134 [US4] Phone/tablet dashboard customization uses the grid editor on every device (drag, resize, own layout on save); only settings and remove remain on widgets
 - [X] T135 [US9] Gamification administration redesigned: simple/detailed modes; overview curves (daily gains, leaders' running totals, sources); progression tuning by dragging the projected curve over members' positions (one overall pace factor, `economy.pace`); XP per action as forms (fixed + per minute, conditions, limits, presets); play streak tiers (`economy.streak`, gamification_0004); level curve and level tiers with rewards (Coins, Contribution, product offered via `marketplace.gifts`) beside shop unlocks; achievements and quests as forms
+- [X] T136 [US10] Compact checkboxes everywhere (1.25rem box, the row is the touch target); CheckboxField hint under its label
+- [X] T137 [US9] Campaign shop discounts (`campaigns.discounts`, best reduction per product or category, charged at purchase, struck price and campaign badge in the shop); campaign console as a form (bonuses by action, media kind, genre, title; discounts); episodes inherit their series' genres for campaign conditions
+- [X] T138 [US9] Monthly quest period and optional activity window on every quest kind; weekly/monthly objective labels
+- [X] T139 [US8] Feedback: form builder for feedback forms and ticket types (rating, choices…), feedback requests asked of members between two dates (one answer each, rewardable `target = request`), member page (requests, opinion kinds, my feedback with replies), staff review redesigned (status tabs, readable answers, reply with notification, request results); migration support_0003
+- [X] T140 [US9] Demo/LAN economy: XP per play (count + minutes), shop purchase, ticket, feedback, request; play streak tiers; level rewards; Halloween/Christmas/cinema campaigns with genre bonuses and discounts; a year of daily/weekly/monthly/seasonal quests; a feedback request
+- [X] T141 [US9] Progression page: where my XP comes from (by source with streak/campaign/pace bonuses split out, per day), current streak
 
 ## Dependencies & Execution Order
 

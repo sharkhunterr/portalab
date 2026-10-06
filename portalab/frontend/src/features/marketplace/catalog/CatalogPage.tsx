@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
@@ -9,6 +8,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Product, useDescribe, useProducts } from "../api";
 import { LazyArt } from "./LazyArt";
+import { Price, priceOf } from "./Price";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
 import "../marketplace.css";
@@ -75,7 +75,7 @@ function shelfOrder(a: Product, b: Product): number {
   return (
     soldOut(a) - soldOut(b) ||
     Number(b.featured) - Number(a.featured) ||
-    (a.price_coins ?? 0) - (b.price_coins ?? 0) ||
+    (priceOf(a) ?? 0) - (priceOf(b) ?? 0) ||
     (RANK[a.rarity ?? "common"] ?? 3) - (RANK[b.rarity ?? "common"] ?? 3) ||
     a.name.localeCompare(b.name)
   );
@@ -241,7 +241,7 @@ export default function CatalogPage() {
                     <Icon name="check" size={16} /> {t("marketplace:product.owned")}
                   </span>
                 ) : product.price_coins ? (
-                  <CoinBadge amount={product.price_coins} label={t("gamification:value.coins")} />
+                  <Price product={product} />
                 ) : null}
               </div>
             </li>

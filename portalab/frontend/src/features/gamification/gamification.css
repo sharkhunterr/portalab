@@ -948,3 +948,103 @@
     flex-wrap: wrap;
   }
 }
+
+/* --- where my gains come from (027) ------------------------------------------------------------------- */
+.gain-sources {
+  display: grid;
+  gap: var(--space-4);
+}
+.gain-sources__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+.gain-sources__head h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.gain-sources__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.gain-sources__streak {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+.gain-sources__streak[data-active] {
+  background: color-mix(in srgb, var(--rarity-legendary) 16%, transparent);
+}
+.gain-sources__streak svg {
+  color: var(--rarity-legendary);
+}
+.gain-sources__charts {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+}
+.gain-sources__ring,
+.gain-sources__bars {
+  margin: 0;
+  min-inline-size: 0;
+}
+.gain-sources__bars figcaption {
+  font-weight: var(--font-weight-semibold);
+  margin-block-end: var(--space-2);
+}
+.gain-sources__ring-plot {
+  position: relative;
+}
+.gain-sources__total {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.gain-sources__total strong {
+  font-size: var(--font-size-2xl);
+}
+.gain-sources__total span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.gain-sources__legend {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+.gain-sources__legend li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.gain-sources__dot {
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--color-surface);
+}
+@media (max-width: 52rem) {
+  .gain-sources__charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

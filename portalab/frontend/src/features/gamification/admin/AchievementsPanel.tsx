@@ -11,6 +11,7 @@ import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
+import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import type { Value } from "../api";
@@ -412,7 +413,8 @@ function QuestForm({
       onSubmit={(event: FormEvent) => {
         event.preventDefault();
         setError(null);
-        const definition = { ...def, window: def.kind === "challenge" ? def.window : null };
+        const span = def.window?.starts_at && def.window.ends_at ? def.window : null;
+        const definition = { ...def, window: span };
         save.mutate({ key, definition }, { onSuccess: onDone, onError: fail });
       }}
     >
@@ -446,7 +448,7 @@ function QuestForm({
           value={def.period ?? "none"}
           onChange={(e) => patch({ period: e.target.value as QuestDefinition["period"] })}
         >
-          {(["none", "day", "week"] as const).map((p) => (
+          {(["none", "day", "week", "month"] as const).map((p) => (
             <option key={p} value={p}>
               {t(`gamification:admin.quest.periods.${p}`)}
             </option>
@@ -479,38 +481,37 @@ function QuestForm({
         value={def.description ?? ""}
         onChange={(e) => patch({ description: e.target.value })}
       />
-      {def.kind === "challenge" ? (
-        <FormGrid>
-          <TextField
-            label={t("gamification:admin.quest.starts")}
-            type="datetime-local"
-            required
-            value={local(def.window?.starts_at)}
-            onChange={(e) =>
-              patch({
-                window: {
-                  starts_at: new Date(e.target.value).toISOString(),
-                  ends_at: def.window?.ends_at ?? "",
-                },
-              })
-            }
-          />
-          <TextField
-            label={t("gamification:admin.quest.ends")}
-            type="datetime-local"
-            required
-            value={local(def.window?.ends_at)}
-            onChange={(e) =>
-              patch({
-                window: {
-                  starts_at: def.window?.starts_at ?? "",
-                  ends_at: new Date(e.target.value).toISOString(),
-                },
-              })
-            }
-          />
-        </FormGrid>
-      ) : null}
+      <FormGrid>
+        <TextField
+          label={t("gamification:admin.quest.starts")}
+          hint={def.kind === "challenge" ? undefined : t("gamification:admin.quest.windowHint")}
+          type="datetime-local"
+          required={def.kind === "challenge"}
+          value={local(def.window?.starts_at)}
+          onChange={(e) =>
+            patch({
+              window: {
+                starts_at: new Date(e.target.value).toISOString(),
+                ends_at: def.window?.ends_at ?? "",
+              },
+            })
+          }
+        />
+        <TextField
+          label={t("gamification:admin.quest.ends")}
+          type="datetime-local"
+          required={def.kind === "challenge"}
+          value={local(def.window?.ends_at)}
+          onChange={(e) =>
+            patch({
+              window: {
+                starts_at: def.window?.starts_at ?? "",
+                ends_at: new Date(e.target.value).toISOString(),
+              },
+            })
+          }
+        />
+      </FormGrid>
       <fieldset className="gam-fieldset">
         <legend>{t("gamification:admin.quest.steps")}</legend>
         {def.steps.map((step, index) => (
@@ -679,6 +680,7 @@ export function AchievementsPanel() {
 /** Quests, daily objectives and time-boxed challenges (027): steps in words, rewards, period. */
 export function QuestsPanel() {
   const t = useT();
+  const format = useFormat();
   const { query, retire } = useQuestAdmin();
   const types = useEventTypes();
   const [open, setOpen] = useState<string | null>(null);
@@ -721,6 +723,12 @@ export function QuestsPanel() {
               <span className="admin-muted">
                 {t(`gamification:admin.quest.kinds.${item.definition.kind}`)} ·{" "}
                 {t(`gamification:admin.quest.periods.${item.definition.period ?? "none"}`)}
+                {item.definition.window
+                  ? ` · ${t("gamification:admin.quest.window", {
+                      from: format.date(item.definition.window.starts_at, "medium"),
+                      to: format.date(item.definition.window.ends_at, "medium"),
+                    })}`
+                  : ""}
               </span>
               <span className="gam-chips">
                 {item.definition.steps.map((s, i) => (

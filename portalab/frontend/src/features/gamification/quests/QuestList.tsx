@@ -9,6 +9,7 @@ export interface QuestItem {
   kind: "quest" | "daily" | "challenge" | string;
   label: string;
   description?: string | null;
+  period?: string | null;
   ends_at?: string | null;
   completed: boolean;
   steps: Array<{ current: number; target: number }>;
@@ -29,8 +30,14 @@ export function QuestList({ quests }: { quests: QuestItem[] }) {
         <li key={quest.key} className="ds-card ds-stack" data-state={quest.completed ? "completed" : "open"}>
           <h3>{quest.label}</h3>
           <p className="ds-badge">
-            {t(`gamification:quests.kind.${quest.kind}`)} ·{" "}
-            {t(quest.completed ? "gamification:quests.completed" : "gamification:quests.open")}
+            {t(
+              `gamification:quests.kind.${
+                quest.kind === "daily" && quest.period && quest.period !== "day"
+                  ? `daily_${quest.period}`
+                  : quest.kind
+              }`,
+            )}{" "}
+            · {t(quest.completed ? "gamification:quests.completed" : "gamification:quests.open")}
           </p>
           {quest.description ? <p>{quest.description}</p> : null}
           {quest.steps.map((step, index) => (

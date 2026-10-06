@@ -1,9 +1,9 @@
 import { Link } from "react-router";
-import { CoinBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Product } from "../api";
 import { LazyArt } from "./LazyArt";
+import { Price } from "./Price";
 
 /**
  * A product in the shop (spec 015 T021, 027 US8): a collectible card — rarity frame with a pre-rendering of
@@ -71,7 +71,7 @@ export function ProductCard({
               <Icon name="check" size={16} /> {t("marketplace:product.owned")}
             </span>
           ) : product.price_coins ? (
-            <CoinBadge amount={product.price_coins} label={t("gamification:value.coins")} />
+            <Price product={product} compact />
           ) : (
             <span className="ds-badge">{t("marketplace:purchase.free")}</span>
           )}

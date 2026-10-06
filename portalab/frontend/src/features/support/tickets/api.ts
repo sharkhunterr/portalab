@@ -13,7 +13,7 @@ export type FeedbackDetail = components["schemas"]["FeedbackDetail"];
 export interface FieldDef {
   key: string;
   label: string;
-  type: "text" | "long_text" | "select" | "multi_select" | "number" | "boolean" | "date" | "user";
+  type: "text" | "long_text" | "select" | "multi_select" | "number" | "boolean" | "date" | "user" | "rating";
   required?: boolean;
   options?: string[];
   visibility?: string;

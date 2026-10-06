@@ -103,3 +103,33 @@ async def test_tuning_api(gm: GamHarness, client: AsyncClient) -> None:
 
     await login(client, "ursula")
     assert (await client.get("/api/v1/admin/gamification/streak")).status_code == 403
+
+
+def test_split_bonus() -> None:
+    from portalab.modules.gamification.progression.sources import split
+
+    modifiers = {
+        "applied": [
+            {"source_ref": "rule", "factor": 1.0},
+            {"source_ref": "streak:5d", "factor": 2.0},
+            {"source_ref": "campaign:halloween:1:horror_xp", "factor": 2.0},
+        ]
+    }
+    # base 20, x4 → 80: the action keeps 20, streak and campaign share the 60 extra equally
+    assert split("reward_rule", 80, 20, modifiers, "media") == {"media": 20, "streak": 30, "campaigns": 30}
+    assert split("quest", 50, 50, {}, "quests") == {"quests": 50}
+
+
+async def test_my_sources(gm: GamHarness, client: AsyncClient) -> None:
+    gm.module.config = replace(gm.module.config, streak=STREAK)
+    await gm.rule("played", RULE)
+    user = gm.people["ursula"]
+    start = gm.clock.now() + timedelta(hours=1)
+    for day in (0, 1):
+        await gm.emit(user, at=start + timedelta(days=day))
+    gm.clock.set(start + timedelta(days=1, hours=1))
+    await login(client, "ursula")
+    body = (await client.get("/api/v1/me/progression/sources?days=30")).json()
+    by_source = {s["source"]: s["amount"] for s in body["sources"]}
+    assert body["total"] == 50 and by_source == {"media": 40, "streak": 10}  # media.played is a media action
+    assert [d["amounts"] for d in body["days"]][-1] == {"media": 20, "streak": 10}

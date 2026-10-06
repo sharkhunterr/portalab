@@ -83,11 +83,18 @@ export function CheckboxField({
 }: FieldShellProps & InputHTMLAttributes<HTMLInputElement>) {
   const generated = useId();
   const inputId = id ?? generated;
+  const hintId = hint ? `${inputId}-hint` : undefined;
   return (
-    <div className="ds-field ds-stack--row">
-      <input id={inputId} type="checkbox" {...props} />
-      <label htmlFor={inputId}>{label}</label>
-      {hint ? <span className="ds-field__hint">{hint}</span> : null}
+    <div className="ds-field ds-stack--row ds-check">
+      <input id={inputId} type="checkbox" aria-describedby={hintId} {...props} />
+      <span className="ds-check__text">
+        <label htmlFor={inputId}>{label}</label>
+        {hint ? (
+          <span id={hintId} className="ds-field__hint">
+            {hint}
+          </span>
+        ) : null}
+      </span>
     </div>
   );
 }

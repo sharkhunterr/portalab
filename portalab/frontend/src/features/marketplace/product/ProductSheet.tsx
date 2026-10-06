@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { type Product, useAcquire, useDescribe, useProducts } from "../api";
+import { Price, priceOf } from "../catalog/Price";
 import { ProductArt, TYPE_BADGE_ICON } from "../catalog/ProductArt";
 import { ConditionsChecklist } from "./ConditionsChecklist";
 
@@ -125,11 +126,7 @@ export function ProductSheet({ product }: { product: Product }) {
         </div>
         <dl className="product-sheet__facts">
           <Fact icon="coins" label={t("marketplace:sheet.price")}>
-            {product.price_coins ? (
-              <CoinBadge amount={product.price_coins} label={t("gamification:value.coins")} />
-            ) : (
-              t("marketplace:purchase.free")
-            )}
+            {product.price_coins ? <Price product={product} /> : t("marketplace:purchase.free")}
           </Fact>
           <Fact icon="star" label={t("marketplace:sheet.copies")}>
             {supply === null || remaining === null ? (
@@ -288,7 +285,7 @@ export function PurchaseBar({ product }: { product: Product }) {
       <Button onClick={() => setConfirming(true)}>
         <Icon name="shop" size={16} />
         {product.price_coins
-          ? t("marketplace:buy.cta", { price: product.price_coins })
+          ? t("marketplace:buy.cta", { price: priceOf(product) ?? 0 })
           : t("marketplace:buy.free")}
       </Button>
     );
@@ -301,7 +298,7 @@ export function PurchaseBar({ product }: { product: Product }) {
         ) : (
           <>
             {product.price_coins
-              ? t("marketplace:buy.confirmText", { price: product.price_coins })
+              ? t("marketplace:buy.confirmText", { price: priceOf(product) ?? 0 })
               : t("marketplace:purchase.free")}{" "}
             <span className="admin-muted">
               {policy.refundable

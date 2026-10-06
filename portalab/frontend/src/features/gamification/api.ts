@@ -226,6 +226,7 @@ interface QuestOut {
   kind: string;
   label: string;
   description?: string;
+  period?: string | null;
   ends_at?: string | null;
   completed_at?: string | null;
   steps?: Array<{ current: number; target: number }>;
@@ -238,6 +239,7 @@ export function toQuestItem(quest: QuestOut): QuestItem {
     kind: quest.kind,
     label: quest.label,
     description: quest.description ?? null,
+    period: quest.period ?? null,
     ends_at: quest.ends_at ?? null,
     completed: Boolean(quest.completed_at),
     steps: (quest.steps ?? []).map((s) => ({ current: s.current, target: s.target })),

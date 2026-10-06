@@ -231,3 +231,70 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+/* --- console (027): cards and the form editor ------------------------------------------------------ */
+.campaign-cards {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+}
+
+.campaign-when {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0 0 var(--space-2);
+}
+
+.campaign-editor {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.campaign-bonus {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+
+.campaign-bonus__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.campaign-bonus__head > .ds-field {
+  flex: 1 1 8rem;
+}
+
+.campaign-bonus__group {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.campaign-bonus__group legend {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  margin-block-end: var(--space-1);
+}
+
+.campaign-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
+.campaign-checks--products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  max-block-size: 16rem;
+  overflow: auto;
+  margin-block-start: var(--space-2);
+}

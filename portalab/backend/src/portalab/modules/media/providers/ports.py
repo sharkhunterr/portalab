@@ -75,12 +75,21 @@ class MediaActivityAttributes:
             return None
         async with self.database.session() as session:
             row = await session.get(MediaObject, object_id)
-        if row is None:
-            return None
-        effective = row.effective or {}
+            if row is None:
+                return None
+            effective = row.effective or {}
+            genres = effective.get("genres") or ()
+            parent_id, hops = row.parent_id, 0
+            # 027: an episode or a season carries no genres of its own — its series does
+            while not genres and parent_id is not None and hops < 3:
+                parent = await session.get(MediaObject, parent_id)
+                if parent is None:
+                    break
+                genres = (parent.effective or {}).get("genres") or ()
+                parent_id, hops = parent.parent_id, hops + 1
         return ActivityAttributes(
             media_kind=row.kind,
-            genres=tuple(sorted({str(g).strip().casefold() for g in effective.get("genres") or ()})),
+            genres=tuple(sorted({str(g).strip().casefold() for g in genres})),
             title=row.title,
             original_title=effective.get("original_title"),
         )

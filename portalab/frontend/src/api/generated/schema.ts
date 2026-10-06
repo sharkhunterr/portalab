@@ -4816,6 +4816,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Feedback
+         * @description 027: what I sent, its status and the staff reply.
+         */
+        get: operations["my_feedback_api_v1_me_feedback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/feedback/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Requests
+         * @description 027: the requests open now and whether I already answered each.
+         */
+        get: operations["my_requests_api_v1_me_feedback_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/fundings": {
         parameters: {
             query?: never;
@@ -5444,6 +5484,27 @@ export interface paths {
         };
         /** My Progression */
         get: operations["my_progression_api_v1_me_progression_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/progression/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Sources
+         * @description 027: where my gains came from — actions by kind, quests, achievements, levels and the bonuses
+         *     (streaks, campaigns, pace) on top — per day and in all.
+         */
+        get: operations["my_sources_api_v1_me_progression_sources_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6544,6 +6605,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/feedback/results/{form_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Results
+         * @description 027: a form's (or a request's) answers summed up.
+         */
+        get: operations["results_api_v1_support_feedback_results__form_key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/feedback/{feedback_id}": {
         parameters: {
             query?: never;
@@ -6572,6 +6653,26 @@ export interface paths {
         put?: never;
         /** Convert */
         post: operations["convert_api_v1_support_feedback__feedback_id__convert_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/feedback/{feedback_id}/reply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reply
+         * @description 027: answer the member (shown in their feedback list, with a notification).
+         */
+        post: operations["reply_api_v1_support_feedback__feedback_id__reply_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8933,6 +9034,8 @@ export interface components {
             created_at: string;
             /** Form Key */
             form_key: string;
+            /** Form Label */
+            form_label?: string | null;
             /** Form Version */
             form_version: number;
             /**
@@ -8946,23 +9049,64 @@ export interface components {
             payload: {
                 [key: string]: unknown;
             };
+            /** Replied At */
+            replied_at?: string | null;
+            /** Reply */
+            reply?: string | null;
             /** Status */
             status: string;
             /** Submitter Id */
             submitter_id: string | null;
+            /** Submitter Name */
+            submitter_name?: string | null;
+        };
+        /** FeedbackFieldResultOut */
+        FeedbackFieldResultOut: {
+            /** Answers */
+            answers: number;
+            /** Average */
+            average?: number | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            } | null;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Latest */
+            latest?: string[] | null;
+            /** Type */
+            type: string;
         };
         /** FeedbackFormOut */
         FeedbackFormOut: {
+            /** Closes At */
+            closes_at?: string | null;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
             /** Fields */
             fields: {
                 [key: string]: unknown;
             }[];
+            /** Icon */
+            icon?: string | null;
             /** Key */
             key: string;
             /** Kind */
             kind: string;
             /** Label */
             label: string;
+            /** Opens At */
+            opens_at?: string | null;
+            /**
+             * Requested
+             * @default false
+             */
+            requested: boolean;
             /** Version */
             version: number;
         };
@@ -8984,6 +9128,8 @@ export interface components {
             created_at: string;
             /** Form Key */
             form_key: string;
+            /** Form Label */
+            form_label?: string | null;
             /** Form Version */
             form_version: number;
             /**
@@ -8997,10 +9143,38 @@ export interface components {
             payload: {
                 [key: string]: unknown;
             };
+            /** Replied At */
+            replied_at?: string | null;
+            /** Reply */
+            reply?: string | null;
             /** Status */
             status: string;
             /** Submitter Id */
             submitter_id: string | null;
+            /** Submitter Name */
+            submitter_name?: string | null;
+        };
+        /** FeedbackReplyIn */
+        FeedbackReplyIn: {
+            /** Text */
+            text: string;
+        };
+        /** FeedbackRequestOut */
+        FeedbackRequestOut: {
+            /** Answered */
+            answered: boolean;
+            form: components["schemas"]["FeedbackFormOut"];
+        };
+        /** FeedbackResultsOut */
+        FeedbackResultsOut: {
+            /** Fields */
+            fields: components["schemas"]["FeedbackFieldResultOut"][];
+            /** Form */
+            form: string;
+            /** Label */
+            label: string;
+            /** Total */
+            total: number;
         };
         /** FieldUpdateBody */
         FieldUpdateBody: {
@@ -9476,6 +9650,21 @@ export interface components {
             /** Confirmation */
             confirmation?: string | null;
         };
+        /** MarketplaceDiscountOut */
+        MarketplaceDiscountOut: {
+            /** Campaign */
+            campaign: string;
+            /** Ends At */
+            ends_at?: string | null;
+            /** Name */
+            name: string;
+            /** Names */
+            names?: {
+                [key: string]: string;
+            };
+            /** Percent */
+            percent: number;
+        };
         /** MarketplaceGrantIn */
         MarketplaceGrantIn: {
             /** Confirmation */
@@ -9561,6 +9750,7 @@ export interface components {
             descriptions: {
                 [key: string]: string;
             };
+            discount?: components["schemas"]["MarketplaceDiscountOut"] | null;
             /**
              * Eligibility
              * @default []
@@ -9600,6 +9790,8 @@ export interface components {
             };
             /** Price Coins */
             price_coins: number | null;
+            /** Price Now */
+            price_now?: number | null;
             /**
              * Rarity
              * @default common
@@ -10087,6 +10279,17 @@ export interface components {
             permissions: string[];
             /** Roles */
             roles: string[];
+        };
+        /** MySourcesOut */
+        MySourcesOut: {
+            /** Days */
+            days: components["schemas"]["SourceDayOut"][];
+            /** Sources */
+            sources: components["schemas"]["SourceOut"][];
+            /** Total */
+            total: number;
+            /** Value */
+            value: string;
         };
         /** MyStreakOut */
         MyStreakOut: {
@@ -11353,6 +11556,15 @@ export interface components {
              */
             user_id: string;
         };
+        /** SourceDayOut */
+        SourceDayOut: {
+            /** Amounts */
+            amounts: {
+                [key: string]: number;
+            };
+            /** Day */
+            day: string;
+        };
         /** SourceOut */
         SourceOut: {
             /** Amount */
@@ -11529,6 +11741,13 @@ export interface components {
         };
         /** SupportFormIn */
         SupportFormIn: {
+            /** Closes At */
+            closes_at?: string | null;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
             /**
              * Enabled
              * @default true
@@ -11538,13 +11757,29 @@ export interface components {
             fields?: {
                 [key: string]: unknown;
             }[];
+            /** Icon */
+            icon?: string | null;
             /** Kind */
             kind: string;
             /** Label */
             label: string;
+            /** Opens At */
+            opens_at?: string | null;
+            /**
+             * Requested
+             * @default false
+             */
+            requested: boolean;
         };
         /** SupportFormOut */
         SupportFormOut: {
+            /** Closes At */
+            closes_at?: string | null;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
             /**
              * Enabled
              * @default true
@@ -11554,12 +11789,21 @@ export interface components {
             fields?: {
                 [key: string]: unknown;
             }[];
+            /** Icon */
+            icon?: string | null;
             /** Key */
             key: string;
             /** Kind */
             kind: string;
             /** Label */
             label: string;
+            /** Opens At */
+            opens_at?: string | null;
+            /**
+             * Requested
+             * @default false
+             */
+            requested: boolean;
             /** Version */
             version: number;
         };
@@ -22418,6 +22662,46 @@ export interface operations {
             };
         };
     };
+    my_feedback_api_v1_me_feedback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackOut"][];
+                };
+            };
+        };
+    };
+    my_requests_api_v1_me_feedback_requests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackRequestOut"][];
+                };
+            };
+        };
+    };
     my_fundings_api_v1_me_fundings_get: {
         parameters: {
             query?: never;
@@ -23527,6 +23811,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProgressionOut"];
+                };
+            };
+        };
+    };
+    my_sources_api_v1_me_progression_sources_get: {
+        parameters: {
+            query?: {
+                value?: "xp" | "coins" | "contribution";
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MySourcesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -25717,6 +26033,7 @@ export interface operations {
             query?: {
                 status?: string | null;
                 kind?: string | null;
+                form?: string | null;
             };
             header?: never;
             path?: never;
@@ -25731,6 +26048,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FeedbackOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    results_api_v1_support_feedback_results__form_key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                form_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackResultsOut"];
                 };
             };
             /** @description Validation Error */
@@ -25799,6 +26147,41 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reply_api_v1_support_feedback__feedback_id__reply_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackReplyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackOut"];
                 };
             };
             /** @description Validation Error */

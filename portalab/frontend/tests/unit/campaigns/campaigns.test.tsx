@@ -43,7 +43,19 @@ const CAMPAIGN = {
   state: "active",
   current_version: 1,
   timezone: "Europe/Paris",
-  definition: {},
+  definition: {
+    names: { en: "Halloween", fr: "Halloween" },
+    timezone: "Europe/Paris",
+    schedule: {
+      start_at: "2026-10-20T00:00:00",
+      end_at: "2026-11-01T00:00:00",
+      recurrence: { kind: "yearly" },
+    },
+    modifiers: [
+      { id: "horror_xp", value: "xp", factor: 2, when: { media_kind: ["movie"], genre: ["horror"] } },
+    ],
+    discounts: [{ id: "spooky", percent: 20, products: ["pumpkin"], categories: [] }],
+  },
   created_at: "2026-10-01T12:00:00Z",
 };
 
@@ -114,7 +126,10 @@ describe("campaigns", () => {
     await waitFor(() =>
       expect(posts.at(-1)?.body).toMatchObject({ reason: "Server load", confirmation: "tok" }),
     );
-    fireEvent.click(screen.getByRole("button", { name: "Simulate" }));
+    const summary = screen.getByText("Simulate", { selector: "summary" });
+    (summary.parentElement as HTMLDetailsElement).open = true;
+    fireEvent(summary.parentElement as HTMLElement, new Event("toggle"));
+    fireEvent.click(await screen.findByRole("button", { name: "Simulate" }));
     expect(await screen.findByText(/horror_xp · xp ×2 — applies/)).toBeTruthy();
     expect(screen.getByText(/unknown attributes \(not applied\)/)).toBeTruthy();
   });

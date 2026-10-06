@@ -21,6 +21,8 @@ from portalab.modules.gamification.api.me import Me, Module, _me
 from portalab.modules.gamification.events import OWN_TYPES
 from portalab.modules.gamification.models import LedgerTransaction
 from portalab.modules.gamification.permissions import MANAGE
+from portalab.modules.gamification.progression.sources import since_days
+from portalab.modules.gamification.progression.sources import sources as gain_sources
 from portalab.modules.gamification.settings import SETTINGS
 from portalab.modules.gamification.streaks.level_rewards import LevelReward, parse_rewards
 from portalab.modules.gamification.streaks.service import PaceConfig, StreakConfig, parse_pace, parse_streak
@@ -368,3 +370,34 @@ async def population(
         rate_high=round(_quantile(rates, 0.8), 2),
         active=len(rates),
     )
+
+
+class SourceDayOut(BaseModel):
+    day: str
+    amounts: dict[str, int]
+
+
+class MySourcesOut(BaseModel):
+    value: str
+    total: int
+    sources: list[SourceOut]
+    days: list[SourceDayOut]
+
+
+@router.get("/me/progression/sources", response_model=MySourcesOut)
+async def my_sources(
+    principal: Me,
+    module: Module,
+    value: Literal["xp", "coins", "contribution"] = "xp",
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+) -> MySourcesOut:
+    """027: where my gains came from — actions by kind, quests, achievements, levels and the bonuses
+    (streaks, campaigns, pace) on top — per day and in all."""
+    result = await gain_sources(
+        module.database,
+        _me(principal),
+        value,
+        since_days(utc_now(module.clock), days),
+        module.config.timezone or "UTC",
+    )
+    return MySourcesOut.model_validate(result)

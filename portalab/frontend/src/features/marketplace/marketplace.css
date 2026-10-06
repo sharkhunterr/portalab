@@ -999,3 +999,26 @@
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
 }
+
+/* 027: a campaign price — struck catalog price, reduced price, the campaign */
+.price-deal {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+.price-deal__was {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.price-deal__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  background: color-mix(in srgb, var(--cal-campaign) 22%, transparent);
+  color: var(--color-text);
+}

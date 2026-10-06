@@ -15,7 +15,7 @@ from portalab.core.errors import ValidationFailed
 from portalab.modules.gamification.achievements.definition import EventCount, Reward
 
 QuestKind = Literal["quest", "daily", "challenge"]
-Period = Literal["none", "day", "week"]
+Period = Literal["none", "day", "week", "month"]
 
 
 class Window(BaseModel):
@@ -46,7 +46,7 @@ class QuestDefinition(BaseModel):
     @model_validator(mode="after")
     def _coherent(self) -> "QuestDefinition":
         if self.kind == "daily" and self.period == "none":
-            raise ValueError("a daily objective resets each day or week")
+            raise ValueError("a daily objective resets each day, week or month")
         if self.kind == "challenge" and (self.window is None or self.period != "none"):
             raise ValueError("a challenge is a time-boxed quest: a window and no period")
         if self.kind == "quest" and self.period == "day":

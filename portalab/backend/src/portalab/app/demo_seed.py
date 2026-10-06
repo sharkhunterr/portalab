@@ -22,8 +22,10 @@ from uuid import UUID
 
 from sqlalchemy import text
 
+from portalab.app import demo_economy
 from portalab.app.demo_shop import COLLECTIONS, SHOP, definition
 from portalab.app.wiring import Platform
+from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.notifications import AllAuthenticated, CommunicationRequest
 from portalab.capabilities.support import TicketRequest
 from portalab.core.authz_port import Principal
@@ -347,6 +349,10 @@ class DemoSeeder:
         await self._step("marketplace purchases", self.purchases)
         await self._step("community projects", self.projects)
         await self._step("campaign", self.campaign)
+        await self._step("economy", self.economy)
+        await self._step("seasonal campaigns", self.seasonal_campaigns)
+        await self._step("quests of the year", self.year_quests)
+        await self._step("feedback request", self.feedback_request)
         await self._step("news", self.news)
         await self._step("wiki", self.wiki)
         await self._step("support", self.support)
@@ -582,6 +588,76 @@ class DemoSeeder:
         await campaigns.definitions.create(self.admin, "autumn_festival", definition)
         await campaigns.reconciler.run()
         return "created and active"
+
+    async def economy(self) -> str:
+        """027: what earns XP (count and time watched), play streaks and level rewards."""
+        gamification = self.platform.gamification
+        made = 0
+        for key, raw in demo_economy.RULES.items():
+            if await self._scalar("SELECT 1 FROM gamification.reward_rules WHERE key = :k LIMIT 1", k=key):
+                continue
+            rule = await gamification.rules.save(self.admin, key, raw)
+            await gamification.rules.publish(self.admin, key, rule.version)
+            made += 1
+        writer = gamification.capabilities.system_providers(CONFIG_WRITER_CAPABILITY)
+        await gamification.refresh_config()
+        settings = 0
+        if writer:
+            if not (gamification.config.streak or {}).get("enabled"):
+                await writer[0].provider.set_global(
+                    self.admin, "economy.streak", demo_economy.STREAK, reason="demo economy"
+                )
+                settings += 1
+            if not gamification.config.level_rewards:
+                await writer[0].provider.set_global(
+                    self.admin, "economy.levelRewards", demo_economy.LEVEL_REWARDS, reason="demo economy"
+                )
+                settings += 1
+            await gamification.refresh_config()
+        return f"{made} rules, {settings} settings"
+
+    async def seasonal_campaigns(self) -> str:
+        campaigns = self.platform.campaigns
+        made = 0
+        for key, raw in demo_economy.campaigns(utc_now().date()).items():
+            if await self._scalar("SELECT 1 FROM campaigns.campaigns WHERE key = :k", k=key):
+                continue
+            await campaigns.definitions.create(self.admin, key, raw)
+            made += 1
+        if made:
+            await campaigns.reconciler.run()
+        return f"{made} campaigns created"
+
+    async def year_quests(self) -> str:
+        gamification = self.platform.gamification
+        made = 0
+        for key, raw in demo_economy.quests(utc_now().date()).items():
+            if await self._scalar("SELECT 1 FROM gamification.quests WHERE key = :k LIMIT 1", k=key):
+                continue
+            await gamification.quests.save(self.admin, key, raw)
+            made += 1
+        return f"{made} quests created"
+
+    async def feedback_request(self) -> str:
+        definitions = self.platform.support.definitions
+        request = demo_economy.FEEDBACK_REQUEST
+        if await self._scalar("SELECT 1 FROM support.feedback_forms WHERE key = :k", k=request["key"]):
+            return "exists"
+        now = utc_now()
+        await definitions.save_form(
+            self.admin,
+            request["key"],
+            request["kind"],
+            request["label"],
+            request["fields"],
+            True,
+            description=request["description"],
+            icon=request["icon"],
+            requested=True,
+            opens_at=now - timedelta(days=1),
+            closes_at=now + timedelta(days=21),
+        )
+        return "created"
 
     async def news(self) -> str:
         articles = self.platform.news.articles

@@ -242,6 +242,14 @@ class FeedbackForm(SupportBase):
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    # 027: a form may be requested from members between two dates (one answer each)
+    description: Mapped[str] = mapped_column(
+        Text, nullable=False, default="", server_default="", info=not_personal("form description")
+    )
+    icon: Mapped[str | None] = mapped_column(String(40))
+    requested: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    opens_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    closes_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
 class FeedbackItem(SupportBase):
@@ -249,6 +257,7 @@ class FeedbackItem(SupportBase):
     __table_args__ = (
         CheckConstraint("status IN ('new', 'reviewed', 'converted', 'dismissed')", name="status"),
         Index("ix_feedback_items_status", "status", "created_at"),
+        Index("ix_feedback_items_form_submitter", "form_key", "submitter_id"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
@@ -261,6 +270,9 @@ class FeedbackItem(SupportBase):
     reviewed_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    # 027: staff may answer the member (shown in their feedback list)
+    reply: Mapped[str | None] = mapped_column(Text, info=pii("content"))
+    replied_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
 class FeedbackConversion(SupportBase):

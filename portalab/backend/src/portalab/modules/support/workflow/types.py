@@ -1,7 +1,8 @@
 """Ticket types and their custom fields (T018; R4): a closed field schema (``text``, ``long_text``,
-``select``, ``multi_select``, ``number``, ``boolean``, ``date``, ``user``), required fields enforced at
-creation **naming** what is missing (``ticket.required_fields_missing``), and per-field privacy
-(``private`` = requester and staff only… or ``staff_only``). Feedback forms reuse the same field schema."""
+``select``, ``multi_select``, ``number``, ``boolean``, ``date``, ``user``, and ``rating`` — 1 to 5 stars,
+027), required fields enforced at creation **naming** what is missing (``ticket.required_fields_missing``),
+and per-field privacy (``private`` = requester and staff only… or ``staff_only``). Feedback forms reuse the
+same field schema."""
 
 from collections.abc import Mapping, Sequence
 from datetime import date
@@ -12,7 +13,9 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from portalab.core.errors import ValidationFailed
 
-FieldType = Literal["text", "long_text", "select", "multi_select", "number", "boolean", "date", "user"]
+FieldType = Literal[
+    "text", "long_text", "select", "multi_select", "number", "boolean", "date", "user", "rating"
+]
 
 
 class FieldDef(BaseModel):
@@ -68,6 +71,10 @@ def _coerce(definition: FieldDef, value: Any) -> Any:
     if kind == "number":
         if isinstance(value, bool) or not isinstance(value, int | float):
             raise ValueError("number")
+        return value
+    if kind == "rating":
+        if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 5:
+            raise ValueError("rating")
         return value
     if kind == "boolean":
         if not isinstance(value, bool):
@@ -140,7 +147,16 @@ BASELINE_FORMS: tuple[dict[str, Any], ...] = (
         "key": "general",
         "kind": "general",
         "label": "General feedback",
-        "fields": [{"key": "message", "label": "Your feedback", "type": "long_text", "required": True}],
+        "fields": [
+            {"key": "message", "label": "Your feedback", "type": "long_text", "required": True},
+            {
+                "key": "topic",
+                "label": "About",
+                "type": "select",
+                "options": ["portal", "media", "shop", "community", "support", "other"],
+            },
+            {"key": "rating", "label": "Your overall rating", "type": "rating"},
+        ],
     },
     {
         "key": "bug_report",

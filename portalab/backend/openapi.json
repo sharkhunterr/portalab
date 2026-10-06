@@ -4261,6 +4261,17 @@
             "title": "Form Key",
             "type": "string"
           },
+          "form_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Form Label"
+          },
           "form_version": {
             "title": "Form Version",
             "type": "integer"
@@ -4279,6 +4290,29 @@
             "title": "Payload",
             "type": "object"
           },
+          "replied_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replied At"
+          },
+          "reply": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -4294,6 +4328,17 @@
               }
             ],
             "title": "Submitter Id"
+          },
+          "submitter_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitter Name"
           }
         },
         "required": [
@@ -4310,8 +4355,92 @@
         "title": "FeedbackDetail",
         "type": "object"
       },
+      "FeedbackFieldResultOut": {
+        "properties": {
+          "answers": {
+            "title": "Answers",
+            "type": "integer"
+          },
+          "average": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average"
+          },
+          "counts": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counts"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "type",
+          "answers"
+        ],
+        "title": "FeedbackFieldResultOut",
+        "type": "object"
+      },
       "FeedbackFormOut": {
         "properties": {
+          "closes_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes At"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
           "fields": {
             "items": {
               "additionalProperties": true,
@@ -4319,6 +4448,17 @@
             },
             "title": "Fields",
             "type": "array"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
           },
           "key": {
             "title": "Key",
@@ -4331,6 +4471,23 @@
           "label": {
             "title": "Label",
             "type": "string"
+          },
+          "opens_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opens At"
+          },
+          "requested": {
+            "default": false,
+            "title": "Requested",
+            "type": "boolean"
           },
           "version": {
             "title": "Version",
@@ -4378,6 +4535,17 @@
             "title": "Form Key",
             "type": "string"
           },
+          "form_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Form Label"
+          },
           "form_version": {
             "title": "Form Version",
             "type": "integer"
@@ -4396,6 +4564,29 @@
             "title": "Payload",
             "type": "object"
           },
+          "replied_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replied At"
+          },
+          "reply": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -4411,6 +4602,17 @@
               }
             ],
             "title": "Submitter Id"
+          },
+          "submitter_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitter Name"
           }
         },
         "required": [
@@ -4424,6 +4626,70 @@
           "created_at"
         ],
         "title": "FeedbackOut",
+        "type": "object"
+      },
+      "FeedbackReplyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "FeedbackReplyIn",
+        "type": "object"
+      },
+      "FeedbackRequestOut": {
+        "properties": {
+          "answered": {
+            "title": "Answered",
+            "type": "boolean"
+          },
+          "form": {
+            "$ref": "#/components/schemas/FeedbackFormOut"
+          }
+        },
+        "required": [
+          "form",
+          "answered"
+        ],
+        "title": "FeedbackRequestOut",
+        "type": "object"
+      },
+      "FeedbackResultsOut": {
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/FeedbackFieldResultOut"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "form": {
+            "title": "Form",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "form",
+          "label",
+          "total",
+          "fields"
+        ],
+        "title": "FeedbackResultsOut",
         "type": "object"
       },
       "FieldUpdateBody": {
@@ -5784,6 +6050,48 @@
         "title": "MarketplaceConfirmIn",
         "type": "object"
       },
+      "MarketplaceDiscountOut": {
+        "properties": {
+          "campaign": {
+            "title": "Campaign",
+            "type": "string"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "object"
+          },
+          "percent": {
+            "title": "Percent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "percent",
+          "campaign",
+          "name"
+        ],
+        "title": "MarketplaceDiscountOut",
+        "type": "object"
+      },
       "MarketplaceGrantIn": {
         "properties": {
           "confirmation": {
@@ -6018,6 +6326,16 @@
             "title": "Descriptions",
             "type": "object"
           },
+          "discount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarketplaceDiscountOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "eligibility": {
             "default": [],
             "items": {
@@ -6114,6 +6432,17 @@
               }
             ],
             "title": "Price Coins"
+          },
+          "price_now": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Now"
           },
           "rarity": {
             "default": "common",
@@ -7439,6 +7768,40 @@
           "roles"
         ],
         "title": "MyPermissions",
+        "type": "object"
+      },
+      "MySourcesOut": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/SourceDayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "total",
+          "sources",
+          "days"
+        ],
+        "title": "MySourcesOut",
         "type": "object"
       },
       "MyStreakOut": {
@@ -10862,6 +11225,27 @@
         "title": "SessionInfo",
         "type": "object"
       },
+      "SourceDayOut": {
+        "properties": {
+          "amounts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Amounts",
+            "type": "object"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "amounts"
+        ],
+        "title": "SourceDayOut",
+        "type": "object"
+      },
       "SourceOut": {
         "properties": {
           "amount": {
@@ -11377,6 +11761,24 @@
       "SupportFormIn": {
         "additionalProperties": false,
         "properties": {
+          "closes_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes At"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Description",
+            "type": "string"
+          },
           "enabled": {
             "default": true,
             "title": "Enabled",
@@ -11390,6 +11792,18 @@
             "maxItems": 40,
             "title": "Fields",
             "type": "array"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
           },
           "kind": {
             "maxLength": 30,
@@ -11402,6 +11816,23 @@
             "minLength": 1,
             "title": "Label",
             "type": "string"
+          },
+          "opens_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opens At"
+          },
+          "requested": {
+            "default": false,
+            "title": "Requested",
+            "type": "boolean"
           }
         },
         "required": [
@@ -11414,6 +11845,24 @@
       "SupportFormOut": {
         "additionalProperties": false,
         "properties": {
+          "closes_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes At"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Description",
+            "type": "string"
+          },
           "enabled": {
             "default": true,
             "title": "Enabled",
@@ -11427,6 +11876,18 @@
             "maxItems": 40,
             "title": "Fields",
             "type": "array"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
           },
           "key": {
             "title": "Key",
@@ -11443,6 +11904,23 @@
             "minLength": 1,
             "title": "Label",
             "type": "string"
+          },
+          "opens_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opens At"
+          },
+          "requested": {
+            "default": false,
+            "title": "Requested",
+            "type": "boolean"
           },
           "version": {
             "title": "Version",
@@ -28195,6 +28673,58 @@
         ]
       }
     },
+    "/api/v1/me/feedback": {
+      "get": {
+        "description": "027: what I sent, its status and the staff reply.",
+        "operationId": "my_feedback_api_v1_me_feedback_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeedbackOut"
+                  },
+                  "title": "Response My Feedback Api V1 Me Feedback Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Feedback",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/me/feedback/requests": {
+      "get": {
+        "description": "027: the requests open now and whether I already answered each.",
+        "operationId": "my_requests_api_v1_me_feedback_requests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeedbackRequestOut"
+                  },
+                  "title": "Response My Requests Api V1 Me Feedback Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Requests",
+        "tags": [
+          "support"
+        ]
+      }
+    },
     "/api/v1/me/fundings": {
       "get": {
         "operationId": "my_fundings_api_v1_me_fundings_get",
@@ -29696,6 +30226,67 @@
         "summary": "My Progression",
         "tags": [
           "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/progression/sources": {
+      "get": {
+        "description": "027: where my gains came from \u2014 actions by kind, quests, achievements, levels and the bonuses\n(streaks, campaigns, pace) on top \u2014 per day and in all.",
+        "operationId": "my_sources_api_v1_me_progression_sources_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "value",
+            "required": false,
+            "schema": {
+              "default": "xp",
+              "enum": [
+                "xp",
+                "coins",
+                "contribution"
+              ],
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySourcesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Sources",
+        "tags": [
+          "gamification-admin"
         ]
       }
     },
@@ -33033,6 +33624,23 @@
               ],
               "title": "Kind"
             }
+          },
+          {
+            "in": "query",
+            "name": "form",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 60,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Form"
+            }
           }
         ],
         "responses": {
@@ -33062,6 +33670,49 @@
           }
         },
         "summary": "Queue",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/support/feedback/results/{form_key}": {
+      "get": {
+        "description": "027: a form's (or a request's) answers summed up.",
+        "operationId": "results_api_v1_support_feedback_results__form_key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "form_key",
+            "required": true,
+            "schema": {
+              "title": "Form Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackResultsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Results",
         "tags": [
           "support"
         ]
@@ -33160,6 +33811,60 @@
           }
         },
         "summary": "Convert",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/support/feedback/{feedback_id}/reply": {
+      "post": {
+        "description": "027: answer the member (shown in their feedback list, with a notification).",
+        "operationId": "reply_api_v1_support_feedback__feedback_id__reply_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "feedback_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Feedback Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackReplyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reply",
         "tags": [
           "support"
         ]

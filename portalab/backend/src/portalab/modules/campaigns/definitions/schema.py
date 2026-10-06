@@ -77,6 +77,23 @@ class ModifierDef(_Closed):
     when: When = When()
 
 
+class DiscountDef(_Closed):
+    """027: a shop reduction while the campaign is active — on named products and/or whole categories."""
+
+    id: str = Field(pattern=IDENT)
+    percent: int = Field(ge=1, le=90)
+    products: list[str] = Field(default_factory=list, max_length=200)
+    categories: list[str] = Field(default_factory=list, max_length=20)
+
+    @model_validator(mode="after")
+    def _targets(self) -> "DiscountDef":
+        if not self.products and not self.categories:
+            raise ValueError("a discount names products or categories")
+        if any(not 1 <= len(v) <= 96 for v in [*self.products, *self.categories]):
+            raise ValueError("product and category keys are 1-96 characters")
+        return self
+
+
 class Theme(_Closed):
     theme_key: str = Field(min_length=1, max_length=64)
     presentation_priority: int = Field(default=0, ge=0, le=100)
@@ -112,6 +129,7 @@ class CampaignDefinition(_Closed):
     timezone: str = "UTC"
     schedule: Schedule
     modifiers: list[ModifierDef] = Field(default_factory=list, max_length=20)
+    discounts: list[DiscountDef] = Field(default_factory=list, max_length=20)
     achievements: list[Nested] = Field(default_factory=list, max_length=10)
     quests: list[Nested] = Field(default_factory=list, max_length=10)
     theme: Theme | None = None
@@ -139,6 +157,9 @@ class CampaignDefinition(_Closed):
         ids = [m.id for m in self.modifiers]
         if len(set(ids)) != len(ids):
             raise ValueError("modifier ids must be unique")
+        discounts = [d.id for d in self.discounts]
+        if len(set(discounts)) != len(discounts):
+            raise ValueError("discount ids must be unique")
         return self
 
     def name(self, language: str = "en") -> str:

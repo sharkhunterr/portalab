@@ -22,9 +22,10 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.activation.service import LIVE, Activation
 from portalab.modules.marketplace.availability.service import Availability
 from portalab.modules.marketplace.eligibility.service import Eligibility
-from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
+from portalab.modules.marketplace.models import Category, Ownership, Product, ProductVersion
 from portalab.modules.marketplace.notify import notify_owner
 from portalab.modules.marketplace.observability import metrics
+from portalab.modules.marketplace.pricing import active_discounts, price_now
 from portalab.modules.marketplace.resolution.service import Resolution
 
 
@@ -88,10 +89,18 @@ class Purchases:
             version = (
                 await session.get(ProductVersion, (product.id, product.current_version)) if product else None
             )
+            category = (
+                await session.get(Category, product.category_id) if product and product.category_id else None
+            )
         if existing is not None:
             return existing
         if product is None or version is None or product.state != "available":
             raise NotAvailable("This product cannot be acquired now.")
+        # 027: the price now — less the best reduction of an active campaign
+        discounts = await active_discounts(self.capabilities, utc_now(self.clock))
+        reduced, _ = price_now(
+            discounts, product.key, category.key if category else None, version.price_coins
+        )
         checks = await self.eligibility.checks(user, list(version.conditions), None)
         unmet = [c for c in checks if not c.met]
         if unmet:
@@ -102,7 +111,7 @@ class Purchases:
                     "reasons": {c.label(): c.reason for c in unmet},
                 },
             )
-        price = int(version.price_coins or 0)
+        price = int(reduced or 0)
         try:
             async with self.database.unit_of_work() as uow:
                 session = uow.session

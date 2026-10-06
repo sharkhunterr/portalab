@@ -20,5 +20,7 @@ def period_key(period: Period, at: datetime, timezone: str) -> str:
     local = at.astimezone(_zone(timezone))
     if period == "day":
         return local.date().isoformat()
+    if period == "month":  # 027: monthly objectives
+        return f"{local.year}-M{local.month:02d}"
     year, week, _ = local.isocalendar()
     return f"{year}-W{week:02d}"

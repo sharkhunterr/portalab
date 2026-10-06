@@ -124,7 +124,7 @@ describe("feedback review", () => {
       });
     };
     renderAt("/", [{ path: "/", element: <ReviewQueue /> }]);
-    fireEvent.click(await screen.findByRole("button", { name: /bug_report · new/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /A member.*bug_report/ }));
     const proposal = await screen.findByRole("button", { name: /Feature proposal/ });
     expect((proposal as HTMLButtonElement).disabled).toBe(true);
     expect(proposal.textContent).toContain("Community is not available");
