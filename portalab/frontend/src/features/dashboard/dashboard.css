@@ -9,15 +9,17 @@
   min-inline-size: 0;
 }
 
-/* 027 R10/R11: explicit 2D placement (inline grid-column/grid-row); 12 / 6 / 2 columns by device class */
+/* 027 R10/R11: explicit 2D placement (inline grid-column/grid-row); 12 / 8 / 4 columns by screen, rows of
+   a fixed height — the edit mode shows the cells and a few free rows below */
 .dashboard-grid {
-  --row-height: 4.75rem;
+  --row-height: 4.5rem;
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   grid-template-columns: repeat(var(--columns, 12), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 1), var(--row-height));
   grid-auto-rows: var(--row-height);
 }
 
@@ -31,19 +33,47 @@
 .dashboard-grid__cell > .widget-frame {
   block-size: 100%;
   min-block-size: 0;
-  overflow: auto;
+  overflow: hidden;
+}
+
+.dashboard-grid__cell[data-dragging] {
+  transition: none;
+}
+.dashboard-grid[data-editing] {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .dashboard-grid[data-editing] {
-  padding: var(--space-2);
-  border-radius: var(--radius-xl);
-  background-image: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--color-accent) 10%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: calc((100% + var(--space-4)) / var(--columns, 12)) 100%;
-  outline: 2px dashed color-mix(in srgb, var(--color-accent) 35%, transparent);
+  --cell-w: calc((100% - (var(--columns, 12) - 1) * var(--space-3)) / var(--columns, 12));
+  border-radius: var(--radius-lg);
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-accent) 7%, transparent) var(--cell-w),
+      transparent var(--cell-w)
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-accent) 7%, transparent) var(--row-height),
+      transparent var(--row-height)
+    );
+  background-size:
+    calc(var(--cell-w) + var(--space-3)) 100%,
+    100% calc(var(--row-height) + var(--space-3));
+  background-blend-mode: multiply;
+}
+
+.dashboard-grid__ghost {
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--color-accent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
 }
 
 .dashboard-grid[data-editing] .widget-frame {
@@ -85,16 +115,103 @@
 
 .dash-resize {
   position: absolute;
-  inset-block-end: 4px;
-  inset-inline-end: 4px;
-  z-index: 2;
+  z-index: 3;
+  touch-action: none;
+}
+.dash-resize--east {
+  inset-block: 1.5rem;
+  inset-inline-end: -4px;
+  inline-size: 10px;
+  cursor: ew-resize;
+}
+.dash-resize--south {
+  inset-inline: 1.5rem;
+  inset-block-end: -4px;
+  block-size: 10px;
+  cursor: ns-resize;
+}
+.dash-resize--east::after,
+.dash-resize--south::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  opacity: 0.55;
+}
+.dash-resize--east::after {
+  inline-size: 4px;
+  block-size: 2.5rem;
+}
+.dash-resize--south::after {
+  inline-size: 2.5rem;
+  block-size: 4px;
+}
+.dash-resize--corner {
+  inset-block-end: 2px;
+  inset-inline-end: 2px;
   inline-size: 1.25rem;
   block-size: 1.25rem;
   border-inline-end: 3px solid var(--color-accent);
   border-block-end: 3px solid var(--color-accent);
   border-end-end-radius: var(--radius-md);
   cursor: nwse-resize;
-  touch-action: none;
+}
+.dash-resize:hover::after {
+  opacity: 1;
+}
+
+/* 027: what the edit mode adds above the grid, and the narrower previews of tablet and phone */
+.dashboard-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.dashboard-toolbar .ds-subnav button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.dashboard-toolbar__mode {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+.dashboard-toolbar__mode input {
+  inline-size: 2.4rem;
+  block-size: 1.3rem;
+  accent-color: var(--color-accent);
+}
+.dashboard-toolbar__mode > span {
+  display: grid;
+  font-size: var(--font-size-sm);
+}
+.dashboard-toolbar__mode > span > span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.dashboard-toolbar .dashboard-page__hint {
+  flex-basis: 100%;
+  font-size: var(--font-size-sm);
+}
+.dashboard-stage[data-preview] {
+  margin-inline: auto;
+  padding: var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: calc(var(--radius-lg) * 2);
+  background: color-mix(in srgb, var(--color-text) 3%, transparent);
+}
+.dashboard-stage[data-preview][data-view="tablet"] {
+  max-inline-size: 52rem;
+}
+.dashboard-stage[data-preview][data-view="phone"] {
+  max-inline-size: 26rem;
 }
 
 .dashboard-page__hint {
@@ -110,9 +227,10 @@
   border-radius: var(--radius-lg);
   background: var(--color-surface-raised);
   box-shadow: var(--shadow-1);
-  padding: var(--space-5);
+  padding: var(--space-4);
   block-size: 100%;
-  min-block-size: calc(var(--widget-h, 2) * 4.5rem);
+  min-block-size: 0;
+  position: relative;
   transition:
     transform var(--motion-duration-normal) var(--motion-easing),
     box-shadow var(--motion-duration-normal) var(--motion-easing);
@@ -133,6 +251,28 @@
 
 .widget-frame:hover {
   box-shadow: var(--shadow-2);
+}
+
+.widget-frame__body {
+  position: relative;
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+  container-type: size; /* 027: widgets size their content to the block (cqw / cqh) */
+}
+.widget-frame__body li[data-overflow] {
+  visibility: hidden;
+}
+.widget-frame__more {
+  position: absolute;
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-3);
+  padding: 0.05rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-surface));
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .widget-frame__header {
@@ -408,7 +548,8 @@
 .widget-posters {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(6.5rem, 7.5rem);
+  /* 027: posters as tall as the block allows (title and caption below), never taller */
+  grid-auto-columns: clamp(3.5rem, calc((100cqh - 4.4rem) * 2 / 3), 8rem);
   gap: var(--space-3);
   margin: 0;
   padding: 0 0 var(--space-2);
@@ -839,4 +980,32 @@
   inset-block-start: 0.4rem;
   inset-inline-end: 0.4rem;
   color: var(--color-text-muted);
+}
+
+/* 027: in edit mode the per-widget buttons float over the bottom of the widget (shown on hover or focus,
+   always on touch screens) so the content keeps its room */
+.dashboard-grid[data-editing] .widget-frame__controls {
+  position: absolute;
+  z-index: 4;
+  inset-inline: var(--space-2);
+  inset-block-end: var(--space-2);
+  justify-content: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  box-shadow: var(--shadow-2, var(--shadow-1));
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-easing);
+}
+.dashboard-grid[data-editing] .widget-frame:hover .widget-frame__controls,
+.dashboard-grid[data-editing] .widget-frame:focus-within .widget-frame__controls {
+  opacity: 1;
+}
+@media (hover: none) {
+  .dashboard-grid[data-editing] .widget-frame__controls {
+    opacity: 1;
+  }
 }

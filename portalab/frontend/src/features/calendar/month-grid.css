@@ -1,0 +1,260 @@
+/* 027: the month grid of the calendar widget and page */
+:where([data-category="movie"]) {
+  --cal-color: var(--cal-movie);
+}
+:where([data-category="series"]) {
+  --cal-color: var(--cal-series);
+}
+:where([data-category="book"]) {
+  --cal-color: var(--cal-book);
+}
+:where([data-category="event"]) {
+  --cal-color: var(--cal-event);
+}
+:where([data-category="campaign"]) {
+  --cal-color: var(--cal-campaign);
+}
+:where([data-category="maintenance"]) {
+  --cal-color: var(--cal-maintenance);
+}
+:where([data-category="incident"]) {
+  --cal-color: var(--cal-incident);
+}
+:where([data-category="news"]) {
+  --cal-color: var(--cal-news);
+}
+.month-grid {
+  --cal-color: var(--cal-other);
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.month-grid [data-category="movie"] {
+  --cal-color: var(--cal-movie);
+}
+.month-grid [data-category="series"] {
+  --cal-color: var(--cal-series);
+}
+.month-grid [data-category="book"] {
+  --cal-color: var(--cal-book);
+}
+.month-grid [data-category="event"] {
+  --cal-color: var(--cal-event);
+}
+.month-grid [data-category="campaign"] {
+  --cal-color: var(--cal-campaign);
+}
+.month-grid [data-category="maintenance"] {
+  --cal-color: var(--cal-maintenance);
+}
+.month-grid [data-category="incident"] {
+  --cal-color: var(--cal-incident);
+}
+.month-grid [data-category="news"] {
+  --cal-color: var(--cal-news);
+}
+.month-grid__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+  text-transform: uppercase;
+}
+.month-grid__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: 1.6rem repeat(var(--lanes, 0), 1.25rem) minmax(1.1rem, auto);
+  row-gap: 2px;
+  column-gap: 2px;
+  min-block-size: 5.5rem;
+}
+.month-grid[data-compact] .month-grid__week {
+  grid-template-rows: 1.3rem repeat(var(--lanes, 0), 0.45rem) minmax(0.5rem, auto);
+  min-block-size: 2.4rem;
+  row-gap: 1px;
+}
+.month-grid__day {
+  grid-row: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.month-grid[data-compact] .month-grid__day {
+  justify-content: center;
+  padding: 0.1rem;
+  font-size: var(--font-size-xs);
+}
+.month-grid__day:hover {
+  border-color: var(--color-border);
+}
+.month-grid__day[data-outside] {
+  background: transparent;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+.month-grid__day[data-today] .month-grid__num {
+  display: grid;
+  place-items: center;
+  min-inline-size: 1.4rem;
+  block-size: 1.4rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-bold);
+}
+.month-grid[data-compact] .month-grid__day[data-today] .month-grid__num {
+  min-inline-size: 1.15rem;
+  block-size: 1.15rem;
+}
+.month-grid__day[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.month-grid__bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  margin-inline: 3px;
+  padding-inline: 0.35rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--cal-color) 85%, transparent);
+  color: var(--color-surface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.month-grid__bar span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.month-grid[data-compact] .month-grid__bar {
+  padding: 0;
+  pointer-events: none;
+}
+.month-grid[data-compact] .month-grid__bar .ds-icon {
+  display: none;
+}
+.month-grid__bar[data-before] {
+  margin-inline-start: 0;
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+.month-grid__bar[data-after] {
+  margin-inline-end: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+.month-grid__bar[data-status="resolved"],
+.month-grid__chip[data-status="cancelled"] {
+  opacity: 0.6;
+}
+.month-grid__singles {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+  padding: 0 3px 3px;
+  pointer-events: none;
+}
+.month-grid[data-compact] .month-grid__singles {
+  flex-flow: row wrap;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 1px 2px;
+}
+.month-grid__chip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  padding: 0.1rem 0.35rem;
+  border-inline-start: 3px solid var(--cal-color);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--cal-color) 16%, var(--color-surface));
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  line-height: 1.25;
+  text-decoration: none;
+  pointer-events: auto;
+}
+.month-grid__chip .ds-icon {
+  flex: none;
+  color: var(--cal-color);
+}
+.month-grid__chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.month-grid__dot {
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: 50%;
+  background: var(--cal-color);
+}
+.month-grid__more {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+}
+.month-grid__legend {
+  --cal-color: var(--cal-other);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-xs);
+}
+.month-grid__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-text-muted);
+}
+.month-grid__legend li .ds-icon {
+  color: var(--cal-color);
+}
+.month-grid__legend [data-category="movie"] {
+  --cal-color: var(--cal-movie);
+}
+.month-grid__legend [data-category="series"] {
+  --cal-color: var(--cal-series);
+}
+.month-grid__legend [data-category="book"] {
+  --cal-color: var(--cal-book);
+}
+.month-grid__legend [data-category="event"] {
+  --cal-color: var(--cal-event);
+}
+.month-grid__legend [data-category="campaign"] {
+  --cal-color: var(--cal-campaign);
+}
+.month-grid__legend [data-category="maintenance"] {
+  --cal-color: var(--cal-maintenance);
+}
+.month-grid__legend [data-category="incident"] {
+  --cal-color: var(--cal-incident);
+}
+.month-grid__legend [data-category="news"] {
+  --cal-color: var(--cal-news);
+}

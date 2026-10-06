@@ -1,9 +1,11 @@
 """Dashboard arrangement engine (spec 027 R10/R11, T070) — the server twin of the editor's ``engine.ts``.
 
-Pure, deterministic functions over a 12-column grid: widgets never overlap, float up into free space
-(vertical compaction), a moved/resized widget pushes the ones in its way down, locked widgets never move,
-and reading order (row, then column) is the stored ``position``. Both implementations read the shared
-cases of ``tests/fixtures/dashboard-arrangements.json`` so the editor's preview is what the server stores.
+Pure, deterministic functions over a grid of 12 (desktop), 8 (tablet) or 4 (phone) columns: widgets never
+overlap; a moved or resized widget stays exactly where it was put (027: free placement, gaps allowed) and
+pushes the ones in its way down; locked widgets never move; « auto fit » packs everything up and to the
+start and widens widgets into the space left beside them; reading order (row, then column) is the stored
+``position``. Both implementations read the shared cases of ``tests/fixtures/dashboard-arrangements.json``
+so the editor's preview is what the server stores.
 """
 
 from collections.abc import Iterable, Sequence
@@ -11,6 +13,7 @@ from dataclasses import dataclass, replace
 
 COLUMNS = 12
 MAX_ROWS_SIZE = 12
+VIEW_COLUMNS = {"desktop": 12, "tablet": 8, "phone": 4}
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,25 +78,58 @@ def compact(items: Iterable[Item]) -> list[Item]:
     return reading_order(placed)
 
 
+def _push(fixed: Sequence[Item], others: Iterable[Item]) -> list[Item]:
+    """The ``others`` keep their place unless something sits there: then they move down (cascading)."""
+    pushed: list[Item] = []
+    for item in reading_order(others):
+        pushed.append(_settle(item, [*fixed, *pushed]))
+    return reading_order([*fixed, *pushed])
+
+
 def move(items: Sequence[Item], id: str, x: int, y: int, columns: int = COLUMNS) -> list[Item]:
+    """Place ``id`` at (x, y) — it stays there; widgets in its way are pushed down."""
     target = next((i for i in items if i.id == id), None)
     if target is None or target.locked:
-        return compact(items)
+        return reading_order(items)
     moved = bound(replace(target, x=x, y=y), columns)
     locked = [i for i in items if i.locked and i.id != id]
     fixed = [_settle(moved, locked), *locked]
-    pushed: list[Item] = []
-    for item in reading_order(i for i in items if i.id != id and not i.locked):
-        pushed.append(_settle(item, [*fixed, *pushed]))
-    return compact([*fixed, *pushed])
+    return _push(fixed, (i for i in items if i.id != id and not i.locked))
 
 
 def resize(items: Sequence[Item], id: str, w: int, h: int, columns: int = COLUMNS) -> list[Item]:
     target = next((i for i in items if i.id == id), None)
     if target is None or target.locked:
-        return compact(items)
+        return reading_order(items)
     sized = bound(replace(target, w=w, h=h), columns)
     return move([sized if i.id == id else i for i in items], id, sized.x, sized.y, columns)
+
+
+def autofit(items: Iterable[Item], columns: int = COLUMNS) -> list[Item]:
+    """« Auto fit » (027): everything floats up, then to the start of its row, then each widget widens
+    into the free space beside it (within its limits) — no hole left where a widget could grow."""
+    placed = compact(normalize(items, columns))
+    out: list[Item] = [i for i in placed if i.locked]
+    for item in reading_order(i for i in placed if not i.locked):
+        current = item
+        while current.x > 0 and not _hits(replace(current, x=current.x - 1), out):
+            current = replace(current, x=current.x - 1)
+        out.append(current)
+    grown: list[Item] = []
+    for item in reading_order(out):
+        current = item
+        high = item.max.w if item.max else columns
+        others = [o for o in out if o.id != item.id]
+        while (
+            not current.locked
+            and current.x + current.w < columns
+            and current.w < high
+            and not _hits(replace(current, w=current.w + 1), [*others, *grown])
+        ):
+            current = replace(current, w=current.w + 1)
+        grown.append(current)
+        out = [current if o.id == current.id else o for o in out]
+    return compact(grown)
 
 
 def first_free(items: Sequence[Item], w: int, h: int, columns: int = COLUMNS) -> tuple[int, int]:
@@ -107,12 +143,12 @@ def first_free(items: Sequence[Item], w: int, h: int, columns: int = COLUMNS) ->
 
 
 def normalize(items: Iterable[Item], columns: int = COLUMNS) -> list[Item]:
-    """Server-side: bound every widget, resolve overlaps in reading order, compact."""
+    """Server-side: bound every widget and resolve overlaps in reading order (gaps are kept)."""
     items = list(items)
     placed = [bound(i, columns) for i in items if i.locked]
     for item in reading_order(i for i in items if not i.locked):
         placed.append(_settle(bound(item, columns), placed))
-    return compact(placed)
+    return reading_order(placed)
 
 
 def flow(items: Iterable[Item], columns: int = COLUMNS) -> list[Item]:
@@ -130,14 +166,15 @@ def flow(items: Iterable[Item], columns: int = COLUMNS) -> list[Item]:
 
 
 def derived_width(w: int, columns: int) -> int:
+    """Width of a desktop widget in a narrower view: half or full width, never in-between slivers."""
     if columns >= COLUMNS:
         return w
     if columns <= 1:
         return 1
-    threshold = 3 if columns == 2 else 6
+    threshold = 3 if columns <= 4 else 6
     return columns // 2 if w <= threshold else columns
 
 
 def derive(items: Iterable[Item], columns: int) -> list[Item]:
-    """Tablet/phone view of the desktop arrangement — computed, never stored."""
+    """Tablet/phone view of the desktop arrangement (one layout for every screen, 027)."""
     return flow([replace(i, w=derived_width(i.w, columns)) for i in reading_order(items)], columns)

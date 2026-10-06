@@ -20,9 +20,16 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound, ValidationFailed
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
+from portalab.modules.dashboard.arrangement import (
+    VIEW_COLUMNS,
+    derive,
+    first_free,
+    flow,
+    normalize,
+    reading_order,
+)
 from portalab.modules.dashboard.arrangement import Item as GridItem
 from portalab.modules.dashboard.arrangement import Size as GridSize
-from portalab.modules.dashboard.arrangement import first_free, flow, normalize, reading_order
 from portalab.modules.dashboard.arrangement import move as grid_move
 from portalab.modules.dashboard.arrangement import resize as grid_resize
 from portalab.modules.dashboard.conditions.evaluator import ConditionEvaluator, parse_condition
@@ -74,6 +81,8 @@ class DashboardView:
     instances: list[EffectiveInstance]
     layout_version: int
     diagnostics: list[str] = field(default_factory=list)
+    layout_mode: str = "shared"  # 027: one arrangement for every screen, or one per screen
+    views: dict[UUID, dict[str, Any]] = field(default_factory=dict)  # 027: tablet/phone places
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,7 +193,22 @@ class DashboardService:
             await self.apply_starter(principal)
         async with self.database.session() as session:
             overlay, board = await self._overlay(session, principal)
-        return DashboardView(overlay.instances, board.layout_version if board else 0, overlay.diagnostics)
+            views = {
+                row_id: dict(row_views)
+                for row_id, row_views in await session.execute(
+                    select(WidgetInstance.id, WidgetInstance.views).where(
+                        WidgetInstance.user_id == _user(principal)
+                    )
+                )
+                if row_views
+            }
+        return DashboardView(
+            overlay.instances,
+            board.layout_version if board else 0,
+            overlay.diagnostics,
+            layout_mode=board.layout_mode if board else "shared",
+            views=views if board and board.layout_mode == "per_device" else {},
+        )
 
     async def _has_board(self, principal: Principal) -> bool:
         async with self.database.session() as session:
@@ -461,11 +485,18 @@ class DashboardService:
         return first_free([self._grid(r, policies) for r in rows], w, h)
 
     async def arrangement(
-        self, principal: Principal, items: Sequence[ArrangedItem], *, if_match: int | None
+        self,
+        principal: Principal,
+        items: Sequence[ArrangedItem],
+        *,
+        if_match: int | None,
+        view: str = "desktop",
     ) -> int:
         """Store a desktop arrangement (027 R13): listed widgets take the given coordinates (bounded by
         their limits and the grid; locked widgets must not change), widgets left out keep theirs, then the
         engine resolves overlaps and compacts. Removal stays ``DELETE``; hide/show stays ``PATCH``."""
+        if view != "desktop":
+            return await self._view_arrangement(principal, items, if_match=if_match, view=view)
         user = _user(principal)
         policies = self.config().widget_policies
         now = utc_now(self.clock)
@@ -530,6 +561,99 @@ class DashboardService:
                     row.w, row.h = size.w, size.h
                 row.updated_at = now
             await self._rearrange(session, user)
+            return await self._bump(session, board, principal)
+
+    def _view_items(
+        self, rows: Sequence[WidgetInstance], view: str, policies: Mapping[str, Mapping[str, Any]]
+    ) -> list[GridItem]:
+        """The arrangement of a tablet/phone view: stored places, the others derived from the desktop one."""
+        columns = VIEW_COLUMNS[view]
+        derived = {i.id: i for i in derive([self._grid(r, policies) for r in rows], columns)}
+        out: list[GridItem] = []
+        for row in rows:
+            stored = (row.views or {}).get(view)
+            base = derived[str(row.id)]
+            if isinstance(stored, dict):
+                base = GridItem(
+                    str(row.id),
+                    int(stored.get("x", 0)),
+                    int(stored.get("y", 0)),
+                    int(stored.get("w", base.w)),
+                    int(stored.get("h", base.h)),
+                    None,
+                    None,
+                    base.locked,
+                )
+            out.append(GridItem(base.id, base.x, base.y, base.w, base.h, None, None, base.locked))
+        return out
+
+    async def _view_arrangement(
+        self, principal: Principal, items: Sequence[ArrangedItem], *, if_match: int | None, view: str
+    ) -> int:
+        """027: store the tablet or phone arrangement of a member who arranges each screen on its own."""
+        if view not in VIEW_COLUMNS:
+            raise ValidationFailed("Unknown view.", code="dashboard.unknown_view")
+        user = _user(principal)
+        columns = VIEW_COLUMNS[view]
+        policies = self.config().widget_policies
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            rows = list(
+                (
+                    await session.execute(
+                        select(WidgetInstance)
+                        .where(WidgetInstance.user_id == user, WidgetInstance.status == "active")
+                        .with_for_update()
+                    )
+                ).scalars()
+            )
+            wanted = {str(i.id): i for i in items if i.id is not None}
+            current = self._view_items(rows, view, policies)
+            placed = [
+                GridItem(
+                    c.id, wanted[c.id].x, wanted[c.id].y, wanted[c.id].w, wanted[c.id].h, None, None, False
+                )
+                if c.id in wanted and not c.locked
+                else c
+                for c in current
+            ]
+            by_id = {str(r.id): r for r in rows}
+            for item in normalize(placed, columns):
+                row = by_id[item.id]
+                row.views = {**(row.views or {}), view: {"x": item.x, "y": item.y, "w": item.w, "h": item.h}}
+            return await self._bump(session, board, principal)
+
+    async def layout_mode(self, principal: Principal, mode: str, *, if_match: int | None) -> int:
+        """027: one arrangement for every screen (``shared``) or one per screen (``per_device``). Switching
+        to ``per_device`` starts each screen from what it showed until now."""
+        if mode not in ("shared", "per_device"):
+            raise ValidationFailed("Unknown layout mode.", code="dashboard.unknown_layout_mode")
+        user = _user(principal)
+        policies = self.config().widget_policies
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            board = await self._board_for_update(session, user, if_match)
+            if board.layout_mode == mode:
+                return board.layout_version
+            board.layout_mode = mode
+            if mode == "per_device":
+                rows = list(
+                    (
+                        await session.execute(
+                            select(WidgetInstance)
+                            .where(WidgetInstance.user_id == user, WidgetInstance.status == "active")
+                            .with_for_update()
+                        )
+                    ).scalars()
+                )
+                for view in ("tablet", "phone"):
+                    by_id = {str(r.id): r for r in rows}
+                    for item in self._view_items(rows, view, policies):
+                        row = by_id[item.id]
+                        if view not in (row.views or {}):
+                            cell = {"x": item.x, "y": item.y, "w": item.w, "h": item.h}
+                            row.views = {**(row.views or {}), view: cell}
             return await self._bump(session, board, principal)
 
     async def _next_position(self, session: AsyncSession, user: UUID) -> int:

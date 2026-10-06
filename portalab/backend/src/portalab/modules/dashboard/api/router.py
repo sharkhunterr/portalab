@@ -59,6 +59,13 @@ class WidgetMeta(BaseModel):
     config_schema: dict[str, Any]
 
 
+class GridCellOut(BaseModel):
+    x: int
+    y: int
+    w: int
+    h: int
+
+
 class DashboardInstanceOut(BaseModel):
     id: UUID | None
     widget_key: str
@@ -76,11 +83,18 @@ class DashboardInstanceOut(BaseModel):
     hideable: bool
     available: bool
     widget: WidgetMeta | None
+    views: dict[str, GridCellOut] = Field(default_factory=dict)  # 027: tablet/phone places (per_device)
 
 
 class DashboardOut(BaseModel):
     layout_version: int
     instances: list[DashboardInstanceOut]
+    layout_mode: Literal["shared", "per_device"] = "shared"
+
+
+class LayoutModeIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    mode: Literal["shared", "per_device"]
 
 
 class CatalogEntryOut(BaseModel):
@@ -197,8 +211,15 @@ def _meta(module: DashboardModule, key: str) -> WidgetMeta | None:
     )
 
 
-def _instance(module: DashboardModule, instance: EffectiveInstance) -> DashboardInstanceOut:
+def _instance(
+    module: DashboardModule, instance: EffectiveInstance, views: dict[str, Any] | None = None
+) -> DashboardInstanceOut:
     return DashboardInstanceOut(
+        views={
+            name: GridCellOut(**cell)
+            for name, cell in (views or {}).items()
+            if name in ("tablet", "phone") and isinstance(cell, dict)
+        },
         id=instance.id,
         widget_key=instance.widget_key,
         status=instance.status,
@@ -223,7 +244,11 @@ async def dashboard(principal: User, module: Module, response: Response) -> Dash
     view = await module.service.view(principal)
     response.headers["ETag"] = f'"{view.layout_version}"'
     return DashboardOut(
-        layout_version=view.layout_version, instances=[_instance(module, i) for i in view.instances]
+        layout_version=view.layout_version,
+        instances=[
+            _instance(module, i, view.views.get(i.id) if i.id is not None else None) for i in view.instances
+        ],
+        layout_mode=view.layout_mode,
     )
 
 
@@ -298,12 +323,29 @@ async def delete_widget(
 
 @router.put("/dashboard/arrangement", response_model=VersionOut)
 async def put_arrangement(
-    principal: User, body: ArrangementIn, module: Module, if_match: IfMatch = None
+    principal: User,
+    body: ArrangementIn,
+    module: Module,
+    if_match: IfMatch = None,
+    view: Literal["desktop", "tablet", "phone"] = "desktop",
 ) -> VersionOut:
-    """027 R13: the desktop arrangement in one write (Save); tablet/phone views derive from it."""
+    """027 R13: an arrangement in one write (Save) — the desktop one (tablet/phone derive from it), or with
+    ``view`` the tablet or phone one of a member who arranges each screen on its own."""
     items = [ArrangedItem(i.id, i.widget_key, i.x, i.y, i.w, i.h) for i in body.items]
     return VersionOut(
-        layout_version=await module.service.arrangement(principal, items, if_match=version_of(if_match))
+        layout_version=await module.service.arrangement(
+            principal, items, if_match=version_of(if_match), view=view
+        )
+    )
+
+
+@router.put("/dashboard/layout-mode", response_model=VersionOut)
+async def put_layout_mode(
+    principal: User, body: LayoutModeIn, module: Module, if_match: IfMatch = None
+) -> VersionOut:
+    """027: one arrangement for every screen, or one per screen (desktop, tablet, phone)."""
+    return VersionOut(
+        layout_version=await module.service.layout_mode(principal, body.mode, if_match=version_of(if_match))
     )
 
 

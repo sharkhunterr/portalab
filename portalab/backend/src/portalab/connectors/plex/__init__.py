@@ -173,6 +173,8 @@ class PlexConnector(HttpConnector):
                             "people": [r.get("tag") for r in item.get("Role") or [] if r.get("tag")][:50],
                             "duration_s": _seconds(item.get("duration")),
                             "image": key if item.get("thumb") else None,
+                            # 027: release (or air) date, for « Recent releases »
+                            "released": _day(item.get("originallyAvailableAt")),
                         }
                         yield self.record(service, key, kind, payload, parse_time(item.get("addedAt")))
                         count += 1
@@ -258,6 +260,11 @@ class _Playback:
                 )
             )
         return sorted(history, key=lambda h: h.occurred_at)
+
+
+def _day(value: Any) -> str | None:
+    text = str(value or "")[:10]
+    return text if len(text) == 10 and text[4] == "-" and text[7] == "-" else None
 
 
 def map_history(item: Mapping[str, Any]) -> SourceActivity | None:

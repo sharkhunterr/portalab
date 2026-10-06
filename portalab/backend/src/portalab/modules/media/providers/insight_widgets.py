@@ -80,9 +80,28 @@ STATS = _definition(
     },
     defaults={"scope": "me", "period": "30d", "category": "all", "metric": "time", "chart": "bars"},
 )
-RECENTLY_ADDED = _definition(
-    "media.recently_added", component="media.posters", icon="sparkles", events=("media.added",)
+KIND_FILTER = {
+    "type": "object",
+    "properties": {"kind": {"type": "string", "enum": ["all", "movie", "series", "book"]}},
+    "additionalProperties": False,
+}
+RECENTLY_ADDED = _definition(  # 027: what the services added last (their own date), newest first
+    "media.recently_added",
+    component="media.posters",
+    icon="sparkles",
+    events=("media.added",),
+    schema=KIND_FILTER,
+    defaults={"kind": "all"},
 )
+RECENT_RELEASES = _definition(  # 027: what came out last (release or air date) among what the library holds
+    "media.recent_releases",
+    component="media.posters",
+    icon="clapperboard",
+    events=("media.added",),
+    schema=KIND_FILTER,
+    defaults={"kind": "all"},
+)
+KINDS_OF = {"all": None, "movie": ("movie",), "series": ("series",), "book": ("book", "audiobook")}
 RECENTLY_REQUESTED = _definition(
     "media.recently_requested",
     component="media.posters",
@@ -222,24 +241,47 @@ class StatsWidget(_Base):
 
 
 class RecentlyAddedWidget(_Base):
+    """027: « Recently added » (``released=False``) or « Recent releases » — one card per work, newest first,
+    with when it was added or released and the new episode of a series."""
+
+    def __init__(self, database: Database, clock: Clock | None = None, *, released: bool = False) -> None:
+        super().__init__(database, clock)
+        self.released = released
+
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
+        from portalab.modules.media.discovery.recent import recent_releases, recently_added
+
+        kinds = KINDS_OF.get(str(config.get("kind") or "all"))
         async with self.database.session() as session:
-            rows = (
-                await session.execute(
-                    select(MediaObject.id, MediaObject.title, MediaObject.kind, MediaObject.year)
-                    .where(
-                        MediaObject.status == "active",
-                        MediaObject.available.is_(True),
-                        MediaObject.kind.in_(("movie", "series", "book", "audiobook", "game", "album")),
+            recents = (
+                await recent_releases(session, utc_now(self.clock).date(), limit=16, kinds=kinds)
+                if self.released
+                else await recently_added(session, limit=16, kinds=kinds)
+            )
+            rows = {
+                row.id: row
+                for row in (
+                    await session.execute(
+                        select(MediaObject).where(MediaObject.id.in_([r.object_id for r in recents]))
                     )
-                    .order_by(MediaObject.first_seen_at.desc())
-                    .limit(16)
-                )
-            ).all()
-        items = [{"id": str(i), "title": t, "kind": k, "meta": str(y) if y else None} for i, t, k, y in rows]
-        return self.payload({"items": await self.cards(items)})
+                ).scalars()
+            }
+        items = [
+            {
+                "id": str(r.object_id),
+                "title": rows[r.object_id].title,
+                "kind": rows[r.object_id].kind,
+                "meta": r.episode or (str(rows[r.object_id].year) if rows[r.object_id].year else None),
+                "at": r.at,
+            }
+            for r in recents
+            if r.object_id in rows
+        ]
+        return self.payload(
+            {"items": await self.cards(items), "mode": "released" if self.released else "added"}
+        )
 
 
 class RecentlyRequestedWidget(_Base):

@@ -3850,7 +3850,8 @@ export interface paths {
         get?: never;
         /**
          * Put Arrangement
-         * @description 027 R13: the desktop arrangement in one write (Save); tablet/phone views derive from it.
+         * @description 027 R13: an arrangement in one write (Save) — the desktop one (tablet/phone derive from it), or with
+         *     ``view`` the tablet or phone one of a member who arranges each screen on its own.
          */
         put: operations["put_arrangement_api_v1_dashboard_arrangement_put"];
         post?: never;
@@ -3890,6 +3891,26 @@ export interface paths {
          * @deprecated
          */
         put: operations["put_layout_api_v1_dashboard_layout_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/layout-mode": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Layout Mode
+         * @description 027: one arrangement for every screen, or one per screen (desktop, tablet, phone).
+         */
+        put: operations["put_layout_mode_api_v1_dashboard_layout_mode_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7715,6 +7736,8 @@ export interface components {
         CalendarItemOut: {
             /** All Day */
             all_day: boolean;
+            /** Category */
+            category?: string | null;
             /** Date */
             date: string | null;
             /** Ends At */
@@ -8422,6 +8445,10 @@ export interface components {
              * @enum {string}
              */
             status: "active" | "hidden";
+            /** Views */
+            views?: {
+                [key: string]: components["schemas"]["GridCellOut"];
+            };
             /** W */
             w: number;
             widget: components["schemas"]["WidgetMeta"] | null;
@@ -8436,6 +8463,12 @@ export interface components {
         DashboardOut: {
             /** Instances */
             instances: components["schemas"]["DashboardInstanceOut"][];
+            /**
+             * Layout Mode
+             * @default shared
+             * @enum {string}
+             */
+            layout_mode: "shared" | "per_device";
             /** Layout Version */
             layout_version: number;
         };
@@ -8787,6 +8820,17 @@ export interface components {
             /** Source */
             source: string;
         };
+        /** GridCellOut */
+        GridCellOut: {
+            /** H */
+            h: number;
+            /** W */
+            w: number;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
         /** GroupCreate */
         GroupCreate: {
             /**
@@ -8993,6 +9037,14 @@ export interface components {
             w: number;
             /** Widget Key */
             widget_key: string;
+        };
+        /** LayoutModeIn */
+        LayoutModeIn: {
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "shared" | "per_device";
         };
         /** LeaderboardEntryOut */
         LeaderboardEntryOut: {
@@ -9397,8 +9449,12 @@ export interface components {
         };
         /** MediaCard */
         MediaCard: {
+            /** At */
+            at?: string | null;
             /** Available */
             available: boolean;
+            /** Episode */
+            episode?: string | null;
             /**
              * Id
              * Format: uuid
@@ -9436,8 +9492,12 @@ export interface components {
         };
         /** MediaDetail */
         MediaDetail: {
+            /** At */
+            at?: string | null;
             /** Available */
             available: boolean;
+            /** Episode */
+            episode?: string | null;
             /** Genres */
             genres: string[];
             /**
@@ -19790,7 +19850,9 @@ export interface operations {
     };
     put_arrangement_api_v1_dashboard_arrangement_put: {
         parameters: {
-            query?: never;
+            query?: {
+                view?: "desktop" | "tablet" | "phone";
+            };
             header?: {
                 "If-Match"?: string | null;
             };
@@ -19855,6 +19917,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LayoutIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_layout_mode_api_v1_dashboard_layout_mode_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LayoutModeIn"];
             };
         };
         responses: {

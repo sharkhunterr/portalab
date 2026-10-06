@@ -75,6 +75,19 @@ class Presentation:
             theme.presentation_priority if theme else 0,
         )
 
+    async def public_view(self, key: str) -> dict[str, Any] | None:
+        """027: what a campaign says of itself (its pitch and boosts) — its current version."""
+        async with self.database.session() as session:
+            row = (await session.execute(select(Campaign).where(Campaign.key == key))).scalar_one_or_none()
+            version = await session.get(CampaignVersion, (row.id, row.current_version)) if row else None
+        if row is None or version is None:
+            return None
+        definition = CampaignDefinition.model_validate(version.definition)
+        return {
+            "description": definition.description,
+            "modifiers": [{"value": m.value, "factor": m.factor} for m in definition.modifiers],
+        }
+
     async def active_for_user(self, user: UUID, at: datetime | None = None) -> Sequence[CampaignRef]:
         at = at or utc_now(self.clock)
         return [self._ref(c) for c in await self.resolver.at(at) if await self._for(user, c)]

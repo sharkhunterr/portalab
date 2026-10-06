@@ -4,14 +4,15 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Instance } from "../api";
 import { type Cell, itemsOf, keyOf } from "../edit/EditSession";
-import { derive, type Item, readingOrder } from "./engine";
+import { type Item, readingOrder } from "./engine";
 
 /**
- * Dashboard grid (spec 027 T074/T076/T077): widgets at explicit grid coordinates on desktop (12 columns),
- * the derived arrangement on tablet (6) and phone (2) — computed, never stored. DOM order = reading order.
- * In desktop edit mode every widget gets a grip (drag with mouse, touch or pen; or Enter then arrow keys)
- * and a resize corner (drag; or Shift + arrow keys). The preview runs the shared engine, so neighbours make
- * room live exactly as the server will store it. Locked widgets show no handles.
+ * Dashboard grid (spec 027 T074/T076/T077): widgets at explicit grid coordinates — 12 columns on desktop,
+ * 8 on tablet, 4 on phone — rows of a fixed height. DOM order = reading order. In edit mode the grid shows
+ * its cells (with free rows below to drop into); each widget gets a grip (drag with mouse, touch or pen; or
+ * Enter then arrow keys) and resize edges (right, bottom, corner; or Shift + arrow keys). A placeholder
+ * shows where the widget lands; the preview runs the shared engine, so neighbours make room live exactly as
+ * the server will store it. Locked widgets show no handles.
  */
 export interface Arranger {
   move: (key: string, x: number, y: number) => void;
@@ -28,22 +29,33 @@ interface DashboardGridProps {
   render: (instance: Instance, handles: ReactNode) => ReactNode;
 }
 
+type Mode = "move" | "east" | "south" | "corner";
+
 interface Drag {
   key: string;
-  mode: "move" | "resize";
+  mode: Mode;
   startX: number;
   startY: number;
   origin: Cell;
   target: Cell;
+  /** Pointer travel in pixels: the widget follows it, the placeholder snaps to the cells. */
+  dx: number;
+  dy: number;
 }
 
 function metrics(grid: HTMLElement, columns: number) {
   const rect = grid.getBoundingClientRect();
   const style = getComputedStyle(grid);
   const gap = Number.parseFloat(style.columnGap) || 0;
-  const row = Number.parseFloat(style.gridAutoRows) || 72;
-  return { colStep: (rect.width + gap) / columns, rowStep: row + (Number.parseFloat(style.rowGap) || 0) };
+  const row = Number.parseFloat(style.gridTemplateRows.split(" ")[0] ?? "") || 76;
+  const padding = Number.parseFloat(style.paddingInlineStart) || 0;
+  return {
+    colStep: (rect.width - 2 * padding + gap) / columns,
+    rowStep: row + (Number.parseFloat(style.rowGap) || 0),
+  };
 }
+
+const SPARE_ROWS = 3;
 
 export function DashboardGrid({ label, instances, cells, columns, arranger, render }: DashboardGridProps) {
   const t = useT();
@@ -53,7 +65,7 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
   const [grabbed, setGrabbed] = useState<string | null>(null);
   const byKey = new Map(instances.map((i) => [keyOf(i), i]));
 
-  let placed: Item[] = itemsOf(cells, instances);
+  let placed: Item[] = itemsOf(cells, instances, columns);
   if (drag && arranger) {
     placed =
       arranger.preview(
@@ -63,39 +75,48 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
           : { w: drag.target.w, h: drag.target.h },
       ) ?? placed;
   }
-  const shown = columns >= 12 ? readingOrder(placed) : derive(placed, columns);
+  const shown = readingOrder(placed);
+  const bottom = Math.max(0, ...shown.map((item) => item.y + item.h));
+  const rows = bottom + (arranger ? SPARE_ROWS : 0);
+  const ghost = drag ? shown.find((item) => item.id === drag.key) : undefined;
   const titleOf = (instance: Instance) =>
     instance.widget ? t(instance.widget.title_key) : instance.widget_key;
 
-  const begin = (event: PointerEvent<HTMLElement>, key: string, mode: Drag["mode"]) => {
+  const begin = (event: PointerEvent<HTMLElement>, key: string, mode: Mode) => {
     const cell = cells.get(key);
     if (!cell || !grid.current) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    setDrag({ key, mode, startX: event.clientX, startY: event.clientY, origin: cell, target: cell });
+    setDrag({
+      key,
+      mode,
+      startX: event.clientX,
+      startY: event.clientY,
+      origin: cell,
+      target: cell,
+      dx: 0,
+      dy: 0,
+    });
   };
   const track = (event: PointerEvent<HTMLElement>) => {
     if (!drag || !grid.current) return;
     const { colStep, rowStep } = metrics(grid.current, columns);
     const dx = Math.round((event.clientX - drag.startX) / colStep);
     const dy = Math.round((event.clientY - drag.startY) / rowStep);
-    const { origin } = drag;
+    const { origin, mode } = drag;
     const target =
-      drag.mode === "move"
+      mode === "move"
         ? {
             ...origin,
             x: Math.max(0, Math.min(columns - origin.w, origin.x + dx)),
             y: Math.max(0, origin.y + dy),
           }
-        : { ...origin, w: Math.max(1, origin.w + dx), h: Math.max(1, origin.h + dy) };
-    if (
-      target.x !== drag.target.x ||
-      target.y !== drag.target.y ||
-      target.w !== drag.target.w ||
-      target.h !== drag.target.h
-    ) {
-      setDrag({ ...drag, target });
-    }
+        : {
+            ...origin,
+            w: mode === "south" ? origin.w : Math.max(1, Math.min(columns - origin.x, origin.w + dx)),
+            h: mode === "east" ? origin.h : Math.max(1, origin.h + dy),
+          };
+    setDrag({ ...drag, target, dx: event.clientX - drag.startX, dy: event.clientY - drag.startY });
   };
   const end = () => {
     if (!drag || !arranger) return;
@@ -151,6 +172,17 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
     }
   };
 
+  const edge = (key: string, mode: Exclude<Mode, "move">) => (
+    <span
+      className={`dash-resize dash-resize--${mode}`}
+      aria-hidden="true"
+      onPointerDown={(event) => begin(event, key, mode)}
+      onPointerMove={track}
+      onPointerUp={end}
+      onPointerCancel={() => setDrag(null)}
+    />
+  );
+
   return (
     <div className="dashboard-grid-container">
       <ol
@@ -159,12 +191,28 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
         aria-label={label}
         data-columns={columns}
         data-editing={arranger ? "true" : undefined}
-        style={{ "--columns": columns } as React.CSSProperties}
+        style={{ "--columns": columns, "--rows": rows } as React.CSSProperties}
       >
+        {ghost ? (
+          <li
+            className="dashboard-grid__ghost"
+            aria-hidden="true"
+            style={{
+              gridColumn: `${ghost.x + 1} / span ${ghost.w}`,
+              gridRow: `${ghost.y + 1} / span ${ghost.h}`,
+            }}
+          >
+            <span>
+              {ghost.w} × {ghost.h}
+            </span>
+          </li>
+        ) : null}
         {shown.map((item) => {
           const instance = byKey.get(item.id);
           if (!instance) return null;
           const dragging = drag?.key === item.id;
+          const following = dragging && drag?.mode === "move";
+          const at = following && drag ? drag.origin : item;
           const editable = Boolean(arranger) && !instance.locked;
           const handles = editable ? (
             <>
@@ -182,14 +230,9 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
               >
                 <Icon name="grip" size={18} />
               </button>
-              <span
-                className="dash-resize"
-                aria-hidden="true"
-                onPointerDown={(event) => begin(event, item.id, "resize")}
-                onPointerMove={track}
-                onPointerUp={end}
-                onPointerCancel={() => setDrag(null)}
-              />
+              {edge(item.id, "east")}
+              {edge(item.id, "south")}
+              {edge(item.id, "corner")}
             </>
           ) : null;
           return (
@@ -198,9 +241,14 @@ export function DashboardGrid({ label, instances, cells, columns, arranger, rend
               className="dashboard-grid__cell"
               data-dragging={dragging ? "true" : undefined}
               data-grabbed={grabbed === item.id ? "true" : undefined}
+              data-w={item.w}
+              data-h={item.h}
               style={{
-                gridColumn: `${item.x + 1} / span ${item.w}`,
-                gridRow: `${item.y + 1} / span ${item.h}`,
+                gridColumn: `${at.x + 1} / span ${at.w}`,
+                gridRow: `${at.y + 1} / span ${at.h}`,
+                ...(following && drag
+                  ? { transform: `translate(${drag.dx}px, ${drag.dy}px)`, zIndex: 5 }
+                  : {}),
               }}
             >
               {render(instance, handles)}

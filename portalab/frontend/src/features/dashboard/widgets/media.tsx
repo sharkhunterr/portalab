@@ -41,9 +41,18 @@ function Posters({ payload }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  const items = ((payload.data ?? {}) as { items?: Card[] }).items ?? [];
+  const data = (payload.data ?? {}) as { items?: Card[]; mode?: "added" | "released" };
+  const items = data.items ?? [];
   const caption = (card: Card) => {
     if (card.state) return t(`media:requests.state.${card.state}`);
+    if (data.mode && card.at) {
+      // 027: « added 2 days ago » / « out on 3 Oct. », with the new episode of a series
+      const when =
+        data.mode === "added"
+          ? format.relative((Date.parse(card.at) - Date.now()) / 1000)
+          : format.date(`${card.at.slice(0, 10)}T12:00:00Z`, "medium");
+      return card.meta && /^S\d+E\d+$/.test(card.meta) ? `${card.meta} · ${when}` : when;
+    }
     if (card.type && card.at) {
       const when = format.date(card.at, "medium");
       const episode =

@@ -1,15 +1,18 @@
 /**
- * Dashboard arrangement engine (spec 027 R10/R11): pure, deterministic functions over a 12-column grid.
- * The same algorithm lives in ``backend/src/portalab/modules/dashboard/arrangement.py``; both read the
- * shared cases of ``tests/fixtures/dashboard-arrangements.json`` so the editor's preview is exactly what
- * the server stores.
+ * Dashboard arrangement engine (spec 027 R10/R11): pure, deterministic functions over a grid of 12
+ * (desktop), 8 (tablet) or 4 (phone) columns. The same algorithm lives in
+ * ``backend/src/portalab/modules/dashboard/arrangement.py``; both read the shared cases of
+ * ``tests/fixtures/dashboard-arrangements.json`` so the editor's preview is exactly what the server stores.
  *
- * - widgets never overlap; after every change they float up as far as possible (vertical compaction);
- * - a moved or resized widget keeps the place it was given; widgets in its way are pushed down;
+ * - widgets never overlap; a moved or resized widget stays exactly where it was put (gaps are kept) and
+ *   widgets in its way are pushed down;
+ * - « auto fit » packs everything up and to the start and widens widgets into the space beside them;
  * - locked widgets never move;
- * - reading order (row, then column) is the DOM order and the order of tablet/phone views.
+ * - reading order (row, then column) is the DOM order and the order of derived views.
  */
 export const COLUMNS = 12;
+export type View = "desktop" | "tablet" | "phone";
+export const VIEW_COLUMNS: Record<View, number> = { desktop: 12, tablet: 8, phone: 4 };
 
 export interface Size {
   w: number;
@@ -74,7 +77,14 @@ export function compact(items: readonly Item[]): Item[] {
   return readingOrder(placed);
 }
 
-/** Place ``id`` at ``to`` (bounded); widgets in its way are pushed down, then everything compacts. */
+/** The ``others`` keep their place unless something sits there: then they move down (cascading). */
+function push(fixed: Item[], others: readonly Item[]): Item[] {
+  const pushed: Item[] = [];
+  for (const item of readingOrder(others)) pushed.push(settle(item, [...fixed, ...pushed]));
+  return readingOrder([...fixed, ...pushed]);
+}
+
+/** Place ``id`` at ``to`` (bounded) — it stays there; widgets in its way are pushed down. */
 export function move(
   items: readonly Item[],
   id: string,
@@ -82,22 +92,19 @@ export function move(
   columns = COLUMNS,
 ): Item[] {
   const target = items.find((i) => i.id === id);
-  if (!target || target.locked) return compact(items);
+  if (!target || target.locked) return readingOrder(items);
   const moved = bound({ ...target, ...to }, columns);
-  const fixed: Item[] = [moved, ...items.filter((i) => i.locked && i.id !== id)];
-  const settledMoved = settle(moved, fixed.slice(1));
-  fixed[0] = settledMoved;
-  const others = readingOrder(items.filter((i) => i.id !== id && !i.locked));
-  const pushed: Item[] = [];
-  for (const item of others) pushed.push(settle(item, [...fixed, ...pushed]));
-  // then everything floats up in reading order: a widget dropped below another stays below it
-  return compact([...fixed, ...pushed]);
+  const locked = items.filter((i) => i.locked && i.id !== id);
+  return push(
+    [settle(moved, locked), ...locked],
+    items.filter((i) => i.id !== id && !i.locked),
+  );
 }
 
 /** Resize ``id`` (bounded by its limits and the grid) and make room for it. */
 export function resize(items: readonly Item[], id: string, size: Size, columns = COLUMNS): Item[] {
   const target = items.find((i) => i.id === id);
-  if (!target || target.locked) return compact(items);
+  if (!target || target.locked) return readingOrder(items);
   const sized = bound({ ...target, ...size }, columns);
   return move(
     items.map((i) => (i.id === id ? sized : i)),
@@ -105,6 +112,36 @@ export function resize(items: readonly Item[], id: string, size: Size, columns =
     { x: sized.x, y: sized.y },
     columns,
   );
+}
+
+/** « Auto fit »: everything floats up, then to the start of its row, then widens into the free space. */
+export function autofit(items: readonly Item[], columns = COLUMNS): Item[] {
+  const placed = compact(normalize(items, columns));
+  let out: Item[] = placed.filter((i) => i.locked);
+  for (const item of readingOrder(placed.filter((i) => !i.locked))) {
+    let current = item;
+    while (current.x > 0 && hits({ ...current, x: current.x - 1 }, out).length === 0) {
+      current = { ...current, x: current.x - 1 };
+    }
+    out.push(current);
+  }
+  const grown: Item[] = [];
+  for (const item of readingOrder(out)) {
+    let current = item;
+    const high = item.max?.w ?? columns;
+    const others = out.filter((o) => o.id !== item.id);
+    while (
+      !current.locked &&
+      current.x + current.w < columns &&
+      current.w < high &&
+      hits({ ...current, w: current.w + 1 }, [...others, ...grown]).length === 0
+    ) {
+      current = { ...current, w: current.w + 1 };
+    }
+    grown.push(current);
+    out = out.map((o) => (o.id === current.id ? current : o));
+  }
+  return compact(grown);
 }
 
 /** The first position (top to bottom, start to end) where a ``w``×``h`` widget fits. */
@@ -117,13 +154,13 @@ export function firstFree(items: readonly Item[], size: Size, columns = COLUMNS)
   }
 }
 
-/** Server-side normalization: bound every widget, resolve overlaps in reading order, compact. */
+/** Normalization: bound every widget and resolve overlaps in reading order (gaps are kept). */
 export function normalize(items: readonly Item[], columns = COLUMNS): Item[] {
   const placed: Item[] = items.filter((i) => i.locked).map((i) => bound(i, columns));
   for (const item of readingOrder(items.filter((i) => !i.locked))) {
     placed.push(settle(bound(item, columns), placed));
   }
-  return compact(placed);
+  return readingOrder(placed);
 }
 
 /** Row packing in a given order (migration of ordered dashboards, derived views). */
@@ -149,11 +186,11 @@ export function flow(items: readonly Item[], columns = COLUMNS): Item[] {
 export function derivedWidth(w: number, columns: number): number {
   if (columns >= COLUMNS) return w;
   if (columns <= 1) return 1;
-  const threshold = columns === 2 ? 3 : 6;
+  const threshold = columns <= 4 ? 3 : 6;
   return w <= threshold ? columns / 2 : columns;
 }
 
-/** Tablet (6 columns) / phone (2 columns) view of the desktop arrangement — computed, never stored. */
+/** Tablet (8 columns) / phone (4 columns) view of the desktop arrangement (one layout for every screen). */
 export function derive(items: readonly Item[], columns: number): Item[] {
   return flow(
     readingOrder(items).map((item) => ({ ...item, w: derivedWidth(item.w, columns) })),

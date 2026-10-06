@@ -57,3 +57,48 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 027: the page around the month grid */
+.calendar-page__period {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-display);
+  text-transform: capitalize;
+}
+.calendar-page__day {
+  --cal-color: var(--cal-other);
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.calendar-page__day h3 {
+  margin: 0;
+  text-transform: capitalize;
+}
+.calendar-page__day ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.calendar-page__none {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.calendar-item__icon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-inline-end: 0.3rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cal-color) 20%, transparent);
+  color: var(--cal-color);
+  vertical-align: middle;
+}
+.calendar-page {
+  --cal-color: var(--cal-other);
+}

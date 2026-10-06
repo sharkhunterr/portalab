@@ -31,7 +31,18 @@ export function Poster({ src, kind }: { src: string | null; kind: string }) {
 
 /** Media cards (027 redesign): the poster first, title and year under it; kind and availability as text
  * (never color alone). ``rail`` lays them in one scrolling row. */
-export function MediaGrid({ items, label, rail }: { items: MediaCard[]; label: string; rail?: boolean }) {
+export function MediaGrid({
+  items,
+  label,
+  rail,
+  note,
+}: {
+  items: MediaCard[];
+  label: string;
+  rail?: boolean;
+  /** 027: a line of its own under the title (when it was added or released, the new episode). */
+  note?: ((item: MediaCard) => string | null) | undefined;
+}) {
   const t = useT();
   return (
     <ul className={rail ? "media-rail" : "media-grid"} aria-label={label}>
@@ -48,6 +59,7 @@ export function MediaGrid({ items, label, rail }: { items: MediaCard[]; label: s
             </span>
             <span className="media-card__title">{item.title}</span>
           </Link>
+          {note?.(item) ? <span className="media-card__note">{note(item)}</span> : null}
           <span className="media-card__meta">
             {t(`media:kind.${item.kind}`)}
             {item.year ? ` · ${item.year}` : ""} ·{" "}

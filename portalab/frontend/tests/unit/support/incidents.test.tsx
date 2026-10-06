@@ -79,9 +79,11 @@ describe("incidents", () => {
   it("renders the detail timeline as text, newest first", async () => {
     fake.handler = () => json(200, INCIDENT);
     renderAt(`/incidents/${INCIDENT.id}`, [{ path: "/incidents/:incidentId", element: <IncidentsPage /> }]);
-    await screen.findByRole("heading", { name: "INC-0007 · <b>Media</b> down" });
-    const items = screen.getAllByRole("listitem").map((li) => li.textContent ?? "");
-    expect(items[0]).toContain("Disk full.");
+    await screen.findByRole("heading", { name: "<b>Media</b> down" }); // text, never markup
+    expect(screen.getByText("INC-0007")).toBeTruthy();
+    const items = [...document.querySelectorAll(".incident-timeline > li")].map((li) => li.textContent ?? "");
+    expect(items[0]).toContain("Disk full."); // newest first
+    expect(items.at(-1)).toContain("Incident declared");
     expect(screen.getByRole("link", { name: "Media" }).getAttribute("href")).toBe("/services/s1");
   });
 

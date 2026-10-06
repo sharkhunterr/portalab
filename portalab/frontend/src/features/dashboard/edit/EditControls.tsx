@@ -29,6 +29,8 @@ export interface Arrange {
   count: number;
   prev?: { x: number; y: number; w: number; h: number } | undefined;
   next?: { x: number; y: number; w: number; h: number } | undefined;
+  /** 027: the screen being arranged has this many columns (12, 8 or 4). */
+  columns?: number;
   move: (x: number, y: number) => void;
   resize: (w: number, h: number) => void;
 }
@@ -101,7 +103,7 @@ export function EditControls({
       </Button>
       <Button
         variant="secondary"
-        disabled={fixed || !widget || cell.w >= widget.max_w}
+        disabled={fixed || !widget || cell.w >= Math.min(widget.max_w, arrange?.columns ?? 12)}
         onClick={() => resize(cell.w + 1, cell.h)}
         size="icon"
         aria-label={t("dashboard:wider")}
@@ -111,7 +113,7 @@ export function EditControls({
       </Button>
       <Button
         variant="secondary"
-        disabled={fixed || !widget || cell.w <= widget.min_w}
+        disabled={fixed || !widget || cell.w <= Math.min(widget.min_w, arrange?.columns ?? 12)}
         onClick={() => resize(cell.w - 1, cell.h)}
         size="icon"
         aria-label={t("dashboard:narrower")}

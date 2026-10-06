@@ -21,11 +21,21 @@ class DashboardBase(DeclarativeBase):
 
 class UserDashboard(DashboardBase):
     __tablename__ = "user_dashboards"
+    __table_args__ = (CheckConstraint("layout_mode IN ('shared', 'per_device')", name="layout_mode"),)
 
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
     starter_applied_at: Mapped[datetime | None] = mapped_column(TZDateTime, info=pii("activity"))
     last_summary_seen_at: Mapped[datetime | None] = mapped_column(TZDateTime, info=pii("activity"))
     layout_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # 027: « shared » — one arrangement for every screen (tablet and phone derived from the desktop one);
+    # « per_device » — the tablet and phone arrangements are the member's own (``WidgetInstance.views``)
+    layout_mode: Mapped[str] = mapped_column(
+        String(12),
+        nullable=False,
+        default="shared",
+        server_default="shared",
+        info=pii("preference", tombstone="shared"),
+    )
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
@@ -55,6 +65,11 @@ class WidgetInstance(DashboardBase):
         JSONB, nullable=False, info=pii("preference", tombstone={})
     )
     config_schema_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    # 027: the widget's place in the tablet (8 columns) and phone (4 columns) arrangements, when the member
+    # arranges each screen on its own: {"tablet": {"x":…, "y":…, "w":…, "h":…}, "phone": {…}}
+    views: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}", info=pii("preference", tombstone={})
+    )
     origin: Mapped[str] = mapped_column(String(16), nullable=False)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

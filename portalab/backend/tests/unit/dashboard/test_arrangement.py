@@ -10,6 +10,7 @@ import pytest
 from portalab.modules.dashboard.arrangement import (
     Item,
     Size,
+    autofit,
     compact,
     derive,
     first_free,
@@ -49,6 +50,8 @@ def _run(case: dict[str, Any]) -> Any:
             return {"x": x, "y": y}
         case "normalize":
             return _strip(normalize(items))
+        case "autofit":
+            return _strip(autofit(items))
         case "flow":
             return _strip(flow(items))
         case "derive":

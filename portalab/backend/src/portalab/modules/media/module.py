@@ -83,6 +83,7 @@ from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
     MY_SOON,
     POSTER_WALL,
+    RECENT_RELEASES,
     RECENTLY_ADDED,
     RECENTLY_REQUESTED,
     MySoonWidget,
@@ -316,6 +317,7 @@ class MediaModule:
             (REQUESTS_WIDGET, RequestsWidget(self.requests, self.clock)),
             (STATS_WIDGET, StatsWidget(self.database, self.insights, self.clock)),
             (RECENTLY_ADDED, RecentlyAddedWidget(self.database, self.clock)),
+            (RECENT_RELEASES, RecentlyAddedWidget(self.database, self.clock, released=True)),
             (RECENTLY_REQUESTED, RecentlyRequestedWidget(self.database, self.clock, self.enricher)),
             (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),

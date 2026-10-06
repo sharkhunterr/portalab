@@ -159,3 +159,75 @@
   color: var(--color-accent);
   text-decoration: none;
 }
+
+/* 027: the campaigns widget */
+.campaigns-widget {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.campaigns-widget__card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 60%
+    ),
+    var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.campaigns-widget__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.campaigns-widget__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 1.8rem;
+  block-size: 1.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.campaigns-widget__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-inline-start: auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+.campaigns-widget__boosts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.campaigns-widget__boosts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  font-size: var(--font-size-sm);
+}
+.campaigns-widget__pitch {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}

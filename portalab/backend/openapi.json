@@ -1562,6 +1562,17 @@
             "title": "All Day",
             "type": "boolean"
           },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
           "date": {
             "anyOf": [
               {
@@ -3467,6 +3478,13 @@
             "title": "Status",
             "type": "string"
           },
+          "views": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GridCellOut"
+            },
+            "title": "Views",
+            "type": "object"
+          },
           "w": {
             "title": "W",
             "type": "integer"
@@ -3523,6 +3541,15 @@
             },
             "title": "Instances",
             "type": "array"
+          },
+          "layout_mode": {
+            "default": "shared",
+            "enum": [
+              "shared",
+              "per_device"
+            ],
+            "title": "Layout Mode",
+            "type": "string"
           },
           "layout_version": {
             "title": "Layout Version",
@@ -4443,6 +4470,34 @@
         "title": "GrantOut",
         "type": "object"
       },
+      "GridCellOut": {
+        "properties": {
+          "h": {
+            "title": "H",
+            "type": "integer"
+          },
+          "w": {
+            "title": "W",
+            "type": "integer"
+          },
+          "x": {
+            "title": "X",
+            "type": "integer"
+          },
+          "y": {
+            "title": "Y",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "title": "GridCellOut",
+        "type": "object"
+      },
       "GroupCreate": {
         "additionalProperties": false,
         "properties": {
@@ -5060,6 +5115,24 @@
           "h"
         ],
         "title": "LayoutItemIn",
+        "type": "object"
+      },
+      "LayoutModeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "enum": [
+              "shared",
+              "per_device"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "LayoutModeIn",
         "type": "object"
       },
       "LeaderboardEntryOut": {
@@ -6246,9 +6319,31 @@
       },
       "MediaCard": {
         "properties": {
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
           "available": {
             "title": "Available",
             "type": "boolean"
+          },
+          "episode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Episode"
           },
           "id": {
             "format": "uuid",
@@ -6339,9 +6434,31 @@
       },
       "MediaDetail": {
         "properties": {
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
           "available": {
             "title": "Available",
             "type": "boolean"
+          },
+          "episode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Episode"
           },
           "genres": {
             "items": {
@@ -24345,9 +24462,24 @@
     },
     "/api/v1/dashboard/arrangement": {
       "put": {
-        "description": "027 R13: the desktop arrangement in one write (Save); tablet/phone views derive from it.",
+        "description": "027 R13: an arrangement in one write (Save) \u2014 the desktop one (tablet/phone derive from it), or with\n``view`` the tablet or phone one of a member who arranges each screen on its own.",
         "operationId": "put_arrangement_api_v1_dashboard_arrangement_put",
         "parameters": [
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "desktop",
+              "enum": [
+                "desktop",
+                "tablet",
+                "phone"
+              ],
+              "title": "View",
+              "type": "string"
+            }
+          },
           {
             "in": "header",
             "name": "If-Match",
@@ -24485,6 +24617,67 @@
           }
         },
         "summary": "Put Layout",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/layout-mode": {
+      "put": {
+        "description": "027: one arrangement for every screen, or one per screen (desktop, tablet, phone).",
+        "operationId": "put_layout_mode_api_v1_dashboard_layout_mode_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayoutModeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Layout Mode",
         "tags": [
           "dashboard"
         ]

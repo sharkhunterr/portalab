@@ -6,8 +6,9 @@ import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { Skeleton } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
+import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { imageUrl, type ShelfName, useNowPlaying, useShelf } from "../api";
+import { imageUrl, type MediaCard, type ShelfName, useNowPlaying, useShelf } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
@@ -127,7 +128,16 @@ function Row({
 /** A discovery shelf: shown only when it has something (an empty shelf is not a section). */
 function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
   const t = useT();
+  const format = useFormat();
   const shelf = useShelf(name);
+  const note = (item: MediaCard) => {
+    if (!item.at) return null;
+    const when =
+      name === "new"
+        ? format.relative((Date.parse(item.at) - Date.now()) / 1000)
+        : format.date(`${item.at.slice(0, 10)}T12:00:00Z`, "medium");
+    return item.episode ? `${item.episode} · ${when}` : when;
+  };
   if (shelf.isError) return null;
   if (shelf.isPending) {
     return (
@@ -143,7 +153,7 @@ function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
       title={t(`media:shelf.${name}`)}
       more={{ to: "/media/browse", label: t("media:home.seeAll") }}
     >
-      <MediaGrid items={shelf.data.items} label={t(`media:shelf.${name}`)} rail />
+      <MediaGrid items={shelf.data.items} label={t(`media:shelf.${name}`)} rail note={note} />
     </Row>
   );
 }
@@ -232,6 +242,7 @@ export function MediaHome() {
         </Row>
       ) : null}
       <Shelf name="new" icon="sparkles" />
+      <Shelf name="released" icon="clapperboard" />
       {lately.length ? (
         <Row
           icon="clock"

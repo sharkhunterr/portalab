@@ -56,6 +56,29 @@ async def test_visibility_and_surfacing(
         Principal(user_id=alex), {}, LocaleContext()
     )  # type: ignore[union-attr]
     assert widget.data["items"][0]["route"] == f"/incidents/{created['id']}"  # type: ignore[index]
+    first = widget.data["items"][0]  # type: ignore[index]
+    assert (first["severity"], first["state"], first["services"], widget.data["open"]) == (  # type: ignore[index]
+        "critical",
+        "investigating",
+        2,
+        1,
+    )
+    # 027: an incident in the calendar lasts from its start until now while it runs
+    from datetime import timedelta
+
+    from portalab.capabilities.content import default_calendar_sources
+    from portalab.core.time import utc_now
+    from portalab.modules.support.incidents.integrations import IncidentCalendarSource
+
+    assert default_calendar_sources.get("incident") is not None  # registered by the module
+    source = IncidentCalendarSource(support.module.incidents, support.module.clock)
+    now = utc_now(support.module.clock)
+    found = await source.items(
+        now - timedelta(days=1), now + timedelta(days=1), Principal(user_id=alex), LocaleContext()
+    )
+    [item] = [i for i in found.items if i.source_id == created["id"]]
+    assert item.type == "incident" and item.category == "critical" and item.ends_at is not None
+    assert item.title == "INC-0001 · Books offline" and item.url_ref == f"/incidents/{created['id']}"
     provider = support.search.provider("incidents")
     query = ParsedQuery(text="books", normalized="books", terms=("books",))
     found = await provider.search(query, Principal(user_id=alex), LocaleContext(), limit=5, cursor=None)  # type: ignore[union-attr]

@@ -5,6 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 from uuid import UUID
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import CalendarSourceRegistry, default_calendar_sources
@@ -120,36 +121,52 @@ class MonthWidget:
         now = utc_now(self.clock)
         first = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         end = (first + timedelta(days=32)).replace(day=1) + timedelta(days=7)
-        view = await self.aggregator.view(principal, first, end, ctx)
+        view = await self.aggregator.view(principal, first - timedelta(days=7), end, ctx)
         show = str(config.get("show") or "all")
         items = [
             i for i in view.items if show == "all" or (i.source_kind == "media_release") == (show == "media")
         ]
-        days: dict[str, list[dict[str, Any]]] = {}
-        upcoming: list[dict[str, Any]] = []
+        zone = _zone(ctx.time_zone)
+        today = now.astimezone(zone).date()
+        entries: list[dict[str, Any]] = []
         for item in items:
-            day = item.date or (item.starts_at.date() if item.starts_at else None)
-            if day is None:
+            start_day = item.date or (item.starts_at.astimezone(zone).date() if item.starts_at else None)
+            if start_day is None:
                 continue
-            entry = {
-                "title": item.title,
-                "kind": item.source_kind,
-                "time": None if item.all_day or item.starts_at is None else item.starts_at.isoformat(),
-                "route": item.url_ref if item.url_ref and item.url_ref.startswith("/") else "/calendar",
-                "date": day.isoformat(),
-            }
-            days.setdefault(day.isoformat(), []).append(entry)
-            if day >= now.date() and len(upcoming) < 6:
-                upcoming.append(entry)
+            end_day = start_day
+            if item.ends_at is not None and not item.date:
+                # an end at midnight closes the previous day
+                end_day = max(start_day, (item.ends_at.astimezone(zone) - timedelta(seconds=1)).date())
+            entries.append(
+                {
+                    "title": item.title,
+                    "kind": item.source_kind,
+                    "category": item.category,
+                    "status": item.status,
+                    "time": None if item.all_day or item.starts_at is None else item.starts_at.isoformat(),
+                    "route": item.url_ref if item.url_ref and item.url_ref.startswith("/") else "/calendar",
+                    "date": start_day.isoformat(),
+                    "end": end_day.isoformat(),
+                }
+            )
+        entries.sort(key=lambda e: (e["date"], e["end"]))
+        upcoming = [e for e in entries if e["end"] >= today.isoformat()][:6]
         data = {
             "month": first.date().isoformat(),
-            "today": now.date().isoformat(),
-            "days": days,
+            "today": today.isoformat(),
+            "entries": entries,
             "upcoming": upcoming,
         }
         if any(s != "ok" for s in view.source_states.values()):
             return WidgetPayload("partial", as_of=now, data=data)
         return WidgetPayload("available", as_of=now, data=data)
+
+
+def _zone(name: str) -> ZoneInfo:
+    try:
+        return ZoneInfo(name)
+    except (ZoneInfoNotFoundError, ValueError):
+        return ZoneInfo("UTC")
 
 
 class _Participant:

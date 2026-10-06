@@ -116,6 +116,7 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
         "original_title": f"{title} — {subtitle}"[:500] if subtitle else None,
         "ids": ids,
         "year": published.year if published else None,
+        "released": published.date().isoformat() if published else None,  # 027: « Recent releases »
         "overview": (str(meta.get("description") or "")[:5000]) or None,
         "genres": _names(meta.get("categories"))[:30],
         "people": people[:50],

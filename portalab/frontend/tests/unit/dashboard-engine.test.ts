@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  autofit,
   compact,
   derive,
   firstFree,
@@ -42,6 +43,8 @@ function run(c: Case): unknown {
       return firstFree(c.items, c.size as { w: number; h: number });
     case "normalize":
       return strip(normalize(c.items));
+    case "autofit":
+      return strip(autofit(c.items));
     case "flow":
       return strip(flow(c.items));
     case "derive":

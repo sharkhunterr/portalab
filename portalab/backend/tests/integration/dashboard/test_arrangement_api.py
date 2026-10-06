@@ -109,3 +109,48 @@ async def test_locked_widgets_cannot_be_rearranged(
     assert refused.json()["widget"] == "health.services_summary"
     moved = await client.patch(f"/api/v1/dashboard/widgets/{locked['id']}", json={"x": 4})
     assert moved.status_code == 409
+
+
+async def test_one_arrangement_per_screen(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
+) -> None:
+    """027: by default tablet and phone derive from the desktop arrangement; a member may arrange each screen
+    on its own — switching starts every screen from what it showed — and a tablet arrangement leaves the
+    desktop one untouched. A widget kept where it was dropped leaves its gap (free placement)."""
+    register(dash)
+    await create_user(module_of(app), "alex")
+    await login(client, "alex")
+    await client.post("/api/v1/dashboard/widgets", json={"widget_key": "t.one"})
+    view = await board(client)
+    assert view["layout_mode"] == "shared" and all(i["views"] == {} for i in view["instances"])
+    desktop = cells(view)
+    switched = await client.put(
+        "/api/v1/dashboard/layout-mode",
+        json={"mode": "per_device"},
+        headers={"If-Match": str(view["layout_version"])},
+    )
+    assert switched.status_code == 200
+    view = await board(client)
+    active = [i for i in view["instances"] if i["status"] == "active"]
+    assert view["layout_mode"] == "per_device"
+    assert all({"tablet", "phone"} <= set(i["views"]) for i in active)
+    assert all(i["views"]["phone"]["x"] + i["views"]["phone"]["w"] <= 4 for i in active)
+    moved = active[0]
+    items = [{"id": i["id"], "widget_key": i["widget_key"], **i["views"]["tablet"]} for i in active]
+    items[0].update(x=4, y=6, w=4, h=2)
+    saved = await client.put(
+        "/api/v1/dashboard/arrangement",
+        params={"view": "tablet"},
+        json={"items": items},
+        headers={"If-Match": str(view["layout_version"])},
+    )
+    assert saved.status_code == 200
+    after = await board(client)
+    placed = next(i for i in after["instances"] if i["id"] == moved["id"])
+    assert placed["views"]["tablet"] == {"x": 4, "y": 6, "w": 4, "h": 2}  # stays where it was put
+    assert cells(after) == desktop  # the desktop arrangement did not change
+    bad = await client.put("/api/v1/dashboard/layout-mode", json={"mode": "chaos"})
+    assert bad.status_code == 422
+    back = await client.put("/api/v1/dashboard/layout-mode", json={"mode": "shared"})
+    assert back.status_code == 200
+    assert all(i["views"] == {} for i in (await board(client))["instances"])  # shared: derived again

@@ -42,6 +42,7 @@ class CalendarItemOut(BaseModel):
     reference_tz: str | None
     status: str
     url_ref: str | None
+    category: str | None = None  # 027: movie | series | book for media releases
 
 
 class CalendarOut(BaseModel):

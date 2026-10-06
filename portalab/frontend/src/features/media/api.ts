@@ -10,7 +10,7 @@ export type MediaSection = components["schemas"]["MediaSectionOut"];
 export type MediaRequest = components["schemas"]["MediaRequestOut"];
 export type MediaLink = components["schemas"]["MediaLinkOut"];
 export type MatchCandidate = components["schemas"]["MediaMatchCandidateOut"];
-export type ShelfName = "new" | "recent" | "continue" | "trending" | "recommended";
+export type ShelfName = "new" | "released" | "recent" | "continue" | "trending" | "recommended";
 
 export interface CatalogFilters {
   q?: string;

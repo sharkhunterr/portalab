@@ -558,3 +558,11 @@ a.media-card__link:focus-visible .media-card__frame {
   margin: 0;
   font-weight: var(--font-weight-medium);
 }
+.media-card__note {
+  overflow: hidden;
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

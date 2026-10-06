@@ -89,6 +89,8 @@ class LibraryPayload(BaseModel):
     pages: int | None = Field(default=None, ge=0)
     image: str | None = Field(default=None, max_length=300)  # opaque ref fetched through the provider
     available: bool = True
+    # 027: release date (a film's, a book's) or air date (an episode's), for « Recent releases »
+    released: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
 
 
 class RequestPayload(BaseModel):

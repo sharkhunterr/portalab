@@ -8,7 +8,9 @@ import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { type CalendarItem, useCalendar, useReminderActions, useReminders } from "./api";
 import "./calendar.css";
+import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
+import { CATEGORY_ICONS, type CalEntry, CalendarLegend, categoryOf, MonthGrid } from "./MonthGrid";
 
 /**
  * Calendar (spec 011 T025): month, week and list views of items owned by other domains. Every type has an
@@ -16,14 +18,6 @@ import { PageHeader } from "../../design-system/components/PageHeader";
  * others render; times follow the user's time zone and first day of the week (026); reminders are opt-in.
  */
 type View = "month" | "week" | "list";
-const ICONS: Record<string, string> = {
-  maintenance: "🔧",
-  publication: "📰",
-  campaign: "🏁",
-  community_event: "👥",
-  deadline: "⏳",
-  event: "📅",
-};
 const DAY = 86_400_000;
 
 function dayKey(value: Date, timeZone: string): string {
@@ -38,6 +32,23 @@ function dayKey(value: Date, timeZone: string): string {
 export function itemDay(item: CalendarItem, timeZone: string): string {
   if (item.date) return item.date;
   return item.starts_at ? dayKey(new Date(item.starts_at), timeZone) : "";
+}
+
+/** 027: the item as a grid entry — its first and last day in the viewer's time zone. */
+export function entryOf(item: CalendarItem, timeZone: string): CalEntry {
+  const date = itemDay(item, timeZone);
+  const end =
+    item.ends_at && !item.date ? dayKey(new Date(new Date(item.ends_at).getTime() - 1000), timeZone) : date;
+  return {
+    title: item.title,
+    kind: item.source_kind,
+    category: item.category ?? null,
+    status: item.status,
+    time: item.all_day ? null : (item.starts_at ?? null),
+    route: item.url_ref?.startsWith("/") ? item.url_ref : "/calendar",
+    date,
+    end: end < date ? date : end,
+  };
 }
 
 function startOfDayUtc(key: string): Date {
@@ -80,10 +91,20 @@ function ItemLine({ item, leads }: { item: CalendarItem; leads: number[] }) {
   const route = item.url_ref?.startsWith("/") ? item.url_ref : null;
   const future = item.starts_at ? new Date(item.starts_at).getTime() > Date.now() : false;
   return (
-    <li className="calendar-item" data-type={item.type}>
-      <span aria-hidden="true">{ICONS[item.type] ?? "📅"} </span>
-      <span className="calendar-item__type">{t(`calendar:type.${item.type}`)}</span> ·{" "}
-      {route ? <Link to={route}>{item.title}</Link> : item.title}
+    <li
+      className="calendar-item"
+      data-category={categoryOf({ kind: item.source_kind, category: item.category })}
+    >
+      <span className="calendar-item__icon" aria-hidden="true">
+        <Icon
+          name={CATEGORY_ICONS[categoryOf({ kind: item.source_kind, category: item.category })] ?? "calendar"}
+          size={14}
+        />
+      </span>
+      <span className="calendar-item__type">
+        {t(`calendar:category.${categoryOf({ kind: item.source_kind, category: item.category })}`)}
+      </span>{" "}
+      · {route ? <Link to={route}>{item.title}</Link> : item.title}
       {item.starts_at && !item.all_day ? (
         <span className="calendar-item__time"> · {format.time(item.starts_at)}</span>
       ) : null}
@@ -134,21 +155,27 @@ export function CalendarPage() {
   const { from, to, days } = useMemo(() => range(view, anchor, firstDay), [view, anchor, firstDay]);
   const calendar = useCalendar(from, to);
   const reminders = useReminders();
+  const [picked, setPicked] = useState<string | null>(null);
+  const entries = useMemo(
+    () => (calendar.data?.items ?? []).map((item) => ({ item, entry: entryOf(item, timeZone) })),
+    [calendar.data, timeZone],
+  );
   const byDay = useMemo(() => {
     const map = new Map<string, CalendarItem[]>();
-    for (const item of calendar.data?.items ?? []) {
-      const key = itemDay(item, timeZone);
-      map.set(key, [...(map.get(key) ?? []), item]);
+    for (const { item, entry } of entries) {
+      for (const day of days) {
+        if (day >= entry.date && day <= entry.end) map.set(day, [...(map.get(day) ?? []), item]);
+      }
     }
     return map;
-  }, [calendar.data, timeZone]);
+  }, [entries, days]);
   const move = (direction: number) => {
     const step = view === "month" ? 30 : view === "week" ? 7 : 30;
     setAnchor(new Date(startOfDayUtc(anchor).getTime() + direction * step * DAY).toISOString().slice(0, 10));
   };
   const leads = calendar.data?.lead_options ?? [60];
   const failing = Object.entries(calendar.data?.source_states ?? {}).filter(([, state]) => state !== "ok");
-  const types = [...new Set((calendar.data?.items ?? []).map((i) => i.type))];
+  const today = dayKey(new Date(), timeZone);
   return (
     <section aria-labelledby={headingId} className="calendar-page">
       <PageHeader titleId={headingId} level={2} icon="calendar" title={t("calendar:title")} />
@@ -178,15 +205,7 @@ export function CalendarPage() {
           {t("calendar:sourceUnavailable", { source: t(calendar.data?.sources[kind] ?? kind) })}
         </p>
       ))}
-      {types.length ? (
-        <ul className="calendar-legend" aria-label={t("calendar:legend")}>
-          {types.map((type) => (
-            <li key={type}>
-              <span aria-hidden="true">{ICONS[type] ?? "📅"}</span> {t(`calendar:type.${type}`)}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <CalendarLegend entries={entries.map((e) => e.entry)} />
       {calendar.isPending ? <FunctionalState state="loading" /> : null}
       {calendar.isError ? <FunctionalState state="unavailable" onRetry={() => calendar.refetch()} /> : null}
       {calendar.data ? (
@@ -207,18 +226,38 @@ export function CalendarPage() {
             {days.every((day) => !byDay.has(day)) ? <li>{t("calendar:empty")}</li> : null}
           </ol>
         ) : (
-          <ol className={`calendar-grid calendar-grid--${view}`}>
-            {days.map((day) => (
-              <li key={day} className="calendar-day" data-today={day === dayKey(new Date(), timeZone)}>
-                <h3 className="calendar-day__label">{format.date(`${day}T12:00:00Z`, "short")}</h3>
-                <ul>
-                  {(byDay.get(day) ?? []).map((item) => (
-                    <ItemLine key={`${item.source_kind}-${item.source_id}`} item={item} leads={leads} />
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
+          <>
+            <h3 className="calendar-page__period">
+              {new Date(`${anchor}T12:00:00Z`).toLocaleDateString(undefined, {
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC",
+              })}
+            </h3>
+            <MonthGrid
+              days={days}
+              month={view === "month" ? anchor : undefined}
+              today={today}
+              entries={entries.map((e) => e.entry)}
+              maxLanes={view === "week" ? 6 : 3}
+              picked={picked}
+              onPick={setPicked}
+            />
+            {picked ? (
+              <section className="calendar-page__day" aria-label={format.date(`${picked}T12:00:00Z`, "long")}>
+                <h3>{format.date(`${picked}T12:00:00Z`, "long")}</h3>
+                {(byDay.get(picked) ?? []).length ? (
+                  <ul>
+                    {(byDay.get(picked) ?? []).map((item) => (
+                      <ItemLine key={`${item.source_kind}-${item.source_id}`} item={item} leads={leads} />
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="calendar-page__none">{t("calendar:empty")}</p>
+                )}
+              </section>
+            ) : null}
+          </>
         )
       ) : null}
       {reminders.data?.length ? (

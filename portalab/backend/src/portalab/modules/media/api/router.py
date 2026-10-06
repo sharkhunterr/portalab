@@ -81,6 +81,8 @@ class MediaCard(BaseModel):
     year: int | None
     available: bool
     image_id: UUID | None = None
+    at: str | None = None  # 027: when it was added or released (« new » / « released » shelves)
+    episode: str | None = None  # 027: « S02E05 » when a new episode brought the series up
 
 
 class MediaPage(BaseModel):
@@ -269,6 +271,16 @@ async def browse(
 async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf:
     if shelf not in SHELVES:
         raise MediaNotFound("This shelf does not exist.")
+    if shelf in ("new", "released"):  # 027: with when it was added or released
+        size = max(1, min(module.config.discovery_shelf_size, 50))
+        recents = await module.discovery.recent(shelf, limit=size)
+        async with module.database.session() as session:
+            images = await module.catalog._images(session, [r.id for r, _ in recents])
+        items = [
+            _card(r, images.get(r.id)).model_copy(update={"at": note.at, "episode": note.episode})
+            for r, note in recents
+        ]
+        return MediaShelf(shelf=shelf, items=items, next_action=None if items else "browse")
     rows, next_action = await module.discovery.shelf(shelf, principal)
     async with module.database.session() as session:
         images = await module.catalog._images(session, [r.id for r in rows])

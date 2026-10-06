@@ -4,8 +4,10 @@ affected services are only named to holders of ``services.read``."""
 
 import time
 from collections.abc import Mapping, Sequence
+from datetime import datetime
 from typing import Any
 
+from portalab.capabilities.content import CalendarItem, CalendarSourceResult
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
 from portalab.capabilities.i18n import LocaleContext, normalize_for_search
 from portalab.capabilities.search import FacetDef, ParsedQuery, ProviderResult, SearchItem
@@ -22,10 +24,10 @@ OPEN_INCIDENTS = WidgetDefinition(
     description_key="support:widget.incidents.description",
     icon="alert",
     required_permission=INCIDENTS_READ,
-    size=SizeLimits(default=Size(6, 2), min=Size(3, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
     refresh=Refresh(mode="event", events=("incident.created", "incident.updated", "incident.resolved")),
     stale_after_s=900,
-    template="list",
+    component_id="support.incidents",  # 027: severity, state, duration and the latest update
 )
 
 
@@ -37,21 +39,76 @@ class OpenIncidentsWidget:
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
+        now = utc_now(self.clock)
         views = await self.incidents.list(state="open", limit=10)
-        if not views:
-            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        resolved = [
+            v
+            for v in await self.incidents.list(state="resolved", limit=3)
+            if v.resolved_at is not None and (now - v.resolved_at).days < 7
+        ]
+        if not views and not resolved:
+            return WidgetPayload("no-data", as_of=now)
         items = [
             {
+                "id": str(v.id),
                 "title": v.title,
-                "subtitle": v.reference,
+                "reference": v.reference,
                 "route": f"/incidents/{v.id}",
-                "state": v.state,  # 027: badge; the severity stays in words
-                "meta": v.severity,
-                "icon": "alert",
+                "state": v.state,
+                "severity": v.severity,
+                "since": v.created_at.isoformat(),
+                "resolved_at": v.resolved_at.isoformat() if v.resolved_at else None,
+                "services": len(v.service_ids),
             }
-            for v in views
+            for v in [*views, *resolved]
         ]
-        return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
+        return WidgetPayload(
+            "available", as_of=now, data={"items": items, "open": len(views), "resolved": len(resolved)}
+        )
+
+
+class IncidentCalendarSource:
+    """027: incidents in the calendar — from their start to their resolution (still running: until now), so
+    a long one draws a bar across the days it lasted; for holders of ``incidents.read``."""
+
+    kind = "incident"
+    label_key = "calendar:source.incident"
+    required_permission = INCIDENTS_READ
+
+    def __init__(self, incidents: IncidentService, clock: Clock | None = None) -> None:
+        self.incidents = incidents
+        self.clock = clock
+
+    def _item(self, view: IncidentView) -> CalendarItem:
+        return CalendarItem(
+            source_kind=self.kind,
+            source_id=str(view.id),
+            type="incident",
+            title=f"{view.reference} · {view.title}",
+            starts_at=view.created_at,
+            ends_at=view.resolved_at or utc_now(self.clock),
+            status=view.state,
+            url_ref=f"/incidents/{view.id}",
+            category=view.severity,
+        )
+
+    async def items(
+        self, start: datetime, end: datetime, viewer: Principal, ctx: LocaleContext
+    ) -> CalendarSourceResult:
+        rows = [
+            self._item(v)
+            for v in await self.incidents.list(limit=200)
+            if v.created_at < end and (v.resolved_at is None or v.resolved_at > start)
+        ]
+        return CalendarSourceResult(items=rows, as_of=utc_now(self.clock))
+
+    async def item(self, source_id: str, viewer: Principal) -> CalendarItem | None:
+        from uuid import UUID
+
+        try:
+            return self._item(await self.incidents.get(UUID(source_id)))
+        except (ValueError, IncidentNotFound):
+            return None
 
 
 class IncidentSearchProvider:

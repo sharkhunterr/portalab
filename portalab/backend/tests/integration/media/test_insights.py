@@ -486,3 +486,56 @@ async def test_media_home_journal_and_posters_of_titles_outside_the_library(
         and latest["parent_title"] == "Dune"
         and latest["poster_ref"] == "/poster.jpg"
     )
+
+
+async def test_recently_added_and_recent_releases(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """027 — « Recently added » follows the services' own dates (a new episode brings its series up, once);
+    « Recent releases » the release or air date, never one still to come."""
+    from datetime import UTC, datetime
+
+    from portalab.capabilities.i18n import LocaleContext
+    from portalab.core.authz_port import Principal
+
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+
+    def at(day: int) -> datetime:
+        return datetime(2026, 9, day, 12, tzinfo=UTC)
+
+    await media.module.library.upsert(
+        [
+            library_record("m1", title="Old film", at=at(1), released="2026-09-20"),
+            library_record("m2", title="New film", at=at(20), released="2021-05-01"),
+            library_record("s1", kind="series", title="Andor", at=at(2)),
+            library_record("se1", kind="season", title="Season 2", parent="s1", position=2, at=at(2)),
+            library_record(
+                "e1", kind="episode", title="One", parent="se1", position=1, at=at(25), released="2026-09-24"
+            ),
+            library_record(
+                "e2", kind="episode", title="Two", parent="se1", position=2, at=at(24), released="2026-09-23"
+            ),
+            library_record("m3", title="Coming", at=at(10), released="2027-01-01"),
+        ],
+        one,
+    )
+    await login(client, "zoe")
+    added = (await client.get("/api/v1/media/discovery/new")).json()["items"]
+    assert [(i["title"], i["episode"]) for i in added] == [
+        ("Andor", "S02E01"),
+        ("New film", None),
+        ("Coming", None),
+        ("Old film", None),
+    ]
+    released = (await client.get("/api/v1/media/discovery/released")).json()["items"]
+    assert [(i["title"], i["at"]) for i in released] == [
+        ("Andor", "2026-09-24"),
+        ("Old film", "2026-09-20"),
+        ("New film", "2021-05-01"),
+    ]  # « Coming » is not out yet
+    zoe, ctx = Principal(user_id=people["zoe"]), LocaleContext()
+    films = await _widget(media, "media.recent_releases").load(zoe, {"kind": "movie"}, ctx)
+    assert [i["title"] for i in films.data["items"]] == ["Old film", "New film"]
+    assert films.data["mode"] == "released"

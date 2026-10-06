@@ -16,14 +16,16 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.media.discovery.recent import Recent, recent_releases, recently_added
 from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.models import HistoryEntry, MediaObject, ObjectTag
 from portalab.modules.media.observability import log
 
-SHELVES = ("new", "recent", "continue", "trending", "recommended")
+SHELVES = ("new", "released", "recent", "continue", "trending", "recommended")
 COHORT = 5
 NEXT_ACTION = {
     "new": "browse",
+    "released": "browse",
     "recent": "browse",
     "continue": "browse",
     "trending": "browse",
@@ -93,21 +95,29 @@ class Discovery:
         self.config = config
         self.clock = clock
 
+    async def recent(
+        self, name: str, *, limit: int, kinds: Sequence[str] | None = None
+    ) -> list[tuple[MediaObject, Recent]]:
+        """027: « new » (added last) or « released » (came out last) works with their date and episode."""
+        async with self.database.session() as session:
+            recents = (
+                await recent_releases(session, utc_now(self.clock).date(), limit=limit, kinds=kinds)
+                if name == "released"
+                else await recently_added(session, limit=limit, kinds=kinds)
+            )
+            rows = {row.id: row for row in await self._ordered(session, [r.object_id for r in recents])}
+        return [(rows[r.object_id], r) for r in recents if r.object_id in rows]
+
     async def shelf(self, name: str, viewer: Principal) -> tuple[list[MediaObject], str | None]:
         user = viewer.acting_for or viewer.user_id
         size = max(1, min(self.config().discovery_shelf_size, 50))
         now = utc_now(self.clock)
-        base = select(MediaObject).where(MediaObject.status == "active", MediaObject.parent_id.is_(None))
+        if name in ("new", "released"):  # 027: the services' own dates, newest first
+            found = [row for row, _ in await self.recent(name, limit=size)]
+            return found, (None if found else NEXT_ACTION[name])
+        rows: Sequence[MediaObject]
         async with self.database.session() as session:
-            if name == "new":
-                since = now - timedelta(days=max(1, self.config().discovery_new_days))
-                stmt = base.where(MediaObject.first_seen_at >= since, MediaObject.available.is_(True))
-                rows = (
-                    (await session.execute(stmt.order_by(MediaObject.first_seen_at.desc()).limit(size)))
-                    .scalars()
-                    .all()
-                )
-            elif name == "recent" and user is not None:
+            if name == "recent" and user is not None:
                 ids = [
                     r[0]
                     for r in await session.execute(

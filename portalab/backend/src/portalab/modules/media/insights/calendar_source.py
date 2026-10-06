@@ -12,6 +12,7 @@ from portalab.core.time import utc_now
 from portalab.modules.media.insights.upcoming import Upcoming
 
 HORIZON_DAYS = 90
+CATEGORY = {"movie": "movie", "episode": "series", "series": "series", "book": "book", "audiobook": "book"}
 
 
 def _title(release: dict[str, Any]) -> str:
@@ -39,6 +40,7 @@ class MediaReleaseCalendarSource:
             all_day=True,
             status="available" if release.get("available") else "scheduled",
             url_ref=f"/media/{object_id}" if object_id else "/media/insights",
+            category=CATEGORY.get(str(release.get("kind") or ""), "movie"),
         )
 
     async def items(

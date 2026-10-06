@@ -1,4 +1,14 @@
-import { Component, type ErrorInfo, type ReactNode, Suspense, useId } from "react";
+import {
+  Component,
+  type ErrorInfo,
+  type ReactNode,
+  type RefObject,
+  Suspense,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
@@ -69,6 +79,49 @@ function Body({ instance }: { instance: Instance }) {
   );
 }
 
+/**
+ * 027: the content fits its block — list items that would spill over the bottom are left out (no inner
+ * scrollbar) and counted; recomputed when the block is resized or the content changes.
+ */
+function useFit(ref: RefObject<HTMLElement | null>): number {
+  const [hidden, setHidden] = useState(0);
+  useEffect(() => {
+    const body = ref.current;
+    if (!body || typeof ResizeObserver === "undefined") return;
+    let frame = 0;
+    const fit = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // items are hidden with « visibility » (layout unchanged), so measuring never re-flows the content
+        const limit = body.getBoundingClientRect().bottom + 1;
+        let count = 0;
+        for (const item of body.querySelectorAll<HTMLElement>("ul > li, ol > li")) {
+          if (item.closest("svg, .recharts-wrapper, [data-nofit]")) continue;
+          const box = item.getBoundingClientRect();
+          // the first row of a list always stays (cropped if need be): a block never looks empty
+          const first = item.parentElement?.firstElementChild?.getBoundingClientRect();
+          const firstRow = !first || box.top <= first.top + 2;
+          const over = box.height > 0 && box.bottom > limit && !firstRow;
+          if (over !== item.hasAttribute("data-overflow")) item.toggleAttribute("data-overflow", over);
+          if (over && !item.parentElement?.closest("li[data-overflow]")) count += 1;
+        }
+        setHidden(count);
+      });
+    };
+    const resized = new ResizeObserver(fit);
+    resized.observe(body);
+    const changed = new MutationObserver(fit);
+    changed.observe(body, { childList: true, subtree: true });
+    fit();
+    return () => {
+      resized.disconnect();
+      changed.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [ref]);
+  return hidden;
+}
+
 export function WidgetFrame({
   instance,
   controls,
@@ -80,6 +133,8 @@ export function WidgetFrame({
 }) {
   const t = useT();
   const headingId = useId();
+  const body = useRef<HTMLDivElement>(null);
+  const hidden = useFit(body);
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
   return (
     <section
@@ -97,15 +152,22 @@ export function WidgetFrame({
         {instance.mandatory ? <span className="widget__badge">{t("dashboard:mandatory")}</span> : null}
         {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
       </header>
-      {instance.available ? (
-        <FrameBoundary fallback={<FunctionalState state="error" />}>
-          <Suspense fallback={<FunctionalState state="loading" />}>
-            <Body instance={instance} />
-          </Suspense>
-        </FrameBoundary>
-      ) : (
-        <FunctionalState state="unavailable" label={t("dashboard:unavailableWidget")} />
-      )}
+      <div className="widget-frame__body" ref={body}>
+        {instance.available ? (
+          <FrameBoundary fallback={<FunctionalState state="error" />}>
+            <Suspense fallback={<FunctionalState state="loading" />}>
+              <Body instance={instance} />
+            </Suspense>
+          </FrameBoundary>
+        ) : (
+          <FunctionalState state="unavailable" label={t("dashboard:unavailableWidget")} />
+        )}
+      </div>
+      {hidden ? (
+        <span className="widget-frame__more" title={t("dashboard:moreItems", { count: hidden })}>
+          +{hidden}
+        </span>
+      ) : null}
       {controls}
     </section>
   );

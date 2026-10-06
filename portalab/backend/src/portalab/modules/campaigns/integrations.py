@@ -18,10 +18,10 @@ ACTIVE_WIDGET = WidgetDefinition(
     description_key="campaigns:widget.active.description",
     icon="sparkles",
     required_permission=READ,
-    size=SizeLimits(default=Size(4, 2), min=Size(3, 2), max=Size(12, 4)),
+    size=SizeLimits(default=Size(4, 3), min=Size(3, 2), max=Size(12, 4)),
     refresh=Refresh(mode="event", events=("campaign.started", "campaign.ended")),
     stale_after_s=600,
-    template="list",
+    component_id="campaigns.active",  # 027: a card per campaign — countdown and boosts
 )
 
 
@@ -39,12 +39,17 @@ class ActiveWidget:
         active = await self.presentation.active_for_user(user)
         if not active:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
-        items = [
-            {
-                "title": c.name,
-                "route": f"/campaigns/{c.key}",
-                "meta": c.ends_at.isoformat() if c.ends_at else "",
-            }
-            for c in active
-        ]
+        items = []
+        for c in active:
+            view = await self.presentation.public_view(c.key)
+            items.append(
+                {
+                    "key": c.key,
+                    "title": c.name,
+                    "route": f"/campaigns/{c.key}",
+                    "ends_at": c.ends_at.isoformat() if c.ends_at else None,
+                    "description": (view or {}).get("description") or "",
+                    "boosts": (view or {}).get("modifiers") or [],
+                }
+            )
         return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})

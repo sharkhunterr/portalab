@@ -24,7 +24,9 @@ from portalab.core.authz_port import Principal
 KNOWLEDGE = "support.knowledge"
 HELP = "content.help"
 LinkState = Literal["ok", "forbidden", "archived", "deleted", "unavailable"]
-ItemType = Literal["event", "maintenance", "campaign", "community_event", "deadline", "publication"]
+ItemType = Literal[
+    "event", "maintenance", "campaign", "community_event", "deadline", "publication", "incident"
+]
 SourceState = Literal["ok", "partial", "unavailable"]
 _REF = re.compile(r"^portalab://([a-z][a-z0-9_.-]{0,40})/([A-Za-z0-9_.:/-]{1,200})$")
 
@@ -107,6 +109,7 @@ class CalendarItem:
     reference_tz: str | None = None
     status: str = "scheduled"
     url_ref: str | None = None  # SPA route or ``portalab://`` ref
+    category: str | None = None  # 027: a finer kind shown apart (a media release: movie, series, book)
 
 
 @dataclass(frozen=True, slots=True)

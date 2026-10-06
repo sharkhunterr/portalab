@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.content import default_calendar_sources
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.health import INCIDENTS, SERVICE_DIRECTORY
@@ -43,6 +44,7 @@ from portalab.modules.support.events import register_event_types
 from portalab.modules.support.feedback.service import FeedbackService
 from portalab.modules.support.incidents.integrations import (
     OPEN_INCIDENTS,
+    IncidentCalendarSource,
     IncidentSearchProvider,
     OpenIncidentsWidget,
 )
@@ -173,6 +175,8 @@ class SupportModule:
             )
         if self.search.provider("incidents") is None:
             self.search.register(IncidentSearchProvider(self.incidents, self.authorizer), owner=OWNER)
+        if default_calendar_sources.get(IncidentCalendarSource.kind) is None:  # 027: incidents that last
+            default_calendar_sources.register(IncidentCalendarSource(self.incidents, self.clock), owner=OWNER)
         self.observables.declare(
             ObservedComponent(
                 "support", OWNER, label="Support", functional_checks=(Check("incidents", self.probe),)

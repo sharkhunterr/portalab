@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
 import { useAnnounce } from "../../design-system/a11y/Announce";
@@ -13,13 +13,13 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useMe } from "../auth/useAuth";
 import { IncidentBanner } from "../support/incidents/IncidentBanner";
-import { type Change, DASHBOARD_KEY, useDashboard, useDashboardWrite } from "./api";
+import { type Change, DASHBOARD_KEY, type Instance, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
-import { itemsOf, keyOf, useEditSession } from "./edit/EditSession";
+import { cellsFor, itemsOf, keyOf, type LayoutMode, useEditSession } from "./edit/EditSession";
 import { WidgetFrame } from "./frame/WidgetFrame";
 import { DashboardGrid } from "./grid/DashboardGrid";
-import { readingOrder } from "./grid/engine";
+import { readingOrder, VIEW_COLUMNS, type View } from "./grid/engine";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
@@ -28,6 +28,8 @@ import "./widgets/calendar";
 import "../gamification/widget";
 import "../community/widget";
 import "../marketplace/widget";
+import "../support/incidents/widget";
+import "../campaigns/widget";
 import { ActiveCampaignBanner } from "../campaigns/banner/ActiveCampaignBanner";
 
 const ONBOARDED = "portalab.onboarding.dashboard";
@@ -45,6 +47,12 @@ export function greetingKey(hour: number): string {
   return "dashboard:greeting.evening";
 }
 
+const VIEWS: Array<{ view: View; icon: string }> = [
+  { view: "desktop", icon: "monitor" },
+  { view: "tablet", icon: "tablet" },
+  { view: "phone", icon: "smartphone" },
+];
+
 export function DashboardPage({ live = true }: { live?: boolean }) {
   const t = useT();
   const format = useFormat();
@@ -55,11 +63,11 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const client = useQueryClient();
   const dashboard = useDashboard();
   const device = useDeviceClass();
-  const desktop = device === "desktop";
-  const columns = desktop ? 12 : device === "tablet" ? 6 : 2;
-  const [editing, setEditing] = useState(false); // tablet/phone edit mode (027 FR-046)
+  const deviceView: View = device === "desktop" ? "desktop" : device === "tablet" ? "tablet" : "phone";
+  const [editing, setEditing] = useState(false); // shared layout on tablet/phone: buttons only (027 FR-046)
   const write = useDashboardWrite(() => announce(t("dashboard:conflict")));
   const apply = (change: Change) => write.mutate(change);
+  const mode: LayoutMode = dashboard.data?.layout_mode === "per_device" ? "per_device" : "shared";
 
   useEffect(() => {
     if (!live) return;
@@ -88,17 +96,21 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
       .catch(() => undefined);
   }, [loaded]);
 
-  const instances = dashboard.data?.instances ?? [];
-  const visible = instances.filter((i) => i.status === "active");
+  const instances = useMemo(() => dashboard.data?.instances ?? [], [dashboard.data]);
+  const visible = useMemo(() => instances.filter((i) => i.status === "active"), [instances]);
   const hidden = instances.filter((i) => i.status === "hidden");
-  // desktop: a 2D edit session (drag, resize, keyboard) saved in one write (027 US6)
-  const session = useEditSession(visible, dashboard.data?.layout_version, () => {
+  // a 2D edit session (drag, resize, keyboard, auto fit) of one screen, saved in one write (027 US6)
+  const session = useEditSession(visible, dashboard.data?.layout_version, mode, () => {
     void client.invalidateQueries({ queryKey: DASHBOARD_KEY });
   });
-  const arranging = desktop && session.editing;
-  const isEditing = desktop ? session.editing : editing;
-  const cells = session.draft ?? new Map(visible.map((i) => [keyOf(i), { x: i.x, y: i.y, w: i.w, h: i.h }]));
-  const order = readingOrder(itemsOf(cells, visible));
+  // a shared layout is arranged on a computer (tablet and phone derive from it)
+  const canArrange = deviceView === "desktop" || mode === "per_device";
+  const arranging = session.editing;
+  const isEditing = arranging || editing;
+  const shownView: View = arranging ? session.view : deviceView;
+  const columns = VIEW_COLUMNS[shownView];
+  const cells = session.draft ?? cellsFor(visible, shownView, mode);
+  const order = readingOrder(itemsOf(cells, visible, columns));
   const arrangeOf = (key: string) => {
     if (!arranging) return undefined;
     const index = order.findIndex((item) => item.id === key);
@@ -110,9 +122,35 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
       count: order.length,
       prev: order[index - 1],
       next: order[index + 1],
+      columns,
       move: (x: number, y: number) => session.move(key, x, y),
       resize: (w: number, h: number) => session.resize(key, w, h),
     };
+  };
+  const fresh = async () => {
+    await client.refetchQueries({ queryKey: DASHBOARD_KEY });
+    return (client.getQueryData<{ instances?: Instance[] }>(DASHBOARD_KEY)?.instances ?? []).filter(
+      (i) => i.status === "active",
+    );
+  };
+  const switchView = async (view: View) => {
+    if (view === session.view) return;
+    if (session.dirty) await session.save();
+    session.start(view, await fresh());
+  };
+  const switchMode = async (next: LayoutMode) => {
+    if (session.dirty) await session.save();
+    await fresh();
+    const version = client.getQueryData<{ layout_version?: number }>(DASHBOARD_KEY);
+    await api.PUT("/api/v1/dashboard/layout-mode", {
+      body: { mode: next },
+      ...(version?.layout_version !== undefined
+        ? { headers: { "If-Match": String(version.layout_version) } }
+        : {}),
+    });
+    const instancesNow = await fresh();
+    announce(t(`dashboard:layoutMode.${next}.done`));
+    if (arranging) session.start(next === "shared" ? "desktop" : session.view, instancesNow, next);
   };
   return (
     <div className="dashboard-page">
@@ -143,7 +181,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
               <Button
                 variant={editing ? "primary" : "secondary"}
                 aria-pressed={editing}
-                onClick={() => (desktop ? session.start() : setEditing((value) => !value))}
+                onClick={() => (canArrange ? session.start(deviceView) : setEditing((value) => !value))}
               >
                 <Icon name={editing ? "check" : "dashboard"} size={18} />
                 {editing ? t("dashboard:done") : t("dashboard:edit")}
@@ -163,36 +201,82 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
           icon="dashboard"
           title={t("dashboard:empty")}
           message={t("dashboard:emptyHint")}
-          action={{ label: t("dashboard:addWidget"), onSelect: () => setEditing(true) }}
+          action={{ label: t("dashboard:addWidget"), onSelect: () => session.start(deviceView) }}
         />
       ) : null}
       <h2 id={headingId} className="visually-hidden">
         {t("dashboard:title")}
       </h2>
-      {arranging ? <p className="dashboard-page__hint">{t("dashboard:editHint")}</p> : null}
-      <DashboardGrid
-        label={t("dashboard:title")}
-        instances={visible}
-        cells={cells}
-        columns={columns}
-        arranger={arranging ? session : null}
-        render={(instance, handles) => (
-          <WidgetFrame
-            instance={instance}
-            handles={handles}
-            controls={
-              isEditing ? (
-                <EditControls
-                  instance={instance}
-                  count={instances.length}
-                  apply={apply}
-                  arrange={arrangeOf(keyOf(instance))}
-                />
-              ) : null
-            }
-          />
-        )}
-      />
+      {isEditing ? (
+        <section className="dashboard-toolbar" aria-label={t("dashboard:toolbar")}>
+          <fieldset className="ds-subnav" aria-label={t("dashboard:screens")}>
+            {VIEWS.map(({ view, icon }) => (
+              <button
+                key={view}
+                type="button"
+                aria-pressed={shownView === view}
+                disabled={!arranging || (mode === "shared" && view !== "desktop")}
+                title={mode === "shared" && view !== "desktop" ? t("dashboard:sharedHint") : undefined}
+                onClick={() => void switchView(view)}
+              >
+                <Icon name={icon} size={16} />
+                {t(`dashboard:view.${view}`)}
+              </button>
+            ))}
+          </fieldset>
+          <label className="dashboard-toolbar__mode">
+            <input
+              type="checkbox"
+              role="switch"
+              aria-checked={mode === "per_device"}
+              checked={mode === "per_device"}
+              onChange={(event) => void switchMode(event.target.checked ? "per_device" : "shared")}
+            />
+            <span>
+              <strong>{t("dashboard:layoutMode.label")}</strong>
+              <span>{t(`dashboard:layoutMode.${mode}.hint`)}</span>
+            </span>
+          </label>
+          {arranging ? (
+            <Button variant="secondary" onClick={() => session.autofit()}>
+              <Icon name="maximize" size={16} />
+              {t("dashboard:autofit")}
+            </Button>
+          ) : null}
+          <p className="dashboard-page__hint">
+            {arranging ? t("dashboard:editHint") : t("dashboard:arrangeOnComputer")}
+          </p>
+        </section>
+      ) : null}
+      <div
+        className="dashboard-stage"
+        data-view={shownView}
+        data-preview={shownView !== deviceView || undefined}
+      >
+        <DashboardGrid
+          label={t("dashboard:title")}
+          instances={visible}
+          cells={cells}
+          columns={columns}
+          arranger={arranging ? session : null}
+          render={(instance, handles) => (
+            <WidgetFrame
+              instance={instance}
+              handles={handles}
+              controls={
+                isEditing ? (
+                  <EditControls
+                    instance={instance}
+                    count={instances.length}
+                    apply={apply}
+                    arrange={arrangeOf(keyOf(instance))}
+                  />
+                ) : null
+              }
+            />
+          )}
+        />
+      </div>
       {isEditing && hidden.length ? (
         <section className="ds-panel" aria-label={t("dashboard:hidden")}>
           <h3>{t("dashboard:hidden")}</h3>
