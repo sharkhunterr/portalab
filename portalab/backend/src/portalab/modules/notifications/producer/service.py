@@ -182,6 +182,7 @@ class Producer:
                         produced_by=produced_by[:80],
                         valid_until=request.valid_until,
                         action_url=request.action_url,
+                        email_body=dict(request.email_body) if request.email_body else None,
                         recipients=0,
                         created_at=now,
                     )

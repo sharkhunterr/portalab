@@ -36,5 +36,16 @@ def declare_news_settings(catalog: SettingCatalog = default_catalog) -> None:
                 description=_DESCRIPTIONS[name],
             )
 
+    if "news.newsletter.optOut" not in known:  # 027: the newsletter channels a member does not want
+        declare(
+            scope="global",
+            key="news.newsletter.optOut",
+            schema=list[str],
+            default=[],
+            user_overridable=True,
+            owner=OWNER,
+            description="Newsletter channels I do not want to receive by e-mail.",
+        )
+
 
 declare_news_settings()

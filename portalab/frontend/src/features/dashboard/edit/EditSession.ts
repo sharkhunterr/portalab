@@ -119,7 +119,7 @@ export function useEditSession(
   );
 
   const send = useCallback(
-    async (cells: Map<string, Cell>) => {
+    async (cells: Map<string, Cell>, versionOverride?: number) => {
       const byKey = new Map(instancesRef.current.map((i) => [keyOf(i), i]));
       const items = [...cells]
         .filter(([key]) => byKey.has(key))
@@ -130,7 +130,9 @@ export function useEditSession(
       await api.PUT("/api/v1/dashboard/arrangement", {
         body: { items },
         params: { query: { view } },
-        ...(version !== undefined ? { headers: { "If-Match": String(version) } } : {}),
+        ...((versionOverride ?? version) !== undefined
+          ? { headers: { "If-Match": String(versionOverride ?? version) } }
+          : {}),
       });
     },
     [version, view],
@@ -147,10 +149,10 @@ export function useEditSession(
   }, [snapshot, draft]);
 
   const finish = useCallback(
-    async (cells: Map<string, Cell> | null, changed: boolean) => {
+    async (cells: Map<string, Cell> | null, changed: boolean, versionOverride?: number) => {
       setSaving(true);
       try {
-        if (cells && changed) await send(cells);
+        if (cells && (changed || versionOverride !== undefined)) await send(cells, versionOverride);
         setSnapshot(null);
         setDraft(null);
         onSaved();
@@ -184,7 +186,8 @@ export function useEditSession(
         ? resize(items, key, { w: to.w ?? target.w, h: to.h ?? target.h }, columns)
         : move(items, key, { x: to.x ?? target.x, y: to.y ?? target.y }, columns);
     },
-    save: () => finish(draft, dirty),
+    /** ``version``: the layout version to send when it changed meanwhile (a screen given its own layout). */
+    save: (version?: number) => finish(draft, dirty, version),
     cancel: () => finish(null, false), // the draft was never sent: the server still holds the snapshot
   };
 }

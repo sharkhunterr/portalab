@@ -75,7 +75,26 @@ LIFECYCLE_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Community project lifecycle and funding summary (Marketplace 015)",
 )
-SPECS: tuple[CapabilitySpec, ...] = (LIFECYCLE_SPEC,)
+GIFTS = "marketplace.gifts"
+
+
+@runtime_checkable
+class Gifts(Protocol):
+    """027: offer a product to a member on the portal's behalf (a level reward…) — ``False`` when the
+    product is unknown or already owned; never charged."""
+
+    async def gift(self, user: UUID, product_key: str, reason: str) -> bool: ...
+
+
+GIFTS_SPEC = CapabilitySpec(
+    name=GIFTS,
+    version="1.0",
+    protocol=Gifts,
+    multi_provider=False,
+    description="Offer a shop product to a member (level rewards, 027)",
+)
+
+SPECS: tuple[CapabilitySpec, ...] = (LIFECYCLE_SPEC, GIFTS_SPEC)
 
 
 # --- slice B: product types and activation ------------------------------------------------------------

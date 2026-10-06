@@ -8,6 +8,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Incident, useIncident, useIncidents } from "./api";
 import { SeverityBadge, StateSteps, useLasting } from "./IncidentParts";
+import { type Maintenance, useMaintenances, useServiceNames } from "./maintenance";
 
 /** Incidents (spec 016 T013; 027 redesign): the state of the portal at a glance, then each incident as a
  * card — severity, step reached, how long it lasts, affected services, latest news — and its timeline. */
@@ -134,12 +135,56 @@ export function IncidentDetail({ id }: { id: string }) {
   );
 }
 
+/** A planned maintenance (027): shown with the incidents — when, how long, what it touches. */
+function MaintenanceCard({ item, names }: { item: Maintenance; names: Map<string, string> | undefined }) {
+  const t = useT();
+  const format = useFormat();
+  const lasting = useLasting();
+  const running = Date.parse(item.starts_at) <= Date.now();
+  return (
+    <li className="incident-card incident-card--maintenance" data-running={running || undefined}>
+      <div className="incident-card__head">
+        <span className="incident-severity" data-severity="maintenance">
+          <Icon name="wrench" size={12} />
+          {t(running ? "support:maintenance.running" : "support:maintenance.planned")}
+        </span>
+        <span className="incident-card__lasting">
+          <Icon name="clock" size={12} />
+          {lasting(item.starts_at, item.ends_at)}
+        </span>
+      </div>
+      <h3 className="incident-card__title">{item.title}</h3>
+      <p className="incident-card__latest">
+        {format.dateTime(item.starts_at)} → {format.dateTime(item.ends_at)}
+      </p>
+      {item.description ? <p className="incident-card__summary">{item.description}</p> : null}
+      <ul className="incident-card__services">
+        <li>
+          {item.service_id ? (
+            <Link to={`/services/${item.service_id}`}>
+              <Icon name="server" size={12} />
+              {names?.get(item.service_id) ?? item.service_id}
+            </Link>
+          ) : (
+            <span className="incident-card__whole">
+              <Icon name="server" size={12} />
+              {t("support:console.wholeServer")}
+            </span>
+          )}
+        </li>
+      </ul>
+    </li>
+  );
+}
+
 type Filter = "open" | "resolved" | "all";
 
 export function IncidentsList() {
   const t = useT();
   const headingId = useId();
   const all = useIncidents();
+  const maintenances = useMaintenances();
+  const names = useServiceNames(Boolean(maintenances.data?.length));
   const [filter, setFilter] = useState<Filter>("open");
   const items = all.data ?? [];
   const open = items.filter((i) => i.state !== "resolved");
@@ -205,6 +250,19 @@ export function IncidentsList() {
           <Card key={incident.id} incident={incident} />
         ))}
       </ul>
+      {maintenances.data?.length ? (
+        <section className="incidents-maintenance" aria-label={t("support:maintenance.title")}>
+          <h3>
+            <Icon name="wrench" size={18} />
+            {t("support:maintenance.title")}
+          </h3>
+          <ul className="incident-cards">
+            {maintenances.data.map((item) => (
+              <MaintenanceCard key={item.id} item={item} names={names.data} />
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </section>
   );
 }

@@ -17,7 +17,7 @@ from portalab.capabilities.community import SectionRegistry, default_sections
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import ENTITLEMENTS, WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
-from portalab.capabilities.marketplace import LIFECYCLE, ProductTypeRegistry, default_product_types
+from portalab.capabilities.marketplace import GIFTS, LIFECYCLE, ProductTypeRegistry, default_product_types
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -75,6 +75,20 @@ from portalab.modules.marketplace.types.registry import register_builtin_types
 SYSTEM_PRINCIPAL = Principal(channel="system")
 OWNER = "module:marketplace"
 INSTANCE = "marketplace"
+
+
+class MarketplaceGifts:
+    """``marketplace.gifts``: a product offered on the portal's behalf (a level reward); never twice."""
+
+    def __init__(self, grants: Any) -> None:
+        self.grants = grants
+
+    async def gift(self, user: UUID, product_key: str, reason: str) -> bool:
+        try:
+            await self.grants.grant(Principal(channel="system"), user, product_key, reason)
+        except Exception:
+            return False  # unknown product, or already owned
+        return True
 
 
 class MarketplaceModule:
@@ -157,6 +171,9 @@ class MarketplaceModule:
         register_event_types(self.event_types)
         if not self.capabilities.system_providers(LIFECYCLE):
             self.capabilities.provide(LIFECYCLE, self.projects, instance_ref=INSTANCE, owner=OWNER)
+        if not self.capabilities.system_providers(GIFTS):  # 027: level rewards offer products
+            gifts = MarketplaceGifts(self.grants)
+            self.capabilities.provide(GIFTS, gifts, instance_ref=INSTANCE, owner=OWNER)
         if not self.capabilities.system_providers(ENTITLEMENTS):
             self.capabilities.provide(ENTITLEMENTS, self.entitlements, instance_ref=INSTANCE, owner=OWNER)
         if not self.capabilities.system_providers(THEME_ENTITLEMENTS):

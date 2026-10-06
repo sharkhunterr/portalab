@@ -1,20 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useId, useMemo, useState } from "react";
+import { type FormEvent, type ReactNode, useId, useMemo, useState } from "react";
 import { api } from "../../api/client";
-import {
-  AdminPage,
-  AdminSection,
-  AdminTable,
-  AdminTabs,
-  AdminToolbar,
-  FormActions,
-  SearchBox,
-  StatusBadge,
-} from "../../design-system/admin/AdminKit";
+import { AdminGrid, AdminPage, SearchBox, StatusBadge } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
-import { Dialog } from "../../design-system/components/Overlays";
+import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../state/regions";
+import { DigestDefault, EmailSettings } from "./communication/EmailSettings";
 import { Toggles } from "./Toggles";
 
 interface SettingItem {
@@ -23,6 +15,10 @@ interface SettingItem {
   sensitive: boolean;
   value: unknown;
   source: string;
+  default?: unknown;
+  /** 027: how it is edited — boolean, integer, number, string or json — and the allowed values. */
+  kind?: "boolean" | "integer" | "number" | "string" | "json";
+  choices?: unknown[];
 }
 
 interface PreviewResult {
@@ -33,10 +29,11 @@ interface PreviewResult {
 }
 
 /**
- * Configuration (spec 020 US5, 027 administration kit): settings grouped by area (tabs with counts) and
- * searchable, one table row per setting with its current value and where it comes from; "Modify" opens an
- * editor that previews the change before applying it. Sensitive values are write-only. Extensions can be
- * enabled or disabled below (data is never deleted).
+ * Configuration (spec 020 US5; 027 redesign): every setting of the portal, grouped by area in a side list
+ * and searchable; each setting is a card — what it does, where its value comes from — edited in place with
+ * the right control (a switch, a number, a list of choices, text or JSON). Saving validates first (the
+ * server checks the value and reports what changes), then applies; « reset » goes back to the default.
+ * Sensitive values are write-only.
  */
 function parse(raw: string): unknown {
   try {
@@ -55,87 +52,214 @@ function area(key: string): string {
   return key.split(".")[0] ?? key;
 }
 
-function SettingEditor({ item }: { item: SettingItem }) {
-  const t = useT();
-  const fieldId = useId();
+const AREA_ICONS: Record<string, string> = {
+  admin: "shield",
+  ai: "bot",
+  authz: "key",
+  automations: "zap",
+  calendar: "calendar",
+  campaigns: "star",
+  community: "users",
+  connectors: "plug",
+  content: "newspaper",
+  dashboard: "dashboard",
+  events: "activity",
+  gamification: "trophy",
+  health: "activity",
+  i18n: "globe",
+  identity: "user",
+  marketplace: "shop",
+  media: "film",
+  news: "newspaper",
+  notifications: "bell",
+  observability: "gauge",
+  plugins: "plug",
+  privacy: "lock",
+  search: "search",
+  statistics: "chart",
+  support: "lifebuoy",
+  ui: "palette",
+  wiki: "book",
+};
+
+function useApply(item: SettingItem) {
   const queryClient = useQueryClient();
-  const [raw, setRaw] = useState(
-    item.sensitive ? "" : typeof item.value === "string" ? item.value : JSON.stringify(item.value),
-  );
-  const [preview, setPreview] = useState<PreviewResult | null>(null);
-  const body = {
-    changes: [{ key: item.key, value: parse(raw), scope: "global" as const, scope_ref: "", unset: false }],
-    reason: "",
-  };
-  const validate = useMutation({
-    mutationFn: async () =>
-      (await api.POST("/api/v1/admin/config/validate", { body })).data as unknown as PreviewResult,
-    onSuccess: setPreview,
-  });
-  const apply = useMutation({
-    mutationFn: async () => {
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const t = useT();
+  const mutation = useMutation({
+    mutationFn: async (change: { value?: unknown; unset?: boolean }) => {
+      const body = {
+        changes: [
+          {
+            key: item.key,
+            value: change.unset ? null : change.value,
+            scope: "global" as const,
+            scope_ref: "",
+            unset: Boolean(change.unset),
+          },
+        ],
+        reason: "",
+      };
+      const preview = (await api.POST("/api/v1/admin/config/validate", { body })).data as unknown as
+        | PreviewResult
+        | undefined;
+      if (preview && !preview.ok) throw new Error(preview.errors[0]?.detail ?? t("admin:config.invalid"));
       await api.PUT("/api/v1/admin/config", { body });
+      return preview;
     },
-    onSuccess: () => {
-      setPreview(null);
+    onSuccess: (preview) => {
+      const diff = preview?.diff[0];
+      setMessage({
+        ok: true,
+        text:
+          diff && !item.sensitive
+            ? `${t("admin:config.applied")} (${display(diff.before)} → ${display(diff.after)})`
+            : t("admin:config.applied"),
+      });
       void queryClient.invalidateQueries({ queryKey: ["admin", "config"] });
     },
+    onError: (error) =>
+      setMessage({
+        ok: false,
+        text: error instanceof ApiError || error instanceof Error ? error.message : t("admin:config.failed"),
+      }),
   });
+  return { mutation, message, clear: () => setMessage(null) };
+}
 
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    validate.mutate();
-  }
-
-  return (
-    <form onSubmit={submit} className="config-editor">
-      <p className="admin-muted">{item.description}</p>
-      <div className="ds-field">
-        <label htmlFor={fieldId}>{t("admin:config.newValue", { key: item.key })}</label>
+/** One setting, edited in place with the control its type calls for. */
+function SettingCard({ item }: { item: SettingItem }) {
+  const t = useT();
+  const fieldId = useId();
+  const { mutation, message, clear } = useApply(item);
+  const initial = item.sensitive
+    ? ""
+    : typeof item.value === "string"
+      ? item.value
+      : JSON.stringify(item.value);
+  const [raw, setRaw] = useState(initial);
+  const kind = item.kind ?? "json";
+  const dirty = raw !== initial;
+  const save = (value: unknown) => mutation.mutate({ value });
+  const typed = () =>
+    kind === "integer" || kind === "number" ? Number(raw) : kind === "string" ? raw : parse(raw);
+  let control: ReactNode;
+  if (kind === "boolean" && !item.sensitive) {
+    control = (
+      <span className="setting-switch">
         <input
           id={fieldId}
-          value={raw}
-          type={item.sensitive ? "password" : "text"}
-          autoComplete="off"
-          onChange={(event) => {
-            setRaw(event.target.value);
-            setPreview(null);
-          }}
+          type="checkbox"
+          role="switch"
+          aria-checked={Boolean(item.value)}
+          checked={Boolean(item.value)}
+          disabled={mutation.isPending}
+          onChange={(event) => save(event.target.checked)}
         />
-        <span className="ds-field__hint">{t("admin:config.jsonHint")}</span>
-      </div>
-      {preview ? (
-        <div role="status" className="config-editor__preview">
-          {preview.ok ? (
-            <>
-              <p>
-                {t("admin:config.before")} <code>{display(preview.diff[0]?.before)}</code> →{" "}
-                {t("admin:config.after")} <code>{display(preview.diff[0]?.after)}</code>
-              </p>
-              {preview.warnings.map((warning) => (
-                <p key={warning}>{warning}</p>
-              ))}
-            </>
-          ) : (
-            <p role="alert">{preview.errors[0]?.detail ?? t("admin:config.invalid")}</p>
-          )}
-        </div>
-      ) : null}
-      {apply.isError ? (
-        <p role="alert">{apply.error instanceof ApiError ? apply.error.message : t("admin:config.failed")}</p>
-      ) : null}
-      {apply.isSuccess ? <p role="status">{t("admin:config.applied")}</p> : null}
-      <FormActions>
-        <Button type="submit" variant="secondary">
-          {t("admin:config.preview")}
-        </Button>
-        {preview?.ok ? (
-          <Button type="button" onClick={() => apply.mutate()} disabled={apply.isPending}>
-            {t("admin:config.apply")}
+        <span aria-hidden="true">{item.value ? t("admin:config.on") : t("admin:config.off")}</span>
+      </span>
+    );
+  } else if (item.choices?.length && !item.sensitive) {
+    control = (
+      <select
+        id={fieldId}
+        className="setting-input"
+        value={String(item.value)}
+        disabled={mutation.isPending}
+        onChange={(event) => save(event.target.value)}
+      >
+        {item.choices.map((choice) => (
+          <option key={String(choice)} value={String(choice)}>
+            {String(choice)}
+          </option>
+        ))}
+      </select>
+    );
+  } else {
+    const multiline = kind === "json" && !item.sensitive;
+    control = (
+      <form
+        className="setting-edit"
+        onSubmit={(event: FormEvent) => {
+          event.preventDefault();
+          save(item.sensitive ? raw : typed());
+        }}
+      >
+        {multiline ? (
+          <textarea
+            id={fieldId}
+            className="setting-input setting-input--json"
+            rows={Math.min(8, Math.max(2, raw.split("\n").length))}
+            value={raw}
+            onChange={(event) => {
+              setRaw(event.target.value);
+              clear();
+            }}
+          />
+        ) : (
+          <input
+            id={fieldId}
+            className="setting-input"
+            type={item.sensitive ? "password" : kind === "integer" || kind === "number" ? "number" : "text"}
+            step={kind === "number" ? "any" : undefined}
+            autoComplete="off"
+            placeholder={item.sensitive ? t("admin:config.sensitive") : undefined}
+            value={raw}
+            onChange={(event) => {
+              setRaw(event.target.value);
+              clear();
+            }}
+          />
+        )}
+        {dirty ? (
+          <Button type="submit" disabled={mutation.isPending}>
+            <Icon name="check" size={14} />
+            {t("admin:config.save")}
           </Button>
         ) : null}
-      </FormActions>
-    </form>
+      </form>
+    );
+  }
+  return (
+    <li className="setting-card" data-changed={item.source !== "default" || undefined}>
+      <div className="setting-card__text">
+        <label htmlFor={fieldId} className="setting-card__label">
+          {item.description || item.key}
+        </label>
+        <code className="setting-card__key">{item.key}</code>
+      </div>
+      <div className="setting-card__control">
+        {control}
+        {item.sensitive && item.source !== "default" ? (
+          <span className="admin-muted">{t("admin:config.sensitive")}</span>
+        ) : null}
+      </div>
+      <div className="setting-card__meta">
+        <StatusBadge tone={item.source === "default" ? "neutral" : "info"}>
+          {t(`admin:config.sources.${item.source}`)}
+        </StatusBadge>
+        {item.source !== "default" ? (
+          <Button
+            variant="ghost"
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate({ unset: true })}
+            title={t("admin:config.resetHint")}
+          >
+            <Icon name="sync" size={14} />
+            {t("admin:config.reset")}
+          </Button>
+        ) : null}
+      </div>
+      {message ? (
+        <p
+          role={message.ok ? "status" : "alert"}
+          className="setting-card__message"
+          data-ok={message.ok || undefined}
+        >
+          {message.text}
+        </p>
+      ) : null}
+    </li>
   );
 }
 
@@ -152,13 +276,13 @@ export function ConfigEditor() {
       }
     >
       {(settings) => (
-        <SettingsTable settings={settings} query={query} setQuery={setQuery} tab={tab} setTab={setTab} />
+        <SettingsExplorer settings={settings} query={query} setQuery={setQuery} tab={tab} setTab={setTab} />
       )}
     </DataRegion>
   );
 }
 
-function SettingsTable({
+function SettingsExplorer({
   settings,
   query,
   setQuery,
@@ -180,85 +304,64 @@ function SettingsTable({
   const needle = query.trim().toLowerCase();
   const shown = settings.filter(
     (item) =>
-      (tab === "all" || area(item.key) === tab) &&
+      (tab === "all" || needle || area(item.key) === tab) &&
       (!needle || item.key.toLowerCase().includes(needle) || item.description.toLowerCase().includes(needle)),
   );
+  const changed = settings.filter((s) => s.source !== "default").length;
+  const label = (key: string) => {
+    const text = t(`admin:config.area.${key}`);
+    return text === `config.area.${key}` ? key.charAt(0).toUpperCase() + key.slice(1) : text;
+  };
   return (
-    <AdminSection title={t("admin:config.settings")} icon="settings" flush>
-      <div className="config-toolbar">
-        <AdminToolbar>
-          <SearchBox label={t("admin:config.search")} value={query} onChange={setQuery} />
-        </AdminToolbar>
-        <AdminTabs
-          label={t("admin:config.areas")}
-          current={tab}
-          onChange={setTab}
-          tabs={[
-            { key: "all", label: t("admin:config.all"), count: settings.length },
-            ...areas.map(([key, count]) => ({ key, label: key, count })),
-          ]}
-        />
-      </div>
-      <AdminTable<SettingItem>
-        label={t("admin:config.settings")}
-        rows={shown}
-        rowKey={(item) => item.key}
-        empty={<p className="admin-muted config-empty">{t("admin:config.none")}</p>}
-        columns={[
-          {
-            key: "key",
-            header: t("admin:config.setting"),
-            primary: true,
-            render: (item) => (
-              <span className="config-setting">
-                <code>{item.key}</code>
-                <span className="admin-muted">{item.description}</span>
-              </span>
-            ),
-          },
-          {
-            key: "value",
-            header: t("admin:config.value"),
-            render: (item) =>
-              item.sensitive ? (
-                <span className="admin-muted">{t("admin:config.sensitive")}</span>
-              ) : (
-                <code className="config-value">{display(item.value)}</code>
-              ),
-          },
-          {
-            key: "source",
-            header: t("admin:config.source"),
-            render: (item) => (
-              <StatusBadge tone={item.source === "default" ? "neutral" : "info"}>
-                {t(`admin:config.sources.${item.source}`)}
-              </StatusBadge>
-            ),
-          },
-        ]}
-        actions={(item) => (
-          <Dialog
-            title={item.key}
-            closeLabel={t("admin:services.close")}
-            trigger={
-              <Button variant="ghost" aria-label={`${t("admin:config.modify")} ${item.key}`}>
-                {t("admin:config.modify")}
-              </Button>
-            }
-          >
-            <SettingEditor item={item} />
-          </Dialog>
+    <div className="settings-explorer">
+      <nav className="settings-explorer__areas" aria-label={t("admin:config.areas")}>
+        <SearchBox label={t("admin:config.search")} value={query} onChange={setQuery} />
+        <ul>
+          {[["all", settings.length] as const, ...areas].map(([key, count]) => (
+            <li key={key}>
+              <button type="button" aria-pressed={!needle && tab === key} onClick={() => setTab(key)}>
+                <Icon name={key === "all" ? "list" : (AREA_ICONS[key] ?? "settings")} size={16} />
+                <span>{key === "all" ? t("admin:config.all") : label(key)}</span>
+                <span className="settings-explorer__count">{count}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p className="admin-muted settings-explorer__changed">
+          {t("admin:config.changed", { count: changed })}
+        </p>
+      </nav>
+      <div className="settings-explorer__list">
+        <h2 className="settings-explorer__title">
+          {needle
+            ? t("admin:config.results", { count: shown.length })
+            : tab === "all"
+              ? t("admin:config.all")
+              : label(tab)}
+        </h2>
+        {shown.length ? (
+          <ul className="setting-cards">
+            {shown.map((item) => (
+              <SettingCard key={`${item.key}:${JSON.stringify(item.value)}`} item={item} />
+            ))}
+          </ul>
+        ) : (
+          <p className="admin-muted config-empty">{t("admin:config.none")}</p>
         )}
-      />
-    </AdminSection>
+      </div>
+    </div>
   );
 }
 
-/** The routed Configuration page: settings, then extensions on/off. */
+/** The routed Configuration page (« System »): e-mail first, then every setting, then extensions on/off. */
 export function ConfigurationPage() {
   const t = useT();
   return (
     <AdminPage icon="settings" title={t("admin:config.title")} description={t("admin:config.subtitle")}>
+      <AdminGrid>
+        <EmailSettings />
+        <DigestDefault />
+      </AdminGrid>
       <ConfigEditor />
       <Toggles />
     </AdminPage>

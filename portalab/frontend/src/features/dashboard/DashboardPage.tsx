@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo } from "react";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
 import { useAnnounce } from "../../design-system/a11y/Announce";
@@ -16,10 +16,10 @@ import { IncidentBanner } from "../support/incidents/IncidentBanner";
 import { type Change, DASHBOARD_KEY, type Instance, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
-import { cellsFor, itemsOf, keyOf, type LayoutMode, useEditSession } from "./edit/EditSession";
+import { cellsFor, type LayoutMode, useEditSession } from "./edit/EditSession";
 import { WidgetFrame } from "./frame/WidgetFrame";
 import { DashboardGrid } from "./grid/DashboardGrid";
-import { readingOrder, VIEW_COLUMNS, type View } from "./grid/engine";
+import { VIEW_COLUMNS, type View } from "./grid/engine";
 import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
 import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
@@ -64,7 +64,6 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const dashboard = useDashboard();
   const device = useDeviceClass();
   const deviceView: View = device === "desktop" ? "desktop" : device === "tablet" ? "tablet" : "phone";
-  const [editing, setEditing] = useState(false); // shared layout on tablet/phone: buttons only (027 FR-046)
   const write = useDashboardWrite(() => announce(t("dashboard:conflict")));
   const apply = (change: Change) => write.mutate(change);
   const mode: LayoutMode = dashboard.data?.layout_mode === "per_device" ? "per_device" : "shared";
@@ -103,30 +102,11 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const session = useEditSession(visible, dashboard.data?.layout_version, mode, () => {
     void client.invalidateQueries({ queryKey: DASHBOARD_KEY });
   });
-  // a shared layout is arranged on a computer (tablet and phone derive from it)
-  const canArrange = deviceView === "desktop" || mode === "per_device";
   const arranging = session.editing;
-  const isEditing = arranging || editing;
+  const isEditing = arranging;
   const shownView: View = arranging ? session.view : deviceView;
   const columns = VIEW_COLUMNS[shownView];
   const cells = session.draft ?? cellsFor(visible, shownView, mode);
-  const order = readingOrder(itemsOf(cells, visible, columns));
-  const arrangeOf = (key: string) => {
-    if (!arranging) return undefined;
-    const index = order.findIndex((item) => item.id === key);
-    const cell = order[index];
-    if (!cell) return undefined;
-    return {
-      cell,
-      index,
-      count: order.length,
-      prev: order[index - 1],
-      next: order[index + 1],
-      columns,
-      move: (x: number, y: number) => session.move(key, x, y),
-      resize: (w: number, h: number) => session.resize(key, w, h),
-    };
-  };
   const fresh = async () => {
     await client.refetchQueries({ queryKey: DASHBOARD_KEY });
     return (client.getQueryData<{ instances?: Instance[] }>(DASHBOARD_KEY)?.instances ?? []).filter(
@@ -137,6 +117,25 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
     if (view === session.view) return;
     if (session.dirty) await session.save();
     session.start(view, await fresh());
+  };
+  /**
+   * Save the arrangement. A phone or tablet arranged while the layout is shared gets its own layout first
+   * (027): the other screens keep what they showed, this one keeps what was just arranged.
+   */
+  const save = async () => {
+    if (mode === "shared" && session.view !== "desktop") {
+      await fresh();
+      const before = client.getQueryData<{ layout_version?: number }>(DASHBOARD_KEY)?.layout_version;
+      await api.PUT("/api/v1/dashboard/layout-mode", {
+        body: { mode: "per_device" },
+        ...(before !== undefined ? { headers: { "If-Match": String(before) } } : {}),
+      });
+      await fresh();
+      announce(t("dashboard:layoutMode.per_device.done"));
+      await session.save(client.getQueryData<{ layout_version?: number }>(DASHBOARD_KEY)?.layout_version);
+      return;
+    }
+    await session.save();
   };
   const switchMode = async (next: LayoutMode) => {
     if (session.dirty) await session.save();
@@ -170,21 +169,16 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
               <Button variant="secondary" disabled={session.saving} onClick={() => void session.cancel()}>
                 {t("dashboard:cancel")}
               </Button>
-              <Button disabled={session.saving} onClick={() => void session.save()}>
+              <Button disabled={session.saving} onClick={() => void save()}>
                 <Icon name="check" size={18} />
                 {t("dashboard:save")}
               </Button>
             </>
           ) : (
             <>
-              {editing ? <CatalogDrawer apply={apply} /> : null}
-              <Button
-                variant={editing ? "primary" : "secondary"}
-                aria-pressed={editing}
-                onClick={() => (canArrange ? session.start(deviceView) : setEditing((value) => !value))}
-              >
-                <Icon name={editing ? "check" : "dashboard"} size={18} />
-                {editing ? t("dashboard:done") : t("dashboard:edit")}
+              <Button variant="secondary" onClick={() => session.start(deviceView)}>
+                <Icon name="dashboard" size={18} />
+                {t("dashboard:edit")}
               </Button>
             </>
           )
@@ -215,7 +209,10 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
                 key={view}
                 type="button"
                 aria-pressed={shownView === view}
-                disabled={!arranging || (mode === "shared" && view !== "desktop")}
+                disabled={
+                  !arranging ||
+                  (deviceView === "desktop" ? mode === "shared" && view !== "desktop" : view !== deviceView)
+                }
                 title={mode === "shared" && view !== "desktop" ? t("dashboard:sharedHint") : undefined}
                 onClick={() => void switchView(view)}
               >
@@ -244,7 +241,8 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
             </Button>
           ) : null}
           <p className="dashboard-page__hint">
-            {arranging ? t("dashboard:editHint") : t("dashboard:arrangeOnComputer")}
+            {t("dashboard:editHint")}
+            {mode === "shared" && deviceView !== "desktop" ? ` ${t("dashboard:ownLayoutOnSave")}` : ""}
           </p>
         </section>
       ) : null}
@@ -263,16 +261,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
             <WidgetFrame
               instance={instance}
               handles={handles}
-              controls={
-                isEditing ? (
-                  <EditControls
-                    instance={instance}
-                    count={instances.length}
-                    apply={apply}
-                    arrange={arrangeOf(keyOf(instance))}
-                  />
-                ) : null
-              }
+              controls={isEditing ? <EditControls instance={instance} apply={apply} /> : null}
             />
           )}
         />

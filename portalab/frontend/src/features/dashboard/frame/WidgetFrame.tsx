@@ -151,6 +151,7 @@ export function WidgetFrame({
         </h3>
         {instance.mandatory ? <span className="widget__badge">{t("dashboard:mandatory")}</span> : null}
         {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
+        {controls}
       </header>
       <div className="widget-frame__body" ref={body}>
         {instance.available ? (
@@ -168,7 +169,6 @@ export function WidgetFrame({
           +{hidden}
         </span>
       ) : null}
-      {controls}
     </section>
   );
 }

@@ -1050,3 +1050,43 @@
 [data-motion="none"] .shell-tabs__item {
   transition: none;
 }
+
+/* 027: a maintenance announced as a banner */
+.maintenance-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-block-end: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--state-maintenance-fg) 45%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--state-maintenance-fg) 14%, var(--color-surface));
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+.maintenance-banner > .ds-icon {
+  color: var(--state-maintenance-fg);
+}
+.maintenance-banner[data-running] {
+  border-color: color-mix(in srgb, var(--state-partial-fg) 55%, var(--color-border));
+  background: color-mix(in srgb, var(--state-partial-fg) 14%, var(--color-surface));
+}
+.maintenance-banner > span {
+  flex: 1;
+  min-inline-size: 12rem;
+}
+.maintenance-banner a {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
+.maintenance-banner__close {
+  display: grid;
+  place-items: center;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}

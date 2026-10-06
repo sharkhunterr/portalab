@@ -17,7 +17,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
-from portalab.capabilities.media import LIBRARY, REQUESTS
+from portalab.capabilities.media import DIGEST, LIBRARY, REQUESTS
 from portalab.capabilities.media_core import (
     CATALOG,
     HISTORY,
@@ -66,6 +66,7 @@ from portalab.modules.media.images.service import ImageService
 from portalab.modules.media.insights.aggregate import JOB as AGGREGATE_JOB
 from portalab.modules.media.insights.aggregate import ActivityAggregator
 from portalab.modules.media.insights.calendar_source import MediaReleaseCalendarSource
+from portalab.modules.media.insights.digest import LibraryDigest
 from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
@@ -278,6 +279,13 @@ class MediaModule:
         register_baseline(self.types, OWNER)
         if self.calendar.get(MediaReleaseCalendarSource.kind) is None:  # 027: releases in the calendar
             self.calendar.register(MediaReleaseCalendarSource(self.upcoming), owner=OWNER)
+        if not self.capabilities.system_providers(DIGEST):  # 027: the newsletters' source
+            self.capabilities.provide(
+                DIGEST,
+                LibraryDigest(self.database, self.upcoming, self.clock),
+                instance_ref="media",
+                owner=OWNER,
+            )
         register_event_types(self.event_types)
         for capability, sink in ((LIBRARY, self.library), (REQUESTS, self.request_sink)):
             if self.sinks.get(capability) is None:

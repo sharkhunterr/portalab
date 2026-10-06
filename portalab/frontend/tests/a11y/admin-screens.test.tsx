@@ -70,10 +70,12 @@ describe("admin screens", () => {
     await expectAccessible(container);
   });
 
-  it("configuration editor previews before applying and hides sensitive values", async () => {
+  it("configuration editor validates before applying, in place, and hides sensitive values", async () => {
+    const calls: string[] = [];
     fake.handler = (request) => {
       const url = new URL(request.url);
       if (url.pathname.endsWith("/validate")) {
+        calls.push("validate");
         return json(200, {
           ok: true,
           diff: [{ key: "demo.pageSize", before: 20, after: 50 }],
@@ -81,26 +83,48 @@ describe("admin screens", () => {
           errors: [],
         });
       }
-      if (request.method === "PUT") return json(200, { applied: true });
+      if (request.method === "PUT") {
+        calls.push("apply");
+        return json(200, { applied: true });
+      }
       return json(200, {
         settings: [
-          { key: "demo.pageSize", description: "Rows", sensitive: false, value: 20, source: "default" },
-          { key: "demo.apiToken", description: "Token", sensitive: true, value: "***", source: "global" },
+          {
+            key: "demo.pageSize",
+            description: "Rows",
+            sensitive: false,
+            value: 20,
+            source: "default",
+            kind: "integer",
+          },
+          {
+            key: "demo.apiToken",
+            description: "Token",
+            sensitive: true,
+            value: "***",
+            source: "global",
+            kind: "string",
+          },
+          {
+            key: "demo.enabled",
+            description: "Enabled",
+            sensitive: false,
+            value: true,
+            source: "default",
+            kind: "boolean",
+          },
         ],
         policies: [],
       });
     };
     const { container } = render(withClient(<ConfigEditor />));
     expect(await screen.findByText("Hidden (write-only)")).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Enabled" })).toBeChecked();
     await expectAccessible(container);
-    fireEvent.click(screen.getByRole("button", { name: "Modify demo.pageSize" }));
-    fireEvent.change(await screen.findByLabelText("New value for demo.pageSize"), {
-      target: { value: "50" },
-    });
-    expect(screen.queryByRole("button", { name: "Apply" })).toBeNull(); // preview first
-    fireEvent.click(screen.getByRole("button", { name: "Preview the change" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Apply" }));
-    expect(await screen.findByText("Configuration updated.")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Rows"), { target: { value: "50" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("Configuration updated. (20 → 50)")).toBeInTheDocument();
+    expect(calls).toEqual(["validate", "apply"]); // checked by the server first, then applied
   });
 
   it("toggles explain refusals", async () => {

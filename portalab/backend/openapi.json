@@ -3623,6 +3623,29 @@
         "title": "DatumOut",
         "type": "object"
       },
+      "DayOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "members": {
+            "title": "Members",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "amount",
+          "members"
+        ],
+        "title": "DayOut",
+        "type": "object"
+      },
       "DeletionStatus": {
         "properties": {
           "deletion_due_at": {
@@ -3897,6 +3920,19 @@
             "title": "Port",
             "type": "integer"
           },
+          "portal_url": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "pattern": "^(https?://[^\\s]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portal Url"
+          },
           "sender": {
             "maxLength": 200,
             "minLength": 3,
@@ -3971,6 +4007,24 @@
         "title": "EntryIn",
         "type": "object"
       },
+      "EventFieldOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "numeric": {
+            "title": "Numeric",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "numeric"
+        ],
+        "title": "EventFieldOut",
+        "type": "object"
+      },
       "EventInput": {
         "properties": {
           "all_day": {
@@ -4037,6 +4091,32 @@
           "starts_at"
         ],
         "title": "EventInput",
+        "type": "object"
+      },
+      "EventTypeOut": {
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/EventFieldOut"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "owner": {
+            "title": "Owner",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "owner",
+          "fields"
+        ],
+        "title": "EventTypeOut",
         "type": "object"
       },
       "ExportOut": {
@@ -5281,6 +5361,114 @@
           "definition"
         ],
         "title": "LevelCurveIn",
+        "type": "object"
+      },
+      "LevelReward": {
+        "additionalProperties": false,
+        "properties": {
+          "coins": {
+            "default": 0,
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Coins",
+            "type": "integer"
+          },
+          "contribution": {
+            "default": 0,
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "label": {
+            "default": "",
+            "maxLength": 120,
+            "title": "Label",
+            "type": "string"
+          },
+          "level": {
+            "maximum": 1000.0,
+            "minimum": 2.0,
+            "title": "Level",
+            "type": "integer"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "maxLength": 96,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "LevelReward",
+        "type": "object"
+      },
+      "LevelRewardsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "rewards": {
+            "items": {
+              "$ref": "#/components/schemas/LevelReward"
+            },
+            "maxItems": 100,
+            "title": "Rewards",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rewards"
+        ],
+        "title": "LevelRewardsIn",
+        "type": "object"
+      },
+      "LevelRewardsOut": {
+        "properties": {
+          "levels": {
+            "items": {
+              "$ref": "#/components/schemas/LevelStepOut"
+            },
+            "title": "Levels",
+            "type": "array"
+          },
+          "rewards": {
+            "items": {
+              "$ref": "#/components/schemas/LevelReward"
+            },
+            "title": "Rewards",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rewards",
+          "levels"
+        ],
+        "title": "LevelRewardsOut",
+        "type": "object"
+      },
+      "LevelStepOut": {
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level",
+          "xp"
+        ],
+        "title": "LevelStepOut",
         "type": "object"
       },
       "LoginRequest": {
@@ -7075,6 +7263,104 @@
         "title": "MediaSplitIn",
         "type": "object"
       },
+      "MemberPointOut": {
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "total"
+        ],
+        "title": "MemberPointOut",
+        "type": "object"
+      },
+      "MemberPositionOut": {
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "days",
+          "xp",
+          "level"
+        ],
+        "title": "MemberPositionOut",
+        "type": "object"
+      },
+      "MemberSeriesOut": {
+        "properties": {
+          "gained": {
+            "title": "Gained",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/MemberPointOut"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "gained",
+          "points"
+        ],
+        "title": "MemberSeriesOut",
+        "type": "object"
+      },
       "ModuleCascadeIn": {
         "properties": {
           "cascade": {
@@ -7155,6 +7441,40 @@
         "title": "MyPermissions",
         "type": "object"
       },
+      "MyStreakOut": {
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "multiplier": {
+            "title": "Multiplier",
+            "type": "number"
+          },
+          "next": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StreakNextOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "enabled",
+          "days",
+          "multiplier",
+          "next"
+        ],
+        "title": "MyStreakOut",
+        "type": "object"
+      },
       "NewsArticleIn": {
         "additionalProperties": false,
         "properties": {
@@ -7197,6 +7517,11 @@
               }
             ],
             "title": "Category Id"
+          },
+          "email_on_publish": {
+            "default": false,
+            "title": "Email On Publish",
+            "type": "boolean"
           },
           "language": {
             "default": "en",
@@ -7381,10 +7706,28 @@
       "NewsCategoryIn": {
         "additionalProperties": false,
         "properties": {
+          "description": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Description",
+            "type": "string"
+          },
           "enabled": {
             "default": true,
             "title": "Enabled",
             "type": "boolean"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
           },
           "key": {
             "pattern": "^[a-z0-9][a-z0-9_-]{0,59}$",
@@ -7396,6 +7739,11 @@
             "minLength": 1,
             "title": "Name",
             "type": "string"
+          },
+          "newsletter": {
+            "default": false,
+            "title": "Newsletter",
+            "type": "boolean"
           },
           "position": {
             "default": 0,
@@ -7414,9 +7762,25 @@
       },
       "NewsCategoryOut": {
         "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
           "enabled": {
             "title": "Enabled",
             "type": "boolean"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
           },
           "id": {
             "format": "uuid",
@@ -7430,6 +7794,11 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "newsletter": {
+            "default": false,
+            "title": "Newsletter",
+            "type": "boolean"
           },
           "position": {
             "title": "Position",
@@ -7486,6 +7855,23 @@
               }
             ],
             "title": "Category Id"
+          },
+          "email_on_publish": {
+            "default": false,
+            "title": "Email On Publish",
+            "type": "boolean"
+          },
+          "emailed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emailed At"
           },
           "feature_priority": {
             "title": "Feature Priority",
@@ -7701,6 +8087,222 @@
           "body_md"
         ],
         "title": "NewsTranslationIn",
+        "type": "object"
+      },
+      "NewsletterScheduleIn": {
+        "additionalProperties": false,
+        "properties": {
+          "cadence": {
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "title": "Cadence",
+            "type": "string"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "email": {
+            "default": true,
+            "title": "Email",
+            "type": "boolean"
+          },
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "hour": {
+            "default": 9,
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "releases",
+              "additions",
+              "upcoming"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "language": {
+            "default": "fr",
+            "maxLength": 16,
+            "title": "Language",
+            "type": "string"
+          },
+          "media_kinds": {
+            "items": {
+              "enum": [
+                "movie",
+                "series",
+                "book",
+                "game",
+                "album"
+              ],
+              "type": "string"
+            },
+            "title": "Media Kinds",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "weekday": {
+            "default": 0,
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Weekday",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "category_id",
+          "kind",
+          "cadence"
+        ],
+        "title": "NewsletterScheduleIn",
+        "type": "object"
+      },
+      "NewsletterScheduleOut": {
+        "properties": {
+          "cadence": {
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "title": "Cadence",
+            "type": "string"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "email": {
+            "default": true,
+            "title": "Email",
+            "type": "boolean"
+          },
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "hour": {
+            "default": 9,
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "releases",
+              "additions",
+              "upcoming"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "language": {
+            "default": "fr",
+            "maxLength": 16,
+            "title": "Language",
+            "type": "string"
+          },
+          "last_article_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Article Id"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "media_kinds": {
+            "items": {
+              "enum": [
+                "movie",
+                "series",
+                "book",
+                "game",
+                "album"
+              ],
+              "type": "string"
+            },
+            "title": "Media Kinds",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "weekday": {
+            "default": 0,
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Weekday",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "category_id",
+          "kind",
+          "cadence",
+          "id",
+          "last_run_at",
+          "next_run_at",
+          "last_article_id"
+        ],
+        "title": "NewsletterScheduleOut",
         "type": "object"
       },
       "NotificationOut": {
@@ -7929,6 +8531,28 @@
           }
         },
         "title": "OperationIn",
+        "type": "object"
+      },
+      "PaceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "factor": {
+            "default": 1.0,
+            "maximum": 10.0,
+            "minimum": 0.1,
+            "title": "Factor",
+            "type": "number"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "title": "PaceConfig",
         "type": "object"
       },
       "PasswordConfirmation": {
@@ -8313,6 +8937,37 @@
         "title": "PolicyOut",
         "type": "object"
       },
+      "PopulationOut": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "integer"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberPositionOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "rate_high": {
+            "title": "Rate High",
+            "type": "number"
+          },
+          "rate_median": {
+            "title": "Rate Median",
+            "type": "number"
+          }
+        },
+        "required": [
+          "members",
+          "rate_median",
+          "rate_high",
+          "active"
+        ],
+        "title": "PopulationOut",
+        "type": "object"
+      },
       "PreferenceIn": {
         "additionalProperties": false,
         "properties": {
@@ -8562,6 +9217,43 @@
           }
         },
         "title": "ProfilePatch",
+        "type": "object"
+      },
+      "ProgressOut": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberSeriesOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "days",
+          "members",
+          "sources"
+        ],
+        "title": "ProgressOut",
         "type": "object"
       },
       "ProgressionOut": {
@@ -10170,6 +10862,24 @@
         "title": "SessionInfo",
         "type": "object"
       },
+      "SourceOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "amount"
+        ],
+        "title": "SourceOut",
+        "type": "object"
+      },
       "StatResultOut": {
         "properties": {
           "as_of": {
@@ -10499,6 +11209,78 @@
           "percent"
         ],
         "title": "StatisticsTrendOut",
+        "type": "object"
+      },
+      "StreakConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "default": false,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "event_types": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Event Types",
+            "type": "array"
+          },
+          "tiers": {
+            "items": {
+              "$ref": "#/components/schemas/Tier"
+            },
+            "maxItems": 10,
+            "title": "Tiers",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "title": "StreakConfig",
+        "type": "object"
+      },
+      "StreakNextOut": {
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "multiplier": {
+            "title": "Multiplier",
+            "type": "number"
+          }
+        },
+        "required": [
+          "days",
+          "multiplier"
+        ],
+        "title": "StreakNextOut",
+        "type": "object"
+      },
+      "SubscriptionsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "maxProperties": 100,
+            "title": "Changes",
+            "type": "object"
+          }
+        },
+        "required": [
+          "changes"
+        ],
+        "title": "SubscriptionsIn",
         "type": "object"
       },
       "SummaryOut": {
@@ -11605,6 +12387,29 @@
         "title": "TicketTypeOut",
         "type": "object"
       },
+      "Tier": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "maximum": 366.0,
+            "minimum": 2.0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "multiplier": {
+            "exclusiveMinimum": 1.0,
+            "maximum": 10.0,
+            "title": "Multiplier",
+            "type": "number"
+          }
+        },
+        "required": [
+          "days",
+          "multiplier"
+        ],
+        "title": "Tier",
+        "type": "object"
+      },
       "ToggleIn": {
         "additionalProperties": false,
         "properties": {
@@ -12586,6 +13391,11 @@
       "WindowIn": {
         "additionalProperties": false,
         "properties": {
+          "banner": {
+            "default": false,
+            "title": "Banner",
+            "type": "boolean"
+          },
           "description": {
             "default": "",
             "maxLength": 4000,
@@ -12644,6 +13454,17 @@
       "WindowPatch": {
         "additionalProperties": false,
         "properties": {
+          "banner": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Banner"
+          },
           "description": {
             "anyOf": [
               {
@@ -15683,6 +16504,32 @@
         ]
       }
     },
+    "/api/v1/admin/gamification/event-types": {
+      "get": {
+        "description": "Every action a rule may reward, with the attributes a rule may test or count.",
+        "operationId": "event_types_api_v1_admin_gamification_event_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EventTypeOut"
+                  },
+                  "title": "Response Event Types Api V1 Admin Gamification Event Types Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Event Types",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
     "/api/v1/admin/gamification/level-curve": {
       "get": {
         "operationId": "get_curve_api_v1_admin_gamification_level_curve_get",
@@ -15747,6 +16594,66 @@
         ]
       }
     },
+    "/api/v1/admin/gamification/level-rewards": {
+      "get": {
+        "operationId": "get_level_rewards_api_v1_admin_gamification_level_rewards_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LevelRewardsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Level Rewards",
+        "tags": [
+          "gamification-admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_level_rewards_api_v1_admin_gamification_level_rewards_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LevelRewardsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LevelRewardsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Level Rewards",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
     "/api/v1/admin/gamification/manual-grants": {
       "post": {
         "operationId": "manual_grant_api_v1_admin_gamification_manual_grants_post",
@@ -15788,6 +16695,185 @@
           }
         },
         "summary": "Manual Grant",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/pace": {
+      "get": {
+        "operationId": "get_pace_api_v1_admin_gamification_pace_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaceConfig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Pace",
+        "tags": [
+          "gamification-admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_pace_api_v1_admin_gamification_pace_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaceConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaceConfig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Pace",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/population": {
+      "get": {
+        "description": "027: where members stand (days since their first XP, XP, level) and the pace of active members\n(XP per day over the last 30 days) \u2014 what the progression chart draws and projects.",
+        "operationId": "population_api_v1_admin_gamification_population_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 300,
+              "maximum": 1000,
+              "minimum": 10,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PopulationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Population",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/progress": {
+      "get": {
+        "description": "Daily gains over the period (positive movements only), the members who gained most \u2014 with their\nrunning total day by day \u2014 and the share of each source (rules by key, achievements, manual\u2026).",
+        "operationId": "progress_api_v1_admin_gamification_progress_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "value",
+            "required": false,
+            "schema": {
+              "default": "xp",
+              "enum": [
+                "xp",
+                "coins",
+                "contribution"
+              ],
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "required": false,
+            "schema": {
+              "default": 5,
+              "maximum": 10,
+              "minimum": 1,
+              "title": "Top",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Progress",
         "tags": [
           "gamification-admin"
         ]
@@ -16173,6 +17259,66 @@
           }
         },
         "summary": "Simulate Rule",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/streak": {
+      "get": {
+        "operationId": "get_streak_api_v1_admin_gamification_streak_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreakConfig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Streak",
+        "tags": [
+          "gamification-admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_streak_api_v1_admin_gamification_streak_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StreakConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreakConfig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Streak",
         "tags": [
           "gamification-admin"
         ]
@@ -18595,6 +19741,203 @@
           }
         },
         "summary": "Put Category",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletters": {
+      "get": {
+        "operationId": "schedules_api_v1_admin_news_newsletters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NewsletterScheduleOut"
+                  },
+                  "title": "Response Schedules Api V1 Admin News Newsletters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Schedules",
+        "tags": [
+          "news"
+        ]
+      },
+      "post": {
+        "operationId": "create_schedule_api_v1_admin_news_newsletters_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterScheduleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterScheduleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Schedule",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletters/{schedule_id}": {
+      "delete": {
+        "operationId": "delete_schedule_api_v1_admin_news_newsletters__schedule_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "schedule_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Schedule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Schedule",
+        "tags": [
+          "news"
+        ]
+      },
+      "put": {
+        "operationId": "update_schedule_api_v1_admin_news_newsletters__schedule_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "schedule_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Schedule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterScheduleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterScheduleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Schedule",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletters/{schedule_id}/run": {
+      "post": {
+        "description": "Write the newsletter now (\u00ab preview \u00bb it in the news desk); nothing when there is nothing to tell.",
+        "operationId": "run_schedule_api_v1_admin_news_newsletters__schedule_id__run_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "schedule_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Schedule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Run Schedule Api V1 Admin News Newsletters  Schedule Id  Run Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run Schedule",
         "tags": [
           "news"
         ]
@@ -27582,6 +28925,77 @@
         ]
       }
     },
+    "/api/v1/me/newsletters": {
+      "get": {
+        "description": "The channels sent by e-mail, and whether I receive each one.",
+        "operationId": "my_newsletters_api_v1_me_newsletters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response My Newsletters Api V1 Me Newsletters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Newsletters",
+        "tags": [
+          "news"
+        ]
+      },
+      "put": {
+        "operationId": "set_my_newsletters_api_v1_me_newsletters_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Set My Newsletters Api V1 Me Newsletters Put",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set My Newsletters",
+        "tags": [
+          "news"
+        ]
+      }
+    },
     "/api/v1/me/notification-preferences": {
       "get": {
         "operationId": "get_preferences_api_v1_me_notification_preferences_get",
@@ -28455,6 +29869,28 @@
         "summary": "Put Preferences",
         "tags": [
           "statistics"
+        ]
+      }
+    },
+    "/api/v1/me/streak": {
+      "get": {
+        "description": "The member's play streak today (or yesterday's, still alive) and the next tier.",
+        "operationId": "my_streak_api_v1_me_streak_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyStreakOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Streak",
+        "tags": [
+          "gamification-admin"
         ]
       }
     },

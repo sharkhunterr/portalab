@@ -352,3 +352,188 @@
   align-items: center;
   gap: var(--space-2);
 }
+
+/* 027: the System page — areas on the side, one card per setting edited in place */
+.settings-explorer {
+  display: grid;
+  grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+.settings-explorer__areas {
+  position: sticky;
+  inset-block-start: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  max-block-size: calc(100vh - 8rem);
+  overflow-y: auto;
+}
+.settings-explorer__areas ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.settings-explorer__areas button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: start;
+  cursor: pointer;
+}
+.settings-explorer__areas button:hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.settings-explorer__areas button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  font-weight: var(--font-weight-semibold);
+}
+.settings-explorer__areas button .ds-icon {
+  color: var(--color-accent);
+}
+.settings-explorer__areas button span:nth-child(2) {
+  flex: 1;
+}
+.settings-explorer__count {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+.settings-explorer__changed {
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+.settings-explorer__list {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.settings-explorer__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.setting-cards {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.setting-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 20rem) auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.setting-card[data-changed] {
+  border-inline-start: 3px solid var(--color-accent);
+}
+.setting-card__text {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+.setting-card__label {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+.setting-card__key {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.setting-card__control {
+  display: grid;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+.setting-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+.setting-card__message {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--state-error-fg);
+  font-size: var(--font-size-xs);
+}
+.setting-card__message[data-ok] {
+  color: var(--state-available-fg);
+}
+.setting-edit {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.setting-input {
+  flex: 1;
+  min-inline-size: 0;
+  inline-size: 100%;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+.setting-input--json {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-size-xs);
+  resize: vertical;
+}
+.setting-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.setting-switch input {
+  inline-size: 2.4rem;
+  block-size: 1.3rem;
+  accent-color: var(--color-accent);
+}
+@media (max-width: 56rem) {
+  .settings-explorer {
+    grid-template-columns: 1fr;
+  }
+  .settings-explorer__areas {
+    position: static;
+    max-block-size: none;
+  }
+  .settings-explorer__areas ul {
+    display: flex;
+    overflow-x: auto;
+  }
+  .settings-explorer__areas button {
+    white-space: nowrap;
+  }
+  .setting-card {
+    grid-template-columns: 1fr;
+  }
+  .setting-card__meta {
+    justify-content: flex-start;
+  }
+}

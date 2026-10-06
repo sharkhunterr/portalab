@@ -68,6 +68,9 @@ class CommunicationRequest:
     required_permission: str | None = None  # re-checked per recipient at delivery
     valid_until: datetime | None = None
     action_url: str | None = None  # in-portal route
+    # 027: the e-mail itself when it is more than the rendered template (a newsletter): {"subject",
+    # "text", "html"} — sent as is, never folded into a digest
+    email_body: Mapping[str, str] | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -2,7 +2,8 @@
 
 ``{event_type, predicate[], grants[], multiplier, limits{cooldown_seconds, caps[], diminishing}}``:
 predicates and per-unit fields may only use attributes the event type declares ``rewardable`` (007);
-grants are fixed amounts or ``per_unit(field, factor, max)``; rules can only produce ledger grants."""
+grants are a fixed amount, ``per_unit(field, factor, max)`` or both (027: e.g. 10 XP per play
+plus 1 XP per minute watched); rules can only produce ledger grants."""
 
 from collections.abc import Iterable, Mapping
 from typing import Any, Literal
@@ -39,8 +40,8 @@ class Grant(BaseModel):
 
     @model_validator(mode="after")
     def _one(self) -> "Grant":
-        if (self.amount is None) == (self.per_unit is None):
-            raise ValueError("a grant has either an amount or a per_unit formula")
+        if self.amount is None and self.per_unit is None:
+            raise ValueError("a grant has an amount, a per_unit formula or both")
         return self
 
 

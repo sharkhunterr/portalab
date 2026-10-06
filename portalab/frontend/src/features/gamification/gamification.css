@@ -439,3 +439,512 @@
   background: var(--done);
   color: var(--color-surface);
 }
+
+/* --- administration (027) ------------------------------------------------------------------------- */
+.gam-charts {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+.gam-chart {
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.gam-chart figcaption {
+  font-weight: var(--font-weight-semibold);
+  margin-block-end: var(--space-2);
+}
+
+.gam-leaders,
+.gam-sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.gam-leaders {
+  counter-reset: leader;
+}
+
+.gam-leaders li,
+.gam-sources li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gam-leaders li::before {
+  counter-increment: leader;
+  content: counter(leader);
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+}
+
+.gam-leaders li span,
+.gam-sources li > span:first-child {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gam-sources__bar {
+  flex: 2;
+  block-size: 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  overflow: hidden;
+}
+
+.gam-sources__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--xp-gradient, var(--color-accent));
+}
+
+.gam-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.gam-fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.gam-fieldset legend {
+  font-weight: var(--font-weight-semibold);
+  padding-inline: var(--space-1);
+}
+
+.gam-grants {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.gam-grants--compact {
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+}
+
+.gam-grant {
+  display: grid;
+  gap: var(--space-2) var(--space-3);
+  grid-template-columns: 6rem repeat(4, minmax(0, 1fr));
+  align-items: end;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+
+.gam-grant__value {
+  align-self: center;
+}
+
+.gam-grant[data-value="xp"] .gam-grant__value {
+  color: var(--color-accent);
+}
+
+.gam-grant[data-value="coins"] .gam-grant__value {
+  color: var(--rarity-legendary);
+}
+
+.gam-condition,
+.gam-criterion,
+.gam-tier {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: end;
+}
+
+.gam-condition > .ds-field,
+.gam-criterion > .ds-field,
+.gam-tier > .ds-field {
+  flex: 1 1 8rem;
+}
+
+.gam-advanced summary {
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.gam-advanced pre {
+  max-block-size: 16rem;
+  overflow: auto;
+  font-size: var(--font-size-xs);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.gam-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-end: var(--space-4);
+}
+
+.gam-rules,
+.gam-cards,
+.gam-tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.gam-cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+
+.gam-rule,
+.gam-card,
+.gam-level {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+
+.gam-rule[data-status="retired"] {
+  opacity: 0.6;
+}
+
+.gam-rule__icon,
+.gam-card__icon {
+  flex: none;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+
+.gam-rule__text,
+.gam-card__body,
+.gam-level__body {
+  flex: 1;
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.gam-rule__actions,
+.gam-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.gam-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-block-start: var(--space-1);
+}
+
+.gam-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+
+.gam-chip[data-value="xp"] {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.gam-chip[data-value="coins"] {
+  background: color-mix(in srgb, var(--rarity-legendary) 18%, transparent);
+}
+
+.gam-chip[data-value="contribution"] {
+  background: color-mix(in srgb, var(--color-accent-alt) 16%, transparent);
+}
+
+.gam-chip[data-kind="limit"] {
+  background: color-mix(in srgb, var(--state-stale-fg) 12%, transparent);
+}
+
+.gam-chip[data-kind="shop"] {
+  background: color-mix(in srgb, var(--rarity-epic) 14%, transparent);
+}
+
+.gam-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+}
+
+.gam-checks--wide {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+}
+
+.gam-streak {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  gap: var(--space-2);
+}
+
+.gam-streak li {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  font-size: var(--font-size-sm);
+}
+
+.gam-streak li[data-boost] {
+  background: color-mix(in srgb, var(--rarity-legendary) 14%, transparent);
+}
+
+.gam-streak li[data-tier] {
+  outline: 2px solid var(--rarity-legendary);
+}
+
+.gam-streak__flame {
+  color: var(--rarity-legendary);
+  block-size: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.gam-streak__day {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.gam-curve {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+}
+
+.gam-curve__form {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.gam-milestones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.gam-milestones div {
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+
+.gam-milestones dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.gam-milestones dd {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.gam-level__badge {
+  flex: none;
+  inline-size: 3rem;
+  block-size: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--xp-gradient, var(--color-accent));
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+
+.gam-level__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.gam-level__fields {
+  display: grid;
+  gap: var(--space-2) var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+}
+
+.gam-level__unlocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+/* progression tuning: a draggable projection over where members stand */
+.gam-pace {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 17rem);
+}
+
+.gam-pace__chart {
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.gam-pace__chart svg {
+  inline-size: 100%;
+  block-size: auto;
+  touch-action: none;
+  cursor: ns-resize;
+  user-select: none;
+}
+
+.gam-pace__grid {
+  stroke: var(--color-border);
+  stroke-dasharray: 3 4;
+}
+
+.gam-pace__tick {
+  fill: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.gam-pace__member {
+  fill: color-mix(in srgb, var(--color-text) 35%, transparent);
+}
+
+.gam-pace__line {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.gam-pace__line[data-kind="current"] {
+  stroke: var(--color-text-muted);
+  stroke-dasharray: 6 5;
+}
+
+.gam-pace__line[data-kind="draft"] {
+  stroke: var(--color-accent);
+  stroke-width: 3.5;
+}
+
+.gam-pace__line[data-kind="high"] {
+  stroke: var(--color-accent-alt);
+  stroke-dasharray: 2 4;
+}
+
+.gam-pace__handle {
+  fill: var(--color-accent);
+  stroke: var(--color-surface);
+  stroke-width: 3;
+  filter: drop-shadow(0 1px 3px var(--scrim));
+}
+
+.gam-pace__chart svg[data-dragging] .gam-pace__handle {
+  r: 12;
+}
+
+.gam-pace__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.gam-pace__legend span::before {
+  content: "";
+  display: inline-block;
+  inline-size: 1.25rem;
+  block-size: 0;
+  border-block-start: 3px solid var(--color-accent);
+  vertical-align: middle;
+  margin-inline-end: 0.375rem;
+}
+
+.gam-pace__legend [data-kind="member"]::before {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 35%, transparent);
+}
+
+.gam-pace__legend [data-kind="current"]::before {
+  border-block-start: 3px dashed var(--color-text-muted);
+}
+
+.gam-pace__legend [data-kind="high"]::before {
+  border-block-start: 3px dotted var(--color-accent-alt);
+}
+
+.gam-pace__side {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.gam-pace__side input[type="range"] {
+  inline-size: 100%;
+  accent-color: var(--color-accent);
+}
+
+@media (max-width: 52rem) {
+  .gam-pace,
+  .gam-curve {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gam-grant {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gam-grant__value {
+    grid-column: 1 / -1;
+  }
+
+  .gam-rule,
+  .gam-card,
+  .gam-level {
+    flex-wrap: wrap;
+  }
+}

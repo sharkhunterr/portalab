@@ -24,6 +24,7 @@ class WindowIn(BaseModel):
     starts_at: datetime
     ends_at: datetime
     reference_time_zone: str | None = Field(default=None, max_length=64)
+    banner: bool = False  # 027: also a banner across the portal
 
 
 class WindowPatch(BaseModel):
@@ -33,6 +34,7 @@ class WindowPatch(BaseModel):
     starts_at: datetime | None = None
     ends_at: datetime | None = None
     reference_time_zone: str | None = Field(default=None, max_length=64)
+    banner: bool | None = None
 
 
 @router.get("/maintenance")

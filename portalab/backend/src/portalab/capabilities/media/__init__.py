@@ -22,7 +22,7 @@ the core: a Plex, Jellyfin or Sonarr connector only maps its API onto these shap
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Literal, Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -304,6 +304,31 @@ class MetadataProvider(Protocol):
     async def fetch_image(self, ref: str, size: str) -> bytes: ...
 
 
+DIGEST = "media.digest"
+
+
+@dataclass(frozen=True, slots=True)
+class DigestItem:
+    """One title of a newsletter (027): what came out, arrived or comes next in the library."""
+
+    title: str
+    kind: str  # movie | series | book | audiobook | game | album
+    date: str  # ISO day
+    route: str  # portal route (``/media/<id>`` or ``/media/insights``)
+    detail: str | None = None  # « S02E05 », a release type…
+
+
+@runtime_checkable
+class MediaDigest(Protocol):
+    """027: the library's news for newsletters, read by the portal's own media module."""
+
+    async def releases(self, since: date, until: date, limit: int) -> list[DigestItem]: ...
+
+    async def additions(self, since: datetime, limit: int) -> list[DigestItem]: ...
+
+    async def upcoming(self, until: date, limit: int) -> list[DigestItem]: ...
+
+
 def _spec(name: str, protocol: type[Any], description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=True, description=description
@@ -319,4 +344,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CALENDAR, ReleaseCalendar, "Upcoming releases announced by one service (027)"),
     _spec(METADATA, MetadataProvider, "Metadata provider enriching the catalog (027)"),
     _spec(DOWNLOADS, DownloadQueue, "What a download manager is fetching or importing now (027)"),
+    _spec(
+        DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
+    ),
 )

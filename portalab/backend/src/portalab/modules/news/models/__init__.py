@@ -26,6 +26,13 @@ class Category(NewsBase):
     name: Mapped[str] = mapped_column(String(120), nullable=False, info=not_personal("category label"))
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # 027: a category is a channel — described, with an icon, and (``newsletter``) e-mailed to its
+    # subscribers (members may unsubscribe from each channel)
+    description: Mapped[str] = mapped_column(
+        String(300), nullable=False, default="", server_default="", info=not_personal("channel description")
+    )
+    icon: Mapped[str | None] = mapped_column(String(40))
+    newsletter: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
 
 
 class Article(NewsBase):
@@ -58,6 +65,15 @@ class Article(NewsBase):
     featured_until: Mapped[datetime | None] = mapped_column(TZDateTime)
     feature_priority: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     notify_on_publish: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # 027: e-mailed to the channel's subscribers when published (once: ``emailed_at``)
+    email_on_publish: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+        info=not_personal("whether the article is e-mailed on publication"),
+    )
+    emailed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     publish_seq: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     search_vector: Mapped[Any] = mapped_column(TSVECTOR, nullable=True)
@@ -89,4 +105,35 @@ class ArticleTranslation(NewsBase):
     rendered_html: Mapped[str] = mapped_column(Text, nullable=False)
     renderer_version: Mapped[str] = mapped_column(String(8), nullable=False)
     state: Mapped[str] = mapped_column(String(14), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class NewsletterSchedule(NewsBase):
+    """027: an automatic newsletter — on its cadence the portal writes an article for a channel from what
+    the media services report (releases, additions, upcoming) and publishes it (e-mailed when asked)."""
+
+    __tablename__ = "newsletter_schedules"
+    __table_args__ = (
+        CheckConstraint("kind IN ('releases', 'additions', 'upcoming')", name="kind"),
+        CheckConstraint("cadence IN ('daily', 'weekly', 'monthly')", name="cadence"),
+        CheckConstraint("weekday BETWEEN 0 AND 6 AND hour BETWEEN 0 AND 23", name="when"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    name: Mapped[str] = mapped_column(String(120), nullable=False, info=not_personal("schedule name"))
+    category_id: Mapped[UUID] = mapped_column(ForeignKey("news.categories.id"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    media_kinds: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)  # empty: all
+    cadence: Mapped[str] = mapped_column(String(10), nullable=False)
+    weekday: Mapped[int] = mapped_column(Integer, nullable=False, default=0)  # 0 = Monday
+    hour: Mapped[int] = mapped_column(Integer, nullable=False, default=9)
+    language: Mapped[str] = mapped_column(String(16), nullable=False, default="fr")
+    email: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, info=not_personal("whether the newsletter is e-mailed")
+    )
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    last_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    next_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    last_article_id: Mapped[UUID | None] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

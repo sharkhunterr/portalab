@@ -288,3 +288,114 @@
   gap: var(--space-2);
   padding: var(--space-2);
 }
+
+/* 027: channels, automatic newsletters and subscriptions */
+.news-channels {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.news-channel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.news-channel[data-disabled] {
+  opacity: 0.6;
+}
+.news-channel__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.news-channel__text {
+  display: grid;
+  flex: 1;
+  gap: 0.1rem;
+  min-inline-size: 12rem;
+}
+.news-channel__badges,
+.news-channel__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.news-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.news-kinds legend {
+  margin-block-end: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+.newsletter-subscriptions {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-6);
+}
+.newsletter-subscriptions h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+.newsletter-subscriptions ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.newsletter-subscriptions li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.newsletter-subscriptions li[data-on] {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+}
+.newsletter-subscriptions__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.2rem;
+  block-size: 2.2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.newsletter-subscriptions__text {
+  display: grid;
+  flex: 1;
+  gap: 0.1rem;
+}
+.newsletter-subscriptions__text span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.newsletter-subscriptions input {
+  inline-size: 2.4rem;
+  block-size: 1.3rem;
+  accent-color: var(--color-accent);
+}

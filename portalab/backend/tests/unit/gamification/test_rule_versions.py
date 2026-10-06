@@ -128,3 +128,25 @@ async def test_publish_is_append_only_and_simulation_writes_nothing(gm) -> None:
     await gm.emit(user)
     async with gm.database.session() as session:
         assert await session.scalar(text("SELECT count(*) FROM gamification.transactions")) == 2
+
+
+def test_fixed_plus_per_unit() -> None:
+    """027: a play gives its fixed part plus a part per minute watched (capped)."""
+    from portalab.modules.gamification.calculator.calculator import base_amounts
+    from portalab.modules.gamification.rules.definition import parse_rule
+
+    rule = parse_rule(
+        {
+            "event_type": "media.playback_finished",
+            "grants": [
+                {
+                    "value": "xp",
+                    "amount": 10,
+                    "per_unit": {"field": "duration_s", "factor": 1 / 60, "max": 180},
+                }
+            ],
+        }
+    )
+    assert base_amounts(rule, {"duration_s": 1500}) == [("xp", 35)]  # 10 + 25 min
+    assert base_amounts(rule, {"duration_s": 3 * 3600 * 2}) == [("xp", 190)]  # capped part
+    assert base_amounts(rule, {}) == [("xp", 10)]

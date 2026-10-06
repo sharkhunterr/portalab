@@ -12,7 +12,7 @@ import {
   type Tone,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -33,6 +33,7 @@ interface Window {
   starts_at: string;
   ends_at: string;
   status: string;
+  banner?: boolean;
 }
 
 interface ServiceItem {
@@ -62,6 +63,7 @@ function WindowForm({
   const [service, setService] = useState(existing?.service_id ?? "");
   const [title, setTitle] = useState(existing?.title ?? "");
   const [description, setDescription] = useState(existing?.description ?? "");
+  const [banner, setBanner] = useState(Boolean(existing?.banner));
   const [starts, setStarts] = useState(existing ? local(existing.starts_at) : local(soon.toISOString()));
   const [ends, setEnds] = useState(
     existing ? local(existing.ends_at) : local(new Date(soon.getTime() + 3600_000).toISOString()),
@@ -73,11 +75,18 @@ function WindowForm({
       if (existing) {
         return api.PATCH("/api/v1/maintenance/{window_id}", {
           params: { path: { window_id: existing.id } },
-          body: { title, description, ...times, reference_time_zone: zone },
+          body: { title, description, ...times, reference_time_zone: zone, banner },
         });
       }
       return api.POST("/api/v1/maintenance", {
-        body: { service_id: service || null, title, description, ...times, reference_time_zone: zone },
+        body: {
+          service_id: service || null,
+          title,
+          description,
+          ...times,
+          reference_time_zone: zone,
+          banner,
+        },
       });
     },
     onSuccess: () => void client.invalidateQueries({ queryKey: KEY }),
@@ -134,6 +143,12 @@ function WindowForm({
           />
         </div>
       </FormGrid>
+      <CheckboxField
+        label={t("admin:maintenance.banner")}
+        hint={t("admin:maintenance.bannerHint")}
+        checked={banner}
+        onChange={(e) => setBanner(e.target.checked)}
+      />
       {save.isSuccess ? (
         <p role="status" className="services-admin__ok">
           {t("admin:maintenance.saved")}

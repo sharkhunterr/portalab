@@ -52,6 +52,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     schema=model,
                     open_payload=False,
                     automatable=kind in ("marketplace.purchase", "marketplace.product_published"),
+                    rewardable=frozenset({"price"}) if model is OwnershipChanged else frozenset(),
                     aggregatable=frozenset(
                         {"product", "price"} if model is OwnershipChanged else {"product"}
                     ),

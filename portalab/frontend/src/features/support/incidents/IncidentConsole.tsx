@@ -7,6 +7,9 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { type Incident, type Severity, useIncidentStaff, useIncidents } from "./api";
+import { SeverityBadge, StateSteps } from "./IncidentParts";
+import { ServicePicker } from "./ServicePicker";
+import "../support.css";
 
 /**
  * Incident console (spec 016 T013): declare, update the public timeline, change severity/services and
@@ -21,7 +24,7 @@ function Declare() {
   const [title, setTitle] = useState("");
   const [severity, setSeverity] = useState<Severity>("major");
   const [summary, setSummary] = useState("");
-  const [services, setServices] = useState("");
+  const [services, setServices] = useState<string[]>([]);
   function submit(event: FormEvent) {
     event.preventDefault();
     staff.mutate(
@@ -30,12 +33,15 @@ function Declare() {
         title,
         severity,
         summary,
-        service_ids: services
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
+        service_ids: services,
       },
-      { onSuccess: () => setTitle("") },
+      {
+        onSuccess: () => {
+          setTitle("");
+          setSummary("");
+          setServices([]);
+        },
+      },
     );
   }
   return (
@@ -66,11 +72,7 @@ function Declare() {
           maxLength={4000}
           onChange={(e) => setSummary(e.target.value)}
         />
-        <TextField
-          label={t("support:console.services")}
-          value={services}
-          onChange={(e) => setServices(e.target.value)}
-        />
+        <ServicePicker label={t("support:console.services")} value={services} onChange={setServices} />
         <Button type="submit" disabled={staff.isPending}>
           {t("support:console.declare")}
         </Button>
@@ -94,10 +96,24 @@ function Manage({ incident }: { incident: Incident }) {
   };
   const base = { id: incident.id, version: incident.version };
   return (
-    <section aria-labelledby={headingId} className="admin-section incident-manage">
-      <h3 id={headingId}>
-        {incident.reference} · {incident.title}
+    <section
+      aria-labelledby={headingId}
+      className="admin-section incident-manage incident-card"
+      data-severity={incident.severity}
+    >
+      <div className="incident-card__head">
+        <SeverityBadge severity={incident.severity} />
+        <span className="incident-card__ref">{incident.reference}</span>
+      </div>
+      <h3 id={headingId} className="incident-card__title">
+        {incident.title}
       </h3>
+      <StateSteps state={incident.state} />
+      <ServicePicker
+        label={t("support:console.services")}
+        value={incident.services.map((s) => s.id)}
+        onChange={(ids) => staff.mutate({ kind: "patch", ...base, service_ids: ids }, { onError })}
+      />
       <TextField
         label={t("support:console.message")}
         value={message}

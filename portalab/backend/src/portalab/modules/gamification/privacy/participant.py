@@ -22,6 +22,7 @@ from portalab.modules.gamification.models import (
     LedgerTransaction,
     QuestProgress,
     Reservation,
+    StreakDay,
     UsageWindow,
     UserAchievement,
     Withheld,
@@ -139,6 +140,7 @@ class GamificationParticipant:
                 Withheld,
                 AnomalyFlag,
                 AppliedEvent,
+                StreakDay,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
         if self.leaderboards is not None:

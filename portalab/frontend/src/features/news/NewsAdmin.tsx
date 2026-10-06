@@ -1,9 +1,9 @@
 import { type FormEvent, useState } from "react";
-import { Link } from "react-router";
-import { AdminPage } from "../../design-system/admin/AdminKit";
+import { Link, useSearchParams } from "react-router";
+import { AdminPage, AdminTabs } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
 import { Card } from "../../design-system/components/Content";
-import { CheckboxField, TextField } from "../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { Popover } from "../../design-system/components/Overlays";
 import { EmptyState } from "../../design-system/components/Placeholders";
@@ -13,6 +13,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { MarkdownEditor } from "../content/MarkdownEditor";
 import { type NewsEditor, useEditorial, useNewsActions } from "./api";
 import { Cover } from "./cover";
+import { ChannelsPanel, NewslettersPanel, useChannels } from "./NewsChannels";
 import "./news.css";
 
 /**
@@ -34,6 +35,10 @@ function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () =>
   const [summary, setSummary] = useState(article?.summary ?? "");
   const [body, setBody] = useState(article?.body_md ?? "");
   const [notify, setNotify] = useState(article?.notify_on_publish ?? false);
+  const channels = useChannels();
+  const [category, setCategory] = useState(article?.category_id ?? "");
+  const [email, setEmail] = useState(article?.email_on_publish ?? false);
+  const chosen = (channels.data ?? []).find((c) => c.id === category);
   const submit = (event: FormEvent) => {
     event.preventDefault();
     save.mutate(
@@ -44,6 +49,8 @@ function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () =>
           summary,
           body_md: body,
           notify_on_publish: notify,
+          category_id: category || null,
+          email_on_publish: Boolean(chosen?.newsletter) && email,
           language: documentLanguage(),
           ...(article ? { base_version: article.version } : {}),
         },
@@ -80,10 +87,38 @@ function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () =>
           onChange={setBody}
           ownerRef={article ? `portalab://news/${article.id}` : undefined}
         />
+        <SelectField
+          label={t("news:field.channel")}
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="">{t("news:field.noChannel")}</option>
+          {(channels.data ?? [])
+            .filter((c) => c.enabled)
+            .map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+                {c.newsletter ? ` · ${t("news:channels.byEmail")}` : ""}
+              </option>
+            ))}
+        </SelectField>
         <CheckboxField
           label={t("news:field.notify")}
           checked={notify}
           onChange={(e) => setNotify(e.target.checked)}
+        />
+        <CheckboxField
+          label={t("news:field.email")}
+          hint={
+            article?.emailed_at
+              ? t("news:field.emailed")
+              : chosen?.newsletter
+                ? t("news:field.emailHint", { channel: chosen.name })
+                : t("news:field.emailNeedsChannel")
+          }
+          checked={Boolean(chosen?.newsletter) && email}
+          disabled={!chosen?.newsletter || Boolean(article?.emailed_at)}
+          onChange={(e) => setEmail(e.target.checked)}
         />
         <div className="news-admin__actions">
           <Button type="submit" disabled={save.isPending}>
@@ -145,6 +180,12 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
       <div className="news-admin__main">
         <span className="news-admin__title">
           <strong>{article.title}</strong>
+          {article.emailed_at ? (
+            <span className="ds-badge" title={t("news:field.emailed")}>
+              <Icon name="mail" size={12} />
+              {t("news:admin.emailed")}
+            </span>
+          ) : null}
           {featured ? (
             <span className="ds-badge news-admin__featured">
               <Icon name="star" size={12} />
@@ -194,8 +235,12 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
   );
 }
 
+const TABS = ["articles", "channels", "newsletters"] as const;
+
 export function NewsAdmin() {
   const t = useT();
+  const [params, setParams] = useSearchParams();
+  const tab = (TABS as readonly string[]).includes(params.get("tab") ?? "") ? params.get("tab") : "articles";
   const editorial = useEditorial();
   const [editing, setEditing] = useState<NewsEditor | "new" | null>(null);
   const [status, setStatus] = useState<string>("");
@@ -208,46 +253,62 @@ export function NewsAdmin() {
       title={t("news:admin.title")}
       description={t("news:admin.subtitle")}
       primary={
-        <Button onClick={() => setEditing("new")}>
-          <Icon name="plus" size={16} />
-          {t("news:admin.new")}
-        </Button>
+        tab === "articles" ? (
+          <Button onClick={() => setEditing("new")}>
+            <Icon name="plus" size={16} />
+            {t("news:admin.new")}
+          </Button>
+        ) : undefined
+      }
+      tabs={
+        <AdminTabs
+          label={t("news:admin.title")}
+          current={tab ?? "articles"}
+          onChange={(next) => setParams(next === "articles" ? {} : { tab: next }, { replace: true })}
+          tabs={TABS.map((key) => ({ key, label: t(`news:admin.tabs.${key}`) }))}
+        />
       }
     >
-      {editing ? (
-        <Editor
-          key={editing === "new" ? "new" : editing.id}
-          article={editing === "new" ? null : editing}
-          onDone={() => setEditing(null)}
-        />
-      ) : null}
-      {editorial.isPending ? <FunctionalState state="loading" /> : null}
-      {editorial.isError ? <FunctionalState state="unauthorized" /> : null}
-      {editorial.data ? (
-        <fieldset className="ds-subnav" aria-label={t("news:admin.title")}>
-          <button type="button" aria-pressed={!status} onClick={() => setStatus("")}>
-            {t("news:admin.filter.all")} · {articles.length}
-          </button>
-          {STATUSES.map((s) => (
-            <button key={s} type="button" aria-pressed={status === s} onClick={() => setStatus(s)}>
-              {t(`news:status.${s}`)} · {count(s)}
-            </button>
-          ))}
-        </fieldset>
-      ) : null}
-      {editorial.data && shown.length === 0 ? (
-        <EmptyState
-          icon="newspaper"
-          title={t("news:admin.empty")}
-          action={{ label: t("news:admin.new"), onSelect: () => setEditing("new") }}
-        />
-      ) : null}
-      {shown.length ? (
-        <ul className="news-admin__list">
-          {shown.map((a) => (
-            <ArticleRow key={a.id} article={a} onEdit={() => setEditing(a)} />
-          ))}
-        </ul>
+      {tab === "channels" ? <ChannelsPanel /> : null}
+      {tab === "newsletters" ? <NewslettersPanel /> : null}
+      {tab === "articles" ? (
+        <>
+          {editing ? (
+            <Editor
+              key={editing === "new" ? "new" : editing.id}
+              article={editing === "new" ? null : editing}
+              onDone={() => setEditing(null)}
+            />
+          ) : null}
+          {editorial.isPending ? <FunctionalState state="loading" /> : null}
+          {editorial.isError ? <FunctionalState state="unauthorized" /> : null}
+          {editorial.data ? (
+            <fieldset className="ds-subnav" aria-label={t("news:admin.title")}>
+              <button type="button" aria-pressed={!status} onClick={() => setStatus("")}>
+                {t("news:admin.filter.all")} · {articles.length}
+              </button>
+              {STATUSES.map((s) => (
+                <button key={s} type="button" aria-pressed={status === s} onClick={() => setStatus(s)}>
+                  {t(`news:status.${s}`)} · {count(s)}
+                </button>
+              ))}
+            </fieldset>
+          ) : null}
+          {editorial.data && shown.length === 0 ? (
+            <EmptyState
+              icon="newspaper"
+              title={t("news:admin.empty")}
+              action={{ label: t("news:admin.new"), onSelect: () => setEditing("new") }}
+            />
+          ) : null}
+          {shown.length ? (
+            <ul className="news-admin__list">
+              {shown.map((a) => (
+                <ArticleRow key={a.id} article={a} onEdit={() => setEditing(a)} />
+              ))}
+            </ul>
+          ) : null}
+        </>
       ) : null}
     </AdminPage>
   );

@@ -46,11 +46,14 @@ from portalab.modules.news.integrations import (
     NewsWidget,
     register_publish_action,
 )
+from portalab.modules.news.newsletters import CATEGORY as NEWSLETTER_CATEGORY
+from portalab.modules.news.newsletters import Newsletters
 from portalab.modules.news.participant import NewsParticipant
 from portalab.modules.news.settings import SETTINGS, NewsConfig
 
 OWNER = "module:news"
 SWEEP_JOB = "news.publish_sweep"
+NEWSLETTER_JOB = "news.newsletters"
 log = get_logger("portalab.news")
 
 
@@ -89,6 +92,8 @@ class NewsModule:
         self.articles = ArticleService(
             database, events, authorizer, capabilities, lambda: self.config, clock=clock
         )
+        self.newsletters = Newsletters(database, self.articles, capabilities, clock=clock)  # 027
+        self.articles.newsletter = self.newsletters.email_article
 
     def register(self) -> None:
         register_event_types(self.event_types)
@@ -109,6 +114,14 @@ class NewsModule:
                 )
         if self.categories.get("news.published") is None:
             declare_category("news.published", OWNER, "news:category.published", registry=self.categories)
+        if self.categories.get(NEWSLETTER_CATEGORY) is None:  # 027: newsletters, by e-mail only
+            declare_category(
+                NEWSLETTER_CATEGORY,
+                OWNER,
+                "news:category.newsletter",
+                default_channels=("email",),
+                registry=self.categories,
+            )
         register_publish_action(self.articles, self.actions)
         self.observables.declare(
             ObservedComponent(
@@ -145,9 +158,15 @@ class NewsModule:
         async def sweep() -> None:
             await self.articles.sweep()
 
+        async def newsletters() -> None:
+            await self.newsletters.run_due()
+
         return [
             self.refresh_config,
             register_periodic(jobs, self.database, SWEEP_JOB, timedelta(minutes=1), sweep, owner=OWNER),
+            register_periodic(
+                jobs, self.database, NEWSLETTER_JOB, timedelta(minutes=10), newsletters, owner=OWNER
+            ),
         ]
 
     async def refresh_config(self) -> None:

@@ -11,8 +11,9 @@ import { useT } from "../../../i18n/hooks/useT";
 import type { Change, Instance } from "../api";
 
 /**
- * Edit controls of one widget (spec 009 T019; R4, WCAG 2.2): every personalization — move, resize, hide,
- * remove, configure — is a plain button (keyboard and touch; never drag-only). Policy-locked actions are
+ * Edit controls of one widget (spec 009 T019; 027): moving and resizing are done on the grid itself (drag
+ * the grip or pull the edges; keyboard: Enter on the grip then arrows, Shift + arrows to resize), so a
+ * widget only keeps two buttons in its header — its settings and « remove ». Policy-locked actions are
  * disabled with their reason; the server enforces them anyway.
  */
 interface SchemaProperty {
@@ -23,148 +24,36 @@ interface SchemaProperty {
   maxLength?: number;
 }
 
-export interface Arrange {
-  cell: { x: number; y: number; w: number; h: number };
-  index: number;
-  count: number;
-  prev?: { x: number; y: number; w: number; h: number } | undefined;
-  next?: { x: number; y: number; w: number; h: number } | undefined;
-  /** 027: the screen being arranged has this many columns (12, 8 or 4). */
-  columns?: number;
-  move: (x: number, y: number) => void;
-  resize: (w: number, h: number) => void;
-}
-
-export function EditControls({
-  instance,
-  count,
-  apply,
-  arrange,
-}: {
-  instance: Instance;
-  count: number;
-  apply: (change: Change) => void;
-  /**
-   * Desktop edit session (027 FR-040): the buttons change the draft like a drag would — moving up takes
-   * the previous widget's place (reading order), moving down goes below the next one; saved with the rest.
-   */
-  arrange?: Arrange | undefined;
-}) {
+export function EditControls({ instance, apply }: { instance: Instance; apply: (change: Change) => void }) {
   const t = useT();
   const announce = useAnnounce();
   const widget = instance.widget;
   const id = instance.id;
   const title = widget ? t(widget.title_key) : instance.widget_key;
   if (!id) return null; // synthesized by a policy: nothing to personalize
-  const patch = (body: Extract<Change, { kind: "patch" }>["body"], message?: string) => {
-    apply({ kind: "patch", id, body });
-    if (message) announce(message);
-  };
-  const cell = arrange?.cell ?? instance;
-  const index = arrange?.index ?? instance.position;
-  const total = arrange?.count ?? count;
-  const resize = (w: number, h: number) => {
-    if (arrange) arrange.resize(w, h);
-    else patch({ w, h });
-    announce(t("dashboard:resized", { title, w, h }));
-  };
-  const move = (up: boolean) => {
-    const neighbour = up ? arrange?.prev : arrange?.next;
-    if (arrange && neighbour) {
-      if (up) arrange.move(neighbour.x, neighbour.y);
-      else arrange.move(neighbour.x, neighbour.y + neighbour.h);
-    } else if (!arrange) {
-      patch({ position: instance.position + (up ? -1 : 1) });
-    }
-    announce(t("dashboard:moved", { title, position: index + (up ? 0 : 2) }));
-  };
-  const fixed = instance.locked;
+  const configurable =
+    widget && !instance.locked && Object.keys((widget.config_schema.properties as object) ?? {}).length > 0;
   return (
-    <div className="widget-frame__controls ds-stack ds-stack--row" role="toolbar" aria-label={title}>
-      <Button
-        variant="secondary"
-        disabled={fixed || index === 0}
-        onClick={() => move(true)}
-        size="icon"
-        aria-label={t("dashboard:moveUp")}
-        title={t("dashboard:moveUp")}
-      >
-        <Icon name="arrow-up" size={18} />
-      </Button>
-      <Button
-        variant="secondary"
-        disabled={fixed || index >= total - 1}
-        onClick={() => move(false)}
-        size="icon"
-        aria-label={t("dashboard:moveDown")}
-        title={t("dashboard:moveDown")}
-      >
-        <Icon name="arrow-down" size={18} />
-      </Button>
-      <Button
-        variant="secondary"
-        disabled={fixed || !widget || cell.w >= Math.min(widget.max_w, arrange?.columns ?? 12)}
-        onClick={() => resize(cell.w + 1, cell.h)}
-        size="icon"
-        aria-label={t("dashboard:wider")}
-        title={t("dashboard:wider")}
-      >
-        <Icon name="wider" size={18} />
-      </Button>
-      <Button
-        variant="secondary"
-        disabled={fixed || !widget || cell.w <= Math.min(widget.min_w, arrange?.columns ?? 12)}
-        onClick={() => resize(cell.w - 1, cell.h)}
-        size="icon"
-        aria-label={t("dashboard:narrower")}
-        title={t("dashboard:narrower")}
-      >
-        <Icon name="narrower" size={18} />
-      </Button>
-      <Button
-        variant="secondary"
-        disabled={fixed || !widget || cell.h >= widget.max_h}
-        onClick={() => resize(cell.w, cell.h + 1)}
-        size="icon"
-        aria-label={t("dashboard:taller")}
-        title={t("dashboard:taller")}
-      >
-        <Icon name="taller" size={18} />
-      </Button>
-      <Button
-        variant="secondary"
-        disabled={fixed || !widget || cell.h <= widget.min_h}
-        onClick={() => resize(cell.w, cell.h - 1)}
-        size="icon"
-        aria-label={t("dashboard:shorter")}
-        title={t("dashboard:shorter")}
-      >
-        <Icon name="shorter" size={18} />
-      </Button>
-      {widget && !fixed && Object.keys((widget.config_schema.properties as object) ?? {}).length ? (
-        <ConfigDialog instance={instance} onSave={(config) => patch({ config })} />
+    <div className="widget-frame__controls" role="toolbar" aria-label={title}>
+      {configurable ? (
+        <ConfigDialog
+          instance={instance}
+          onSave={(config) => apply({ kind: "patch", id, body: { config } })}
+        />
       ) : null}
-      <Button
-        variant="secondary"
-        disabled={!instance.hideable}
-        onClick={() => patch({ status: "hidden" })}
-        size="icon"
-        aria-label={t("dashboard:hide")}
-        title={t("dashboard:hide")}
-      >
-        <Icon name="hide" size={18} />
-      </Button>
       <Button
         variant="danger"
         disabled={!instance.removable}
-        onClick={() => apply({ kind: "remove", id })}
+        onClick={() => {
+          apply({ kind: "remove", id });
+          announce(t("dashboard:removed", { title }));
+        }}
         size="icon"
         aria-label={t("dashboard:remove")}
-        title={t("dashboard:remove")}
+        title={instance.removable ? t("dashboard:remove") : t("dashboard:mandatory")}
       >
-        <Icon name="trash" size={18} />
+        <Icon name="trash" size={16} />
       </Button>
-      {!instance.hideable ? <span className="widget__meta">{t("dashboard:mandatory")}</span> : null}
     </div>
   );
 }
@@ -216,7 +105,7 @@ function ConfigDialog({
           aria-label={t("dashboard:settings")}
           title={t("dashboard:settings")}
         >
-          <Icon name="settings" size={18} />
+          <Icon name="settings" size={16} />
         </Button>
       }
     >

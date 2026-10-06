@@ -114,6 +114,8 @@ class MaintenanceWindow(HealthBase):
     ends_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     reference_time_zone: Mapped[str | None] = mapped_column(String(64))
     status: Mapped[str] = mapped_column(String(16), nullable=False)
+    # 027: also shown as a banner across the portal (from a day before until it ends)
+    banner: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     schedule_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

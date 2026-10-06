@@ -16,6 +16,7 @@ import { PaletteContext } from "./palette/PaletteContext";
 import { RegionBoundary } from "./router/RouteBoundary";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
 import { GlobalStatusBanner } from "./status/GlobalStatusBanner";
+import { MaintenanceBanner } from "./status/MaintenanceBanner";
 import { useShellStrings } from "./strings";
 
 /**
@@ -122,6 +123,7 @@ export function AppShell({
           bottomBar={nav === "bottom-bar"}
         />
         <GlobalStatusBanner />
+        <MaintenanceBanner />
         {nav === "topbar" ? (
           <nav aria-label={shellStrings.mainNav} className="shell-topnav">
             <NavContent variant="bar" />

@@ -12,7 +12,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
-from portalab.capabilities.economy import CATALOG, ECONOMY, LEADERBOARDS, REWARDS
+from portalab.capabilities.economy import CATALOG, ECONOMY, LEADERBOARDS, MODIFIERS, REWARDS
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -74,10 +74,15 @@ from portalab.modules.gamification.progression.service import ProgressionService
 from portalab.modules.gamification.quests.service import Quests
 from portalab.modules.gamification.rules.store import RuleStore
 from portalab.modules.gamification.settings import SETTINGS, EconomyConfig
+from portalab.modules.gamification.streaks.level_rewards import CONSUMER as LEVEL_REWARDS
+from portalab.modules.gamification.streaks.level_rewards import LevelRewards
+from portalab.modules.gamification.streaks.service import Pace, Streaks
 from portalab.modules.gamification.verify.verifier import verify
 
 OWNER = "module:gamification"
 INSTANCE = "gamification"
+STREAK_INSTANCE = "streak"
+PACE_INSTANCE = "pace"
 PURGE_JOB = "gamification.purge"
 LEADERBOARD_JOB = "gamification.leaderboards"  # snapshots older than refreshMinutes are rebuilt
 
@@ -153,6 +158,9 @@ class GamificationModule:
         self.quests = Quests(database, self.writer, events, audit, capabilities, config, clock=clock)
         self.pipeline.quests = self.quests
         self.progression = ProgressionService(database, self.levels)
+        self.streaks = Streaks(database, config)
+        self.pace = Pace(config)
+        self.level_rewards = LevelRewards(database, self.writer, capabilities, config)
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock
         )
@@ -161,6 +169,11 @@ class GamificationModule:
         register_event_types(self.event_types)
         if self.consumers.get(CONSUMER) is None:
             self.consumers.register(self.pipeline.consumer())
+        if self.consumers.get(LEVEL_REWARDS) is None:
+            self.consumers.register(self.level_rewards.consumer())
+        for instance, modifier in ((STREAK_INSTANCE, self.streaks), (PACE_INSTANCE, self.pace)):
+            if not any(p.instance_ref == instance for p in self.capabilities.system_providers(MODIFIERS)):
+                self.capabilities.provide(MODIFIERS, modifier, instance_ref=instance, owner=OWNER)
         for name, provider in (
             (ECONOMY, self.economy),
             (REWARDS, self.rewards),

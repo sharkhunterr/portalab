@@ -42,6 +42,7 @@ def window_out(row: MaintenanceWindow) -> dict[str, Any]:
         "reference_time_zone": row.reference_time_zone,
         "status": row.status,
         "schedule_version": row.schedule_version,
+        "banner": row.banner,
     }
 
 
@@ -112,6 +113,7 @@ class MaintenanceService:
         ends_at: datetime,
         description: str = "",
         reference_time_zone: str | None = None,
+        banner: bool = False,
     ) -> dict[str, Any]:
         starts, ends = self._validate(starts_at, ends_at, reference_time_zone)
         async with self.database.unit_of_work() as uow:
@@ -122,6 +124,7 @@ class MaintenanceService:
                 starts_at=starts,
                 ends_at=ends,
                 reference_time_zone=reference_time_zone,
+                banner=banner,
                 status="scheduled",
                 schedule_version=1,
                 created_by=actor.user_id,
@@ -160,11 +163,14 @@ class MaintenanceService:
         starts_at: datetime | None = None,
         ends_at: datetime | None = None,
         reference_time_zone: str | None = None,
+        banner: bool | None = None,
     ) -> dict[str, Any]:
         async with self.database.unit_of_work() as uow:
             row = await self._row(uow.session, window_id)
             if row.status in ("ended", "cancelled"):
                 raise InvalidWindow("This maintenance window is over.")
+            if banner is not None:
+                row.banner = banner
             if title is not None:
                 row.title = title
             if description is not None:

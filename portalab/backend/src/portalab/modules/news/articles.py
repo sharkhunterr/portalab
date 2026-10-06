@@ -10,7 +10,7 @@ priority then recency."""
 import asyncio
 import re
 import unicodedata
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -84,6 +84,7 @@ class ArticleInput:
     audience: dict[str, Any] | None = None
     notify_on_publish: bool = False
     language: str = "en"
+    email_on_publish: bool = False  # 027: e-mailed to the channel's subscribers when published
 
 
 class ArticleService:
@@ -103,6 +104,8 @@ class ArticleService:
         self.capabilities = capabilities
         self.config = config  # callable → NewsConfig
         self.clock = clock
+        # 027: e-mails a published newsletter to its channel's subscribers (set by the module)
+        self.newsletter: Callable[[Article], Awaitable[int]] | None = None
 
     async def allowed(self, principal: Principal, permission: str) -> bool:
         try:
@@ -135,15 +138,16 @@ class ArticleService:
     def _vector(self, title: str, summary: str, text: str) -> Any:
         return func.to_tsvector("simple", normalize_for_search(f"{title} {title} {summary} {text}")[:200_000])
 
-    async def create(self, actor: Principal, data: ArticleInput) -> Article:
-        if not await self.allowed(actor, NEWS_CREATE):
+    async def create(self, actor: Principal | None, data: ArticleInput) -> Article:
+        """``actor=None``: written by the portal itself (an automatic newsletter)."""
+        if actor is not None and not await self.allowed(actor, NEWS_CREATE):
             raise Forbidden("You cannot write news.")
         rendered = render_markdown(data.body_md)
         audience = Audience.model_validate(
             data.audience or {"mode": self.config().default_audience}
         ).model_dump()
         now = utc_now(self.clock)
-        author = actor.acting_for or actor.user_id
+        author = (actor.acting_for or actor.user_id) if actor is not None else None
         async with self.database.unit_of_work() as uow:
             session = uow.session
             await self._category(session, data.category_id)
@@ -161,6 +165,7 @@ class ArticleService:
                 status="draft",
                 audience=audience,
                 notify_on_publish=data.notify_on_publish,
+                email_on_publish=data.email_on_publish,
                 version=1,
                 search_vector=self._vector(data.title, data.summary, rendered.text),
                 created_at=now,
@@ -221,6 +226,7 @@ class ArticleService:
                 data.notify_on_publish,
                 data.language,
             )
+            row.email_on_publish = data.email_on_publish
             if data.audience is not None:
                 row.audience = Audience.model_validate(data.audience).model_dump()
             row.search_vector = self._vector(row.title, row.summary, rendered.text)
@@ -249,7 +255,7 @@ class ArticleService:
         allowed_from, target = TRANSITIONS[action]
         permission = NEWS_ARCHIVE if action in ("archive", "restore") else NEWS_PUBLISH
         now = utc_now(self.clock)
-        notify = False
+        notify = email = False
         async with self.database.unit_of_work() as uow:
             session = uow.session
             row = await session.get(Article, article_id, with_for_update=True)
@@ -284,6 +290,7 @@ class ArticleService:
                 row.published_at = now
                 row.publish_at = None
                 notify = row.notify_on_publish
+                email = row.email_on_publish and row.emailed_at is None
             if action == "archive":
                 row.archived_at = now
             if action == "restore":
@@ -294,6 +301,11 @@ class ArticleService:
                 await self._event(session, row, event)
         if notify:
             await self._notify(row)
+        if email and self.newsletter is not None:
+            try:
+                await self.newsletter(row)
+            except Exception:
+                log.warning("newsletter e-mail not sent")  # publishing is never blocked
         return row
 
     async def run_scheduled(self, payload: dict[str, Any]) -> bool:

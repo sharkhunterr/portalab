@@ -110,6 +110,8 @@ class EmailConfigIn(BaseModel):
     tls: bool = False
     username: str = Field(default="", max_length=200)
     password: str | None = Field(default=None, max_length=500)  # write-only; None keeps the stored one
+    # 027: the portal's public address, for the links of e-mails (newsletters…); None keeps the stored one
+    portal_url: str | None = Field(default=None, max_length=300, pattern=r"^(https?://[^\s]+)?$")
 
 
 class CategoryPolicyIn(BaseModel):
@@ -432,6 +434,10 @@ async def put_email(principal: Manager, body: EmailConfigIn, module: Module) -> 
         await writer.set_global(principal, SETTINGS[field], value, reason="e-mail transport")
     if body.password is not None:
         await writer.set_global(principal, SMTP_PASSWORD, body.password, reason="e-mail transport")
+    if body.portal_url is not None:
+        await writer.set_global(
+            principal, SETTINGS["portal_url"], body.portal_url.rstrip("/"), reason="e-mail links"
+        )
     await module.refresh_config()
     return {"enabled": module.config.email_enabled, "host": module.config.smtp_host, "password": "********"}
 

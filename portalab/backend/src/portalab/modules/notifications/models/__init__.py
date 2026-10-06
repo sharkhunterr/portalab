@@ -57,6 +57,8 @@ class Communication(NotifyBase):
     produced_by: Mapped[str] = mapped_column(String(80), nullable=False)
     valid_until: Mapped[datetime | None] = mapped_column(TZDateTime)
     action_url: Mapped[str | None] = mapped_column(String(256))
+    # 027: a newsletter's own e-mail ({subject, text, html}); dropped with the communication's retention
+    email_body: Mapped[dict[str, Any] | None] = mapped_column(JSONB, info=not_personal("newsletter content"))
     recipients: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 

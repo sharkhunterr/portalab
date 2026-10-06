@@ -99,7 +99,8 @@ describe("incidents", () => {
         : json(200, INCIDENT);
     };
     renderAt("/admin/incidents", [{ path: "/admin/incidents", element: <IncidentConsole /> }]);
-    await screen.findByRole("heading", { name: "INC-0007 · <b>Media</b> down" });
+    await screen.findByRole("heading", { name: "<b>Media</b> down" });
+    expect(screen.getByText("INC-0007")).toBeTruthy(); // the reference sits beside the severity
     fireEvent.change(screen.getByLabelText("Public update"), { target: { value: "Fix deployed." } });
     fireEvent.click(screen.getByRole("button", { name: "Post update" }));
     await waitFor(() =>

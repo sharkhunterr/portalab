@@ -169,7 +169,7 @@ describe("widget frames", () => {
 });
 
 describe("edit mode", () => {
-  it("uses plain buttons with If-Match, respects policies and reloads on conflict", async () => {
+  it("arranges with the grip, saves once with If-Match, respects policies and reports conflicts", async () => {
     const writes: Array<{ method: string; path: string; ifMatch: string | null; body: unknown }> = [];
     let conflict = false;
     setup(
@@ -191,7 +191,7 @@ describe("edit mode", () => {
           method: request.method,
           path: new URL(request.url).pathname,
           ifMatch: request.headers.get("If-Match"),
-          body: request.method === "PATCH" ? await request.json() : null,
+          body: ["PUT", "PATCH", "POST"].includes(request.method) ? await request.json() : null,
         });
         return conflict
           ? json(409, { code: "dashboard.version_conflict", title: "Conflict" })
@@ -201,18 +201,27 @@ describe("edit mode", () => {
     await screen.findByText("42");
     fireEvent.click(screen.getByRole("button", { name: "Customize" }));
     const first = within(frame("First"));
-    expect((first.getByRole("button", { name: "Move up" }) as HTMLButtonElement).disabled).toBe(true);
-    fireEvent.click(first.getByRole("button", { name: "Move down" }));
+    const grip = first.getByRole("button", { name: /Arrange|First/ });
+    fireEvent.keyDown(grip, { key: "Enter" });
+    fireEvent.keyDown(grip, { key: "ArrowDown" }); // moved one row down: it stays there (free placement)
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(writes[0]).toMatchObject({ method: "PATCH", ifMatch: "7", body: { position: 1 } }),
+      expect(writes.find((w) => w.path === "/api/v1/dashboard/arrangement")).toMatchObject({
+        method: "PUT",
+        ifMatch: "7",
+      }),
     );
-    fireEvent.click(first.getByRole("button", { name: "Wider" }));
-    await waitFor(() => expect(writes[1]?.body).toEqual({ w: 5, h: 2 }));
+    const saved = writes.find((w) => w.path === "/api/v1/dashboard/arrangement")?.body as {
+      items: Array<{ widget_key: string; y: number }>;
+    };
+    expect(saved.items.find((i) => i.widget_key === "t.ok")?.y).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button", { name: "Customize" }));
     const locked = within(frame("Locked"));
-    for (const name of ["Move up", "Wider", "Hide", "Remove"])
-      expect((locked.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(true);
+    expect((locked.getByRole("button", { name: "Remove" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(locked.queryByRole("button", { name: /Arrange/ })).toBeNull(); // no grip on a locked widget
+    expect(within(frame("First")).queryByRole("button", { name: "Move up" })).toBeNull(); // old buttons gone
     conflict = true;
-    fireEvent.click(first.getByRole("button", { name: "Hide" }));
+    fireEvent.click(within(frame("First")).getByRole("button", { name: "Remove" }));
     expect(await screen.findByText(/changed on another device/)).toBeTruthy();
   });
 });

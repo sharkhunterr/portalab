@@ -55,6 +55,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     retention_class="business",
                     visibility_class="private",
                     aggregatable=frozenset({"state", "type", "priority"}),
+                    rewardable=frozenset({"type", "priority"}),
                     automatable=True,
                 )
             )

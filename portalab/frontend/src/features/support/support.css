@@ -624,3 +624,69 @@
   gap: 0.2rem;
   margin-inline-start: auto;
 }
+
+/* 027: what an incident concerns — the whole server or ticked services */
+.service-picker {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.service-picker legend {
+  margin-block-end: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+.service-picker__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.service-picker__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+.service-picker__item[data-checked] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.service-picker__kind {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.incident-severity[data-severity="maintenance"] {
+  --tone: var(--state-maintenance-fg);
+}
+.incident-card--maintenance {
+  --tone: var(--state-maintenance-fg);
+}
+.incident-card--maintenance[data-running] {
+  --tone: var(--state-partial-fg);
+}
+.incident-card__whole {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  font-size: var(--font-size-xs);
+}
+.incidents-maintenance {
+  display: grid;
+  gap: var(--space-3);
+}
+.incidents-maintenance h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}

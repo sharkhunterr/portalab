@@ -78,6 +78,8 @@ class NewsEditorOut(NewsCard):
     featured_until: datetime | None
     feature_priority: int
     notify_on_publish: bool
+    email_on_publish: bool = False  # 027
+    emailed_at: datetime | None = None
     version: int
     publish_seq: int
 
@@ -95,6 +97,7 @@ class NewsArticleIn(BaseModel):
     category_id: UUID | None = None
     audience: Audience | None = None
     notify_on_publish: bool = False
+    email_on_publish: bool = False  # 027: e-mailed to the channel's subscribers when published
     language: str = Field(default="en", max_length=16)
     base_version: int | None = Field(default=None, ge=1)
 
@@ -129,6 +132,9 @@ class NewsCategoryIn(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     position: int = Field(default=0, ge=0, le=1000)
     enabled: bool = True
+    description: str = Field(default="", max_length=300)  # 027: channels
+    icon: str | None = Field(default=None, max_length=40)
+    newsletter: bool = False
 
 
 class NewsCategoryOut(BaseModel):
@@ -137,6 +143,68 @@ class NewsCategoryOut(BaseModel):
     name: str
     position: int
     enabled: bool
+    description: str = ""
+    icon: str | None = None
+    newsletter: bool = False
+
+
+def _category_out(c: Category) -> NewsCategoryOut:
+    return NewsCategoryOut(
+        id=c.id,
+        key=c.key,
+        name=c.name,
+        position=c.position,
+        enabled=c.enabled,
+        description=c.description,
+        icon=c.icon,
+        newsletter=c.newsletter,
+    )
+
+
+class NewsletterScheduleIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(min_length=1, max_length=120)
+    category_id: UUID
+    kind: Literal["releases", "additions", "upcoming"]
+    media_kinds: list[Literal["movie", "series", "book", "game", "album"]] = Field(default_factory=list)
+    cadence: Literal["daily", "weekly", "monthly"]
+    weekday: int = Field(default=0, ge=0, le=6)
+    hour: int = Field(default=9, ge=0, le=23)
+    language: str = Field(default="fr", max_length=16)
+    email: bool = True
+    enabled: bool = True
+
+
+class NewsletterScheduleOut(NewsletterScheduleIn):
+    model_config = ConfigDict(extra="ignore")
+    id: UUID
+    last_run_at: datetime | None
+    next_run_at: datetime | None
+    last_article_id: UUID | None
+
+
+class SubscriptionsIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    changes: dict[str, bool] = Field(max_length=100)
+
+
+def _schedule_out(row: Any) -> NewsletterScheduleOut:
+    return NewsletterScheduleOut(
+        id=row.id,
+        name=row.name,
+        category_id=row.category_id,
+        kind=row.kind,
+        media_kinds=row.media_kinds or [],
+        cadence=row.cadence,
+        weekday=row.weekday,
+        hour=row.hour,
+        language=row.language,
+        email=row.email,
+        enabled=row.enabled,
+        last_run_at=row.last_run_at,
+        next_run_at=row.next_run_at,
+        last_article_id=row.last_article_id,
+    )
 
 
 def _card(row: Article) -> NewsCard:
@@ -161,6 +229,8 @@ def _editor(row: Article) -> NewsEditorOut:
         featured_until=row.featured_until,
         feature_priority=row.feature_priority,
         notify_on_publish=row.notify_on_publish,
+        email_on_publish=row.email_on_publish,
+        emailed_at=row.emailed_at,
         version=row.version,
         publish_seq=row.publish_seq,
     )
@@ -174,6 +244,7 @@ def _input(body: NewsArticleIn) -> ArticleInput:
         category_id=body.category_id,
         audience=body.audience.model_dump() if body.audience else None,
         notify_on_publish=body.notify_on_publish,
+        email_on_publish=body.email_on_publish,
         language=body.language,
     )
 
@@ -336,10 +407,7 @@ async def translate(
 
 @router.get("/admin/news/categories", response_model=list[NewsCategoryOut])
 async def all_categories(principal: CategoryManager, module: Module) -> list[NewsCategoryOut]:
-    return [
-        NewsCategoryOut(id=c.id, key=c.key, name=c.name, position=c.position, enabled=c.enabled)
-        for c in await module.articles.categories(enabled_only=False)
-    ]
+    return [_category_out(c) for c in await module.articles.categories(enabled_only=False)]
 
 
 @router.put("/admin/news/categories", response_model=NewsCategoryOut)
@@ -353,11 +421,61 @@ async def put_category(principal: CategoryManager, body: NewsCategoryIn, module:
             uow.session.add(row)
         else:
             row.name, row.position, row.enabled = body.name, body.position, body.enabled
+        row.description, row.icon, row.newsletter = body.description, body.icon, body.newsletter
         await uow.session.flush()
-        out = NewsCategoryOut(
-            id=row.id, key=row.key, name=row.name, position=row.position, enabled=row.enabled
-        )
+        out = _category_out(row)
     return out
+
+
+# --- newsletters (027) -----------------------------------------------------------------------------------
+@router.get("/me/newsletters")
+async def my_newsletters(principal: Reader, module: Module) -> list[dict[str, Any]]:
+    """The channels sent by e-mail, and whether I receive each one."""
+    user = principal.acting_for or principal.user_id
+    return await module.newsletters.subscriptions(user) if user else []
+
+
+@router.put("/me/newsletters")
+async def set_my_newsletters(
+    principal: Reader, body: SubscriptionsIn, module: Module
+) -> list[dict[str, Any]]:
+    await module.newsletters.set_subscriptions(principal, body.changes)
+    user = principal.acting_for or principal.user_id
+    return await module.newsletters.subscriptions(user) if user else []
+
+
+@router.get("/admin/news/newsletters", response_model=list[NewsletterScheduleOut])
+async def schedules(principal: Publisher, module: Module) -> list[NewsletterScheduleOut]:
+    return [_schedule_out(row) for row in await module.newsletters.schedules()]
+
+
+@router.post(
+    "/admin/news/newsletters", response_model=NewsletterScheduleOut, status_code=status.HTTP_201_CREATED
+)
+async def create_schedule(
+    principal: Publisher, body: NewsletterScheduleIn, module: Module
+) -> NewsletterScheduleOut:
+    return _schedule_out(await module.newsletters.save_schedule(None, body.model_dump()))
+
+
+@router.put("/admin/news/newsletters/{schedule_id}", response_model=NewsletterScheduleOut)
+async def update_schedule(
+    principal: Publisher, schedule_id: UUID, body: NewsletterScheduleIn, module: Module
+) -> NewsletterScheduleOut:
+    return _schedule_out(await module.newsletters.save_schedule(schedule_id, body.model_dump()))
+
+
+@router.delete("/admin/news/newsletters/{schedule_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_schedule(principal: Publisher, schedule_id: UUID, module: Module) -> Response:
+    await module.newsletters.delete_schedule(schedule_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/admin/news/newsletters/{schedule_id}/run")
+async def run_schedule(principal: Publisher, schedule_id: UUID, module: Module) -> dict[str, Any]:
+    """Write the newsletter now (« preview » it in the news desk); nothing when there is nothing to tell."""
+    article = await module.newsletters.generate(schedule_id, force=True)
+    return {"article": _editor(article).model_dump(mode="json") if article else None}
 
 
 @router.post("/admin/news/articles/{article_id}/{action}", response_model=NewsEditorOut)

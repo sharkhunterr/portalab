@@ -3,13 +3,14 @@ values (triggers forbid UPDATE/DELETE); ``balances`` is the transactional cache 
 negative); definitions are append-only versions effective by instant; progress state is per user.
 Columns referencing ``identity.users`` carry their foreign key in the migration only."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
+    Date,
     ForeignKey,
     Identity,
     Index,
@@ -295,3 +296,12 @@ class QuestProgress(GamificationBase):
     counts: Mapped[list[int]] = mapped_column(JSONB, nullable=False, default=list)
     completed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class StreakDay(GamificationBase):
+    """027: a day on which a member did something counted by play streaks (one row per user and day)."""
+
+    __tablename__ = "streak_days"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    day: Mapped[date] = mapped_column(Date, primary_key=True)

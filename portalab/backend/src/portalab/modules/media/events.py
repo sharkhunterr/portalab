@@ -100,7 +100,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                 dedup_fields=("session", "state_seq"),
                 retention_class="business",
                 visibility_class="private",
-                rewardable=frozenset({"kind", "percent"})
+                rewardable=frozenset({"kind", "percent", "duration_s", "position_s"})
                 if name == "media.playback_finished"
                 else frozenset(),
                 aggregatable=frozenset({"kind", "percent"}),

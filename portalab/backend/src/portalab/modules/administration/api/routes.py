@@ -80,6 +80,22 @@ def _changes(body: ChangesIn) -> list[Change]:
     return [Change(item.key, item.value, item.scope, item.scope_ref, item.unset) for item in body.changes]
 
 
+def _kind(declaration: Any) -> dict[str, Any]:
+    """027: how the System page edits a setting — its JSON type and, for a choice, the allowed values."""
+    try:
+        schema = declaration.adapter.json_schema()
+    except Exception:
+        return {"kind": "json"}
+    options = schema.get("anyOf") or []
+    if options and any(o.get("type") == "null" for o in options):
+        schema = next((o for o in options if o.get("type") != "null"), schema)
+    kind = schema.get("type", "json")
+    out: dict[str, Any] = {"kind": kind if kind in ("boolean", "integer", "number", "string") else "json"}
+    if isinstance(schema.get("enum"), list):
+        out["choices"] = schema["enum"]
+    return out
+
+
 @router.get("/admin/config")
 async def get_config(module: Module, principal: Principal = require(MANAGE)) -> dict[str, Any]:
     items = []
@@ -97,6 +113,7 @@ async def get_config(module: Module, principal: Principal = require(MANAGE)) -> 
                 "source": effective.source,
                 "owner": declaration.owner,
                 "version": declaration.version,
+                **_kind(declaration),
             }
         )
     policies = [

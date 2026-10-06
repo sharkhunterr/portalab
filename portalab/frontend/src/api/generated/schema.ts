@@ -885,6 +885,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/event-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Event Types
+         * @description Every action a rule may reward, with the attributes a rule may test or count.
+         */
+        get: operations["event_types_api_v1_admin_gamification_event_types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/level-curve": {
         parameters: {
             query?: never;
@@ -903,6 +923,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/level-rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Level Rewards */
+        get: operations["get_level_rewards_api_v1_admin_gamification_level_rewards_get"];
+        /** Put Level Rewards */
+        put: operations["put_level_rewards_api_v1_admin_gamification_level_rewards_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/manual-grants": {
         parameters: {
             query?: never;
@@ -914,6 +952,66 @@ export interface paths {
         put?: never;
         /** Manual Grant */
         post: operations["manual_grant_api_v1_admin_gamification_manual_grants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gamification/pace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pace */
+        get: operations["get_pace_api_v1_admin_gamification_pace_get"];
+        /** Put Pace */
+        put: operations["put_pace_api_v1_admin_gamification_pace_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gamification/population": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Population
+         * @description 027: where members stand (days since their first XP, XP, level) and the pace of active members
+         *     (XP per day over the last 30 days) — what the progression chart draws and projects.
+         */
+        get: operations["population_api_v1_admin_gamification_population_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gamification/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Progress
+         * @description Daily gains over the period (positive movements only), the members who gained most — with their
+         *     running total day by day — and the share of each source (rules by key, achievements, manual…).
+         */
+        get: operations["progress_api_v1_admin_gamification_progress_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1035,6 +1133,24 @@ export interface paths {
         put?: never;
         /** Simulate Rule */
         post: operations["simulate_rule_api_v1_admin_gamification_rules__key__simulate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gamification/streak": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Streak */
+        get: operations["get_streak_api_v1_admin_gamification_streak_get"];
+        /** Put Streak */
+        put: operations["put_streak_api_v1_admin_gamification_streak_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1837,6 +1953,62 @@ export interface paths {
         /** Put Category */
         put: operations["put_category_api_v1_admin_news_categories_put"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Schedules */
+        get: operations["schedules_api_v1_admin_news_newsletters_get"];
+        put?: never;
+        /** Create Schedule */
+        post: operations["create_schedule_api_v1_admin_news_newsletters_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletters/{schedule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Schedule */
+        put: operations["update_schedule_api_v1_admin_news_newsletters__schedule_id__put"];
+        post?: never;
+        /** Delete Schedule */
+        delete: operations["delete_schedule_api_v1_admin_news_newsletters__schedule_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletters/{schedule_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run Schedule
+         * @description Write the newsletter now (« preview » it in the news desk); nothing when there is nothing to tell.
+         */
+        post: operations["run_schedule_api_v1_admin_news_newsletters__schedule_id__run_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4981,6 +5153,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/newsletters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Newsletters
+         * @description The channels sent by e-mail, and whether I receive each one.
+         */
+        get: operations["my_newsletters_api_v1_me_newsletters_get"];
+        /** Set My Newsletters */
+        put: operations["set_my_newsletters_api_v1_me_newsletters_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/notification-preferences": {
         parameters: {
             query?: never;
@@ -5322,6 +5515,26 @@ export interface paths {
         get: operations["get_preferences_api_v1_me_statistics_preferences_get"];
         /** Put Preferences */
         put: operations["put_preferences_api_v1_me_statistics_preferences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/streak": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Streak
+         * @description The member's play streak today (or yesterday's, still alive) and the next tier.
+         */
+        get: operations["my_streak_api_v1_me_streak_get"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -8493,6 +8706,15 @@ export interface components {
             /** User Choosable */
             user_choosable: boolean;
         };
+        /** DayOut */
+        DayOut: {
+            /** Amount */
+            amount: number;
+            /** Day */
+            day: string;
+            /** Members */
+            members: number;
+        };
         /** DeletionStatus */
         DeletionStatus: {
             /** Deletion Due At */
@@ -8577,6 +8799,8 @@ export interface components {
             password?: string | null;
             /** Port */
             port: number;
+            /** Portal Url */
+            portal_url?: string | null;
             /** Sender */
             sender: string;
             /**
@@ -8606,6 +8830,13 @@ export interface components {
              * @enum {string}
              */
             state: "draft" | "published" | "deprecated";
+        };
+        /** EventFieldOut */
+        EventFieldOut: {
+            /** Name */
+            name: string;
+            /** Numeric */
+            numeric: boolean;
         };
         /** EventInput */
         EventInput: {
@@ -8641,6 +8872,15 @@ export interface components {
             starts_at: string;
             /** Title */
             title: string;
+        };
+        /** EventTypeOut */
+        EventTypeOut: {
+            /** Fields */
+            fields: components["schemas"]["EventFieldOut"][];
+            /** Name */
+            name: string;
+            /** Owner */
+            owner: string;
         };
         /** ExportOut */
         ExportOut: {
@@ -9091,6 +9331,47 @@ export interface components {
             definition: {
                 [key: string]: unknown;
             };
+        };
+        /** LevelReward */
+        LevelReward: {
+            /**
+             * Coins
+             * @default 0
+             */
+            coins: number;
+            /**
+             * Contribution
+             * @default 0
+             */
+            contribution: number;
+            /**
+             * Label
+             * @default
+             */
+            label: string;
+            /** Level */
+            level: number;
+            /** Product */
+            product?: string | null;
+        };
+        /** LevelRewardsIn */
+        LevelRewardsIn: {
+            /** Rewards */
+            rewards: components["schemas"]["LevelReward"][];
+        };
+        /** LevelRewardsOut */
+        LevelRewardsOut: {
+            /** Levels */
+            levels: components["schemas"]["LevelStepOut"][];
+            /** Rewards */
+            rewards: components["schemas"]["LevelReward"][];
+        };
+        /** LevelStepOut */
+        LevelStepOut: {
+            /** Level */
+            level: number;
+            /** Xp */
+            xp: number;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -9734,6 +10015,43 @@ export interface components {
              */
             merge: string;
         };
+        /** MemberPointOut */
+        MemberPointOut: {
+            /** Day */
+            day: string;
+            /** Total */
+            total: number;
+        };
+        /** MemberPositionOut */
+        MemberPositionOut: {
+            /** Days */
+            days: number;
+            /** Level */
+            level: number;
+            /** Name */
+            name: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Xp */
+            xp: number;
+        };
+        /** MemberSeriesOut */
+        MemberSeriesOut: {
+            /** Gained */
+            gained: number;
+            /** Name */
+            name: string | null;
+            /** Points */
+            points: components["schemas"]["MemberPointOut"][];
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
         /** ModuleCascadeIn */
         ModuleCascadeIn: {
             /**
@@ -9770,6 +10088,16 @@ export interface components {
             /** Roles */
             roles: string[];
         };
+        /** MyStreakOut */
+        MyStreakOut: {
+            /** Days */
+            days: number;
+            /** Enabled */
+            enabled: boolean;
+            /** Multiplier */
+            multiplier: number;
+            next: components["schemas"]["StreakNextOut"] | null;
+        };
         /** NewsArticleIn */
         NewsArticleIn: {
             audience?: components["schemas"]["Audience"] | null;
@@ -9782,6 +10110,11 @@ export interface components {
             body_md: string;
             /** Category Id */
             category_id?: string | null;
+            /**
+             * Email On Publish
+             * @default false
+             */
+            email_on_publish: boolean;
             /**
              * Language
              * @default en
@@ -9855,14 +10188,26 @@ export interface components {
         /** NewsCategoryIn */
         NewsCategoryIn: {
             /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
              * Enabled
              * @default true
              */
             enabled: boolean;
+            /** Icon */
+            icon?: string | null;
             /** Key */
             key: string;
             /** Name */
             name: string;
+            /**
+             * Newsletter
+             * @default false
+             */
+            newsletter: boolean;
             /**
              * Position
              * @default 0
@@ -9871,8 +10216,15 @@ export interface components {
         };
         /** NewsCategoryOut */
         NewsCategoryOut: {
+            /**
+             * Description
+             * @default
+             */
+            description: string;
             /** Enabled */
             enabled: boolean;
+            /** Icon */
+            icon?: string | null;
             /**
              * Id
              * Format: uuid
@@ -9882,6 +10234,11 @@ export interface components {
             key: string;
             /** Name */
             name: string;
+            /**
+             * Newsletter
+             * @default false
+             */
+            newsletter: boolean;
             /** Position */
             position: number;
         };
@@ -9900,6 +10257,13 @@ export interface components {
             body_md: string;
             /** Category Id */
             category_id: string | null;
+            /**
+             * Email On Publish
+             * @default false
+             */
+            email_on_publish: boolean;
+            /** Emailed At */
+            emailed_at?: string | null;
             /** Feature Priority */
             feature_priority: number;
             /** Featured From */
@@ -9968,6 +10332,111 @@ export interface components {
             summary: string;
             /** Title */
             title: string;
+        };
+        /** NewsletterScheduleIn */
+        NewsletterScheduleIn: {
+            /**
+             * Cadence
+             * @enum {string}
+             */
+            cadence: "daily" | "weekly" | "monthly";
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /**
+             * Email
+             * @default true
+             */
+            email: boolean;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Hour
+             * @default 9
+             */
+            hour: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "releases" | "additions" | "upcoming";
+            /**
+             * Language
+             * @default fr
+             */
+            language: string;
+            /** Media Kinds */
+            media_kinds?: ("movie" | "series" | "book" | "game" | "album")[];
+            /** Name */
+            name: string;
+            /**
+             * Weekday
+             * @default 0
+             */
+            weekday: number;
+        };
+        /** NewsletterScheduleOut */
+        NewsletterScheduleOut: {
+            /**
+             * Cadence
+             * @enum {string}
+             */
+            cadence: "daily" | "weekly" | "monthly";
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /**
+             * Email
+             * @default true
+             */
+            email: boolean;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Hour
+             * @default 9
+             */
+            hour: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "releases" | "additions" | "upcoming";
+            /**
+             * Language
+             * @default fr
+             */
+            language: string;
+            /** Last Article Id */
+            last_article_id: string | null;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Media Kinds */
+            media_kinds?: ("movie" | "series" | "book" | "game" | "album")[];
+            /** Name */
+            name: string;
+            /** Next Run At */
+            next_run_at: string | null;
+            /**
+             * Weekday
+             * @default 0
+             */
+            weekday: number;
         };
         /** NotificationOut */
         NotificationOut: {
@@ -10050,6 +10519,16 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** PaceConfig */
+        PaceConfig: {
+            /**
+             * Factor
+             * @default 1
+             */
+            factor: number;
+            /** Values */
+            values?: string[];
         };
         /** PasswordConfirmation */
         PasswordConfirmation: {
@@ -10184,6 +10663,17 @@ export interface components {
             /** Subject User Id */
             subject_user_id: string | null;
         };
+        /** PopulationOut */
+        PopulationOut: {
+            /** Active */
+            active: number;
+            /** Members */
+            members: components["schemas"]["MemberPositionOut"][];
+            /** Rate High */
+            rate_high: number;
+            /** Rate Median */
+            rate_median: number;
+        };
         /** PreferenceIn */
         PreferenceIn: {
             /** Datum Ref */
@@ -10285,6 +10775,17 @@ export interface components {
             fields?: {
                 [key: string]: components["schemas"]["FieldUpdateBody"];
             } | null;
+        };
+        /** ProgressOut */
+        ProgressOut: {
+            /** Days */
+            days: components["schemas"]["DayOut"][];
+            /** Members */
+            members: components["schemas"]["MemberSeriesOut"][];
+            /** Sources */
+            sources: components["schemas"]["SourceOut"][];
+            /** Value */
+            value: string;
         };
         /** ProgressionOut */
         ProgressionOut: {
@@ -10852,6 +11353,13 @@ export interface components {
              */
             user_id: string;
         };
+        /** SourceOut */
+        SourceOut: {
+            /** Amount */
+            amount: number;
+            /** Source */
+            source: string;
+        };
         /** StatResultOut */
         StatResultOut: {
             /** As Of */
@@ -10955,6 +11463,34 @@ export interface components {
             percent: number | null;
             /** Previous Value */
             previous_value: number;
+        };
+        /** StreakConfig */
+        StreakConfig: {
+            /**
+             * Enabled
+             * @default false
+             */
+            enabled: boolean;
+            /** Event Types */
+            event_types?: string[];
+            /** Tiers */
+            tiers?: components["schemas"]["Tier"][];
+            /** Values */
+            values?: string[];
+        };
+        /** StreakNextOut */
+        StreakNextOut: {
+            /** Days */
+            days: number;
+            /** Multiplier */
+            multiplier: number;
+        };
+        /** SubscriptionsIn */
+        SubscriptionsIn: {
+            /** Changes */
+            changes: {
+                [key: string]: boolean;
+            };
         };
         /** SummaryOut */
         SummaryOut: {
@@ -11379,6 +11915,13 @@ export interface components {
             /** Label */
             label: string;
         };
+        /** Tier */
+        Tier: {
+            /** Days */
+            days: number;
+            /** Multiplier */
+            multiplier: number;
+        };
         /** ToggleIn */
         ToggleIn: {
             /** Enabled */
@@ -11737,6 +12280,11 @@ export interface components {
         /** WindowIn */
         WindowIn: {
             /**
+             * Banner
+             * @default false
+             */
+            banner: boolean;
+            /**
              * Description
              * @default
              */
@@ -11760,6 +12308,8 @@ export interface components {
         };
         /** WindowPatch */
         WindowPatch: {
+            /** Banner */
+            banner?: boolean | null;
             /** Description */
             description?: string | null;
             /** Ends At */
@@ -13776,6 +14326,26 @@ export interface operations {
             };
         };
     };
+    event_types_api_v1_admin_gamification_event_types_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventTypeOut"][];
+                };
+            };
+        };
+    };
     get_curve_api_v1_admin_gamification_level_curve_get: {
         parameters: {
             query?: never;
@@ -13833,6 +14403,59 @@ export interface operations {
             };
         };
     };
+    get_level_rewards_api_v1_admin_gamification_level_rewards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LevelRewardsOut"];
+                };
+            };
+        };
+    };
+    put_level_rewards_api_v1_admin_gamification_level_rewards_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LevelRewardsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LevelRewardsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     manual_grant_api_v1_admin_gamification_manual_grants_post: {
         parameters: {
             query?: never;
@@ -13863,6 +14486,123 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pace_api_v1_admin_gamification_pace_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaceConfig"];
+                };
+            };
+        };
+    };
+    put_pace_api_v1_admin_gamification_pace_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaceConfig"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaceConfig"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    population_api_v1_admin_gamification_population_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopulationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    progress_api_v1_admin_gamification_progress_get: {
+        parameters: {
+            query?: {
+                value?: "xp" | "coins" | "contribution";
+                days?: number;
+                top?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgressOut"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -14139,6 +14879,59 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_streak_api_v1_admin_gamification_streak_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreakConfig"];
+                };
+            };
+        };
+    };
+    put_streak_api_v1_admin_gamification_streak_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StreakConfig"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreakConfig"];
                 };
             };
             /** @description Validation Error */
@@ -15822,6 +16615,156 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NewsCategoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schedules_api_v1_admin_news_newsletters_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsletterScheduleOut"][];
+                };
+            };
+        };
+    };
+    create_schedule_api_v1_admin_news_newsletters_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewsletterScheduleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsletterScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_schedule_api_v1_admin_news_newsletters__schedule_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewsletterScheduleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsletterScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_schedule_api_v1_admin_news_newsletters__schedule_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_schedule_api_v1_admin_news_newsletters__schedule_id__run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -21999,6 +22942,63 @@ export interface operations {
             };
         };
     };
+    my_newsletters_api_v1_me_newsletters_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    set_my_newsletters_api_v1_me_newsletters_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_preferences_api_v1_me_notification_preferences_get: {
         parameters: {
             query?: never;
@@ -22673,6 +23673,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_streak_api_v1_me_streak_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyStreakOut"];
                 };
             };
         };

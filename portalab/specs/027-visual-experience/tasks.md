@@ -270,6 +270,11 @@ lossless migration.
 - [X] T128 [US8] Calendar: shared month grid for the widget and Discover › Calendar — a colour and an icon per kind (films, series, books, events, campaigns, maintenance, incidents, news), what lasts several days drawn as a bar across the days; incidents as a calendar source (start → resolution); media releases carry their category; widget entries with first and last day in the viewer's zone
 - [X] T129 [US8] Media: « Recently added » from the services' own dates (a new episode brings its series up) and « Recent releases » (release or air date, `released` in library payloads from Plex and Grimmory) — shelves of the media home and widgets (`media.recent_releases`, kind filter)
 - [X] T130 [US8] Incidents page redone (state of the portal, filter, cards with severity, steps, duration, services, latest update; timeline), incidents widget and campaigns widget as cards
+- [X] T131 [US8] Communication: news desk channels (admin-defined, icon, description, newsletter on/off), article « e-mail on publish » to channel subscribers (per-channel unsubscribe in notification preferences), scheduled automatic newsletters (week's releases, recent additions, upcoming; daily/weekly/monthly) via `media.digest`; migrations news_0002, notify_0002
+- [X] T132 [US8] Maintenance shown like an incident on the incidents page and optionally as a dismissible banner (health_0002); incident services chosen with a picker (whole server / services)
+- [X] T133 [US10] System page redesigned (settings explorer by area with search, typed controls, reset) with SMTP/e-mail settings and portal URL
+- [X] T134 [US4] Phone/tablet dashboard customization uses the grid editor on every device (drag, resize, own layout on save); only settings and remove remain on widgets
+- [X] T135 [US9] Gamification administration redesigned: simple/detailed modes; overview curves (daily gains, leaders' running totals, sources); progression tuning by dragging the projected curve over members' positions (one overall pace factor, `economy.pace`); XP per action as forms (fixed + per minute, conditions, limits, presets); play streak tiers (`economy.streak`, gamification_0004); level curve and level tiers with rewards (Coins, Contribution, product offered via `marketplace.gifts`) beside shop unlocks; achievements and quests as forms
 
 ## Dependencies & Execution Order
 

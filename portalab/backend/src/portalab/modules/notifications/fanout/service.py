@@ -265,18 +265,21 @@ class FanOut:
             metrics.increment("notifications.suppressed.no_address")
             return
         digest = await self.user_setting(DIGEST, user, self.config().digest_default_mode)
+        own = communication.email_body or {}  # 027: a newsletter brings its own e-mail
         async with self.database.unit_of_work() as uow:
             delivery = await self._delivery(uow.session, communication, user, "email", "pending")
-            if delivery is None or (digest in ("daily", "weekly") and communication.priority != "critical"):
+            if delivery is None or (
+                not own and digest in ("daily", "weekly") and communication.priority != "critical"
+            ):
                 return  # duplicate, or kept for the digest
             link = f"\n\n{communication.action_url}" if communication.action_url else ""
             uow.session.add(
                 EmailOutbox(
                     delivery_id=delivery,
                     to_hash=address_hash(address),
-                    subject=title,
-                    body_text=f"{title}\n\n{body}{link}".strip(),
-                    body_html=None,
+                    subject=str(own.get("subject") or title)[:200],
+                    body_text=str(own.get("text") or f"{title}\n\n{body}{link}").strip(),
+                    body_html=own.get("html") or None,
                     next_attempt_at=now,
                     attempts=0,
                 )

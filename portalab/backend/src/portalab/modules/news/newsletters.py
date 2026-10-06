@@ -1,0 +1,379 @@
+"""Newsletters (027): the news desk's channels (its categories) can be e-mailed to their subscribers — every
+member, minus those who unsubscribed from that channel (``news.newsletter.optOut``) or from newsletter
+e-mails altogether (their notification preferences) — and some newsletters write themselves: on its
+cadence a schedule turns what the media services report (what came out, what arrived, what comes next)
+into an article of its channel, published and e-mailed when asked.
+
+The e-mail is the article itself (its sanitized HTML), sent through the notification centre so delivery,
+retries and opt-outs stay in one place; links point to the portal's public address."""
+
+import re
+from collections.abc import Mapping, Sequence
+from datetime import date, datetime, timedelta
+from html import escape
+from typing import Any
+from uuid import UUID
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+from sqlalchemy import select
+
+from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.i18n import RENDERER, LocaleContext
+from portalab.capabilities.identity_directory import CONTACT
+from portalab.capabilities.media import DIGEST, DigestItem
+from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
+from portalab.capabilities.registry import CapabilityRegistry
+from portalab.core.authz_port import Principal
+from portalab.core.db import Database
+from portalab.core.errors import NotFound, ValidationFailed
+from portalab.core.logging import get_logger
+from portalab.core.time import Clock, utc_now
+from portalab.modules.news.articles import ArticleInput, ArticleService
+from portalab.modules.news.models import Article, Category, NewsletterSchedule
+from portalab.modules.news.permissions import NEWS_READ
+
+OPT_OUT = "news.newsletter.optOut"
+CATEGORY = "news.newsletter"
+PORTAL_URL = "notifications.email.portalUrl"
+ZONE = "i18n.defaultTimeZone"
+KINDS = ("releases", "additions", "upcoming")
+CADENCES = {"daily": 1, "weekly": 7, "monthly": 30}
+GROUPS = (
+    ("movie", ("movie",)),
+    ("series", ("series", "episode", "season")),
+    ("book", ("book", "audiobook")),
+    ("game", ("game",)),
+    ("album", ("album", "track")),
+)
+log = get_logger("portalab.news")
+
+
+class ScheduleNotFound(NotFound):
+    default_code = "news.schedule_not_found"
+    default_title = "Newsletter schedule not found"
+
+
+def _provider(capabilities: CapabilityRegistry, name: str) -> Any | None:
+    try:
+        providers = capabilities.system_providers(name)
+    except Exception:
+        return None
+    return providers[0].provider if providers else None
+
+
+def email_html(title: str, body_html: str, portal: str, channel: str, unsubscribe: str) -> str:
+    """A plain, mail-client friendly page around the article (inline styles only)."""
+    absolute = re.sub(r'(href|src)="/', rf'\1="{portal}/', body_html) if portal else body_html
+    return (
+        '<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f7">'
+        '<div style="max-width:640px;margin:0 auto;padding:24px;font-family:Arial,Helvetica,sans-serif;'
+        'color:#16181d;line-height:1.55">'
+        f'<p style="margin:0 0 4px;color:#6b7280;font-size:13px">{escape(channel)}</p>'
+        f'<h1 style="margin:0 0 16px;font-size:24px">{escape(title)}</h1>'
+        f'<div style="background:#ffffff;border-radius:12px;padding:20px">{absolute}</div>'
+        f'<p style="margin:16px 0 0;color:#6b7280;font-size:12px">{unsubscribe}</p>'
+        "</div></body></html>"
+    )
+
+
+def next_run(cadence: str, weekday: int, hour: int, after: datetime, zone: ZoneInfo) -> datetime:
+    """The next time the schedule writes its newsletter, strictly after ``after``."""
+    local = after.astimezone(zone)
+    candidate = local.replace(hour=hour, minute=0, second=0, microsecond=0)
+    if cadence == "daily":
+        if candidate <= local:
+            candidate += timedelta(days=1)
+    elif cadence == "weekly":
+        candidate += timedelta(days=(weekday - candidate.weekday()) % 7)
+        if candidate <= local:
+            candidate += timedelta(days=7)
+    else:  # monthly: the first ``weekday`` of the month
+        first = candidate.replace(day=1)
+        candidate = first + timedelta(days=(weekday - first.weekday()) % 7)
+        if candidate <= local:
+            month = (first + timedelta(days=32)).replace(day=1)
+            candidate = month + timedelta(days=(weekday - month.weekday()) % 7)
+    return candidate.astimezone(ZoneInfo("UTC"))
+
+
+class Newsletters:
+    def __init__(
+        self,
+        database: Database,
+        articles: ArticleService,
+        capabilities: CapabilityRegistry,
+        *,
+        clock: Clock | None = None,
+    ) -> None:
+        self.database = database
+        self.articles = articles
+        self.capabilities = capabilities
+        self.clock = clock
+
+    # --- settings ------------------------------------------------------------------------------------
+    async def _setting(self, key: str, default: Any, user: UUID | None = None) -> Any:
+        reader = _provider(self.capabilities, CONFIG)
+        if reader is None:
+            return default
+        try:
+            value = (await reader.get(key, user_id=user)).value
+        except Exception:
+            return default
+        return default if value is None else value
+
+    async def _zone(self) -> ZoneInfo:
+        try:
+            return ZoneInfo(str(await self._setting(ZONE, "UTC")))
+        except (ZoneInfoNotFoundError, ValueError):
+            return ZoneInfo("UTC")
+
+    def _t(self, key: str, language: str, args: Mapping[str, Any] | None = None) -> str:
+        renderer = _provider(self.capabilities, RENDERER)
+        if renderer is None:
+            return key
+        return str(renderer.t(key, LocaleContext(language=language, locale=language), args, namespace="news"))
+
+    # --- channels and subscriptions ------------------------------------------------------------------
+    async def channels(self) -> list[Category]:
+        async with self.database.session() as session:
+            return list(
+                (
+                    await session.execute(
+                        select(Category)
+                        .where(Category.enabled.is_(True), Category.newsletter.is_(True))
+                        .order_by(Category.position, Category.name)
+                    )
+                ).scalars()
+            )
+
+    async def opted_out(self, user: UUID) -> set[str]:
+        value = await self._setting(OPT_OUT, [], user)
+        return {str(v) for v in value} if isinstance(value, list) else set()
+
+    async def subscriptions(self, user: UUID) -> list[dict[str, Any]]:
+        out = await self.opted_out(user)
+        return [
+            {
+                "key": c.key,
+                "name": c.name,
+                "description": c.description,
+                "icon": c.icon,
+                "subscribed": c.key not in out,
+            }
+            for c in await self.channels()
+        ]
+
+    async def set_subscriptions(self, principal: Principal, changes: Mapping[str, bool]) -> None:
+        user = principal.acting_for or principal.user_id
+        if user is None:
+            raise NotFound()
+        known = {c.key for c in await self.channels()}
+        out = await self.opted_out(user)
+        for key, subscribed in changes.items():
+            if key not in known:
+                raise ValidationFailed("Unknown channel.", code="news.unknown_channel")
+            if subscribed:
+                out.discard(key)
+            else:
+                out.add(key)
+        from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
+
+        writer = _provider(self.capabilities, CONFIG_WRITER_CAPABILITY)
+        if writer is None:
+            raise ValidationFailed("Preferences cannot be saved right now.", code="news.unavailable")
+        await writer.set_user(principal, OPT_OUT, sorted(out))
+
+    # --- e-mailing an article -----------------------------------------------------------------------
+    async def email_article(self, row: Article) -> int:
+        """E-mail a published article of a newsletter channel to the channel's subscribers, once."""
+        async with self.database.session() as session:
+            category = await session.get(Category, row.category_id) if row.category_id else None
+        if category is None or not category.newsletter or row.audience.get("mode", "all") != "all":
+            return 0  # only channels sent by e-mail, to everyone who may read them
+        notify = _provider(self.capabilities, NOTIFY)
+        contact = _provider(self.capabilities, CONTACT)
+        if notify is None or contact is None:
+            return 0
+        users = [u for u in await contact.active_user_ids() if category.key not in await self.opted_out(u)]
+        portal = str(await self._setting(PORTAL_URL, "")).rstrip("/")
+        link = f"{portal}/news/{row.slug}" if portal else f"/news/{row.slug}"
+        unsubscribe_url = f"{portal}/settings/notifications#newsletters" if portal else ""
+        language = row.language or "en"
+        unsubscribe = self._t(
+            "newsletter.unsubscribe", language, {"channel": category.name, "link": unsubscribe_url or "—"}
+        )
+        if users:
+            await notify.send(
+                CommunicationRequest(
+                    category=CATEGORY,
+                    template_key="news:notify.newsletter",
+                    audience=Users(tuple(users)),
+                    dedup_key=f"news.newsletter:{row.id}:{row.publish_seq}",
+                    params={"title": row.title[:200], "channel": category.name[:120]},
+                    source="module",
+                    subject_ref=f"news:{row.id}",
+                    required_permission=NEWS_READ,
+                    action_url=f"/news/{row.slug}",
+                    email_body={
+                        "subject": row.title[:200],
+                        "text": f"{row.title}\n\n{row.plain_text}\n\n{link}\n\n{unsubscribe}"[:100_000],
+                        "html": email_html(
+                            row.title, row.rendered_html, portal, category.name, escape(unsubscribe)
+                        ),
+                    },
+                )
+            )
+        async with self.database.unit_of_work() as uow:
+            stored = await uow.session.get(Article, row.id, with_for_update=True)
+            if stored is not None:
+                stored.emailed_at = utc_now(self.clock)
+        return len(users)
+
+    # --- automatic newsletters -----------------------------------------------------------------------
+    async def schedules(self) -> list[NewsletterSchedule]:
+        async with self.database.session() as session:
+            return list(
+                (
+                    await session.execute(select(NewsletterSchedule).order_by(NewsletterSchedule.name))
+                ).scalars()
+            )
+
+    async def _validate(self, session: Any, values: Mapping[str, Any]) -> None:
+        if values.get("kind") not in KINDS or values.get("cadence") not in CADENCES:
+            raise ValidationFailed("Unknown newsletter kind or cadence.", code="news.invalid_schedule")
+        category = await session.get(Category, values.get("category_id"))
+        if category is None or not category.enabled:
+            raise ValidationFailed("This channel does not exist.", code="news.invalid_category")
+
+    async def save_schedule(self, schedule_id: UUID | None, values: Mapping[str, Any]) -> NewsletterSchedule:
+        now = utc_now(self.clock)
+        zone = await self._zone()
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            await self._validate(session, values)
+            if schedule_id is None:
+                row = NewsletterSchedule(created_at=now, updated_at=now, **values)
+                session.add(row)
+            else:
+                found = await session.get(NewsletterSchedule, schedule_id, with_for_update=True)
+                if found is None:
+                    raise ScheduleNotFound("This newsletter schedule does not exist.")
+                row = found
+                for key, value in values.items():
+                    setattr(row, key, value)
+                row.updated_at = now
+            row.next_run_at = next_run(row.cadence, row.weekday, row.hour, now, zone)
+            await session.flush()
+            return row
+
+    async def delete_schedule(self, schedule_id: UUID) -> None:
+        async with self.database.unit_of_work() as uow:
+            row = await uow.session.get(NewsletterSchedule, schedule_id)
+            if row is None:
+                raise ScheduleNotFound("This newsletter schedule does not exist.")
+            await uow.session.delete(row)
+
+    async def _items(self, schedule: NewsletterSchedule, now: datetime) -> list[DigestItem]:
+        digest = _provider(self.capabilities, DIGEST)
+        if digest is None:
+            return []
+        days = CADENCES.get(schedule.cadence, 7)
+        today = now.date()
+        if schedule.kind == "releases":
+            items = await digest.releases(today - timedelta(days=days), today, 60)
+        elif schedule.kind == "additions":
+            items = await digest.additions(now - timedelta(days=days), 60)
+        else:
+            items = await digest.upcoming(today + timedelta(days=days), 60)
+        wanted = set(schedule.media_kinds or [])
+        if wanted:
+            groups = {kind for key, kinds in GROUPS if key in wanted for kind in kinds}
+            items = [i for i in items if i.kind in groups]
+        return list(items)
+
+    def _day(self, value: str, language: str) -> str:
+        try:
+            from babel.dates import format_date
+
+            return str(format_date(date.fromisoformat(value[:10]), "d MMM", locale=language))
+        except Exception:
+            return value[:10]
+
+    def compose(
+        self, schedule: NewsletterSchedule, items: Sequence[DigestItem], now: datetime
+    ) -> tuple[str, str, str]:
+        """Title, summary and Markdown body of the newsletter (in the schedule's language)."""
+        language = schedule.language or "en"
+        title = self._t(
+            f"newsletter.title.{schedule.kind}.{schedule.cadence}",
+            language,
+            {"date": self._day(now.date().isoformat(), language)},
+        )
+        summary = self._t(f"newsletter.intro.{schedule.kind}", language, {"count": len(items)})
+        lines = [summary, ""]
+        for group, kinds in GROUPS:
+            chosen = [i for i in items if i.kind in kinds]
+            if not chosen:
+                continue
+            lines.append(f"### {self._t(f'newsletter.group.{group}', language)}")
+            lines.append("")
+            for item in chosen:
+                extra = f" · {item.detail}" if item.detail else ""
+                lines.append(f"- [**{item.title}**]({item.route}) — {self._day(item.date, language)}{extra}")
+            lines.append("")
+        return title[:200], summary[:600], "\n".join(lines).strip()
+
+    async def generate(self, schedule_id: UUID, *, force: bool = False) -> Article | None:
+        """Write, publish (and e-mail) one newsletter; nothing is written when there is nothing to tell."""
+        now = utc_now(self.clock)
+        zone = await self._zone()
+        async with self.database.session() as session:
+            schedule = await session.get(NewsletterSchedule, schedule_id)
+        if schedule is None:
+            raise ScheduleNotFound("This newsletter schedule does not exist.")
+        if not force and (not schedule.enabled or (schedule.next_run_at and schedule.next_run_at > now)):
+            return None
+        items = await self._items(schedule, now)
+        article: Article | None = None
+        if items:
+            title, summary, body = self.compose(schedule, items, now)
+            draft = await self.articles.create(
+                None,
+                ArticleInput(
+                    title=title,
+                    body_md=body,
+                    summary=summary,
+                    category_id=schedule.category_id,
+                    language=schedule.language,
+                    email_on_publish=schedule.email,
+                ),
+            )
+            article = await self.articles.transition(None, draft.id, "publish")
+        async with self.database.unit_of_work() as uow:
+            row = await uow.session.get(NewsletterSchedule, schedule_id, with_for_update=True)
+            if row is not None:
+                row.last_run_at = now
+                row.next_run_at = next_run(row.cadence, row.weekday, row.hour, now, zone)
+                if article is not None:
+                    row.last_article_id = article.id
+        return article
+
+    async def run_due(self) -> int:
+        now = utc_now(self.clock)
+        async with self.database.session() as session:
+            due = list(
+                (
+                    await session.execute(
+                        select(NewsletterSchedule.id).where(
+                            NewsletterSchedule.enabled.is_(True), NewsletterSchedule.next_run_at <= now
+                        )
+                    )
+                ).scalars()
+            )
+        written = 0
+        for schedule_id in due:
+            try:
+                written += 1 if await self.generate(schedule_id) is not None else 0
+            except Exception:
+                log.warning("automatic newsletter not written")
+        return written

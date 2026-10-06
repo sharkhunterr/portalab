@@ -6,6 +6,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type Preferences, usePreferences, useSavePreferences } from "../api";
 import "../notifications.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { NewsletterSubscriptions } from "../../news/NewsletterSubscriptions";
 
 /**
  * Notification preferences (spec 010 T016): per category and channel; a channel required by the category
@@ -103,6 +104,7 @@ export function NotificationPreferences() {
       </SelectField>
       <p aria-live="polite">{saved ? t("notifications:preferences.saved") : ""}</p>
       {save.isError ? <FunctionalState state="error" /> : null}
+      <NewsletterSubscriptions />
     </section>
   );
 }

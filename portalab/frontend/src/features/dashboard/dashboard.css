@@ -295,11 +295,6 @@
   color: var(--color-accent);
 }
 
-.widget-frame__controls {
-  flex-wrap: wrap;
-  margin-block-start: var(--space-2);
-}
-
 .widget__badge,
 .widget__meta {
   font-size: var(--font-size-sm);
@@ -982,30 +977,37 @@
   color: var(--color-text-muted);
 }
 
-/* 027: in edit mode the per-widget buttons float over the bottom of the widget (shown on hover or focus,
-   always on touch screens) so the content keeps its room */
-.dashboard-grid[data-editing] .widget-frame__controls {
-  position: absolute;
-  z-index: 4;
-  inset-inline: var(--space-2);
-  inset-block-end: var(--space-2);
-  justify-content: center;
+/* 027: in edit mode a widget keeps two buttons (settings, remove) in its header, next to the grip */
+.widget-frame__controls {
+  display: inline-flex;
   gap: var(--space-1);
-  margin: 0;
-  padding: var(--space-1);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  box-shadow: var(--shadow-2, var(--shadow-1));
-  opacity: 0;
-  transition: opacity var(--motion-duration-fast) var(--motion-easing);
+  margin-inline-start: auto;
 }
-.dashboard-grid[data-editing] .widget-frame:hover .widget-frame__controls,
-.dashboard-grid[data-editing] .widget-frame:focus-within .widget-frame__controls {
-  opacity: 1;
+.widget-frame__controls .ds-button {
+  min-block-size: 2rem;
+  min-inline-size: 2rem;
 }
-@media (hover: none) {
-  .dashboard-grid[data-editing] .widget-frame__controls {
-    opacity: 1;
+.dashboard-grid[data-editing] .widget-frame__header {
+  padding-inline-end: calc(max(var(--target-min), 2.25rem) + var(--space-1));
+  flex-wrap: nowrap;
+}
+.dashboard-grid[data-editing] .widget-frame__title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* touch screens: wider grips and edges, easy to catch with a finger */
+@media (pointer: coarse) {
+  .dash-resize--east {
+    inset-inline-end: -10px;
+    inline-size: 24px;
+  }
+  .dash-resize--south {
+    inset-block-end: -10px;
+    block-size: 24px;
+  }
+  .dash-resize--corner {
+    inline-size: 2rem;
+    block-size: 2rem;
   }
 }

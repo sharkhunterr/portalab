@@ -13,7 +13,7 @@ import {
   StatusBadge,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -31,21 +31,6 @@ interface Status {
   email_enabled: boolean;
   deliveries: Array<{ channel: string; status: string; reason: string | null; count: number }>;
 }
-
-interface Setting {
-  key: string;
-  value: unknown;
-}
-
-const DIGEST_DEFAULT = "notifications.digest.defaultMode";
-const EMAIL_KEYS = {
-  enabled: "notifications.email.enabled",
-  sender: "notifications.email.from",
-  host: "notifications.email.smtp.host",
-  port: "notifications.email.smtp.port",
-  tls: "notifications.email.smtp.tls",
-  username: "notifications.email.smtp.username",
-} as const;
 
 function Broadcast() {
   const t = useT();
@@ -157,132 +142,6 @@ function Broadcast() {
   );
 }
 
-function EmailSettings() {
-  const t = useT();
-  const client = useQueryClient();
-  const settings = useQuery({
-    queryKey: ["admin", "notifications", "email"],
-    retry: false,
-    queryFn: async () => {
-      const all = ((await api.GET("/api/v1/admin/config")).data as unknown as { settings: Setting[] })
-        .settings;
-      return Object.fromEntries(all.map((s) => [s.key, s.value]));
-    },
-  });
-  const [draft, setDraft] = useState<Record<string, unknown> | null>(null);
-  const [password, setPassword] = useState("");
-  const value = (key: keyof typeof EMAIL_KEYS) => (draft ?? {})[key] ?? settings.data?.[EMAIL_KEYS[key]];
-  const set = (key: keyof typeof EMAIL_KEYS, v: unknown) => setDraft({ ...(draft ?? {}), [key]: v });
-  const save = useMutation({
-    mutationFn: async () =>
-      api.PUT("/api/v1/admin/notifications/email", {
-        body: {
-          enabled: Boolean(value("enabled")),
-          sender: String(value("sender") ?? ""),
-          host: String(value("host") ?? ""),
-          port: Number(value("port") ?? 587),
-          tls: Boolean(value("tls")),
-          username: String(value("username") ?? ""),
-          password: password || null,
-        },
-      }),
-    onSuccess: () => {
-      setPassword("");
-      setDraft(null);
-      void client.invalidateQueries({ queryKey: ["admin", "notifications"] });
-    },
-  });
-  const test = useMutation({
-    mutationFn: async () =>
-      (await api.POST("/api/v1/admin/notifications/email/test")).data as { outcome: string },
-  });
-  return (
-    <AdminSection
-      title={t("admin:announce.email")}
-      description={t("admin:announce.emailHint")}
-      icon="message"
-    >
-      <form
-        className="admin-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          save.mutate();
-        }}
-      >
-        <CheckboxField
-          label={t("admin:announce.emailEnabled")}
-          checked={Boolean(value("enabled"))}
-          onChange={(e) => set("enabled", e.target.checked)}
-        />
-        <FormGrid>
-          <TextField
-            label={t("admin:announce.sender")}
-            value={String(value("sender") ?? "")}
-            onChange={(e) => set("sender", e.target.value)}
-          />
-          <TextField
-            label={t("admin:announce.host")}
-            value={String(value("host") ?? "")}
-            onChange={(e) => set("host", e.target.value)}
-          />
-          <TextField
-            label={t("admin:announce.port")}
-            type="number"
-            value={String(value("port") ?? 587)}
-            onChange={(e) => set("port", Number(e.target.value))}
-          />
-          <TextField
-            label={t("admin:announce.username")}
-            value={String(value("username") ?? "")}
-            onChange={(e) => set("username", e.target.value)}
-          />
-          <TextField
-            label={t("admin:services.access.account")}
-            hint={t("admin:services.writeOnly.hint")}
-            type="password"
-            autoComplete="off"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FormGrid>
-        <CheckboxField
-          label={t("admin:announce.tls")}
-          checked={Boolean(value("tls"))}
-          onChange={(e) => set("tls", e.target.checked)}
-        />
-        {save.isSuccess ? (
-          <p role="status" className="services-admin__ok">
-            {t("admin:config.applied")}
-          </p>
-        ) : null}
-        {save.isError ? (
-          <p role="alert" className="services-admin__ko">
-            {t("admin:announce.failed")}
-          </p>
-        ) : null}
-        {test.data ? (
-          <p
-            role="status"
-            className={test.data.outcome === "sent" ? "services-admin__ok" : "services-admin__ko"}
-          >
-            {test.data.outcome === "sent"
-              ? t("admin:announce.testSent")
-              : t("admin:announce.testFailed", { detail: test.data.outcome })}
-          </p>
-        ) : null}
-        <FormActions>
-          <Button type="button" variant="secondary" onClick={() => test.mutate()} disabled={test.isPending}>
-            {t("admin:announce.test")}
-          </Button>
-          <Button type="submit" disabled={save.isPending}>
-            {t("admin:announce.saveEmail")}
-          </Button>
-        </FormActions>
-      </form>
-    </AdminSection>
-  );
-}
-
 function Deliveries({ status }: { status: Status | undefined }) {
   const t = useT();
   const format = useFormat();
@@ -319,61 +178,11 @@ function Deliveries({ status }: { status: Status | undefined }) {
   );
 }
 
-function Newsletter() {
-  const t = useT();
-  const client = useQueryClient();
-  const current = useQuery({
-    queryKey: ["admin", "notifications", "digest"],
-    retry: false,
-    queryFn: async () => {
-      const all = ((await api.GET("/api/v1/admin/config")).data as unknown as { settings: Setting[] })
-        .settings;
-      return String(all.find((s) => s.key === DIGEST_DEFAULT)?.value ?? "off");
-    },
-  });
-  const save = useMutation({
-    mutationFn: async (mode: string) =>
-      api.PUT("/api/v1/admin/config", {
-        body: {
-          changes: [{ key: DIGEST_DEFAULT, value: mode, scope: "global", scope_ref: "", unset: false }],
-          reason: "newsletter",
-        },
-      }),
-    onSuccess: () => void client.invalidateQueries({ queryKey: ["admin", "notifications", "digest"] }),
-  });
-  return (
-    <AdminSection
-      title={t("admin:announce.newsletter")}
-      description={t("admin:announce.newsletterHint")}
-      icon="newspaper"
-    >
-      <fieldset className="ds-subnav" aria-label={t("admin:announce.newsletter")}>
-        {(["off", "daily", "weekly"] as const).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            aria-pressed={current.data === mode}
-            onClick={() => save.mutate(mode)}
-          >
-            {t(`admin:announce.digest.${mode}`)}
-          </button>
-        ))}
-      </fieldset>
-      <p className="admin-muted">{t("admin:announce.newsletterNote")}</p>
-      {save.isSuccess ? (
-        <p role="status" className="services-admin__ok">
-          {t("admin:config.applied")}
-        </p>
-      ) : null}
-    </AdminSection>
-  );
-}
-
-const TABS = ["announce", "maintenance", "newsletter"] as const;
+const TABS = ["announce", "maintenance"] as const;
 
 /**
- * Announcements (027 hubs, Communication): one page, three tabs — tell everyone now (and see deliveries),
- * plan maintenances, and the newsletter (the e-mail digest) with the e-mail transport. Grouped on purpose:
+ * Announcements (027 hubs, Communication): tell everyone now (and see deliveries) and plan maintenances.
+ * Newsletters live in the news desk; the e-mail transport in System. Grouped on purpose:
  * everything that reaches members' inboxes lives here.
  */
 export default function AnnouncementsAdmin() {
@@ -439,12 +248,6 @@ export default function AnnouncementsAdmin() {
         </>
       ) : null}
       {tab === "maintenance" ? <MaintenancePanel /> : null}
-      {tab === "newsletter" ? (
-        <AdminGrid>
-          <Newsletter />
-          <EmailSettings />
-        </AdminGrid>
-      ) : null}
     </AdminPage>
   );
 }

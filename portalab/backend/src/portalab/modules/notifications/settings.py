@@ -20,6 +20,7 @@ class NotificationsConfig:
     retention_days: int = 90
     email_enabled: bool = False
     email_from: str = "portalab@localhost"
+    portal_url: str = ""
     smtp_host: str = "localhost"
     smtp_port: int = 25
     smtp_tls: bool = False
@@ -34,6 +35,7 @@ SETTINGS: dict[str, str] = {
     "retention_days": "notifications.retentionDays",
     "email_enabled": "notifications.email.enabled",
     "email_from": "notifications.email.from",
+    "portal_url": "notifications.email.portalUrl",
     "smtp_host": "notifications.email.smtp.host",
     "smtp_port": "notifications.email.smtp.port",
     "smtp_tls": "notifications.email.smtp.tls",
@@ -48,6 +50,7 @@ _DESCRIPTIONS = {
     "retention_days": "Days notifications are kept in the notification center.",
     "email_enabled": "Send e-mail notifications (SMTP).",
     "email_from": "Sender address of e-mails.",
+    "portal_url": "Public address of the portal, for the links of e-mails (e.g. https://portal.example).",
     "smtp_host": "SMTP server host.",
     "smtp_port": "SMTP server port.",
     "smtp_tls": "Use TLS with the SMTP server.",
