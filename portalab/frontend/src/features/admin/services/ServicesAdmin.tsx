@@ -486,9 +486,14 @@ function EditService({
       title={t("admin:services.edit.title", { name: service.name })}
       closeLabel={t("admin:services.close")}
       trigger={
-        <Button type="button" variant="ghost">
-          <Icon name="settings" size={16} />
-          {t("admin:services.edit")}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={t("admin:services.edit")}
+          title={t("admin:services.edit")}
+        >
+          <Icon name="settings" size={18} />
         </Button>
       }
     >
@@ -698,20 +703,28 @@ function ServiceActions({
   return (
     <div className="svc-card__actions">
       {dormant ? (
-        <Button type="button" onClick={() => action.mutate("enable")}>
-          <Icon name="zap" size={16} />
-          {t("admin:services.enable")}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={t("admin:services.enable")}
+          title={t("admin:services.enable")}
+          onClick={() => action.mutate("enable")}
+        >
+          <Icon name="zap" size={18} />
         </Button>
       ) : null}
       {active && !continuous(connector) ? (
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
+          size="icon"
+          aria-label={t("admin:services.syncNow")}
+          title={t("admin:services.syncNow")}
           disabled={syncing || action.isPending}
           onClick={() => action.mutate("sync")}
         >
-          <Icon name={syncing ? "spinner" : "sync"} size={16} />
-          {t("admin:services.syncNow")}
+          <Icon name={syncing ? "spinner" : "sync"} size={18} />
         </Button>
       ) : null}
       <EditService service={service} connector={connector} />
@@ -794,20 +807,20 @@ function ServiceCard({
           <strong>{service.name}</strong>
           <span className="admin-muted">{connector?.name ?? service.connector}</span>
         </span>
-      </header>
-      <div className="svc-card__badges">
-        <StatusBadge tone={STATE_TONE[service.display_state] ?? "neutral"}>
-          {t(`admin:services.state.${service.display_state}`)}
-        </StatusBadge>
-        <span
-          className="svc-importance"
-          data-importance={importance}
-          title={t(`admin:services.importance.${importance}.hint`)}
-        >
-          <Icon name={IMPORTANCE_ICONS[importance] ?? "minus"} size={12} />
-          {t(`admin:services.importance.${importance}`)}
+        <span className="svc-card__badges">
+          <StatusBadge tone={STATE_TONE[service.display_state] ?? "neutral"}>
+            {t(`admin:services.state.${service.display_state}`)}
+          </StatusBadge>
+          <span
+            className="svc-importance"
+            data-importance={importance}
+            title={t(`admin:services.importance.${importance}.hint`)}
+          >
+            <Icon name={IMPORTANCE_ICONS[importance] ?? "minus"} size={12} />
+            {t(`admin:services.importance.${importance}`)}
+          </span>
         </span>
-      </div>
+      </header>
       {service.public_url ? (
         <a className="svc-card__link" href={service.public_url} target="_blank" rel="noreferrer">
           <Icon name="link" size={14} />
@@ -819,34 +832,36 @@ function ServiceCard({
           <UptimeBars serviceId={service.id} />
         </div>
       ) : null}
-      <div className="svc-card__sync">
-        {service.sync.status === "running" ? (
-          <LiveProgress
-            label={t("admin:services.syncing")}
-            done={p?.done}
-            total={p?.total}
-            detail={
-              p
-                ? p.total
-                  ? `${format.number(p.done)} / ${format.number(p.total)}`
-                  : t("admin:services.syncedSoFar", { count: p.done })
-                : null
-            }
-          />
-        ) : (
-          <span className="admin-muted">
-            <Icon name="sync" size={14} />{" "}
-            {continuous(connector)
-              ? t("admin:services.continuous")
-              : last
-                ? t("admin:services.lastSuccess", {
-                    when: format.relative((Date.parse(last) - Date.now()) / 1000),
-                  })
-                : t("admin:services.never")}
-          </span>
-        )}
-      </div>
-      <ServiceActions service={service} connector={connector} />
+      <footer className="svc-card__foot">
+        <div className="svc-card__sync">
+          {service.sync.status === "running" ? (
+            <LiveProgress
+              label={t("admin:services.syncing")}
+              done={p?.done}
+              total={p?.total}
+              detail={
+                p
+                  ? p.total
+                    ? `${format.number(p.done)} / ${format.number(p.total)}`
+                    : t("admin:services.syncedSoFar", { count: p.done })
+                  : null
+              }
+            />
+          ) : (
+            <span className="admin-muted" title={last ? format.dateTime(last) : undefined}>
+              <Icon name="sync" size={14} />{" "}
+              {continuous(connector)
+                ? t("admin:services.continuous")
+                : last
+                  ? t("admin:services.lastSuccess", {
+                      when: format.relative((Date.parse(last) - Date.now()) / 1000),
+                    })
+                  : t("admin:services.never")}
+            </span>
+          )}
+        </div>
+        <ServiceActions service={service} connector={connector} />
+      </footer>
     </li>
   );
 }
@@ -876,7 +891,7 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
     );
   }
   return (
-    <>
+    <div className="svc-admin">
       <AdminStats
         label={t("admin:services.list")}
         stats={[
@@ -916,7 +931,7 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
             ))}
         </ul>
       </AdminSection>
-    </>
+    </div>
   );
 }
 
@@ -940,11 +955,6 @@ export function ServicesAdmin() {
       icon="plug"
       title={t("admin:services.title")}
       description={t("admin:services.subtitle")}
-      secondary={
-        <Link className="ds-button ds-button--ghost" to="/services">
-          {t("admin:services.status")}
-        </Link>
-      }
       primary={
         <Dialog
           open={open}

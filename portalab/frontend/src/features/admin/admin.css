@@ -642,6 +642,7 @@
 .svc-card__who {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-inline-size: 0;
 }
 .svc-card__who strong {
@@ -652,8 +653,10 @@
 }
 .svc-card__badges {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex: none;
 }
 .svc-importance {
   display: inline-flex;
@@ -677,7 +680,6 @@
   white-space: nowrap;
 }
 .svc-card__sync {
-  min-block-size: 1.5rem;
   font-size: var(--font-size-sm);
 }
 .svc-card__sync .admin-muted {
@@ -685,22 +687,47 @@
   align-items: center;
   gap: 0.3rem;
 }
-.svc-card__actions {
+/* the foot: last sync on the left, compact icon actions on the right (tooltips name them) */
+.svc-card__foot {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
   margin-block-start: auto;
   padding-block-start: var(--space-2);
   border-block-start: 1px solid var(--glass-border);
 }
-.svc-card__actions > .ds-button--icon {
-  margin-inline-start: auto;
+.svc-card__foot .svc-card__sync {
+  flex: 1;
+  min-inline-size: 0;
+}
+.svc-card__foot .svc-card__sync > .admin-muted {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.svc-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  flex: none;
+}
+.svc-card__actions .ds-button--icon {
+  min-inline-size: 2.1rem;
+  min-block-size: 2.1rem;
 }
 .svc-card__message {
-  flex-basis: 100%;
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-3);
   color: var(--color-text-muted);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
+}
+.svc-admin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 .svc-card__uptime .uptime-bars {
   block-size: 1.25rem;
