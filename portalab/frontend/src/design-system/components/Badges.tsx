@@ -17,9 +17,11 @@ export function levelProgress(xp: number, floor: number, next: number | null): n
   return Math.min(1, Math.max(0, (xp - floor) / (next - floor)));
 }
 
+/** The member's level — a star tells it is a level, not a count (027). */
 export function LevelBadge({ level, label }: { level: number; label: string }) {
   return (
     <span className="ds-level" role="img" aria-label={label}>
+      <Icon name="star" size={11} />
       <span aria-hidden="true">{level}</span>
     </span>
   );

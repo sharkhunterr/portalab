@@ -311,7 +311,7 @@ export function presentationOf(theme: ThemeDefinition): ResolvedPresentation {
     nav: {
       desktop: layout.nav?.desktop ?? "sidebar",
       tablet: layout.nav?.tablet ?? "rail",
-      phone: layout.nav?.phone ?? "bottom-bar",
+      phone: layout.nav?.phone ?? "drawer",
     },
     header: layout.header ?? "full",
     headerPosition: layout.headerPosition ?? "top",

@@ -576,6 +576,7 @@
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x proximity;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .widget-posters li {
   scroll-snap-align: start;
@@ -863,6 +864,7 @@
   padding: 0 0 var(--space-1);
   list-style: none;
   overflow-x: auto;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .widget-continue a,
 .widget-continue li > span {
@@ -1202,4 +1204,80 @@
   flex: none;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+}
+
+/* 027 — one-row widgets are tiles: no visible header (the title stays for screen readers), the whole
+   cell is the action; edit controls float in a corner */
+.widget-frame[data-tile] {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.widget-frame[data-tile] .widget-frame__header {
+  position: absolute;
+  inset-block-start: 0.15rem;
+  inset-inline-end: 0.15rem;
+  z-index: 2;
+}
+.widget-frame[data-tile] .widget-frame__title {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.widget-frame[data-tile] .widget__badge {
+  display: none;
+}
+.widget-frame[data-tile] .widget-frame__body {
+  container-type: inline-size; /* the value shrinks with a narrow tile */
+}
+.widget-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  block-size: 100%;
+  padding: var(--space-1);
+  border-radius: inherit;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color var(--motion-fast, 120ms) ease;
+}
+.widget-tile:hover,
+.widget-tile:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.widget-tile__icon {
+  display: grid;
+  place-items: center;
+  color: var(--color-accent);
+}
+.widget-tile__label {
+  max-inline-size: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-xs, 0.75rem);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+.widget-tile__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-inline-size: 100%;
+  white-space: nowrap;
+  font-size: clamp(0.95rem, 22cqi, 1.35rem);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.widget-tile__value .ds-icon {
+  color: var(--color-accent);
+}
+.widget-tile[data-alert] .widget-tile__value .ds-icon {
+  color: var(--cal-incident);
 }

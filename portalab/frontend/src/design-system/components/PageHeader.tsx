@@ -23,6 +23,9 @@ export interface PageHeaderProps {
   secondary?: ReactNode;
   /** Image URL shown behind the header (media detail pages). */
   artwork?: string | null;
+  /** 027: an artwork layer of its own (a gallery one swipes through) instead of a single image; the
+   * header's text lets the gestures through, its links and buttons stay usable */
+  art?: ReactNode;
   /** Id of the title, for ``aria-labelledby`` of the page section. */
   titleId?: string;
   /** Heading level of the title (pages nested in a titled region keep their outline with 2). */
@@ -62,14 +65,20 @@ export function PageHeader({
   primary,
   secondary,
   artwork,
+  art,
   titleId,
   level = 1,
   children,
 }: PageHeaderProps) {
   const Title = level === 2 ? "h2" : "h1";
   return (
-    <header className="ds-page-header" data-artwork={artwork ? "true" : undefined}>
-      {artwork ? (
+    <header
+      className="ds-page-header"
+      data-artwork={artwork || art ? "true" : undefined}
+      data-art-interactive={art ? "true" : undefined}
+    >
+      {art ? <div className="ds-page-header__art">{art}</div> : null}
+      {!art && artwork ? (
         <div className="ds-page-header__art" aria-hidden="true">
           <img src={artwork} alt="" />
         </div>

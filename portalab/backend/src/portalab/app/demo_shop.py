@@ -342,6 +342,11 @@ _p("backdrop_banner", "profile_backdrop", 1500, "legendary", "Film backdrop bann
    "Le backdrop de n'importe quel film ou série de la bibliothèque en bannière de profil.",
    {"feature": "backdrop"}, collection="profile", icon="film", featured=False, level=8, supply=5)  # fmt: skip
 
+_p("release_search", "access", 5000, "legendary", "Release hunter", "Chasseur de versions",
+   "Search the indexers yourself from a title's page and see every release found (advanced).",
+   "Interroger soi-même les indexeurs depuis la fiche d'un titre et voir toutes les versions trouvées (avancé).",
+   {"permission": "media.release_search"}, collection="essentials", icon="search", level=20, supply=3)  # fmt: skip
+
 # --------------------------------------------------------------------------------- name styles
 for value, en, fr, rarity, price, level in (
     ("wizard", "Golden spellbook", "Grimoire doré", "epic", 750, 6),

@@ -151,6 +151,7 @@ export function WidgetFrame({
       aria-labelledby={headingId}
       className="widget-frame"
       data-widget={instance.widget_key}
+      data-tile={instance.h <= 1 || undefined}
       style={{ "--widget-w": instance.w, "--widget-h": instance.h } as React.CSSProperties}
     >
       {handles}

@@ -238,6 +238,7 @@
 .admin-table-wrap {
   inline-size: 100%;
   overflow-x: auto;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .admin-table {
   inline-size: 100%;

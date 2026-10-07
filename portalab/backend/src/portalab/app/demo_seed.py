@@ -478,6 +478,21 @@ class DemoSeeder:
                 unlocked += bool(await rewards.unlock(self.admin, self.people[name], key))
         return f"{unlocked} newly unlocked"
 
+    async def _access_permissions(self) -> None:
+        """027: the permissions the demo shop's « access » products grant are allowed for such products."""
+        marketplace = self.platform.marketplace
+        await marketplace.refresh_config()
+        wanted = sorted(
+            {str(p["payload"]["permission"]) for p in SHOP if p["type"] == "access"}
+            | set(marketplace.config.access_allowed_permissions)
+        )
+        writer = marketplace.capabilities.system_providers(CONFIG_WRITER_CAPABILITY)
+        if writer and wanted != sorted(marketplace.config.access_allowed_permissions):
+            await writer[0].provider.set_global(
+                self.admin, "marketplace.access.allowedPermissions", wanted, reason="demo shop"
+            )
+            await marketplace.refresh_config()
+
     async def catalog(self) -> str:
         """027: the demo shop (``demo_shop``) — new products are created and published, existing ones are
         revised when their price, texts, contents or level changed (purchases keep their snapshot), then
@@ -485,6 +500,7 @@ class DemoSeeder:
         from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
 
         catalog = self.platform.marketplace.catalog
+        await self._access_permissions()
         for key, label, icon, position in COLLECTIONS:
             await catalog.add_category(key, label, position, icon)
         made = revised = 0

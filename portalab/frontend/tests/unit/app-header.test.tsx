@@ -99,7 +99,7 @@ describe("frame arrangement", () => {
   it("follows the theme per device class", () => {
     expect(arrangementFor("desktop", portalab).nav).toBe("sidebar");
     expect(arrangementFor("tablet", portalab).nav).toBe("rail");
-    expect(arrangementFor("phone", portalab).nav).toBe("bottom-bar");
+    expect(arrangementFor("phone", portalab).nav).toBe("drawer"); // 027: no bottom bar by default
   });
 
   it("merges a footer header with the phone bottom bar", () => {
@@ -109,11 +109,14 @@ describe("frame arrangement", () => {
     expect(arrangementFor("desktop", orbit).nav).toBe("orbit");
   });
 
-  it("shows the bottom bar on phones and keeps the page when the class changes", async () => {
+  it("keeps the essentials in the phone header and the page when the class changes", async () => {
     setViewport(390);
     fake.handler = backend();
     renderShell();
-    expect(await screen.findByRole("navigation", { name: "Sections" })).toBeInTheDocument();
+    // 027: no bottom bar — home and search on the left, notifications and the menu on the right
+    expect(await screen.findByRole("link", { name: "Home" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open navigation" })).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Sections" })).toBeNull();
     expect(screen.getByRole("heading", { name: "Home page" })).toBeInTheDocument();
     setViewport(1280);
   });

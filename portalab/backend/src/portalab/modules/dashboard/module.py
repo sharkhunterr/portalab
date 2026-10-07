@@ -51,7 +51,7 @@ from portalab.modules.dashboard.service.service import DashboardService
 from portalab.modules.dashboard.settings import POLICIES, SETTINGS, STARTER, DashboardConfig
 from portalab.modules.dashboard.summary.aggregator import SinceLastLogin
 from portalab.modules.dashboard.validators import DashboardValidators
-from portalab.modules.dashboard.widgets.builtin import register_builtin
+from portalab.modules.dashboard.widgets.builtin import register_builtin, register_since_last_visit
 
 OWNER = "module:dashboard"
 
@@ -92,6 +92,7 @@ class DashboardModule:
     def register(self) -> None:
         if self.registry.get("dashboard.welcome") is None:
             register_builtin(self.registry, self.capabilities, self.authorizer, self.clock)
+        register_since_last_visit(self.registry, self.summary, self.clock)
         register_event_types(self.event_types)
         participant = DashboardParticipant(self.database, self.service.erase)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):

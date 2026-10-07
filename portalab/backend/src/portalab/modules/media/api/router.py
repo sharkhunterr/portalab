@@ -40,7 +40,13 @@ from portalab.modules.media.models import (
     PlaybackSession,
 )
 from portalab.modules.media.module import MediaModule
-from portalab.modules.media.permissions import MEDIA_MANAGE, MEDIA_READ, MEDIA_REQUEST, SELF
+from portalab.modules.media.permissions import (
+    MEDIA_MANAGE,
+    MEDIA_READ,
+    MEDIA_RELEASE_SEARCH,
+    MEDIA_REQUEST,
+    SELF,
+)
 from portalab.modules.media.providers.insight_widgets import posters, with_posters
 from portalab.modules.media.requests.insights import kind_of, lookup_of
 from portalab.modules.media.sections.service import SECTIONS
@@ -65,6 +71,7 @@ Reader = Annotated[Principal, require(MEDIA_READ)]
 Requester = Annotated[Principal, require(MEDIA_REQUEST)]
 User = Annotated[Principal, require(SELF)]
 Manager = Annotated[Principal, require(MEDIA_MANAGE)]
+Searcher = Annotated[Principal, require(MEDIA_RELEASE_SEARCH)]
 
 
 def _me(principal: Principal) -> UUID:
@@ -489,12 +496,16 @@ async def detail(principal: Reader, object_id: UUID, module: Module) -> MediaDet
 @router.get("/media/{object_id}/journey")
 async def journey(principal: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
     """027: where this title's request stands — asked, approved, released, searched, downloading,
-    imported, available — with the download managers' and torrent clients' facts."""
-    return await module.journey.journey(principal, object_id)
+    imported, available — with the download managers' and torrent clients' facts. The indexers' search is
+    offered only to members who unlocked it."""
+    body = await module.journey.journey(principal, object_id)
+    if body.get("can_search") and not await module.authorizer.is_allowed(principal, MEDIA_RELEASE_SEARCH):
+        body["can_search"], body["search"] = False, None
+    return body
 
 
 @router.post("/media/{object_id}/journey/search")
-async def journey_search(principal: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
+async def journey_search(principal: Searcher, object_id: UUID, module: Module) -> dict[str, Any]:
     """027: what the indexers offer for this title now (the download managers' interactive search; kept
     30 minutes — it is slow and loads the indexers)."""
     return await module.journey.search(principal, object_id)

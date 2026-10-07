@@ -90,7 +90,7 @@
     "nav": {
       "desktop": "sidebar",
       "tablet": "rail",
-      "phone": "bottom-bar"
+      "phone": "drawer"
     },
     "header": "full",
     "headerPosition": "top",

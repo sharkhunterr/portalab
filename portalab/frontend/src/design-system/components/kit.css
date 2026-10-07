@@ -158,8 +158,10 @@
   font-size: var(--font-size-xs);
 }
 .ds-level {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
   min-inline-size: 1.75rem;
   block-size: 1.75rem;
   padding-inline: 0.35rem;
@@ -270,6 +272,15 @@
   position: absolute;
   inset: 0;
   background: var(--artwork-fade);
+  pointer-events: none;
+}
+/* 027: a gallery behind the header — swipes reach it through the text, actions stay clickable */
+.ds-page-header[data-art-interactive] .ds-page-header__body {
+  position: relative;
+  pointer-events: none;
+}
+.ds-page-header[data-art-interactive] .ds-page-header__body :is(a, button, input, select, [role="button"]) {
+  pointer-events: auto;
 }
 .ds-page-header[data-artwork] .ds-page-header__context {
   color: var(--artwork-text);
@@ -715,6 +726,7 @@ progress {
   background: color-mix(in srgb, var(--color-text) 6%, transparent);
   inline-size: fit-content;
   max-inline-size: 100%;
+  padding-block-end: var(--space-2); /* the scrollbar keeps its distance */
 }
 fieldset.ds-subnav {
   margin: 0;

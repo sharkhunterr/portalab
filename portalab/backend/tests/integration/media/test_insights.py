@@ -8,7 +8,7 @@ from typing import Any
 
 import httpx
 from fastapi import FastAPI
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
@@ -319,6 +319,9 @@ async def test_metadata_enrichment_and_upcoming(
     clock.advance(timedelta(minutes=1))
     resync = await media.module.enricher.drive(service, "resync_partial", report)
     assert (resync.modified, resync.ignored) == (1, 1) and reports[-1] == (2, 2)
+    async with media.database.unit_of_work() as uow:  # details kept before the alternative artwork
+        await uow.session.execute(text("UPDATE media.object_metadata SET data = data - '_v'"))
+    assert [o.title for o in await media.module.enricher.due()] == ["Dune"]  # looked up again
     assert {(kind, ids.get("tmdb")) for kind, ids, _ in tmdb.asked} == {("movie", "438631"), ("movie", None)}
     async with media.database.session() as session:
         dune = await session.scalar(select(MediaObject.id).where(MediaObject.title == "Dune"))

@@ -21,6 +21,10 @@ from portalab.modules.health.state.deriver import RULES_VERSION, Derived, Inputs
 
 SYSTEM = Principal(channel="system")
 RECENT = 20
+# 027: an outage that lasts is announced at these durations (minutes) — automations act on it (« declare an
+# incident when a service has been down for 10 minutes »)
+LASTING_MINUTES = (5, 10, 15, 30, 60, 120)
+OUTAGE_LASTING = "service.outage_lasting"
 
 
 class StateService:
@@ -134,6 +138,8 @@ class StateService:
             row.maintenance_id = maintenance.id if maintenance else None
             if not changed:
                 row.reason = derived.reason
+                if derived.state == "unavailable":
+                    await self._lasting(session, row, inputs, now)
                 return derived
             at = occurred_at or now
             row.state, row.reason, row.state_since = derived.state, derived.reason, at
@@ -168,6 +174,32 @@ class StateService:
             )
             metrics.increment(f"health.state_changes.{metric_part(derived.state)}")
         return derived
+
+    async def _lasting(self, session: AsyncSession, row: ServiceState, inputs: Inputs, now: datetime) -> None:
+        """027: how long the current outage has lasted, once per milestone (5, 10, 15, 30, 60, 120 min)."""
+        minutes = (now - row.state_since).total_seconds() / 60
+        reached = [m for m in LASTING_MINUTES if minutes >= m]
+        if not reached:
+            return
+        info = await self.service_info(row.service_id)
+        for milestone in reached:
+            await self.events.publish(
+                session,
+                OUTAGE_LASTING,
+                {
+                    "service_id": row.service_id,
+                    "service_label": info.name if info else None,
+                    "state_seq": row.state_seq,
+                    "minutes": milestone,
+                    "failures": inputs.consecutive_failures,
+                    "since": row.state_since.isoformat(),
+                },
+                occurred_at=now,
+                actor=SYSTEM,
+                subject=SubjectRef("service", row.service_id),
+                source="health",
+                dedup_key=f"{OUTAGE_LASTING}:{row.service_id}:{row.state_seq}:{milestone}",
+            )
 
     async def evaluate_all(self) -> int:
         """Re-derive every known service (sweeps, maintenance transitions, start-up)."""

@@ -20,7 +20,8 @@ import { EmptyWidgets } from "./frame/emptiness";
 import { WidgetFrame } from "./frame/WidgetFrame";
 import { DashboardGrid } from "./grid/DashboardGrid";
 import { VIEW_COLUMNS, type View } from "./grid/engine";
-import { SinceLastLoginCard } from "./summary/SinceLastLoginCard";
+import "./summary/SinceLastLoginCard";
+import "./widgets/tiles";
 import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
 import "./widgets/media";
@@ -203,7 +204,6 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
         }
       />
       <WelcomeCard />
-      <SinceLastLoginCard />
       {dashboard.isPending ? <FunctionalState state="loading" /> : null}
       {dashboard.isError ? <FunctionalState state="error" onRetry={() => dashboard.refetch()} /> : null}
       {dashboard.data && visible.length === 0 ? (

@@ -1,4 +1,6 @@
-import { useLocation } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "react-router";
+import { api } from "../../api/client";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import type { DeviceClass } from "../../design-system/components/Layout";
@@ -45,6 +47,33 @@ export function AppHeader({
   const strings = useShellStrings();
   const phone = device === "phone";
   const name = data.me?.display_name ?? data.me?.login ?? fallbackName;
+  // 027: on a phone with the menu in a panel, the header keeps the essentials — home and search on the
+  // left; incidents, level, notifications and the menu on the right (profile, Coins… live in the menu)
+  const compactPhone = phone && Boolean(onOpenNavigation);
+  if (compactPhone) {
+    return (
+      <header className="shell-header" data-device={device} data-compact="true">
+        <div className="shell-header__start">
+          <Link to="/" className="ds-button ds-button--ghost ds-button--icon" aria-label={strings.home}>
+            <Icon name="home" />
+          </Link>
+          <SearchField compact />
+        </div>
+        <div className="shell-header__end">
+          <IncidentsButton />
+          {data.progression ? (
+            <RegionBoundary resetKey="progression">
+              <ProgressChip progression={data.progression} compact coins={false} />
+            </RegionBoundary>
+          ) : null}
+          <NotificationButton unread={data.unread} />
+          <Button variant="ghost" size="icon" aria-label={strings.openNavigation} onClick={onOpenNavigation}>
+            <Icon name="menu" />
+          </Button>
+        </div>
+      </header>
+    );
+  }
   return (
     <header className="shell-header" data-device={device}>
       <div className="shell-header__start">
@@ -67,6 +96,7 @@ export function AppHeader({
       )}
       <div className="shell-header__end">
         <AssistantButton />
+        <IncidentsButton />
         {bottomBar ? null : <NotificationButton unread={data.unread} />}
         {data.progression ? (
           <RegionBoundary resetKey="progression">
@@ -118,22 +148,43 @@ function SearchField({ compact }: { compact: boolean }) {
   );
 }
 
+/** The assistant, only when one is available (027: an inert button helped nobody). */
 function AssistantButton() {
   const strings = useShellStrings();
   const { ai } = useSlots();
   const location = useLocation();
-  const available = Boolean(ai?.available);
+  if (!ai?.available) return null;
   return (
     <Button
       variant="ghost"
       size="icon"
-      aria-label={available ? strings.assistant : `${strings.assistant}: ${strings.assistantUnavailable}`}
-      aria-disabled={available ? undefined : "true"}
-      title={available ? strings.assistant : strings.assistantUnavailable}
-      onClick={() => (available ? ai?.open({ route: location.pathname }) : undefined)}
+      aria-label={strings.assistant}
+      title={strings.assistant}
+      onClick={() => ai.open({ route: location.pathname })}
     >
       <Icon name="sparkles" />
     </Button>
+  );
+}
+
+/** 027: incidents in progress, with their count — only while there are some. */
+export function IncidentsButton() {
+  const t = useT();
+  const open = useQuery({
+    queryKey: ["incidents", "open"],
+    retry: false,
+    refetchInterval: 60_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/incidents", { params: { query: { state: "open" } } })).data ?? []) as unknown[],
+  });
+  const count = Array.isArray(open.data) ? open.data.length : 0;
+  if (!count) return null;
+  const label = t("shell:incidents", { count });
+  return (
+    <Link to="/incidents" className="shell-incidents" aria-label={label} title={label}>
+      <Icon name="alert" size={18} />
+      <span aria-hidden="true">{count}</span>
+    </Link>
   );
 }
 

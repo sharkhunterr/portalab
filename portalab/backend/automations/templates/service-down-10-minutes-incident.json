@@ -1,0 +1,36 @@
+{
+  "title": "Incident when a service stays down",
+  "description": "Declare an incident when a service has been unavailable for 10 minutes (change « minutes » to 5, 15, 30, 60 or 120; add a « failures » filter to count failed checks; filter on « service_id » for one service).",
+  "definition": {
+    "name": "Service down for 10 minutes",
+    "trigger": {
+      "kind": "event",
+      "event_type": "service.outage_lasting",
+      "filter": [
+        {
+          "field": "minutes",
+          "op": "eq",
+          "value": 10
+        }
+      ]
+    },
+    "steps": [
+      {
+        "id": "declare",
+        "action": "incident.create",
+        "params": {
+          "title": "${event.service_label} is not answering",
+          "severity": "major",
+          "service_ids": [
+            "${event.service_id}"
+          ],
+          "summary": "Unavailable for ${event.minutes} minutes (${event.failures} failed checks in a row).",
+          "dedup_key": "outage:${event.service_id}:${event.state_seq}"
+        }
+      }
+    ],
+    "limits": {
+      "cooldown_s": 600
+    }
+  }
+}

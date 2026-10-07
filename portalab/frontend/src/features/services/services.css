@@ -27,6 +27,123 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
-.services-page__card > button {
+
+/* 027 — the members' status page (under Support): overall status, incidents, maintenance, then cards */
+.services-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-end: var(--space-4);
+  padding: var(--space-4);
+  border-inline-start: 4px solid var(--state-available-fg);
+  background: color-mix(in srgb, var(--state-available-bg) 18%, var(--color-surface-raised));
+}
+.services-status[data-tone="warn"] {
+  border-inline-start-color: var(--state-maintenance-fg);
+  background: color-mix(in srgb, var(--state-maintenance-bg) 18%, var(--color-surface-raised));
+}
+.services-status[data-tone="bad"] {
+  border-inline-start-color: var(--state-error-fg);
+  background: color-mix(in srgb, var(--state-error-bg) 18%, var(--color-surface-raised));
+}
+.services-status__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  flex: none;
+  border-radius: 50%;
+  color: var(--state-available-fg);
+  background: var(--state-available-bg);
+}
+.services-status[data-tone="warn"] .services-status__icon {
+  color: var(--state-maintenance-fg);
+  background: var(--state-maintenance-bg);
+}
+.services-status[data-tone="bad"] .services-status__icon {
+  color: var(--state-error-fg);
+  background: var(--state-error-bg);
+}
+.services-status__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.services-status__text strong {
+  font-size: var(--font-size-lg);
+}
+.services-status__text span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.services-block {
+  margin-block-end: var(--space-4);
+}
+.services-block h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+.services-incidents,
+.services-maintenance {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.services-incidents__item,
+.services-maintenance li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+  background: var(--color-surface-raised);
+}
+.services-incidents__item:hover {
+  border-color: var(--color-accent);
+}
+.services-page__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.services-page__uptime {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  inline-size: 100%;
+}
+.services-page__bar {
+  display: block;
+  block-size: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.services-page__bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--state-available-fg);
+}
+.services-page__card[data-state="degraded"] .services-page__bar > span,
+.services-page__card[data-state="unavailable"] .services-page__bar > span {
+  background: var(--state-error-fg);
+}
+.services-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   margin-block-start: auto;
 }

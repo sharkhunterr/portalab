@@ -47,7 +47,7 @@ describe("theme schema v2", () => {
     expect(errors).toEqual([]);
     expect(theme?.schemaVersion).toBe(THEME_SCHEMA_VERSION);
     expect(presentationOf(theme as never)).toMatchObject({
-      nav: { desktop: "sidebar", tablet: "rail", phone: "bottom-bar" },
+      nav: { desktop: "sidebar", tablet: "rail", phone: "drawer" },
       header: "full",
       headerPosition: "top",
       cards: "elevated",
@@ -76,7 +76,7 @@ describe("theme schema v2", () => {
     const root = document.createElement("html");
     const effective = resolve(DEFAULT_PREFERENCES, DEFAULT_POLICY, BUILTIN_THEMES);
     applyToDocument(effective, DEFAULT_PREFERENCES, root);
-    expect(root.dataset).toMatchObject({ navPhone: "bottom-bar", headerPosition: "top", cards: "glass" });
+    expect(root.dataset).toMatchObject({ navPhone: "drawer", headerPosition: "top", cards: "glass" });
     expect(root.dataset.motion).toBe("lively");
     applyToDocument({ ...effective, reducedMotion: true }, DEFAULT_PREFERENCES, root);
     expect(root.dataset.motion).toBe("none");

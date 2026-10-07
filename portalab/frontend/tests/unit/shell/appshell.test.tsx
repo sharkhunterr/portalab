@@ -27,7 +27,7 @@ describe("AppShell", () => {
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#main-content");
     expect(screen.getByRole("button", { name: /Search/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Assistant/ })).toHaveAttribute("aria-disabled", "true");
+    expect(screen.queryByRole("button", { name: /Assistant/ })).toBeNull(); // 027: no inert assistant button
     const banner = screen.getByRole("banner");
     await act(() => router.navigate("/account"));
     expect(await screen.findByRole("heading", { name: "Account page" })).toBeInTheDocument();

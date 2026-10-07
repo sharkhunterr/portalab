@@ -37,7 +37,12 @@ async def test_personalization(app: FastAPI, client: httpx.AsyncClient, dash: Da
     first = await board(client)
     starter = [i["widget_key"] for i in first["instances"]]  # type: ignore[index, union-attr]
     # starter applied on first view: the widgets this member can use, in the starter's order (027)
-    assert starter == ["dashboard.welcome", "health.services_summary", "health.service_links"]
+    assert starter == [
+        "dashboard.since_last_visit",
+        "dashboard.welcome",
+        "health.services_summary",
+        "health.service_links",
+    ]
     version = first["layout_version"]
     added = await client.post(
         "/api/v1/dashboard/widgets",

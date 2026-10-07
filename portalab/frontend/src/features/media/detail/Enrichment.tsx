@@ -116,18 +116,22 @@ export function useMetadata(objectId: string) {
  * The artwork at the top of a title's page (027): the backdrop, then the other backdrops and posters —
  * swiped on a touch screen, with arrows and dots elsewhere; images load as they come into view.
  */
-export function Backdrop({ objectId }: { objectId: string }) {
+export function artworkSlides(data: Metadata | null | undefined): Array<{ ref: string; poster: boolean }> {
+  return [
+    ...[...new Set([data?.backdrop, ...(data?.backdrops ?? [])].filter(Boolean) as string[])].map((ref) => ({
+      ref,
+      poster: false,
+    })),
+    ...(data?.posters ?? []).map((ref) => ({ ref, poster: true })),
+  ];
+}
+
+export function Backdrop({ objectId, fill = false }: { objectId: string; fill?: boolean }) {
   const t = useT();
   const metadata = useMetadata(objectId);
   const strip = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-  const data = metadata.data;
-  const slides = [
-    ...[data?.backdrop, ...(data?.backdrops ?? [])]
-      .filter(Boolean)
-      .map((ref) => ({ ref: ref as string, poster: false })),
-    ...(data?.posters ?? []).map((ref) => ({ ref, poster: true })),
-  ];
+  const slides = artworkSlides(metadata.data);
   if (!slides.length) return null;
   const go = (next: number) => {
     const target = Math.max(0, Math.min(slides.length - 1, next));
@@ -135,7 +139,7 @@ export function Backdrop({ objectId }: { objectId: string }) {
     if (box) box.scrollTo({ left: target * box.clientWidth, behavior: "smooth" });
   };
   return (
-    <div className="media-backdrop">
+    <div className="media-backdrop" data-fill={fill || undefined}>
       <div
         ref={strip}
         className="media-backdrop__strip"

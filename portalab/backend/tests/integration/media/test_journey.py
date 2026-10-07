@@ -19,6 +19,7 @@ from portalab.capabilities.media import (
     TorrentState,
 )
 from portalab.capabilities.media.testkit import library_record
+from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.core.time import FixedClock
 from portalab.modules.media.models import MediaObject, UserLink
 from tests.integration.identity.helpers import login
@@ -120,7 +121,12 @@ async def test_journey(
         "detail": "no_release",
         "manager": "Radarr",
     }
-    assert body["manager"]["link"] == "http://radarr/movie/heat" and body["can_search"] is True
+    assert "link" not in body["manager"]  # members have no use for the download manager's page
+    assert body["can_search"] is False  # the indexers' search is an advanced feature, unlocked per member
+    assert (await client.post(f"{path}/search")).status_code == 403
+    [grants] = media.ev.full.identity.capabilities.system_providers(USER_GRANTS)
+    await grants.provider.grant(people["zoe"], "media.release_search", source="test:shop")
+    assert (await client.get(path)).json()["can_search"] is True
 
     queue.items = [
         SourceDownload(

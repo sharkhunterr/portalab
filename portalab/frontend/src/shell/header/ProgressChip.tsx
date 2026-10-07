@@ -13,9 +13,12 @@ import { useShellStrings } from "../strings";
 export function ProgressChip({
   progression,
   compact = false,
+  coins = true,
 }: {
   progression: Progression;
   compact?: boolean;
+  /** 027: the phone header leaves Coins to the menu */
+  coins?: boolean;
 }) {
   const t = useT();
   const strings = useShellStrings();
@@ -36,9 +39,11 @@ export function ProgressChip({
           </span>
         )}
       </Link>
-      <Link to="/progression" className="shell-progress__coins">
-        <CoinBadge amount={progression.coins} label={strings.coins} locale={locale} />
-      </Link>
+      {coins ? (
+        <Link to="/progression" className="shell-progress__coins">
+          <CoinBadge amount={progression.coins} label={strings.coins} locale={locale} />
+        </Link>
+      ) : null}
     </div>
   );
 }

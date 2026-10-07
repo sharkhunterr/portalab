@@ -63,6 +63,7 @@ async def test_templates(au: AutoHarness, client: AsyncClient) -> None:
         "critical-service-incident-draft",
         "weekly-community-digest-news",
         "new-ticket-notify-support",
+        "service-down-10-minutes-incident",  # 027: an incident when a service stays down
     }
     # the harness registers no owner actions/events beyond tests: templates report what is missing
     assert all(not t["valid"] for t in templates.values())

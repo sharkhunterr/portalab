@@ -5903,7 +5903,8 @@ export interface paths {
         /**
          * Journey
          * @description 027: where this title's request stands — asked, approved, released, searched, downloading,
-         *     imported, available — with the download managers' and torrent clients' facts.
+         *     imported, available — with the download managers' and torrent clients' facts. The indexers' search is
+         *     offered only to members who unlocked it.
          */
         get: operations["journey_api_v1_media__object_id__journey_get"];
         put?: never;

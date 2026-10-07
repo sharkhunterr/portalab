@@ -539,6 +539,7 @@
   .settings-explorer__areas ul {
     display: flex;
     overflow-x: auto;
+    padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
   }
   .settings-explorer__areas button {
     white-space: nowrap;

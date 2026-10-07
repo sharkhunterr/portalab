@@ -19,6 +19,7 @@
   list-style: none;
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .media-rail > li {
   scroll-snap-align: start;
@@ -402,6 +403,16 @@ a.media-card__link:focus-visible .media-card__frame {
   overflow: hidden;
   border-radius: var(--radius-lg, 1rem);
 }
+/* 027: the gallery as the header's own artwork — it fills the header, images at full strength */
+.media-backdrop[data-fill] {
+  inset: 0;
+  block-size: auto;
+  border-radius: inherit;
+}
+.media-backdrop[data-fill] .media-backdrop__slide img {
+  opacity: 1;
+  mask-image: none;
+}
 .media-backdrop__strip {
   display: flex;
   block-size: 100%;
@@ -482,20 +493,13 @@ a.media-card__link:focus-visible .media-card__frame {
   background: var(--color-accent);
 }
 /* the header lets the top of the artwork be swiped; its own content stays usable */
-.media-detail:has(.media-backdrop) > .ds-page-header {
-  position: relative;
-  z-index: 1;
-  pointer-events: none;
-}
-.media-detail:has(.media-backdrop) > .ds-page-header * {
-  pointer-events: auto;
-}
-.media-detail > :not(.media-backdrop) {
+.media-detail > * {
   position: relative;
   z-index: 1;
 }
-.media-detail:has(.media-backdrop) > .ds-page-header {
-  padding-block-start: clamp(6rem, 18vw, 13rem);
+/* 027: with a gallery, the header is a tall hero one swipes through */
+.media-detail > .ds-page-header[data-art-interactive] {
+  min-block-size: clamp(16rem, 48vw, 28rem);
 }
 .media-enriched {
   display: grid;
@@ -569,6 +573,7 @@ a.media-card__link:focus-visible .media-card__frame {
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x proximity;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .media-enriched__cast li {
   display: grid;
@@ -681,6 +686,7 @@ a.media-card__link:focus-visible .media-card__frame {
   padding: 0;
   display: flex;
   overflow-x: auto;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .journey-step {
   position: relative;

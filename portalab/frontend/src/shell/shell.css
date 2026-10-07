@@ -369,6 +369,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border-block-end: 1px solid var(--glass-border);
   overflow-x: auto;
+  padding-block-end: var(--space-2); /* the scrollbar keeps its distance */
 }
 .shell-sections--bar {
   flex-direction: row;
@@ -601,6 +602,7 @@
   background: color-mix(in srgb, var(--color-text) 6%, transparent);
   inline-size: fit-content;
   max-inline-size: 100%;
+  padding-block-end: var(--space-2); /* the scrollbar keeps its distance */
 }
 .hub-tabs a {
   display: inline-flex;
@@ -1125,4 +1127,133 @@
 .announcement-banner a {
   color: var(--color-accent);
   font-weight: var(--font-weight-semibold);
+}
+
+/* 027 — incidents in progress in the header (only while there are some) */
+.shell-incidents {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-block-size: var(--target-min);
+  padding-inline: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--cal-incident) 45%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--cal-incident) 14%, transparent);
+  color: var(--cal-incident);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+.shell-incidents:hover {
+  background: color-mix(in srgb, var(--cal-incident) 22%, transparent);
+}
+
+/* 027 — the compact phone header: home and search on the left; incidents, level, notifications, menu */
+.shell-header[data-compact="true"] .shell-header__start,
+.shell-header[data-compact="true"] .shell-header__end {
+  gap: 0.15rem;
+}
+.shell-header[data-compact="true"] {
+  justify-content: space-between;
+}
+
+/* 027 — the member at the top of the navigation: profile, level and progress, Coins, contribution */
+.shell-profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-end: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 70%),
+    var(--color-surface-raised);
+}
+.shell-profile a {
+  color: inherit;
+  text-decoration: none;
+}
+.shell-profile__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.shell-profile__name {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+.shell-profile__name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-profile__name span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.shell-profile__progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
+.shell-profile__progress:hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.shell-profile__level {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.shell-profile__bar {
+  flex: 1;
+}
+.shell-profile__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+.shell-profile__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: var(--font-weight-bold);
+}
+.shell-profile__stat .ds-icon {
+  color: var(--color-accent);
+}
+.shell-profile__links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.15rem;
+  margin: 0;
+  padding: var(--space-2) 0 0;
+  border-block-start: 1px solid var(--glass-border);
+  list-style: none;
+}
+.shell-profile__links a,
+.shell-profile__links button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  min-block-size: var(--target-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: start;
+  cursor: pointer;
+}
+.shell-profile__links a:hover,
+.shell-profile__links button:hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
 }

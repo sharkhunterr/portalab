@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
+import { ProfileCard } from "./header/ProfileCard";
 import { useHeaderData } from "./header/useHeaderData";
 import { BottomBar } from "./nav/BottomBar";
 import { HubTabs } from "./nav/HubTabs";
@@ -136,6 +137,7 @@ export function AppShell({
           {nav === "tabs" ? <TabsNav sections={sections} /> : null}
           {nav === "sidebar" || nav === "rail" ? (
             <nav aria-label={shellStrings.mainNav} className="shell-side" data-variant={nav}>
+              {nav === "sidebar" ? <ProfileCard data={header} /> : null}
               <NavContent variant={nav === "rail" ? "rail" : "list"} />
             </nav>
           ) : null}
@@ -162,6 +164,12 @@ export function AppShell({
             closeLabel={shellStrings.closeMenu}
             trigger={<span hidden />}
           >
+            <ProfileCard
+              data={header}
+              personal={view.personal}
+              onNavigate={() => setMenuOpen(false)}
+              {...(arrangement.device === "phone" ? { onSignOut } : {})}
+            />
             <nav aria-label={shellStrings.mainNav}>
               <NavContent onNavigate={() => setMenuOpen(false)} />
             </nav>

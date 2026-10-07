@@ -124,6 +124,8 @@ body {
   --space-3: calc(0.75rem * var(--space-unit));
   --space-4: calc(1rem * var(--space-unit));
   --space-6: calc(1.5rem * var(--space-unit));
+  /* 027: room between what scrolls sideways and its scrollbar */
+  --scroller-gap: calc(0.875rem * var(--space-unit));
 }
 
 /* Explicit or forced reduced motion: same effect as the OS setting (content is preserved). */

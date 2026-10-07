@@ -16,7 +16,7 @@ import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
-import { Backdrop, Enrichment, useMetadata } from "./Enrichment";
+import { artworkSlides, Backdrop, Enrichment, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 
 /**
@@ -428,7 +428,9 @@ export function DetailPage() {
   const headingId = useId();
   const detail = useMediaDetail(objectId);
   // with enriched details (TMDB), the cast and the technical timeline would only repeat or distract
-  const enriched = Boolean(useMetadata(objectId).data);
+  const metadata = useMetadata(objectId);
+  const enriched = Boolean(metadata.data);
+  const gallery = artworkSlides(metadata.data).length > 0; // 027: the artwork one swipes through
   const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
@@ -437,11 +439,11 @@ export function DetailPage() {
   const poster = imageUrl(media.image_id);
   return (
     <article aria-labelledby={headingId} className="media-detail">
-      <Backdrop objectId={media.id} />
       <PageHeader
         titleId={headingId}
         level={2}
         artwork={poster}
+        art={gallery ? <Backdrop objectId={media.id} fill /> : undefined}
         title={
           <>
             {media.title} {media.year ? <span className="media-muted">({media.year})</span> : null}

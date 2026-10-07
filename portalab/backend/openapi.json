@@ -31401,7 +31401,7 @@
     },
     "/api/v1/media/{object_id}/journey": {
       "get": {
-        "description": "027: where this title's request stands \u2014 asked, approved, released, searched, downloading,\nimported, available \u2014 with the download managers' and torrent clients' facts.",
+        "description": "027: where this title's request stands \u2014 asked, approved, released, searched, downloading,\nimported, available \u2014 with the download managers' and torrent clients' facts. The indexers' search is\noffered only to members who unlocked it.",
         "operationId": "journey_api_v1_media__object_id__journey_get",
         "parameters": [
           {

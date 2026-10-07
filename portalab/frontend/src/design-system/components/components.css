@@ -153,6 +153,7 @@
 }
 .ds-table-wrap {
   overflow-x: auto;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .ds-list {
   display: flex;

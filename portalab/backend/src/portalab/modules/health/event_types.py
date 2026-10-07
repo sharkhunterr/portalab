@@ -25,6 +25,17 @@ class MaintenancePayload(BaseModel):
     reference_time_zone: str | None = None
 
 
+class OutageLasting(BaseModel):
+    """027: a service still unavailable after a while (5, 10, 15, 30, 60, 120 minutes)."""
+
+    service_id: str
+    service_label: str | None = None  # the service as named in the portal
+    state_seq: int
+    minutes: int
+    failures: int  # failed probes in a row so far
+    since: str
+
+
 class OperationPayload(BaseModel):
     service_id: str
     operation: str
@@ -57,6 +68,20 @@ def register_event_types() -> None:
                 live_permission="services.read",
             )
         )
+    default_event_types.register(
+        EventType(
+            name="service.outage_lasting",
+            owner=OWNER,
+            schema=OutageLasting,
+            open_payload=False,
+            dedup_fields=("service_id", "state_seq", "minutes"),
+            retention_class="technical",
+            visibility_class="restricted",
+            automatable=True,
+            live_permission="services.read",
+            description="A service has been unavailable for a while (minutes, failed probes).",
+        )
+    )
     default_event_types.register(
         EventType(
             name="service.operation_performed",

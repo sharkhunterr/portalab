@@ -29,6 +29,7 @@ DEFAULT_POLICIES: dict[str, dict[str, Any]] = {
 # skipped): where to start and how I progress, today's objectives, the services and their links, what is
 # new in the library and what I was watching, the news and what is coming up
 DEFAULT_STARTER: list[dict[str, Any]] = [
+    {"widget_key": "dashboard.since_last_visit", "w": 12, "h": 3},
     {"widget_key": "dashboard.welcome", "w": 6, "h": 2},
     {"widget_key": "gamification.progress", "w": 3, "h": 2},
     {"widget_key": "gamification.daily_objectives", "w": 3, "h": 2},

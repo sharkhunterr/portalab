@@ -51,6 +51,7 @@ async def test_export_erase_and_events(
     records = await exporter.export(alex)
     # the starter widgets this member can use (027 starter)
     assert {r.data["widget"] for r in records} == {
+        "dashboard.since_last_visit",
         "dashboard.welcome",
         "health.services_summary",
         "health.service_links",

@@ -94,3 +94,23 @@ async def test_capability_read_model(hl: HealthHarness) -> None:
     view = await hl.module.reader.get(service_id)
     assert view is not None and view.state == "operational" and view.availability == 1.0
     assert view.as_of is not None
+
+
+async def test_lasting_outage_is_announced_once_per_milestone(hl: HealthHarness, clock: FixedClock) -> None:
+    """027: a service still unavailable after 5, 10… minutes is announced once per milestone, with the
+    failed probes so far — what « declare an incident after 10 minutes down » automations act on."""
+    service_id = await hl.service("Plex")
+    runner = hl.module.runner
+    await runner.probe(service_id)
+    hl.cn.remote.mode = "error"
+    for _ in range(8):  # one probe a minute: unavailable within three failures, then a few more minutes
+        clock.advance(STEP)
+        await runner.probe(service_id)
+    await hl.module.state.evaluate(service_id)  # a sweep in between changes nothing
+    lasting = await hl.outbox("service.outage_lasting")
+    assert [(e["minutes"], e["service_label"]) for e in lasting] == [(5, "Plex")]
+    clock.advance(timedelta(minutes=6))
+    await runner.probe(service_id)
+    lasting = await hl.outbox("service.outage_lasting")
+    assert [e["minutes"] for e in lasting] == [5, 10]
+    assert lasting[-1]["failures"] == 9 and lasting[-1]["service_id"] == service_id  # probes failed so far

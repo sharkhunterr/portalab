@@ -36,9 +36,12 @@ KINDS = ("movie", "series")
 DRIVEN_LIMIT = 20_000  # « sync now »: titles looked up in one go
 
 
+DATA_VERSION = 2  # 027: 2 = alternative backdrops and posters (the artwork one swipes through)
+
+
 def record_data(record: MetadataRecord) -> dict[str, Any]:
     data = asdict(record)
-    return {k: (list(v) if isinstance(v, tuple) else v) for k, v in data.items()}
+    return {k: (list(v) if isinstance(v, tuple) else v) for k, v in data.items()} | {"_v": DATA_VERSION}
 
 
 class MetadataEnricher:
@@ -77,6 +80,11 @@ class MetadataEnricher:
             if before is not None
             else or_(
                 and_(meta.status == "found", meta.fetched_at < now - REFRESH),
+                # details found before the portal kept more of them are looked up again
+                and_(
+                    meta.status == "found",
+                    func.coalesce(meta.data["_v"].as_integer(), 1) < DATA_VERSION,
+                ),
                 and_(meta.status != "found", meta.attempts < MAX_ATTEMPTS, meta.fetched_at < now - RETRY),
             )
         )

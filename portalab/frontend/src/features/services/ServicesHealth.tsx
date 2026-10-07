@@ -1,13 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { type ReactNode, useId, useState } from "react";
+import { type ReactNode, useId } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
 import { Icon } from "../../design-system/components/Icon";
+import { Dialog } from "../../design-system/components/Overlays";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/FunctionalState";
+import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { DataRegion } from "../../state/regions";
-import { useHasPermission } from "../authz/useMyPermissions";
+import { useIncidents } from "../support/incidents/api";
+import { SeverityBadge } from "../support/incidents/IncidentParts";
+import { useMaintenances } from "../support/incidents/maintenance";
 import "./services.css";
 
 /**
@@ -62,6 +66,7 @@ interface OverviewItem {
   connector: string;
   state: HealthState;
   availability: number | null;
+  link?: string | null;
 }
 
 interface Section {
@@ -225,24 +230,50 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
   );
 }
 
+/** 027: a recognisable icon per kind of service. */
+const CONNECTOR_ICONS: Record<string, string> = {
+  plex: "play",
+  jellyfin: "play",
+  emby: "play",
+  radarr: "film",
+  sonarr: "tv",
+  seerr: "inbox",
+  tautulli: "chart",
+  tmdb: "database",
+  grimmory: "book",
+  romm: "joystick",
+  qbittorrent: "package",
+  deluge: "package",
+};
+
+const RANK: Record<HealthState, number> = {
+  unavailable: 0,
+  degraded: 1,
+  maintenance: 2,
+  unknown: 3,
+  operational: 4,
+};
+
+/**
+ * Services as members see them (027, under Support): how everything goes at a glance, what is wrong now
+ * (incidents) or planned (maintenance), then one card per service — its state, how available it was over
+ * the day, a way to open it when it has a public address, and its details on demand. Nothing to configure
+ * here: services are added and managed in the administration.
+ */
 export function ServicesHealth() {
-  const [selected, setSelected] = useState<OverviewItem | null>(null);
   const t = useT();
-  const manage = useHasPermission("services.manage");
+  const format = useFormat();
+  const incidents = useIncidents("open");
+  const maintenances = useMaintenances();
+  const open = Array.isArray(incidents.data) ? incidents.data : [];
+  const planned = Array.isArray(maintenances.data) ? maintenances.data : [];
   return (
     <div className="account-page services-page">
       <PageHeader
         level={2}
         icon="server"
-        title={servicesHealthStrings.title}
-        primary={
-          manage ? (
-            <Link className="ds-button ds-button--primary" to="/admin/services?add=1">
-              <Icon name="plus" size={18} />
-              {t("admin:services.add")}
-            </Link>
-          ) : undefined
-        }
+        title={t("support:status.title")}
+        context={t("support:status.subtitle")}
       />
       <DataRegion<OverviewItem[]>
         label={servicesHealthStrings.overview}
@@ -251,36 +282,133 @@ export function ServicesHealth() {
           ((await api.GET("/api/v1/services/health")).data as unknown as { items: OverviewItem[] }).items
         }
       >
-        {(items) =>
-          items.length === 0 ? (
-            <p>{servicesHealthStrings.empty}</p>
-          ) : (
-            <ul aria-label={servicesHealthStrings.overview} className="services-page__grid">
-              {items.map((item) => (
-                <li key={item.id} className="ds-card services-page__card" data-state={item.state}>
-                  <span className="services-page__name">
-                    <Icon name="server" size={20} />
-                    <strong>{item.name}</strong>
-                  </span>
-                  <HealthBadge state={item.state} />
-                  <span className="services-page__meta">
-                    {servicesHealthStrings.availability(item.availability)}
-                  </span>
-                  <button
-                    type="button"
-                    className="ds-button ds-button--secondary"
-                    aria-pressed={selected?.id === item.id}
-                    onClick={() => setSelected(item)}
-                  >
-                    {servicesHealthStrings.details(item.name)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )
-        }
+        {(items) => {
+          const troubled = items.filter((i) => i.state === "unavailable" || i.state === "degraded").length;
+          const maintenance = items.filter((i) => i.state === "maintenance").length;
+          const tone = troubled || open.length ? "bad" : maintenance ? "warn" : "ok";
+          const sorted = [...items].sort(
+            (a, b) => (RANK[a.state] ?? 3) - (RANK[b.state] ?? 3) || a.name.localeCompare(b.name),
+          );
+          return (
+            <>
+              <section className="services-status ds-card" data-tone={tone} aria-live="polite">
+                <span className="services-status__icon" aria-hidden="true">
+                  <Icon name={tone === "ok" ? "check" : tone === "warn" ? "wrench" : "alert"} size={28} />
+                </span>
+                <span className="services-status__text">
+                  <strong>
+                    {items.length === 0
+                      ? servicesHealthStrings.empty
+                      : troubled
+                        ? t("support:status.troubled", { count: troubled })
+                        : open.length
+                          ? t("support:status.incidents", { count: open.length })
+                          : maintenance
+                            ? t("support:status.maintenance", { count: maintenance })
+                            : t("support:status.allGood")}
+                  </strong>
+                  <span>{t("support:status.count", { count: items.length })}</span>
+                </span>
+              </section>
+              {open.length ? (
+                <section className="services-block" aria-labelledby="services-incidents">
+                  <h3 id="services-incidents">
+                    <Icon name="alert" size={18} /> {t("support:status.openIncidents")}
+                  </h3>
+                  <ul className="services-incidents">
+                    {open.map((incident) => (
+                      <li key={incident.id} data-severity={incident.severity}>
+                        <Link to={`/incidents/${incident.id}`} className="services-incidents__item">
+                          <SeverityBadge severity={incident.severity} />
+                          <strong>{incident.title}</strong>
+                          <span className="services-page__meta">
+                            {t(`support:state.${incident.state}`)} ·{" "}
+                            {format.relative((Date.parse(incident.created_at) - Date.now()) / 1000)}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+              {planned.length ? (
+                <section className="services-block" aria-labelledby="services-maintenance">
+                  <h3 id="services-maintenance">
+                    <Icon name="wrench" size={18} /> {t("support:status.plannedMaintenance")}
+                  </h3>
+                  <ul className="services-maintenance">
+                    {planned.map((window) => (
+                      <li key={window.id}>
+                        <strong>{window.title}</strong>
+                        <span className="services-page__meta">
+                          {format.dateTime(window.starts_at)} → {format.dateTime(window.ends_at)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+              {items.length ? (
+                <ul aria-label={servicesHealthStrings.overview} className="services-page__grid">
+                  {sorted.map((item) => (
+                    <ServiceCard key={item.id} item={item} />
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          );
+        }}
       </DataRegion>
-      {selected ? <ServiceDetail serviceId={selected.id} name={selected.name} /> : null}
+      <p className="services-page__meta">
+        <Link to="/incidents">{t("support:status.history")}</Link>
+      </p>
     </div>
+  );
+}
+
+function ServiceCard({ item }: { item: OverviewItem }) {
+  const t = useT();
+  const ratio = item.availability;
+  return (
+    <li className="ds-card services-page__card" data-state={item.state}>
+      <span className="services-page__name">
+        <span className="services-page__icon" aria-hidden="true">
+          <Icon name={CONNECTOR_ICONS[item.connector] ?? "server"} size={20} />
+        </span>
+        <strong>{item.name}</strong>
+      </span>
+      <HealthBadge state={item.state} />
+      <span className="services-page__uptime">
+        <span className="services-page__bar" aria-hidden="true">
+          <span style={{ inlineSize: `${Math.round((ratio ?? 0) * 100)}%` }} />
+        </span>
+        <span className="services-page__meta">{servicesHealthStrings.availability(ratio)}</span>
+      </span>
+      <span className="services-page__actions">
+        {item.link ? (
+          <a className="ds-button ds-button--primary" href={item.link} target="_blank" rel="noreferrer">
+            <Icon name="link" size={16} />
+            {t("support:status.open")}
+          </a>
+        ) : null}
+        <Dialog
+          title={item.name}
+          closeLabel={t("support:status.close")}
+          size="lg"
+          trigger={
+            <button
+              type="button"
+              className="ds-button ds-button--secondary"
+              aria-label={servicesHealthStrings.details(item.name)}
+            >
+              <Icon name="info" size={16} />
+              {t("support:status.details")}
+            </button>
+          }
+        >
+          <ServiceDetail serviceId={item.id} name={item.name} />
+        </Dialog>
+      </span>
+    </li>
   );
 }

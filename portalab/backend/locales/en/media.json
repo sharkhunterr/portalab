@@ -235,7 +235,6 @@
   "journey.lastFailure": "Last failure on {date}",
   "journey.nextAiring": "Next episode: {date}",
   "journey.noResults": "No result: nothing is available for download yet.",
-  "journey.openIn": "Open in {manager}",
   "journey.peers": "{seeds} seeds · {peers} peers",
   "journey.physical": "Blu-ray/DVD: {date}",
   "journey.quality": "Quality",

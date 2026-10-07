@@ -193,4 +193,5 @@
 }
 .wiki-content pre {
   overflow-x: auto;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }

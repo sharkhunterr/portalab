@@ -65,6 +65,7 @@
 /* weekday x hour */
 .insights-heatmap {
   overflow-x: auto;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .insights-heatmap table {
   inline-size: 100%;
@@ -155,6 +156,7 @@
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x proximity;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 .insights-poster {
   scroll-snap-align: start;

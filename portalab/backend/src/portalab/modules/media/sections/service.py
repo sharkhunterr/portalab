@@ -181,7 +181,9 @@ class Sections:
                         "sync_failed_at": s.last_sync_attempt_at.isoformat()
                         if s.last_sync_attempt_at
                         else None,
-                        "link": s.item_link or s.link,
+                        # 027: only the title's own page in a library (Plex, Jellyfin, Grimmory…) — never
+                        # a download manager's or a service's home
+                        "link": s.item_link,
                         "item_link": s.item_link,
                     }
                     for s in sources

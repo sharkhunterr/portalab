@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import axe from "axe-core";
 import type { ReactNode } from "react";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
 // 006 T024 — services overview and detail: text-labelled states, independent sections (one unavailable
@@ -25,7 +26,9 @@ function withClient(children: ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return (
     <QueryClientProvider client={client}>
-      <main>{children}</main>
+      <MemoryRouter>
+        <main>{children}</main>
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }
@@ -36,6 +39,8 @@ describe("services health", () => {
   it("shows states with labels and independent detail sections", async () => {
     fake.handler = async (request) => {
       const url = new URL(request.url);
+      if (url.pathname === "/api/v1/incidents") return json(200, []);
+      if (url.pathname === "/api/v1/maintenance") return json(200, { items: [] });
       if (url.pathname === "/api/v1/services/health") {
         return json(200, {
           items: [
@@ -68,6 +73,8 @@ describe("services health", () => {
     };
     const { container } = render(withClient(<ServicesHealth />));
     expect(await screen.findByText("Degraded")).toBeInTheDocument();
+    expect(screen.getByText("1 service is in trouble")).toBeInTheDocument(); // 027: the overall status
+    expect(screen.queryByRole("link", { name: /add/i })).toBeNull(); // members do not add services
     expect(screen.getByText("Under maintenance")).toBeInTheDocument();
     expect(screen.getByText(/99.5% available/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Details of Media" }));

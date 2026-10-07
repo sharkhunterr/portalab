@@ -61,7 +61,7 @@ interface Journey {
   kind: string;
   available: boolean;
   request: { state: string; requested_at: string } | null;
-  manager: { name: string; link: string | null; status: string | null } | null;
+  manager: { name: string; status: string | null } | null;
   steps: Step[];
   can_search: boolean;
   search: { at: string | null; releases: Release[] } | null;
@@ -273,16 +273,6 @@ export function RequestJourney({ objectId }: { objectId: string }) {
         <h3 id={headingId}>
           <Icon name="activity" size={18} /> {t("media:journey.title")}
         </h3>
-        {data.manager?.link ? (
-          <a
-            className="ds-button ds-button--ghost"
-            href={data.manager.link}
-            target="_blank"
-            rel="noopener noreferrer external"
-          >
-            {t("media:journey.openIn", { manager: data.manager.name })} <Icon name="link" size={14} />
-          </a>
-        ) : null}
       </header>
       <ol className="journey-steps">
         {data.steps.map((step) => (

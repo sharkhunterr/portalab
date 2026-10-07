@@ -84,6 +84,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   list-style: none;
+  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
 }
 
 .shop-shelf__list > * {

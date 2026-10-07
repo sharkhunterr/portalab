@@ -381,9 +381,8 @@ class RequestJourney:
             }
             if request is not None
             else None,
-            "manager": {
+            "manager": {  # 027: no link to the download manager — members have no use for it
                 "name": acquisition.service_name,
-                "link": acquisition.link,
                 "monitored": acquisition.monitored,
                 "status": acquisition.status,
                 "added_at": _iso(acquisition.added_at),

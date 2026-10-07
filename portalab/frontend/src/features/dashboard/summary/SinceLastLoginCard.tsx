@@ -1,13 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useId } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
-import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { useSummary } from "../api";
+import { registerWidgetComponent, type WidgetProps } from "../widgets/registry";
 
 // each kind of news keeps its icon and colour (theme tokens)
 const KINDS: Record<string, { icon: string; tone: string }> = {
@@ -21,41 +19,35 @@ const KINDS: Record<string, { icon: string; tone: string }> = {
   services: { icon: "server", tone: "var(--cal-incident)" },
 };
 
+interface SummaryItem {
+  kind: string;
+  occurred_at: string;
+  ref: string;
+  title?: string | null;
+  title_key?: string | null;
+  title_args?: Record<string, unknown>;
+  detail?: string | null;
+}
+
 /**
- * "Since your last visit" (spec 009 T028; 027 redesign): what changed for me — my requests now available,
- * answers on my tickets, new titles, news, my progress, the shop, services in trouble — one line each
- * with its icon and a detail line, most important first; « mark all as seen » moves the boundary.
+ * "Since your last visit" (spec 009 T028; 027: a widget like the others, placed and hidden at will): what
+ * changed for me — my requests now available, answers on my tickets, new titles, news, my progress, the
+ * shop, services in trouble — one line each with its icon and a detail line, most important first;
+ * « mark all as seen » moves the boundary.
  */
-export function SinceLastLoginCard() {
+function SinceLastVisitWidget({ payload }: WidgetProps) {
   const t = useT();
   const format = useFormat();
-  const headingId = useId();
   const client = useQueryClient();
-  const summary = useSummary();
+  const data = (payload.data ?? {}) as { items?: SummaryItem[]; unavailable?: string[] };
+  const items = Array.isArray(data.items) ? data.items : [];
   async function seen() {
     await api.POST("/api/v1/dashboard/since-last-login/seen", { body: {} });
+    await client.invalidateQueries({ queryKey: ["widget", "dashboard.since_last_visit"] });
     await client.invalidateQueries({ queryKey: ["dashboard", "summary"] });
   }
-  const items = summary.data?.items ?? [];
-  if (summary.data && items.length === 0) return null; // nothing new: no card at all
   return (
-    <section aria-labelledby={headingId} className="dashboard-summary ds-panel">
-      <header className="dashboard-summary__head">
-        <h2 id={headingId} className="dashboard-summary__title">
-          <span className="dashboard-summary__icon" aria-hidden="true">
-            <Icon name="sparkles" size={18} />
-          </span>
-          {t("dashboard:summary.title")}
-        </h2>
-        {items.length ? (
-          <Button variant="ghost" onClick={seen}>
-            <Icon name="check" size={16} />
-            {t("dashboard:summary.allSeen")}
-          </Button>
-        ) : null}
-      </header>
-      {summary.isPending ? <FunctionalState state="loading" /> : null}
-      {summary.isError ? <FunctionalState state="error" onRetry={() => summary.refetch()} /> : null}
+    <div className="dashboard-summary">
       {items.length ? (
         <ul className="dashboard-summary__list">
           {items.map((item) => {
@@ -85,10 +77,18 @@ export function SinceLastLoginCard() {
             );
           })}
         </ul>
+      ) : (
+        <p className="widget__meta">{t("dashboard:summary.nothing")}</p>
+      )}
+      {data.unavailable?.length ? <p className="widget__meta">{t("dashboard:summary.unavailable")}</p> : null}
+      {items.length ? (
+        <Button variant="ghost" onClick={seen}>
+          <Icon name="check" size={16} />
+          {t("dashboard:summary.allSeen")}
+        </Button>
       ) : null}
-      {summary.data?.unavailable.length ? (
-        <p className="widget__meta">{t("dashboard:summary.unavailable")}</p>
-      ) : null}
-    </section>
+    </div>
   );
 }
+
+registerWidgetComponent("dashboard.since_last_visit", SinceLastVisitWidget);
