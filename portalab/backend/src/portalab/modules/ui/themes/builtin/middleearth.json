@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "key": "middleearth",
+  "name": "Middle-earth",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f5ecd7",
+    "surfaceRaised": "#fbf5e6",
+    "text": "#2b1d0e",
+    "textMuted": "#5c4630",
+    "border": "#c9b08a",
+    "accent": "#7c5a10",
+    "accentContrast": "#ffffff",
+    "focus": "#14532d",
+    "accentAlt": "#166534",
+    "rarity": {
+      "common": "#5c4630",
+      "rare": "#1d4ed8",
+      "epic": "#7e22ce",
+      "legendary": "#a16207"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#334155",
+      "bg": "#e4e4e2",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#166534",
+      "bg": "#e1e8df",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#92400e",
+      "bg": "#eee4db",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#854d0e",
+      "bg": "#ede5db",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#b91c1c",
+      "bg": "#f2e0dd",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#9f1239",
+      "bg": "#efdfe0",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#5b21b6",
+      "bg": "#e8e1ec",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#9d174d",
+      "bg": "#efe0e2",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#475569",
+      "bg": "#e6e6e4",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#075985",
+      "bg": "#e0e6e7",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"EB Garamond\", serif",
+    "headingFamily": "\"Cinzel Decorative\", \"Cinzel\", serif",
+    "headingCase": "none",
+    "headingEffect": "emboss"
+  },
+  "radii": {
+    "sm": 0.3,
+    "md": 0.5
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "fireworks",
+    "fastMs": 140,
+    "normalMs": 280,
+    "levelUp": "onering"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "launcher",
+      "tablet": "launcher",
+      "phone": "launcher"
+    },
+    "header": "full",
+    "headerPosition": "top",
+    "cards": "ornate",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "compass": "map",
+      "server": "castle",
+      "shop": "store",
+      "trophy": "crown",
+      "lifebuoy": "scroll",
+      "search": "eye",
+      "users": "users"
+    }
+  },
+  "background": {
+    "fallback": "#f5ecd7",
+    "pattern": "parchment",
+    "ambient": "meadow"
+  },
+  "sounds": {
+    "notification": "asset:magic/notification.wav",
+    "alert": "asset:magic/alert.wav",
+    "success": "asset:magic/success.wav",
+    "reward": "asset:magic/reward.wav",
+    "levelUp": "asset:magic/level-up.wav",
+    "ui": "asset:magic/ui.wav"
+  },
+  "notification": {
+    "style": "elven",
+    "animation": "eye"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "La Comté",
+      "nav:nav.section.home": "La Comté",
+      "dashboard:title": "La Comté",
+      "nav:nav.media": "La bibliothèque de Fondcombe",
+      "nav:nav.section.media": "La bibliothèque de Fondcombe",
+      "media:home.title": "La bibliothèque de Fondcombe",
+      "nav:nav.media_requests": "Mes quêtes",
+      "nav:nav.media_insights": "Mes chroniques",
+      "media:insights.title": "Mes chroniques",
+      "nav:nav.section.content": "Le Poney Fringant",
+      "nav:nav.news": "Les nouvelles de la Terre du Milieu",
+      "news:title": "Les nouvelles de la Terre du Milieu",
+      "nav:nav.wiki": "Le Livre Rouge",
+      "wiki:title": "Le Livre Rouge",
+      "nav:nav.search": "Le Palantír",
+      "search:title": "Le Palantír",
+      "nav:nav.calendar": "Le calendrier de la Comté",
+      "calendar:title": "Le calendrier de la Comté",
+      "nav:nav.services": "Les forges",
+      "nav:nav.section.services": "Les forges",
+      "nav:nav.statistics": "Les annales",
+      "statistics:title": "Les annales",
+      "nav:nav.community": "La Communauté",
+      "nav:nav.section.community": "La Communauté",
+      "community:title": "La Communauté",
+      "nav:nav.progression": "Mon voyage",
+      "gamification:progression.title": "Mon voyage",
+      "nav:nav.campaigns": "Les fêtes de la Comté",
+      "campaigns:page.title": "Les fêtes de la Comté",
+      "nav:nav.marketplace": "Le marché de Bree",
+      "nav:nav.section.marketplace": "Le marché de Bree",
+      "marketplace:catalog.title": "Le marché de Bree",
+      "nav:nav.projects": "Les grands ouvrages",
+      "marketplace:projects.title": "Les grands ouvrages",
+      "marketplace:owned.title": "Mon trésor",
+      "nav:nav.support": "Le Conseil d'Elrond",
+      "nav:nav.section.support": "Le Conseil d'Elrond",
+      "nav:nav.incidents": "Les ombres",
+      "support:incident.title": "Les ombres",
+      "nav:nav.feedback": "Les missives",
+      "support:feedback.title": "Les missives",
+      "gamification:value.coins": "Pièces d'or",
+      "gamification:value.xp": "Renommée"
+    },
+    "en": {
+      "nav:nav.home": "The Shire",
+      "nav:nav.section.home": "The Shire",
+      "dashboard:title": "The Shire",
+      "nav:nav.media": "The library of Rivendell",
+      "nav:nav.section.media": "The library of Rivendell",
+      "media:home.title": "The library of Rivendell",
+      "nav:nav.media_requests": "My quests",
+      "nav:nav.media_insights": "My chronicles",
+      "media:insights.title": "My chronicles",
+      "nav:nav.section.content": "The Prancing Pony",
+      "nav:nav.news": "News of Middle-earth",
+      "news:title": "News of Middle-earth",
+      "nav:nav.wiki": "The Red Book",
+      "wiki:title": "The Red Book",
+      "nav:nav.search": "The Palantír",
+      "search:title": "The Palantír",
+      "nav:nav.calendar": "The Shire calendar",
+      "calendar:title": "The Shire calendar",
+      "nav:nav.services": "The forges",
+      "nav:nav.section.services": "The forges",
+      "nav:nav.statistics": "The annals",
+      "statistics:title": "The annals",
+      "nav:nav.community": "The Fellowship",
+      "nav:nav.section.community": "The Fellowship",
+      "community:title": "The Fellowship",
+      "nav:nav.progression": "My journey",
+      "gamification:progression.title": "My journey",
+      "nav:nav.campaigns": "Shire feasts",
+      "campaigns:page.title": "Shire feasts",
+      "nav:nav.marketplace": "Bree market",
+      "nav:nav.section.marketplace": "Bree market",
+      "marketplace:catalog.title": "Bree market",
+      "nav:nav.projects": "Great works",
+      "marketplace:projects.title": "Great works",
+      "marketplace:owned.title": "My treasure",
+      "nav:nav.support": "The Council of Elrond",
+      "nav:nav.section.support": "The Council of Elrond",
+      "nav:nav.incidents": "The shadows",
+      "support:incident.title": "The shadows",
+      "nav:nav.feedback": "Missives",
+      "support:feedback.title": "Missives",
+      "gamification:value.coins": "Gold pieces",
+      "gamification:value.xp": "Renown"
+    }
+  }
+}

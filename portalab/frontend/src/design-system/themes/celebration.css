@@ -730,3 +730,56 @@
 .ds-celebration[data-contained] .celebration-flash {
   position: absolute;
 }
+
+/* 027 flicker: a string of Christmas lights round the bubble, blinking out of step; the bubble flickers */
+[data-effect="flicker"] .celebration-fx {
+  inline-size: 0.7rem;
+  block-size: 0.9rem;
+  border-radius: 50% 50% 45% 45%;
+  background: hsl(calc(var(--i) * 90deg) 95% 58%);
+  box-shadow: 0 0 12px hsl(calc(var(--i) * 90deg) 95% 58%);
+  --angle: calc(360deg / var(--n) * var(--i));
+  transform: rotate(var(--angle)) translateY(-5rem) rotate(calc(-1 * var(--angle)));
+  animation: fx-bulb calc(0.3s + var(--s) * 0.4s) steps(2, jump-none) infinite;
+}
+@keyframes fx-bulb {
+  50% {
+    opacity: 0.2;
+    box-shadow: none;
+  }
+}
+[data-effect="flicker"] .ds-celebration__badge {
+  background: #12151f;
+  color: #ff3b4f;
+  box-shadow:
+    0 0 0 2px #ff3b4f,
+    0 0 26px #dc2626;
+  animation:
+    ds-pop var(--motion-duration-slow) var(--motion-easing-spring) both,
+    name-flicker 1.6s steps(1, end) 2;
+}
+/* 027 fireworks: rockets bursting into coloured stars over the page */
+[data-effect="fireworks"] .celebration-fx {
+  left: calc(20% + mod(var(--i), 3) * 30%);
+  top: calc(20% + mod(var(--i), 2) * 15%);
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  border-radius: 50%;
+  background: hsl(calc(mod(var(--i), 3) * 120deg + 40deg) 100% 65%);
+  box-shadow: 0 0 10px hsl(calc(mod(var(--i), 3) * 120deg + 40deg) 100% 65%);
+  --angle: calc(360deg / 12 * var(--i));
+  animation-name: fx-firework;
+  animation-duration: 1.4s;
+  animation-delay: calc(mod(var(--i), 3) * 0.35s);
+  animation-timing-function: cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+@keyframes fx-firework {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-9rem) scale(0.4);
+  }
+}

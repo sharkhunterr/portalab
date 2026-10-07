@@ -80,6 +80,10 @@ const BADGE_STYLES = [
   "water",
   "wind",
   "saber",
+  "veins",
+  "mirror",
+  "ring",
+  "elven",
 ];
 const ICON_NAMES = Object.keys(ICONS).sort();
 

@@ -17,6 +17,7 @@ import horror from "./horror.json";
 import light from "./light.json";
 import manga from "./manga.json";
 import matrix from "./matrix.json";
+import middleearth from "./middleearth.json";
 import minimal from "./minimal.json";
 import neowave from "./neowave.json";
 import orbit from "./orbit.json";
@@ -25,6 +26,7 @@ import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
 import sincity from "./sincity.json";
 import studio from "./studio.json";
+import upsidedown from "./upsidedown.json";
 import wizard from "./wizard.json";
 
 /** Built-in themes (also seeded by the backend ``ui`` migrations; a test keeps both copies identical). */
@@ -57,6 +59,8 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   cyberpunk,
   sincity,
   plex,
+  upsidedown,
+  middleearth,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

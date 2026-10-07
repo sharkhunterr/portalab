@@ -121,6 +121,26 @@ for key, label, fr, icon, style, rarity, price, level, en_about, fr_about, suppl
      "Light as the wind, never in a hurry.", "Léger comme le vent, jamais pressé.", None),
     ("badge_jedi", "Light blade master", "Badge Maître de la lame de lumière", "sword", "saber", "legendary", 1500,
      14, "The force is strong with this one.", "La force est puissante chez celui-ci.", None),
+    # 027: the Upside Down
+    ("badge_demohunter", "Demogorgon hunter", "Badge Chasseur de Démogorgon", "skull", "veins", "epic", 700, 6,
+     "Rolled a natural twenty when it mattered.", "A fait un vingt naturel au bon moment.", None),
+    ("badge_upside_survivor", "Upside Down survivor", "Badge Survivant de l'envers", "flashlight", "mirror", "epic",
+     650, 5, "Came back from the other side.", "Revenu de l'autre côté.", None),
+    ("badge_party", "Party member", "Badge Membre de la bande", "dices", "pulse", "rare", 300, None,
+     "Never splits the party.", "Ne sépare jamais la bande.", None),
+    ("badge_walkie", "Over and out", "Badge Terminé", "radio", "vhs", "rare", 300, None,
+     "Walkie-talkie always on channel six.", "Talkie-walkie toujours sur le canal six.", None),
+    # 027: Middle-earth
+    ("badge_ringbearer", "Ringbearer", "Badge Porteur de l'Anneau", "gem", "ring", "legendary", 1500, 15,
+     "Carried it all the way — a single copy.", "L'a porté jusqu'au bout — exemplaire unique.", 1),
+    ("badge_grey_wizard", "Grey wizard", "Badge Magicien gris", "wand", "elven", "epic", 700, 6,
+     "Never late, nor early.", "Jamais en retard, ni en avance.", None),
+    ("badge_balrog_slayer", "Balrog slayer", "Badge Tueur de Balrog", "flame", "flame", "legendary", 1400, 14,
+     "Stood on the bridge and held.", "A tenu sur le pont.", None),
+    ("badge_hobbit", "Hobbit of the Shire", "Badge Hobbit de la Comté", "sprout", "float", "common", 150, None,
+     "Fond of good food and quiet.", "Amateur de bonne chère et de calme.", None),
+    ("badge_pixel_quest", "Pixel quest", "Badge Quête pixel", "sword", "pixel", "rare", 300, None,
+     "The fellowship in 8-bit.", "La communauté en 8 bits.", None),
 ):  # fmt: skip
     _p(key, "badge", price, rarity, f"{label} badge", fr, en_about, fr_about,
        {"label": label, "icon": icon, **({"style": style} if style != "none" else {})},
@@ -157,6 +177,18 @@ for key, label, fr, style, rarity, price, level, en_about, fr_about in (
      None, "Always there when it matters.", "Toujours là quand il le faut."),
     ("title_less_is_more", "Less is more", "Titre : Moins, c'est mieux", "none", "common", 120, None,
      "Simplicity as a way of life.", "La simplicité comme art de vivre."),
+    ("title_mouth_breather", "Mouth breather", "Titre : Respire-par-la-bouche", "mirror", "common", 150, None,
+     "Said with affection. Mostly.", "Dit avec affection. En général."),
+    ("title_friends_dont_lie", "Friends don't lie", "Titre : Les amis ne mentent pas", "veins", "rare", 350, None,
+     "A promise kept.", "Une promesse tenue."),
+    ("title_hawkins_hero", "Hero of Hawkins", "Titre : Héros de Hawkins", "neon", "epic", 650, 6,
+     "Closed the gate.", "A refermé le portail."),
+    ("title_ringbearer", "Ringbearer", "Titre : Porteur de l'Anneau", "ring", "legendary", 1400, 14,
+     "One title to rule them all.", "Un titre pour les gouverner tous."),
+    ("title_shall_not_pass", "You shall not pass", "Titre : Vous ne passerez pas", "elven", "epic", 700, 6,
+     "The bridge holds.", "Le pont tient."),
+    ("title_second_breakfast", "Second breakfast champion", "Titre : Champion du second petit-déjeuner", "none",
+     "common", 150, None, "What about elevenses?", "Et l'en-cas de onze heures ?"),
 ):  # fmt: skip
     _p(key, "title", price, rarity, label if key == "title_cinephile" else f"Title: {label}", fr, en_about,
        fr_about, {"label": label, **({"style": style} if style != "none" else {})}, collection="titles",
@@ -263,6 +295,20 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
     ("notif_portal", "notification_animation", "animation", "portal", "Portal notifications", "Notifications portail",
      "legendary", 1000, "They step out of a swirling dimensional portal — and back into it.",
      "Elles sortent d'un portail dimensionnel tourbillonnant — et y retournent."),
+    ("notif_upsidedown", "notification_style", "style", "upsidedown", "Upside Down notifications",
+     "Notifications monde à l'envers", "epic", 700, "Cracked with red veins, their faint mirror image fading below.",
+     "Craquelées de veines rouges, leur reflet pâle s'effaçant en dessous."),
+    ("notif_flipup", "notification_animation", "animation", "flipup", "Flip-up notifications",
+     "Notifications retournées", "epic", 600, "They rise from below and flip up, as if turned over from the other side.",
+     "Elles montent d'en bas et se retournent, comme venues de l'autre côté."),
+    ("notif_elven", "notification_style", "style", "elven", "Elven notifications", "Notifications elfiques",
+     "rare", 400, "A silver-green leaf written in fine capitals.", "Une feuille vert argent écrite en fines capitales."),
+    ("notif_onering", "notification_style", "style", "onering", "One Ring notifications",
+     "Notifications de l'Anneau", "legendary", 1000, "Black, inside a turning golden ring.", "Noires, dans un anneau d'or qui tourne."),
+    ("notif_balrog", "notification_animation", "animation", "balrog", "Balrog notifications", "Notifications Balrog",
+     "epic", 650, "They rise from fire, wings of shadow opening.", "Elles surgissent du feu, des ailes d'ombre s'ouvrant."),
+    ("notif_eye", "notification_animation", "animation", "eye", "Eye notifications", "Notifications de l'Œil",
+     "epic", 600, "They open like a fiery slit eye.", "Elles s'ouvrent comme un œil de feu."),
 ):  # fmt: skip
     _p(key, kind, price, rarity, en, fr, en_about, fr_about, {field: value}, collection="looks",
        icon="bell" if kind == "notification_style" else "sparkles")  # fmt: skip
@@ -285,6 +331,8 @@ for key, value, en, fr, rarity, price, level in (
     ("effect_freeze", "freeze", "Freeze", "Gel", "rare", 400, None),
     ("effect_glitch", "glitch", "Glitch", "Glitch", "rare", 450, None),
     ("effect_portal", "portal", "Portal", "Portail", "legendary", 1200, 12),
+    ("effect_flicker", "flicker", "Christmas lights", "Guirlande", "rare", 400, None),
+    ("effect_fireworks", "fireworks", "Wizard's fireworks", "Feux d'artifice du magicien", "epic", 700, 6),
 ):  # fmt: skip
     _p(key, "effect", price, rarity, f"{en} celebration", f"Célébration {fr.lower()}",
        f"{en} burst out when you earn a reward or level up.",
@@ -318,6 +366,10 @@ AMBIENT_NAMES = {
     "tide": ("Tide", "Marée", "epic", 650),
     "lanterns": ("Sky lanterns", "Lanternes célestes", "epic", 700),
     "pixelsky": ("8-bit sky", "Ciel 8 bits", "rare", 450),
+    "upsidedown": ("Upside Down spores", "Spores du monde à l'envers", "epic", 750),
+    "veins": ("Red veins", "Veines rouges", "epic", 650),
+    "meadow": ("Shire meadow", "Prairie de la Comté", "rare", 400),
+    "ash": ("Ash of Mordor", "Cendres du Mordor", "rare", 450),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -328,7 +380,7 @@ for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
 
 # --------------------------------------------------------------------------------- animated profile backgrounds
 for value in ("starfield", "code-rain", "snow", "embers", "petals", "aurora", "disco", "bats", "fireflies",
-              "rain", "spores", "hearts"):  # fmt: skip
+              "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash"):  # fmt: skip
     en, fr, rarity, price = AMBIENT_NAMES[value]
     rarity = "legendary" if value == "aurora" else "epic" if rarity in ("epic", "legendary") else "rare"
     _p(f"bg_{value.replace('-', '_')}", "profile_background", {"rare": 450, "epic": 800, "legendary": 1300}[rarity],
@@ -379,6 +431,16 @@ for key, value, en, fr, rarity, price, level, en_about, fr_about in (
      "Spinning disco lights.", "Des lumières disco qui tournent."),
     ("banner_night_city", "night-city", "Night city banner", "Bannière Night City", "epic", 650, 6,
      "Neon towers in the rain.", "Des tours de néon sous la pluie."),
+    ("banner_upsidedown", "upsidedown", "Upside Down banner", "Bannière Monde à l'envers", "epic", 700, 6,
+     "A red sky, floating spores and lightning over the other side.", "Un ciel rouge, des spores et des éclairs sur l'autre côté."),
+    ("banner_hawkins", "hawkins", "Hawkins lights banner", "Bannière guirlande de Hawkins", "rare", 400, None,
+     "A string of Christmas lights blinking on a wallpapered wall.", "Une guirlande qui clignote sur un mur tapissé."),
+    ("banner_shire", "shire", "Shire banner", "Bannière de la Comté", "rare", 400, None,
+     "Green hills under a gentle sun.", "Des collines vertes sous un doux soleil."),
+    ("banner_mordor", "mordor", "Mordor banner", "Bannière du Mordor", "epic", 750, 7,
+     "A dark land, a burning eye on its tower.", "Une terre sombre, un œil de feu sur sa tour."),
+    ("banner_pixelshire", "pixelshire", "Pixel Shire banner", "Bannière Comté pixel", "rare", 350, None,
+     "The Shire in pixel art: hills, a round door, clouds.", "La Comté en pixel art : collines, porte ronde, nuages."),
 ):  # fmt: skip
     _p(key, "profile_banner", price, rarity, en, fr, en_about, fr_about, {"banner": value},
        collection="profile", icon="image", level=level)  # fmt: skip
@@ -422,6 +484,14 @@ for key, value, en, fr, rarity, price, level, en_about, fr_about in (
      "Pulsing acid glow.", "Une lueur acide qui pulse."),
     ("frame_sakura", "sakura", "Sakura frame", "Cadre sakura", "rare", 350, None,
      "Cherry blossoms around you.", "Des fleurs de cerisier autour de vous."),
+    ("frame_veins", "veins", "Red veins frame", "Cadre veines rouges", "epic", 650, 6,
+     "Red veins pulsing around your face.", "Des veines rouges qui pulsent autour de vous."),
+    ("frame_lights", "lights", "Christmas lights frame", "Cadre guirlande", "rare", 350, None,
+     "A ring of blinking bulbs.", "Un cercle d'ampoules qui clignotent."),
+    ("frame_onering", "onering", "One Ring frame", "Cadre de l'Anneau unique", "epic", 800, 8,
+     "A golden ring turning around you.", "Un anneau d'or qui tourne autour de vous."),
+    ("frame_elven", "elven", "Elven frame", "Cadre elfique", "rare", 400, None,
+     "Silver and green, like Lothlórien.", "Argent et vert, comme la Lothlórien."),
 ):  # fmt: skip
     _p(key, "avatar_frame", price, rarity, en, fr, en_about, fr_about, {"frame": value},
        collection="profile", icon="user", level=level)  # fmt: skip
@@ -439,6 +509,9 @@ _p("release_search", "access", 5000, "legendary", "Release hunter", "Chasseur de
 # --------------------------------------------------------------------------------- name styles
 for value, en, fr, rarity, price, level in (
     ("wizard", "Golden spellbook", "Grimoire doré", "epic", 750, 6),
+    ("upsidedown", "Upside Down", "Monde à l'envers", "epic", 700, 6),
+    ("elvish", "Elvish gold", "Or elfique", "epic", 700, 6),
+    ("mordor", "Fires of Mordor", "Feux du Mordor", "rare", 450, None),
     ("galaxy", "Galactic", "Galactique", "rare", 400, None),
     ("matrix", "Simulation", "Simulation", "epic", 700, 5),
     ("desert", "Dune sand", "Sable des dunes", "rare", 400, None),
@@ -493,6 +566,8 @@ for value, en, fr, rarity, price, level in (
     ("slate", "Slate", "Ardoise", "common", 150, None),
     ("peach", "Peach", "Pêche", "common", 150, None),
     ("crimson", "Crimson", "Carmin", "epic", 550, 4),
+    ("hawkins", "Hawkins", "Hawkins", "rare", 300, None),
+    ("gondor", "Gondor", "Gondor", "epic", 550, 4),
 ):  # fmt: skip
     _p(f"palette_{value}", "palette", price, rarity, f"{en} palette", f"Palette {fr.lower()}",
        "Accent colours laid over any theme — try it before buying.",
@@ -523,6 +598,17 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
     ("portal", "Dimensional portal", "Portail dimensionnel", "legendary", 1300, 14, "A swirling portal opens behind your level.",
      "Un portail tourbillonnant s'ouvre derrière votre niveau."),
     ("inferno", "Inferno", "Brasier", "epic", 700, 6, "Your level burns with living flames.", "Votre niveau brûle de flammes vives."),
+    ("upsidedown", "Upside Down", "Monde à l'envers", "epic", 750, 6, "Red neon, a faint mirror, and now and then it turns over.",
+     "Néon rouge, un reflet pâle, et de temps en temps il se retourne."),
+    ("veins", "Red veins", "Veines rouges", "epic", 650, 6, "Red veins pulsing across your level.", "Des veines rouges qui pulsent sur votre niveau."),
+    ("lights", "Christmas lights", "Guirlande", "rare", 400, None, "A string of bulbs blinking over your level.", "Une guirlande qui clignote au-dessus de votre niveau."),
+    ("onering", "One Ring", "Anneau unique", "legendary", 1500, 15, "A golden ring turning around your level.", "Un anneau d'or qui tourne autour de votre niveau."),
+    ("eye", "The Eye", "L'Œil", "legendary", 1400, 14, "A fiery slit eye that blinks now and then.", "Un œil de feu qui cligne de temps en temps."),
+    ("mithril", "Mithril", "Mithril", "epic", 700, 6, "Light chainmail with a silver gleam.", "Une fine cotte de mailles à l'éclat d'argent."),
+    ("balrog", "Balrog", "Balrog", "legendary", 1300, 13, "Shadow and flame rising behind your level.", "Ombre et flamme derrière votre niveau."),
+    ("frost", "Frost", "Givre", "rare", 400, None, "Cold blue ice.", "Une glace d'un bleu froid."),
+    ("nebula", "Nebula", "Nébuleuse", "epic", 650, 5, "A drifting nebula with a few stars.", "Une nébuleuse qui dérive, quelques étoiles."),
+    ("circuit", "Circuit", "Circuit", "rare", 400, None, "Green traces on a circuit board.", "Des pistes vertes sur un circuit imprimé."),
 ):  # fmt: skip
     _p(f"level_{value}", "level_badge", price, rarity, f"{en} level badge", f"Badge de niveau {fr.lower()}",
        about_en, about_fr, {"style": value}, collection="levels", icon="star", level=level)  # fmt: skip
@@ -565,6 +651,10 @@ for value, en, fr, about_en, about_fr in (
     ('glitch', 'Glitch', 'Glitch', 'The screen tears and the title glitches.', "L'écran se déchire et le titre bugue."),
     ('noir', 'Film noir', 'Film noir', 'Rain in black and white, your number in red.', 'La pluie en noir et blanc, votre niveau en rouge.'),
     ('spotlight', 'Spotlight', 'Projecteur', 'An amber spotlight finds you.', 'Un projecteur ambré vous trouve.'),
+    ("upsidedown", "Upside Down", "Monde à l'envers", "The world turns over, spores drift up, red lightning flashes.",
+     "Le monde se retourne, les spores remontent, des éclairs rouges."),
+    ("onering", "The One Ring", "L'Anneau unique", "A golden ring turns in the dark; the scroll of your journey unrolls.",
+     "Un anneau d'or tourne dans l'ombre ; le parchemin de votre voyage se déroule."),
 ):  # fmt: skip
     _p(f"levelup_{value}", "level_up", 450, "rare", f"{en} level-up", f"Passage de niveau {fr.lower()}",
        about_en, about_fr, {"animation": value}, collection="levels", icon="trophy")  # fmt: skip
@@ -742,6 +832,20 @@ THEME_TEXT = {
         "Le style du serveur multimédia : anthracite et ambre, barre latérale sur écran et barre du bas sur mobile, ses mots pour vos bibliothèques.",
     ),
 }
+THEME_TEXT |= {
+    "upsidedown": (
+        "Upside Down",
+        "Monde à l'envers",
+        "The other side: red veins, spores drifting up, a string of lights to find your way and notifications that flip up from below.",
+        "L'autre côté : veines rouges, spores qui remontent, une guirlande pour s'orienter et des notifications qui se retournent depuis le bas.",
+    ),
+    "middleearth": (
+        "Middle-earth",
+        "Terre du Milieu",
+        "From the Shire to Mordor: parchment, a map screen to travel, elven notifications, the One Ring and fireworks.",
+        "De la Comté au Mordor : parchemin, un écran de carte pour voyager, notifications elfiques, l'Anneau unique et des feux d'artifice.",
+    ),
+}
 THEME_RARITY = {
     "orbit": ("epic", 900, 6), "studio": ("rare", 600, None), "wizard": ("legendary", 1500, 12),
     "galaxy": ("legendary", 1500, 12), "matrix": ("legendary", 1500, 12), "desert": ("epic", 900, 6),
@@ -750,6 +854,7 @@ THEME_RARITY = {
     "futuristic": ("epic", 900, 6), "minimal": ("common", 300, None), "alien": ("epic", 900, 6),
     "heroes": ("legendary", 1500, 12), "neowave": ("epic", 900, 6), "disco": ("epic", 900, 5),
     "cyberpunk": ("legendary", 1500, 14), "sincity": ("legendary", 1500, 12), "plex": ("epic", 900, 4),
+    "upsidedown": ("legendary", 1500, 12), "middleearth": ("legendary", 1500, 12),
 }  # fmt: skip
 for theme, (en, fr, about_en, about_fr) in THEME_TEXT.items():
     rarity, price, level = THEME_RARITY[theme]
@@ -1026,6 +1131,12 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "title_night_city",
     ),
 }
+UNIVERSES |= {  # 027: the Upside Down and Middle-earth
+    "upsidedown": ("banner_upsidedown", "frame_veins", "name_upsidedown", "notif_upsidedown", "effect_flicker",
+                   "ambient_upsidedown", "badge_demohunter", "title_friends_dont_lie"),
+    "middleearth": ("banner_shire", "frame_onering", "name_elvish", "notif_elven", "effect_fireworks",
+                    "ambient_meadow", "badge_grey_wizard", "title_shall_not_pass"),
+}  # fmt: skip
 UNIVERSES |= {  # 027: the two new universes
     "sincity": ("banner_mono", "frame_blood", "name_minimal", "notif_noir", "effect_shatter", "ambient_fog",
                 "badge_vigilante", "title_night_city"),
@@ -1044,6 +1155,13 @@ UNIVERSE_EXTRAS = {
     "heroes": ("level_kapow", "notif_kapow", "levelup_comic", "levelup_hero"), "neowave": ("level_vhs", "ambient_vhs", "levelup_synthwave"),
     "disco": ("level_hologram", "notif_jelly", "levelup_disco"), "cyberpunk": ("level_neon", "notif_vhs", "levelup_arcade", "levelup_glitch"),
     "sincity": ("level_melt", "notif_filmwipe", "notif_noir", "levelup_noir"), "plex": ("level_neon", "notif_iris", "levelup_spotlight"),
+    "upsidedown": ("level_upsidedown", "level_veins", "level_lights", "notif_flipup", "levelup_upsidedown",
+                   "banner_hawkins", "frame_lights", "bg_upsidedown", "ambient_veins", "palette_hawkins",
+                   "badge_upside_survivor", "badge_party", "badge_walkie", "title_mouth_breather", "title_hawkins_hero"),
+    "middleearth": ("level_onering", "level_eye", "level_mithril", "notif_onering", "notif_balrog", "notif_eye",
+                    "levelup_onering", "banner_mordor", "banner_pixelshire", "frame_elven", "name_mordor", "bg_meadow",
+                    "bg_ash", "ambient_ash", "palette_gondor", "badge_hobbit", "badge_pixel_quest",
+                    "title_second_breakfast"),
 }  # fmt: skip
 for theme, items in UNIVERSES.items():
     en, fr, _, _ = THEME_TEXT[theme]

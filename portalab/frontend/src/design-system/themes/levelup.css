@@ -1537,3 +1537,117 @@
     opacity: 0.3;
   }
 }
+
+/* upsidedown — the world turns over, spores drift up, red lightning; the card has its mirror */
+.levelup[data-look="upsidedown"] {
+  --glow: #ff3b4f;
+}
+.levelup[data-look="upsidedown"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 0%, #dc262655, transparent 55%),
+    linear-gradient(180deg, #2a0a10, #12151f 60%, #050608);
+  animation: levelup-upside 1.6s cubic-bezier(0.6, 0, 0.3, 1) both;
+}
+.levelup[data-look="upsidedown"] .levelup__scene {
+  display: block;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 47%, #fecaca 48%, transparent 49.5%) no-repeat;
+  opacity: 0;
+  animation: banner-lightning 3s steps(1, end) 0.8s infinite;
+}
+.levelup[data-look="upsidedown"] .levelup__fx {
+  display: block;
+  inset-block-end: -2vh;
+  inset-inline-start: var(--x);
+  inline-size: calc(0.2rem + var(--r) * 0.3rem);
+  block-size: calc(0.2rem + var(--r) * 0.3rem);
+  border-radius: 40%;
+  background: #e2e8f0;
+  opacity: 0.6;
+  animation: levelup-rise calc(5s + var(--r) * 5s) linear calc(var(--r) * -5s) infinite;
+}
+.levelup[data-look="upsidedown"] .levelup__card {
+  --color-text: #e5e7eb;
+  --color-text-muted: #9ca3af;
+  border-color: #dc262688;
+  background:
+    linear-gradient(118deg, transparent 18%, #dc262644 18.5%, transparent 19.5%),
+    linear-gradient(62deg, transparent 70%, #b91c1c55 70.5%, transparent 71.5%), #0b0d12f2;
+  -webkit-box-reflect: below 8px linear-gradient(transparent 70%, #ffffff1f);
+  transform-origin: 50% 100%;
+  animation: levelup-flipup 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both;
+}
+.levelup[data-look="upsidedown"] .levelup__title {
+  color: #ff3b4f;
+  font-family: "EB Garamond", serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px #dc2626;
+}
+@keyframes levelup-upside {
+  0% {
+    transform: rotate(180deg);
+    filter: brightness(0.4);
+  }
+  60% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes levelup-flipup {
+  from {
+    opacity: 0;
+    transform: translateY(20vh) perspective(50rem) rotateX(-180deg);
+  }
+  70% {
+    opacity: 1;
+    transform: perspective(50rem) rotateX(10deg);
+  }
+}
+
+/* onering — a golden ring turning in the dark, embers rising, the scroll of Middle-earth */
+.levelup[data-look="onering"] {
+  --glow: #f59e0b;
+}
+.levelup[data-look="onering"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle at 50% 55%, #451a0355, #000 70%);
+}
+.levelup[data-look="onering"] .levelup__scene {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 70vmin;
+  block-size: 70vmin;
+  border-radius: 50%;
+  background: conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3.2vmin), #000 calc(100% - 3vmin));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.2vmin), #000 calc(100% - 3vmin));
+  filter: drop-shadow(0 0 2vmin #f97316);
+  transform: translate(-50%, -50%) perspective(60rem) rotateX(65deg);
+  animation:
+    level-elements 3s linear infinite,
+    levelup-ring-drop 1.4s cubic-bezier(0.3, 0.8, 0.3, 1) both;
+}
+.levelup[data-look="onering"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: var(--x);
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: #fb923c;
+  box-shadow: 0 0 8px #ea580c;
+  animation: levelup-rise calc(3s + var(--r) * 3s) ease-out calc(var(--r) * -3s) infinite;
+}
+@keyframes levelup-ring-drop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -120%) perspective(60rem) rotateX(0deg) scale(0.3);
+  }
+}

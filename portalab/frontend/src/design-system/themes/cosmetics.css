@@ -1505,3 +1505,408 @@
 :root[data-motion="none"] .cosmetic-badge .ds-icon {
   animation: none;
 }
+
+/* ================================================================ 027: the Upside Down and Middle-earth */
+/* banners */
+.profile-banner[data-banner="upsidedown"] {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 30%, #f8fafcaa 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 35% 60%, #f8fafc88 50%, transparent 51%),
+    radial-gradient(2px 2px at 62% 25%, #f8fafcaa 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 52%, #f8fafc77 50%, transparent 51%),
+    linear-gradient(to top, #050608 0 12%, transparent 12%),
+    radial-gradient(60% 90% at 70% 0%, #dc262688, transparent 70%),
+    linear-gradient(180deg, #2a0a10, #12151f 60%, #050608);
+  animation: banner-upside 7s ease-in-out infinite;
+}
+.profile-banner[data-banner="upsidedown"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 45%, #fecaca 46%, transparent 47.5%) no-repeat;
+  opacity: 0;
+  animation: banner-lightning 5s steps(1, end) infinite;
+}
+.profile-banner[data-banner="hawkins"] {
+  background:
+    radial-gradient(circle at 8% 12%, #ef4444 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 20% 15%, #22c55e 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 32% 12%, #facc15 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 44% 15%, #3b82f6 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 56% 12%, #ef4444 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 68% 15%, #f97316 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 80% 12%, #22c55e 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 92% 15%, #facc15 0.25rem, transparent 0.3rem),
+    repeating-linear-gradient(90deg, #3a2a1f 0 3.5rem, #2d1f16 3.5rem 7rem);
+  animation: banner-bulbs 1.6s steps(2, jump-none) infinite;
+}
+.profile-banner[data-banner="shire"] {
+  background:
+    radial-gradient(120% 60% at 25% 100%, #4d7c0f 0 50%, transparent 51%),
+    radial-gradient(110% 55% at 80% 100%, #65a30d 0 48%, transparent 49%),
+    radial-gradient(140% 70% at 50% 110%, #3f6212 0 52%, transparent 53%),
+    radial-gradient(circle at 80% 22%, #fef3c7 0 2.2rem, #fde68a55 2.3rem, transparent 5rem),
+    linear-gradient(180deg, #7dd3fc, #e0f2fe 70%);
+}
+.profile-banner[data-banner="mordor"] {
+  background:
+    radial-gradient(ellipse 0.7rem 1.6rem at 72% 26%, #000 0 30%, #fde047 40%, #f97316 60%, transparent 70%),
+    linear-gradient(to top, #0b0605 0 18%, transparent 18%),
+    conic-gradient(from 160deg at 50% 100%, transparent 0 15deg, #1c0f0b 15deg 40deg, transparent 40deg) 0 0 /
+    100% 100%,
+    radial-gradient(60% 80% at 72% 30%, #f9731666, transparent 70%),
+    linear-gradient(180deg, #450a0a, #1c0f0b 70%);
+  animation: banner-mordor 3s ease-in-out infinite;
+}
+.profile-banner[data-banner="pixelshire"] {
+  background:
+    linear-gradient(#3f6212 0 0) 0 100% / 100% 22% no-repeat,
+    repeating-linear-gradient(90deg, #4d7c0f 0 16px, #65a30d 16px 32px) 0 78% / 100% 16px no-repeat,
+    linear-gradient(#78350f 0 0) 70% 70% / 28px 36px no-repeat,
+    linear-gradient(#a3e635 0 0) 18% 62% / 64px 32px no-repeat,
+    linear-gradient(#fef08a 0 0) 85% 18% / 32px 32px no-repeat,
+    linear-gradient(#ffffff 0 0) 30% 20% / 64px 16px no-repeat,
+    linear-gradient(#ffffff 0 0) 33% 14% / 32px 16px no-repeat,
+    #7dd3fc;
+  image-rendering: pixelated;
+}
+@keyframes banner-upside {
+  50% {
+    background-position:
+      0 -6px,
+      0 -10px,
+      0 -4px,
+      0 -8px,
+      0 0,
+      0 0,
+      0 0;
+  }
+}
+@keyframes banner-lightning {
+  0%,
+  88%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  89%,
+  91% {
+    opacity: 0.9;
+  }
+}
+@keyframes banner-bulbs {
+  50% {
+    filter: brightness(1.35) saturate(1.3);
+  }
+}
+@keyframes banner-mordor {
+  50% {
+    filter: brightness(1.15);
+  }
+}
+/* avatar frames */
+.avatar-frame[data-frame="veins"] {
+  background: repeating-conic-gradient(
+    from 10deg,
+    #7f1d1d 0 8deg,
+    #dc2626 8deg 11deg,
+    #450a0a 11deg 25deg,
+    #b91c1c 25deg 28deg
+  );
+  box-shadow: 0 0 0.9rem #dc2626aa;
+  animation: frame-veins 2.2s ease-in-out infinite;
+}
+.avatar-frame[data-frame="lights"] {
+  background:
+    radial-gradient(circle at 50% 0, #ef4444 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 100% 50%, #22c55e 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 50% 100%, #facc15 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 0 50%, #3b82f6 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 15% 15%, #f97316 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 85% 15%, #ef4444 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 85% 85%, #22c55e 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 15% 85%, #facc15 0.28rem, transparent 0.32rem), #1f2937;
+  animation: banner-bulbs 1.2s steps(2, jump-none) infinite;
+}
+.avatar-frame[data-frame="onering"] {
+  background: conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  box-shadow:
+    0 0 0.6rem #f59e0b,
+    0 0 1.6rem #f9731655;
+  animation: level-elements 6s linear infinite;
+}
+.avatar-frame[data-frame="elven"] {
+  background: conic-gradient(#e2e8f0, #86efac, #f8fafc, #4ade80, #e2e8f0);
+  box-shadow: 0 0 1rem #bbf7d088;
+}
+@keyframes frame-veins {
+  50% {
+    box-shadow: 0 0 1.6rem #ef4444;
+    filter: brightness(1.25);
+  }
+}
+/* name styles */
+.name-style[data-name="upsidedown"] {
+  font-family: "EB Garamond", serif;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px #ff3b4f;
+  text-shadow:
+    0 0 6px #ff3b4f,
+    0 0 18px #dc2626;
+  -webkit-box-reflect: below -0.25em linear-gradient(transparent 55%, #ffffff40);
+  animation: name-flicker 4s steps(1, end) infinite;
+}
+.name-style[data-name="elvish"] {
+  font-family: "Cinzel Decorative", "Cinzel", serif;
+  background: linear-gradient(90deg, #a16207, #fef3c7, #d4af37, #fef3c7, #a16207);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 4px #f59e0b88);
+  animation: name-shimmer 6s linear infinite;
+}
+.name-style[data-name="mordor"] {
+  font-family: "Cinzel", serif;
+  font-weight: 700;
+  background: linear-gradient(0deg, #7f1d1d, #f97316 60%, #fde047);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px #ea580c);
+}
+@keyframes name-flicker {
+  0%,
+  42%,
+  46%,
+  100% {
+    opacity: 1;
+  }
+  43%,
+  45% {
+    opacity: 0.25;
+  }
+}
+/* badge and title styles */
+:is(.cosmetic-badge, .cosmetic-title)[data-style="veins"] {
+  border-color: #dc2626;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 30%,
+      #dc262699 31%,
+      transparent 33%,
+      transparent 60%,
+      #b91c1c99 61%,
+      transparent 63%
+    ),
+    #12151f;
+  color: #fecaca;
+  animation: frame-veins 2.2s ease-in-out infinite;
+}
+.cosmetic-title[data-style="veins"] {
+  background: none;
+  color: #ff3b4f;
+  text-shadow: 0 0 8px #dc2626;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="mirror"] {
+  border-color: #64748b;
+  background: #0f172a;
+  color: #e2e8f0;
+  -webkit-box-reflect: below 1px linear-gradient(transparent 50%, #ffffff33);
+  animation: name-flicker 5s steps(1, end) infinite;
+}
+.cosmetic-title[data-style="mirror"] {
+  background: none;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="ring"] {
+  border-color: #d97706;
+  background: linear-gradient(90deg, #451a03, #78350f, #451a03);
+  color: #fde68a;
+  text-shadow: 0 0 6px #f59e0b;
+  animation: badge-shimmer 3s ease-in-out infinite;
+}
+.cosmetic-title[data-style="ring"] {
+  background: none;
+  font-family: "Cinzel", serif;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="elven"] {
+  border-color: #bbf7d0;
+  background: linear-gradient(135deg, #14532d, #166534);
+  color: #f0fdf4;
+  box-shadow: 0 0 8px #86efac88;
+}
+.cosmetic-title[data-style="elven"] {
+  background: none;
+  color: #bbf7d0;
+  font-family: "Cinzel", serif;
+  text-shadow: 0 0 6px #86efac;
+}
+/* level badges */
+:is(:root[data-level-badge="upsidedown"] .ds-level:not([data-look]), .ds-level[data-look="upsidedown"]) {
+  background: #12151f;
+  color: #ff3b4f;
+  box-shadow:
+    0 0 0 1.5px #ff3b4f,
+    0 0 10px #dc2626aa;
+  font-family: "EB Garamond", serif;
+  font-weight: 800;
+  -webkit-box-reflect: below 2px linear-gradient(transparent 45%, #ffffff40);
+  animation: level-upside 6s ease-in-out infinite;
+}
+@keyframes level-upside {
+  0%,
+  80%,
+  100% {
+    transform: none;
+  }
+  85%,
+  92% {
+    transform: rotateX(180deg);
+  }
+}
+:is(:root[data-level-badge="veins"] .ds-level:not([data-look]), .ds-level[data-look="veins"]) {
+  background:
+    linear-gradient(
+      115deg,
+      transparent 25%,
+      #dc2626 26%,
+      transparent 29%,
+      transparent 58%,
+      #b91c1c 59%,
+      transparent 62%
+    ),
+    linear-gradient(60deg, transparent 40%, #7f1d1d 41%, transparent 44%), #1a0a0e;
+  color: #fecaca;
+  animation: frame-veins 2s ease-in-out infinite;
+}
+:is(:root[data-level-badge="lights"] .ds-level:not([data-look]), .ds-level[data-look="lights"]) {
+  padding-block-start: 0.3rem;
+  background:
+    radial-gradient(circle at 15% 0.15rem, #ef4444 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 38% 0.15rem, #22c55e 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 62% 0.15rem, #facc15 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 85% 0.15rem, #3b82f6 0.16rem, transparent 0.2rem), #3a2a1f;
+  color: #fef3c7;
+  animation: banner-bulbs 1.2s steps(2, jump-none) infinite;
+}
+:is(:root[data-level-badge="onering"] .ds-level:not([data-look]), .ds-level[data-look="onering"]) {
+  position: relative;
+  isolation: isolate;
+  background: #1c1003;
+  color: #fde68a;
+  font-family: "Cinzel", serif;
+  box-shadow: 0 0 10px #f59e0b88;
+}
+:is(:root[data-level-badge="onering"] .ds-level:not([data-look]), .ds-level[data-look="onering"])::before {
+  content: "";
+  position: absolute;
+  inset: -0.3rem;
+  z-index: -1;
+  border-radius: 999px;
+  background: conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 0.28rem), #000 calc(100% - 0.26rem));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 0.28rem), #000 calc(100% - 0.26rem));
+  animation: level-elements 5s linear infinite;
+}
+:is(:root[data-level-badge="eye"] .ds-level:not([data-look]), .ds-level[data-look="eye"]) {
+  padding-inline-start: 0.95rem;
+  background:
+    radial-gradient(ellipse 0.1rem 0.6rem at 0.55rem 50%, #000 0 70%, transparent 80%),
+    radial-gradient(ellipse 0.6rem 0.75rem at 0.55rem 50%, #fde047, #f97316 55%, transparent 70%),
+    linear-gradient(90deg, #7f1d1d, #1c0805);
+  color: #fff7ed;
+  text-shadow: 0 0 4px #000;
+  border-radius: 50% / 70%;
+  box-shadow: 0 0 12px #f97316;
+  animation: level-eye 4s ease-in-out infinite;
+}
+@keyframes level-eye {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+:is(:root[data-level-badge="mithril"] .ds-level:not([data-look]), .ds-level[data-look="mithril"]) {
+  background:
+    radial-gradient(circle, transparent 0.12rem, #94a3b866 0.13rem 0.16rem, transparent 0.17rem) 0 0 / 0.4rem
+    0.4rem,
+    linear-gradient(115deg, transparent 35%, #ffffffcc 50%, transparent 65%) 0 0 / 300% 100%,
+    linear-gradient(135deg, #e2e8f0, #94a3b8);
+  color: #0f172a;
+  animation: level-gem 3.5s ease-in-out infinite;
+}
+:is(:root[data-level-badge="balrog"] .ds-level:not([data-look]), .ds-level[data-look="balrog"]) {
+  position: relative;
+  isolation: isolate;
+  background: #0b0605;
+  color: #fb923c;
+  box-shadow: 0 0 12px #ea580c;
+}
+:is(:root[data-level-badge="balrog"] .ds-level:not([data-look]), .ds-level[data-look="balrog"])::before {
+  content: "";
+  position: absolute;
+  inset: -0.6rem -0.9rem 30%;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 100%, #000 30%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, #000 30%, transparent 60%),
+    radial-gradient(ellipse at 50% 100%, #f97316 30%, #7f1d1d 55%, transparent 75%);
+  clip-path: polygon(0 100%, 10% 20%, 30% 70%, 50% 0, 70% 70%, 90% 20%, 100% 100%);
+  filter: blur(1px);
+  animation: level-flames 0.8s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+:is(:root[data-level-badge="frost"] .ds-level:not([data-look]), .ds-level[data-look="frost"]) {
+  background: linear-gradient(135deg, #e0f2fe, #7dd3fc 50%, #0284c7);
+  color: #082f49;
+  box-shadow:
+    0 0 0 1.5px #f0f9ff,
+    0 0 10px #7dd3fc;
+}
+:is(:root[data-level-badge="nebula"] .ds-level:not([data-look]), .ds-level[data-look="nebula"]) {
+  background:
+    radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 60%, #fff 50%, transparent 51%),
+    radial-gradient(circle at 30% 40%, #db2777aa, transparent 50%),
+    radial-gradient(circle at 70% 60%, #6d28d9aa, transparent 55%), #0b0820;
+  background-size:
+    100% 100%,
+    100% 100%,
+    200% 200%,
+    200% 200%,
+    auto;
+  color: #f5d0fe;
+  animation: level-nebula 8s ease-in-out infinite alternate;
+}
+@keyframes level-nebula {
+  to {
+    background-position:
+      0 0,
+      0 0,
+      100% 100%,
+      0 100%,
+      0 0;
+  }
+}
+:is(:root[data-level-badge="circuit"] .ds-level:not([data-look]), .ds-level[data-look="circuit"]) {
+  border-radius: 0.2rem;
+  background:
+    linear-gradient(90deg, transparent 48%, #22c55e 48% 52%, transparent 52%) 0 0 / 0.8rem 0.8rem,
+    linear-gradient(transparent 48%, #22c55e66 48% 52%, transparent 52%) 0 0 / 0.8rem 0.8rem,
+    #022c22;
+  color: #bbf7d0;
+  font-family: "Share Tech Mono", monospace;
+  box-shadow: 0 0 0 1.5px #22c55e;
+}
+/* the Eye takes the icon's place */
+:is(:root[data-level-badge="eye"] .ds-level:not([data-look]), .ds-level[data-look="eye"]) .ds-icon {
+  display: none;
+}

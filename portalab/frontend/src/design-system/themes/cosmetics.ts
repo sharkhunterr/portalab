@@ -29,6 +29,11 @@ export const BANNER_KEYS = [
   "skyline",
   "mirrorball",
   "night-city",
+  "upsidedown",
+  "hawkins",
+  "shire",
+  "mordor",
+  "pixelshire",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -54,6 +59,10 @@ export const FRAME_KEYS = [
   "disco",
   "toxic",
   "sakura",
+  "veins",
+  "lights",
+  "onering",
+  "elven",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -81,4 +90,7 @@ export const NAME_KEYS = [
   "ice",
   "rainbow",
   "royal",
+  "upsidedown",
+  "elvish",
+  "mordor",
 ] as const;

@@ -55,16 +55,19 @@ PROFILE_BANNERS: tuple[str, ...] = (
     # 027 universes
     "castle", "hyperspace", "code", "dunes", "bloodmoon", "snowfall", "pow", "speedlines", "toon", "cabin",
     "neon-grid", "mono", "nebula", "skyline", "mirrorball", "night-city",
+    "upsidedown", "hawkins", "shire", "mordor", "pixelshire",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
     "runes", "orbit", "code", "sand", "blood", "pumpkin", "holly", "pow", "chrome", "hologram", "cyber",
     "hero", "disco", "toxic", "sakura",
+    "veins", "lights", "onering", "elven",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
     "aurora", "lagoon", "lava", "mint", "gold", "ice", "rose", "toxic", "midnight", "coffee", "lavender",
     "bubblegum", "polar", "copper", "solar", "berry", "slate", "peach", "crimson",
+    "hawkins", "gondor",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -72,16 +75,19 @@ AMBIENTS: tuple[str, ...] = (
     "rain", "sparkles", "disco", "fog", "sand", "leaves", "hearts", "glitch", "lights", "spores", "aurora",
     # 027: VHS tracking, wind, tide, sky lanterns, 8-bit sky
     "vhs", "wind", "tide", "lanterns", "pixelsky",
+    "upsidedown", "veins", "meadow", "ash",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
     "petals", "bubbles", "assemble", "burn", "shatter", "freeze", "glitch", "portal",
+    "flicker", "fireworks",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
     "pixel", "paper", "square", "circle", "cloud", "ticket", "tag", "split",
     # 027 universes: space saga, pirates, manga, film noir, VHS tape
     "saga", "pirate", "manga", "noir", "vhs",
+    "upsidedown", "elven", "onering",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -90,23 +96,27 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "filmwipe", "iris", "air", "water", "earth", "fire",
     # 027: sucked into a black hole, melting, a comic « KAPOW! », a dimensional portal
     "blackhole", "melt", "kapow", "portal",
+    "flipup", "balrog", "eye",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
     "none", "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga",
     "cartoon", "cozy", "futuristic", "minimal", "alien", "hero", "neowave", "disco", "cyberpunk", "pixel",
     "handwritten", "fire", "ice", "rainbow", "royal",
+    "upsidedown", "elvish", "mordor",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
     "none", "shimmer", "pulse", "flame", "glitch", "rainbow", "float", "spin", "frost", "neon", "gold",
     "vhs", "pixel", "terminal", "water", "wind", "saber",
+    "veins", "mirror", "ring", "elven",
 )  # fmt: skip
 # 027: the look of the level badge (the « XP badge » in the header, the navigation and on the profile, seen
 # by everyone): ``classic`` is free and changes with the level (a new rank every ten levels)
 LEVEL_BADGES: tuple[str, ...] = (
     "classic", "pixel", "neon", "crest", "gem", "hologram", "vhs", "saber", "elements",
     "blackhole", "melt", "kapow", "portal", "crown", "inferno",
+    "upsidedown", "veins", "lights", "onering", "eye", "mithril", "balrog", "frost", "nebula", "circuit",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -119,6 +129,7 @@ LEVEL_UPS: tuple[str, ...] = (
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
     "cozy", "futuristic", "minimal", "alien", "heroes", "neowave", "disco", "cyberpunk", "sincity", "plex",
+    "upsidedown", "middleearth",
 )  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),

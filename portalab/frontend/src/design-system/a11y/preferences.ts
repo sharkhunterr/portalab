@@ -26,6 +26,8 @@ export const UNIVERSE_THEMES = [
   "cyberpunk",
   "sincity",
   "plex",
+  "upsidedown",
+  "middleearth",
 ] as const;
 
 export type Density = "compact" | "comfortable" | "spacious";
@@ -60,6 +62,8 @@ export const PALETTE_KEYS = [
   "slate",
   "peach",
   "crimson",
+  "hawkins",
+  "gondor",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -89,6 +93,9 @@ export const NOTIFICATION_STYLES = [
   "manga",
   "noir",
   "vhs",
+  "upsidedown",
+  "elven",
+  "onering",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -120,6 +127,9 @@ export const NOTIFICATION_ANIMATIONS = [
   "melt",
   "kapow",
   "portal",
+  "flipup",
+  "balrog",
+  "eye",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -150,6 +160,10 @@ export const AMBIENTS = [
   "tide",
   "lanterns",
   "pixelsky",
+  "upsidedown",
+  "veins",
+  "meadow",
+  "ash",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -171,6 +185,16 @@ export const LEVEL_BADGES = [
   "portal",
   "crown",
   "inferno",
+  "upsidedown",
+  "veins",
+  "lights",
+  "onering",
+  "eye",
+  "mithril",
+  "balrog",
+  "frost",
+  "nebula",
+  "circuit",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -224,6 +248,8 @@ export const CELEBRATION_KEYS = [
   "freeze",
   "glitch",
   "portal",
+  "flicker",
+  "fireworks",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

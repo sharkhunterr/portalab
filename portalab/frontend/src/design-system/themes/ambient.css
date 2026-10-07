@@ -701,6 +701,158 @@
   }
 }
 
+/* 027 upsidedown: ash and spores drifting up through a cold haze, red lightning now and then */
+[data-ambient="upsidedown"] {
+  background: radial-gradient(ellipse at 50% 120%, #1e293b55, transparent 60%);
+}
+[data-ambient="upsidedown"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 0%, #dc262655, transparent 60%);
+  opacity: 0;
+  animation: ambient-red-flash 7s steps(1, end) infinite;
+}
+[data-ambient="upsidedown"] > span {
+  top: auto;
+  bottom: -3vh;
+  inline-size: calc(0.25rem + var(--size) * 0.3rem);
+  block-size: calc(0.25rem + var(--size) * 0.3rem);
+  border-radius: 40%;
+  background: #e2e8f0;
+  opacity: 0.55;
+  filter: blur(0.5px);
+  animation-name: ambient-spore-up;
+  animation-duration: calc(14s + var(--size) * 10s);
+}
+@keyframes ambient-spore-up {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+  to {
+    transform: translate3d(var(--drift), -110vh, 0) rotate(240deg);
+  }
+}
+@keyframes ambient-red-flash {
+  0%,
+  86%,
+  90%,
+  100% {
+    opacity: 0;
+  }
+  87%,
+  89% {
+    opacity: 1;
+  }
+}
+
+/* 027 veins: dark red veins creeping in from the edges and pulsing */
+[data-ambient="veins"] > span {
+  left: 0;
+  top: var(--y);
+  inline-size: calc(10vw + var(--size) * 22vw);
+  block-size: 2px;
+  background: linear-gradient(90deg, #7f1d1dcc, #dc262688, transparent);
+  transform-origin: left;
+  filter: drop-shadow(0 0 3px #dc2626);
+  animation-name: ambient-vein;
+  animation-duration: calc(5s + var(--size) * 4s);
+  animation-timing-function: ease-in-out;
+  rotate: calc((var(--size) - 0.85) * 40deg);
+}
+[data-ambient="veins"] > span:nth-child(2n) {
+  left: auto;
+  right: 0;
+  transform-origin: right;
+  background: linear-gradient(270deg, #7f1d1dcc, #dc262688, transparent);
+}
+@keyframes ambient-vein {
+  0%,
+  100% {
+    transform: scaleX(0.6);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* 027 meadow: grass swaying along the bottom, butterflies fluttering by */
+[data-ambient="meadow"] > span {
+  top: auto;
+  bottom: -0.5rem;
+  inline-size: 0.35rem;
+  block-size: calc(2rem + var(--size) * 4rem);
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(#a3e635, #3f6212);
+  opacity: 0.55;
+  transform-origin: bottom;
+  animation-name: ambient-grass;
+  animation-duration: calc(3s + var(--size) * 2s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+[data-ambient="meadow"] > span:nth-child(5n) {
+  bottom: auto;
+  top: var(--y);
+  inline-size: 0.8rem;
+  block-size: 0.6rem;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background:
+    radial-gradient(circle at 25% 50%, #fde047 45%, transparent 50%),
+    radial-gradient(circle at 75% 50%, #fb923c 45%, transparent 50%);
+  opacity: 0.85;
+  animation-name: ambient-butterfly;
+  animation-duration: calc(10s + var(--size) * 8s);
+  animation-direction: normal;
+  animation-timing-function: linear;
+}
+@keyframes ambient-grass {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+@keyframes ambient-butterfly {
+  0% {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+  25% {
+    transform: translate3d(8vw, -4vh, 0) scaleX(0.3);
+  }
+  50% {
+    transform: translate3d(16vw, 2vh, 0) scaleX(1);
+  }
+  75% {
+    transform: translate3d(8vw, 6vh, 0) scaleX(0.3);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}
+
+/* 027 ash: grey ash falling over a red glow rising from the ground */
+[data-ambient="ash"] {
+  background: radial-gradient(ellipse at 50% 120%, #ea580c44, transparent 55%);
+}
+[data-ambient="ash"] > span {
+  top: -3vh;
+  inline-size: calc(0.2rem + var(--size) * 0.35rem);
+  block-size: calc(0.15rem + var(--size) * 0.25rem);
+  border-radius: 30%;
+  background: #78716c;
+  opacity: 0.7;
+  animation-name: ambient-fall;
+  animation-duration: calc(10s + var(--size) * 10s);
+}
+[data-ambient="ash"] > span:nth-child(6n) {
+  background: #fb923c;
+  box-shadow: 0 0 6px #ea580c;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient {
     display: none;

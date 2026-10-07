@@ -761,7 +761,9 @@
             "shatter",
             "freeze",
             "glitch",
-            "portal"
+            "portal",
+            "flicker",
+            "fireworks"
           ]
         },
         "levelUp": {
@@ -816,7 +818,8 @@
                 "tabs",
                 "launcher",
                 "terminal",
-                "reel"
+                "reel",
+                "lights"
               ]
             },
             "tablet": {
@@ -830,7 +833,8 @@
                 "tabs",
                 "launcher",
                 "terminal",
-                "reel"
+                "reel",
+                "lights"
               ]
             },
             "phone": {
@@ -843,7 +847,8 @@
                 "tabs",
                 "launcher",
                 "terminal",
-                "reel"
+                "reel",
+                "lights"
               ]
             }
           },
@@ -1007,7 +1012,11 @@
             "wind",
             "tide",
             "lanterns",
-            "pixelsky"
+            "pixelsky",
+            "upsidedown",
+            "veins",
+            "meadow",
+            "ash"
           ]
         }
       },
@@ -1096,7 +1105,10 @@
             "pirate",
             "manga",
             "noir",
-            "vhs"
+            "vhs",
+            "upsidedown",
+            "elven",
+            "onering"
           ]
         },
         "animation": {
@@ -1127,7 +1139,10 @@
             "blackhole",
             "melt",
             "kapow",
-            "portal"
+            "portal",
+            "flipup",
+            "balrog",
+            "eye"
           ]
         }
       },

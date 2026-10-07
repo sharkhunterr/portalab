@@ -8,8 +8,9 @@ import { currentEntry, isHubSection, sectionEntries } from "./SectionNav";
 
 /**
  * Navigation principles chosen by themes (027 R24, beyond the sidebar and the orbit): a floating **dock**,
- * book **tabs** on the edge, a game-like **launcher** screen, a **terminal** command line and a film
- * **reel** (the sections as frames of a strip, sprocket holes and all). Same
+ * book **tabs** on the edge, a game-like **launcher** screen, a **terminal** command line, a film
+ * **reel** (the sections as frames of a strip, sprocket holes and all) and a string of **lights** (each
+ * section painted on a wall under its bulb, the current one lit). Same
  * destinations as every variant (the server-filtered sections); a member section opens on its first page
  * (its pages are hub tabs), Administration lists its topics. Keyboard: links and buttons in order, arrows
  * move along a bar, Escape closes what is open. Each one works on phones, tablets and desktops.
@@ -402,6 +403,39 @@ export function ReelNav({ sections }: { sections: readonly NavSection[] }) {
       </ul>
       {section ? (
         <div className="shell-reel__panel">
+          <DestinationList section={section} currentKey={current?.key} onPick={() => setOpen(null)} />
+        </div>
+      ) : null}
+    </nav>
+  );
+}
+
+/** 027 Lights: the sections painted on a wall, each under a bulb of a string of Christmas lights — the
+ * current one lit, the others blinking now and then; a section with several destinations opens below. */
+export function LightsNav({ sections }: { sections: readonly NavSection[] }) {
+  const strings = useShellStrings();
+  const { current, isActive } = useCurrent(sections);
+  const { open, setOpen, root } = useOpenSection();
+  const section = sections.find((s) => s.key === open);
+  return (
+    <nav ref={root} className="shell-lights" aria-label={strings.mainNav}>
+      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: arrow keys move along the string */}
+      <ul className="shell-lights__wall" onKeyDown={(event) => moveFocus(event)}>
+        {sections.map((s, index) => (
+          <li key={s.key} style={{ "--i": index } as CSSProperties}>
+            <span className="shell-lights__bulb" aria-hidden="true" />
+            <SectionItem
+              section={s}
+              active={isActive(s)}
+              open={open === s.key}
+              onToggle={() => setOpen(open === s.key ? null : s.key)}
+              className="shell-lights__item"
+            />
+          </li>
+        ))}
+      </ul>
+      {section ? (
+        <div className="shell-lights__panel">
           <DestinationList section={section} currentKey={current?.key} onPick={() => setOpen(null)} />
         </div>
       ) : null}

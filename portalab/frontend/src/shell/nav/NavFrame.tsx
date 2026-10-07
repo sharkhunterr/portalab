@@ -18,7 +18,8 @@ export type NavVariant =
   | "tabs"
   | "launcher"
   | "terminal"
-  | "reel";
+  | "reel"
+  | "lights";
 
 export interface Arrangement {
   device: DeviceClass;

@@ -41,6 +41,7 @@ export const appearanceStrings = {
     launcher: "Launcher screen",
     terminal: "Command line",
     reel: "Film reel",
+    lights: "String of lights",
   } as Record<string, string>,
   footerHeader: "header at the bottom",
   theme: "Theme",

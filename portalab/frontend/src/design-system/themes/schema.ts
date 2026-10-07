@@ -60,6 +60,7 @@ export const NAV_DESKTOP = [
   "launcher",
   "terminal",
   "reel",
+  "lights",
 ] as const;
 export const NAV_TABLET = [
   "rail",
@@ -71,6 +72,7 @@ export const NAV_TABLET = [
   "launcher",
   "terminal",
   "reel",
+  "lights",
 ] as const;
 export const NAV_PHONE = [
   "bottom-bar",
@@ -81,6 +83,7 @@ export const NAV_PHONE = [
   "launcher",
   "terminal",
   "reel",
+  "lights",
 ] as const;
 export const HEADER_STYLES = ["full", "compact", "centered"] as const;
 export const HEADER_POSITIONS = ["top", "bottom"] as const;
@@ -121,6 +124,8 @@ export const CELEBRATIONS = [
   "freeze",
   "glitch",
   "portal",
+  "flicker",
+  "fireworks",
 ] as const;
 /** 027: what a theme draws behind the portal — a static pattern and an animated ambient layer. */
 export const BACKDROP_PATTERNS = [

@@ -111,6 +111,14 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#ffb199", accentAlt: "#9fd6f0", contrast: "#2a0f06" },
     light: { accent: "#a8452a", accentAlt: "#0d628a", contrast: "#ffffff" },
   },
+  hawkins: {
+    dark: { accent: "#ff3b4f", accentAlt: "#4fa3ff", contrast: "#1a0206" },
+    light: { accent: "#b3122a", accentAlt: "#1d4ed8", contrast: "#ffffff" },
+  },
+  gondor: {
+    dark: { accent: "#dbe4ee", accentAlt: "#d4af37", contrast: "#10151c" },
+    light: { accent: "#334155", accentAlt: "#8a6d0b", contrast: "#ffffff" },
+  },
   crimson: {
     dark: { accent: "#ff5c6c", accentAlt: "#c7d0dc", contrast: "#24040a" },
     light: { accent: "#b3122a", accentAlt: "#4b5563", contrast: "#ffffff" },

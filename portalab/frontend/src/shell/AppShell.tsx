@@ -13,7 +13,7 @@ import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
-import { DockNav, LauncherNav, ReelNav, TabsNav, TerminalNav } from "./nav/PrincipleNavs";
+import { DockNav, LauncherNav, LightsNav, ReelNav, TabsNav, TerminalNav } from "./nav/PrincipleNavs";
 import { NavContent } from "./nav/SectionNav";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
@@ -143,6 +143,7 @@ export function AppShell({
         ) : null}
         {nav === "terminal" ? <TerminalNav sections={sections} /> : null}
         {nav === "reel" ? <ReelNav sections={sections} /> : null}
+        {nav === "lights" ? <LightsNav sections={sections} /> : null}
         <div className="shell-body">
           {nav === "tabs" ? <TabsNav sections={sections} /> : null}
           {nav === "sidebar" || nav === "rail" ? (
