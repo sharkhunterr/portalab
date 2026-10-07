@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 from pydantic import BaseModel
 
 from portalab.capabilities.economy import (
@@ -25,6 +25,7 @@ from portalab.core.visibility_port import Redacted
 from portalab.modules.gamification.integrations import PROGRESSION
 from portalab.modules.gamification.module import GamificationModule
 from portalab.modules.gamification.permissions import READ
+from portalab.modules.gamification.progression.level_up import level_up_summary
 
 router = APIRouter(prefix="/api/v1", tags=["gamification"])
 SELF = "users.self.manage"
@@ -128,6 +129,27 @@ async def my_transactions(
 @router.get("/me/achievements")
 async def my_achievements(principal: Me, module: Module) -> list[dict[str, Any]]:
     return await module.achievements.progress(_me(principal))
+
+
+@router.get("/me/level-ups/{level}")
+async def my_level_up(
+    principal: Me,
+    module: Module,
+    level: Annotated[int, Path(ge=2, le=100_000)],
+    since: Annotated[int | None, Query(ge=1, le=100_000)] = None,
+) -> dict[str, Any]:
+    """027: the level-up moment — the new level, the level rewards crossed, the achievements just
+    unlocked and what they gave (own data only)."""
+    return await level_up_summary(
+        module.database,
+        module.levels,
+        module.achievements,
+        module.config,
+        _me(principal),
+        level,
+        since,
+        clock=module.clock,
+    )
 
 
 @router.get("/achievements/catalog")

@@ -88,6 +88,8 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "rise", "wipe", "focus", "jelly", "shake",
     # 027: film transitions (a hard wipe right to left, an iris) and the four elements
     "filmwipe", "iris", "air", "water", "earth", "fire",
+    # 027: sucked into a black hole, melting, a comic « KAPOW! », a dimensional portal
+    "blackhole", "melt", "kapow", "portal",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -100,10 +102,14 @@ BADGE_STYLES: tuple[str, ...] = (
     "none", "shimmer", "pulse", "flame", "glitch", "rainbow", "float", "spin", "frost", "neon", "gold",
     "vhs", "pixel", "terminal", "water", "wind", "saber",
 )  # fmt: skip
-# 027: the look of the level badge (the « XP badge » in the header and on profiles); ``classic`` is free
+# 027: the look of the level badge (the « XP badge » in the header, the navigation and on the profile, seen
+# by everyone): ``classic`` is free and changes with the level (a new rank every ten levels)
 LEVEL_BADGES: tuple[str, ...] = (
     "classic", "pixel", "neon", "crest", "gem", "hologram", "vhs", "saber", "elements",
+    "blackhole", "melt", "kapow", "portal", "crown", "inferno",
 )  # fmt: skip
+# 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
+LEVEL_UPS: tuple[str, ...] = ("classic", "arcade", "cosmic", "comic", "elements", "cinema")
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
     "cozy", "futuristic", "minimal", "alien", "heroes", "neowave", "disco", "cyberpunk", "sincity", "plex",
@@ -113,6 +119,7 @@ PROFILE_SLOTS = {
     "frame": ("avatar_frame", "frame"),
     "background": ("profile_background", "background"),
     "name": ("name_style", "style"),
+    "level": ("level_badge", "style"),  # 027: the level badge's look, worn on the profile
 }
 
 

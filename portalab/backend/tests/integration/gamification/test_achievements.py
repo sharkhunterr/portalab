@@ -114,3 +114,49 @@ async def test_unlock_notification_names_the_achievement(gm: GamHarness) -> None
     await gm.module.pipeline.process(gm.envelope(gm.people["ursula"], {"minutes": 1, "genre": "rock"}))
     [note] = [r for r in outbox.sent if r.category == "gamification.achievement"]
     assert note.params == {"achievement": "First play", "description": "Play something once."}
+
+
+async def test_some_achievements_unlock_cosmetics(gm: GamHarness) -> None:
+    """027: an achievement may give shop products (a badge, a title…) — offered once committed, through the
+    shop's gifts; the level-up moment lists the achievements just unlocked and what they gave."""
+    from dataclasses import replace
+    from typing import Any
+
+    from portalab.capabilities.marketplace import GIFTS
+    from portalab.modules.gamification.progression.level_up import level_up_summary
+
+    class _Gifts:
+        def __init__(self) -> None:
+            self.given: list[tuple[Any, str]] = []
+
+        async def gift(self, user: Any, product_key: str, reason: str) -> bool:
+            self.given.append((user, product_key))
+            return True
+
+    gifts = _Gifts()
+    gm.ev.full.identity.capabilities.provide(GIFTS, gifts, instance_ref="t", owner="test")
+    await gm.module.achievements.save(
+        SYSTEM,
+        "collector_test",
+        {
+            "label": "The Collector",
+            "criteria": [{"kind": "event_count", "event_type": "media.played", "count": 1}],
+            "rewards": [{"value": "coins", "amount": 50}],
+            "unlocks": [
+                {"product": "badge_completionist", "kind": "badge", "label": "The Collector"},
+                {"product": "title_completionist", "kind": "title", "label": "The Collector"},
+            ],
+        },
+    )
+    user = gm.people["ursula"]
+    gm.clock.advance(timedelta(seconds=1))
+    await gm.module.pipeline.process(gm.envelope(user, {"minutes": 1, "genre": "rock"}))
+    assert gifts.given == [(user, "badge_completionist"), (user, "title_completionist")]
+    config = replace(gm.module.config, level_rewards=[{"level": 3, "coins": 100, "label": "Level 3"}])
+    summary = await level_up_summary(
+        gm.database, gm.module.levels, gm.module.achievements, config, user, 3, 1, clock=gm.clock
+    )
+    assert [t["coins"] for t in summary["rewards"]] == [100]  # every tier crossed
+    [unlocked] = [a for a in summary["achievements"] if a["key"] == "collector_test"]
+    assert [u["product"] for u in unlocked["unlocks"]] == ["badge_completionist", "title_completionist"]
+    assert unlocked["rewards"] == [{"value": "coins", "amount": 50}]

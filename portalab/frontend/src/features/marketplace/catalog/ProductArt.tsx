@@ -38,6 +38,7 @@ export const TYPE_BADGE_ICON: Record<string, string> = {
   profile_backdrop: "film",
   palette: "palette",
   level_badge: "star",
+  level_up: "trophy",
 };
 
 type Preview = Record<string, unknown>;
@@ -281,6 +282,13 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
           {[7, 42, 253].map((level) => (
             <LevelBadge key={level} level={level} label={name} look={text(preview, "style")} />
           ))}
+        </span>
+      );
+    case "level_up":
+      return (
+        <span className="product-art__levelup" data-look={text(preview, "animation")} data-size={size}>
+          <span className="product-art__levelup-kicker">LEVEL UP!</span>
+          <LevelBadge level={42} label={name} look="classic" />
         </span>
       );
     case "name_style":

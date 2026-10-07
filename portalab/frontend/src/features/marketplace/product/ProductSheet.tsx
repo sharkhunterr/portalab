@@ -10,6 +10,7 @@ import { useCelebrate } from "../../../design-system/feedback/Celebration";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
+import { showLevelUp } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useAcquire, useDescribe, useProducts } from "../api";
 import { Price, priceOf } from "../catalog/Price";
 import { ProductArt, TYPE_BADGE_ICON } from "../catalog/ProductArt";
@@ -194,8 +195,8 @@ function trialOf(product: Product): Partial<UiPreferences> | null {
       return value("effect") ? ({ celebration: value("effect") } as Partial<UiPreferences>) : null;
     case "notification_style":
       return value("style") ? ({ notificationStyle: value("style") } as Partial<UiPreferences>) : null;
-    case "level_badge":
-      return value("style") ? ({ levelBadge: value("style") } as Partial<UiPreferences>) : null;
+    case "level_up":
+      return value("animation") ? ({ levelUp: value("animation") } as Partial<UiPreferences>) : null;
     case "notification_animation":
       return value("animation")
         ? ({ notificationAnimation: value("animation") } as Partial<UiPreferences>)
@@ -220,6 +221,10 @@ export function TryOn({ product }: { product: Product }) {
   if (!trial) return null;
   const show = () => {
     if (product.type === "effect") celebrate({ kind: "reward", text: "+40 XP" });
+    if (product.type === "level_up") {
+      const animation = (product.preview as Record<string, unknown> | undefined)?.animation;
+      showLevelUp({ level: 12, preview: typeof animation === "string" ? animation : "classic" });
+    }
     if (product.type.startsWith("notification_")) {
       notify({
         severity: "success",

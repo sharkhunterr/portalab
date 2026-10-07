@@ -11,7 +11,7 @@ from portalab.capabilities.themes import (
     AMBIENTS,
     CELEBRATIONS,
     COSMETICS,
-    LEVEL_BADGES,
+    LEVEL_UPS,
     NOTIFICATION_ANIMATIONS,
     NOTIFICATION_STYLES,
     PALETTES,
@@ -28,7 +28,7 @@ KINDS = {
     # 027: animated layer behind the portal and celebration effect (product types ``ambient``/``effect``)
     "ui.ambient": ("ambient", "ambient", frozenset({"theme", "none"})),
     "ui.celebration": ("effect", "effect", frozenset({"theme", "none", "sparkle", "glow"})),
-    "ui.levelBadge": ("level_badge", "style", frozenset({"classic"})),  # 027: the XP badge's look
+    "ui.levelUp": ("level_up", "animation", frozenset({"classic"})),  # 027: the level-up moment
 }
 
 
@@ -61,14 +61,14 @@ class NotificationLooks:
         palettes = await self.locked("ui.palette", user_id)
         ambients = await self.locked("ui.ambient", user_id)
         celebrations = await self.locked("ui.celebration", user_id)
-        level_badges = await self.locked("ui.levelBadge", user_id)
+        level_ups = await self.locked("ui.levelUp", user_id)
         return {
             "styles": [{"key": k, "locked": k in styles} for k in STYLES],
             "animations": [{"key": k, "locked": k in animations} for k in ANIMATIONS],
             "palettes": [{"key": k, "locked": k in palettes} for k in PALETTES],
             "ambients": [{"key": k, "locked": k in ambients} for k in AMBIENTS],
             "celebrations": [{"key": k, "locked": k in celebrations} for k in CELEBRATIONS],
-            "level_badges": [{"key": k, "locked": k in level_badges} for k in LEVEL_BADGES],
+            "level_ups": [{"key": k, "locked": k in level_ups} for k in LEVEL_UPS],
         }
 
     def validator(self, setting: str) -> Any:

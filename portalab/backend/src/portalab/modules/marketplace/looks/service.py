@@ -16,6 +16,7 @@ from portalab.capabilities.themes import (
     AMBIENTS,
     AVATAR_FRAMES,
     BADGE_STYLES,
+    LEVEL_BADGES,
     NAME_STYLES,
     PROFILE_BANNERS,
     PROFILE_SLOTS,
@@ -33,6 +34,7 @@ CHOICES = {
     "frame": AVATAR_FRAMES,
     "background": AMBIENTS,  # 027: an animated background behind the profile
     "name": NAME_STYLES,  # 027: the name's font and effect
+    "level": LEVEL_BADGES,  # 027: the level badge's look (``classic`` changes with the level)
 }
 SLOTS = (*CHOICES, "backdrop", "title", "badges")
 SHOWCASE = 3  # badges shown next to the name
@@ -96,6 +98,7 @@ class ProfileLooks:
             "frames": [{"key": k, "locked": k in locked["frame"]} for k in AVATAR_FRAMES],
             "backgrounds": [{"key": k, "locked": k in locked["background"]} for k in AMBIENTS],
             "names": [{"key": k, "locked": k in locked["name"]} for k in NAME_STYLES],
+            "levels": [{"key": k, "locked": k in locked["level"]} for k in LEVEL_BADGES],
             "titles": await self.owned_items(user, "title"),
             "badges": await self.owned_items(user, "badge"),
             "backdrop": {"unlocked": await self.backdrop_unlocked(user)},

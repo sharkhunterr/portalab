@@ -32,6 +32,7 @@ def _p(
     supply: int | None = None,
     limit: tuple[int, int] | None = None,
     repeatable: bool = False,
+    reward_only: bool = False,
 ) -> None:
     SHOP.append(
         {
@@ -49,6 +50,8 @@ def _p(
             "supply": supply,
             "limit": limit,
             "repeatable": repeatable,
+            # 027: given by an achievement only — out of sale (« unavailable »), the design stays exclusive
+            "reward_only": reward_only,
         }
     )
 
@@ -249,6 +252,17 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
      "epic", 500, "They rise like a slab of rock and land with a jolt.", "Elles surgissent comme une dalle de roche et retombent d'un coup."),
     ("notif_fire", "notification_animation", "animation", "fire", "Fire notifications", "Notifications feu",
      "epic", 500, "They flare up from embers, glowing, then cool down.", "Elles s'embrasent depuis les braises, rougeoient, puis refroidissent."),
+    ("notif_blackhole", "notification_animation", "animation", "blackhole", "Black hole notifications",
+     "Notifications trou noir", "legendary", 1100, "They spin out of a singularity — and are sucked back in when they go.",
+     "Elles jaillissent d'une singularité en tournoyant — et y sont aspirées en partant."),
+    ("notif_melt", "notification_animation", "animation", "melt", "Melting notifications", "Notifications fondantes",
+     "epic", 550, "They drip into shape — and melt away when they go.", "Elles prennent forme en coulant — et fondent en partant."),
+    ("notif_kapow", "notification_animation", "animation", "kapow", "KAPOW! notifications", "Notifications KAPOW !",
+     "epic", 600, "A comic punch: they land with a « KAPOW! » burst — and a « POOF » when they go.",
+     "Un coup de poing de BD : elles arrivent dans un « KAPOW ! » — et repartent dans un « POUF »."),
+    ("notif_portal", "notification_animation", "animation", "portal", "Portal notifications", "Notifications portail",
+     "legendary", 1000, "They step out of a swirling dimensional portal — and back into it.",
+     "Elles sortent d'un portail dimensionnel tourbillonnant — et y retournent."),
 ):  # fmt: skip
     _p(key, kind, price, rarity, en, fr, en_about, fr_about, {field: value}, collection="looks",
        icon="bell" if kind == "notification_style" else "sparkles")  # fmt: skip
@@ -501,9 +515,73 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
      "Une lame de lumière vibrante de votre couleur d'accent."),
     ("elements", "Four elements", "Quatre éléments", "legendary", 1300, 15,
      "Fire, water, earth and air turning around your level.", "Le feu, l'eau, la terre et l'air qui tournent autour de votre niveau."),
+    ("blackhole", "Black hole", "Trou noir", "legendary", 1400, 16, "An accretion disc spinning around your level, the number pulled in now and then.",
+     "Un disque d'accrétion qui tourne autour de votre niveau, le chiffre aspiré de temps en temps."),
+    ("melt", "Melting", "Fondant", "epic", 600, 5, "Your level drips like hot wax.", "Votre niveau coule comme de la cire chaude."),
+    ("kapow", "KAPOW!", "KAPOW !", "epic", 650, 5, "A comic starburst behind your level, punching now and then.",
+     "Une explosion de BD derrière votre niveau, qui frappe de temps en temps."),
+    ("portal", "Dimensional portal", "Portail dimensionnel", "legendary", 1300, 14, "A swirling portal opens behind your level.",
+     "Un portail tourbillonnant s'ouvre derrière votre niveau."),
+    ("inferno", "Inferno", "Brasier", "epic", 700, 6, "Your level burns with living flames.", "Votre niveau brûle de flammes vives."),
 ):  # fmt: skip
     _p(f"level_{value}", "level_badge", price, rarity, f"{en} level badge", f"Badge de niveau {fr.lower()}",
-       about_en, about_fr, {"style": value}, collection="looks", icon="star", level=level)  # fmt: skip
+       about_en, about_fr, {"style": value}, collection="levels", icon="star", level=level)  # fmt: skip
+_p("level_crown", "level_badge", None, "legendary", "Crowned level badge", "Badge de niveau couronné",
+   "A golden crown over your level — only for living legends (achievement « Living legend »).",
+   "Une couronne d'or sur votre niveau — réservée aux légendes vivantes (succès « Légende vivante »).",
+   {"style": "crown"}, collection="rewards", icon="crown", reward_only=True)  # fmt: skip
+
+# --------------------------------------------------------------------------------- level-up moments (027)
+for value, en, fr, rarity, price, level, about_en, about_fr in (
+    ("arcade", "Arcade", "Arcade", "rare", 350, None, "LEVEL UP! in 8-bit, blinking stars and a coin sound.",
+     "LEVEL UP ! en 8 bits, étoiles clignotantes et bruit de pièce."),
+    ("cosmic", "Cosmic", "Cosmique", "epic", 800, 8, "Your new level is born from a black hole, in a ring of stars.",
+     "Votre nouveau niveau naît d'un trou noir, dans un anneau d'étoiles."),
+    ("comic", "Comic book", "Bande dessinée", "epic", 650, 5, "A splash page: KAPOW!, halftone and speed lines.",
+     "Une page de BD : KAPOW !, trame et lignes de vitesse."),
+    ("elements", "Four elements", "Quatre éléments", "epic", 750, 7, "Fire, water, earth and air swirl together into your new level.",
+     "Le feu, l'eau, la terre et l'air tourbillonnent pour former votre nouveau niveau."),
+):  # fmt: skip
+    _p(f"levelup_{value}", "level_up", price, rarity, f"{en} level-up", f"Passage de niveau {fr.lower()}",
+       about_en, about_fr, {"animation": value}, collection="levels", icon="trophy", level=level)  # fmt: skip
+_p("levelup_cinema", "level_up", None, "legendary", "Premiere level-up", "Passage de niveau avant-première",
+   "A film countdown 3-2-1, then your new level on the big screen — for the ten-thousand-XP club.",
+   "Un compte à rebours de film 3-2-1, puis votre nouveau niveau sur grand écran — pour le club des dix mille XP.",
+   {"animation": "cinema"}, collection="rewards", icon="clapperboard", reward_only=True)  # fmt: skip
+
+# --------------------------------------------------------------------------------- achievement rewards (027)
+# out of sale: each one is given by an achievement (see the demo achievements' « unlocks »)
+for key, kind, payload, en, fr, about_en, about_fr, icon in (
+    ("badge_bug_hunter", "badge", {"label": "Bug hunter", "icon": "bug", "style": "glitch"}, "Bug hunter badge",
+     "Badge Chasseur de bugs", "Given for three pieces of feedback.", "Offert pour trois retours.", "bug"),
+    ("badge_achievement_hunter", "badge", {"label": "Achievement hunter", "icon": "trophy", "style": "shimmer"},
+     "Achievement hunter badge", "Badge Chasseur de succès", "Given for ten achievements.", "Offert pour dix succès.", "trophy"),
+    ("badge_patron", "badge", {"label": "Patron", "icon": "handshake", "style": "gold"}, "Patron badge",
+     "Badge Mécène", "Given for funding three projects.", "Offert pour trois projets financés.", "handshake"),
+    ("badge_completionist", "badge", {"label": "The Collector", "icon": "gem", "style": "rainbow"},
+     "The Collector badge", "Badge Le Collectionneur", "Unique: for those who bought 150 things in the shop.",
+     "Unique : pour qui a acheté 150 objets dans la boutique.", "gem"),
+    ("title_golden_reel", "title", {"label": "Golden reel", "style": "gold"}, "Title: Golden reel",
+     "Titre : Bobine d'or", "Given for 250 films and episodes.", "Offert pour 250 films et épisodes.", "trophy"),
+    ("title_wish_master", "title", {"label": "Wish master", "style": "shimmer"}, "Title: Wish master",
+     "Titre : Maître des souhaits", "Given for 25 requests.", "Offert pour 25 demandes.", "trophy"),
+    ("title_patron", "title", {"label": "Patron of the arts", "style": "gold"}, "Title: Patron of the arts",
+     "Titre : Mécène", "Given for funding three projects.", "Offert pour trois projets financés.", "trophy"),
+    ("title_living_legend", "title", {"label": "Living legend", "style": "flame"}, "Title: Living legend",
+     "Titre : Légende vivante", "Given at level 20.", "Offert au niveau 20.", "trophy"),
+    ("title_big_spender", "title", {"label": "Big spender", "style": "gold"}, "Title: Big spender",
+     "Titre : Flambeur", "Given for 25 purchases.", "Offert pour 25 achats.", "trophy"),
+    ("title_completionist", "title", {"label": "The Collector", "style": "rainbow"}, "Title: The Collector",
+     "Titre : Le Collectionneur", "Unique: for those who bought 150 things in the shop.",
+     "Unique : pour qui a acheté 150 objets dans la boutique.", "trophy"),
+    ("frame_loyal", "avatar_frame", {"frame": "gold"}, "Loyal golden frame", "Cadre doré de la fidélité",
+     "Given for a hundred visits.", "Offert pour cent visites.", "user"),
+    ("bg_night_owl", "profile_background", {"background": "starfield"}, "Night owl background",
+     "Fond Oiseau de nuit", "A secret achievement's starry sky.", "Le ciel étoilé d'un succès secret.", "moon"),
+):  # fmt: skip
+    _p(key, kind, None, "legendary", en, fr, about_en, about_fr, payload, collection="rewards", icon=icon,
+       reward_only=True)  # fmt: skip
+
 
 # --------------------------------------------------------------------------------- themes
 THEME_TEXT = {
@@ -924,13 +1002,33 @@ UNIVERSES = {  # theme: banner, frame, name, notification style or animation, ce
         "title_night_city",
     ),
 }
+UNIVERSES |= {  # 027: the two new universes
+    "sincity": ("banner_mono", "frame_blood", "name_minimal", "notif_noir", "effect_shatter", "ambient_fog",
+                "badge_vigilante", "title_night_city"),
+    "plex": ("banner_skyline", "frame_chrome", "name_futuristic", "notif_split", "effect_glitch", None,
+             "badge_golden_cinephile", "title_cinephile"),
+}  # fmt: skip
+# 027: each universe's level badge, notification look and level-up moment
+UNIVERSE_EXTRAS = {
+    "wizard": ("level_crest", "notif_portal"), "galaxy": ("level_blackhole", "notif_saga", "notif_filmwipe",
+    "levelup_cosmic"), "matrix": ("level_vhs", "notif_vhs"), "desert": ("level_gem", "notif_earth"),
+    "horror": ("level_melt", "notif_melt"), "halloween": ("level_inferno", "notif_fire"),
+    "christmas": ("level_gem", "notif_air"), "comic": ("level_kapow", "notif_kapow", "levelup_comic"),
+    "manga": ("level_kapow", "notif_manga", "levelup_comic"), "cartoon": ("level_pixel", "notif_jelly"),
+    "cozy": ("level_crest", "ambient_lanterns"), "futuristic": ("level_hologram", "notif_iris"),
+    "minimal": ("level_neon", "notif_focus"), "alien": ("level_portal", "notif_portal", "levelup_cosmic"),
+    "heroes": ("level_kapow", "notif_kapow", "levelup_comic"), "neowave": ("level_vhs", "ambient_vhs"),
+    "disco": ("level_hologram", "notif_jelly"), "cyberpunk": ("level_neon", "notif_vhs", "levelup_arcade"),
+    "sincity": ("level_melt", "notif_filmwipe", "notif_noir"), "plex": ("level_neon", "notif_iris"),
+}  # fmt: skip
 for theme, items in UNIVERSES.items():
     en, fr, _, _ = THEME_TEXT[theme]
-    contents = [f"theme_{theme}", *[item for item in items if item]]
+    extras = [item for item in UNIVERSE_EXTRAS.get(theme, ()) if item not in items]
+    contents = [f"theme_{theme}", *[item for item in items if item], *extras]
     level = max(THEME_RARITY[theme][2] or 0, 8)
     _p(f"ultimate_{theme}", "bundle", None, "legendary", f"Ultimate {en} pack", f"Pack ultime {fr}",
-       f"The whole {en} universe: the theme and everything that goes with it — banner, frame, name style, notifications, effects and its badge.",
-       f"Tout l'univers {fr} : le thème et tout ce qui va avec — bannière, cadre, style de nom, notifications, effets et son badge.",
+       f"The whole {en} universe: the theme and everything that goes with it — banner, frame, name style, level badge, notifications, effects and its badge.",
+       f"Tout l'univers {fr} : le thème et tout ce qui va avec — bannière, cadre, style de nom, badge de niveau, notifications, effets et son badge.",
        {"products": contents}, collection="ultimate", icon="crown", featured=theme in ("wizard", "cyberpunk"),
        level=level + 4, supply=5)  # fmt: skip
 
@@ -952,10 +1050,11 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "La bannière et le fond étoilés, le cadre doré et le style de nom royal.",
      ["banner_starfield", "bg_starfield", "frame_gold", "name_royal"], "legendary", 12),
     ("pack_notifications", "Notification designer pack", "Pack Designer de notifications",
-     "Six notification styles and four animations.",
-     "Six styles et quatre animations de notifications.",
+     "Nine notification styles and six animations.",
+     "Neuf styles et six animations de notifications.",
      ["notif_glass", "notif_comic", "notif_terminal", "notif_pixel", "notif_parchment", "notif_hologram",
-      "notif_flip", "notif_glitch", "notif_spiral", "notif_slam"], "epic", 6),
+      "notif_flip", "notif_glitch", "notif_spiral", "notif_slam", "notif_square", "notif_cloud", "notif_ticket",
+      "notif_melt", "notif_iris"], "epic", 6),
     ("pack_ambiences", "Ambience pack", "Pack Ambiances",
      "Snowfall, fireflies, autumn leaves, sakura petals and floating hearts behind the portal.",
      "Neige, lucioles, feuilles d'automne, pétales de sakura et cœurs flottants derrière le portail.",
@@ -983,6 +1082,34 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "An aurora background, the hologram frame, the rainbow name and the nebula banner.",
      "Un fond aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse.",
      ["bg_aurora", "frame_hologram", "name_rainbow", "banner_nebula"], "legendary", 15),
+    # 027: level badges, level-up moments, elements, retro, comics, cosmos
+    ("pack_level_badges", "Level badge pack", "Pack Badges de niveau",
+     "Five looks for your level badge: pixel, neon, crest, gem and hologram.",
+     "Cinq apparences pour votre badge de niveau : pixel, néon, blason, gemme et hologramme.",
+     ["level_pixel", "level_neon", "level_crest", "level_gem", "level_hologram"], "epic", 5),
+    ("pack_level_ups", "Level-up pack", "Pack Passages de niveau",
+     "Four ways to celebrate a new level: arcade, cosmic, comic book and the four elements.",
+     "Quatre façons de fêter un nouveau niveau : arcade, cosmique, bande dessinée et quatre éléments.",
+     ["levelup_arcade", "levelup_cosmic", "levelup_comic", "levelup_elements"], "epic", 8),
+    ("pack_elements", "Four elements pack", "Pack Quatre éléments",
+     "Air, water, earth and fire notifications, the elements level badge, the waterbender and airbender badges, wind and tide.",
+     "Notifications air, eau, terre et feu, le badge de niveau éléments, les badges maître de l'eau et de l'air, vent et marée.",
+     ["notif_air", "notif_water", "notif_earth", "notif_fire", "level_elements", "levelup_elements",
+      "badge_waterbender", "badge_airbender", "ambient_wind", "ambient_tide"], "legendary", 15),
+    ("pack_retro", "Retro pack", "Pack Rétro",
+     "VHS notifications and ambience, pixel and VHS level badges, the arcade level-up, an 8-bit sky and two retro badges.",
+     "Notifications et ambiance VHS, badges de niveau pixel et VHS, passage de niveau arcade, ciel 8 bits et deux badges rétro.",
+     ["notif_vhs", "ambient_vhs", "level_pixel", "level_vhs", "levelup_arcade", "ambient_pixelsky",
+      "badge_rewinder", "badge_8bit_hero", "badge_root"], "epic", 6),
+    ("pack_comics", "Comics pack", "Pack Comics",
+     "KAPOW! notifications and level badge, the comic book level-up, manga panels and the POW banner.",
+     "Notifications et badge de niveau KAPOW !, passage de niveau BD, cases de manga et bannière POW.",
+     ["notif_kapow", "level_kapow", "levelup_comic", "notif_manga", "banner_pow"], "epic", 6),
+    ("pack_cosmos", "Cosmos pack", "Pack Cosmos",
+     "Black hole and portal notifications and level badges, the cosmic level-up and the space saga look.",
+     "Notifications et badges de niveau trou noir et portail, passage de niveau cosmique et style saga spatiale.",
+     ["notif_blackhole", "notif_portal", "level_blackhole", "level_portal", "levelup_cosmic", "notif_saga"],
+     "legendary", 16),
 ):  # fmt: skip
     _p(key, "bundle", None, rarity, en, fr, about_en, about_fr, {"products": contents},
        collection="packs", icon="shop", featured=key == "pack_cinephile", level=level)  # fmt: skip
@@ -1031,6 +1158,8 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("palettes", "Palettes", "palette", 45),
     ("widgets", "Widgets", "dashboard", 50),
     ("statistics", "Statistics", "chart", 52),
+    ("levels", "Level badges and level-ups", "trophy", 41),
+    ("rewards", "Achievement rewards", "gift", 60),
 )
 
 

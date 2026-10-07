@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
 
+from portalab.capabilities.marketplace import GIFTS
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.gamification.observability import log
@@ -25,6 +26,7 @@ class Note:
     user: UUID
     dedup: str
     params: Mapping[str, Any] = field(default_factory=dict)
+    gifts: tuple[str, ...] = ()  # 027: shop products the achievement gives, offered once committed
 
 
 class Notifier:
@@ -32,6 +34,8 @@ class Notifier:
         self.capabilities = capabilities
 
     async def send(self, notes: Iterable[Note]) -> None:
+        notes = list(notes)
+        await self._gift(notes)
         try:
             providers = self.capabilities.system_providers(NOTIFY)
         except Exception:
@@ -53,3 +57,21 @@ class Notifier:
                 )
             except Exception:
                 log.warning("reward notification not sent", extra={"fields": {"kind": note.kind}})
+
+    async def _gift(self, notes: list[Note]) -> None:
+        """027: what an unlocked achievement gives (badge, title, frame…) — never twice (a product owned
+        already is skipped by the shop); a failure never affects the achievement."""
+        wanted = [(note.user, product, note.dedup) for note in notes for product in note.gifts]
+        if not wanted:
+            return
+        try:
+            providers = self.capabilities.system_providers(GIFTS)
+        except Exception:
+            return
+        if not providers:
+            return
+        for user, product, reason in wanted:
+            try:
+                await providers[0].provider.gift(user, product, reason[:200])
+            except Exception:
+                log.warning("achievement gift not offered", extra={"fields": {"product": product}})

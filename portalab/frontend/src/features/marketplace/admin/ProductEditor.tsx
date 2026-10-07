@@ -4,6 +4,7 @@ import {
   AMBIENTS,
   CELEBRATION_KEYS,
   LEVEL_BADGES,
+  LEVEL_UPS,
   NOTIFICATION_ANIMATIONS,
   NOTIFICATION_STYLES,
   PALETTE_KEYS,
@@ -40,6 +41,7 @@ const TYPES = [
   "profile_background",
   "name_style",
   "level_badge",
+  "level_up",
   "widget",
   "bundle",
   "quota",
@@ -58,6 +60,7 @@ const DESIGNS: Partial<
   avatar_frame: { field: "frame", values: FRAME_KEYS, ns: "community:looks.frame" },
   name_style: { field: "style", values: NAME_KEYS, ns: "community:looks.name" },
   level_badge: { field: "style", values: LEVEL_BADGES, ns: "notifications:levelBadge.names" },
+  level_up: { field: "animation", values: LEVEL_UPS, ns: "notifications:levelUp.names" },
 };
 const BADGE_STYLES = [
   "none",

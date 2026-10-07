@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { api } from "../../../api/client";
 
 /**
@@ -33,15 +34,18 @@ export interface Equipped {
   name?: string | null;
   title?: WornItem | null;
   badges?: { items: WornItem[] } | null;
+  /** 027: the level badge's look (``classic`` changes with the level). */
+  level?: string | null;
 }
 
-export type Slot = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges";
+export type Slot = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges" | "level";
 
 export interface LooksCatalog {
   banners: LookChoice[];
   frames: LookChoice[];
   backgrounds: LookChoice[];
   names: LookChoice[];
+  levels: LookChoice[];
   titles: WornItem[];
   badges: WornItem[];
   backdrop: { unlocked: boolean };
@@ -55,6 +59,7 @@ export function useProfileLooks(enabled = true) {
     queryKey: KEY,
     enabled,
     retry: false,
+    staleTime: 5 * 60_000,
     queryFn: async () => (await api.GET("/api/v1/me/profile-looks")).data as unknown as LooksCatalog,
   });
 }
@@ -73,4 +78,14 @@ export function useEquipLook() {
 
 export function backdropUrl(ref: string, size = "w1280"): string {
   return `/api/v1/media/metadata-images?ref=${encodeURIComponent(ref)}&size=${size}`;
+}
+
+/** 027: the level badge look the signed-in member wears — set on the root so every one of their badges
+ * (header, navigation, progression) shows it; ``classic`` when none. */
+export function useWornLevelBadge(enabled: boolean): void {
+  const looks = useProfileLooks(enabled);
+  const look = looks.data?.equipped?.level ?? "classic";
+  useEffect(() => {
+    document.documentElement.dataset.levelBadge = look;
+  }, [look]);
 }

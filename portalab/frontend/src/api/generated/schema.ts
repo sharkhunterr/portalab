@@ -5028,6 +5028,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/level-ups/{level}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Level Up
+         * @description 027: the level-up moment — the new level, the level rewards crossed, the achievements just
+         *     unlocked and what they gave (own data only).
+         */
+        get: operations["my_level_up_api_v1_me_level_ups__level__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/marketplace/owned": {
         parameters: {
             query?: never;
@@ -23293,6 +23314,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeaderboardPositionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_level_up_api_v1_me_level_ups__level__get: {
+        parameters: {
+            query?: {
+                since?: number | null;
+            };
+            header?: never;
+            path: {
+                level: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

@@ -1056,3 +1056,26 @@
   min-inline-size: 3px;
   transition: inline-size var(--motion-duration-slow) var(--motion-easing-out);
 }
+
+/* 027: what an achievement gives — its rewards, and the cosmetics some unlock */
+.achievement__gives {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.achievement__gives li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  font-size: var(--font-size-xs);
+}
+.achievement__gives li[data-unlock] {
+  background: color-mix(in srgb, var(--color-accent-alt) 20%, transparent);
+  font-weight: var(--font-weight-semibold);
+}

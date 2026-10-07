@@ -216,7 +216,6 @@ export function applyToDocument(
   root.style.setProperty("--text-scale", String(effective.textScale));
   root.dataset.theme = theme.key;
   root.dataset.palette = palette ? preferences.palette : "theme";
-  root.dataset.levelBadge = preferences.contrast === "high" ? "classic" : preferences.levelBadge;
   root.dataset.colorScheme = theme.colorScheme;
   root.dataset.contrast = preferences.contrast;
   root.dataset.density = preferences.density;

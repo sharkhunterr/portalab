@@ -1,4 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../../../api/client";
 import { Avatar } from "../../../design-system/components/Avatar";
+import { LevelBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { backdropUrl, type Equipped, type WornItem } from "./looks";
@@ -87,8 +90,9 @@ export function ProfileHero({
           src={`/api/v1/users/${memberId}/avatar`}
         />
         <div className="profile-hero__text">
-          <h1>
+          <h1 className="profile-hero__name">
             <StyledName name={name} style={looks.name} />
+            <MemberLevel memberId={memberId} look={looks.level} />
           </h1>
           {looks.title ? <WornBadge item={looks.title} kind="title" /> : null}
           {looks.badges?.items?.length ? (
@@ -110,4 +114,23 @@ export function ProfileHero({
       </div>
     </header>
   );
+}
+
+/** 027: the member's level badge in the look they wear — when their progression is visible to me. */
+function MemberLevel({ memberId, look }: { memberId: string; look: string | null | undefined }) {
+  const t = useT();
+  const progression = useQuery({
+    queryKey: ["gamification", "member-progression", memberId],
+    retry: false,
+    staleTime: 60_000,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/users/{user_id}/progression", {
+          params: { path: { user_id: memberId } },
+        })
+      ).data as { level?: number } | undefined,
+  });
+  const level = progression.data?.level;
+  if (typeof level !== "number") return null;
+  return <LevelBadge level={level} label={t("shell:levelLabel", { level })} look={look ?? "classic"} />;
 }

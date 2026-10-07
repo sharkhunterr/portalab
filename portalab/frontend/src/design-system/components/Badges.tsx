@@ -17,8 +17,18 @@ export function levelProgress(xp: number, floor: number, next: number | null): n
   return Math.min(1, Math.max(0, (xp - floor) / (next - floor)));
 }
 
-/** The member's level — a star tells it is a level, not a count (027). Its look is the member's choice
- * (``ui.levelBadge``, some sold in the shop); ``look`` forces one (shop and Appearance previews). */
+/**
+ * 027: the rank of a level — the classic badge changes every ten levels (bronze, silver, gold, emerald,
+ * sapphire, amethyst, ruby, then legend from level 100 and mythic from 250), like game platforms.
+ */
+export function levelTier(level: number): number {
+  if (level >= 250) return 9;
+  if (level >= 100) return 8;
+  return Math.min(7, Math.floor(Math.max(0, level) / 10) + 1);
+}
+
+/** The member's level — a star tells it is a level, not a count (027). Its look is the one the member
+ * wears (their profile's ``level`` slot, everyone sees it); ``look`` forces one (previews, other members). */
 export function LevelBadge({
   level,
   label,
@@ -26,11 +36,17 @@ export function LevelBadge({
 }: {
   level: number;
   label: string;
-  look?: string | undefined;
+  look?: string | null | undefined;
 }) {
   return (
-    <span className="ds-level" role="img" aria-label={label} data-look={look}>
-      <Icon name="star" size={11} />
+    <span
+      className="ds-level"
+      role="img"
+      aria-label={label}
+      data-look={look ?? undefined}
+      data-tier={levelTier(level)}
+    >
+      <Icon name={levelTier(level) >= 8 ? "crown" : "star"} size={11} />
       <span aria-hidden="true">{level}</span>
     </span>
   );

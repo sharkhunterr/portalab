@@ -10,6 +10,7 @@ import pytest
 from sqlalchemy import text
 
 from portalab.app.demo_seed import MEMBERS, PRODUCTS, seed_demo
+from portalab.app.demo_shop import SHOP
 from portalab.app.wiring import wire_platform
 from portalab.capabilities.catalog import new_registry
 from portalab.core.db import Database
@@ -20,7 +21,9 @@ COUNTS = {
     "users": "SELECT count(*) FROM identity.users",
     "transactions": "SELECT count(*) FROM gamification.transactions",
     "achievements": "SELECT count(*) FROM gamification.user_achievements",
-    "products": "SELECT count(*) FROM marketplace.products WHERE state = 'available'",
+    # 027: achievement rewards are out of sale (« unavailable ») but published all the same
+    "products": "SELECT count(*) FROM marketplace.products WHERE state IN ('available', 'unavailable')",
+    "rewards": "SELECT count(*) FROM marketplace.products WHERE state = 'unavailable'",
     "ownerships": "SELECT count(*) FROM marketplace.ownerships",
     "projects": "SELECT count(*) FROM marketplace.projects",
     "fundings": "SELECT count(*) FROM marketplace.project_fundings",
@@ -55,6 +58,7 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
     after_first = await counts(database)
     assert after_first["users"] == 1 + len(MEMBERS)
     assert after_first["products"] == len(PRODUCTS) and after_first["ownerships"] >= 3
+    assert after_first["rewards"] == sum(1 for p in SHOP if p["reward_only"])
     assert after_first["projects"] == 2 and after_first["fundings"] >= 5
     assert after_first["achievements"] >= 10 and after_first["campaigns"] == 4  # demo + 3 seasonal (027)
     assert after_first["articles"] == 3 and after_first["pages"] >= 3

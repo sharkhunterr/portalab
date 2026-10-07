@@ -11,7 +11,7 @@ from pydantic import Field
 from portalab.capabilities.themes import (
     AMBIENTS,
     CELEBRATIONS,
-    LEVEL_BADGES,
+    LEVEL_UPS,
     NOTIFICATION_ANIMATIONS,
     NOTIFICATION_STYLES,
     PALETTES,
@@ -86,10 +86,10 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
         "Animated layer behind the portal (theme: the theme's); some are sold in the shop (027).",
     ),
     (
-        "ui.levelBadge",
-        _one_of(LEVEL_BADGES),
+        "ui.levelUp",
+        _one_of(LEVEL_UPS),
         "classic",
-        "Look of the level (XP) badge (027); some looks are sold in the shop.",
+        "How a level-up is shown (027); some are sold in the shop.",
     ),
     (
         "ui.celebration",

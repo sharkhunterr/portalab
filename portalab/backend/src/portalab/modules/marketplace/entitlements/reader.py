@@ -83,7 +83,11 @@ class CosmeticsReader:
 
     async def sold(self, kind: str, field: str) -> frozenset[str]:
         async with self.database.session() as session:
-            rows = await session.scalars(self._choices(kind, field).where(Product.state == "available"))
+            # 027: an unavailable product (a reward of an achievement, out of sale) still keeps its design
+            # for its owners
+            rows = await session.scalars(
+                self._choices(kind, field).where(Product.state.in_(("available", "unavailable")))
+            )
             return frozenset(key for key in rows if key)
 
     async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:

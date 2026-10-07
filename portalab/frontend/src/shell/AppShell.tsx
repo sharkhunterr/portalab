@@ -1,6 +1,8 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
+import { useWornLevelBadge } from "../features/community/profile/looks";
+import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
 import { focusHeaderSearch } from "./header/HeaderSearch";
@@ -51,6 +53,7 @@ export function AppShell({
   const arrangement = useArrangement();
   const { view } = useNavigationView();
   const header = useHeaderData();
+  useWornLevelBadge(Boolean(header.me)); // 027: the level badge look the member wears, everywhere
   const [menuOpen, setMenuOpen] = useState(false);
   // biome-ignore lint/correctness/useExhaustiveDependencies: close the menu panel on navigation
   useEffect(() => setMenuOpen(false), [location.pathname]);
@@ -130,6 +133,7 @@ export function AppShell({
           bottomBar={nav === "bottom-bar"}
         />
         <GlobalStatusBanner />
+        <LevelUpMoment />
         <AnnouncementBanner />
         <MaintenanceBanner />
         {nav === "topbar" ? (

@@ -104,6 +104,7 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "profile_background": ("background",),
     "name_style": ("style",),
     "level_badge": ("style",),
+    "level_up": ("animation",),
     "widget_option": ("option",),
     "project_launch": ("kind",),
     "statistic": ("statistic",),
@@ -337,7 +338,7 @@ async def refund(
 
 # --- 027: profile looks (banner, avatar frame, film backdrop) -------------------------------------------
 class ProfileLookIn(BaseModel):
-    slot: str = Field(pattern=r"^(banner|frame|backdrop|background|name|title|badges)$")
+    slot: str = Field(pattern=r"^(banner|frame|backdrop|background|name|title|badges|level)$")
     value: Any = None
 
 

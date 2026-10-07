@@ -145,3 +145,27 @@ async def test_shop_window_widget_leaves_out_what_the_viewer_owns(mk: MkHarness)
     assert loaded.data is not None
     assert [i["key"] for i in loaded.data["items"]] == ["badge_b"] and loaded.data["total"] == 1
     assert {"rarity", "price", "type", "featured"} <= set(loaded.data["items"][0])
+
+
+async def test_level_badge_slot_and_reward_only_designs(mk: MkHarness) -> None:
+    """027: the level badge's look is a profile slot — ``classic`` free, a sold look only for its owners —
+    and a design given by an achievement (an « unavailable » product, out of sale) stays exclusive."""
+    import pytest
+
+    from portalab.modules.marketplace.looks.service import LookLocked
+
+    await published(mk, "level_neon", "level_badge", payload={"style": "neon"})
+    await published(mk, "level_crown", "level_badge", payload={"style": "crown"})
+    await mk.module.catalog.move(mk.p("boss"), "level_crown", "unavailable")  # an achievement's reward
+    looks = mk.module.looks
+    user = mk.people["ursula"]
+    assert (await looks.equip(user, "level", "classic"))["level"] == "classic"
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "level", "neon")
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "level", "crown")  # out of sale, yet not free for everyone
+    await mk.module.grants.grant(mk.p("boss"), user, "level_crown", "achievement")
+    assert (await looks.equip(user, "level", "crown"))["level"] == "crown"
+    catalog = await looks.catalog(user)
+    shown = {c["key"]: c["locked"] for c in catalog["levels"]}
+    assert shown["crown"] is False and shown["neon"] is True and shown["classic"] is False

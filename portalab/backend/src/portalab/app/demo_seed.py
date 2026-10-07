@@ -178,6 +178,46 @@ ACHIEVEMENTS |= {
     )
 }  # fmt: skip
 
+# 027: what some achievements unlock — cosmetics in their spirit, most of them exclusive (out of sale)
+ACHIEVEMENTS["completionist"] = {
+    "category": "purchase",
+    "label": "The Collector",
+    "description": "Buy 150 things in the shop — nearly the whole catalog.",
+    "icon": "gem",
+    "criteria": _count("marketplace.purchase", 150),
+    "rewards": [{"value": "coins", "amount": 500}],
+}
+
+
+def _unlock(product: str, kind: str, label: str) -> dict[str, str]:
+    return {"product": product, "kind": kind, "label": label}
+
+
+UNLOCKS: dict[str, list[dict[str, str]]] = {
+    "golden_cinephile": [_unlock("title_golden_reel", "title", "Golden reel")],
+    "wishlist_master": [_unlock("title_wish_master", "title", "Wish master")],
+    "bug_hunter": [_unlock("badge_bug_hunter", "badge", "Bug hunter")],
+    "patron": [
+        _unlock("badge_patron", "badge", "Patron"),
+        _unlock("title_patron", "title", "Patron of the arts"),
+    ],
+    "big_spender": [_unlock("title_big_spender", "title", "Big spender")],
+    "achievement_hunter": [_unlock("badge_achievement_hunter", "badge", "Achievement hunter")],
+    "loyal": [_unlock("frame_loyal", "avatar_frame", "Loyal golden frame")],
+    "night_owl": [_unlock("bg_night_owl", "profile_background", "Night owl starry sky")],
+    "level_20": [
+        _unlock("level_crown", "level_badge", "Crowned level badge"),
+        _unlock("title_living_legend", "title", "Living legend"),
+    ],
+    "xp_10000": [_unlock("levelup_cinema", "level_up", "Premiere level-up")],
+    "completionist": [
+        _unlock("badge_completionist", "badge", "The Collector"),
+        _unlock("title_completionist", "title", "The Collector"),
+    ],
+}  # fmt: skip
+for key, unlocks in UNLOCKS.items():
+    ACHIEVEMENTS[key] = {**ACHIEVEMENTS[key], "unlocks": unlocks}
+
 QUESTS: dict[str, dict[str, Any]] = {
     "daily_visit": {
         "kind": "daily",
@@ -511,6 +551,10 @@ class DemoSeeder:
                 await catalog.create(self.admin, raw)
                 await catalog.move(self.admin, product["key"], "available")
                 made += 1
+            if product.get("reward_only"):  # 027: given by an achievement, never sold
+                current, _ = await catalog.get(product["key"])
+                if current.state == "available":
+                    await catalog.move(self.admin, product["key"], "unavailable")
             else:
                 current, version = await catalog.get(product["key"])
                 wanted = raw["version"]

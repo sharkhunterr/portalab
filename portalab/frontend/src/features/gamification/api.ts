@@ -22,6 +22,9 @@ export interface AchievementView {
   category?: string;
   unlock_share?: number;
   rarity?: "common" | "rare" | "epic" | "legendary";
+  /** 027: what it gives — Coins and co, and the cosmetics some achievements unlock. */
+  rewards?: Array<{ value: string; amount: number }>;
+  unlocks?: Array<{ product: string; kind: string; label: string }>;
 }
 
 export interface AnomalyView {

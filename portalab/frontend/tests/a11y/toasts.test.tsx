@@ -76,11 +76,20 @@ describe("live toasts", () => {
     await act(async () => {
       vi.advanceTimersByTime(5000);
     });
+    await act(async () => {
+      vi.advanceTimersByTime(600); // 027: it plays its exit animation, then goes
+    });
     expect(screen.queryByText("New film")).toBeNull();
     expect(screen.getByText("Media is down")).toBeTruthy(); // critical stays until acknowledged
     const dismiss = screen.getByRole("button", { name: "Dismiss: Media is down" });
     dismiss.focus();
     fireEvent.click(dismiss);
+    expect(screen.getByText("Media is down").closest(".ds-notification")?.hasAttribute("data-leaving")).toBe(
+      true,
+    );
+    await act(async () => {
+      vi.advanceTimersByTime(600);
+    });
     expect(screen.queryByText("Media is down")).toBeNull();
     vi.useRealTimers();
   });

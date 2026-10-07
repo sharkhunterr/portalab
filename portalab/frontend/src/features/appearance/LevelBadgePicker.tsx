@@ -1,28 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "../../api/client";
-import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
-import { LEVEL_BADGES, type LevelBadge } from "../../design-system/a11y/preferences";
+import { LEVEL_BADGES } from "../../design-system/a11y/preferences";
 import { LevelBadge as Badge } from "../../design-system/components/Badges";
+import { useNotify } from "../../design-system/components/Notification";
 import { useT } from "../../i18n/hooks/useT";
+import { useEquipLook, useProfileLooks } from "../community/profile/looks";
+import { useProgression } from "../gamification/api";
 import { InShop } from "./InShop";
 
 /**
- * The level (XP) badge's look (027): the classic one and those the member owns, each shown as worn; how
- * many more the shop sells is said in one line.
+ * The level (XP) badge's look (027): worn on the profile — everyone sees it, in the header, the navigation
+ * and on the profile. « Classic » changes with the level; the others the member owns (bought in the shop or
+ * given by an achievement) are shown as worn at their level; how many more the shop sells is said in one
+ * line.
  */
-export function LevelBadgePicker({ level = 12 }: { level?: number }) {
+export function LevelBadgePicker() {
   const t = useT();
-  const { preferences, setPreference } = usePreferences();
-  const looks = useQuery({
-    queryKey: ["ui", "notification-looks"],
-    retry: false,
-    queryFn: async () =>
-      (await api.GET("/api/v1/ui/notification-looks")).data as unknown as {
-        level_badges?: Array<{ key: string; locked: boolean }>;
-      },
-  });
-  const locked = (key: string) => Boolean(looks.data?.level_badges?.find((p) => p.key === key)?.locked);
+  const notify = useNotify();
+  const looks = useProfileLooks();
+  const equip = useEquipLook();
+  const progression = useProgression();
+  const level = progression.data?.level ?? 12;
+  const locked = (key: string) => Boolean(looks.data?.levels?.find((p) => p.key === key)?.locked);
   const owned = LEVEL_BADGES.filter((key) => !locked(key));
+  const worn = looks.data?.equipped?.level ?? "classic";
   return (
     <section className="looks appearance-card" aria-labelledby="level-badge-picker">
       <h3 id="level-badge-picker">{t("notifications:levelBadge.title")}</h3>
@@ -30,7 +29,7 @@ export function LevelBadgePicker({ level = 12 }: { level?: number }) {
       <fieldset className="level-badges">
         <legend className="visually-hidden">{t("notifications:levelBadge.title")}</legend>
         {owned.map((key) => {
-          const current = preferences.levelBadge === key;
+          const current = worn === key;
           const name = t(`notifications:levelBadge.names.${key}`);
           return (
             <label key={key} className="level-badges__item" data-current={current || undefined}>
@@ -39,7 +38,13 @@ export function LevelBadgePicker({ level = 12 }: { level?: number }) {
                 name="level-badge"
                 value={key}
                 checked={current}
-                onChange={() => setPreference("levelBadge", key as LevelBadge)}
+                disabled={equip.isPending}
+                onChange={() =>
+                  equip.mutate(
+                    { slot: "level", value: key === "classic" ? null : key },
+                    { onError: () => notify({ severity: "warning", title: t("community:looks.failed") }) },
+                  )
+                }
               />
               <Badge level={level} label={name} look={key} />
               <span className="looks__name">{name}</span>
@@ -47,6 +52,7 @@ export function LevelBadgePicker({ level = 12 }: { level?: number }) {
           );
         })}
       </fieldset>
+      <p className="ds-field__hint">{t("notifications:levelBadge.tiers")}</p>
       <InShop count={LEVEL_BADGES.length - owned.length} type="level_badge" />
     </section>
   );

@@ -315,6 +315,7 @@ class Achievements:
                 user,
                 f"achievement:{user}:{definition.key}",
                 {"achievement": shown.label, "description": shown.description},
+                gifts=tuple(unlock.product for unlock in shown.unlocks),
             )
         ]
         ids: list[str] = []
@@ -428,6 +429,11 @@ class Achievements:
                     "rarity": rarity_of(share),
                     "unlocked_at": row.unlocked_at.isoformat() if row else None,
                     "progress": steps,
+                    # 027: what it gives — Coins and co, and the cosmetics it unlocks
+                    "rewards": [
+                        {"value": r.value, "amount": r.amount} for r in definition.definition.rewards
+                    ],
+                    "unlocks": [u.model_dump() for u in definition.definition.unlocks],
                 }
             )
         return out

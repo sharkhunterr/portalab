@@ -20,6 +20,8 @@ export const TYPE_ICONS: Record<string, string> = {
   ambient: "snowflake",
   profile_background: "sparkles",
   name_style: "feather",
+  level_badge: "star",
+  level_up: "trophy",
   widget_option: "settings",
   project_launch: "lightbulb",
 };

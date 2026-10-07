@@ -4,12 +4,14 @@ import { Link } from "react-router";
 import { api } from "../../../api/client";
 import type { Ambient } from "../../../design-system/a11y/preferences";
 import { AdminEmpty, AdminTabs } from "../../../design-system/admin/AdminKit";
+import { LevelBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { useT } from "../../../i18n/hooks/useT";
+import { useProgression } from "../../gamification/api";
 import { imageUrl } from "../../media/api";
 import { backdropUrl, type LookChoice, useEquipLook, useProfileLooks, type WornItem } from "./looks";
 import { BannerArt, FramedAvatar, StyledName, WornBadge } from "./ProfileHero";
@@ -20,15 +22,21 @@ import { BannerArt, FramedAvatar, StyledName, WornBadge } from "./ProfileHero";
  * shop), an animated background, the name's font and effect, a title and a showcase of three badges.
  * Locked designs show a padlock and lead to the shop.
  */
-type Tab = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges";
-type DesignSlot = "banner" | "frame" | "background" | "name";
+type Tab = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges" | "level";
+type DesignSlot = "banner" | "frame" | "background" | "name" | "level";
 const SHOP_TYPE: Record<DesignSlot, string> = {
   banner: "profile_banner",
   frame: "avatar_frame",
   background: "profile_background",
   name: "name_style",
+  level: "level_badge",
 };
-const NONE: Partial<Record<DesignSlot, string>> = { frame: "none", background: "none", name: "none" };
+const NONE: Partial<Record<DesignSlot, string>> = {
+  frame: "none",
+  background: "none",
+  name: "none",
+  level: "classic",
+};
 
 function Choices({
   slot,
@@ -56,7 +64,7 @@ function Choices({
               disabled={choice.locked || equip.isPending}
               onClick={() =>
                 equip.mutate(
-                  { slot, value: choice.key },
+                  { slot, value: slot === "level" && choice.key === "classic" ? null : choice.key },
                   { onError: () => notify({ severity: "warning", title: t("community:looks.failed") }) },
                 )
               }
@@ -70,7 +78,9 @@ function Choices({
                 ) : null}
                 {slot === "background"
                   ? t(`notifications:universe.ambients.${choice.key}`)
-                  : t(`community:looks.${slot}.${choice.key}`)}
+                  : slot === "level"
+                    ? t(`notifications:levelBadge.names.${choice.key}`)
+                    : t(`community:looks.${slot}.${choice.key}`)}
               </span>
             </button>
             {choice.locked ? (
@@ -278,6 +288,7 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
   const [tab, setTab] = useState<Tab>("banner");
   const looks = useProfileLooks(open);
   const equipped = looks.data?.equipped ?? {};
+  const level = useProgression().data?.level ?? 12;
   return (
     <Dialog
       open={open}
@@ -315,6 +326,7 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           { key: "name", label: t("community:looks.tab.name") },
           { key: "title", label: t("community:looks.tab.title") },
           { key: "badges", label: t("community:looks.tab.badges") },
+          { key: "level", label: t("community:looks.tab.level") },
         ]}
       />
       {!looks.data ? (
@@ -355,6 +367,17 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           render={(key) => (
             <span className="looks-grid__name-sample">
               <StyledName name={name} style={key} />
+            </span>
+          )}
+        />
+      ) : tab === "level" ? (
+        <Choices
+          slot="level"
+          choices={looks.data.levels ?? []}
+          current={equipped.level}
+          render={(key) => (
+            <span className="looks-grid__level">
+              <LevelBadge level={level} label={key} look={key} />
             </span>
           )}
         />

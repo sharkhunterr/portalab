@@ -5,6 +5,7 @@ import { connectStream, type LiveEvent } from "../../api/stream";
 import { useCelebrate } from "../../design-system/feedback/Celebration";
 import { useMe } from "../../features/auth/useAuth";
 import type { Progression } from "../../features/gamification/api";
+import { showLevelUp } from "../../features/gamification/levelup/LevelUpMoment";
 import { useUnreadCount } from "../../features/notifications/api";
 import { useT } from "../../i18n/hooks/useT";
 
@@ -68,10 +69,13 @@ function useLiveProgression(enabled: boolean) {
       onEvent: (event: LiveEvent) => {
         if (!isChange(event.data) || seen.current.has(event.id)) return;
         seen.current.add(event.id);
+        const before = client.getQueryData<Progression>(PROGRESSION_KEY)?.level;
         applyChange(client, event.data);
         const change = event.data;
         const { celebrate, t } = latest.current;
         if (change.level_up) {
+          // 027: the level-up moment — the new level, what it brought and what it unlocked
+          showLevelUp({ level: change.level, from: before, xp: change.delta_xp || undefined });
           celebrate({ kind: "level", text: t("shell:levelReached", { level: change.level }) });
         } else if (change.delta_xp > 0) {
           celebrate({ kind: "reward", text: t("shell:xpGained", { amount: change.delta_xp }) });

@@ -67,24 +67,24 @@ async def test_ambient_and_celebration_follow_ownership() -> None:
     assert set(NotificationLooks.SETTINGS) >= {"ui.ambient", "ui.celebration", "ui.palette"}
 
 
-async def test_level_badge_looks_follow_ownership() -> None:
-    """027: the level (XP) badge's look — ``classic`` is free, the others are worn by their owners only."""
+async def test_level_up_looks_follow_ownership() -> None:
+    """027: how a level-up is shown — ``classic`` is free, the others are worn by their owners only."""
 
-    class _Badges(_Shop):
+    class _LevelUps(_Shop):
         async def sold(self, kind: str, field: str) -> frozenset[str]:
-            return frozenset({"saber", "gem"}) if kind == "level_badge" else frozenset()
+            return frozenset({"cosmic", "arcade"}) if kind == "level_up" else frozenset()
 
         async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:
-            return frozenset({"gem"}) if user_id == OWNER and kind == "level_badge" else frozenset()
+            return frozenset({"arcade"}) if user_id == OWNER and kind == "level_up" else frozenset()
 
     registry = CapabilityRegistry()
     registry.declare(COSMETICS_SPEC)
-    registry.provide(COSMETICS, _Badges(), instance_ref="shop", owner="test")
+    registry.provide(COSMETICS, _LevelUps(), instance_ref="shop", owner="test")
     looks = NotificationLooks(registry)
-    badge = looks.validator("ui.levelBadge")
-    assert await badge("classic", None) == []
-    assert await badge("gem", str(OWNER)) == []
-    assert await badge("saber", str(OWNER)) != []
+    level_up = looks.validator("ui.levelUp")
+    assert await level_up("classic", None) == []
+    assert await level_up("arcade", str(OWNER)) == []
+    assert await level_up("cosmic", str(OWNER)) != []
     catalog = await looks.catalog(OWNER)
-    shown = {b["key"]: b["locked"] for b in catalog["level_badges"]}
-    assert shown["saber"] is True and shown["gem"] is False and shown["classic"] is False
+    shown = {b["key"]: b["locked"] for b in catalog["level_ups"]}
+    assert shown["cosmic"] is True and shown["arcade"] is False and shown["classic"] is False

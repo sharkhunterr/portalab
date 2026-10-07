@@ -220,6 +220,10 @@ NOTIFICATION_ANIMATIONS = Literal[
     "water",
     "earth",
     "fire",
+    "blackhole",
+    "melt",
+    "kapow",
+    "portal",
 ]
 AMBIENTS = Literal[
     "none",

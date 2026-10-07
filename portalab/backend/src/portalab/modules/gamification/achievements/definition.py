@@ -50,6 +50,19 @@ class Reward(BaseModel):
     amount: int = Field(ge=1, le=1_000_000)
 
 
+class Unlock(BaseModel):
+    """027: a shop product the achievement gives (a badge, a title, a frame, a background, a level badge…),
+    with the words shown to members — reward-only products are not in the shop's public listing."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    product: str = Field(pattern=r"^[a-z0-9][a-z0-9_.-]{0,95}$")
+    kind: Literal[
+        "badge", "title", "avatar_frame", "profile_banner", "profile_background", "name_style", "level_badge",
+        "level_up", "notification_style", "notification_animation", "effect", "ambient", "palette", "theme",
+    ]  # fmt: skip
+    label: str = Field(min_length=1, max_length=80)
+
+
 class AchievementDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     label: str = Field(min_length=1, max_length=120)
@@ -62,6 +75,7 @@ class AchievementDefinition(BaseModel):
     ] = "other"
     criteria: list[Criterion] = Field(min_length=1, max_length=5)
     rewards: list[Reward] = Field(default_factory=list, max_length=3)
+    unlocks: list[Unlock] = Field(default_factory=list, max_length=4)  # 027: cosmetics it gives
 
 
 _ADAPTER = TypeAdapter(AchievementDefinition)

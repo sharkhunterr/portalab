@@ -114,10 +114,13 @@ export function Notification({
   item,
   onDismiss,
   durationMs,
+  leaving = false,
 }: {
   item: NotificationItem;
   onDismiss?: () => void;
   durationMs?: number | undefined;
+  /** 027: playing its exit animation. */
+  leaving?: boolean;
 }) {
   const tone = item.tone ?? item.severity;
   const internal = item.href?.startsWith("/") && !item.href.startsWith("//");
@@ -126,6 +129,7 @@ export function Notification({
       className="ds-notification"
       data-severity={item.severity}
       data-tone={tone}
+      data-leaving={leaving || undefined}
       role={item.severity === "critical" ? "alert" : "status"}
     >
       <span className="ds-notification__icon" aria-hidden="true">
@@ -160,6 +164,9 @@ export function Notification({
   );
 }
 
+/** 027: how long a notification takes to leave (its exit animation). */
+const EXIT_MS = 520;
+
 interface NotifyContextValue {
   notify: (item: Omit<NotificationItem, "id">) => void;
 }
@@ -168,12 +175,33 @@ const NotifyContext = createContext<NotifyContextValue>({ notify: () => undefine
 
 export function NotificationArea({ children }: { children: ReactNode }) {
   const { preferences } = usePreferences();
-  const { looks } = useTheme(); // 027: the member's look, or the theme's when they follow it
+  const { looks, effective } = useTheme(); // 027: the member's look, or the theme's when they follow it
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [paused, setPaused] = useState(false);
   const counter = useRef(0);
   sound.enabled = preferences.soundEnabled;
-  const dismiss = useCallback((id: string) => setItems((current) => current.filter((i) => i.id !== id)), []);
+  // 027: a notification leaves with its animation (sucked into a black hole, melting…) before it goes
+  const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
+  const reduced = effective.reducedMotion;
+  const dismiss = useCallback(
+    (id: string) => {
+      const remove = () => {
+        setItems((current) => current.filter((i) => i.id !== id));
+        setLeaving((current) => {
+          const next = new Set(current);
+          next.delete(id);
+          return next;
+        });
+      };
+      if (reduced) {
+        remove();
+        return;
+      }
+      setLeaving((current) => new Set(current).add(id));
+      window.setTimeout(remove, EXIT_MS);
+    },
+    [reduced],
+  );
   const notify = useCallback((item: Omit<NotificationItem, "id">) => {
     counter.current += 1;
     const id = `n${counter.current}`;
@@ -185,11 +213,11 @@ export function NotificationArea({ children }: { children: ReactNode }) {
   const durationMs = preferences.notificationDurationSeconds * 1000;
   useEffect(() => {
     if (!items.length || paused) return;
-    const oldest = items.find((i) => i.severity !== "critical");
+    const oldest = items.find((i) => i.severity !== "critical" && !leaving.has(i.id));
     if (!oldest) return; // critical notifications stay until dismissed
     const timer = setTimeout(() => dismiss(oldest.id), durationMs);
     return () => clearTimeout(timer);
-  }, [items, durationMs, dismiss, paused]);
+  }, [items, durationMs, dismiss, paused, leaving]);
   const value = useMemo(() => ({ notify }), [notify]);
   const style = looks.notificationStyle === "banner" ? " ds-notifications--banner" : "";
   return (
@@ -213,6 +241,7 @@ export function NotificationArea({ children }: { children: ReactNode }) {
             item={item}
             onDismiss={() => dismiss(item.id)}
             durationMs={durationMs}
+            leaving={leaving.has(item.id)}
           />
         ))}
       </section>

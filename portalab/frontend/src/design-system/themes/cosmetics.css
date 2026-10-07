@@ -1152,6 +1152,269 @@
   color: var(--color-text);
   animation: level-elements 6s linear infinite;
 }
+/* 027: the classic badge changes with the rank (every ten levels; legend from 100, mythic from 250) */
+:is(
+  :root:not([data-level-badge]) .ds-level:not([data-look]),
+  :root[data-level-badge="classic"] .ds-level:not([data-look]),
+  .ds-level[data-look="classic"]
+)[data-tier] {
+  --rank: transparent;
+  box-shadow:
+    0 0 0 2px var(--rank),
+    var(--shadow-1);
+}
+:is(
+  :root:not([data-level-badge]) .ds-level:not([data-look]),
+  :root[data-level-badge="classic"] .ds-level:not([data-look]),
+  .ds-level[data-look="classic"]
+) {
+  &[data-tier="2"] {
+    --rank: #b87333;
+  }
+  &[data-tier="3"] {
+    --rank: #c0c7d0;
+  }
+  &[data-tier="4"] {
+    --rank: #f5c542;
+  }
+  &[data-tier="5"] {
+    --rank: #34d399;
+  }
+  &[data-tier="6"] {
+    --rank: #60a5fa;
+  }
+  &[data-tier="7"] {
+    --rank: #c084fc;
+  }
+  &[data-tier="8"] {
+    --rank: #fbbf24;
+    background:
+      linear-gradient(115deg, transparent 35%, #ffffffaa 50%, transparent 65%) 0 0 / 300% 100%,
+      linear-gradient(135deg, #b45309, #f59e0b 45%, #fde68a);
+    color: #451a03;
+    box-shadow:
+      0 0 0 2px #fde68a,
+      0 0 0 4px #b45309,
+      0 0 12px #f59e0b88;
+    animation: level-gem 4s ease-in-out infinite;
+  }
+  &[data-tier="9"] {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(#1e1035, #1e1035) padding-box,
+      conic-gradient(from var(--level-turn, 0deg), #f43f5e, #f59e0b, #22c55e, #38bdf8, #a855f7, #f43f5e)
+      border-box;
+    color: #fff;
+    box-shadow: 0 0 14px #a855f7aa;
+    animation: level-elements 4s linear infinite;
+  }
+}
+
+/* 027: animated looks — a black hole, melting wax, a comic burst, a dimensional portal, a crown, flames */
+:is(:root[data-level-badge="blackhole"] .ds-level:not([data-look]), .ds-level[data-look="blackhole"]) {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(circle, #000000 45%, #1e1b4b 70%, #000000);
+  color: #e0e7ff;
+  box-shadow: 0 0 10px #6366f1aa;
+}
+:is(
+  :root[data-level-badge="blackhole"] .ds-level:not([data-look]),
+  .ds-level[data-look="blackhole"]
+)::before {
+  content: "";
+  position: absolute;
+  inset: -0.45rem;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from var(--level-turn, 0deg),
+    transparent,
+    #f97316cc,
+    #fde68a,
+    #f97316cc,
+    transparent 60%
+  );
+  filter: blur(2px);
+  mask: radial-gradient(circle, transparent 52%, #000 56%, #000 68%, transparent 72%);
+  animation: level-elements 2.4s linear infinite;
+}
+:is(:root[data-level-badge="blackhole"] .ds-level:not([data-look]), .ds-level[data-look="blackhole"]) > * {
+  animation: level-suck 6s ease-in-out infinite;
+}
+@keyframes level-suck {
+  0%,
+  80%,
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+  88% {
+    transform: scale(0.1) rotate(540deg);
+    opacity: 0;
+  }
+  92% {
+    transform: scale(0.1) rotate(720deg);
+    opacity: 0;
+  }
+}
+:is(:root[data-level-badge="melt"] .ds-level:not([data-look]), .ds-level[data-look="melt"]) {
+  position: relative;
+  border-radius: 0.6rem 0.6rem 0.4rem 0.4rem;
+  background: linear-gradient(180deg, #fb7185, #e11d48);
+  color: #fff1f2;
+}
+:is(:root[data-level-badge="melt"] .ds-level:not([data-look]), .ds-level[data-look="melt"])::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.3rem;
+  inset-block-start: 85%;
+  block-size: 0.7rem;
+  background:
+    radial-gradient(circle at 15% 0, #e11d48 0.22rem, transparent 0.24rem),
+    radial-gradient(circle at 50% 0, #e11d48 0.3rem, transparent 0.32rem),
+    radial-gradient(circle at 82% 0, #e11d48 0.2rem, transparent 0.22rem);
+  transform-origin: top;
+  animation: level-drip 3s ease-in infinite;
+}
+@keyframes level-drip {
+  0% {
+    transform: scaleY(0.4);
+  }
+  70% {
+    transform: scaleY(1.6);
+  }
+  100% {
+    transform: scaleY(0.4);
+  }
+}
+:is(:root[data-level-badge="kapow"] .ds-level:not([data-look]), .ds-level[data-look="kapow"]) {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid #111;
+  border-radius: 0.25rem;
+  background: #fde047;
+  color: #111;
+  font-family: "Bangers", "Luckiest Guy", sans-serif;
+  letter-spacing: 0.04em;
+  box-shadow: 2px 2px 0 #111;
+  animation: level-punch 3.5s ease-out infinite;
+}
+:is(:root[data-level-badge="kapow"] .ds-level:not([data-look]), .ds-level[data-look="kapow"])::before {
+  content: "";
+  position: absolute;
+  inset: -0.55rem -0.7rem;
+  z-index: -1;
+  background: #ef4444;
+  clip-path: polygon(
+    50% 0,
+    61% 30%,
+    95% 12%,
+    74% 42%,
+    100% 55%,
+    70% 64%,
+    82% 100%,
+    52% 74%,
+    25% 98%,
+    32% 66%,
+    0 60%,
+    26% 44%,
+    6% 14%,
+    38% 30%
+  );
+}
+@keyframes level-punch {
+  0%,
+  86%,
+  100% {
+    transform: none;
+  }
+  89% {
+    transform: scale(1.3) rotate(-8deg);
+  }
+  93% {
+    transform: scale(0.95) rotate(3deg);
+  }
+}
+:is(:root[data-level-badge="portal"] .ds-level:not([data-look]), .ds-level[data-look="portal"]) {
+  position: relative;
+  isolation: isolate;
+  background: #052e16;
+  color: #dcfce7;
+  box-shadow: 0 0 10px #22c55eaa;
+}
+:is(:root[data-level-badge="portal"] .ds-level:not([data-look]), .ds-level[data-look="portal"])::before {
+  content: "";
+  position: absolute;
+  inset: -0.35rem;
+  z-index: -1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from var(--level-turn, 0deg),
+    #22c55e 0 12deg,
+    #a3e635 12deg 24deg,
+    #052e16 24deg 36deg
+  );
+  filter: blur(1px);
+  animation: level-elements 1.8s linear infinite;
+}
+:is(:root[data-level-badge="crown"] .ds-level:not([data-look]), .ds-level[data-look="crown"]) {
+  position: relative;
+  margin-block-start: 0.55rem;
+  background: linear-gradient(135deg, #7c2d12, #b45309 50%, #f59e0b);
+  color: #fef3c7;
+  box-shadow:
+    0 0 0 2px #fde68a,
+    0 0 12px #f59e0b99;
+}
+:is(:root[data-level-badge="crown"] .ds-level:not([data-look]), .ds-level[data-look="crown"])::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.7rem;
+  inset-inline-start: 50%;
+  inline-size: 1.3rem;
+  block-size: 0.75rem;
+  background: linear-gradient(#fde68a, #f59e0b);
+  clip-path: polygon(0 100%, 0 20%, 25% 60%, 50% 0, 75% 60%, 100% 20%, 100% 100%);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 3px #f59e0b);
+}
+:is(:root[data-level-badge="inferno"] .ds-level:not([data-look]), .ds-level[data-look="inferno"]) {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(0deg, #7f1d1d, #ea580c);
+  color: #fff7ed;
+}
+:is(:root[data-level-badge="inferno"] .ds-level:not([data-look]), .ds-level[data-look="inferno"])::before {
+  content: "";
+  position: absolute;
+  inset: -0.5rem 0.1rem 40%;
+  z-index: -1;
+  border-radius: 50% 50% 20% 20%;
+  background:
+    radial-gradient(ellipse at 30% 100%, #f97316 30%, transparent 60%),
+    radial-gradient(ellipse at 70% 100%, #facc15 25%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, #ef4444 40%, transparent 70%);
+  filter: blur(2px);
+  animation: level-flames 0.9s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+@keyframes level-flames {
+  from {
+    transform: scaleY(0.85) skewX(-4deg);
+  }
+  to {
+    transform: scaleY(1.15) skewX(4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-level::before,
+  .ds-level::after,
+  .ds-level > * {
+    animation: none !important;
+  }
+}
+
 @property --level-turn {
   syntax: "<angle>";
   inherits: false;

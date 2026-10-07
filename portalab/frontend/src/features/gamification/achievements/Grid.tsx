@@ -12,6 +12,7 @@ import type { AchievementView } from "../api";
  * medals are animated (static under reduced motion). Hidden achievements keep their secret but show rarity.
  */
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
+const GIVES_ICON: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "handshake" };
 type Sort = "rarity" | "recent" | "name";
 
 export function AchievementGrid({ achievements }: { achievements: AchievementView[] }) {
@@ -92,6 +93,23 @@ export function AchievementGrid({ achievements }: { achievements: AchievementVie
                   <>
                     <h3>{achievement.label}</h3>
                     {achievement.description ? <p>{achievement.description}</p> : null}
+                    {achievement.rewards?.length || achievement.unlocks?.length ? (
+                      // 027: what it gives — Coins and co, and for some the cosmetics it unlocks
+                      <ul className="achievement__gives" aria-label={t("gamification:achievements.gives")}>
+                        {(achievement.rewards ?? []).map((reward) => (
+                          <li key={reward.value} data-value={reward.value}>
+                            <Icon name={GIVES_ICON[reward.value] ?? "star"} size={12} />+
+                            {format.number(reward.amount)} {t(`gamification:value.${reward.value}`)}
+                          </li>
+                        ))}
+                        {(achievement.unlocks ?? []).map((unlock) => (
+                          <li key={unlock.product} data-unlock>
+                            <Icon name="gift" size={12} />
+                            {unlock.label}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                     {achievement.category ? (
                       <span className="achievement__category">
                         {t(`gamification:achievements.category.${achievement.category}`)}

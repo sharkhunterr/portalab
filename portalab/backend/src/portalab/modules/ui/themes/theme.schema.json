@@ -1091,7 +1091,11 @@
             "air",
             "water",
             "earth",
-            "fire"
+            "fire",
+            "blackhole",
+            "melt",
+            "kapow",
+            "portal"
           ]
         }
       },

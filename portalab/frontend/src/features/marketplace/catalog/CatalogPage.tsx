@@ -41,6 +41,8 @@ export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }>
       { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
       { key: "effects", icon: "sparkles", types: ["effect", "ambient"] },
       { key: "badges", icon: "star", types: ["badge", "title"] },
+      // 027: the level badge's looks and the level-up moments
+      { key: "levels", icon: "trophy", types: ["level_badge", "level_up"] },
     ],
   },
   {

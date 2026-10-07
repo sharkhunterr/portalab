@@ -247,3 +247,25 @@
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px var(--color-accent);
 }
+
+/* 027: the level badge next to the name, in the look the member wears */
+.profile-hero__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.profile-hero__name .ds-level {
+  align-self: center;
+  font-size: var(--font-size-md);
+  transform: scale(1.15);
+}
+.looks-grid__level {
+  display: grid;
+  place-items: center;
+  min-block-size: 4rem;
+}
+.looks-grid__level .ds-level {
+  align-self: center;
+  transform: scale(1.4);
+}
