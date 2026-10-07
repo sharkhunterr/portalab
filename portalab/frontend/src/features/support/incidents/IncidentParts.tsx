@@ -34,7 +34,7 @@ export function SeverityBadge({ severity }: { severity: string }) {
   );
 }
 
-/** The four steps of an incident, the current one marked. */
+/** The four steps of an incident, the current one marked — each step in its own colour (027), also named. */
 export function StateSteps({ state, compact = false }: { state: string; compact?: boolean }) {
   const t = useT();
   const reached = STATES.indexOf(state as (typeof STATES)[number]);
@@ -47,6 +47,7 @@ export function StateSteps({ state, compact = false }: { state: string; compact?
       {STATES.map((step, index) => (
         <li
           key={step}
+          data-step={step}
           data-done={index < reached || state === "resolved" || undefined}
           data-current={index === reached || undefined}
         >

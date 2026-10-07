@@ -584,3 +584,20 @@
     animation: none;
   }
 }
+
+/* 027: any element can carry a state tone (« has-tone » + data-tone) and paint with var(--tone) */
+.has-tone {
+  --tone: var(--admin-neutral, var(--color-text-muted));
+}
+.has-tone[data-tone="ok"] {
+  --tone: var(--state-available-fg);
+}
+.has-tone[data-tone="warn"] {
+  --tone: var(--state-partial-fg);
+}
+.has-tone[data-tone="bad"] {
+  --tone: var(--state-error-fg);
+}
+.has-tone[data-tone="info"] {
+  --tone: var(--color-accent);
+}

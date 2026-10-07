@@ -9,6 +9,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type Incident, useIncident, useIncidents } from "./api";
 import { SeverityBadge, StateSteps, useLasting } from "./IncidentParts";
 import { type Maintenance, useMaintenances, useServiceNames } from "./maintenance";
+import "../support.css";
 
 /** Incidents (spec 016 T013; 027 redesign): the state of the portal at a glance, then each incident as a
  * card — severity, step reached, how long it lasts, affected services, latest news — and its timeline. */

@@ -313,6 +313,9 @@ lossless migration.
 - [X] T171 [US6] Layout widgets, sold in the shop: progress bar across and upright (level, today's objectives, quests, achievements), separator (line, dashes, dots, gradient, space, label), clock, sticky note, countdown; « since your last visit » without its inner background
 - [X] T172 [US11] New shop looks without duplicates: notification shapes (square tile, bubble, cloud, ticket, label, two-tone), entrance animations (rise, wipe, focus, jelly, shake), accent palettes (polar, copper, solar, berry, slate, peach, crimson — no shared pair, AA tested)
 - [X] T173 [US3] Campaigns use the width: identity and boosts beside the time left, « day N of M » progress (page and widget, the running window); shop notices name the product in the owner's language
+- [X] T174 [US3] Incident steps in their own colours (investigating red, identified amber, monitoring blue, resolved green) on cards, widget and timeline; the incidents page loads its own styles (its status banner was unstyled when opened directly)
+- [X] T175 [US6] Services widget redesigned (a ring of how many work, a chip per troubled state, a tile per service ringed in its state with its 24 h availability, trouble then importance first) and a new compact one-line widget (`health.services_compact`)
+- [X] T176 [US6] Widget catalog: searchable, « to add » and « already there » apart, shop widgets no longer mixed in — one line says how many more the shop has, like Appearance
 
 ## Dependencies & Execution Order
 

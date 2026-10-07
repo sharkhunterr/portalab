@@ -61,6 +61,22 @@ SERVICES_SUMMARY = WidgetDefinition(
     component_id="health.services_summary",
 )
 
+# 027: the same states in one line — a dot per service and the count that works (a header-sized block)
+SERVICES_COMPACT = WidgetDefinition(
+    key="health.services_compact",
+    owner=OWNER,
+    title_key="dashboard:widget.services_compact.title",
+    description_key="dashboard:widget.services_compact.description",
+    icon="activity",
+    required_permission=SERVICES_READ,
+    config_schema={"type": "object", "properties": {}, "additionalProperties": False},
+    config_defaults={"_hide_title": True},
+    size=SizeLimits(default=Size(4, 1), min=Size(2, 1), max=Size(12, 2)),
+    refresh=Refresh(mode="event", events=(STATUS_CHANGED,)),
+    stale_after_s=600,
+    component_id="health.services_compact",
+)
+
 SERVICE_LINKS = WidgetDefinition(
     key="health.service_links",
     owner=OWNER,
@@ -380,11 +396,17 @@ def _provider(capabilities: CapabilityRegistry, name: str) -> Any | None:
 
 class ServicesSummaryProvider:
     def __init__(
-        self, capabilities: CapabilityRegistry, authorizer: Authorizer, clock: Clock | None = None
+        self,
+        capabilities: CapabilityRegistry,
+        authorizer: Authorizer,
+        clock: Clock | None = None,
+        *,
+        compact: bool = False,
     ) -> None:
         self.capabilities = capabilities
         self.authorizer = authorizer
         self.clock = clock
+        self.compact = compact  # 027: every service, for the one-line version
 
     async def _rows(self) -> list[dict[str, Any]]:
         states = _provider(self.capabilities, SERVICE_STATE)
@@ -400,11 +422,18 @@ class ServicesSummaryProvider:
                 {
                     "id": service.id,
                     "name": service.name,
+                    "connector": service.connector,
+                    "importance": service.importance,
                     "state": view.state if view else "unknown",
                     "since": view.since.isoformat() if view else None,
+                    "availability": view.availability if view else None,
                     "as_of": view.as_of if view else None,
                 }
             )
+        # 027: trouble first, then by importance, then by name
+        severity = {"unavailable": 0, "degraded": 1, "maintenance": 2, "unknown": 3, "operational": 4}
+        order = {"critical": 0, "major": 1, "minor": 2, "internal": 3}
+        rows.sort(key=lambda r: (severity.get(r["state"], 5), order.get(r["importance"], 4), r["name"]))
         return rows
 
     async def load(
@@ -423,11 +452,14 @@ class ServicesSummaryProvider:
             {
                 "id": r["id"],
                 "name": r["name"],
+                "connector": r["connector"],
+                "importance": r["importance"],
                 "state": r["state"],
                 "since": r["since"],
+                "availability": r["availability"],
                 "route": f"/services/{r['id']}",
             }
-            for r in shown[: int(config.get("limit", 8))]
+            for r in shown[: int(config.get("limit", 50 if self.compact else 8))]
         ]
         return WidgetPayload(
             "partial" if unknown and len(unknown) < len(rows) else "available",
@@ -530,6 +562,12 @@ def register_builtin(
     registry.register(WELCOME, WelcomeProvider(clock), owner=OWNER)
     services = ServicesSummaryProvider(capabilities, authorizer, clock)
     registry.register(SERVICES_SUMMARY, services, owner=OWNER)
+    if registry.get(SERVICES_COMPACT.key) is None:
+        registry.register(
+            SERVICES_COMPACT,
+            ServicesSummaryProvider(capabilities, authorizer, clock, compact=True),
+            owner=OWNER,
+        )
     if registry.get(SERVICE_LINKS.key) is None:
         registry.register(SERVICE_LINKS, ServiceLinksProvider(capabilities, authorizer, clock), owner=OWNER)
     registry.register_summary(ServicesChanges(services), owner=OWNER)
