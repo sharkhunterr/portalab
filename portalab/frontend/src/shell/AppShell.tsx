@@ -11,7 +11,7 @@ import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
-import { DockNav, LauncherNav, TabsNav, TerminalNav } from "./nav/PrincipleNavs";
+import { DockNav, LauncherNav, ReelNav, TabsNav, TerminalNav } from "./nav/PrincipleNavs";
 import { NavContent } from "./nav/SectionNav";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
@@ -25,7 +25,7 @@ import { useShellStrings } from "./strings";
 /**
  * Persistent shell (spec 004 T017; 027 US1–US3): one environment for every module — the personal header,
  * the section navigation in the arrangement the theme chose for the device (sidebar, rail, top bar,
- * drawer, phone bottom bar, orbit bubble, dock, book tabs, launcher screen, terminal line; header on top
+ * drawer, phone bottom bar, orbit bubble, dock, book tabs, launcher screen, terminal line, film reel; header on top
  * or as a footer bar), the global status banner,
  * breadcrumbs and the page outlet. Only the outlet changes on navigation, and a change of arrangement
  * never remounts it: the page keeps its state. Unknown to anonymous visitors (CD-025).
@@ -138,6 +138,7 @@ export function AppShell({
           </nav>
         ) : null}
         {nav === "terminal" ? <TerminalNav sections={sections} /> : null}
+        {nav === "reel" ? <ReelNav sections={sections} /> : null}
         <div className="shell-body">
           {nav === "tabs" ? <TabsNav sections={sections} /> : null}
           {nav === "sidebar" || nav === "rail" ? (

@@ -311,3 +311,38 @@
   color: var(--state-available-fg);
   font-size: var(--font-size-xs);
 }
+
+/* 027: level (XP) badge looks, each shown as worn */
+.level-badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.level-badges__item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2) var(--space-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.level-badges__item .ds-level {
+  align-self: center;
+}
+.level-badges__item[data-current] {
+  border-color: var(--color-accent);
+}
+.level-badges__item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.level-badges__item:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

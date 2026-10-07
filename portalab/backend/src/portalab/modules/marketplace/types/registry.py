@@ -236,6 +236,7 @@ def register_builtin_types(
         ("ambient", owned, ("ambient",)),  # an animated layer behind the whole portal
         ("profile_background", owned, ("background",)),  # an animated background behind the profile
         ("name_style", owned, ("style",)),  # the name's font and effect on the profile
+        ("level_badge", owned, ("style",)),  # the look of the level (XP) badge
         ("widget_option", owned, ("option",)),  # a widget setting value: ``<widget>:<field>=<value>``
         ("project_launch", ProjectLaunchHandler(project_launch), ("kind",)),  # a community project
     ):

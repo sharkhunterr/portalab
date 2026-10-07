@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 2,
+  "key": "plex",
+  "name": "Plex",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#1c1d1f",
+    "surfaceRaised": "#282a2d",
+    "text": "#ececec",
+    "textMuted": "#a8aaad",
+    "border": "#3b3d41",
+    "accent": "#e5a00d",
+    "accentContrast": "#1c1d1f",
+    "focus": "#e5a00d",
+    "accentAlt": "#cc7b19",
+    "rarity": {
+      "common": "#a8aaad",
+      "rare": "#5aa9e6",
+      "epic": "#b48cf2",
+      "legendary": "#e5a00d"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#27282e",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#1d2826",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2c2620",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2a261e",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#2c2126",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2a2229",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#252231",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#2b222b",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#24252b",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#1f262f",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "headingCase": "none",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.25,
+    "md": 0.45
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "glow",
+    "fastMs": 120,
+    "normalMs": 200
+  },
+  "layout": {
+    "nav": {
+      "desktop": "sidebar",
+      "tablet": "rail",
+      "phone": "bottom-bar"
+    },
+    "header": "full",
+    "headerPosition": "top",
+    "cards": "flat",
+    "content": "full",
+    "corners": "soft",
+    "widgetFrame": "plain"
+  },
+  "icons": {
+    "set": "default",
+    "overrides": {
+      "film": "film",
+      "media": "film",
+      "compass": "compass",
+      "server": "server",
+      "search": "search"
+    }
+  },
+  "background": {
+    "fallback": "#1c1d1f",
+    "pattern": "none",
+    "ambient": "none"
+  },
+  "sounds": {
+    "notification": "asset:soft/notification.wav",
+    "alert": "asset:soft/alert.wav",
+    "success": "asset:soft/success.wav",
+    "reward": "asset:soft/reward.wav",
+    "levelUp": "asset:soft/level-up.wav",
+    "ui": "asset:soft/ui.wav"
+  },
+  "notification": {
+    "style": "split",
+    "animation": "slide"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Accueil",
+      "nav:nav.section.home": "Accueil",
+      "dashboard:title": "Accueil",
+      "nav:nav.media": "Bibliothèques",
+      "nav:nav.section.media": "Bibliothèques",
+      "media:home.title": "Bibliothèques",
+      "nav:nav.media_requests": "Ma liste de suivi",
+      "nav:nav.media_insights": "Mes statistiques",
+      "media:insights.title": "Mes statistiques",
+      "nav:nav.section.content": "À découvrir",
+      "nav:nav.news": "Actualités",
+      "news:title": "Actualités",
+      "nav:nav.wiki": "Wiki",
+      "wiki:title": "Wiki",
+      "nav:nav.search": "Rechercher",
+      "search:title": "Rechercher",
+      "nav:nav.calendar": "Programmation",
+      "calendar:title": "Programmation",
+      "nav:nav.services": "Serveur",
+      "nav:nav.section.services": "Serveur",
+      "nav:nav.statistics": "Statistiques",
+      "statistics:title": "Statistiques",
+      "nav:nav.community": "Amis",
+      "nav:nav.section.community": "Amis",
+      "community:title": "Amis",
+      "nav:nav.progression": "Mon activité",
+      "gamification:progression.title": "Mon activité",
+      "nav:nav.campaigns": "Évènements",
+      "campaigns:page.title": "Évènements",
+      "nav:nav.marketplace": "Boutique",
+      "nav:nav.section.marketplace": "Boutique",
+      "marketplace:catalog.title": "Boutique",
+      "nav:nav.projects": "Projets",
+      "marketplace:projects.title": "Projets",
+      "marketplace:owned.title": "Mes achats",
+      "nav:nav.support": "Aide",
+      "nav:nav.section.support": "Aide",
+      "nav:nav.incidents": "Incidents",
+      "support:incident.title": "Incidents",
+      "nav:nav.feedback": "Suggestions",
+      "support:feedback.title": "Suggestions",
+      "gamification:value.coins": "Crédits",
+      "gamification:value.xp": "XP"
+    },
+    "en": {
+      "nav:nav.home": "Home",
+      "nav:nav.section.home": "Home",
+      "dashboard:title": "Home",
+      "nav:nav.media": "Libraries",
+      "nav:nav.section.media": "Libraries",
+      "media:home.title": "Libraries",
+      "nav:nav.media_requests": "My watchlist",
+      "nav:nav.media_insights": "My stats",
+      "media:insights.title": "My stats",
+      "nav:nav.section.content": "Discover",
+      "nav:nav.news": "News",
+      "news:title": "News",
+      "nav:nav.wiki": "Wiki",
+      "wiki:title": "Wiki",
+      "nav:nav.search": "Search",
+      "search:title": "Search",
+      "nav:nav.calendar": "Schedule",
+      "calendar:title": "Schedule",
+      "nav:nav.services": "Server",
+      "nav:nav.section.services": "Server",
+      "nav:nav.statistics": "Statistics",
+      "statistics:title": "Statistics",
+      "nav:nav.community": "Friends",
+      "nav:nav.section.community": "Friends",
+      "community:title": "Friends",
+      "nav:nav.progression": "My activity",
+      "gamification:progression.title": "My activity",
+      "nav:nav.campaigns": "Events",
+      "campaigns:page.title": "Events",
+      "nav:nav.marketplace": "Store",
+      "nav:nav.section.marketplace": "Store",
+      "marketplace:catalog.title": "Store",
+      "nav:nav.projects": "Projects",
+      "marketplace:projects.title": "Projects",
+      "marketplace:owned.title": "My purchases",
+      "nav:nav.support": "Help",
+      "nav:nav.section.support": "Help",
+      "nav:nav.incidents": "Incidents",
+      "support:incident.title": "Incidents",
+      "nav:nav.feedback": "Suggestions",
+      "support:feedback.title": "Suggestions",
+      "gamification:value.coins": "Credits",
+      "gamification:value.xp": "XP"
+    }
+  }
+}

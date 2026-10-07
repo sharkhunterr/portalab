@@ -194,6 +194,8 @@ function trialOf(product: Product): Partial<UiPreferences> | null {
       return value("effect") ? ({ celebration: value("effect") } as Partial<UiPreferences>) : null;
     case "notification_style":
       return value("style") ? ({ notificationStyle: value("style") } as Partial<UiPreferences>) : null;
+    case "level_badge":
+      return value("style") ? ({ levelBadge: value("style") } as Partial<UiPreferences>) : null;
     case "notification_animation":
       return value("animation")
         ? ({ notificationAnimation: value("animation") } as Partial<UiPreferences>)

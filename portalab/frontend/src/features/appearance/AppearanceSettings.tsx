@@ -11,6 +11,7 @@ import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
 import { presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { InShop } from "./InShop";
+import { LevelBadgePicker } from "./LevelBadgePicker";
 import { NotificationLooks } from "./NotificationLooks";
 import { PalettePicker } from "./PalettePicker";
 import { UniverseLooks } from "./UniverseLooks";
@@ -38,6 +39,7 @@ export const appearanceStrings = {
     tabs: "Book tabs",
     launcher: "Launcher screen",
     terminal: "Command line",
+    reel: "Film reel",
   } as Record<string, string>,
   footerHeader: "header at the bottom",
   theme: "Theme",
@@ -291,6 +293,7 @@ export function AppearanceSettings() {
         ))}
       </section>
       <PalettePicker />
+      <LevelBadgePicker />
       <section className="appearance-card" aria-labelledby="appearance-display">
         <h3 id="appearance-display">{appearanceStrings.display}</h3>
         <p className="ds-page-header__context">{appearanceStrings.displayHint}</p>

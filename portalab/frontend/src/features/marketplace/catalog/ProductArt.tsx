@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useState } from "react";
 import type { Ambient } from "../../../design-system/a11y/preferences";
+import { LevelBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { Notification } from "../../../design-system/components/Notification";
 import { CelebrationScene } from "../../../design-system/feedback/Celebration";
@@ -36,6 +37,7 @@ export const TYPE_BADGE_ICON: Record<string, string> = {
   avatar_frame: "user",
   profile_backdrop: "film",
   palette: "palette",
+  level_badge: "star",
 };
 
 type Preview = Record<string, unknown>;
@@ -271,6 +273,14 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
               style: text(preview, "style") ?? null,
             }}
           />
+        </span>
+      );
+    case "level_badge":
+      return (
+        <span className="product-art__level" data-size={size}>
+          {[7, 42, 253].map((level) => (
+            <LevelBadge key={level} level={level} label={name} look={text(preview, "style")} />
+          ))}
         </span>
       );
     case "name_style":

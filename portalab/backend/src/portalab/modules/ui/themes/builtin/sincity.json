@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "key": "sincity",
+  "name": "Sin City",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#050505",
+    "surfaceRaised": "#131313",
+    "text": "#f5f5f5",
+    "textMuted": "#b5b5b5",
+    "border": "#3a3a3a",
+    "accent": "#e10600",
+    "accentContrast": "#ffffff",
+    "focus": "#f5d90a",
+    "accentAlt": "#f5d90a",
+    "rarity": {
+      "common": "#b5b5b5",
+      "rare": "#f5f5f5",
+      "epic": "#ff4d40",
+      "legendary": "#f5d90a"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#27282e",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#1d2826",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2c2620",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2a261e",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#2c2126",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2a2229",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#252231",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#2b222b",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#24252b",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#1f262f",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "headingFamily": "Anton, sans-serif",
+    "headingCase": "uppercase",
+    "headingEffect": "shadow"
+  },
+  "radii": {
+    "sm": 0,
+    "md": 0
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "shatter",
+    "fastMs": 120,
+    "normalMs": 260
+  },
+  "layout": {
+    "nav": {
+      "desktop": "reel",
+      "tablet": "reel",
+      "phone": "reel"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "comic",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "landmark",
+      "film": "clapperboard",
+      "media": "clapperboard",
+      "compass": "map",
+      "server": "lamp",
+      "users": "glasses",
+      "shop": "wine",
+      "lifebuoy": "flashlight",
+      "trophy": "medal",
+      "search": "eye"
+    }
+  },
+  "background": {
+    "fallback": "#050505",
+    "pattern": "halftone",
+    "ambient": "fog"
+  },
+  "sounds": {
+    "notification": "asset:spooky/notification.wav",
+    "alert": "asset:spooky/alert.wav",
+    "success": "asset:spooky/success.wav",
+    "reward": "asset:spooky/reward.wav",
+    "levelUp": "asset:spooky/level-up.wav",
+    "ui": "asset:spooky/ui.wav"
+  },
+  "notification": {
+    "style": "noir",
+    "animation": "filmwipe"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "La ville",
+      "nav:nav.section.home": "La ville",
+      "dashboard:title": "La ville",
+      "nav:nav.media": "La salle obscure",
+      "nav:nav.section.media": "La salle obscure",
+      "media:home.title": "La salle obscure",
+      "nav:nav.media_requests": "Mes affaires",
+      "nav:nav.media_insights": "Mon casier judiciaire",
+      "media:insights.title": "Mon casier judiciaire",
+      "nav:nav.section.content": "Les ruelles",
+      "nav:nav.news": "La une du soir",
+      "news:title": "La une du soir",
+      "nav:nav.wiki": "Les archives",
+      "wiki:title": "Les archives",
+      "nav:nav.search": "L'enquête",
+      "search:title": "L'enquête",
+      "nav:nav.calendar": "Les rendez-vous",
+      "calendar:title": "Les rendez-vous",
+      "nav:nav.services": "La centrale",
+      "nav:nav.section.services": "La centrale",
+      "nav:nav.statistics": "Les indics",
+      "statistics:title": "Les indics",
+      "nav:nav.community": "Le gang",
+      "nav:nav.section.community": "Le gang",
+      "community:title": "Le gang",
+      "nav:nav.progression": "Mon dossier",
+      "gamification:progression.title": "Mon dossier",
+      "nav:nav.campaigns": "Les coups",
+      "campaigns:page.title": "Les coups",
+      "nav:nav.marketplace": "Le marché noir",
+      "nav:nav.section.marketplace": "Le marché noir",
+      "marketplace:catalog.title": "Le marché noir",
+      "nav:nav.projects": "Les coups montés",
+      "marketplace:projects.title": "Les coups montés",
+      "marketplace:owned.title": "Mon butin",
+      "nav:nav.support": "Le commissariat",
+      "nav:nav.section.support": "Le commissariat",
+      "nav:nav.incidents": "Les crimes",
+      "support:incident.title": "Les crimes",
+      "nav:nav.feedback": "Les tuyaux",
+      "support:feedback.title": "Les tuyaux",
+      "gamification:value.coins": "Dollars",
+      "gamification:value.xp": "Réputation"
+    },
+    "en": {
+      "nav:nav.home": "The city",
+      "nav:nav.section.home": "The city",
+      "dashboard:title": "The city",
+      "nav:nav.media": "The dark room",
+      "nav:nav.section.media": "The dark room",
+      "media:home.title": "The dark room",
+      "nav:nav.media_requests": "My cases",
+      "nav:nav.media_insights": "My rap sheet",
+      "media:insights.title": "My rap sheet",
+      "nav:nav.section.content": "The alleys",
+      "nav:nav.news": "The evening edition",
+      "news:title": "The evening edition",
+      "nav:nav.wiki": "The archives",
+      "wiki:title": "The archives",
+      "nav:nav.search": "The investigation",
+      "search:title": "The investigation",
+      "nav:nav.calendar": "The meetings",
+      "calendar:title": "The meetings",
+      "nav:nav.services": "The power plant",
+      "nav:nav.section.services": "The power plant",
+      "nav:nav.statistics": "The informants",
+      "statistics:title": "The informants",
+      "nav:nav.community": "The gang",
+      "nav:nav.section.community": "The gang",
+      "community:title": "The gang",
+      "nav:nav.progression": "My file",
+      "gamification:progression.title": "My file",
+      "nav:nav.campaigns": "The jobs",
+      "campaigns:page.title": "The jobs",
+      "nav:nav.marketplace": "The black market",
+      "nav:nav.section.marketplace": "The black market",
+      "marketplace:catalog.title": "The black market",
+      "nav:nav.projects": "The setups",
+      "marketplace:projects.title": "The setups",
+      "marketplace:owned.title": "My loot",
+      "nav:nav.support": "The precinct",
+      "nav:nav.section.support": "The precinct",
+      "nav:nav.incidents": "The crimes",
+      "support:incident.title": "The crimes",
+      "nav:nav.feedback": "The tips",
+      "support:feedback.title": "The tips",
+      "gamification:value.coins": "Dollars",
+      "gamification:value.xp": "Reputation"
+    }
+  }
+}

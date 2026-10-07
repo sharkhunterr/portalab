@@ -783,7 +783,8 @@
                 "dock",
                 "tabs",
                 "launcher",
-                "terminal"
+                "terminal",
+                "reel"
               ]
             },
             "tablet": {
@@ -796,7 +797,8 @@
                 "dock",
                 "tabs",
                 "launcher",
-                "terminal"
+                "terminal",
+                "reel"
               ]
             },
             "phone": {
@@ -808,7 +810,8 @@
                 "dock",
                 "tabs",
                 "launcher",
-                "terminal"
+                "terminal",
+                "reel"
               ]
             }
           },
@@ -967,7 +970,12 @@
             "glitch",
             "lights",
             "spores",
-            "aurora"
+            "aurora",
+            "vhs",
+            "wind",
+            "tide",
+            "lanterns",
+            "pixelsky"
           ]
         }
       },
@@ -1051,7 +1059,12 @@
             "cloud",
             "ticket",
             "tag",
-            "split"
+            "split",
+            "saga",
+            "pirate",
+            "manga",
+            "noir",
+            "vhs"
           ]
         },
         "animation": {
@@ -1072,7 +1085,13 @@
             "wipe",
             "focus",
             "jelly",
-            "shake"
+            "shake",
+            "filmwipe",
+            "iris",
+            "air",
+            "water",
+            "earth",
+            "fire"
           ]
         }
       },

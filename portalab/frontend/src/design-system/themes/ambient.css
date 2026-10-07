@@ -524,6 +524,183 @@
   }
 }
 
+/* 027 vhs: a paused tape — fine scanlines, a tracking band rolling down, and a little snow */
+[data-ambient="vhs"] {
+  background: repeating-linear-gradient(180deg, #ffffff06 0 1px, transparent 1px 3px);
+}
+[data-ambient="vhs"] > span {
+  left: 0;
+  inline-size: 100%;
+  block-size: calc(0.4rem + var(--size) * 1.6rem);
+  background: linear-gradient(180deg, transparent, #ffffff10 30%, #ff2a6d14 50%, #05d9e814 60%, transparent);
+  filter: blur(1px);
+  animation-name: ambient-tracking;
+  animation-duration: calc(5s + var(--size) * 7s);
+}
+[data-ambient="vhs"] > span:nth-child(3n) {
+  inline-size: 3px;
+  block-size: 2px;
+  left: var(--x);
+  background: #ffffffaa;
+  filter: none;
+  animation-name: ambient-snow-dot;
+  animation-duration: calc(0.15s + var(--size) * 0.4s);
+  animation-timing-function: steps(1, end);
+}
+@keyframes ambient-tracking {
+  from {
+    transform: translate3d(0, -10vh, 0);
+  }
+  to {
+    transform: translate3d(0, 110vh, 0);
+  }
+}
+@keyframes ambient-snow-dot {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 027 wind: long airy streaks gusting across, curling at the end */
+[data-ambient="wind"] > span {
+  left: -30vw;
+  inline-size: calc(8rem + var(--size) * 14rem);
+  block-size: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #e0f2fe55 40%, #ffffff88 70%, transparent);
+  animation-name: ambient-gust;
+  animation-duration: calc(3s + var(--size) * 4s);
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes ambient-gust {
+  from {
+    transform: translate3d(0, 0, 0) scaleX(0.4);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    transform: translate3d(110vw, calc(var(--drift) * -0.3), 0) scaleX(1) rotate(-2deg);
+    opacity: 0.8;
+  }
+  to {
+    transform: translate3d(140vw, calc(var(--drift) * -0.6), 0) scaleX(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+/* 027 tide: slow swells along the bottom of the page and light caustics drifting above */
+[data-ambient="tide"] > span {
+  top: auto;
+  bottom: calc(-12vh + var(--i) * 2.5vh);
+  left: -50vw;
+  inline-size: 200vw;
+  block-size: 30vh;
+  border-radius: 45%;
+  background: hsl(calc(190 + var(--i) * 6) 80% calc(40% + var(--i) * 3%) / 0.12);
+  animation-name: ambient-swell;
+  animation-duration: calc(9s + var(--i) * 3s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+[data-ambient="tide"] > span:nth-child(n + 5) {
+  bottom: auto;
+  top: var(--y);
+  left: var(--x);
+  inline-size: calc(2rem + var(--size) * 4rem);
+  block-size: calc(0.6rem + var(--size) * 1rem);
+  background: radial-gradient(ellipse, #a5f3fc22, transparent 70%);
+  animation-name: ambient-caustic;
+}
+@keyframes ambient-swell {
+  from {
+    transform: translate3d(-6vw, 0, 0) rotate(-1deg);
+  }
+  to {
+    transform: translate3d(6vw, -3vh, 0) rotate(1deg);
+  }
+}
+@keyframes ambient-caustic {
+  50% {
+    transform: translate3d(var(--drift), -2vh, 0) scale(1.4);
+    opacity: 0.4;
+  }
+}
+
+/* 027 lanterns: paper sky lanterns rising slowly, glowing warm */
+[data-ambient="lanterns"] > span {
+  top: auto;
+  bottom: -8vh;
+  inline-size: calc(0.9rem * var(--size) + 0.5rem);
+  block-size: calc(1.2rem * var(--size) + 0.7rem);
+  border-radius: 40% 40% 30% 30%;
+  background: radial-gradient(ellipse at 50% 70%, #fff3c4, #ffb347 55%, #e2611a);
+  box-shadow:
+    0 0 14px #ffb347aa,
+    0 0 34px #ff7a1a55;
+  animation-name: ambient-lantern;
+}
+@keyframes ambient-lantern {
+  from {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * 0.5), -55vh, 0) rotate(3deg);
+  }
+  to {
+    transform: translate3d(var(--drift), -115vh, 0) rotate(-2deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* 027 pixelsky: an 8-bit sky — square clouds drifting by, square stars blinking in steps */
+[data-ambient="pixelsky"] > span {
+  inline-size: 6px;
+  block-size: 6px;
+  background: #ffffff;
+  box-shadow:
+    6px 0 #ffffff,
+    12px 0 #ffffff,
+    -6px 6px #ffffff,
+    0 6px #ffffff,
+    6px 6px #ffffff,
+    12px 6px #ffffff,
+    18px 6px #ffffff;
+  opacity: 0.18;
+  image-rendering: pixelated;
+  animation-name: ambient-pixel-cloud;
+  animation-timing-function: steps(40, end);
+  animation-duration: calc(30s + var(--size) * 30s);
+}
+[data-ambient="pixelsky"] > span:nth-child(2n) {
+  inline-size: 3px;
+  block-size: 3px;
+  box-shadow: none;
+  opacity: 0.8;
+  background: hsl(calc(40 + var(--hue) / 6) 100% 75%);
+  animation-name: ambient-pixel-star;
+  animation-duration: calc(1s + var(--size) * 2s);
+  animation-timing-function: steps(2, jump-none);
+}
+@keyframes ambient-pixel-cloud {
+  from {
+    transform: translate3d(-20vw, 0, 0) scale(calc(1 + var(--size)));
+  }
+  to {
+    transform: translate3d(120vw, 0, 0) scale(calc(1 + var(--size)));
+  }
+}
+@keyframes ambient-pixel-star {
+  50% {
+    opacity: 0.15;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient {
     display: none;

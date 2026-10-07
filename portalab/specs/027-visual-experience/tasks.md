@@ -316,6 +316,9 @@ lossless migration.
 - [X] T174 [US3] Incident steps in their own colours (investigating red, identified amber, monitoring blue, resolved green) on cards, widget and timeline; the incidents page loads its own styles (its status banner was unstyled when opened directly)
 - [X] T175 [US6] Services widget redesigned (a ring of how many work, a chip per troubled state, a tile per service ringed in its state with its 24 h availability, trouble then importance first) and a new compact one-line widget (`health.services_compact`)
 - [X] T176 [US6] Widget catalog: searchable, « to add » and « already there » apart, shop widgets no longer mixed in — one line says how many more the shop has, like Appearance
+- [X] T177 [US11] Universe notification looks: styles space saga, pirate, manga panel, film noir, VHS; entrance animations film wipe (right to left), iris, and the four elements air, water, earth, fire; sold in the shop
+- [X] T178 [US11] New ambient layers (VHS tape, wind, tide, sky lanterns, 8-bit sky), badge styles (VHS, pixel art, terminal, water, wind, light blade) and a new cosmetic type `level_badge` — the level (XP) badge's look (classic free; pixel, neon, crest, gem, hologram, VHS, light blade, four elements sold), chosen in Appearance (`ui.levelBadge`), previewed and tried in the shop
+- [X] T179 [US1] Themes Sin City (black and white with red, film-reel navigation, noir notifications wiping in) and Plex (charcoal and amber, sidebar and bottom bar, its words); a new navigation principle « reel » (sections as frames of a film strip); migration ui_0005 seeds both themes
 
 ## Dependencies & Execution Order
 

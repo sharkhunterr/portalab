@@ -191,6 +191,11 @@ NOTIFICATION_STYLES = Literal[
     "ticket",
     "tag",
     "split",
+    "saga",
+    "pirate",
+    "manga",
+    "noir",
+    "vhs",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -209,6 +214,12 @@ NOTIFICATION_ANIMATIONS = Literal[
     "focus",
     "jelly",
     "shake",
+    "filmwipe",
+    "iris",
+    "air",
+    "water",
+    "earth",
+    "fire",
 ]
 AMBIENTS = Literal[
     "none",
@@ -232,6 +243,11 @@ AMBIENTS = Literal[
     "lights",
     "spores",
     "aurora",
+    "vhs",
+    "wind",
+    "tide",
+    "lanterns",
+    "pixelsky",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -300,12 +316,16 @@ class Motion(_Closed):
 
 
 class Nav(_Closed):
-    # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line
-    desktop: Literal["sidebar", "topbar", "rail", "orbit", "dock", "tabs", "launcher", "terminal"] | None = (
+    # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel
+    desktop: (
+        Literal["sidebar", "topbar", "rail", "orbit", "dock", "tabs", "launcher", "terminal", "reel"] | None
+    ) = None
+    tablet: (
+        Literal["rail", "topbar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal", "reel"] | None
+    ) = None
+    phone: Literal["bottom-bar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal", "reel"] | None = (
         None
     )
-    tablet: Literal["rail", "topbar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal"] | None = None
-    phone: Literal["bottom-bar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal"] | None = None
 
 
 class Layout(_Closed):

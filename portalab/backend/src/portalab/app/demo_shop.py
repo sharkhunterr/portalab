@@ -105,6 +105,19 @@ for key, label, fr, icon, style, rarity, price, level, en_about, fr_about, suppl
     ("badge_dragon_tamer", "Dragon tamer", "Badge Dompteur de dragons", "flame", "flame", "legendary", 1800,
      18, "Few have ever done it — a single copy.", "Rares sont ceux qui y sont arrivés — exemplaire unique.",
      1),
+    # 027: VHS, pixel art, terminal, the elements, a light blade
+    ("badge_rewinder", "Be kind, rewind", "Badge Rembobineur", "tv", "vhs", "rare", 350, None,
+     "You still remember the video club.", "Vous vous souvenez encore du vidéoclub.", None),
+    ("badge_8bit_hero", "8-bit hero", "Badge Héros 8 bits", "joystick", "pixel", "rare", 300, None,
+     "Three lives and a high score.", "Trois vies et un record.", None),
+    ("badge_root", "Root access", "Badge Accès root", "terminal", "terminal", "epic", 600, 5,
+     "sudo watch everything.", "sudo regarde tout.", None),
+    ("badge_waterbender", "Waterbender", "Badge Maître de l'eau", "droplets", "water", "epic", 650, 6,
+     "Flows around every obstacle.", "Contourne chaque obstacle comme l'eau.", None),
+    ("badge_airbender", "Airbender", "Badge Maître de l'air", "wind", "wind", "epic", 650, 6,
+     "Light as the wind, never in a hurry.", "Léger comme le vent, jamais pressé.", None),
+    ("badge_jedi", "Light blade master", "Badge Maître de la lame de lumière", "sword", "saber", "legendary", 1500,
+     14, "The force is strong with this one.", "La force est puissante chez celui-ci.", None),
 ):  # fmt: skip
     _p(key, "badge", price, rarity, f"{label} badge", fr, en_about, fr_about,
        {"label": label, "icon": icon, **({"style": style} if style != "none" else {})},
@@ -208,6 +221,34 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
     ("notif_shake", "notification_animation", "animation", "shake", "Shaking notifications",
      "Notifications secousse", "epic", 450, "They arrive with a shake — hard to miss.",
      "Elles arrivent en tremblant — impossible de les manquer."),
+    # 027: universes
+    ("notif_saga", "notification_style", "style", "saga", "Space saga notifications",
+     "Notifications saga spatiale", "legendary", 1000, "Bold yellow capitals tilted over a starfield, like an opening crawl.",
+     "Des capitales jaunes inclinées sur un champ d'étoiles, comme un générique d'ouverture."),
+    ("notif_pirate", "notification_style", "style", "pirate", "Pirate notifications", "Notifications pirate",
+     "epic", 650, "A weathered plank, brass rivets and a rope edge.", "Une planche patinée, des rivets de laiton et un bord en corde."),
+    ("notif_manga", "notification_style", "style", "manga", "Manga panel notifications",
+     "Notifications case de manga", "epic", 600, "Screentone, speed lines and a heavy ink frame cut on a slant.",
+     "Trame, lignes de vitesse et un cadre à l'encre coupé en biais."),
+    ("notif_noir", "notification_style", "style", "noir", "Film noir notifications", "Notifications film noir",
+     "epic", 600, "Black and white, hard light — only its colour bleeds in.",
+     "Noir et blanc, lumière crue — seule sa couleur transparaît."),
+    ("notif_vhs", "notification_style", "style", "vhs", "VHS notifications", "Notifications VHS", "rare", 400,
+     "A tape on pause: scanlines, a colour split and PLAY in the corner.",
+     "Une cassette en pause : lignes de balayage, couleurs décalées et PLAY dans le coin."),
+    ("notif_filmwipe", "notification_animation", "animation", "filmwipe", "Film wipe notifications",
+     "Notifications volet de film", "epic", 550, "A hard-edged wipe from right to left, like a scene change.",
+     "Un volet net de droite à gauche, comme un changement de plan."),
+    ("notif_iris", "notification_animation", "animation", "iris", "Iris notifications", "Notifications iris",
+     "rare", 300, "They open in a circle, like an old film.", "Elles s'ouvrent en cercle, comme un vieux film."),
+    ("notif_air", "notification_animation", "animation", "air", "Air notifications", "Notifications air",
+     "epic", 500, "A gust brings them in, still blurred by the wind.", "Une bourrasque les apporte, encore floues de vent."),
+    ("notif_water", "notification_animation", "animation", "water", "Water notifications", "Notifications eau",
+     "epic", 500, "They well up from below and settle with a ripple.", "Elles jaillissent d'en bas et se posent en ondulant."),
+    ("notif_earth", "notification_animation", "animation", "earth", "Earth notifications", "Notifications terre",
+     "epic", 500, "They rise like a slab of rock and land with a jolt.", "Elles surgissent comme une dalle de roche et retombent d'un coup."),
+    ("notif_fire", "notification_animation", "animation", "fire", "Fire notifications", "Notifications feu",
+     "epic", 500, "They flare up from embers, glowing, then cool down.", "Elles s'embrasent depuis les braises, rougeoient, puis refroidissent."),
 ):  # fmt: skip
     _p(key, kind, price, rarity, en, fr, en_about, fr_about, {field: value}, collection="looks",
        icon="bell" if kind == "notification_style" else "sparkles")  # fmt: skip
@@ -258,6 +299,11 @@ AMBIENT_NAMES = {
     "lights": ("Fairy lights", "Guirlande lumineuse", "rare", 350),
     "spores": ("Glowing spores", "Spores lumineuses", "epic", 650),
     "aurora": ("Northern lights", "Aurore boréale", "legendary", 1100),
+    "vhs": ("VHS tape", "Cassette VHS", "rare", 450),
+    "wind": ("Wind", "Vent", "rare", 400),
+    "tide": ("Tide", "Marée", "epic", 650),
+    "lanterns": ("Sky lanterns", "Lanternes célestes", "epic", 700),
+    "pixelsky": ("8-bit sky", "Ciel 8 bits", "rare", 450),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -439,6 +485,26 @@ for value, en, fr, rarity, price, level in (
        "Des couleurs d'accent posées sur n'importe quel thème — essayez-la avant d'acheter.",
        {"palette": value}, collection="palettes", icon="palette", level=level)  # fmt: skip
 
+# --------------------------------------------------------------------------------- level badges (027)
+for value, en, fr, rarity, price, level, about_en, about_fr in (
+    ("pixel", "Pixel", "Pixel", "common", 200, None, "Your level in 8-bit, framed in square pixels.",
+     "Votre niveau en 8 bits, encadré de pixels carrés."),
+    ("neon", "Neon", "Néon", "rare", 350, None, "A glowing cyan tube around your level.",
+     "Un tube cyan lumineux autour de votre niveau."),
+    ("crest", "Crest", "Blason", "rare", 400, None, "A heraldic shield edged with gold.", "Un écu héraldique bordé d'or."),
+    ("gem", "Gem", "Gemme", "epic", 650, 5, "A cut amethyst catching the light.", "Une améthyste taillée qui accroche la lumière."),
+    ("hologram", "Hologram", "Hologramme", "epic", 700, 6, "Iridescent colours drifting across it.",
+     "Des couleurs irisées qui glissent dessus."),
+    ("vhs", "VHS", "VHS", "rare", 350, None, "Scanlines and a colour split, straight off the tape.",
+     "Lignes de balayage et couleurs décalées, tout droit de la cassette."),
+    ("saber", "Light blade", "Lame de lumière", "legendary", 1200, 12, "A humming blade of light in your accent colour.",
+     "Une lame de lumière vibrante de votre couleur d'accent."),
+    ("elements", "Four elements", "Quatre éléments", "legendary", 1300, 15,
+     "Fire, water, earth and air turning around your level.", "Le feu, l'eau, la terre et l'air qui tournent autour de votre niveau."),
+):  # fmt: skip
+    _p(f"level_{value}", "level_badge", price, rarity, f"{en} level badge", f"Badge de niveau {fr.lower()}",
+       about_en, about_fr, {"style": value}, collection="looks", icon="star", level=level)  # fmt: skip
+
 # --------------------------------------------------------------------------------- themes
 THEME_TEXT = {
     "orbit": (
@@ -561,6 +627,18 @@ THEME_TEXT = {
         "Night city: neon rain, a command line on screens and a dock on phones, glitches everywhere.",
         "Night City : pluie de néon, ligne de commande sur écran et dock sur mobile, glitchs partout.",
     ),
+    "sincity": (
+        "Sin City",
+        "Sin City",
+        "Black and white with a splash of red: a film-reel navigation, ink-heavy cards, noir notifications that wipe in like a scene change.",
+        "Noir et blanc avec une touche de rouge : navigation en pellicule, cartes à l'encre, notifications noires qui entrent comme un changement de plan.",
+    ),
+    "plex": (
+        "Plex",
+        "Plex",
+        "The media server's look: charcoal and amber, a sidebar on screens and a bottom bar on phones, its own words for your libraries.",
+        "Le style du serveur multimédia : anthracite et ambre, barre latérale sur écran et barre du bas sur mobile, ses mots pour vos bibliothèques.",
+    ),
 }
 THEME_RARITY = {
     "orbit": ("epic", 900, 6), "studio": ("rare", 600, None), "wizard": ("legendary", 1500, 12),
@@ -569,7 +647,7 @@ THEME_RARITY = {
     "comic": ("rare", 600, 3), "manga": ("rare", 600, 3), "cartoon": ("rare", 600, 3), "cozy": ("rare", 600, None),
     "futuristic": ("epic", 900, 6), "minimal": ("common", 300, None), "alien": ("epic", 900, 6),
     "heroes": ("legendary", 1500, 12), "neowave": ("epic", 900, 6), "disco": ("epic", 900, 5),
-    "cyberpunk": ("legendary", 1500, 14),
+    "cyberpunk": ("legendary", 1500, 14), "sincity": ("legendary", 1500, 12), "plex": ("epic", 900, 4),
 }  # fmt: skip
 for theme, (en, fr, about_en, about_fr) in THEME_TEXT.items():
     rarity, price, level = THEME_RARITY[theme]

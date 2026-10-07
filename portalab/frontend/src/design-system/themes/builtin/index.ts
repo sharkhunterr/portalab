@@ -20,8 +20,10 @@ import matrix from "./matrix.json";
 import minimal from "./minimal.json";
 import neowave from "./neowave.json";
 import orbit from "./orbit.json";
+import plex from "./plex.json";
 import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
+import sincity from "./sincity.json";
 import studio from "./studio.json";
 import wizard from "./wizard.json";
 
@@ -53,6 +55,8 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   neowave,
   disco,
   cyberpunk,
+  sincity,
+  plex,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

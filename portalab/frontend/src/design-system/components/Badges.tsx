@@ -17,10 +17,19 @@ export function levelProgress(xp: number, floor: number, next: number | null): n
   return Math.min(1, Math.max(0, (xp - floor) / (next - floor)));
 }
 
-/** The member's level — a star tells it is a level, not a count (027). */
-export function LevelBadge({ level, label }: { level: number; label: string }) {
+/** The member's level — a star tells it is a level, not a count (027). Its look is the member's choice
+ * (``ui.levelBadge``, some sold in the shop); ``look`` forces one (shop and Appearance previews). */
+export function LevelBadge({
+  level,
+  label,
+  look,
+}: {
+  level: number;
+  label: string;
+  look?: string | undefined;
+}) {
   return (
-    <span className="ds-level" role="img" aria-label={label}>
+    <span className="ds-level" role="img" aria-label={label} data-look={look}>
       <Icon name="star" size={11} />
       <span aria-hidden="true">{level}</span>
     </span>

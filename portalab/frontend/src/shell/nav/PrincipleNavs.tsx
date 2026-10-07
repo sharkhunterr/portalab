@@ -8,7 +8,8 @@ import { currentEntry, isHubSection, sectionEntries } from "./SectionNav";
 
 /**
  * Navigation principles chosen by themes (027 R24, beyond the sidebar and the orbit): a floating **dock**,
- * book **tabs** on the edge, a game-like **launcher** screen and a **terminal** command line. Same
+ * book **tabs** on the edge, a game-like **launcher** screen, a **terminal** command line and a film
+ * **reel** (the sections as frames of a strip, sprocket holes and all). Same
  * destinations as every variant (the server-filtered sections); a member section opens on its first page
  * (its pages are hub tabs), Administration lists its topics. Keyboard: links and buttons in order, arrows
  * move along a bar, Escape closes what is open. Each one works on phones, tablets and desktops.
@@ -371,6 +372,38 @@ export function TerminalNav({ sections }: { sections: readonly NavSection[] }) {
             </li>
           ))}
         </ul>
+      ) : null}
+    </nav>
+  );
+}
+
+/** 027 Reel: the sections as the frames of a film strip under the header — the current one lit, a section
+ * with several destinations unrolls them below; a scrolling strip on phones. */
+export function ReelNav({ sections }: { sections: readonly NavSection[] }) {
+  const strings = useShellStrings();
+  const { current, isActive } = useCurrent(sections);
+  const { open, setOpen, root } = useOpenSection();
+  const section = sections.find((s) => s.key === open);
+  return (
+    <nav ref={root} className="shell-reel" aria-label={strings.mainNav}>
+      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: arrow keys move along the strip */}
+      <ul className="shell-reel__strip" onKeyDown={(event) => moveFocus(event)}>
+        {sections.map((s, index) => (
+          <li key={s.key} style={{ "--i": index } as CSSProperties}>
+            <SectionItem
+              section={s}
+              active={isActive(s)}
+              open={open === s.key}
+              onToggle={() => setOpen(open === s.key ? null : s.key)}
+              className="shell-reel__frame"
+            />
+          </li>
+        ))}
+      </ul>
+      {section ? (
+        <div className="shell-reel__panel">
+          <DestinationList section={section} currentKey={current?.key} onPick={() => setOpen(null)} />
+        </div>
       ) : null}
     </nav>
   );

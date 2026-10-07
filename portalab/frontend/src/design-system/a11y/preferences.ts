@@ -24,6 +24,8 @@ export const UNIVERSE_THEMES = [
   "neowave",
   "disco",
   "cyberpunk",
+  "sincity",
+  "plex",
 ] as const;
 
 export type Density = "compact" | "comfortable" | "spacious";
@@ -81,6 +83,12 @@ export const NOTIFICATION_STYLES = [
   "ticket",
   "tag",
   "split",
+  // 027 universes: space saga, pirates, manga, film noir, VHS tape
+  "saga",
+  "pirate",
+  "manga",
+  "noir",
+  "vhs",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -100,6 +108,13 @@ export const NOTIFICATION_ANIMATIONS = [
   "focus",
   "jelly",
   "shake",
+  // 027: film transitions and the four elements
+  "filmwipe",
+  "iris",
+  "air",
+  "water",
+  "earth",
+  "fire",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -124,7 +139,26 @@ export const AMBIENTS = [
   "lights",
   "spores",
   "aurora",
+  // 027: VHS tracking, wind, tide, sky lanterns, 8-bit sky
+  "vhs",
+  "wind",
+  "tide",
+  "lanterns",
+  "pixelsky",
 ] as const;
+/** 027: the look of the level (XP) badge — ``classic`` is free, the others are sold in the shop. */
+export const LEVEL_BADGES = [
+  "classic",
+  "pixel",
+  "neon",
+  "crest",
+  "gem",
+  "hologram",
+  "vhs",
+  "saber",
+  "elements",
+] as const;
+export type LevelBadge = (typeof LEVEL_BADGES)[number];
 export const CELEBRATION_KEYS = [
   "none",
   "sparkle",
@@ -169,6 +203,8 @@ export interface UiPreferences {
   celebration: CelebrationKey | "theme";
   /** 027: accent colours over the theme (some are sold in the shop). */
   palette: PaletteKey;
+  /** 027: the level (XP) badge's look (some are sold in the shop). */
+  levelBadge: LevelBadge;
   campaignThemes: "allow" | "ignore";
   /** Light/dark choice for theme families (027 R8): dark by default, or follow the device. */
   colorMode: "dark" | "light" | "system";
@@ -196,6 +232,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   ambient: "theme",
   celebration: "theme",
   palette: "theme",
+  levelBadge: "classic",
   campaignThemes: "allow",
   colorMode: "dark",
 };
@@ -232,6 +269,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   ambient: "ui.ambient",
   celebration: "ui.celebration",
   palette: "ui.palette",
+  levelBadge: "ui.levelBadge",
   campaignThemes: "ui.campaignThemes",
   colorMode: "ui.colorMode",
 };
@@ -255,6 +293,7 @@ export function sanitize(input: object): UiPreferences {
   pick("ambient", ["theme", ...AMBIENTS]);
   pick("celebration", ["theme", ...CELEBRATION_KEYS]);
   pick("palette", PALETTE_KEYS);
+  pick("levelBadge", LEVEL_BADGES);
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;

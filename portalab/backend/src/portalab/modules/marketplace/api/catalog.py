@@ -103,6 +103,7 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "ambient": ("ambient",),
     "profile_background": ("background",),
     "name_style": ("style",),
+    "level_badge": ("style",),
     "widget_option": ("option",),
     "project_launch": ("kind",),
     "statistic": ("statistic",),

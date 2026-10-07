@@ -17,7 +17,8 @@ export type NavVariant =
   | "dock"
   | "tabs"
   | "launcher"
-  | "terminal";
+  | "terminal"
+  | "reel";
 
 export interface Arrangement {
   device: DeviceClass;

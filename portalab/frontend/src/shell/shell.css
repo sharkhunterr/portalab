@@ -1053,6 +1053,93 @@
   transition: none;
 }
 
+/* 027: the reel — sections as the frames of a film strip under the header */
+.shell-reel {
+  position: sticky;
+  inset-block-start: var(--frame-top);
+  z-index: calc(var(--z-header) - 1);
+  background: var(--reel-film, color-mix(in srgb, var(--color-surface) 45%, black));
+}
+.shell-reel__strip {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.85rem var(--space-3);
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* the sprocket holes, top and bottom */
+  background:
+    repeating-linear-gradient(90deg, var(--color-surface) 0 0.6rem, transparent 0.6rem 1.25rem) 0 0.2rem /
+    100% 0.4rem no-repeat,
+    repeating-linear-gradient(90deg, var(--color-surface) 0 0.6rem, transparent 0.6rem 1.25rem) 0
+    calc(100% - 0.2rem) / 100% 0.4rem no-repeat;
+}
+.shell-reel__strip > li {
+  flex: none;
+}
+.shell-reel__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-inline-size: 6.5rem;
+  min-block-size: 3.6rem;
+  padding: 0.3rem 0.8rem;
+  border: 0;
+  border-radius: 0.2rem;
+  background: color-mix(in srgb, var(--color-surface-raised) 85%, white);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  filter: grayscale(0.7) brightness(0.85);
+  transition:
+    filter var(--motion-duration-fast) var(--motion-easing),
+    transform var(--motion-duration-fast) var(--motion-easing);
+}
+.shell-reel__frame:hover,
+.shell-reel__frame:focus-visible {
+  filter: none;
+  transform: translateY(-1px);
+}
+.shell-reel__frame[data-active] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  filter: none;
+  box-shadow: 0 0 1.2rem color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+.shell-reel__panel {
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  animation: shell-reel-unroll var(--motion-duration-normal) var(--motion-easing);
+  transform-origin: top;
+}
+.shell-reel__panel ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+@keyframes shell-reel-unroll {
+  from {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+}
+.shell[data-nav="reel"][data-device="phone"] .shell-reel__frame {
+  min-inline-size: 5rem;
+  min-block-size: 3rem;
+}
+[data-motion="none"] .shell-reel__panel {
+  animation: none;
+}
+
 /* 027: a maintenance announced as a banner */
 .maintenance-banner {
   display: flex;

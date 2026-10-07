@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it } from "vitest";
 import type { NavSection } from "../../../src/shell/nav/NavigationProvider";
-import { DockNav, LauncherNav, TabsNav, TerminalNav } from "../../../src/shell/nav/PrincipleNavs";
+import { DockNav, LauncherNav, ReelNav, TabsNav, TerminalNav } from "../../../src/shell/nav/PrincipleNavs";
 
-// 027 — navigation principles themes may choose: a dock, book tabs, a launcher screen and a terminal line.
+// 027 — navigation principles themes may choose: a dock, book tabs, a launcher screen, a terminal line and a
+// film reel.
 // Same destinations as every variant: a member hub opens on its first page, Administration lists its topics,
 // the current section is marked, Escape closes an open list.
 
@@ -103,5 +104,20 @@ describe("navigation principles", () => {
     expect(lists).toHaveLength(2);
     const current = within(lists[1] as HTMLElement).getByRole("link", { current: "page" });
     expect(current.getAttribute("href")).toBe("/media/requests");
+  });
+
+  it("reel: one frame per section, the current one lit, Administration unrolls its topics", () => {
+    show(<ReelNav sections={SECTIONS} />);
+    const nav = screen.getByRole("navigation");
+    const media = within(nav).getByRole("link", { name: /media/i });
+    expect(media.getAttribute("data-active")).toBe("true");
+    const admin = within(nav).getByRole("button", { name: /admin/i });
+    fireEvent.click(admin);
+    expect(admin.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      within(nav)
+        .getAllByRole("link")
+        .map((a) => a.getAttribute("href")),
+    ).toContain("/admin/services");
   });
 });

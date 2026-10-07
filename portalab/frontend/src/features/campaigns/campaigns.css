@@ -396,3 +396,8 @@
     flex-wrap: nowrap;
   }
 }
+@container (max-width: 26rem) {
+  .campaigns-widget__pitch {
+    display: none;
+  }
+}

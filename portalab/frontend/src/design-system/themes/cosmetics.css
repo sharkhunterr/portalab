@@ -954,6 +954,246 @@
   color: transparent;
   box-shadow: none;
 }
+/* 027: more badge styles — VHS, pixel art, terminal, water, wind, light blade */
+:is(.cosmetic-badge, .cosmetic-title)[data-style="vhs"] {
+  border-color: #6a5acd;
+  background: repeating-linear-gradient(180deg, #ffffff0d 0 1px, transparent 1px 3px), #14102a;
+  color: #e8e8ff;
+  text-shadow:
+    -1.5px 0 #ff2a6d,
+    1.5px 0 #05d9e8;
+  animation: universe-vhs-jitter 3.2s steps(1, end) infinite;
+}
+.cosmetic-title[data-style="vhs"] {
+  background: none;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="pixel"] {
+  border: 0;
+  border-radius: 0;
+  background: #2b2d42;
+  color: #f8f8f2;
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    0 -3px 0 #f8f8f2,
+    0 3px 0 #f8f8f2,
+    -3px 0 0 #f8f8f2,
+    3px 0 0 #f8f8f2,
+    4px 5px 0 #00000066;
+}
+.cosmetic-title[data-style="pixel"] {
+  background: none;
+  box-shadow: none;
+  color: #ffd166;
+  text-shadow: 2px 2px 0 #00000088;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="terminal"] {
+  border-color: #22c55e;
+  background: #031007;
+  color: #4ade80;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="terminal"]::after {
+  content: "_";
+  animation: shell-caret 1s steps(2, jump-none) infinite;
+}
+.cosmetic-title[data-style="terminal"] {
+  background: none;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="water"] {
+  border-color: #38bdf8;
+  background: linear-gradient(180deg, #0c4a6e 0 45%, #0284c7 45% 55%, #0369a1 55%) 0 0 / 100% 220%;
+  color: #e0f2fe;
+  animation: badge-water 3s ease-in-out infinite;
+}
+.cosmetic-title[data-style="water"] {
+  background: linear-gradient(90deg, #38bdf8, #a5f3fc, #0ea5e9, #38bdf8);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 4s linear infinite;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="wind"] {
+  border-color: #bae6fd;
+  background: linear-gradient(110deg, #f0f9ff22, #e0f2fe44, #f0f9ff22);
+  color: var(--color-text);
+  animation: badge-wind 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+:is(.cosmetic-badge, .cosmetic-title)[data-style="saber"] {
+  border-color: transparent;
+  background:
+    linear-gradient(#0b0b12, #0b0b12) padding-box,
+    linear-gradient(90deg, transparent, var(--color-accent), #ffffff, var(--color-accent), transparent)
+    border-box;
+  background-size:
+    100% 100%,
+    200% 100%;
+  color: #ffffff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  animation: badge-saber 1.6s ease-in-out infinite;
+}
+.cosmetic-title[data-style="saber"] {
+  background: none;
+  color: #ffffff;
+  text-shadow:
+    0 0 4px var(--color-accent),
+    0 0 12px var(--color-accent);
+  box-shadow: none;
+}
+@keyframes badge-water {
+  50% {
+    background-position: 0 100%;
+  }
+}
+@keyframes badge-wind {
+  0%,
+  100% {
+    transform: skewX(0deg);
+  }
+  30% {
+    transform: skewX(-6deg) translateX(1px);
+  }
+  60% {
+    transform: skewX(3deg);
+  }
+}
+@keyframes badge-saber {
+  0%,
+  100% {
+    background-position:
+      0 0,
+      0 0;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+  50% {
+    background-position:
+      0 0,
+      100% 0;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--color-accent) 90%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------- 027: level (XP) badge looks */
+/* the member's look (``data-level-badge`` on the root) unless the badge forces one (``data-look``) */
+:is(:root[data-level-badge="pixel"] .ds-level:not([data-look]), .ds-level[data-look="pixel"]) {
+  border-radius: 0;
+  background: #2b2d42;
+  color: #ffd166;
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    0 -3px 0 #ffd166,
+    0 3px 0 #ffd166,
+    -3px 0 0 #ffd166,
+    3px 0 0 #ffd166;
+}
+:is(:root[data-level-badge="neon"] .ds-level:not([data-look]), .ds-level[data-look="neon"]) {
+  border: 1.5px solid #22d3ee;
+  background: #04121a;
+  color: #a5f3fc;
+  text-shadow: 0 0 6px #22d3ee;
+  box-shadow:
+    0 0 8px #22d3ee,
+    inset 0 0 6px #22d3ee66;
+}
+:is(:root[data-level-badge="crest"] .ds-level:not([data-look]), .ds-level[data-look="crest"]) {
+  min-inline-size: 2rem;
+  block-size: 2.1rem;
+  padding-block-end: 0.25rem;
+  border-radius: 0;
+  background: linear-gradient(180deg, #1e3a8a, #172554 60%, #0f172a);
+  color: #fde68a;
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+  box-shadow: inset 0 0 0 2px #f59e0b;
+  font-family: "Cinzel", serif;
+}
+:is(:root[data-level-badge="gem"] .ds-level:not([data-look]), .ds-level[data-look="gem"]) {
+  min-inline-size: 2.2rem;
+  border-radius: 0;
+  background:
+    linear-gradient(115deg, transparent 40%, #ffffffaa 50%, transparent 60%) 0 0 / 300% 100%,
+    linear-gradient(135deg, #a855f7, #6d28d9 50%, #ec4899);
+  color: #ffffff;
+  clip-path: polygon(18% 0, 82% 0, 100% 50%, 82% 100%, 18% 100%, 0 50%);
+  animation: level-gem 3.5s ease-in-out infinite;
+}
+:is(:root[data-level-badge="hologram"] .ds-level:not([data-look]), .ds-level[data-look="hologram"]) {
+  border: 1px solid #ffffff88;
+  background: linear-gradient(120deg, #7cf7ff, #c58bff, #ff9be3, #7cf7ff) 0 0 / 300% 100%;
+  color: #1e1b4b;
+  animation: universe-holo-level 4s linear infinite;
+}
+:is(:root[data-level-badge="vhs"] .ds-level:not([data-look]), .ds-level[data-look="vhs"]) {
+  border-radius: 0.15rem;
+  background: repeating-linear-gradient(180deg, #ffffff10 0 1px, transparent 1px 3px), #14102a;
+  color: #e8e8ff;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  text-shadow:
+    -1.5px 0 #ff2a6d,
+    1.5px 0 #05d9e8;
+}
+:is(:root[data-level-badge="saber"] .ds-level:not([data-look]), .ds-level[data-look="saber"]) {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#0b0b12, #0b0b12) padding-box,
+    linear-gradient(90deg, var(--color-accent), #ffffff, var(--color-accent)) border-box;
+  color: #ffffff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 80%, transparent);
+  animation: level-saber 1.8s ease-in-out infinite;
+}
+:is(:root[data-level-badge="elements"] .ds-level:not([data-look]), .ds-level[data-look="elements"]) {
+  position: relative;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--color-surface-raised), var(--color-surface-raised)) padding-box,
+    conic-gradient(from var(--level-turn, 0deg), #f97316, #38bdf8, #a3a35c, #e0f2fe, #f97316) border-box;
+  color: var(--color-text);
+  animation: level-elements 6s linear infinite;
+}
+@property --level-turn {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}
+@keyframes level-gem {
+  0%,
+  60% {
+    background-position:
+      120% 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      -60% 0,
+      0 0;
+  }
+}
+@keyframes universe-holo-level {
+  to {
+    background-position: 300% 0;
+  }
+}
+@keyframes level-saber {
+  50% {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-accent) 100%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-level {
+    animation: none !important;
+  }
+}
+:root[data-motion="none"] .ds-level {
+  animation: none;
+}
+
 @keyframes badge-shimmer {
   0%,
   30% {

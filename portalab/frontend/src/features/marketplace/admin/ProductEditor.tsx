@@ -3,6 +3,7 @@ import { api } from "../../../api/client";
 import {
   AMBIENTS,
   CELEBRATION_KEYS,
+  LEVEL_BADGES,
   NOTIFICATION_ANIMATIONS,
   NOTIFICATION_STYLES,
   PALETTE_KEYS,
@@ -38,6 +39,7 @@ const TYPES = [
   "avatar_frame",
   "profile_background",
   "name_style",
+  "level_badge",
   "widget",
   "bundle",
   "quota",
@@ -55,6 +57,7 @@ const DESIGNS: Partial<
   profile_banner: { field: "banner", values: BANNER_KEYS, ns: "community:looks.banner" },
   avatar_frame: { field: "frame", values: FRAME_KEYS, ns: "community:looks.frame" },
   name_style: { field: "style", values: NAME_KEYS, ns: "community:looks.name" },
+  level_badge: { field: "style", values: LEVEL_BADGES, ns: "notifications:levelBadge.names" },
 };
 const BADGE_STYLES = [
   "none",
@@ -68,6 +71,12 @@ const BADGE_STYLES = [
   "frost",
   "neon",
   "gold",
+  "vhs",
+  "pixel",
+  "terminal",
+  "water",
+  "wind",
+  "saber",
 ];
 const ICON_NAMES = Object.keys(ICONS).sort();
 

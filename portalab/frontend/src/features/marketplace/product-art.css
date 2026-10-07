@@ -559,3 +559,26 @@
   font-weight: var(--font-weight-bold);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-surface) 60%, transparent);
 }
+
+/* 027: a level badge look, worn at three levels */
+.product-art__level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+.product-art__level .ds-level {
+  align-self: center;
+}
+.product-art__level[data-size="sheet"] {
+  gap: 4.2rem;
+}
+.product-art__level[data-size="sheet"] .ds-level {
+  transform: scale(2);
+}
+.product-art__level[data-size="card"] .ds-level {
+  transform: scale(1.3);
+}
+.product-art__level[data-size="mini"] .ds-level:not(:first-child) {
+  display: none;
+}
