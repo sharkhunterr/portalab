@@ -138,7 +138,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Automations */
+        /**
+         * List Automations
+         * @description 027: with each one's trigger and steps, its last run and the runs of the last 7 days.
+         */
         get: operations["list_automations_api_v1_admin_automations_get"];
         put?: never;
         /** Create */
@@ -209,6 +212,26 @@ export interface paths {
         };
         /** Catalog */
         get: operations["catalog_api_v1_admin_automations_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/automations/executions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recent Executions
+         * @description 027: the latest runs of every automation (the run history page), newest first.
+         */
+        get: operations["recent_executions_api_v1_admin_automations_executions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8155,6 +8178,60 @@ export interface components {
              */
             updated_at: string;
         };
+        /**
+         * AutomationSummaryOut
+         * @description 027: a row of the automations page — when it runs, how it last went, how often lately.
+         */
+        AutomationSummaryOut: {
+            /** Consecutive Failures */
+            consecutive_failures: number;
+            /** Current Version */
+            current_version: number;
+            /**
+             * Failures 7D
+             * @default 0
+             */
+            failures_7d: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Identity Kind */
+            identity_kind: string;
+            /** Key */
+            key: string;
+            /** Last Run At */
+            last_run_at?: string | null;
+            /** Last Status */
+            last_status?: string | null;
+            /** Name */
+            name: string;
+            /** Needs Review */
+            needs_review: boolean;
+            /** Published Version */
+            published_version: number | null;
+            /**
+             * Runs 7D
+             * @default 0
+             */
+            runs_7d: number;
+            /** State */
+            state: string;
+            /** Steps */
+            steps?: string[];
+            /** Suspend Reason */
+            suspend_reason: string | null;
+            /** Trigger */
+            trigger?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** AutomationUpdateIn */
         AutomationUpdateIn: {
             /** Definition */
@@ -13061,7 +13138,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AutomationOut"][];
+                    "application/json": components["schemas"]["AutomationSummaryOut"][];
                 };
             };
         };
@@ -13210,6 +13287,38 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    recent_executions_api_v1_admin_automations_executions_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationExecutionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

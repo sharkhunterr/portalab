@@ -336,7 +336,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <ModerationQueue />,
               handle: h({ crumb: "Moderation" }),
             },
+            { path: "automations/new", element: <Automations />, handle: h({ crumb: "New automation" }) },
+            { path: "automations/history", element: <Automations />, handle: h({ crumb: "Run history" }) },
+            { path: "automations/templates", element: <Automations />, handle: h({ crumb: "Templates" }) },
+            { path: "automations/approvals", element: <Automations />, handle: h({ crumb: "Approvals" }) },
             { path: "automations/:id", element: <Automations />, handle: h({ crumb: "Automation" }) },
+            { path: "automations/:id/edit", element: <Automations />, handle: h({ crumb: "Edit" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             {

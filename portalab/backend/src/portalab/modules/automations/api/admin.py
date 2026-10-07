@@ -2,12 +2,13 @@
 when sensitive actions are attested), pause / resume / archive / re-enable, dry-run (no side effects),
 manual run (confirmation), executions, approvals and templates."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import func, select
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.core.authorization import require
@@ -17,7 +18,7 @@ from portalab.core.time import utc_now
 from portalab.modules.automations.definitions.schema import Definition
 from portalab.modules.automations.definitions.validate import effective_sensitivity
 from portalab.modules.automations.dryrun.service import dry_run
-from portalab.modules.automations.models import Approval, Automation, Execution
+from portalab.modules.automations.models import Approval, Automation, AutomationVersion, Execution
 from portalab.modules.automations.module import AutomationsModule
 from portalab.modules.automations.permissions import APPROVE, MANAGE, READ
 from portalab.modules.automations.templates.loader import checked, load
@@ -86,6 +87,17 @@ class AutomationOut(BaseModel):
     suspend_reason: str | None
     consecutive_failures: int
     updated_at: datetime
+
+
+class AutomationSummaryOut(AutomationOut):
+    """027: a row of the automations page — when it runs, how it last went, how often lately."""
+
+    trigger: dict[str, Any] | None = None
+    steps: list[str] = Field(default_factory=list)
+    last_status: str | None = None
+    last_run_at: datetime | None = None
+    runs_7d: int = 0
+    failures_7d: int = 0
 
 
 class AutomationDetailOut(AutomationOut):
@@ -189,6 +201,15 @@ async def catalog(_: Reader, module: Module) -> dict[str, Any]:
         "triggers": {
             "events": sorted(t.name for t in module.event_types.all() if t.automatable),
             "schedules": ["at", "relative", "recurring"],
+            # 027: what each event carries (filters and ${event.<field>} variables) and what it means
+            "event_fields": {
+                t.name: sorted(t.schema.model_fields) if t.schema is not None else []
+                for t in module.event_types.all()
+                if t.automatable
+            },
+            "event_descriptions": {
+                t.name: t.description for t in module.event_types.all() if t.automatable and t.description
+            },
         },
         "conditions": [
             {"key": leaf.key, "description": leaf.description, "params": dict(leaf.params_schema)}
@@ -263,10 +284,73 @@ async def execution(_: Reader, execution_id: UUID, module: Module) -> Automation
     return execution_out(row)
 
 
+@router.get("/admin/automations/executions", response_model=list[AutomationExecutionOut])
+async def recent_executions(
+    _: Reader,
+    module: Module,
+    status: str | None = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> list[AutomationExecutionOut]:
+    """027: the latest runs of every automation (the run history page), newest first."""
+    async with module.database.session() as session:
+        query = select(Execution).order_by(Execution.started_at.desc()).limit(limit)
+        if status:
+            query = query.where(Execution.status == status)
+        rows = (await session.execute(query)).scalars().all()
+    return [execution_out(r) for r in rows]
+
+
 # --- automations -----------------------------------------------------------------------------------------
-@router.get("/admin/automations", response_model=list[AutomationOut])
-async def list_automations(_: Reader, module: Module) -> list[AutomationOut]:
-    return [out(a) for a in await module.definitions.all()]
+@router.get("/admin/automations", response_model=list[AutomationSummaryOut])
+async def list_automations(_: Reader, module: Module) -> list[AutomationSummaryOut]:
+    """027: with each one's trigger and steps, its last run and the runs of the last 7 days."""
+    rows = await module.definitions.all()
+    since = utc_now(module.clock) - timedelta(days=7)
+    async with module.database.session() as session:
+        versions = {
+            (v.automation_id, v.version): v.definition
+            for v in (await session.execute(select(AutomationVersion))).scalars()
+        }
+        last: dict[UUID, tuple[str, datetime]] = {}
+        for automation_id, status, started in (
+            await session.execute(
+                select(Execution.automation_id, Execution.status, Execution.started_at)
+                .distinct(Execution.automation_id)
+                .order_by(Execution.automation_id, Execution.started_at.desc())
+            )
+        ).all():
+            last[automation_id] = (status, started)
+        counts: dict[UUID, tuple[int, int]] = {
+            automation_id: (int(total), int(failed or 0))
+            for automation_id, total, failed in (
+                await session.execute(
+                    select(
+                        Execution.automation_id,
+                        func.count(),
+                        func.count().filter(Execution.status.in_(("failed", "timeout", "refused"))),
+                    )
+                    .where(Execution.started_at >= since)
+                    .group_by(Execution.automation_id)
+                )
+            ).all()
+        }
+    items = []
+    for row in rows:
+        definition = versions.get((row.id, row.current_version)) or {}
+        status, at = last.get(row.id, (None, None))
+        runs, failed = counts.get(row.id, (0, 0))
+        items.append(
+            AutomationSummaryOut(
+                **out(row).model_dump(),
+                trigger=definition.get("trigger"),
+                steps=[str(s.get("action", "")) for s in definition.get("steps", [])],
+                last_status=status,
+                last_run_at=at,
+                runs_7d=runs,
+                failures_7d=failed,
+            )
+        )
+    return items
 
 
 @router.post("/admin/automations", response_model=AutomationOut, status_code=201)

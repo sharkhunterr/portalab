@@ -4,12 +4,67 @@ import type { components } from "../../api/generated/schema";
 
 /** Automation API hooks (spec 019, Admin): catalog, definitions, executions, approvals, templates. */
 export type Automation = components["schemas"]["AutomationOut"];
+export type AutomationSummary = components["schemas"]["AutomationSummaryOut"];
 export type AutomationDetail = components["schemas"]["AutomationDetailOut"];
 export type Execution = components["schemas"]["AutomationExecutionOut"];
 export type Approval = components["schemas"]["AutomationApprovalOut"];
 
+/** An automation's definition (spec 019) — what the builder edits and the flow view draws. */
+export interface Filter {
+  field: string;
+  op: "eq" | "ne" | "in" | "gt" | "gte" | "lt" | "lte" | "contains";
+  value: unknown;
+}
+export interface Trigger {
+  kind: "event" | "at" | "relative" | "recurring";
+  event_type?: string | null;
+  filter?: Filter[];
+  reference?: string | null;
+  offset_minutes?: number;
+  at?: string | null;
+  schedule?: {
+    frequency: "daily" | "weekly" | "monthly";
+    time: string;
+    weekday?: number | null;
+    day?: number | null;
+  } | null;
+  timezone?: string;
+}
+export interface ConditionNode {
+  all_of?: ConditionNode[] | null;
+  any_of?: ConditionNode[] | null;
+  not?: ConditionNode | null;
+  leaf?: string | null;
+  params?: Record<string, unknown>;
+}
+export interface StepDef {
+  id: string;
+  action: string;
+  params: Record<string, unknown>;
+  on_error?: "stop" | "continue";
+}
+export interface Definition {
+  name: string;
+  trigger: Trigger;
+  conditions?: ConditionNode | null;
+  steps: StepDef[];
+  limits?: {
+    cooldown_s?: number;
+    dedup_key?: string | null;
+    dedup_window_s?: number;
+    rate_per_min?: number | null;
+  };
+  identity?: { kind: "author" | "system"; scopes?: string[] };
+}
+
 export interface Catalog {
-  triggers: { events: string[]; schedules: string[] };
+  triggers: {
+    events: string[];
+    schedules: string[];
+    /** 027: what each event carries — filters and ${event.<field>} variables */
+    event_fields?: Record<string, string[]>;
+    event_descriptions?: Record<string, string>;
+  };
   conditions: Array<{ key: string; description: string; params: Record<string, string> }>;
   actions: Array<{
     key: string;
@@ -40,6 +95,7 @@ export interface TemplateView {
   description: string;
   valid: boolean;
   errors: string[];
+  definition?: Definition;
 }
 
 const KEY = ["automations"] as const;
@@ -55,7 +111,20 @@ export function useCatalog() {
 export function useAutomations() {
   return useQuery({
     queryKey: [...KEY, "list"],
-    queryFn: async () => (await api.GET("/api/v1/admin/automations")).data ?? [],
+    queryFn: async () => ((await api.GET("/api/v1/admin/automations")).data ?? []) as AutomationSummary[],
+  });
+}
+
+/** 027: the latest runs of every automation. */
+export function useRecentExecutions(status?: string) {
+  return useQuery({
+    queryKey: [...KEY, "executions", "all", status ?? ""],
+    queryFn: async () =>
+      ((
+        await api.GET("/api/v1/admin/automations/executions", {
+          params: { query: status ? { status, limit: 150 } : { limit: 150 } },
+        })
+      ).data ?? []) as Execution[],
   });
 }
 

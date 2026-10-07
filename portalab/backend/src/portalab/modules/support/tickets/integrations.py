@@ -239,13 +239,21 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
         )
         return {"incident": str(view.id), "created": created}
 
-    for key, description, permission, run, idempotency in (
+    # 027: the parameters are declared, so the automation builder shows a field for each
+    for key, description, permission, run, idempotency, params in (
         (
             "ticket.create",
             "Open a support ticket",
             TICKETS_CREATE,
             create_ticket,
             "one ticket per run; dedup by the rule",
+            {
+                "title": "string",
+                "description": "string?",
+                "type": "string?",
+                "service_id": "uuid?",
+                "fields": "object?",
+            },
         ),
         (
             "incident.create",
@@ -253,6 +261,13 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
             INCIDENTS_MANAGE,
             create_incident,
             "idempotent per (automation, dedup_key)",
+            {
+                "title": "string",
+                "severity": "minor|major|critical",
+                "summary": "string?",
+                "service_ids": "list[uuid]?",
+                "dedup_key": "string?",
+            },
         ),
     ):
         if registry.get(key) is None:
@@ -264,6 +279,8 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
                     idempotency=idempotency,
                     run=run,
                     owner=OWNER,
+                    params_schema=params,
+                    required=("title",),
                 )
             )
 

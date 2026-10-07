@@ -4,8 +4,9 @@ import type { ReactNode } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
-// 019 — the builder offers the catalog and lists the server's validation problems; executions show status
-// in text with the condition trace; approvals are approved from the inbox; templates instantiate drafts.
+// 019 / 027 — the builder offers the catalog (events grouped, a field per declared parameter) and lists the
+// server's validation problems; runs show their status in text and, opened, each condition and step;
+// approvals are approved from the inbox; a template opens the builder filled with it.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -18,13 +19,19 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { Inbox } from "../../../src/features/automations/approvals/Inbox";
-import { Builder } from "../../../src/features/automations/builder/Builder";
+import { Editor } from "../../../src/features/automations/editor/Editor";
 import { ExecutionList } from "../../../src/features/automations/history/ExecutionList";
 import { Gallery } from "../../../src/features/automations/templates/Gallery";
 import { json } from "../../support/fake-api";
 
+const VARIABLE = ["$", "{event.campaign}"].join(""); // what the builder inserts
+
 const CATALOG = {
-  triggers: { events: ["campaign.started", "ticket.created"], schedules: ["at", "relative", "recurring"] },
+  triggers: {
+    events: ["campaign.started", "ticket.created"],
+    schedules: ["at", "relative", "recurring"],
+    event_fields: { "campaign.started": ["campaign", "occurrence"] },
+  },
   conditions: [{ key: "event_field", description: "x", params: {} }],
   actions: [
     {
@@ -56,32 +63,39 @@ describe("automations", () => {
       return json(422, {
         code: "automation.invalid_definition",
         title: "Invalid",
-        errors: ["steps.step_1: missing params ['category']"],
+        errors: ["steps.step_1: missing params ['template_key']"],
       });
     };
-    show(<Builder />);
-    await screen.findByRole("option", { name: "campaign.started" });
-    fireEvent.change(screen.getByLabelText("Key"), { target: { value: "announce" } });
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Announce" } });
+    show(<Editor />);
+    await screen.findByRole("option", { name: "A campaign starts" });
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Announce campaigns" } });
     fireEvent.change(screen.getByLabelText("Event type"), { target: { value: "campaign.started" } });
     fireEvent.change(screen.getByLabelText("Action"), { target: { value: "communication.produce" } });
+    // a field per declared parameter, and the event's variables a click puts into it
+    const category = screen.getByLabelText("Category *");
+    fireEvent.focus(category);
+    fireEvent.click(screen.getByRole("button", { name: VARIABLE }));
     fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
-    expect(await screen.findByText("steps.step_1: missing params ['category']")).toBeTruthy();
+    expect(await screen.findByText("steps.step_1: missing params ['template_key']")).toBeTruthy();
     expect(bodies[0]).toMatchObject({
-      key: "announce",
-      definition: { trigger: { kind: "event", event_type: "campaign.started" } },
+      key: "announce_campaigns",
+      definition: {
+        trigger: { kind: "event", event_type: "campaign.started" },
+        steps: [{ action: "communication.produce", params: { category: VARIABLE } }],
+      },
     });
   });
 
-  it("lists executions with text statuses and traces", async () => {
-    fake.handler = () =>
-      json(200, [
+  it("lists executions with text statuses and opens each step", async () => {
+    fake.handler = (request) => {
+      if (new URL(request.url).pathname.endsWith("/catalog")) return json(200, CATALOG);
+      return json(200, [
         {
           id: "e1",
           automation_id: "a1",
           version: 1,
           status: "no_op",
-          trigger_ref: {},
+          trigger_ref: { type: "campaign.started" },
           chain_id: "c",
           depth: 0,
           conditions_trace: [{ leaf: "event_field", result: false }],
@@ -92,13 +106,15 @@ describe("automations", () => {
           finished_at: "2026-10-01T12:00:00Z",
         },
       ]);
+    };
     show(<ExecutionList automationId="a1" />);
     const entry = await screen.findByRole("button", { name: /Conditions not met/ });
     fireEvent.click(entry);
-    expect(screen.getByText("event_field — false")).toBeTruthy();
+    expect(screen.getByText(/Conditions not met — nothing ran/)).toBeTruthy();
+    expect(screen.getByText(/A field of the event — not met/)).toBeTruthy();
   });
 
-  it("approves from the inbox and instantiates templates", async () => {
+  it("approves from the inbox and opens a template in the builder", async () => {
     const posts: string[] = [];
     fake.handler = (request) => {
       const path = new URL(request.url).pathname;
@@ -106,6 +122,7 @@ describe("automations", () => {
         posts.push(path);
         return json(200, { status: "success" });
       }
+      if (path.endsWith("/catalog")) return json(200, CATALOG);
       if (path.endsWith("/approvals"))
         return json(200, [
           {
@@ -130,12 +147,10 @@ describe("automations", () => {
       </>,
     );
     fireEvent.click(await screen.findByRole("button", { name: "Approve" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Use template" }));
-    await waitFor(() =>
-      expect(posts).toEqual([
-        "/api/v1/admin/automations/approvals/ap1/approve",
-        "/api/v1/admin/automations/templates/weekly-digest/instantiate",
-      ]),
+    await waitFor(() => expect(posts).toEqual(["/api/v1/admin/automations/approvals/ap1/approve"]));
+    expect(await screen.findByRole("link", { name: "Use template" })).toHaveAttribute(
+      "href",
+      "/admin/automations/new?template=weekly-digest",
     );
   });
 });

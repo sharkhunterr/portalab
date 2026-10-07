@@ -296,6 +296,8 @@ lossless migration.
 - [X] T154 [US6] « Since your last visit » becomes a widget (starter, hideable); one-cell tiles: a shortcut (portal page or https link, several allowed) and a single value (level, Coins, contribution, achievements, unread, incidents, requests left); one-row widgets render as tiles
 - [X] T155 [US1] Header: the assistant button only when an assistant is available; a star in the level badge; incidents in progress with their count; phones get home and search on the left, level, notifications and the menu on the right (no bottom bar in the default themes); the navigation starts with the member — profile, level and progress, Coins, contribution (and, on phones, the personal links and sign out)
 - [X] T156 [US3] « A service has been down for N minutes » (`service.outage_lasting` at 5, 10, 15, 30, 60, 120 min, with failed probes) and the automation template « Incident when a service stays down »
+- [X] T157 [US5] Edit a configured service (name, address and settings, write-only secrets kept when empty, public address, sync interval) with a test of the edited values
+- [X] T158 [US10] Automations become an administration hub (overview, new, run history, templates, approvals): cards with trigger sentence, steps and last run; a WHEN / IF / THEN builder with a field per declared parameter, the event's variables, filters, schedules, limits; a detail page with the flow, a dry run on a sample event and runs as step-by-step timelines; `GET /admin/automations` with trigger, steps and runs, `GET /admin/automations/executions`, catalog with event fields; `incident.create`/`ticket.create` declare their parameters
 
 ## Dependencies & Execution Order
 

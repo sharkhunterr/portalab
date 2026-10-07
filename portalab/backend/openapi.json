@@ -1523,6 +1523,138 @@
         "title": "AutomationOut",
         "type": "object"
       },
+      "AutomationSummaryOut": {
+        "description": "027: a row of the automations page \u2014 when it runs, how it last went, how often lately.",
+        "properties": {
+          "consecutive_failures": {
+            "title": "Consecutive Failures",
+            "type": "integer"
+          },
+          "current_version": {
+            "title": "Current Version",
+            "type": "integer"
+          },
+          "failures_7d": {
+            "default": 0,
+            "title": "Failures 7D",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "identity_kind": {
+            "title": "Identity Kind",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "last_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Status"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "published_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Version"
+          },
+          "runs_7d": {
+            "default": 0,
+            "title": "Runs 7D",
+            "type": "integer"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "suspend_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suspend Reason"
+          },
+          "trigger": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trigger"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "state",
+          "current_version",
+          "published_version",
+          "identity_kind",
+          "needs_review",
+          "suspend_reason",
+          "consecutive_failures",
+          "updated_at"
+        ],
+        "title": "AutomationSummaryOut",
+        "type": "object"
+      },
       "AutomationUpdateIn": {
         "additionalProperties": false,
         "properties": {
@@ -14683,6 +14815,7 @@
     },
     "/api/v1/admin/automations": {
       "get": {
+        "description": "027: with each one's trigger and steps, its last run and the runs of the last 7 days.",
         "operationId": "list_automations_api_v1_admin_automations_get",
         "responses": {
           "200": {
@@ -14690,7 +14823,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/AutomationOut"
+                    "$ref": "#/components/schemas/AutomationSummaryOut"
                   },
                   "title": "Response List Automations Api V1 Admin Automations Get",
                   "type": "array"
@@ -14897,6 +15030,72 @@
           }
         },
         "summary": "Catalog",
+        "tags": [
+          "automations"
+        ]
+      }
+    },
+    "/api/v1/admin/automations/executions": {
+      "get": {
+        "description": "027: the latest runs of every automation (the run history page), newest first.",
+        "operationId": "recent_executions_api_v1_admin_automations_executions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AutomationExecutionOut"
+                  },
+                  "title": "Response Recent Executions Api V1 Admin Automations Executions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Recent Executions",
         "tags": [
           "automations"
         ]
