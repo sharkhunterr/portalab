@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ThemeMiniature } from "../../appearance/AppearanceSettings";
 import { useMe } from "../../auth/useAuth";
 import { BannerArt, FramedAvatar, StyledName, WornBadge } from "../../community/profile/ProfileHero";
+import { LevelUpPreview } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useProducts } from "../api";
 import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
@@ -286,9 +287,8 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       );
     case "level_up":
       return (
-        <span className="product-art__levelup" data-look={text(preview, "animation")} data-size={size}>
-          <span className="product-art__levelup-kicker">LEVEL UP!</span>
-          <LevelBadge level={42} label={name} look="classic" />
+        <span className="product-art__levelup" data-size={size}>
+          <LevelUpPreview look={text(preview, "animation") || "classic"} label={name} size={size} />
         </span>
       );
     case "name_style":

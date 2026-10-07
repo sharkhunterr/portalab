@@ -43,6 +43,9 @@ export const shellStrings = {
   more: "More",
   home: "Home",
   sections: "Sections",
+  back: "Back",
+  previousSection: "Previous section",
+  nextSection: "Next section",
   progressUnavailable: "Progression unavailable",
   labels: {
     "nav.home": "Home",

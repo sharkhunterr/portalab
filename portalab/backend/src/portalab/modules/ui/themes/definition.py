@@ -199,6 +199,7 @@ NOTIFICATION_STYLES = Literal[
     "upsidedown",
     "elven",
     "onering",
+    "island",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -230,6 +231,8 @@ NOTIFICATION_ANIMATIONS = Literal[
     "flipup",
     "balrog",
     "eye",
+    "tracking",
+    "morph",
 ]
 AMBIENTS = Literal[
     "none",
@@ -262,6 +265,7 @@ AMBIENTS = Literal[
     "veins",
     "meadow",
     "ash",
+    "bokeh",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -285,6 +289,8 @@ CELEBRATIONS = Literal[
     "portal",
     "flicker",
     "fireworks",
+    "rewind",
+    "bloom",
 ]
 PATTERNS = Literal[
     "none",
@@ -328,6 +334,8 @@ LEVEL_UPS = Literal[
     "classic", "arcade", "cosmic", "comic", "elements", "cinema", "crawl", "spell", "decode", "sandstorm",
     "bloodmoon", "pumpkin", "gift", "manga", "boing", "hearth", "hud", "minimal", "abduction", "hero",
     "synthwave", "disco", "glitch", "noir", "spotlight", "upsidedown", "onering",
+    "vhs",
+    "nova",
 ]  # fmt: skip
 
 
@@ -343,16 +351,52 @@ class Nav(_Closed):
     # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel
     desktop: (
         Literal[
-            "sidebar", "topbar", "rail", "orbit", "dock", "tabs", "launcher", "terminal", "reel", "lights"
+            "sidebar",
+            "topbar",
+            "rail",
+            "orbit",
+            "dock",
+            "tabs",
+            "launcher",
+            "terminal",
+            "reel",
+            "lights",
+            "vcr",
+            "sheet",
         ]
         | None
     ) = None
     tablet: (
-        Literal["rail", "topbar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal", "reel", "lights"]
+        Literal[
+            "rail",
+            "topbar",
+            "drawer",
+            "orbit",
+            "dock",
+            "tabs",
+            "launcher",
+            "terminal",
+            "reel",
+            "lights",
+            "vcr",
+            "sheet",
+        ]
         | None
     ) = None
     phone: (
-        Literal["bottom-bar", "drawer", "orbit", "dock", "tabs", "launcher", "terminal", "reel", "lights"]
+        Literal[
+            "bottom-bar",
+            "drawer",
+            "orbit",
+            "dock",
+            "tabs",
+            "launcher",
+            "terminal",
+            "reel",
+            "lights",
+            "vcr",
+            "sheet",
+        ]
         | None
     ) = None
 

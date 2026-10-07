@@ -1397,44 +1397,100 @@ h3,
 }
 
 /* ================================================================ 027: the Upside Down and Middle-earth */
-/* upsidedown — a dark slab cracked with red veins, its faint mirror image fading below */
+/* upsidedown — the show's title sequence: hollow red neon letters closing in between the logo's two
+   growing bars, the message typed like a lab report, a faint mirror below */
 .ds-notifications[data-style="upsidedown"] .ds-notification {
-  border: 1px solid #dc262666;
-  border-radius: 0.3rem;
+  padding: 1.15rem 1rem 1.2rem 0.8rem;
+  border: 1px solid #ff2a3d33;
+  border-radius: 0.2rem;
   background:
-    linear-gradient(118deg, transparent 18%, #dc262655 18.5%, transparent 19.5%),
-    linear-gradient(62deg, transparent 70%, #b91c1c66 70.5%, transparent 71.5%),
-    linear-gradient(160deg, transparent 40%, #7f1d1d55 40.5%, transparent 41.2%),
-    radial-gradient(1px 1px at 20% 30%, #f8fafc66 50%, transparent 51%),
-    radial-gradient(1px 1px at 70% 70%, #f8fafc55 50%, transparent 51%),
-    linear-gradient(180deg, #1a1f2b, #0b0d12);
-  color: #e5e7eb;
-  box-shadow: 0 0 1.2rem #dc262633;
-  -webkit-box-reflect: below 6px linear-gradient(transparent 62%, #ffffff26);
-  animation:
-    var(--notify-in, ds-notify-slide) var(--motion-duration-normal, 0.25s) var(--motion-easing, ease-out) both,
-    upside-veins 2.6s ease-in-out infinite;
+    radial-gradient(ellipse at 50% 120%, #7f1d1d55, transparent 65%),
+    radial-gradient(ellipse at 50% 50%, #0a0a0a, #000);
+  color: #d4d4d4;
+  box-shadow:
+    0 0 1.4rem #ff2a3d22,
+    0 0.8rem 1.6rem -0.8rem #000;
+  -webkit-box-reflect: below 3px linear-gradient(transparent 70%, #ffffff1a);
 }
-.ds-notifications[data-style="upsidedown"] .ds-notification::before {
-  background: #ff3b4f;
-  box-shadow: 0 0 8px #ff3b4f;
+/* the logo's two bars, growing from the middle above and below */
+.ds-notifications[data-style="upsidedown"] .ds-notification::before,
+.ds-notifications[data-style="upsidedown"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem auto;
+  inset-inline: 10%;
+  inline-size: auto;
+  block-size: 1.5px;
+  background: linear-gradient(90deg, transparent, #c80000aa 25%, #ff1f3d 50%, #c80000aa 75%, transparent);
+  box-shadow: 0 0 6px #ff1f3d88;
+  transform-origin: 50% 50%;
+  animation: notif-st-bar 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
+.ds-notifications[data-style="upsidedown"] .ds-notification::after {
+  inset-block: auto 0.5rem;
+  animation-delay: 0.25s;
+}
+/* the title: hollow red neon letters closing in, then flickering now and then */
 .ds-notifications[data-style="upsidedown"] .ds-notification__title {
-  color: #ff3b4f;
+  color: transparent;
   font-family: "EB Garamond", serif;
+  font-size: 1.12em;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  text-shadow: 0 0 8px #dc2626;
+  -webkit-text-stroke: 1px #ff2a3d;
+  text-shadow:
+    0 0 8px #ff1f3dcc,
+    0 0 22px #ff1f3d55;
+  animation:
+    notif-st-close 2.6s cubic-bezier(0.15, 0.6, 0.2, 1) both,
+    notif-st-flicker 6s ease-in-out 2.6s infinite;
+}
+/* the message: typed, like a Hawkins lab report */
+.ds-notifications[data-style="upsidedown"] .ds-notification__body {
+  color: #bdbdbd;
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  font-size: 0.82rem;
 }
 .ds-notifications[data-style="upsidedown"] .ds-notification__icon {
-  background: #2a0a10;
+  border: 1px solid #ff2a3d;
+  background: #120204;
+  box-shadow: 0 0 10px #ff1f3d66;
   color: #ff3b4f;
 }
-@keyframes upside-veins {
-  50% {
-    box-shadow: 0 0 1.8rem #dc262666;
-    border-color: #ef4444aa;
+@keyframes notif-st-bar {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  30% {
+    opacity: 1;
+  }
+}
+@keyframes notif-st-close {
+  from {
+    opacity: 0;
+    letter-spacing: 0.7em;
+  }
+  25% {
+    opacity: 1;
+  }
+}
+@keyframes notif-st-flicker {
+  0%,
+  44%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.35;
+  }
+  46% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.5;
   }
 }
 /* elven — a silver-green leaf, written in fine capitals */
@@ -1686,5 +1742,584 @@ h3,
 @media (prefers-reduced-motion: reduce) {
   .shell-lights__bulb {
     animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- 027: the « vcr » navigation */
+/* a video recorder's front under the header: PLAY, ◀◀ the channel ▶▶ on a green display, a red counter */
+.shell-vcr {
+  position: sticky;
+  inset-block-start: var(--frame-top);
+  z-index: calc(var(--z-header) - 1);
+  border-block-end: 1px solid #000;
+  background:
+    repeating-linear-gradient(90deg, #ffffff05 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #2a2a30, #131316);
+  box-shadow: inset 0 1px 0 #ffffff1a;
+}
+.shell-vcr__deck {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem var(--space-3);
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.shell-vcr__play {
+  flex: none;
+  color: #f8fafc;
+  letter-spacing: 0.06em;
+  text-shadow:
+    2px 0 #ff004c99,
+    -2px 0 #00e5ff99;
+}
+.shell-vcr__channel {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 0.7rem;
+  min-inline-size: 0;
+  padding: 0.2rem 0.7rem;
+  border-radius: 0.3rem;
+  background: #07120c;
+  box-shadow:
+    inset 0 0 0 1px #000,
+    inset 0 0 14px #000;
+  color: #5cff9d;
+  text-shadow: 0 0 6px #22c55e;
+}
+.shell-vcr__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.shell-vcr__zap,
+.shell-vcr__menu {
+  flex: none;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid #000;
+  border-radius: 0.25rem;
+  background: linear-gradient(180deg, #44444c, #1f1f24);
+  box-shadow:
+    inset 0 1px 0 #ffffff2e,
+    0 2px 0 #000;
+  color: #e5e7eb;
+  font: inherit;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.shell-vcr__zap:active,
+.shell-vcr__menu:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 #ffffff1a;
+}
+.shell-vcr__counter {
+  flex: none;
+  color: #ff4d4d;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 6px #ef4444;
+}
+.shell[data-device="phone"] :is(.shell-vcr__play, .shell-vcr__counter) {
+  display: none;
+}
+/* MENU: the blue on-screen menu, every section a channel */
+.ds-dialog:has(.shell-vcr__osd) {
+  border: 0;
+  background: repeating-linear-gradient(180deg, #ffffff08 0 1px, transparent 1px 3px), #1b2bd6;
+  color: #fff;
+  font-family: "VT323", "Share Tech Mono", monospace;
+  text-shadow: 2px 2px 0 #00000066;
+}
+.ds-dialog:has(.shell-vcr__osd) > h2 {
+  font-family: inherit;
+  font-size: 2.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.shell-vcr__osd {
+  display: grid;
+  gap: 0.6rem;
+  margin: var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-vcr__entry {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  color: #fff;
+  font-size: 2rem;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.shell-vcr__entry::before {
+  content: "▶";
+  inline-size: 1.2rem;
+  visibility: hidden;
+}
+.shell-vcr__osd > li[data-active] .shell-vcr__entry::before,
+.shell-vcr__entry:is(:hover, :focus-visible)::before {
+  visibility: visible;
+}
+.shell-vcr__osd > li[data-active] .shell-vcr__entry {
+  color: #fde047;
+}
+.shell-vcr__entry .shell-vcr__number {
+  color: #93c5fd;
+}
+.shell-vcr__pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.2rem;
+  margin: 0.2rem 0 0;
+  padding-inline-start: 2.2rem;
+  list-style: none;
+}
+.shell-vcr__pages .shell-entry {
+  color: #dbeafe;
+  font-size: 1.35rem;
+  text-decoration: none;
+}
+.shell-vcr__pages .shell-entry[aria-current="page"] {
+  color: #fde047;
+}
+
+/* ---------------------------------------------------------------- 027: the « sheet » navigation */
+/* a phone's bottom bar on every screen: shortcuts either side of a round button raising a sheet of apps */
+.shell-sheet {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+  z-index: var(--z-nav);
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--space-3);
+  pointer-events: none;
+}
+.shell[data-header-position="bottom"] .shell-sheet {
+  inset-block-end: calc(var(--header-height) + env(safe-area-inset-bottom, 0px) + 0.75rem);
+}
+.shell-sheet__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+  border-radius: 1.8rem;
+  background: color-mix(in srgb, var(--color-surface-raised) 72%, transparent);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  box-shadow:
+    0 12px 40px #0000002e,
+    inset 0 1px 0 #ffffff1f;
+  list-style: none;
+  pointer-events: auto;
+}
+.shell-sheet__shortcut {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  inline-size: 4.3rem;
+  padding: 0.35rem 0.2rem;
+  border-radius: 1.1rem;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.shell-sheet__shortcut:hover {
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+.shell-sheet__shortcut[data-active] {
+  color: var(--color-accent);
+}
+.shell-sheet__shortcut[data-active]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.15rem;
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+.shell-sheet__shortcut-label {
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-sheet__center {
+  margin-inline: 0.35rem;
+}
+.shell-sheet__fab {
+  display: grid;
+  place-items: center;
+  inline-size: 3.7rem;
+  block-size: 3.7rem;
+  margin-block: -1.5rem 0;
+  border: 3px solid var(--color-surface);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt));
+  box-shadow:
+    0 10px 26px color-mix(in srgb, var(--color-accent) 50%, transparent),
+    inset 0 1px 0 #ffffff66;
+  color: var(--color-accent-contrast);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.shell-sheet__fab:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+.shell-sheet__fab[data-state="open"] {
+  transform: rotate(90deg) scale(0.94);
+}
+.shell-sheet__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: #0000004d;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: sheet-fade 0.3s ease-out;
+}
+.shell-sheet__backdrop[data-state="closed"] {
+  animation: sheet-fade 0.25s ease-in reverse forwards;
+}
+.shell-sheet__panel {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: calc(var(--z-overlay) + 1);
+  inline-size: min(40rem, 100%);
+  max-block-size: 82dvh;
+  margin-inline: auto;
+  overflow-y: auto;
+  padding: 0.25rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+  border-block-end: 0;
+  border-radius: 1.8rem 1.8rem 0 0;
+  background: color-mix(in srgb, var(--color-surface-raised) 90%, transparent);
+  backdrop-filter: blur(30px) saturate(1.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow: 0 -20px 60px #00000040;
+  color: var(--color-text);
+  outline: none;
+  transform: translateY(var(--drag, 0px));
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1);
+  animation: sheet-up 0.45s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+.shell-sheet__panel[data-dragging] {
+  transition: none;
+}
+.shell-sheet__panel[data-state="closed"] {
+  animation: sheet-down 0.28s ease-in forwards;
+}
+.shell-sheet__handle {
+  display: block;
+  inline-size: 2.8rem;
+  block-size: 0.32rem;
+  margin: 0 auto 0.6rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text) 30%, transparent);
+  background-clip: content-box;
+  box-sizing: content-box;
+  cursor: grab;
+  touch-action: none;
+}
+.shell-sheet__head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-block-end: 1.1rem;
+}
+.shell-sheet__title {
+  grid-column: 2;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.shell-sheet__back {
+  grid-column: 1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.shell-sheet__close {
+  grid-column: 3;
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.shell-sheet__apps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+  gap: 1.3rem 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-sheet__app {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.75rem;
+  text-decoration: none;
+  cursor: pointer;
+  animation: sheet-app 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) calc(0.08s + var(--i) * 30ms) both;
+}
+.shell-sheet__app-icon {
+  --hue: calc(var(--i) * 47deg + 205deg);
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 3.7rem;
+  block-size: 3.7rem;
+  border-radius: 28%;
+  background: linear-gradient(145deg, hsl(var(--hue) 90% 64%), hsl(calc(var(--hue) + 38deg) 85% 47%));
+  box-shadow:
+    0 6px 16px hsl(var(--hue) 80% 40% / 0.35),
+    inset 0 1px 0 #ffffff59,
+    inset 0 -3px 8px #0000001f;
+  color: #fff;
+  transition: transform 0.2s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+/* a folder: its pages peek as small tiles in a corner */
+.shell-sheet__app[data-folder] .shell-sheet__app-icon::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: 0.3rem;
+  inset-block-end: 0.3rem;
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  background: radial-gradient(circle, #fff 0.12rem, transparent 0.14rem) 0 0 / 50% 50%;
+  opacity: 0.85;
+}
+.shell-sheet__app:hover .shell-sheet__app-icon {
+  transform: translateY(-2px) scale(1.06);
+}
+.shell-sheet__app:active .shell-sheet__app-icon {
+  transform: scale(0.92);
+}
+.shell-sheet__app[data-active] .shell-sheet__app-icon {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.shell-sheet__app[data-active] .shell-sheet__app-label {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+.shell-sheet__app-label {
+  max-inline-size: 6rem;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+@keyframes sheet-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-app {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell-sheet__panel,
+  .shell-sheet__app,
+  .shell-sheet__backdrop {
+    animation: none;
+  }
+}
+
+/* ================================================================ 027: VHS and Nova notifications */
+/* VHS, reworked: the VCR font, PLAY ▶ in the corner, a tracking band rolling through */
+.ds-notifications[data-style="vhs"] .ds-notification {
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.08rem;
+}
+.ds-notifications[data-style="vhs"] .ds-notification::before {
+  display: block;
+  inset: 0;
+  inline-size: auto;
+  background: linear-gradient(180deg, transparent 0 45%, #ffffff14 45% 52%, transparent 52%) 0 0 / 100% 300%;
+  pointer-events: none;
+  animation: notif-vhs-track 3.2s linear infinite;
+}
+.ds-notifications[data-style="vhs"] .ds-notification::after {
+  content: "PLAY ▶";
+  inset-block: 0.35rem auto;
+  font-size: 0.95rem;
+}
+@keyframes notif-vhs-track {
+  to {
+    background-position: 0 100%;
+  }
+}
+/* tracking — it arrives torn by bad tracking and steadies; it leaves like a TV switched off */
+.ds-notifications[data-animation="tracking"] .ds-notification {
+  animation-name: universe-notify-tracking;
+  animation-duration: 0.8s;
+  animation-timing-function: linear;
+}
+.ds-notifications[data-animation="tracking"] .ds-notification[data-leaving] {
+  animation: universe-notify-tvoff 0.5s ease-in forwards !important;
+}
+@keyframes universe-notify-tracking {
+  0% {
+    opacity: 0;
+    transform: translateX(-30%) skewX(30deg);
+    clip-path: inset(40% 0 40% 0);
+    filter: blur(2px) contrast(2);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(8%) skewX(-12deg);
+    clip-path: inset(10% 0 30% 0);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: translateX(-4%) skewX(8deg);
+    clip-path: inset(30% 0 0 0);
+  }
+  60% {
+    transform: translateX(2%) skewX(-3deg);
+    clip-path: inset(0 0 15% 0);
+    filter: none;
+  }
+  80%,
+  100% {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0);
+  }
+}
+@keyframes universe-notify-tvoff {
+  0% {
+    transform: none;
+  }
+  60% {
+    transform: scale(1.1, 0.02);
+    filter: brightness(3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0, 0.02);
+    filter: brightness(3);
+  }
+}
+/* island — a black capsule at the top centre of the screen, like a phone's island growing to speak */
+.ds-notifications[data-style="island"] {
+  inset-inline: 0;
+  inset-block: 0.6rem auto;
+  inline-size: min(25rem, calc(100vw - 1.5rem));
+  margin-inline: auto;
+}
+.ds-notifications[data-style="island"] .ds-notification {
+  align-items: center;
+  padding: 0.55rem 0.9rem 0.6rem 0.55rem;
+  border: 0;
+  border-radius: 1.8rem;
+  background: #000;
+  color: #f5f5f7;
+  box-shadow:
+    0 12px 34px #00000059,
+    inset 0 0 0 1px #ffffff14;
+}
+.ds-notifications[data-style="island"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="island"] .ds-notification__icon {
+  background: linear-gradient(135deg, var(--tone), #22d3ee);
+  color: #fff;
+}
+.ds-notifications[data-style="island"] .ds-notification__title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ds-notifications[data-style="island"] .ds-notification__body {
+  color: #a1a1aa;
+}
+/* morph — from a small capsule it swells into the message, the content fading in once it has room */
+.ds-notifications[data-animation="morph"] .ds-notification {
+  transform-origin: 50% 0;
+  animation-name: universe-notify-morph;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.2, 1.2, 0.3, 1);
+}
+.ds-notifications[data-animation="morph"]
+  .ds-notification
+  > :is(.ds-notification__icon, .ds-notification__content) {
+  animation: universe-morph-content 0.7s ease-out both;
+}
+.ds-notifications[data-animation="morph"] .ds-notification[data-leaving] {
+  animation: universe-notify-unmorph 0.45s cubic-bezier(0.6, 0, 0.8, 0.4) forwards !important;
+}
+@keyframes universe-notify-morph {
+  0% {
+    opacity: 0;
+    transform: scale(0.3, 0.55);
+    filter: blur(4px);
+  }
+  40% {
+    opacity: 1;
+    filter: none;
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes universe-morph-content {
+  0%,
+  35% {
+    opacity: 0;
+  }
+}
+@keyframes universe-notify-unmorph {
+  to {
+    opacity: 0;
+    transform: scale(0.3, 0.5);
+    filter: blur(4px);
   }
 }

@@ -30,6 +30,9 @@
 .shell[data-nav="launcher"][data-device="phone"] {
   --frame-bottom: 4.5rem;
 }
+.shell[data-nav="sheet"] {
+  --frame-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
 .shell-body {
   display: flex;
   align-items: flex-start;

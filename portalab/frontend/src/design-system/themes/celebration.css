@@ -783,3 +783,79 @@
     transform: rotate(var(--angle)) translateY(-9rem) scale(0.4);
   }
 }
+
+/* 027 rewind: a tape rewinding — tracking bars race across, the bubble is the VCR's blue display */
+[data-effect="rewind"] .celebration-fx {
+  left: 0;
+  right: 0;
+  top: var(--x);
+  block-size: calc(2px + var(--s) * 6px);
+  background: linear-gradient(90deg, transparent, #ffffffcc 20%, #ffffff 50%, #ffffffaa 80%, transparent);
+  animation-name: fx-rewind;
+  animation-duration: 0.9s;
+  animation-iteration-count: 2;
+  animation-timing-function: linear;
+}
+@keyframes fx-rewind {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+[data-effect="rewind"] .ds-celebration__badge {
+  border-radius: 0;
+  background: #1b2bd6;
+  color: #fff;
+  font-family: "VT323", monospace;
+  letter-spacing: 0.06em;
+  text-shadow:
+    2px 0 #ff004c99,
+    -2px 0 #00e5ff99;
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 26px #00e5ff88;
+}
+/* 027 bloom: soft colour blooms open behind the bubble and fade, like a phone's lock screen waking up */
+[data-effect="bloom"] .celebration-fx {
+  left: var(--x);
+  top: calc(20% + mod(var(--i), 4) * 18%);
+  inline-size: 12rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(calc(240deg + var(--i) * 33deg) 90% 68% / 0.55), transparent 65%);
+  filter: blur(10px);
+  translate: -50% -50%;
+  animation-name: fx-bloom;
+  animation-duration: 2.2s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes fx-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+[data-effect="bloom"] .ds-celebration__badge {
+  border-radius: 999px;
+  background: #111118e6;
+  color: #fff;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 10px 40px #8b7bff66,
+    inset 0 0 0 1px #ffffff26;
+}

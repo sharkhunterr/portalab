@@ -19,7 +19,9 @@ export type NavVariant =
   | "launcher"
   | "terminal"
   | "reel"
-  | "lights";
+  | "lights"
+  | "vcr"
+  | "sheet";
 
 export interface Arrangement {
   device: DeviceClass;

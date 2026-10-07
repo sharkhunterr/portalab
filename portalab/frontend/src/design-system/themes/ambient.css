@@ -701,9 +701,17 @@
   }
 }
 
-/* 027 upsidedown: ash and spores drifting up through a cold haze, red lightning now and then */
+/*
+ * 027 upsidedown: the air of the other side — torn ash flakes tumbling up, dandelion-like spores turning
+ * slowly, a few embers, big flakes passing close (depth by size and opacity: no filter, it stays light),
+ * a cold haze, a red flash now and then, and rifts of red lightning down the sky (upsidedown.css) that
+ * strike, stay a while and come back elsewhere — three faint ones, each on its own rhythm, so where they
+ * appear (and whether one does) keeps changing without crowding the page.
+ */
 [data-ambient="upsidedown"] {
-  background: radial-gradient(ellipse at 50% 120%, #1e293b55, transparent 60%);
+  background:
+    radial-gradient(ellipse at 50% 120%, #1e293b66, transparent 60%),
+    radial-gradient(ellipse at 50% -20%, #3b061033, transparent 55%);
 }
 [data-ambient="upsidedown"]::after {
   content: "";
@@ -711,70 +719,287 @@
   inset: 0;
   background: radial-gradient(ellipse at 70% 0%, #dc262655, transparent 60%);
   opacity: 0;
-  animation: ambient-red-flash 7s steps(1, end) infinite;
+  animation: ambient-red-flash 11s steps(1, end) infinite;
 }
 [data-ambient="upsidedown"] > span {
   top: auto;
-  bottom: -3vh;
-  inline-size: calc(0.25rem + var(--size) * 0.3rem);
-  block-size: calc(0.25rem + var(--size) * 0.3rem);
-  border-radius: 40%;
-  background: #e2e8f0;
-  opacity: 0.55;
-  filter: blur(0.5px);
-  animation-name: ambient-spore-up;
-  animation-duration: calc(14s + var(--size) * 10s);
+  bottom: -4vh;
+  inline-size: calc(0.7rem + var(--size) * 0.8rem);
+  block-size: calc(0.7rem + var(--size) * 0.8rem);
+  background: var(--upside-flake-a) center / contain no-repeat;
+  opacity: 0;
+  --peak: calc(0.35 + var(--size) * 0.4);
+  animation-name: ambient-ash-tumble;
+  animation-duration: calc(13s + var(--size) * 9s);
 }
-@keyframes ambient-spore-up {
-  from {
-    transform: translate3d(0, 0, 0) rotate(0);
+[data-ambient="upsidedown"] > span:nth-child(3n + 1) {
+  background-image: var(--upside-flake-b);
+}
+[data-ambient="upsidedown"] > span:nth-child(3n + 2) {
+  background-image: var(--upside-flake-c);
+}
+/* spores: a glowing heart and fine filaments, turning slowly as they rise */
+[data-ambient="upsidedown"] > span:nth-child(4n) {
+  inline-size: calc(0.9rem + var(--size) * 0.9rem);
+  block-size: calc(0.9rem + var(--size) * 0.9rem);
+  background-image: var(--upside-spore);
+  animation-name: ambient-spore-turn;
+  animation-duration: calc(20s + var(--size) * 12s);
+}
+/* embers: a red spark */
+[data-ambient="upsidedown"] > span:nth-child(9n) {
+  inline-size: calc(0.25rem + var(--size) * 0.2rem);
+  block-size: calc(0.25rem + var(--size) * 0.2rem);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4e6, #ff2a3d 45%, #ff2a3d00 72%);
+  --peak: 0.9;
+  animation-duration: calc(10s + var(--size) * 6s);
+}
+/* close by: a big flake, faint, passing faster */
+[data-ambient="upsidedown"] > span:nth-child(13n) {
+  inline-size: calc(1.6rem + var(--size) * 1rem);
+  block-size: calc(1.6rem + var(--size) * 1rem);
+  --peak: 0.25;
+  animation-duration: calc(8s + var(--size) * 4s);
+}
+/* the rifts: three particles carry one each (twice the screen's width, so they can move), each with its
+   own three places */
+[data-ambient="upsidedown"] > span:is(:nth-child(1), :nth-child(17), :nth-child(33)) {
+  --at-1: -30%;
+  --at-2: 18%;
+  --at-3: -4%;
+  inset: 0 auto;
+  left: -50%;
+  inline-size: 200%;
+  block-size: 100%;
+  border-radius: 0;
+  background: var(--veins-rift-a) 0 0 / 100% 100% no-repeat;
+  opacity: 0;
+  animation-name: rift-wander;
+  animation-duration: calc(16s + var(--size) * 14s);
+  animation-timing-function: linear;
+}
+[data-ambient="upsidedown"] > span:nth-child(17) {
+  --at-1: 26%;
+  --at-2: -14%;
+  --at-3: 34%;
+  background-image: var(--veins-rift-b);
+}
+[data-ambient="upsidedown"] > span:nth-child(33) {
+  --at-1: -8%;
+  --at-2: 32%;
+  --at-3: -24%;
+  background-image: var(--veins-rift-c);
+}
+/* each strike: two flashes, a hold with a flicker, a fade; then, unseen, it moves elsewhere. Faint
+   (--rift peak) and visible about 40 % of the time: the page stays readable over it */
+@keyframes rift-wander {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-1, 0%) / 2));
   }
-  to {
-    transform: translate3d(var(--drift), -110vh, 0) rotate(240deg);
+  1% {
+    opacity: var(--rift, 0.45);
+  }
+  1.6% {
+    opacity: 0.1;
+  }
+  2.4%,
+  12% {
+    opacity: var(--rift, 0.45);
+  }
+  12.6% {
+    opacity: 0.25;
+  }
+  13.2%,
+  18% {
+    opacity: var(--rift, 0.45);
+  }
+  23% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-1, 0%) / 2));
+  }
+  23.1% {
+    transform: translateX(calc(var(--at-2, 0%) / 2)) scaleX(-1);
+  }
+  58% {
+    opacity: 0;
+  }
+  59% {
+    opacity: var(--rift, 0.45);
+  }
+  59.6% {
+    opacity: 0.1;
+  }
+  60.4%,
+  74% {
+    opacity: var(--rift, 0.45);
+  }
+  80% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-2, 0%) / 2)) scaleX(-1);
+  }
+  80.1%,
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-3, 0%) / 2)) scaleX(1);
+  }
+}
+@keyframes ambient-ash-tumble {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate3d(1, 0.4, 0.2, 0deg);
+  }
+  8%,
+  92% {
+    opacity: var(--peak, 0.6);
+  }
+  25% {
+    transform: translate3d(calc(var(--drift) * 0.5), -28vh, 0) rotate3d(1, 0.4, 0.2, 200deg);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.3), -56vh, 0) rotate3d(0.3, 1, 0.2, 380deg);
+  }
+  75% {
+    transform: translate3d(calc(var(--drift) * 0.8), -84vh, 0) rotate3d(1, 0.2, 0.5, 560deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -112vh, 0) rotate3d(1, 0.4, 0.2, 720deg);
+  }
+}
+@keyframes ambient-spore-turn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0) scale(0.9);
+  }
+  10%,
+  90% {
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.6), -55vh, 0) rotate(160deg) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -112vh, 0) rotate(320deg) scale(0.9);
   }
 }
 @keyframes ambient-red-flash {
   0%,
-  86%,
-  90%,
+  3%,
   100% {
     opacity: 0;
   }
-  87%,
-  89% {
+  1%,
+  2% {
     opacity: 1;
+  }
+}
+/*
+ * Red lightning that stays: it strikes (two quick flashes), holds a long while with a faint flicker, fades,
+ * and strikes again. Opacity only — the images are static.
+ */
+@keyframes vein-strike {
+  0% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  2% {
+    opacity: 0.25;
+  }
+  3%,
+  30% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0.7;
+  }
+  32%,
+  58% {
+    opacity: 1;
+  }
+  59% {
+    opacity: 0.75;
+  }
+  60%,
+  72% {
+    opacity: 0.95;
+  }
+  85%,
+  100% {
+    opacity: 0;
   }
 }
 
-/* 027 veins: dark red veins creeping in from the edges and pulsing */
+/*
+ * 027 veins: bolts of red lightning (upsidedown.css) striking in from the corners and staying, rifts
+ * cracking the sky here and there (three particles carry one each, wandering like the Upside Down's);
+ * a few red motes drift near them.
+ */
+[data-ambient="veins"]::before,
+[data-ambient="veins"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--veins-edge-a) left bottom / min(40vw, 60vh) auto no-repeat;
+  opacity: 0;
+  animation: vein-strike 11s linear infinite;
+}
+[data-ambient="veins"]::after {
+  background: var(--veins-edge-b) left top / min(36vw, 54vh) auto no-repeat;
+  transform: scaleX(-1);
+  animation-delay: -5.5s;
+}
 [data-ambient="veins"] > span {
-  left: 0;
-  top: var(--y);
-  inline-size: calc(10vw + var(--size) * 22vw);
-  block-size: 2px;
-  background: linear-gradient(90deg, #7f1d1dcc, #dc262688, transparent);
-  transform-origin: left;
-  filter: drop-shadow(0 0 3px #dc2626);
-  animation-name: ambient-vein;
-  animation-duration: calc(5s + var(--size) * 4s);
+  inline-size: calc(0.25rem + var(--size) * 0.25rem);
+  block-size: calc(0.25rem + var(--size) * 0.25rem);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4e6, #dc2626 45%, #dc262600 72%);
+  opacity: 0;
+  animation-name: ambient-vein-mote;
+  animation-duration: calc(8s + var(--size) * 6s);
   animation-timing-function: ease-in-out;
-  rotate: calc((var(--size) - 0.85) * 40deg);
 }
-[data-ambient="veins"] > span:nth-child(2n) {
-  left: auto;
-  right: 0;
-  transform-origin: right;
-  background: linear-gradient(270deg, #7f1d1dcc, #dc262688, transparent);
+[data-ambient="veins"] > span:is(:nth-child(1), :nth-child(6), :nth-child(11)) {
+  --at-1: -24%;
+  --at-2: 20%;
+  --at-3: 4%;
+  inset: 0 auto;
+  left: -50%;
+  inline-size: 200%;
+  block-size: 100%;
+  border-radius: 0;
+  background: var(--veins-rift-c) 0 0 / 100% 100% no-repeat;
+  animation-name: rift-wander;
+  animation-duration: calc(16s + var(--size) * 14s);
+  animation-timing-function: linear;
 }
-@keyframes ambient-vein {
-  0%,
-  100% {
-    transform: scaleX(0.6);
-    opacity: 0.5;
+[data-ambient="veins"] > span:nth-child(6) {
+  --at-1: 28%;
+  --at-2: -18%;
+  --at-3: 36%;
+  background-image: var(--veins-rift-a);
+}
+[data-ambient="veins"] > span:nth-child(11) {
+  --at-1: 6%;
+  --at-2: -34%;
+  --at-3: -12%;
+  background-image: var(--veins-rift-d);
+}
+@keyframes ambient-vein-mote {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
   }
-  50% {
-    transform: scaleX(1);
-    opacity: 1;
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -14vh, 0);
   }
 }
 
@@ -860,4 +1085,28 @@
 }
 :root[data-motion="none"] .ambient {
   display: none;
+}
+
+/* 027 bokeh: soft out-of-focus colour circles drifting slowly, like a phone's wallpaper */
+[data-ambient="bokeh"] > span {
+  inline-size: calc(4rem + var(--size) * 9rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(calc(230deg + var(--i) * 37deg) 90% 68% / 0.35), transparent 68%);
+  filter: blur(calc(6px + var(--size) * 8px));
+  translate: -50% -50%;
+  animation-name: ambient-bokeh;
+  animation-duration: calc(18s + var(--size) * 14s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+@keyframes ambient-bokeh {
+  from {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate3d(var(--drift), -8vh, 0) scale(1.15);
+    opacity: 1;
+  }
 }

@@ -92,6 +92,8 @@ const LAYOUTS: Record<string, string> = {
   cinema: "split",
   upsidedown: "split",
   sandstorm: "split",
+  vhs: "terminal",
+  nova: "sheet",
 };
 /** The big word some looks shout (an onomatopoeia, a code). */
 const WORDS: Record<string, string> = {
@@ -103,6 +105,7 @@ const WORDS: Record<string, string> = {
   decode: "ACCESS GRANTED",
   pumpkin: "BOO!",
   gift: "HO HO HO",
+  vhs: "PLAY ▶",
 };
 /** How many particles each look scatters. */
 const PARTICLES: Record<string, number> = {
@@ -124,6 +127,8 @@ const PARTICLES: Record<string, number> = {
   abduction: 12,
   minimal: 0,
   noir: 50,
+  vhs: 14,
+  nova: 10,
 };
 
 function sample(level: number): Summary {
@@ -299,9 +304,33 @@ export function LevelUpMoment() {
   );
 }
 
+/**
+ * A level-up look in miniature (the shop's picture of it): the same stage and card as the real moment,
+ * scaled down to a box, with fewer particles — so every look shows itself rather than a generic picture.
+ */
+export function LevelUpPreview({ look, label, size }: { look: string; label: string; size: string }) {
+  const t = useT();
+  return (
+    <span className="levelup" data-mini={size} data-look={look} data-layout="mini">
+      <span className="levelup__stage">
+        <LevelUpFx look={look} max={size === "sheet" ? 24 : 10} />
+      </span>
+      <span className="levelup__card">
+        <span className="levelup__badge">
+          <LevelBadge level={42} label={label} />
+        </span>
+        <span className="levelup__title">
+          <span className="levelup__kicker">{t("gamification:levelUp.kicker")}</span>
+          42
+        </span>
+      </span>
+    </span>
+  );
+}
+
 /** The decoration of each look — layers and particles placed once, animated by CSS. */
-function LevelUpFx({ look }: { look: string }) {
-  const count = PARTICLES[look] ?? 18;
+function LevelUpFx({ look, max }: { look: string; max?: number }) {
+  const count = Math.min(PARTICLES[look] ?? 18, max ?? Number.POSITIVE_INFINITY);
   const word = WORDS[look];
   return (
     <>

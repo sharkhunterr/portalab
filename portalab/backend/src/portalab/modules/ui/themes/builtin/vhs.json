@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "key": "vhs",
+  "name": "VHS",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0d0b1f",
+    "surfaceRaised": "#18153a",
+    "text": "#f1f0ff",
+    "textMuted": "#b4b0d6",
+    "border": "#2e2a5c",
+    "accent": "#ffd23f",
+    "accentContrast": "#141000",
+    "focus": "#00d1ff",
+    "accentAlt": "#00d1ff",
+    "rarity": {
+      "common": "#b4b0d6",
+      "rare": "#00d1ff",
+      "epic": "#ff4fd8",
+      "legendary": "#ffd23f"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#27282e",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#1d2826",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#2c2620",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#2a261e",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#2c2126",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#2a2229",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#252231",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#2b222b",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#24252b",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#1f262f",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Share Tech Mono\", monospace",
+    "headingFamily": "VT323, monospace",
+    "headingCase": "uppercase",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.1,
+    "md": 0.2
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "rewind",
+    "fastMs": 110,
+    "normalMs": 220,
+    "levelUp": "vhs"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "vcr",
+      "tablet": "vcr",
+      "phone": "vcr"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "outlined",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "tv",
+      "film": "clapperboard",
+      "media": "disc",
+      "compass": "radio",
+      "server": "tv",
+      "users": "popcorn",
+      "shop": "store",
+      "lifebuoy": "wrench",
+      "trophy": "star",
+      "search": "scan"
+    }
+  },
+  "background": {
+    "fallback": "#0d0b1f",
+    "pattern": "scanlines",
+    "ambient": "vhs"
+  },
+  "sounds": {
+    "notification": "asset:chiptune/notification.wav",
+    "alert": "asset:chiptune/alert.wav",
+    "success": "asset:chiptune/success.wav",
+    "reward": "asset:chiptune/reward.wav",
+    "levelUp": "asset:chiptune/level-up.wav",
+    "ui": "asset:chiptune/ui.wav"
+  },
+  "notification": {
+    "style": "vhs",
+    "animation": "tracking"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le salon",
+      "nav:nav.section.home": "Le salon",
+      "dashboard:title": "Le salon",
+      "nav:nav.media": "Les cassettes",
+      "nav:nav.section.media": "Les cassettes",
+      "media:home.title": "Les cassettes",
+      "nav:nav.media_requests": "Mes réservations",
+      "nav:nav.media_insights": "Mon compteur de bande",
+      "media:insights.title": "Mon compteur de bande",
+      "nav:nav.section.content": "Le programme télé",
+      "nav:nav.news": "Le magazine télé",
+      "news:title": "Le magazine télé",
+      "nav:nav.wiki": "Le mode d'emploi",
+      "wiki:title": "Le mode d'emploi",
+      "nav:nav.search": "Recherche de bande",
+      "search:title": "Recherche de bande",
+      "nav:nav.calendar": "Les programmations",
+      "calendar:title": "Les programmations",
+      "nav:nav.services": "La régie",
+      "nav:nav.section.services": "La régie",
+      "nav:nav.statistics": "Les audiences",
+      "statistics:title": "Les audiences",
+      "nav:nav.community": "Les habitués",
+      "nav:nav.section.community": "Les habitués",
+      "community:title": "Les habitués",
+      "nav:nav.progression": "Mon compteur",
+      "gamification:progression.title": "Mon compteur",
+      "nav:nav.campaigns": "Les rediffusions",
+      "campaigns:page.title": "Les rediffusions",
+      "nav:nav.marketplace": "Le vidéoclub",
+      "nav:nav.section.marketplace": "Le vidéoclub",
+      "marketplace:catalog.title": "Le vidéoclub",
+      "nav:nav.projects": "Les avant-premières",
+      "marketplace:projects.title": "Les avant-premières",
+      "marketplace:owned.title": "Ma vidéothèque",
+      "nav:nav.support": "Le réparateur",
+      "nav:nav.section.support": "Le réparateur",
+      "nav:nav.incidents": "Les pannes",
+      "support:incident.title": "Les pannes",
+      "nav:nav.feedback": "La boîte à idées",
+      "support:feedback.title": "La boîte à idées",
+      "gamification:value.coins": "Jetons"
+    },
+    "en": {
+      "nav:nav.home": "The living room",
+      "nav:nav.section.home": "The living room",
+      "dashboard:title": "The living room",
+      "nav:nav.media": "The tapes",
+      "nav:nav.section.media": "The tapes",
+      "media:home.title": "The tapes",
+      "nav:nav.media_requests": "My reservations",
+      "nav:nav.media_insights": "My tape counter",
+      "media:insights.title": "My tape counter",
+      "nav:nav.section.content": "The TV guide",
+      "nav:nav.news": "The TV magazine",
+      "news:title": "The TV magazine",
+      "nav:nav.wiki": "The user manual",
+      "wiki:title": "The user manual",
+      "nav:nav.search": "Tape search",
+      "search:title": "Tape search",
+      "nav:nav.calendar": "The recordings",
+      "calendar:title": "The recordings",
+      "nav:nav.services": "The control room",
+      "nav:nav.section.services": "The control room",
+      "nav:nav.statistics": "The ratings",
+      "statistics:title": "The ratings",
+      "nav:nav.community": "The regulars",
+      "nav:nav.section.community": "The regulars",
+      "community:title": "The regulars",
+      "nav:nav.progression": "My counter",
+      "gamification:progression.title": "My counter",
+      "nav:nav.campaigns": "The reruns",
+      "campaigns:page.title": "The reruns",
+      "nav:nav.marketplace": "The video store",
+      "nav:nav.section.marketplace": "The video store",
+      "marketplace:catalog.title": "The video store",
+      "nav:nav.projects": "The previews",
+      "marketplace:projects.title": "The previews",
+      "marketplace:owned.title": "My tape collection",
+      "nav:nav.support": "The repair shop",
+      "nav:nav.section.support": "The repair shop",
+      "nav:nav.incidents": "Breakdowns",
+      "support:incident.title": "Breakdowns",
+      "nav:nav.feedback": "The suggestion box",
+      "support:feedback.title": "The suggestion box",
+      "gamification:value.coins": "Tokens"
+    }
+  }
+}

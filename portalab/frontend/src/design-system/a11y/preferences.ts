@@ -28,6 +28,8 @@ export const UNIVERSE_THEMES = [
   "plex",
   "upsidedown",
   "middleearth",
+  "vhs",
+  "nova",
 ] as const;
 
 export type Density = "compact" | "comfortable" | "spacious";
@@ -64,6 +66,8 @@ export const PALETTE_KEYS = [
   "crimson",
   "hawkins",
   "gondor",
+  "vhs",
+  "nova",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -96,6 +100,7 @@ export const NOTIFICATION_STYLES = [
   "upsidedown",
   "elven",
   "onering",
+  "island",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -130,6 +135,8 @@ export const NOTIFICATION_ANIMATIONS = [
   "flipup",
   "balrog",
   "eye",
+  "tracking",
+  "morph",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -164,6 +171,7 @@ export const AMBIENTS = [
   "veins",
   "meadow",
   "ash",
+  "bokeh",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -195,6 +203,8 @@ export const LEVEL_BADGES = [
   "frost",
   "nebula",
   "circuit",
+  "cassette",
+  "squircle",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -226,6 +236,8 @@ export const LEVEL_UPS = [
   "spotlight",
   "upsidedown",
   "onering",
+  "vhs",
+  "nova",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -250,6 +262,8 @@ export const CELEBRATION_KEYS = [
   "portal",
   "flicker",
   "fireworks",
+  "rewind",
+  "bloom",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

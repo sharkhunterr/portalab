@@ -15,6 +15,7 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/plus-jakarta-sans";
 import "./design-system/fonts/universe-fonts";
 import "./styles.css";
+import "./design-system/themes/upsidedown.css";
 import "./design-system/themes/universe.css";
 import "./design-system/themes/cosmetics.css";
 

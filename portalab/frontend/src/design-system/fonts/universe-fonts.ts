@@ -46,3 +46,4 @@ import "@fontsource/share-tech-mono/latin-400.css";
 import "@fontsource/shrikhand/latin-400.css";
 import "@fontsource/syncopate/latin-400.css";
 import "@fontsource/syncopate/latin-700.css";
+import "@fontsource/vt323/latin-400.css";

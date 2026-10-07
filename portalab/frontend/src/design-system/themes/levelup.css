@@ -509,81 +509,75 @@
   display: none;
 }
 
-/* the shop's picture of a level-up look */
+/* the shop's picture of a level-up look: the real moment in miniature (LevelUpPreview), in a box */
 .product-art__levelup {
-  display: grid;
-  place-items: center;
-  gap: 1.2rem;
+  position: relative;
+  display: block;
   inline-size: 100%;
   block-size: 100%;
-  background: repeating-conic-gradient(
-    from 0deg,
-    color-mix(in srgb, var(--color-accent) 20%, transparent) 0 6deg,
-    transparent 6deg 18deg
-  );
+  overflow: hidden;
 }
-.product-art__levelup .ds-level {
-  align-self: center;
+.levelup[data-mini] {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0.5rem;
+  font-size: 0.75rem;
 }
-.product-art__levelup[data-size="sheet"] .ds-level {
-  transform: scale(1.8);
+.levelup[data-mini] .levelup__card {
+  inline-size: auto;
+  min-inline-size: 7rem;
+  max-block-size: none;
+  overflow: visible;
+  gap: 0.15rem;
+  padding: 0.5rem 1rem 0.55rem;
+  box-shadow: 0 0 1.4rem color-mix(in srgb, var(--glow) 35%, transparent);
 }
-.product-art__levelup-kicker {
-  font-family: var(--font-display, inherit);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.2em;
+.levelup[data-mini] .levelup__badge .ds-level {
+  transform: scale(1.15);
+  margin-block: 0.3rem 0.4rem;
 }
-.product-art__levelup[data-size="mini"] .product-art__levelup-kicker {
+.levelup[data-mini] .levelup__title {
+  font-size: 1.5rem;
+}
+.levelup[data-mini] .levelup__kicker {
+  font-size: 0.6rem;
+}
+.levelup[data-mini] .levelup__burst {
+  font-size: 1.6rem;
+}
+.levelup[data-mini] .levelup__countdown {
   display: none;
 }
-.product-art__levelup[data-look="arcade"] {
-  background: #0b0b1a;
-  color: #ffd166;
+.levelup[data-mini="sheet"] {
+  font-size: 1rem;
 }
-.product-art__levelup[data-look="arcade"] .product-art__levelup-kicker {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.7rem;
-  text-shadow: 2px 2px 0 #ef476f;
+.levelup[data-mini="sheet"] .levelup__card {
+  min-inline-size: 11rem;
+  padding: 1rem 1.6rem;
 }
-.product-art__levelup[data-look="cosmic"] {
-  background:
-    radial-gradient(circle, #000 0 22%, transparent 24%),
-    conic-gradient(
-      from 30deg,
-      transparent,
-      #f97316aa,
-      #fde68a,
-      #f97316aa,
-      transparent 55%,
-      #7c3aed88,
-      transparent
-    );
-  color: #fde68a;
+.levelup[data-mini="sheet"] .levelup__badge .ds-level {
+  transform: scale(1.8);
+  margin-block: 0.9rem 0.8rem;
 }
-.product-art__levelup[data-look="comic"] {
-  background:
-    radial-gradient(#00000033 1.5px, transparent 1.8px) 0 0 / 8px 8px,
-    #fde047;
-  color: #dc2626;
+.levelup[data-mini="sheet"] .levelup__title {
+  font-size: 2.4rem;
 }
-.product-art__levelup[data-look="comic"] .product-art__levelup-kicker {
-  font-family: "Bangers", sans-serif;
-  font-size: 1.4rem;
-  text-shadow: 2px 2px 0 #111;
+.levelup[data-mini="mini"] .levelup__card {
+  min-inline-size: 0;
+  padding: 0.3rem 0.5rem;
 }
-.product-art__levelup[data-look="elements"] {
-  background:
-    radial-gradient(circle at 25% 30%, #f97316aa, transparent 35%),
-    radial-gradient(circle at 75% 30%, #38bdf8aa, transparent 35%),
-    radial-gradient(circle at 25% 75%, #65a30daa, transparent 35%),
-    radial-gradient(circle at 75% 75%, #e2e8f0aa, transparent 35%);
+.levelup[data-mini="mini"] :is(.levelup__kicker, .levelup__burst) {
+  display: none;
 }
-.product-art__levelup[data-look="cinema"] {
-  background: radial-gradient(circle, #2a2a2a, #000 75%);
-  color: #e5e5e5;
+.levelup[data-mini="mini"] .levelup__title {
+  font-size: 1rem;
 }
-.product-art__levelup[data-look="cinema"] .product-art__levelup-kicker {
-  font-family: "Anton", sans-serif;
+:root[data-motion="none"] .levelup[data-mini] *,
+:root[data-motion="none"] .levelup[data-mini] *::before,
+:root[data-motion="none"] .levelup[data-mini] *::after {
+  animation-duration: 0s !important;
+  animation-iteration-count: 1 !important;
 }
 
 /* ================================================================ 027: layouts — the order and the shape vary */
@@ -1557,24 +1551,48 @@
   opacity: 0;
   animation: banner-lightning 3s steps(1, end) 0.8s infinite;
 }
+.levelup[data-look="upsidedown"] .levelup__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* each rift image is twice the screen's width, its rift in the middle: one lands at a fifth of the
+     screen, the other at three quarters */
+  background:
+    var(--veins-rift-a) 80% 0 / 200% 100% no-repeat,
+    var(--veins-rift-c) 25% 0 / 200% 100% no-repeat;
+  animation: levelup-strike 2.2s linear 0.5s both;
+}
 .levelup[data-look="upsidedown"] .levelup__fx {
   display: block;
-  inset-block-end: -2vh;
+  inset-block-end: -4vh;
   inset-inline-start: var(--x);
-  inline-size: calc(0.2rem + var(--r) * 0.3rem);
-  block-size: calc(0.2rem + var(--r) * 0.3rem);
-  border-radius: 40%;
-  background: #e2e8f0;
-  opacity: 0.6;
-  animation: levelup-rise calc(5s + var(--r) * 5s) linear calc(var(--r) * -5s) infinite;
+  inline-size: calc(0.4rem + var(--r) * 0.6rem);
+  block-size: calc(0.4rem + var(--r) * 0.6rem);
+  background: var(--upside-flake-a) center / contain no-repeat;
+  animation: levelup-ash calc(6s + var(--r) * 5s) linear calc(var(--r) * -6s) infinite;
+}
+.levelup[data-look="upsidedown"] .levelup__fx:nth-child(3n) {
+  background-image: var(--upside-flake-b);
+}
+.levelup[data-look="upsidedown"] .levelup__fx:nth-child(4n) {
+  inline-size: calc(1rem + var(--r) * 1rem);
+  block-size: calc(1rem + var(--r) * 1rem);
+  background-image: var(--upside-spore);
+}
+.levelup[data-look="upsidedown"] .levelup__fx:nth-child(7n) {
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4e6, #ff2a3d 45%, #ff2a3d00 72%);
 }
 .levelup[data-look="upsidedown"] .levelup__card {
   --color-text: #e5e7eb;
   --color-text-muted: #9ca3af;
   border-color: #dc262688;
   background:
-    linear-gradient(118deg, transparent 18%, #dc262644 18.5%, transparent 19.5%),
-    linear-gradient(62deg, transparent 70%, #b91c1c55 70.5%, transparent 71.5%), #0b0d12f2;
+    linear-gradient(#0b0d12cc, #0b0d12cc),
+    var(--veins-strip) center / cover no-repeat,
+    #0b0d12f2;
   -webkit-box-reflect: below 8px linear-gradient(transparent 70%, #ffffff1f);
   transform-origin: 50% 100%;
   animation: levelup-flipup 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both;
@@ -1585,6 +1603,38 @@
   font-weight: 800;
   text-transform: uppercase;
   text-shadow: 0 0 14px #dc2626;
+}
+/* the lightning strikes (two flashes) and stays */
+@keyframes levelup-strike {
+  0% {
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  8% {
+    opacity: 0.2;
+  }
+  12%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes levelup-ash {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate3d(1, 0.4, 0.2, 0deg);
+  }
+  10% {
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(-3vw, -50vh, 0) rotate3d(0.3, 1, 0.2, 360deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(2vw, -105vh, 0) rotate3d(1, 0.4, 0.2, 720deg);
+  }
 }
 @keyframes levelup-upside {
   0% {
@@ -1649,5 +1699,197 @@
   from {
     opacity: 0;
     transform: translate(-50%, -120%) perspective(60rem) rotateX(0deg) scale(0.3);
+  }
+}
+
+/* ================================================================ 027: VHS and Nova */
+/* sheet: the card slides up from the bottom like a phone's sheet, its handle on top */
+.levelup[data-layout="sheet"] {
+  place-items: end center;
+  padding-block-end: 0;
+}
+.levelup[data-layout="sheet"] .levelup__card {
+  inline-size: min(34rem, 100%);
+  padding-block-start: 0.6rem;
+  border-block-end: 0;
+  border-radius: 1.8rem 1.8rem 0 0;
+  animation: levelup-sheet-up 0.6s cubic-bezier(0.2, 0.9, 0.2, 1) 0.2s both;
+}
+.levelup[data-layout="sheet"] .levelup__card::before {
+  content: "";
+  inline-size: 2.6rem;
+  block-size: 0.32rem;
+  margin-block-end: 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text) 30%, transparent);
+}
+@keyframes levelup-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+/* vhs — the TV comes on, a blue screen, PLAY ▶ blinking, tracking noise, the summary in the VCR font */
+.levelup[data-look="vhs"] {
+  --glow: #ffd23f;
+}
+.levelup[data-look="vhs"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, #ffffff0a 0 1px, transparent 1px 3px), #1b2bd6;
+  animation: levelup-vhs-on 0.7s ease-out both;
+}
+.levelup[data-look="vhs"] .levelup__scene {
+  display: block;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0 46%, #ffffff26 46% 52%, transparent 52%) 0 0 / 100% 300%;
+  animation: levelup-vhs-track 2.6s linear infinite;
+}
+.levelup[data-look="vhs"] .levelup__burst {
+  display: block;
+  inset-block-start: 5%;
+  inset-inline-start: 5%;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: 0.08em;
+  text-shadow:
+    2px 0 #ff004c99,
+    -2px 0 #00e5ff99;
+  animation: levelup-blink 1s steps(2, jump-none) infinite;
+}
+.levelup[data-look="vhs"] .levelup__fx {
+  display: block;
+  inset-inline: 0;
+  inset-block-start: var(--y);
+  block-size: calc(1px + var(--r) * 4px);
+  background: linear-gradient(90deg, transparent, #ffffff99 30%, #ffffffcc 50%, #ffffff66 70%, transparent);
+  opacity: 0;
+  animation: levelup-vhs-noise calc(1.2s + var(--r) * 2s) steps(4) calc(var(--r) * -3s) infinite;
+}
+.levelup[data-look="vhs"] .levelup__card {
+  --color-text: #ffffff;
+  --color-text-muted: #c7d2fe;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: 1.25rem;
+  text-shadow: 2px 2px 0 #00000055;
+}
+.levelup[data-look="vhs"] .levelup__card {
+  justify-items: center;
+  text-align: center;
+}
+/* typed out like the VCR's display, without the terminal's blink (PLAY ▶ already blinks) */
+.levelup[data-look="vhs"] .levelup__title {
+  border-inline-end: 0;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: clamp(2.4rem, 7vw, 4rem);
+  animation: levelup-type 1.2s steps(14, end) 0.8s forwards;
+}
+.levelup[data-look="vhs"] .levelup__won {
+  justify-content: center;
+}
+.levelup[data-look="vhs"] .levelup__kicker {
+  color: #ffd23f;
+}
+.levelup[data-look="vhs"] :is(.levelup__won li, .levelup__list li) {
+  background: #ffffff1a;
+}
+.levelup[data-look="vhs"] .levelup__actions .ds-button {
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 1.15rem;
+}
+@keyframes levelup-vhs-on {
+  0% {
+    transform: scale(0, 0.005);
+    filter: brightness(4);
+  }
+  40% {
+    transform: scale(1, 0.005);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes levelup-vhs-track {
+  to {
+    background-position: 0 100%;
+  }
+}
+@keyframes levelup-vhs-noise {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-3%);
+  }
+}
+/* nova — soft colour blobs breathing behind a frosted sheet that slides up; a gradient number */
+.levelup[data-look="nova"] {
+  --glow: #8b7bff;
+}
+.levelup[data-look="nova"] .levelup__rays {
+  display: block;
+  inset: -20%;
+  background:
+    radial-gradient(35% 45% at 25% 30%, #8b7bffaa, transparent 70%),
+    radial-gradient(35% 45% at 75% 25%, #22d3eeaa, transparent 70%),
+    radial-gradient(40% 50% at 55% 75%, #f472b699, transparent 70%);
+  filter: blur(30px);
+  animation: levelup-nova-mesh 8s ease-in-out infinite alternate;
+}
+.levelup[data-look="nova"] .levelup__fx {
+  display: block;
+  inset-inline-start: var(--x);
+  inset-block-start: var(--y);
+  inline-size: calc(3rem + var(--r) * 5rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(calc(250deg + var(--i) * 40deg) 90% 70% / 0.55), transparent 70%);
+  filter: blur(6px);
+  animation: levelup-bokeh calc(5s + var(--r) * 4s) ease-in-out calc(var(--r) * -4s) infinite alternate;
+}
+.levelup[data-look="nova"] .levelup__card {
+  --color-text: #f5f5f7;
+  --color-text-muted: #a1a1aa;
+  border-color: #ffffff1f;
+  background: #111118e6;
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: 0 -20px 60px #00000066;
+  color: #f5f5f7;
+}
+.levelup[data-look="nova"] .levelup__title {
+  background: linear-gradient(90deg, #8b7bff, #22d3ee, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.levelup[data-look="nova"] .levelup__kicker {
+  color: #a1a1aa;
+}
+.levelup[data-look="nova"] :is(.levelup__won li, .levelup__list li) {
+  background: #ffffff12;
+}
+@keyframes levelup-nova-mesh {
+  to {
+    transform: translate(4%, -3%) rotate(8deg) scale(1.08);
+  }
+}
+@keyframes levelup-bokeh {
+  to {
+    opacity: 0.6;
+    transform: translate(2rem, -1.5rem) scale(1.2);
   }
 }

@@ -86,6 +86,9 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   // 027: Christmas lights flickering round the bubble; fireworks bursting over the page
   flicker: { count: 12, layer: "badge" },
   fireworks: { count: 36, layer: "screen" },
+  // 027: a tape rewinding (tracking bars racing across); soft colour blooms opening like a phone's wallpaper
+  rewind: { count: 10, layer: "screen" },
+  bloom: { count: 12, layer: "screen" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

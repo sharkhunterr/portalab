@@ -763,7 +763,9 @@
             "glitch",
             "portal",
             "flicker",
-            "fireworks"
+            "fireworks",
+            "rewind",
+            "bloom"
           ]
         },
         "levelUp": {
@@ -795,7 +797,9 @@
             "noir",
             "spotlight",
             "upsidedown",
-            "onering"
+            "onering",
+            "vhs",
+            "nova"
           ]
         }
       },
@@ -819,7 +823,9 @@
                 "launcher",
                 "terminal",
                 "reel",
-                "lights"
+                "lights",
+                "vcr",
+                "sheet"
               ]
             },
             "tablet": {
@@ -834,7 +840,9 @@
                 "launcher",
                 "terminal",
                 "reel",
-                "lights"
+                "lights",
+                "vcr",
+                "sheet"
               ]
             },
             "phone": {
@@ -848,7 +856,9 @@
                 "launcher",
                 "terminal",
                 "reel",
-                "lights"
+                "lights",
+                "vcr",
+                "sheet"
               ]
             }
           },
@@ -1016,7 +1026,8 @@
             "upsidedown",
             "veins",
             "meadow",
-            "ash"
+            "ash",
+            "bokeh"
           ]
         }
       },
@@ -1108,7 +1119,8 @@
             "vhs",
             "upsidedown",
             "elven",
-            "onering"
+            "onering",
+            "island"
           ]
         },
         "animation": {
@@ -1142,7 +1154,9 @@
             "portal",
             "flipup",
             "balrog",
-            "eye"
+            "eye",
+            "tracking",
+            "morph"
           ]
         }
       },

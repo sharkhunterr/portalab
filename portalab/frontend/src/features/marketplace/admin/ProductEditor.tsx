@@ -84,6 +84,7 @@ const BADGE_STYLES = [
   "mirror",
   "ring",
   "elven",
+  "glass",
 ];
 const ICON_NAMES = Object.keys(ICONS).sort();
 

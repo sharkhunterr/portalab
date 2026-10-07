@@ -13,7 +13,16 @@ import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
-import { DockNav, LauncherNav, LightsNav, ReelNav, TabsNav, TerminalNav } from "./nav/PrincipleNavs";
+import {
+  DockNav,
+  LauncherNav,
+  LightsNav,
+  ReelNav,
+  SheetNav,
+  TabsNav,
+  TerminalNav,
+  VcrNav,
+} from "./nav/PrincipleNavs";
 import { NavContent } from "./nav/SectionNav";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
@@ -144,6 +153,7 @@ export function AppShell({
         {nav === "terminal" ? <TerminalNav sections={sections} /> : null}
         {nav === "reel" ? <ReelNav sections={sections} /> : null}
         {nav === "lights" ? <LightsNav sections={sections} /> : null}
+        {nav === "vcr" ? <VcrNav sections={sections} /> : null}
         <div className="shell-body">
           {nav === "tabs" ? <TabsNav sections={sections} /> : null}
           {nav === "sidebar" || nav === "rail" ? (
@@ -167,6 +177,7 @@ export function AppShell({
         {nav === "orbit" ? <OrbitNav sections={sections} /> : null}
         {nav === "dock" ? <DockNav sections={sections} /> : null}
         {nav === "launcher" ? <LauncherNav sections={sections} /> : null}
+        {nav === "sheet" ? <SheetNav sections={sections} /> : null}
         {drawerNav ? (
           <Drawer
             title={shellStrings.mainNav}

@@ -42,6 +42,8 @@ export const appearanceStrings = {
     terminal: "Command line",
     reel: "Film reel",
     lights: "String of lights",
+    vcr: "Video recorder",
+    sheet: "Phone sheet",
   } as Record<string, string>,
   footerHeader: "header at the bottom",
   theme: "Theme",

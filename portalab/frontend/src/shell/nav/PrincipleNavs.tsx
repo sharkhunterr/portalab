@@ -1,4 +1,12 @@
-import { type CSSProperties, type KeyboardEvent, useEffect, useRef, useState } from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { NavLink, useLocation } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
@@ -439,6 +447,297 @@ export function LightsNav({ sections }: { sections: readonly NavSection[] }) {
           <DestinationList section={section} currentKey={current?.key} onPick={() => setOpen(null)} />
         </div>
       ) : null}
+    </nav>
+  );
+}
+
+/** The route a section leads to first. */
+function firstRoute(section: NavSection): string {
+  return destinationsOf(section, undefined)[0]?.route ?? "/";
+}
+
+/** A tape counter running since the page opened (h:mm:ss), like a VCR's display. */
+function TapeCounter() {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <span className="shell-vcr__counter" aria-hidden="true">
+      {Math.floor(seconds / 3600)}:{pad(Math.floor(seconds / 60) % 60)}:{pad(seconds % 60)}
+    </span>
+  );
+}
+
+/**
+ * 027 VCR: a video recorder's display under the header — PLAY, the current section as a numbered channel,
+ * ◀◀ and ▶▶ to zap to the previous or next section, a tape counter; MENU opens the blue on-screen menu
+ * with every section as a channel and its pages under it.
+ */
+export function VcrNav({ sections }: { sections: readonly NavSection[] }) {
+  const strings = useShellStrings();
+  const { current, isActive, pathname } = useCurrent(sections);
+  const [open, setOpen] = useState(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: close on navigation
+  useEffect(() => setOpen(false), [pathname]);
+  if (!sections.length) return null;
+  const index = Math.max(0, sections.findIndex(isActive));
+  const here = sections[index] as NavSection;
+  const previous = sections[(index - 1 + sections.length) % sections.length] as NavSection;
+  const next = sections[(index + 1) % sections.length] as NavSection;
+  const channel = (i: number) => `CH ${String(i + 1).padStart(2, "0")}`;
+  return (
+    <nav className="shell-vcr" aria-label={strings.mainNav}>
+      <div className="shell-vcr__deck">
+        <span className="shell-vcr__play" aria-hidden="true">
+          PLAY ▶
+        </span>
+        <NavLink
+          to={firstRoute(previous)}
+          end
+          className="shell-vcr__zap"
+          aria-label={`${strings.previousSection} — ${strings.label(previous.label_key)}`}
+        >
+          ◀◀
+        </NavLink>
+        <span className="shell-vcr__channel">
+          <span className="shell-vcr__number">{channel(index)}</span>
+          <span className="shell-vcr__name">{strings.label(here.label_key)}</span>
+        </span>
+        <NavLink
+          to={firstRoute(next)}
+          end
+          className="shell-vcr__zap"
+          aria-label={`${strings.nextSection} — ${strings.label(next.label_key)}`}
+        >
+          ▶▶
+        </NavLink>
+        <TapeCounter />
+        <Dialog
+          open={open}
+          onOpenChange={setOpen}
+          size="full"
+          title={strings.mainNav}
+          closeLabel={strings.closeMenu}
+          trigger={
+            <button type="button" className="shell-vcr__menu" aria-expanded={open}>
+              {strings.menu}
+            </button>
+          }
+        >
+          <ol className="shell-vcr__osd">
+            {sections.map((section, i) => {
+              const destinations = destinationsOf(section, current?.key);
+              return (
+                <li key={section.key} data-active={isActive(section) ? "true" : undefined}>
+                  <NavLink to={firstRoute(section)} end className="shell-vcr__entry">
+                    <span className="shell-vcr__number">{channel(i)}</span>
+                    {strings.label(section.label_key)}
+                  </NavLink>
+                  {destinations.length > 1 ? (
+                    <DestinationList
+                      section={section}
+                      currentKey={current?.key}
+                      className="shell-vcr__pages"
+                    />
+                  ) : null}
+                </li>
+              );
+            })}
+          </ol>
+        </Dialog>
+      </div>
+    </nav>
+  );
+}
+
+/** One app icon of the sheet: a link, or a folder button when the section has several destinations. */
+function AppIcon({
+  label,
+  icon,
+  index,
+  active,
+  to,
+  onOpen,
+}: {
+  label: string;
+  icon: string | null | undefined;
+  index: number;
+  active: boolean;
+  to?: string;
+  onOpen?: () => void;
+}) {
+  const body = (
+    <>
+      <span className="shell-sheet__app-icon" aria-hidden="true">
+        <Icon name={icon ?? "dashboard"} size={26} />
+      </span>
+      <span className="shell-sheet__app-label">{label}</span>
+    </>
+  );
+  const style = { "--i": index } as CSSProperties;
+  if (onOpen) {
+    return (
+      <button
+        type="button"
+        className="shell-sheet__app"
+        data-folder
+        data-active={active ? "true" : undefined}
+        style={style}
+        onClick={onOpen}
+      >
+        {body}
+      </button>
+    );
+  }
+  return (
+    <NavLink
+      to={to ?? "/"}
+      end
+      className="shell-sheet__app"
+      data-active={active ? "true" : undefined}
+      aria-current={active ? "page" : undefined}
+      style={style}
+    >
+      {body}
+    </NavLink>
+  );
+}
+
+/**
+ * 027 Sheet: a phone's navigation on every screen — a bottom bar with a few shortcuts either side of a big
+ * round button that slides a sheet up from the bottom: every section as an app icon; a section with
+ * several pages opens like a folder (Back returns). Escape, the backdrop, or dragging the handle down
+ * closes it.
+ */
+export function SheetNav({ sections }: { sections: readonly NavSection[] }) {
+  const strings = useShellStrings();
+  const { current, isActive, pathname } = useCurrent(sections);
+  const [open, setOpen] = useState(false);
+  const [folder, setFolder] = useState<string | null>(null);
+  const [drag, setDrag] = useState(0);
+  const start = useRef<number | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: close on navigation
+  useEffect(() => {
+    setOpen(false);
+    setFolder(null);
+  }, [pathname]);
+  const opened = sections.find((s) => s.key === folder);
+  const shortcuts = sections.slice(0, 4);
+  const shortcut = (s: NavSection) => {
+    const active = isActive(s);
+    const label = strings.label(s.label_key);
+    return (
+      <li key={s.key}>
+        <NavLink
+          to={firstRoute(s)}
+          end={firstRoute(s) === "/"}
+          className="shell-sheet__shortcut"
+          data-nav-item
+          data-active={active ? "true" : undefined}
+          aria-current={active ? "page" : undefined}
+          title={label}
+        >
+          <Icon name={s.icon ?? destinationsOf(s, undefined)[0]?.icon} size={22} />
+          <span className="shell-sheet__shortcut-label">{label}</span>
+        </NavLink>
+      </li>
+    );
+  };
+  const onOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) setFolder(null);
+  };
+  const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    start.current = event.clientY;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const onPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (start.current !== null) setDrag(Math.max(0, event.clientY - start.current));
+  };
+  const onPointerUp = () => {
+    if (drag > 90) onOpenChange(false);
+    start.current = null;
+    setDrag(0);
+  };
+  return (
+    <nav className="shell-sheet" aria-label={strings.mainNav}>
+      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: arrow keys move along the bar */}
+      <ul className="shell-sheet__bar" onKeyDown={(event) => moveFocus(event)}>
+        {shortcuts.slice(0, 2).map(shortcut)}
+        <li className="shell-sheet__center">
+          <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+            <DialogPrimitive.Trigger className="shell-sheet__fab" data-nav-item aria-label={strings.sections}>
+              <Icon name={open ? "close" : "apps"} size={26} />
+            </DialogPrimitive.Trigger>
+            <DialogPrimitive.Portal>
+              <DialogPrimitive.Overlay className="shell-sheet__backdrop" />
+              <DialogPrimitive.Content
+                className="shell-sheet__panel"
+                aria-describedby={undefined}
+                data-dragging={drag ? "true" : undefined}
+                style={{ "--drag": `${drag}px` } as CSSProperties}
+              >
+                <span
+                  className="shell-sheet__handle"
+                  aria-hidden="true"
+                  onPointerDown={onPointerDown}
+                  onPointerMove={onPointerMove}
+                  onPointerUp={onPointerUp}
+                  onPointerCancel={onPointerUp}
+                />
+                <div className="shell-sheet__head">
+                  {opened ? (
+                    <button type="button" className="shell-sheet__back" onClick={() => setFolder(null)}>
+                      <Icon name="chevron-left" size={18} />
+                      {strings.back}
+                    </button>
+                  ) : null}
+                  <DialogPrimitive.Title className="shell-sheet__title">
+                    {opened ? strings.label(opened.label_key) : strings.sections}
+                  </DialogPrimitive.Title>
+                  <DialogPrimitive.Close className="shell-sheet__close" aria-label={strings.closeMenu}>
+                    <Icon name="close" size={18} />
+                  </DialogPrimitive.Close>
+                </div>
+                <ul className="shell-sheet__apps" data-folder={opened ? "true" : undefined}>
+                  {opened
+                    ? destinationsOf(opened, current?.key).map((page, i) => (
+                        <li key={page.key}>
+                          <AppIcon
+                            label={strings.label(page.label_key)}
+                            icon={page.icon}
+                            index={i}
+                            active={page.active}
+                            to={page.route}
+                          />
+                        </li>
+                      ))
+                    : sections.map((s, i) => {
+                        const destinations = destinationsOf(s, current?.key);
+                        return (
+                          <li key={s.key}>
+                            <AppIcon
+                              label={strings.label(s.label_key)}
+                              icon={s.icon ?? destinations[0]?.icon}
+                              index={i}
+                              active={isActive(s)}
+                              {...(destinations.length > 1
+                                ? { onOpen: () => setFolder(s.key) }
+                                : { to: destinations[0]?.route ?? "/" })}
+                            />
+                          </li>
+                        );
+                      })}
+                </ul>
+              </DialogPrimitive.Content>
+            </DialogPrimitive.Portal>
+          </DialogPrimitive.Root>
+        </li>
+        {shortcuts.slice(2, 4).map(shortcut)}
+      </ul>
     </nav>
   );
 }

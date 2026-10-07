@@ -34,6 +34,8 @@ export const BANNER_KEYS = [
   "shire",
   "mordor",
   "pixelshire",
+  "vhs",
+  "mesh",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -63,6 +65,8 @@ export const FRAME_KEYS = [
   "lights",
   "onering",
   "elven",
+  "vhs",
+  "rings",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -93,4 +97,6 @@ export const NAME_KEYS = [
   "upsidedown",
   "elvish",
   "mordor",
+  "vhs",
+  "nova",
 ] as const;

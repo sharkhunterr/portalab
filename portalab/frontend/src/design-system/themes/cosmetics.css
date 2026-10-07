@@ -1514,6 +1514,7 @@
     radial-gradient(1.5px 1.5px at 35% 60%, #f8fafc88 50%, transparent 51%),
     radial-gradient(2px 2px at 62% 25%, #f8fafcaa 50%, transparent 51%),
     radial-gradient(1.5px 1.5px at 84% 52%, #f8fafc77 50%, transparent 51%),
+    var(--veins-strip) center bottom / 100% auto no-repeat,
     linear-gradient(to top, #050608 0 12%, transparent 12%),
     radial-gradient(60% 90% at 70% 0%, #dc262688, transparent 70%),
     linear-gradient(180deg, #2a0a10, #12151f 60%, #050608);
@@ -1577,6 +1578,7 @@
       0 -10px,
       0 -4px,
       0 -8px,
+      center bottom,
       0 0,
       0 0,
       0 0;
@@ -1606,15 +1608,11 @@
 }
 /* avatar frames */
 .avatar-frame[data-frame="veins"] {
-  background: repeating-conic-gradient(
-    from 10deg,
-    #7f1d1d 0 8deg,
-    #dc2626 8deg 11deg,
-    #450a0a 11deg 25deg,
-    #b91c1c 25deg 28deg
-  );
+  background:
+    var(--veins-web) center / cover no-repeat,
+    radial-gradient(circle, #3b0610, #12040a);
   box-shadow: 0 0 0.9rem #dc2626aa;
-  animation: frame-veins 2.2s ease-in-out infinite;
+  animation: frame-veins 4.6s ease-in-out infinite;
 }
 .avatar-frame[data-frame="lights"] {
   background:
@@ -1639,10 +1637,10 @@
   background: conic-gradient(#e2e8f0, #86efac, #f8fafc, #4ade80, #e2e8f0);
   box-shadow: 0 0 1rem #bbf7d088;
 }
+/* the lightning's glow swells and settles (a shadow only: cheap to repaint on a small element) */
 @keyframes frame-veins {
   50% {
     box-shadow: 0 0 1.6rem #ef4444;
-    filter: brightness(1.25);
   }
 }
 /* name styles */
@@ -1694,23 +1692,19 @@
 :is(.cosmetic-badge, .cosmetic-title)[data-style="veins"] {
   border-color: #dc2626;
   background:
-    linear-gradient(
-      115deg,
-      transparent 30%,
-      #dc262699 31%,
-      transparent 33%,
-      transparent 60%,
-      #b91c1c99 61%,
-      transparent 63%
-    ),
+    linear-gradient(#12151f99, #12151f99),
+    var(--veins-web) center / 9rem auto,
     #12151f;
   color: #fecaca;
-  animation: frame-veins 2.2s ease-in-out infinite;
+  text-shadow: 0 0 4px #000;
+  animation: frame-veins 4.6s ease-in-out infinite;
 }
 .cosmetic-title[data-style="veins"] {
-  background: none;
+  background: var(--veins-strip) center / 100% 100% no-repeat;
   color: #ff3b4f;
-  text-shadow: 0 0 8px #dc2626;
+  text-shadow:
+    0 0 8px #dc2626,
+    0 0 2px #000;
 }
 :is(.cosmetic-badge, .cosmetic-title)[data-style="mirror"] {
   border-color: #64748b;
@@ -1747,7 +1741,10 @@
 }
 /* level badges */
 :is(:root[data-level-badge="upsidedown"] .ds-level:not([data-look]), .ds-level[data-look="upsidedown"]) {
-  background: #12151f;
+  background:
+    linear-gradient(#12151fbb, #12151fbb),
+    var(--veins-web) center / 5rem auto,
+    #12151f;
   color: #ff3b4f;
   box-shadow:
     0 0 0 1.5px #ff3b4f,
@@ -1770,18 +1767,12 @@
 }
 :is(:root[data-level-badge="veins"] .ds-level:not([data-look]), .ds-level[data-look="veins"]) {
   background:
-    linear-gradient(
-      115deg,
-      transparent 25%,
-      #dc2626 26%,
-      transparent 29%,
-      transparent 58%,
-      #b91c1c 59%,
-      transparent 62%
-    ),
-    linear-gradient(60deg, transparent 40%, #7f1d1d 41%, transparent 44%), #1a0a0e;
-  color: #fecaca;
-  animation: frame-veins 2s ease-in-out infinite;
+    linear-gradient(#1a0a0e66, #1a0a0e66),
+    var(--veins-web) center / 4.5rem auto,
+    #1a0a0e;
+  color: #fff1f2;
+  text-shadow: 0 0 3px #000;
+  animation: frame-veins 4.6s ease-in-out infinite;
 }
 :is(:root[data-level-badge="lights"] .ds-level:not([data-look]), .ds-level[data-look="lights"]) {
   padding-block-start: 0.3rem;
@@ -1909,4 +1900,232 @@
 /* the Eye takes the icon's place */
 :is(:root[data-level-badge="eye"] .ds-level:not([data-look]), .ds-level[data-look="eye"]) .ds-icon {
   display: none;
+}
+
+/* ================================================================ 027: VHS and Nova */
+/* banners — VHS: the blue screen of a tape that just started (PLAY ▶, a tracking band, the rainbow stripes);
+   mesh: soft colour blobs drifting like a phone's wallpaper */
+.profile-banner[data-banner="vhs"] {
+  background:
+    linear-gradient(180deg, transparent 0 62%, #ffffff24 62% 65%, transparent 65%) 0 0 / 100% 300%,
+    repeating-linear-gradient(180deg, #ffffff0d 0 1px, transparent 1px 3px),
+    linear-gradient(
+      105deg,
+      transparent 0 58%,
+      #ef4444 58% 63%,
+      #f97316 63% 68%,
+      #facc15 68% 73%,
+      #22c55e 73% 78%,
+      #3b82f6 78% 83%,
+      transparent 83%
+    )
+    0 100% / 100% 30% no-repeat,
+    linear-gradient(180deg, #1b2bd6, #1322a3);
+  animation: banner-vhs-track 4s linear infinite;
+}
+.profile-banner[data-banner="vhs"]::after {
+  content: "PLAY ▶";
+  position: absolute;
+  inset-block-start: 0.7rem;
+  inset-inline-start: 1rem;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: 1.7rem;
+  letter-spacing: 0.06em;
+  text-shadow:
+    2px 0 #ff004c88,
+    -2px 0 #00e5ff88;
+  animation: name-flicker 5s steps(1, end) infinite;
+}
+@keyframes banner-vhs-track {
+  to {
+    background-position:
+      0 100%,
+      0 0,
+      0 100%,
+      0 0;
+  }
+}
+.profile-banner[data-banner="mesh"] {
+  background:
+    radial-gradient(40% 70% at 20% 30%, #8b7bffcc, transparent 70%),
+    radial-gradient(45% 80% at 80% 20%, #22d3eecc, transparent 70%),
+    radial-gradient(50% 90% at 60% 90%, #f472b6bb, transparent 70%),
+    radial-gradient(40% 60% at 10% 90%, #fbbf24aa, transparent 70%), #0f0b2a;
+  background-size: 200% 200%;
+  animation: banner-mesh 14s ease-in-out infinite alternate;
+}
+@keyframes banner-mesh {
+  0% {
+    background-position:
+      0 0,
+      100% 0,
+      50% 100%,
+      0 100%;
+  }
+  50% {
+    background-position:
+      30% 20%,
+      70% 40%,
+      20% 60%,
+      40% 80%;
+  }
+  100% {
+    background-position:
+      60% 10%,
+      40% 70%,
+      80% 30%,
+      10% 40%;
+  }
+}
+/* frames — VHS: the tape's rainbow round the avatar, slipping now and then; rings: three activity rings
+   filling up (the avatar's ring, then two around it) */
+.avatar-frame[data-frame="vhs"] {
+  background: conic-gradient(#ef4444 0 20%, #f97316 0 40%, #facc15 0 60%, #22c55e 0 80%, #3b82f6 0);
+  box-shadow:
+    -2px 0 0 #ff004c88,
+    2px 0 0 #00e5ff88;
+  animation: frame-vhs 3s steps(1, end) infinite;
+}
+@keyframes frame-vhs {
+  0%,
+  90%,
+  100% {
+    transform: none;
+  }
+  92% {
+    transform: translateX(2px) skewX(-4deg);
+  }
+  95% {
+    transform: translateX(-2px);
+  }
+}
+@property --ring {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+.avatar-frame[data-frame="rings"] {
+  --ring: 86%;
+  margin: 12px;
+  background: conic-gradient(#00d8fe var(--ring), #00d8fe33 0);
+  animation: frame-rings 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.avatar-frame[data-frame="rings"]::before,
+.avatar-frame[data-frame="rings"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+}
+.avatar-frame[data-frame="rings"]::before {
+  inset: -6px;
+  background: conic-gradient(#a3f900 calc(var(--ring) * 0.8), #a3f90033 0);
+}
+.avatar-frame[data-frame="rings"]::after {
+  inset: -12px;
+  background: conic-gradient(#fa114f calc(var(--ring) * 0.65), #fa114f33 0);
+}
+@keyframes frame-rings {
+  from {
+    --ring: 0%;
+  }
+}
+/* name styles */
+.name-style[data-name="vhs"] {
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.25em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f8fafc;
+  text-shadow:
+    -2px 0 #ff004c,
+    2px 0 #00e5ff,
+    0 0 8px #ffffff55;
+  animation: universe-vhs-jitter 3.2s steps(1, end) infinite;
+}
+.name-style[data-name="nova"] {
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, #8b7bff, #22d3ee, #f472b6, #8b7bff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 8s linear infinite;
+}
+/* badge and title styles — glass: frosted, a soft gradient behind */
+:is(.cosmetic-badge, .cosmetic-title)[data-style="glass"] {
+  border: 1px solid #ffffff40;
+  background: linear-gradient(135deg, #ffffff2e, #ffffff0d), linear-gradient(135deg, #8b7bff66, #22d3ee55);
+  backdrop-filter: blur(10px) saturate(1.6);
+  -webkit-backdrop-filter: blur(10px) saturate(1.6);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 #ffffff66,
+    0 6px 18px #8b7bff33;
+}
+.cosmetic-title[data-style="glass"] {
+  border: 0;
+  background: linear-gradient(90deg, #8b7bff, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-weight: 800;
+}
+/* level badges — VHS gets its font and a tracking band; cassette: a tape, the level on its label;
+   squircle: an app icon */
+:is(:root[data-level-badge="vhs"] .ds-level:not([data-look]), .ds-level[data-look="vhs"]) {
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.05rem;
+  background:
+    linear-gradient(180deg, transparent 0 40%, #ffffff26 40% 55%, transparent 55%) 0 0 / 100% 300%,
+    repeating-linear-gradient(180deg, #ffffff10 0 1px, transparent 1px 3px),
+    #14102a;
+  animation: level-vhs-track 2.8s linear infinite;
+}
+@keyframes level-vhs-track {
+  to {
+    background-position:
+      0 100%,
+      0 0;
+  }
+}
+:is(:root[data-level-badge="cassette"] .ds-level:not([data-look]), .ds-level[data-look="cassette"]) {
+  min-inline-size: 2.7rem;
+  padding-inline: 0.55rem;
+  border: 1px solid #000;
+  border-radius: 0.25rem;
+  background:
+    radial-gradient(circle at 0.22rem 0.22rem, #71717a 0 0.07rem, transparent 0.08rem),
+    radial-gradient(circle at calc(100% - 0.22rem) 0.22rem, #71717a 0 0.07rem, transparent 0.08rem),
+    linear-gradient(90deg, #ef4444 0 20%, #f97316 0 40%, #facc15 0 60%, #22c55e 0 80%, #3b82f6 0) 50% 88% /
+    78% 14% no-repeat,
+    linear-gradient(#fafaf9, #e7e5e4) 50% 30% / 78% 56% no-repeat,
+    #1c1917;
+  color: #1c1917;
+  font-family: "VT323", monospace;
+  font-size: 1rem;
+  line-height: 1;
+  padding-block-end: 0.3rem;
+}
+:is(:root[data-level-badge="squircle"] .ds-level:not([data-look]), .ds-level[data-look="squircle"]) {
+  position: relative;
+  min-inline-size: 1.95rem;
+  block-size: 1.95rem;
+  border-radius: 32%;
+  background: linear-gradient(145deg, #8b7bff, #4f46e5 55%, #22d3ee);
+  color: #fff;
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  box-shadow:
+    inset 0 1px 0 #ffffff66,
+    inset 0 -2px 5px #0000002e,
+    0 4px 12px #6d5cff55;
 }

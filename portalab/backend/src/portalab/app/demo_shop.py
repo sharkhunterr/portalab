@@ -141,6 +141,15 @@ for key, label, fr, icon, style, rarity, price, level, en_about, fr_about, suppl
      "Fond of good food and quiet.", "Amateur de bonne chère et de calme.", None),
     ("badge_pixel_quest", "Pixel quest", "Badge Quête pixel", "sword", "pixel", "rare", 300, None,
      "The fellowship in 8-bit.", "La communauté en 8 bits.", None),
+    # 027: VHS and Nova
+    ("badge_be_kind_rewind", "Be kind, rewind", "Badge Rembobinez, svp", "disc", "vhs", "common", 200, None,
+     "Always brings the tape back rewound.", "Rend toujours la cassette rembobinée.", None),
+    ("badge_video_club", "Video club member", "Badge Membre du vidéoclub", "store", "vhs", "rare", 400, None,
+     "Card number 0042, valid for life.", "Carte n° 0042, valable à vie.", None),
+    ("badge_early_adopter", "Early adopter", "Badge Early adopter", "rocket", "glass", "rare", 400, None,
+     "Updates on day one.", "Fait les mises à jour dès le premier jour.", None),
+    ("badge_power_user", "Power user", "Badge Utilisateur expert", "zap", "glass", "epic", 800, 6,
+     "Knows every shortcut.", "Connaît tous les raccourcis.", None),
 ):  # fmt: skip
     _p(key, "badge", price, rarity, f"{label} badge", fr, en_about, fr_about,
        {"label": label, "icon": icon, **({"style": style} if style != "none" else {})},
@@ -189,6 +198,14 @@ for key, label, fr, style, rarity, price, level, en_about, fr_about in (
      "The bridge holds.", "Le pont tient."),
     ("title_second_breakfast", "Second breakfast champion", "Titre : Champion du second petit-déjeuner", "none",
      "common", 150, None, "What about elevenses?", "Et l'en-cas de onze heures ?"),
+    ("title_be_kind_rewind", "Be kind, rewind", "Titre : Rembobinez, svp", "vhs", "common", 200, None,
+     "The video store's golden rule.", "La règle d'or du vidéoclub."),
+    ("title_late_fees", "Late fees collector", "Titre : Roi des pénalités de retard", "vhs", "rare", 350, None,
+     "The tape always comes back… eventually.", "La cassette revient toujours… un jour."),
+    ("title_one_more_thing", "One more thing", "Titre : Encore une chose", "glass", "rare", 400, None,
+     "Always a last surprise.", "Toujours une dernière surprise."),
+    ("title_beta_tester", "Beta tester", "Titre : Bêta-testeur", "glass", "common", 200, None,
+     "Tries everything first.", "Essaie tout en premier."),
 ):  # fmt: skip
     _p(key, "title", price, rarity, label if key == "title_cinephile" else f"Title: {label}", fr, en_about,
        fr_about, {"label": label, **({"style": style} if style != "none" else {})}, collection="titles",
@@ -296,8 +313,8 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
      "legendary", 1000, "They step out of a swirling dimensional portal — and back into it.",
      "Elles sortent d'un portail dimensionnel tourbillonnant — et y retournent."),
     ("notif_upsidedown", "notification_style", "style", "upsidedown", "Upside Down notifications",
-     "Notifications monde à l'envers", "epic", 700, "Cracked with red veins, their faint mirror image fading below.",
-     "Craquelées de veines rouges, leur reflet pâle s'effaçant en dessous."),
+     "Notifications monde à l'envers", "epic", 700, "The title sequence: hollow red neon letters closing in between two growing bars, the message typed like a lab report.",
+     "Le générique : des lettres de néon rouge creuses qui se resserrent entre deux barres, le message tapé comme un rapport de labo."),
     ("notif_flipup", "notification_animation", "animation", "flipup", "Flip-up notifications",
      "Notifications retournées", "epic", 600, "They rise from below and flip up, as if turned over from the other side.",
      "Elles montent d'en bas et se retournent, comme venues de l'autre côté."),
@@ -309,6 +326,15 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
      "epic", 650, "They rise from fire, wings of shadow opening.", "Elles surgissent du feu, des ailes d'ombre s'ouvrant."),
     ("notif_eye", "notification_animation", "animation", "eye", "Eye notifications", "Notifications de l'Œil",
      "epic", 600, "They open like a fiery slit eye.", "Elles s'ouvrent comme un œil de feu."),
+    ("notif_tracking", "notification_animation", "animation", "tracking", "Bad tracking notifications",
+     "Notifications mauvais tracking", "rare", 450, "They arrive torn by bad tracking and leave like a TV switched off.",
+     "Elles arrivent déchirées par un mauvais tracking et repartent comme une télé qu'on éteint."),
+    ("notif_island", "notification_style", "style", "island", "Island notifications", "Notifications îlot",
+     "epic", 650, "A black capsule at the top of the screen, like a phone's island.",
+     "Une capsule noire en haut de l'écran, comme l'îlot d'un téléphone."),
+    ("notif_morph", "notification_animation", "animation", "morph", "Morph notifications",
+     "Notifications métamorphose", "rare", 450, "A small capsule swells into the message.",
+     "Une petite capsule s'agrandit pour devenir le message."),
 ):  # fmt: skip
     _p(key, kind, price, rarity, en, fr, en_about, fr_about, {field: value}, collection="looks",
        icon="bell" if kind == "notification_style" else "sparkles")  # fmt: skip
@@ -333,6 +359,8 @@ for key, value, en, fr, rarity, price, level in (
     ("effect_portal", "portal", "Portal", "Portail", "legendary", 1200, 12),
     ("effect_flicker", "flicker", "Christmas lights", "Guirlande", "rare", 400, None),
     ("effect_fireworks", "fireworks", "Wizard's fireworks", "Feux d'artifice du magicien", "epic", 700, 6),
+    ("effect_rewind", "rewind", "Rewind", "Rembobinage", "rare", 400, None),
+    ("effect_bloom", "bloom", "Bloom", "Éclosion", "rare", 450, None),
 ):  # fmt: skip
     _p(key, "effect", price, rarity, f"{en} celebration", f"Célébration {fr.lower()}",
        f"{en} burst out when you earn a reward or level up.",
@@ -370,6 +398,7 @@ AMBIENT_NAMES = {
     "veins": ("Red veins", "Veines rouges", "epic", 650),
     "meadow": ("Shire meadow", "Prairie de la Comté", "rare", 400),
     "ash": ("Ash of Mordor", "Cendres du Mordor", "rare", 450),
+    "bokeh": ("Bokeh", "Bokeh", "rare", 450),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -380,7 +409,7 @@ for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
 
 # --------------------------------------------------------------------------------- animated profile backgrounds
 for value in ("starfield", "code-rain", "snow", "embers", "petals", "aurora", "disco", "bats", "fireflies",
-              "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash"):  # fmt: skip
+              "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash", "vhs", "bokeh"):  # fmt: skip
     en, fr, rarity, price = AMBIENT_NAMES[value]
     rarity = "legendary" if value == "aurora" else "epic" if rarity in ("epic", "legendary") else "rare"
     _p(f"bg_{value.replace('-', '_')}", "profile_background", {"rare": 450, "epic": 800, "legendary": 1300}[rarity],
@@ -441,6 +470,11 @@ for key, value, en, fr, rarity, price, level, en_about, fr_about in (
      "A dark land, a burning eye on its tower.", "Une terre sombre, un œil de feu sur sa tour."),
     ("banner_pixelshire", "pixelshire", "Pixel Shire banner", "Bannière Comté pixel", "rare", 350, None,
      "The Shire in pixel art: hills, a round door, clouds.", "La Comté en pixel art : collines, porte ronde, nuages."),
+    ("banner_vhs", "vhs", "VHS blue screen banner", "Bannière écran bleu VHS", "rare", 450, None,
+     "PLAY ▶ on a blue screen, a tracking band and the tape's rainbow.",
+     "PLAY ▶ sur écran bleu, une bande de tracking et l'arc-en-ciel de la cassette."),
+    ("banner_mesh", "mesh", "Colour mesh banner", "Bannière dégradé fluide", "epic", 650, 5,
+     "Soft colours drifting like a phone's wallpaper.", "Des couleurs douces qui dérivent comme un fond d'écran de téléphone."),
 ):  # fmt: skip
     _p(key, "profile_banner", price, rarity, en, fr, en_about, fr_about, {"banner": value},
        collection="profile", icon="image", level=level)  # fmt: skip
@@ -492,6 +526,10 @@ for key, value, en, fr, rarity, price, level, en_about, fr_about in (
      "A golden ring turning around you.", "Un anneau d'or qui tourne autour de vous."),
     ("frame_elven", "elven", "Elven frame", "Cadre elfique", "rare", 400, None,
      "Silver and green, like Lothlórien.", "Argent et vert, comme la Lothlórien."),
+    ("frame_vhs", "vhs", "VHS rainbow frame", "Cadre arc-en-ciel VHS", "rare", 400, None,
+     "The tape's rainbow around you, slipping now and then.", "L'arc-en-ciel de la cassette autour de vous, qui décroche parfois."),
+    ("frame_rings", "rings", "Activity rings frame", "Cadre anneaux d'activité", "epic", 700, 6,
+     "Three rings filling up around your avatar.", "Trois anneaux qui se remplissent autour de votre avatar."),
 ):  # fmt: skip
     _p(key, "avatar_frame", price, rarity, en, fr, en_about, fr_about, {"frame": value},
        collection="profile", icon="user", level=level)  # fmt: skip
@@ -512,6 +550,8 @@ for value, en, fr, rarity, price, level in (
     ("upsidedown", "Upside Down", "Monde à l'envers", "epic", 700, 6),
     ("elvish", "Elvish gold", "Or elfique", "epic", 700, 6),
     ("mordor", "Fires of Mordor", "Feux du Mordor", "rare", 450, None),
+    ("vhs", "VHS", "Magnétoscope", "rare", 400, None),
+    ("nova", "Nova gradient", "Dégradé Nova", "epic", 650, 5),
     ("galaxy", "Galactic", "Galactique", "rare", 400, None),
     ("matrix", "Simulation", "Simulation", "epic", 700, 5),
     ("desert", "Dune sand", "Sable des dunes", "rare", 400, None),
@@ -568,6 +608,8 @@ for value, en, fr, rarity, price, level in (
     ("crimson", "Crimson", "Carmin", "epic", 550, 4),
     ("hawkins", "Hawkins", "Hawkins", "rare", 300, None),
     ("gondor", "Gondor", "Gondor", "epic", 550, 4),
+    ("vhs", "VHS", "Vidéoclub", "rare", 300, None),
+    ("nova", "Nova", "Violet Nova", "epic", 550, 4),
 ):  # fmt: skip
     _p(f"palette_{value}", "palette", price, rarity, f"{en} palette", f"Palette {fr.lower()}",
        "Accent colours laid over any theme — try it before buying.",
@@ -598,6 +640,10 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
     ("portal", "Dimensional portal", "Portail dimensionnel", "legendary", 1300, 14, "A swirling portal opens behind your level.",
      "Un portail tourbillonnant s'ouvre derrière votre niveau."),
     ("inferno", "Inferno", "Brasier", "epic", 700, 6, "Your level burns with living flames.", "Votre niveau brûle de flammes vives."),
+    ("cassette", "Cassette", "Cassette", "rare", 450, None, "Your level written on the label of a tape.",
+     "Votre niveau écrit sur l'étiquette d'une cassette."),
+    ("squircle", "App icon", "Icône d'app", "rare", 450, None, "Your level as a glossy app icon.",
+     "Votre niveau en icône d'application brillante."),
     ("upsidedown", "Upside Down", "Monde à l'envers", "epic", 750, 6, "Red neon, a faint mirror, and now and then it turns over.",
      "Néon rouge, un reflet pâle, et de temps en temps il se retourne."),
     ("veins", "Red veins", "Veines rouges", "epic", 650, 6, "Red veins pulsing across your level.", "Des veines rouges qui pulsent sur votre niveau."),
@@ -655,6 +701,10 @@ for value, en, fr, about_en, about_fr in (
      "Le monde se retourne, les spores remontent, des éclairs rouges."),
     ("onering", "The One Ring", "L'Anneau unique", "A golden ring turns in the dark; the scroll of your journey unrolls.",
      "Un anneau d'or tourne dans l'ombre ; le parchemin de votre voyage se déroule."),
+    ("vhs", "VHS tape", "Magnétoscope", "The TV comes on: a blue screen, PLAY ▶ and your level in the VCR's letters.",
+     "La télé s'allume : écran bleu, PLAY ▶ et votre niveau en lettres de magnétoscope."),
+    ("nova", "Nova sheet", "Volet dépoli", "Soft colours breathe while a frosted sheet slides up with your new level.",
+     "Des couleurs douces respirent pendant qu'un volet dépoli glisse avec votre nouveau niveau."),
 ):  # fmt: skip
     _p(f"levelup_{value}", "level_up", 450, "rare", f"{en} level-up", f"Passage de niveau {fr.lower()}",
        about_en, about_fr, {"animation": value}, collection="levels", icon="trophy")  # fmt: skip
@@ -845,6 +895,18 @@ THEME_TEXT |= {
         "From the Shire to Mordor: parchment, a map screen to travel, elven notifications, the One Ring and fireworks.",
         "De la Comté au Mordor : parchemin, un écran de carte pour voyager, notifications elfiques, l'Anneau unique et des feux d'artifice.",
     ),
+    "vhs": (
+        "VHS",
+        "VHS",
+        "Back to the video store: a blue screen, PLAY ▶, a VCR to zap between sections like channels, bad tracking and tapes rewinding.",
+        "Retour au vidéoclub : écran bleu, PLAY ▶, un magnétoscope pour zapper entre les rubriques comme des chaînes, du mauvais tracking et des cassettes qui rembobinent.",
+    ),
+    "nova": (
+        "Nova",
+        "Nova",
+        "Ultra-modern, like a phone: a round button at the bottom opens a sheet of app icons, frosted glass, soft colours and an island for notifications.",
+        "Ultra moderne, comme un téléphone : un bouton rond en bas ouvre un volet d'icônes d'applications, du verre dépoli, des couleurs douces et un îlot pour les notifications.",
+    ),
 }
 THEME_RARITY = {
     "orbit": ("epic", 900, 6), "studio": ("rare", 600, None), "wizard": ("legendary", 1500, 12),
@@ -855,6 +917,7 @@ THEME_RARITY = {
     "heroes": ("legendary", 1500, 12), "neowave": ("epic", 900, 6), "disco": ("epic", 900, 5),
     "cyberpunk": ("legendary", 1500, 14), "sincity": ("legendary", 1500, 12), "plex": ("epic", 900, 4),
     "upsidedown": ("legendary", 1500, 12), "middleearth": ("legendary", 1500, 12),
+    "vhs": ("epic", 900, 5), "nova": ("legendary", 1500, 10),
 }  # fmt: skip
 for theme, (en, fr, about_en, about_fr) in THEME_TEXT.items():
     rarity, price, level = THEME_RARITY[theme]
@@ -1143,6 +1206,12 @@ UNIVERSES |= {  # 027: the two new universes
     "plex": ("banner_skyline", "frame_chrome", "name_futuristic", "notif_split", "effect_glitch", None,
              "badge_golden_cinephile", "title_cinephile"),
 }  # fmt: skip
+UNIVERSES |= {  # 027: the VHS tape and the phone-like Nova
+    "vhs": ("banner_vhs", "frame_vhs", "name_vhs", "notif_vhs", "effect_rewind", "ambient_vhs", "badge_video_club",
+            "title_be_kind_rewind"),
+    "nova": ("banner_mesh", "frame_rings", "name_nova", "notif_island", "effect_bloom", "ambient_bokeh",
+             "badge_early_adopter", "title_one_more_thing"),
+}  # fmt: skip
 # 027: each universe's level badge, notification look and level-up moment
 UNIVERSE_EXTRAS = {
     "wizard": ("level_crest", "notif_portal", "levelup_spell"), "galaxy": ("level_blackhole", "notif_saga", "notif_filmwipe",
@@ -1162,6 +1231,10 @@ UNIVERSE_EXTRAS = {
                     "levelup_onering", "banner_mordor", "banner_pixelshire", "frame_elven", "name_mordor", "bg_meadow",
                     "bg_ash", "ambient_ash", "palette_gondor", "badge_hobbit", "badge_pixel_quest",
                     "title_second_breakfast"),
+    "vhs": ("level_vhs", "level_cassette", "notif_tracking", "levelup_vhs", "bg_vhs", "palette_vhs", "badge_rewinder",
+            "badge_be_kind_rewind", "title_late_fees"),
+    "nova": ("level_squircle", "notif_morph", "levelup_nova", "bg_bokeh", "palette_nova", "badge_power_user",
+             "title_beta_tester"),
 }  # fmt: skip
 for theme, items in UNIVERSES.items():
     en, fr, _, _ = THEME_TEXT[theme]
@@ -1252,6 +1325,16 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Notifications et badges de niveau trou noir et portail, passage de niveau cosmique et style saga spatiale.",
      ["notif_blackhole", "notif_portal", "level_blackhole", "level_portal", "levelup_cosmic", "notif_saga"],
      "legendary", 16),
+    ("pack_vhs", "VHS pack", "Pack VHS",
+     "Everything for the video store: VHS and bad-tracking notifications, the VHS ambience, banner, frame and name, the VHS and cassette level badges, the VHS level-up, the rewind celebration and two badges.",
+     "Tout pour le vidéoclub : notifications VHS et mauvais tracking, ambiance, bannière, cadre et nom VHS, badges de niveau VHS et cassette, passage de niveau VHS, célébration rembobinage et deux badges.",
+     ["notif_vhs", "notif_tracking", "ambient_vhs", "banner_vhs", "frame_vhs", "name_vhs", "level_vhs",
+      "level_cassette", "levelup_vhs", "effect_rewind", "badge_rewinder", "badge_be_kind_rewind"], "epic", 6),
+    ("pack_nova", "Nova pack", "Pack Nova",
+     "A phone's look: island and morph notifications, the app-icon level badge, the sheet level-up, colour mesh, activity rings, the gradient name, bloom and bokeh.",
+     "Le style d'un téléphone : notifications îlot et métamorphose, badge de niveau icône d'app, passage de niveau en volet, dégradé fluide, anneaux d'activité, nom en dégradé, éclosion et bokeh.",
+     ["notif_island", "notif_morph", "level_squircle", "levelup_nova", "banner_mesh", "frame_rings", "name_nova",
+      "effect_bloom", "ambient_bokeh"], "epic", 6),
 ):  # fmt: skip
     _p(key, "bundle", None, rarity, en, fr, about_en, about_fr, {"products": contents},
        collection="packs", icon="shop", featured=key == "pack_cinephile", level=level)  # fmt: skip

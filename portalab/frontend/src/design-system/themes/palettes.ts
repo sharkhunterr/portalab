@@ -119,6 +119,14 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#dbe4ee", accentAlt: "#d4af37", contrast: "#10151c" },
     light: { accent: "#334155", accentAlt: "#8a6d0b", contrast: "#ffffff" },
   },
+  vhs: {
+    dark: { accent: "#ffd23f", accentAlt: "#00d1ff", contrast: "#141000" },
+    light: { accent: "#1d2bd6", accentAlt: "#a16207", contrast: "#ffffff" },
+  },
+  nova: {
+    dark: { accent: "#8b7bff", accentAlt: "#22d3ee", contrast: "#0b0820" },
+    light: { accent: "#5b3df5", accentAlt: "#0e7490", contrast: "#ffffff" },
+  },
   crimson: {
     dark: { accent: "#ff5c6c", accentAlt: "#c7d0dc", contrast: "#24040a" },
     light: { accent: "#b3122a", accentAlt: "#4b5563", contrast: "#ffffff" },
