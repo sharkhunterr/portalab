@@ -1160,6 +1160,104 @@
 .shell-health:hover {
   background: color-mix(in srgb, var(--health) 22%, transparent);
 }
+/* the icon lives its state: a calm heartbeat, a slow amber breath, an alert pulse with a ripple */
+.shell-health {
+  position: relative;
+}
+.shell-health .ds-icon {
+  transform-origin: center;
+}
+.shell-health[data-state="ok"] .ds-icon {
+  animation: health-beat 2.8s ease-in-out infinite;
+}
+.shell-health[data-state="degraded"] {
+  animation: health-breath 3.2s ease-in-out infinite;
+}
+.shell-health[data-state="degraded"] .ds-icon {
+  animation: health-sway 3.2s ease-in-out infinite;
+}
+.shell-health[data-state="incident"] .ds-icon {
+  animation: health-alert 1.4s ease-in-out infinite;
+}
+.shell-health[data-state="incident"]::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 2px solid var(--health);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: health-ripple 1.4s ease-out infinite;
+}
+@keyframes health-beat {
+  0%,
+  28%,
+  56%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.18);
+  }
+  42% {
+    transform: scale(1.1);
+  }
+}
+@keyframes health-breath {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--health) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0.7rem 0.1rem color-mix(in srgb, var(--health) 45%, transparent);
+  }
+}
+@keyframes health-sway {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  70% {
+    transform: rotate(-10deg);
+  }
+  80% {
+    transform: rotate(8deg);
+  }
+  90% {
+    transform: rotate(-4deg);
+  }
+}
+@keyframes health-alert {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.75;
+  }
+}
+@keyframes health-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell-health,
+  .shell-health .ds-icon,
+  .shell-health::after {
+    animation: none !important;
+  }
+}
+:root[data-motion="none"] :is(.shell-health, .shell-health .ds-icon, .shell-health::after) {
+  animation: none;
+}
 
 /* 027 — the compact phone header: home and search on the left; incidents, level, notifications, menu */
 .shell-header[data-compact="true"] .shell-header__start,
