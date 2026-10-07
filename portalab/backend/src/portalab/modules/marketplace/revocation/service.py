@@ -3,6 +3,7 @@
 notified (``marketplace.revocation``), and a Coins purchase is refunded per its policy **unless** the ground
 is ``abuse``. Audited."""
 
+from collections.abc import Mapping
 from typing import Literal
 from uuid import UUID
 
@@ -18,6 +19,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.activation.service import LIVE, Activation
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
+from portalab.modules.marketplace.notify import product_name
 from portalab.modules.marketplace.observability import log
 from portalab.modules.marketplace.refunds.service import Refunds
 
@@ -70,7 +72,7 @@ class Revocations:
             )
         else:
             row = await self._close(actor, ownership_id, product.key, ground, reason, "revoked")
-        await self._notify(row, product.key, ground)
+        await self._notify(row, product.key, ground, version.names)
         return row
 
     async def _close(
@@ -104,18 +106,21 @@ class Revocations:
         await self.activation.deactivate(row)
         return row
 
-    async def _notify(self, ownership: Ownership, product_key: str, ground: str) -> None:
+    async def _notify(
+        self, ownership: Ownership, product_key: str, ground: str, names: Mapping[str, str] | None = None
+    ) -> None:
         providers = self.capabilities.system_providers(NOTIFY)
         if not providers:
             return
         try:
+            shown = await product_name(self.capabilities, ownership.user_id, product_key, names)
             await providers[0].provider.send(
                 CommunicationRequest(
                     category="marketplace.revocation",
                     template_key=f"marketplace:notify.revocation.{ground}",
                     audience=Users((ownership.user_id,)),
                     dedup_key=f"revocation:{ownership.id}",
-                    params={"product": product_key},
+                    params={"product": shown[:120]},
                     subject_ref=f"ownership:{ownership.id}",
                     action_url="/marketplace/owned",
                 )

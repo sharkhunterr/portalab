@@ -24,6 +24,7 @@ import { DashboardGrid } from "./grid/DashboardGrid";
 import { VIEW_COLUMNS, type View } from "./grid/engine";
 import "./summary/SinceLastLoginCard";
 import "./widgets/tiles";
+import "./widgets/layout";
 import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
 import "./widgets/media";

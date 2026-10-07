@@ -185,9 +185,30 @@ NOTIFICATION_STYLES = Literal[
     "hologram",
     "pixel",
     "paper",
+    "square",
+    "circle",
+    "cloud",
+    "ticket",
+    "tag",
+    "split",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
-    "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam"
+    "slide",
+    "fade",
+    "pop",
+    "zoom",
+    "bounce",
+    "flip",
+    "swing",
+    "glitch",
+    "drop",
+    "spiral",
+    "slam",
+    "rise",
+    "wipe",
+    "focus",
+    "jelly",
+    "shake",
 ]
 AMBIENTS = Literal[
     "none",

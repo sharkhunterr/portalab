@@ -306,3 +306,93 @@
   color: var(--color-text-muted);
   block-size: 100%;
 }
+
+/* 027: a campaign uses the width it has — what it is and gives on one side, its time on the other */
+.campaign-list {
+  container-type: inline-size;
+  grid-template-columns: minmax(0, 1fr);
+}
+.campaign-card__main,
+.campaign-card__side {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.campaign-card__side > .campaign-card__ends {
+  justify-self: start;
+}
+@container (min-width: 44rem) {
+  .campaign-card {
+    grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 1fr);
+    gap: var(--space-5, 1.25rem);
+  }
+  .campaign-card__side {
+    padding-inline-start: var(--space-5, 1.25rem);
+    border-inline-start: 1px solid var(--color-border);
+  }
+}
+.campaign-progress {
+  display: grid;
+  gap: 0.3rem;
+}
+.campaign-progress__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+.campaign-progress__track {
+  display: block;
+  block-size: 0.45rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.campaign-progress__track > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
+}
+
+/* the widget: identity, boosts and time in one row when the block is wide, stacked when narrow */
+.campaigns-widget {
+  container-type: inline-size;
+}
+.campaigns-widget__card {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+}
+.campaigns-widget__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.campaigns-widget__name {
+  display: grid;
+  min-inline-size: 0;
+}
+.campaigns-widget__name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.campaigns-widget__time {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 9rem;
+}
+.campaigns-widget__time .campaigns-widget__left {
+  justify-self: start;
+  margin-inline-start: 0;
+}
+@container (min-width: 34rem) {
+  .campaigns-widget__card {
+    grid-template-columns: minmax(0, 1.4fr) auto minmax(9rem, 0.8fr);
+    gap: var(--space-4);
+  }
+  .campaigns-widget__boosts {
+    flex-wrap: nowrap;
+  }
+}

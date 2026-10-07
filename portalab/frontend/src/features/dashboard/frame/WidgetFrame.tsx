@@ -146,12 +146,16 @@ export function WidgetFrame({
   const body = useRef<HTMLDivElement>(null);
   const hidden = useFit(body);
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
+  // 027: the member may show the content alone — without its title, without its box, or both
+  const frame = (instance.config ?? {}) as Record<string, unknown>;
   return (
     <section
       aria-labelledby={headingId}
       className="widget-frame"
       data-widget={instance.widget_key}
       data-tile={instance.h <= 1 || undefined}
+      data-no-title={frame._hide_title === true || undefined}
+      data-no-box={frame._no_box === true || undefined}
       style={{ "--widget-w": instance.w, "--widget-h": instance.h } as React.CSSProperties}
     >
       {handles}

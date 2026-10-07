@@ -77,15 +77,37 @@ class Presentation:
 
     async def public_view(self, key: str) -> dict[str, Any] | None:
         """027: what a campaign says of itself (its pitch and boosts) — its current version."""
+        now = utc_now(self.clock)
         async with self.database.session() as session:
             row = (await session.execute(select(Campaign).where(Campaign.key == key))).scalar_one_or_none()
             version = await session.get(CampaignVersion, (row.id, row.current_version)) if row else None
+            # 027: the window running now — the widget shows how long is left and how far through it we are
+            window = (
+                (
+                    await session.execute(
+                        select(Occurrence)
+                        .where(
+                            Occurrence.campaign_id == row.id,
+                            Occurrence.start_at <= now,
+                            Occurrence.end_at > now,
+                            Occurrence.status.in_(("planned", "active")),
+                        )
+                        .order_by(Occurrence.start_at)
+                        .limit(1)
+                    )
+                ).scalar_one_or_none()
+                if row
+                else None
+            )
         if row is None or version is None:
             return None
         definition = CampaignDefinition.model_validate(version.definition)
         return {
             "description": definition.description,
             "modifiers": [{"value": m.value, "factor": m.factor} for m in definition.modifiers],
+            "window": {"start_at": window.start_at.isoformat(), "end_at": window.end_at.isoformat()}
+            if window
+            else None,
         }
 
     async def active_for_user(self, user: UUID, at: datetime | None = None) -> Sequence[CampaignRef]:

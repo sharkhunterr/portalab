@@ -4,7 +4,12 @@ import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import {
+  CheckboxField,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
@@ -13,8 +18,8 @@ import type { Change, Instance } from "../api";
 /**
  * Edit controls of one widget (spec 009 T019; 027): moving and resizing are done on the grid itself (drag
  * the grip or pull the edges; keyboard: Enter on the grip then arrows, Shift + arrows to resize), so a
- * widget only keeps two buttons in its header — its settings and « remove ». Policy-locked actions are
- * disabled with their reason; the server enforces them anyway.
+ * widget keeps two buttons beside its grip, drawn alike — its settings (always: at least how it is shown)
+ * and « remove ». Policy-locked actions are disabled with their reason; the server enforces them anyway.
  */
 interface SchemaProperty {
   type?: string;
@@ -22,6 +27,7 @@ interface SchemaProperty {
   minimum?: number;
   maximum?: number;
   maxLength?: number;
+  format?: string;
 }
 
 export function EditControls({ instance, apply }: { instance: Instance; apply: (change: Change) => void }) {
@@ -31,18 +37,17 @@ export function EditControls({ instance, apply }: { instance: Instance; apply: (
   const id = instance.id;
   const title = widget ? t(widget.title_key) : instance.widget_key;
   if (!id) return null; // synthesized by a policy: nothing to personalize
-  const configurable =
-    widget && !instance.locked && Object.keys((widget.config_schema.properties as object) ?? {}).length > 0;
+  // 027: every widget has settings — at least how it is displayed (title, box, hidden when empty)
   return (
     <div className="widget-frame__controls" role="toolbar" aria-label={title}>
-      {configurable ? (
-        <ConfigDialog
-          instance={instance}
-          onSave={(config) => apply({ kind: "patch", id, body: { config } })}
-        />
-      ) : null}
+      <ConfigDialog
+        instance={instance}
+        disabled={Boolean(instance.locked)}
+        onSave={(config) => apply({ kind: "patch", id, body: { config } })}
+      />
       <Button
-        variant="danger"
+        variant="ghost"
+        className="dash-tool ds-button--quiet-danger"
         disabled={!instance.removable}
         onClick={() => {
           apply({ kind: "remove", id });
@@ -61,9 +66,11 @@ export function EditControls({ instance, apply }: { instance: Instance; apply: (
 function ConfigDialog({
   instance,
   onSave,
+  disabled = false,
 }: {
   instance: Instance;
   onSave: (config: Record<string, unknown>) => void;
+  disabled?: boolean;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -100,10 +107,12 @@ function ConfigDialog({
       closeLabel={t("dashboard:cancel")}
       trigger={
         <Button
-          variant="secondary"
+          variant="ghost"
           size="icon"
+          className="dash-tool"
+          disabled={disabled}
           aria-label={t("dashboard:settings")}
-          title={t("dashboard:settings")}
+          title={disabled ? t("dashboard:locked") : t("dashboard:settings")}
         >
           <Icon name="settings" size={16} />
         </Button>
@@ -156,22 +165,49 @@ function ConfigDialog({
                 onChange={(e) => setDraft({ ...draft, [name]: Number(e.target.value) })}
               />
             );
+          if ((schema.maxLength ?? 0) > 120)
+            return (
+              <TextAreaField
+                key={name}
+                label={label(`${base}.${name}`, name)}
+                value={String(value ?? "")}
+                maxLength={schema.maxLength}
+                rows={4}
+                onChange={(e) => setDraft({ ...draft, [name]: e.target.value })}
+              />
+            );
           return (
             <TextField
               key={name}
               label={label(`${base}.${name}`, name)}
+              type={schema.format === "date" ? "date" : "text"}
               value={String(value ?? "")}
               maxLength={schema.maxLength ?? 200}
               onChange={(e) => setDraft({ ...draft, [name]: e.target.value })}
             />
           );
         })}
-        <CheckboxField
-          label={t("dashboard:hideWhenEmpty")}
-          hint={t("dashboard:hideWhenEmptyHint")}
-          checked={Boolean(draft._hide_empty)}
-          onChange={(e) => setDraft({ ...draft, _hide_empty: e.target.checked })}
-        />
+        <fieldset className="widget-config__frame">
+          <legend>{t("dashboard:frame.options")}</legend>
+          <CheckboxField
+            label={t("dashboard:frame.hideTitle")}
+            hint={t("dashboard:frame.hideTitleHint")}
+            checked={Boolean(draft._hide_title)}
+            onChange={(e) => setDraft({ ...draft, _hide_title: e.target.checked })}
+          />
+          <CheckboxField
+            label={t("dashboard:frame.noBox")}
+            hint={t("dashboard:frame.noBoxHint")}
+            checked={Boolean(draft._no_box)}
+            onChange={(e) => setDraft({ ...draft, _no_box: e.target.checked })}
+          />
+          <CheckboxField
+            label={t("dashboard:hideWhenEmpty")}
+            hint={t("dashboard:hideWhenEmptyHint")}
+            checked={Boolean(draft._hide_empty)}
+            onChange={(e) => setDraft({ ...draft, _hide_empty: e.target.checked })}
+          />
+        </fieldset>
         {hasLocked ? (
           <p className="ds-field__hint">
             <Link to="/marketplace?type=widget_option">{t("dashboard:moreOptions")}</Link>

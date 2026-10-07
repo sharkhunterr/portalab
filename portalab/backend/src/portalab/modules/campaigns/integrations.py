@@ -63,12 +63,15 @@ class ActiveWidget:
         items = []
         for c in active:
             view = await self.presentation.public_view(c.key)
+            window = (view or {}).get("window")
             items.append(
                 {
                     "key": c.key,
                     "title": c.name,
                     "route": f"/campaigns/{c.key}",
-                    "ends_at": c.ends_at.isoformat() if c.ends_at else None,
+                    # 027: the running window — how long is left and how far through it we are
+                    "starts_at": window["start_at"] if window else c.started_at.isoformat(),
+                    "ends_at": window["end_at"] if window else c.ends_at.isoformat() if c.ends_at else None,
                     "description": (view or {}).get("description") or "",
                     "boosts": (view or {}).get("modifiers") or [],
                 }

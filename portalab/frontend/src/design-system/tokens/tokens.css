@@ -204,6 +204,13 @@ body {
     );
 
   --color-accent-alt: var(--color-accent);
+  /* 027: sticky notes — paper colours with dark ink, the same in every theme */
+  --note-yellow: #fff3a8;
+  --note-pink: #ffd1e3;
+  --note-blue: #cfe6ff;
+  --note-green: #d4f5cf;
+  --note-violet: #e4d8ff;
+  --note-ink: #2b2512;
   --rarity-common: var(--color-text-muted);
   --rarity-rare: var(--color-accent);
   --rarity-epic: var(--color-accent);

@@ -50,6 +50,14 @@ export const PALETTE_KEYS = [
   "coffee",
   "lavender",
   "bubblegum",
+  // 027: more accent pairs
+  "polar",
+  "copper",
+  "solar",
+  "berry",
+  "slate",
+  "peach",
+  "crimson",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -66,6 +74,13 @@ export const NOTIFICATION_STYLES = [
   "hologram",
   "pixel",
   "paper",
+  // 027: shapes — a square tile, a round bubble, a thought cloud, a ticket, a luggage tag, two tones
+  "square",
+  "circle",
+  "cloud",
+  "ticket",
+  "tag",
+  "split",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -79,6 +94,12 @@ export const NOTIFICATION_ANIMATIONS = [
   "drop",
   "spiral",
   "slam",
+  // 027: rise from below, wipe in, come into focus, jelly squash, arrive with a shake
+  "rise",
+  "wipe",
+  "focus",
+  "jelly",
+  "shake",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [

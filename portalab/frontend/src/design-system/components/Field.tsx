@@ -1,4 +1,10 @@
-import { type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, useId } from "react";
+import {
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+  useId,
+} from "react";
 
 /**
  * Form fields: always a visible ``<label>``, hint and error wired with ``aria-describedby``; accessible
@@ -25,6 +31,41 @@ export function TextField({
     <div className="ds-field">
       <label htmlFor={inputId}>{label}</label>
       <input
+        id={inputId}
+        aria-describedby={[hintId, errorId].filter(Boolean).join(" ") || undefined}
+        aria-invalid={error ? true : undefined}
+        {...props}
+      />
+      {hint ? (
+        <span id={hintId} className="ds-field__hint">
+          {hint}
+        </span>
+      ) : null}
+      {error ? (
+        <span id={errorId} className="ds-field__error" role="alert">
+          {error}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** 027: a multi-line text (a note, a message) — same label, hint and error wiring as ``TextField``. */
+export function TextAreaField({
+  label,
+  hint,
+  error,
+  id,
+  ...props
+}: FieldShellProps & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const generated = useId();
+  const inputId = id ?? generated;
+  const hintId = hint ? `${inputId}-hint` : undefined;
+  const errorId = error ? `${inputId}-error` : undefined;
+  return (
+    <div className="ds-field">
+      <label htmlFor={inputId}>{label}</label>
+      <textarea
         id={inputId}
         aria-describedby={[hintId, errorId].filter(Boolean).join(" ") || undefined}
         aria-invalid={error ? true : undefined}

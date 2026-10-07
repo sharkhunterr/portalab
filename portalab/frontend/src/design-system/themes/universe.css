@@ -528,3 +528,285 @@ h3,
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------- 027: notification shapes */
+/* square — a tile: the icon big, the title under it */
+.ds-notifications:is([data-style="square"], [data-style="circle"]) {
+  align-items: flex-end;
+}
+.ds-notifications--top-start:is([data-style="square"], [data-style="circle"]),
+.ds-notifications--bottom-start:is([data-style="square"], [data-style="circle"]) {
+  align-items: flex-start;
+}
+.ds-notifications:is([data-style="square"], [data-style="circle"]) .ds-notification {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+.ds-notifications:is([data-style="square"], [data-style="circle"]) .ds-notification__head {
+  justify-content: center;
+}
+.ds-notifications:is([data-style="square"], [data-style="circle"])
+  :is(.ds-notification__image, .ds-notification::before) {
+  display: none;
+}
+.ds-notifications:is([data-style="square"], [data-style="circle"]) .ds-notification__link {
+  justify-self: center;
+}
+.ds-notifications:is([data-style="square"], [data-style="circle"]) .ds-notification__close {
+  position: absolute;
+  inset-block-start: 0.35rem;
+  inset-inline-end: 0.35rem;
+}
+.ds-notifications[data-style="square"] .ds-notification {
+  inline-size: 12.5rem;
+  min-block-size: 12.5rem;
+  padding: var(--space-4) var(--space-3);
+  border-radius: var(--radius-md, 0.6rem);
+  border-block-start: 4px solid var(--tone);
+}
+.ds-notifications[data-style="square"] .ds-notification__icon {
+  inline-size: 3.4rem;
+  block-size: 3.4rem;
+  border-radius: var(--radius-md, 0.6rem);
+}
+.ds-notifications[data-style="square"] .ds-notification__icon .ds-icon {
+  inline-size: 1.7rem;
+  block-size: 1.7rem;
+}
+/* circle — a round bubble: icon and title, the details one tap away */
+.ds-notifications[data-style="circle"] .ds-notification {
+  inline-size: 11.5rem;
+  block-size: 11.5rem;
+  padding: var(--space-4);
+  border: 3px solid var(--tone);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--tone) 18%, transparent),
+    0 1rem 2rem -1rem color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+.ds-notifications[data-style="circle"] .ds-notification__body {
+  -webkit-line-clamp: 2;
+  font-size: var(--font-size-xs, 0.75rem);
+}
+.ds-notifications[data-style="circle"] .ds-notification__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--font-size-sm);
+}
+.ds-notifications[data-style="circle"] .ds-notification__close {
+  inset-block-start: 0.9rem;
+  inset-inline-end: 50%;
+  transform: translateX(50%);
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+.ds-notifications[data-style="circle"] .ds-notification__timer {
+  display: none;
+}
+/* cloud — a thought bubble: soft bumps on top, two small puffs trailing to the corner */
+.ds-notifications[data-style="cloud"] .ds-notification {
+  margin-block: 1.1rem 1.4rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 2.2rem;
+  background: var(--color-surface-raised);
+  box-shadow: 0 0.8rem 1.6rem -0.8rem color-mix(in srgb, var(--color-text) 40%, transparent);
+  filter: drop-shadow(0 0 1px color-mix(in srgb, var(--tone) 70%, transparent));
+}
+.ds-notifications[data-style="cloud"] .ds-notification::before {
+  inset: -1.15rem 10% auto;
+  inline-size: auto;
+  block-size: 2.4rem;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 18% 1.6rem, var(--color-surface-raised) 1rem, transparent 1.04rem),
+    radial-gradient(circle at 44% 1.25rem, var(--color-surface-raised) 1.3rem, transparent 1.34rem),
+    radial-gradient(circle at 72% 1.5rem, var(--color-surface-raised) 1.08rem, transparent 1.12rem),
+    radial-gradient(circle at 90% 1.85rem, var(--color-surface-raised) 0.8rem, transparent 0.84rem);
+  z-index: -1;
+}
+.ds-notifications[data-style="cloud"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -1.35rem;
+  inset-inline-end: 1.6rem;
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  box-shadow: 0.85rem 0.6rem 0 -0.2rem var(--color-surface-raised);
+}
+.ds-notifications[data-style="cloud"] .ds-notification__icon {
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface-raised));
+}
+.ds-notifications[data-style="cloud"] .ds-notification__timer {
+  inset-inline: 1.5rem;
+  border-radius: 999px;
+}
+/* ticket — a coupon: notched on both sides, a dashed tear line before the close button */
+.ds-notifications[data-style="ticket"] .ds-notification {
+  border: 0;
+  border-radius: var(--radius-sm, 0.35rem);
+  background: color-mix(in srgb, var(--tone) 12%, var(--color-surface-raised));
+  -webkit-mask:
+    radial-gradient(circle at 0 50%, transparent 0.7rem, #000 0.72rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 0.7rem, #000 0.72rem) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 50%, transparent 0.7rem, #000 0.72rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 0.7rem, #000 0.72rem) right / 51% 100% no-repeat;
+  padding-inline: 1.3rem;
+}
+.ds-notifications[data-style="ticket"] .ds-notification::before {
+  display: none;
+}
+/* the stub: the close button behind a dashed tear line */
+.ds-notifications[data-style="ticket"] .ds-notification__close {
+  align-self: stretch;
+  block-size: auto;
+  inline-size: 2.6rem;
+  margin-block: calc(-1 * var(--space-2));
+  border-inline-start: 2px dashed color-mix(in srgb, var(--tone) 55%, transparent);
+  border-radius: 0;
+}
+/* tag — a luggage label: a pointed end with its eyelet, the text on the flat part */
+.ds-notifications[data-style="tag"] .ds-notification {
+  border: 0;
+  border-radius: 0 var(--radius-md, 0.6rem) var(--radius-md, 0.6rem) 0;
+  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface-raised));
+  clip-path: polygon(1.6rem 0, 100% 0, 100% 100%, 1.6rem 100%, 0 50%);
+  padding-inline-start: 2.4rem;
+}
+.ds-notifications[data-style="tag"] .ds-notification::before {
+  inset-block: calc(50% - 0.32rem) auto;
+  inset-inline-start: 1.05rem;
+  inline-size: 0.64rem;
+  block-size: 0.64rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 2px var(--tone);
+}
+:dir(rtl) .ds-notifications[data-style="tag"] .ds-notification {
+  clip-path: polygon(0 0, calc(100% - 1.6rem) 0, 100% 50%, calc(100% - 1.6rem) 100%, 0 100%);
+}
+/* split — two tones: the icon on a full coloured band, the text on the surface */
+.ds-notifications[data-style="split"] .ds-notification {
+  padding-block: 0;
+  padding-inline-start: 0;
+  align-items: stretch;
+  border-color: color-mix(in srgb, var(--tone) 45%, var(--color-border));
+}
+.ds-notifications[data-style="split"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="split"] .ds-notification__icon {
+  block-size: auto;
+  min-block-size: 4.2rem;
+  inline-size: 4.2rem;
+  border-radius: 0;
+  background: var(--tone);
+  color: var(--color-surface);
+}
+.ds-notifications[data-style="split"] .ds-notification__content {
+  align-self: center;
+  padding-block: var(--space-3);
+}
+.ds-notifications[data-style="split"] .ds-notification__close {
+  align-self: start;
+  margin-block-start: var(--space-2);
+}
+
+/* ---------------------------------------------------------------- 027: more entrance animations */
+.ds-notifications[data-animation="rise"] .ds-notification {
+  animation-name: universe-notify-rise;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ds-notifications[data-animation="wipe"] .ds-notification {
+  animation-name: universe-notify-wipe;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.ds-notifications[data-animation="focus"] .ds-notification {
+  animation-name: universe-notify-focus;
+  animation-duration: 0.6s;
+}
+.ds-notifications[data-animation="jelly"] .ds-notification {
+  animation-name: universe-notify-jelly;
+  animation-duration: 0.8s;
+}
+.ds-notifications[data-animation="shake"] .ds-notification {
+  animation-name: universe-notify-shake;
+  animation-duration: 0.75s;
+}
+@keyframes universe-notify-rise {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem) scale(0.96);
+    filter: blur(4px);
+  }
+}
+@keyframes universe-notify-wipe {
+  from {
+    clip-path: inset(0 100% 0 0 round var(--radius-lg, 0.9rem));
+  }
+  to {
+    clip-path: inset(0 0 0 0 round var(--radius-lg, 0.9rem));
+  }
+}
+@keyframes universe-notify-focus {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(12px);
+  }
+}
+@keyframes universe-notify-jelly {
+  0% {
+    opacity: 0;
+    transform: scale(0.4, 0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.18, 0.82);
+  }
+  45% {
+    transform: scale(0.88, 1.12);
+  }
+  60% {
+    transform: scale(1.06, 0.94);
+  }
+  75% {
+    transform: scale(0.98, 1.02);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+@keyframes universe-notify-shake {
+  0% {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  35%,
+  55%,
+  75% {
+    transform: translateX(-6px);
+  }
+  45%,
+  65%,
+  85% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: none;
+  }
+}

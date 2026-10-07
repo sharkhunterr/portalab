@@ -109,3 +109,26 @@ async def test_campaign_discount_is_charged(mk: MkHarness, client: AsyncClient) 
     bought = await client.post("/api/v1/marketplace/products/owl/acquire", headers={"Idempotency-Key": "d1"})
     assert bought.status_code == 201 and bought.json()["price_paid"] == 36
     assert await mk.balance("ursula") == 64
+
+
+async def test_purchase_notice_names_the_product(mk: MkHarness) -> None:
+    """027: the owner is told the product's name in their language — never its technical key."""
+    from typing import Any
+
+    from portalab.capabilities.notifications import NOTIFY
+
+    class _Outbox:
+        def __init__(self) -> None:
+            self.sent: list[Any] = []
+
+        async def send(self, request: Any, **_: Any) -> Any:
+            self.sent.append(request)
+            return None
+
+    outbox = _Outbox()
+    mk.module.capabilities.provide(NOTIFY, outbox, instance_ref="t", owner="test")
+    await published(mk, "widget_countdown", "badge", price_coins=10, payload={"label": "Countdown"})
+    await mk.coins("ursula", 50)
+    await mk.module.purchases.acquire(mk.p("ursula"), "widget_countdown", "n1")
+    [notice] = [r for r in outbox.sent if r.category == "marketplace.purchase"]
+    assert notice.params["product"] == "Widget Countdown"  # the English name, not « widget_countdown »

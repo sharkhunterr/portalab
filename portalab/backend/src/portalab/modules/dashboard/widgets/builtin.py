@@ -148,6 +148,122 @@ VALUE = WidgetDefinition(
     component_id="dashboard.value",
 )
 
+# 027: progress of something of mine as a bar — across (``progress``) or upright (``progress_vertical``)
+PROGRESS_METRICS = ("level", "objectives", "quests", "achievements")
+_PROGRESS_SCHEMA = {
+    "type": "object",
+    "properties": {"metric": {"enum": list(PROGRESS_METRICS)}},
+    "additionalProperties": False,
+}
+PROGRESS = WidgetDefinition(
+    key="dashboard.progress",
+    owner=OWNER,
+    title_key="dashboard:widget.progress.title",
+    description_key="dashboard:widget.progress.description",
+    icon="gauge",
+    required_permission="users.self.manage",
+    config_schema=_PROGRESS_SCHEMA,
+    config_defaults={"metric": "level", "_hide_title": True},
+    size=SizeLimits(default=Size(4, 1), min=Size(2, 1), max=Size(12, 2)),
+    multiple=True,
+    component_id="dashboard.progress",
+)
+PROGRESS_VERTICAL = WidgetDefinition(
+    key="dashboard.progress_vertical",
+    owner=OWNER,
+    title_key="dashboard:widget.progress_vertical.title",
+    description_key="dashboard:widget.progress_vertical.description",
+    icon="chart",
+    required_permission="users.self.manage",
+    config_schema=_PROGRESS_SCHEMA,
+    config_defaults={"metric": "level", "_hide_title": True},
+    size=SizeLimits(default=Size(1, 2), min=Size(1, 2), max=Size(3, 6)),
+    multiple=True,
+    component_id="dashboard.progress_vertical",
+)
+# 027: layout helpers — a separator (a line, dots, a gradient or just space, with an optional label)
+SEPARATOR = WidgetDefinition(
+    key="dashboard.separator",
+    owner=OWNER,
+    title_key="dashboard:widget.separator.title",
+    description_key="dashboard:widget.separator.description",
+    icon="minus",
+    required_permission="users.self.manage",
+    config_schema={
+        "type": "object",
+        "properties": {
+            "style": {"enum": ["line", "dashed", "dotted", "gradient", "space"]},
+            "label": {"type": "string", "maxLength": 40},
+        },
+        "additionalProperties": False,
+    },
+    # the raw line on the page: no box, no title (both can be turned back on in its settings)
+    config_defaults={"style": "gradient", "label": "", "_hide_title": True, "_no_box": True},
+    size=SizeLimits(default=Size(12, 1), min=Size(1, 1), max=Size(12, 2)),
+    multiple=True,
+    component_id="dashboard.separator",
+)
+CLOCK = WidgetDefinition(
+    key="dashboard.clock",
+    owner=OWNER,
+    title_key="dashboard:widget.clock.title",
+    description_key="dashboard:widget.clock.description",
+    icon="clock",
+    required_permission="users.self.manage",
+    config_schema={
+        "type": "object",
+        "properties": {"seconds": {"type": "boolean"}, "date": {"type": "boolean"}},
+        "additionalProperties": False,
+    },
+    config_defaults={"seconds": False, "date": True, "_hide_title": True},
+    size=SizeLimits(default=Size(2, 1), min=Size(1, 1), max=Size(6, 3)),
+    multiple=True,
+    component_id="dashboard.clock",
+)
+NOTE = WidgetDefinition(
+    key="dashboard.note",
+    owner=OWNER,
+    title_key="dashboard:widget.note.title",
+    description_key="dashboard:widget.note.description",
+    icon="feather",
+    required_permission="users.self.manage",
+    config_schema={
+        "type": "object",
+        "properties": {
+            "text": {"type": "string", "maxLength": 280},
+            "color": {"enum": ["yellow", "pink", "blue", "green", "violet"]},
+        },
+        "additionalProperties": False,
+    },
+    config_defaults={"text": "", "color": "yellow", "_hide_title": True, "_no_box": True},
+    size=SizeLimits(default=Size(3, 2), min=Size(2, 1), max=Size(6, 4)),
+    multiple=True,
+    component_id="dashboard.note",
+)
+COUNTDOWN = WidgetDefinition(
+    key="dashboard.countdown",
+    owner=OWNER,
+    title_key="dashboard:widget.countdown.title",
+    description_key="dashboard:widget.countdown.description",
+    icon="hourglass",
+    required_permission="users.self.manage",
+    config_schema={
+        "type": "object",
+        "properties": {
+            "label": {"type": "string", "maxLength": 40},
+            "date": {"type": "string", "format": "date", "pattern": "^(\\d{4}-\\d{2}-\\d{2})?$"},
+        },
+        "additionalProperties": False,
+    },
+    config_defaults={"label": "", "date": "", "_hide_title": True},
+    size=SizeLimits(default=Size(2, 1), min=Size(1, 1), max=Size(6, 2)),
+    multiple=True,
+    component_id="dashboard.countdown",
+)
+# 027: compact widgets show their content alone by default (the title can be turned back on)
+# what the member set is the content: an empty note or a countdown without a date says « set me up »
+NEEDS = {NOTE.key: "text", COUNTDOWN.key: "date"}
+
 NEXT_STEPS: tuple[dict[str, str], ...] = (
     {"label_key": "nav.search", "route": "/search"},
     {"label_key": "nav.services", "route": "/services"},
@@ -234,6 +350,24 @@ class ValueProvider:
         return WidgetPayload(
             "available", as_of=utc_now(self.clock), data={"metric": metric if metric in VALUES else "level"}
         )
+
+
+class SettingsProvider:
+    """027: widgets drawn from their own settings (progress, separator, clock, note, countdown) — the
+    interface reads the values it shows where the portal already shows them."""
+
+    def __init__(self, key: str, clock: Clock | None = None) -> None:
+        self.key = key
+        self.clock = clock
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        data = {k: v for k, v in config.items() if not k.startswith("_")}
+        needed = NEEDS.get(self.key)
+        if needed and not str(data.get(needed) or "").strip():
+            return WidgetPayload("no-data", as_of=utc_now(self.clock), data=data)
+        return WidgetPayload("available", as_of=utc_now(self.clock), data=data)
 
 
 def _provider(capabilities: CapabilityRegistry, name: str) -> Any | None:
@@ -402,6 +536,9 @@ def register_builtin(
     for definition, provider in ((SHORTCUT, ShortcutProvider(clock)), (VALUE, ValueProvider(clock))):
         if registry.get(definition.key) is None:
             registry.register(definition, provider, owner=OWNER)
+    for definition in (PROGRESS, PROGRESS_VERTICAL, SEPARATOR, CLOCK, NOTE, COUNTDOWN):
+        if registry.get(definition.key) is None:
+            registry.register(definition, SettingsProvider(definition.key, clock), owner=OWNER)
 
 
 def register_since_last_visit(registry: WidgetRegistry, summary: Any, clock: Clock | None = None) -> None:

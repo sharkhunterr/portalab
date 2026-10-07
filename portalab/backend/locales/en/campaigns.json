@@ -69,6 +69,7 @@
   "history.versions": "Versions",
   "notify.announcement": "{campaign} has started! {message}",
   "page.boosts": "Boosts",
+  "page.dayOf": "Day {day} of {days}",
   "page.empty": "No campaign right now.",
   "page.ended": "ended",
   "page.endsIn": "ends {when}",

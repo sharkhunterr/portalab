@@ -5,6 +5,7 @@ import { EmptyState, Skeleton } from "../../design-system/components/Placeholder
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useActiveCampaigns, useCampaign } from "./api";
+import { WindowProgress } from "./WindowProgress";
 import "./campaigns.css";
 
 const VALUE_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
@@ -49,51 +50,59 @@ function CampaignCard({
     (w) => Date.parse(w.start_at) <= Date.now() && Date.parse(w.end_at) > Date.now(),
   );
   const until = endsAt ?? view.windows.find((w) => Date.parse(w.end_at) > Date.now())?.end_at;
+  const current = view.windows.find(
+    (w) => Date.parse(w.start_at) <= Date.now() && Date.parse(w.end_at) > Date.now(),
+  );
   return (
     <article className="campaign-card" data-live={live || undefined}>
-      <header className="campaign-card__head">
-        <span className="campaign-card__icon" aria-hidden="true">
-          <Icon name="star" size={22} />
-        </span>
-        <div className="campaign-card__title">
-          {live ? <span className="campaign-card__live">{t("campaigns:page.live")}</span> : null}
-          <h2>{full ? view.name : <Link to={`/campaigns/${view.key}`}>{view.name}</Link>}</h2>
-        </div>
+      <div className="campaign-card__main">
+        <header className="campaign-card__head">
+          <span className="campaign-card__icon" aria-hidden="true">
+            <Icon name="star" size={22} />
+          </span>
+          <div className="campaign-card__title">
+            {live ? <span className="campaign-card__live">{t("campaigns:page.live")}</span> : null}
+            <h2>{full ? view.name : <Link to={`/campaigns/${view.key}`}>{view.name}</Link>}</h2>
+          </div>
+        </header>
+        {view.description ? <p className="campaign-card__pitch">{view.description}</p> : null}
+        {view.modifiers.length ? (
+          <ul className="campaign-boosts" aria-label={t("campaigns:page.boosts")}>
+            {view.modifiers.map((m) => (
+              <li key={`${m.value}-${m.factor}`} data-value={m.value}>
+                <Icon name={VALUE_ICONS[m.value] ?? "zap"} size={16} />
+                <strong>×{m.factor}</strong>
+                <span>{t(`gamification:value.${m.value}`)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+      <aside className="campaign-card__side">
         {until ? <Countdown endsAt={until} /> : null}
-      </header>
-      {view.description ? <p className="campaign-card__pitch">{view.description}</p> : null}
-      {view.modifiers.length ? (
-        <ul className="campaign-boosts" aria-label={t("campaigns:page.boosts")}>
-          {view.modifiers.map((m) => (
-            <li key={`${m.value}-${m.factor}`} data-value={m.value}>
-              <Icon name={VALUE_ICONS[m.value] ?? "zap"} size={16} />
-              <strong>×{m.factor}</strong>
-              <span>{t(`gamification:value.${m.value}`)}</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {view.windows.length ? (
-        <section className="campaign-windows" aria-label={t("campaigns:page.windows")}>
-          <h3>{t("campaigns:page.windows")}</h3>
-          <ol>
-            {view.windows.slice(0, full ? 5 : 3).map((w) => {
-              const leaf = format.dayMonth(w.start_at);
-              return (
-                <li key={w.start_at}>
-                  <span className="campaign-windows__leaf" aria-hidden="true">
-                    <strong>{leaf.day}</strong>
-                    <span>{leaf.month}</span>
-                  </span>
-                  <span>
-                    {format.dateTime(w.start_at)} – {format.dateTime(w.end_at)}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        </section>
-      ) : null}
+        {current ? <WindowProgress start={current.start_at} end={current.end_at} /> : null}
+        {view.windows.length ? (
+          <section className="campaign-windows" aria-label={t("campaigns:page.windows")}>
+            <h3>{t("campaigns:page.windows")}</h3>
+            <ol>
+              {view.windows.slice(0, full ? 5 : 3).map((w) => {
+                const leaf = format.dayMonth(w.start_at);
+                return (
+                  <li key={w.start_at}>
+                    <span className="campaign-windows__leaf" aria-hidden="true">
+                      <strong>{leaf.day}</strong>
+                      <span>{leaf.month}</span>
+                    </span>
+                    <span>
+                      {format.dateTime(w.start_at)} – {format.dateTime(w.end_at)}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        ) : null}
+      </aside>
     </article>
   );
 }
@@ -133,7 +142,9 @@ function CampaignDetail({ campaignKey }: { campaignKey: string }) {
         <Icon name="chevron-left" size={16} />
         {t("campaigns:page.title")}
       </Link>
-      <CampaignCard campaignKey={campaignKey} full />
+      <div className="campaign-list">
+        <CampaignCard campaignKey={campaignKey} full />
+      </div>
     </div>
   );
 }

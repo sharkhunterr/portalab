@@ -27,6 +27,13 @@
   color: var(--state-error-fg);
   border-color: var(--state-error-fg);
 }
+/* 027: a quiet destructive tool (an icon among others) — it turns red only when pointed at */
+.ds-button--quiet-danger:hover:not([disabled]),
+.ds-button--quiet-danger:focus-visible {
+  border-color: var(--state-error-fg) !important;
+  background: var(--state-error-bg) !important;
+  color: var(--state-error-fg) !important;
+}
 .ds-button[disabled] {
   cursor: not-allowed;
   opacity: 0.6;

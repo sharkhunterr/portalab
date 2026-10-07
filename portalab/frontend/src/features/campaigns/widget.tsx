@@ -3,12 +3,14 @@ import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
+import { WindowProgress } from "./WindowProgress";
 import "./campaigns.css";
 
 interface Item {
   key: string;
   title: string;
   route: string;
+  starts_at?: string | null;
   ends_at: string | null;
   description: string;
   boosts: Array<{ value: string; factor: number }>;
@@ -53,17 +55,16 @@ function CampaignsWidget({ payload }: WidgetProps) {
         return (
           <li key={item.key}>
             <Link to={item.route} className="campaigns-widget__card">
-              <span className="campaigns-widget__head">
+              <span className="campaigns-widget__who">
                 <span className="campaigns-widget__icon" aria-hidden="true">
                   <Icon name="star" size={16} />
                 </span>
-                <strong>{item.title}</strong>
-                {left !== null ? (
-                  <span className="campaigns-widget__left">
-                    <Icon name="hourglass" size={12} />
-                    {left > 0 ? format.relative(left) : t("campaigns:page.ended")}
-                  </span>
-                ) : null}
+                <span className="campaigns-widget__name">
+                  <strong>{item.title}</strong>
+                  {item.description ? (
+                    <span className="campaigns-widget__pitch">{item.description}</span>
+                  ) : null}
+                </span>
               </span>
               {item.boosts.length ? (
                 <span className="campaigns-widget__boosts">
@@ -75,7 +76,17 @@ function CampaignsWidget({ payload }: WidgetProps) {
                   ))}
                 </span>
               ) : null}
-              {item.description ? <span className="campaigns-widget__pitch">{item.description}</span> : null}
+              {left !== null ? (
+                <span className="campaigns-widget__time">
+                  <span className="campaigns-widget__left">
+                    <Icon name="hourglass" size={12} />
+                    {left > 0 ? format.relative(left) : t("campaigns:page.ended")}
+                  </span>
+                  {item.starts_at && item.ends_at ? (
+                    <WindowProgress start={item.starts_at} end={item.ends_at} />
+                  ) : null}
+                </span>
+              ) : null}
             </Link>
           </li>
         );

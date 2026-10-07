@@ -86,6 +86,35 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#f9a8d4", accentAlt: "#7dd3fc", contrast: "#1f0614" },
     light: { accent: "#be185d", accentAlt: "#0369a1", contrast: "#ffffff" },
   },
+  // 027: more accents — each a pair no other palette has
+  polar: {
+    dark: { accent: "#88c0d0", accentAlt: "#a3be8c", contrast: "#10151c" },
+    light: { accent: "#2e6a85", accentAlt: "#4f6b35", contrast: "#ffffff" },
+  },
+  copper: {
+    dark: { accent: "#e8956a", accentAlt: "#5cc4b8", contrast: "#1e0d04" },
+    light: { accent: "#a4471a", accentAlt: "#0f6b62", contrast: "#ffffff" },
+  },
+  solar: {
+    dark: { accent: "#2fc4b5", accentAlt: "#f0b445", contrast: "#03201d" },
+    light: { accent: "#0f6f66", accentAlt: "#8a5a00", contrast: "#ffffff" },
+  },
+  berry: {
+    dark: { accent: "#f06aa8", accentAlt: "#9b7bff", contrast: "#24051a" },
+    light: { accent: "#b0215f", accentAlt: "#5b3fd1", contrast: "#ffffff" },
+  },
+  slate: {
+    dark: { accent: "#9db2d0", accentAlt: "#d2bd98", contrast: "#0e131b" },
+    light: { accent: "#3f5576", accentAlt: "#6d5a3a", contrast: "#ffffff" },
+  },
+  peach: {
+    dark: { accent: "#ffb199", accentAlt: "#9fd6f0", contrast: "#2a0f06" },
+    light: { accent: "#a8452a", accentAlt: "#0d628a", contrast: "#ffffff" },
+  },
+  crimson: {
+    dark: { accent: "#ff5c6c", accentAlt: "#c7d0dc", contrast: "#24040a" },
+    light: { accent: "#b3122a", accentAlt: "#4b5563", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

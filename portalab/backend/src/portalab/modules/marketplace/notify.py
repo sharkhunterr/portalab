@@ -1,8 +1,10 @@
 """Project notifications (T013): funders hear about status changes and refunds of the projects they fund,
 through the 010 engine (``marketplace.project``), coalesced per project. Never blocks a transition."""
 
+from collections.abc import Mapping
 from uuid import UUID
 
+from portalab.capabilities.i18n import RESOLVER
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.marketplace.observability import log
@@ -39,11 +41,36 @@ async def notify_funders(
         log.warning("project notification not sent")
 
 
+async def product_name(
+    capabilities: CapabilityRegistry, user: UUID, key: str, names: Mapping[str, str] | None
+) -> str:
+    """027: the product as its owner reads it — its name in their language (else English, else any), never
+    its technical key unless it has no name at all."""
+    names = {k: v for k, v in (names or {}).items() if v}
+    if not names:
+        return key
+    language = "en"
+    try:
+        providers = capabilities.system_providers(RESOLVER)
+        if providers:
+            language = str((await providers[0].provider.for_user(user)).language or "en")
+    except Exception:  # noqa: S110 — English is fine
+        pass
+    base = language.split("-")[0]
+    return names.get(language) or names.get(base) or names.get("en") or next(iter(names.values()))
+
+
 async def notify_owner(
-    capabilities: CapabilityRegistry, user: UUID, kind: str, product: str, dedup: str
+    capabilities: CapabilityRegistry,
+    user: UUID,
+    kind: str,
+    product: str,
+    dedup: str,
+    names: Mapping[str, str] | None = None,
 ) -> None:
     """``marketplace.purchase`` / ``marketplace.refund`` to the owner (never blocks the operation)."""
     try:
+        shown = await product_name(capabilities, user, product, names)
         providers = capabilities.system_providers(NOTIFY)
         if not providers:
             return
@@ -53,7 +80,7 @@ async def notify_owner(
                 template_key=f"marketplace:notify.{kind}",
                 audience=Users((user,)),
                 dedup_key=dedup,
-                params={"product": product[:120]},
+                params={"product": shown[:120]},
                 subject_ref=f"product:{product}",
                 action_url="/marketplace/owned",
             )

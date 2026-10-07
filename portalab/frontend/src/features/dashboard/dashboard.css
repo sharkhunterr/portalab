@@ -389,10 +389,11 @@
 
 .dashboard-summary {
   display: grid;
+  align-content: start;
   gap: var(--space-2);
-  background:
-    linear-gradient(120deg, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%),
-    var(--color-surface-raised);
+}
+.dashboard-summary > .ds-button {
+  justify-self: end;
 }
 
 .dashboard-summary__title {
@@ -1004,24 +1005,78 @@
   color: var(--color-text-muted);
 }
 
-/* 027: in edit mode a widget keeps two buttons (settings, remove) in its header, next to the grip */
+/* 027: in edit mode a widget's tools sit in one row at its top corner — settings and remove, then the
+   grip — the same size, the same look (the remove button turns red only when pointed at) */
+.dashboard-grid__cell,
+.widget-frame {
+  --dash-tool: max(var(--target-min), 2.25rem);
+}
 .widget-frame__controls {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: 2;
   display: inline-flex;
   gap: var(--space-1);
-  margin-inline-start: auto;
 }
-.widget-frame__controls .ds-button {
-  min-block-size: 2rem;
-  min-inline-size: 2rem;
+.dash-grip ~ .widget-frame__header .widget-frame__controls {
+  inset-inline-end: calc(var(--space-2) + var(--dash-tool) + var(--space-1));
+}
+.widget-frame__controls .dash-tool {
+  inline-size: var(--dash-tool);
+  block-size: var(--dash-tool);
+  min-inline-size: 0;
+  min-block-size: 0;
+  padding: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+.widget-frame__controls .dash-tool:hover:not([disabled]) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.widget-frame__controls .dash-tool[disabled] {
+  opacity: 0.45;
 }
 .dashboard-grid[data-editing] .widget-frame__header {
-  padding-inline-end: calc(max(var(--target-min), 2.25rem) + var(--space-1));
+  padding-inline-end: calc(3 * var(--dash-tool) + 2 * var(--space-1));
   flex-wrap: nowrap;
 }
 .dashboard-grid[data-editing] .widget-frame__title {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+/* 027: display options — the content alone (no title), on the page itself (no box) */
+.dashboard-grid:not([data-editing]) .widget-frame[data-no-title] > .widget-frame__header {
+  display: none;
+}
+.widget-frame[data-no-box] {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.dashboard-grid:not([data-editing]) .widget-frame[data-no-box] {
+  padding: 0;
+}
+.widget-frame[data-no-box]:hover {
+  box-shadow: none;
+}
+.widget-config__frame {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.widget-config__frame legend {
+  padding-inline: var(--space-1);
+  font-weight: var(--font-weight-semibold);
 }
 /* touch screens: wider grips and edges, easy to catch with a finger */
 @media (pointer: coarse) {
@@ -1280,4 +1335,265 @@
 }
 .widget-tile[data-alert] .widget-tile__value .ds-icon {
   color: var(--cal-incident);
+}
+
+/* ---------------------------------------------------------------- 027: layout widgets */
+.widget-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label value"
+    "track track";
+  align-content: center;
+  gap: var(--space-2) var(--space-3);
+  block-size: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.widget-progress__label {
+  grid-area: label;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.widget-progress__label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.widget-progress__label .ds-icon {
+  flex: none;
+  color: var(--color-accent);
+}
+.widget-progress__value {
+  grid-area: value;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+.widget-progress__value span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.widget-progress__track {
+  grid-area: track;
+  position: relative;
+  display: block;
+  block-size: clamp(0.6rem, 22cqh, 1.4rem);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.widget-progress__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  inline-size: calc(var(--progress, 0) * 100%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
+  transition: inline-size var(--motion-duration-normal) var(--motion-easing);
+}
+.widget-progress[data-full] .widget-progress__fill {
+  background: var(--color-accent-alt);
+}
+/* upright: the column fills from the bottom, the figure on top, the label under it */
+.widget-progress[data-orientation="vertical"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "value"
+    "track"
+    "label";
+  justify-items: center;
+  text-align: center;
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__value {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__value strong {
+  font-size: var(--font-size-lg);
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__track {
+  inline-size: clamp(1.4rem, 38cqw, 3.2rem);
+  block-size: 100%;
+  min-block-size: 2.5rem;
+  border-radius: var(--radius-md);
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__fill {
+  inset: auto 0 0 0;
+  inline-size: auto;
+  block-size: calc(var(--progress, 0) * 100%);
+  background: linear-gradient(0deg, var(--color-accent), var(--color-accent-alt));
+  transition: block-size var(--motion-duration-normal) var(--motion-easing);
+}
+.widget-progress[data-orientation="vertical"] {
+  gap: var(--space-1);
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__label {
+  max-inline-size: 100%;
+  font-size: var(--font-size-xs);
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__label .ds-icon {
+  display: none; /* the column itself says it is progress; the words need the room */
+}
+.widget-progress[data-orientation="vertical"] .widget-progress__value span {
+  font-size: var(--font-size-xs);
+}
+@container (max-height: 9rem) {
+  .widget-progress[data-orientation="vertical"] .widget-progress__value span {
+    display: none;
+  }
+}
+
+.widget-separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  block-size: 100%;
+  color: var(--color-text-muted);
+}
+.widget-separator__line {
+  flex: 1;
+  block-size: 0;
+  border-block-start: 2px solid var(--color-border);
+}
+.widget-separator[data-style="dashed"] .widget-separator__line {
+  border-block-start-style: dashed;
+}
+.widget-separator[data-style="dotted"] .widget-separator__line {
+  border-block-start: 4px dotted color-mix(in srgb, var(--color-accent) 60%, var(--color-border));
+}
+.widget-separator[data-style="gradient"] .widget-separator__line {
+  block-size: 2px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--color-accent), var(--color-accent-alt), transparent);
+}
+.widget-separator[data-style="space"] .widget-separator__line {
+  border: 0;
+}
+.widget-separator__label {
+  flex: none;
+  max-inline-size: 60%;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.widget-clock {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.15rem;
+  block-size: 100%;
+  text-align: center;
+}
+.widget-clock__time {
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1rem, min(17cqw, 52cqh), 4.5rem);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+.widget-clock__date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-transform: capitalize;
+}
+
+.widget-note {
+  --note: var(--note-yellow);
+  block-size: 100%;
+  overflow: hidden;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--note);
+  color: var(--note-ink);
+  box-shadow: var(--shadow-2);
+  transform: rotate(-0.4deg);
+}
+.widget-note[data-color="pink"] {
+  --note: var(--note-pink);
+}
+.widget-note[data-color="blue"] {
+  --note: var(--note-blue);
+}
+.widget-note[data-color="green"] {
+  --note: var(--note-green);
+}
+.widget-note[data-color="violet"] {
+  --note: var(--note-violet);
+}
+.widget-note p {
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.widget-countdown {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  block-size: 100%;
+  text-align: center;
+}
+.widget-countdown__days {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(1rem, min(16cqw, 45cqh), 3.2rem);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+.widget-countdown[data-past] .widget-countdown__days {
+  background: none;
+  color: var(--color-text-muted);
+}
+.widget-countdown__what {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-inline-size: 100%;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 027: the members' dashboard page has one save, at the top and at the bottom */
+.dashboard-admin__save {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+.dashboard-admin__save p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.dashboard-admin__save[data-dirty] p {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
+.widget__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
 }

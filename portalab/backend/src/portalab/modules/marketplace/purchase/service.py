@@ -177,7 +177,9 @@ class Purchases:
                 return winner
             raise AlreadyOwned("You already own this product.") from error
         metrics.increment("marketplace.purchases")
-        await notify_owner(self.capabilities, user, "purchase", product.key, f"purchase:{ownership.id}")
+        await notify_owner(
+            self.capabilities, user, "purchase", product.key, f"purchase:{ownership.id}", version.names
+        )
         if not version.config_required:
             return await self.activation.activate(ownership.id)
         return ownership

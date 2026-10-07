@@ -31,16 +31,18 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.dashboard.observability import log, metric_part, metrics
 from portalab.modules.dashboard.settings import DashboardConfig
 
-# 027: the frame's own settings, kept with a widget's but never part of its schema (« hide when empty »)
-FRAME_KEYS = frozenset({"_hide_empty"})
+# 027: the frame's own settings, kept with a widget's but never part of its schema — « hide when empty »,
+# « no title », « no box » (the raw content on the page)
+FRAME_KEYS = frozenset({"_hide_empty", "_hide_title", "_no_box"})
 
 
 def config_errors(widget: RegisteredWidget, config: Mapping[str, Any]) -> list[str]:
     validator = Draft202012Validator(dict(widget.definition.config_schema))
     own = {k: v for k, v in config.items() if k not in FRAME_KEYS}
     errors = [error.message for error in validator.iter_errors(own)]
-    if "_hide_empty" in config and not isinstance(config["_hide_empty"], bool):
-        errors.append("_hide_empty must be true or false")
+    for key in sorted(FRAME_KEYS):
+        if key in config and not isinstance(config[key], bool):
+            errors.append(f"{key} must be true or false")
     return errors
 
 

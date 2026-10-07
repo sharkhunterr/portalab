@@ -180,9 +180,9 @@ def validate_definition(definition: WidgetDefinition, owner: str) -> None:
         Draft202012Validator.check_schema(dict(definition.config_schema))
     except SchemaError as exc:
         raise WidgetRegistryError(f"invalid config schema: {exc.message}") from exc
-    errors = list(
-        Draft202012Validator(dict(definition.config_schema)).iter_errors(dict(definition.config_defaults))
-    )
+    # 027: the frame's own settings (``_hide_title``, ``_no_box``…) may be defaulted; never in the schema
+    own = {k: v for k, v in definition.config_defaults.items() if not k.startswith("_")}
+    errors = list(Draft202012Validator(dict(definition.config_schema)).iter_errors(own))
     if errors:
         raise WidgetRegistryError(f"config defaults do not match the schema: {errors[0].message}")
 

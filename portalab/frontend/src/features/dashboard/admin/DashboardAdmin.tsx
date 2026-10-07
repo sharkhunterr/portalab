@@ -87,26 +87,52 @@ export default function DashboardAdmin() {
       setStarter(settings.data.starter ?? []);
     }
   }, [settings.data]);
-  const savePolicies = useMutation({
-    mutationFn: async () => api.PUT("/api/v1/admin/dashboard/policies", { body: policies as never }),
+  // 027: one save for the whole page — the policies and the starter dashboard together (two separate
+  // buttons let a change to one be lost by saving the other)
+  const saveAll = useMutation({
+    mutationFn: async () => {
+      await api.PUT("/api/v1/admin/dashboard/policies", { body: policies as never });
+      await api.PUT("/api/v1/admin/dashboard/starter", { body: starter as never });
+    },
     onSuccess: () => {
-      setSaved("policies");
+      setSaved("all");
       void client.invalidateQueries({ queryKey: KEY });
+      void client.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
-  const saveStarter = useMutation({
-    mutationFn: async () => api.PUT("/api/v1/admin/dashboard/starter", { body: starter as never }),
-    onSuccess: () => {
-      setSaved("starter");
-      void client.invalidateQueries({ queryKey: KEY });
-    },
-  });
+  const dirty =
+    Boolean(settings.data) &&
+    (JSON.stringify(policies) !== JSON.stringify(settings.data?.policies ?? {}) ||
+      JSON.stringify(starter) !== JSON.stringify(settings.data?.starter ?? []));
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
   if (!settings.data) return <FunctionalState state={settings.isError ? "unauthorized" : "loading"} />;
   const widgets = [...settings.data.widgets].sort((a, b) => t(a.title_key).localeCompare(t(b.title_key)));
   const titleOf = (key: string) => {
     const found = settings.data.widgets.find((w) => w.key === key);
     return found ? t(found.title_key) : key;
   };
+  const saveBar = (
+    <div className="dashboard-admin__save" data-dirty={dirty || undefined}>
+      {saveAll.isError ? (
+        <p role="alert" className="services-admin__ko">
+          {errorText(saveAll.error, t("dashboard:admin.failed"))}
+        </p>
+      ) : saved === "all" && !dirty ? (
+        <p role="status">{t("dashboard:admin.saved")}</p>
+      ) : dirty ? (
+        <p role="status">{t("dashboard:admin.unsaved")}</p>
+      ) : null}
+      <Button disabled={saveAll.isPending || !dirty} onClick={() => saveAll.mutate()}>
+        <Icon name="check" size={16} />
+        {t("dashboard:admin.save")}
+      </Button>
+    </div>
+  );
   const set = (key: string, next: Policy | null) => {
     setSaved(null);
     const copy = { ...policies };
@@ -121,6 +147,7 @@ export default function DashboardAdmin() {
       icon="dashboard"
       title={t("dashboard:admin.title")}
       description={t("dashboard:admin.description")}
+      primary={saveBar}
       wide
     >
       <AdminSection
@@ -204,18 +231,6 @@ export default function DashboardAdmin() {
             );
           })}
         </ul>
-        {savePolicies.isError ? (
-          <p role="alert" className="services-admin__ko">
-            {errorText(savePolicies.error, t("dashboard:admin.failed"))}
-          </p>
-        ) : null}
-        {saved === "policies" ? <p role="status">{t("dashboard:admin.saved")}</p> : null}
-        <FormActions>
-          <Button disabled={savePolicies.isPending} onClick={() => savePolicies.mutate()}>
-            <Icon name="check" size={16} />
-            {t("dashboard:admin.save")}
-          </Button>
-        </FormActions>
       </AdminSection>
 
       <AdminSection
@@ -306,19 +321,8 @@ export default function DashboardAdmin() {
         <p className="admin-muted">
           <StatusBadge tone="info">{t("dashboard:admin.tip")}</StatusBadge> {t("dashboard:admin.tipText")}
         </p>
-        {saveStarter.isError ? (
-          <p role="alert" className="services-admin__ko">
-            {errorText(saveStarter.error, t("dashboard:admin.failed"))}
-          </p>
-        ) : null}
-        {saved === "starter" ? <p role="status">{t("dashboard:admin.saved")}</p> : null}
-        <FormActions>
-          <Button disabled={saveStarter.isPending} onClick={() => saveStarter.mutate()}>
-            <Icon name="check" size={16} />
-            {t("dashboard:admin.save")}
-          </Button>
-        </FormActions>
       </AdminSection>
+      <FormActions>{saveBar}</FormActions>
     </AdminPage>
   );
 }

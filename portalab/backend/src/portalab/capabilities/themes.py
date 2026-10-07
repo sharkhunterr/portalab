@@ -64,7 +64,7 @@ AVATAR_FRAMES: tuple[str, ...] = (
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
     "aurora", "lagoon", "lava", "mint", "gold", "ice", "rose", "toxic", "midnight", "coffee", "lavender",
-    "bubblegum",
+    "bubblegum", "polar", "copper", "solar", "berry", "slate", "peach", "crimson",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -77,10 +77,11 @@ CELEBRATIONS: tuple[str, ...] = (
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
-    "pixel", "paper",
+    "pixel", "paper", "square", "circle", "cloud", "ticket", "tag", "split",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
+    "rise", "wipe", "focus", "jelly", "shake",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (

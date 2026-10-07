@@ -154,5 +154,7 @@ class Refunds:
             await self.activation.deactivate(row)
         metrics.increment("marketplace.refunds")
         if not ground:  # a revocation sends its own notice
-            await notify_owner(self.capabilities, row.user_id, "refund", product.key, f"refund:{row.id}")
+            await notify_owner(
+                self.capabilities, row.user_id, "refund", product.key, f"refund:{row.id}", version.names
+            )
         return row
