@@ -58,7 +58,7 @@ async def test_center(app: FastAPI, client: httpx.AsyncClient, notify: NotifyHar
     page = (await client.get("/api/v1/me/notifications")).json()
     assert page["unread"] == 3
     assert page["items"][0]["priority"] == "critical"  # important first
-    assert page["items"][0]["title"] == "Un service est indisponible"  # rendered in French for alex
+    assert page["items"][0]["title"] == "Media est indisponible"  # rendered in French for alex
     assert sorted(i["count"] for i in page["items"]) == [1, 1, 2]
     one = page["items"][-1]["id"]
     assert (await client.post(f"/api/v1/me/notifications/{one}/read")).json()["read"] is True

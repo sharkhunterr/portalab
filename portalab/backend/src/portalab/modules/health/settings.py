@@ -1,6 +1,7 @@
 """Health settings (T002), declared to Administration (CD-011)."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
@@ -17,6 +18,8 @@ class HealthConfig:
     infra_retention_days: int = 14
     rollup_retention_months: int = 13
     section_timeout_seconds: float = 2.0
+    # 027: the administrator's alerting rule per importance (fields of ``AlertRule``; missing: the default)
+    alert_rules: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 SETTINGS: dict[str, str] = {
@@ -27,6 +30,7 @@ SETTINGS: dict[str, str] = {
     "sample_retention_days": "health.sampleRetentionDays",
     "infra_retention_days": "health.infraRetentionDays",
     "rollup_retention_months": "health.rollupRetentionMonths",
+    "alert_rules": "health.alertRules",
 }
 
 _DESCRIPTIONS = {
@@ -37,23 +41,25 @@ _DESCRIPTIONS = {
     "sample_retention_days": "Days raw health samples are kept.",
     "infra_retention_days": "Days infrastructure metric samples are kept.",
     "rollup_retention_months": "Months hourly availability rollups are kept.",
+    "alert_rules": "Per importance: incident, delays, notifications and e-mails when a service is down.",
 }
+_SCHEMAS: dict[str, Any] = {"alert_rules": dict[str, dict[str, Any]]}
 
 
 def declare_health_settings(catalog: SettingCatalog = default_catalog) -> None:
     declare = declare_setting if catalog is default_catalog else catalog.declare
     known = {declaration.key for declaration in catalog.all()}
     defaults = HealthConfig()
-    for field, key in SETTINGS.items():
+    for name, key in SETTINGS.items():
         if key not in known:
-            default = getattr(defaults, field)
+            default = getattr(defaults, name)
             declare(
                 scope="global",
                 key=key,
-                schema=type(default),
+                schema=_SCHEMAS.get(name, type(default)),
                 default=default,
                 owner=OWNER,
-                description=_DESCRIPTIONS[field],
+                description=_DESCRIPTIONS[name],
             )
 
 

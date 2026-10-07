@@ -1,12 +1,14 @@
 """006 T008 — probes write samples; an outage becomes Unavailable once (one event); recovery is
 Operational; services are isolated; a monitor that stops reporting turns Unknown, never Operational."""
 
+from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import func, select, text
 
 from portalab.capabilities.health import INCIDENTS
+from portalab.capabilities.notifications import NOTIFY
 from portalab.connectors.fake import BACKENDS, FakeBackend
 from portalab.core.time import FixedClock
 from portalab.modules.health.models import HealthSample, RecentError, ServiceState
@@ -173,3 +175,75 @@ async def test_outage_becomes_an_incident_after_its_delay_and_closes_when_back(
     clock.advance(STEP)
     await runner.probe(service_id)
     assert port.closed == [(service_id, "health")]
+
+
+class _Notify:
+    """The notification engine as Health sees it: the requests it was asked to send."""
+
+    def __init__(self) -> None:
+        self.sent: list[Any] = []
+
+    async def send(self, request: Any) -> Any:
+        self.sent.append(request)
+        return None
+
+
+async def test_outage_is_announced_by_its_rule_then_back(hl: HealthHarness, clock: FixedClock) -> None:
+    """027: a « major » outage is told after 5 minutes to administrators and members (apart), by name —
+    once — and its end too; nothing is told for a blip shorter than the delay."""
+    notify = _Notify()
+    hl.cn.full.identity.capabilities.provide(NOTIFY, notify, instance_ref="notify", owner="test:notify")
+    service_id = await hl.service("Plex")
+    runner = hl.module.runner
+    await runner.probe(service_id)
+    hl.cn.remote.mode = "error"
+    for _ in range(6):  # unavailable after three failures: three minutes of outage so far
+        clock.advance(STEP)
+        await runner.probe(service_id)
+    assert notify.sent == []
+    for _ in range(3):
+        clock.advance(STEP)
+        await runner.probe(service_id)
+    sent = [(r.audience.permission, r.audience.without, r.category, r.kind) for r in notify.sent]
+    assert sent == [
+        ("services.manage", None, "system.health", "alert"),
+        ("services.read", "services.manage", "system.health", "alert"),
+    ]
+    assert notify.sent[0].params["service"] == "Plex" and notify.sent[0].params["minutes"] == 5
+    assert notify.sent[0].template_key == "notifications:service.unavailable"
+
+    hl.cn.remote.mode = "ok"
+    clock.advance(STEP)
+    await runner.probe(service_id)
+    assert [r.template_key for r in notify.sent[2:]] == ["notifications:service.back"] * 2
+    back = notify.sent[2]
+    assert back.kind == "notification" and back.params["minutes"] >= 7  # how long it was down
+
+
+async def test_alerting_rule_and_service_overrides(hl: HealthHarness, clock: FixedClock) -> None:
+    """027: the administrator's rule for an importance applies (here: no incident, administrators told at
+    once, by e-mail); a service's own overrides win field by field."""
+    notify, port = _Notify(), _Incidents()
+    capabilities = hl.cn.full.identity.capabilities
+    capabilities.provide(NOTIFY, notify, instance_ref="notify", owner="test:notify")
+    capabilities.provide(INCIDENTS, port, instance_ref="support", owner="test:support")
+    rule = {"incident": False, "notify_after": 0, "notify_members": False, "email_admins": True}
+    hl.module.config = replace(hl.module.config, alert_rules={"major": rule})
+    service_id = await hl.service("Plex")
+    info = await hl.module.state.service_info(service_id)
+    assert info is not None
+    effective = hl.module.state.rule(info)
+    assert not effective.incident and effective.notify_after == 0 and effective.auto_resolve
+    overridden = hl.module.state.rule(replace(info, alerting={"incident": True, "incident_after": 2}))
+    assert overridden.incident and overridden.incident_after == 2 and overridden.email_admins
+
+    runner = hl.module.runner
+    await runner.probe(service_id)
+    hl.cn.remote.mode = "error"
+    for _ in range(15):
+        clock.advance(STEP)
+        await runner.probe(service_id)
+    assert port.created == {}  # no incident for this importance
+    assert [(r.audience.permission, r.category) for r in notify.sent] == [
+        ("services.manage", "system.health_email")
+    ]  # told as soon as it was down

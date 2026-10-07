@@ -10,7 +10,17 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -68,15 +78,13 @@ class Service(ConnectorsBase):
     public_url: Mapped[str | None] = mapped_column(
         String(512), info=not_personal("a service's public address")
     )
-    # 027: how much the service matters (incident severity, status page) and when an outage becomes an
-    # incident — after ``incident_after_minutes`` (NULL: the importance's default, 0: never), closed
-    # again when the service is back (``incident_auto_resolve``)
+    # 027: how much the service matters — its outages follow the importance's alerting rules (incident,
+    # delays, notifications, e-mails), field by field overridden by ``alerting`` (``{}``: the rules)
     importance: Mapped[str] = mapped_column(
         String(10), nullable=False, default="major", server_default="major"
     )
-    incident_after_minutes: Mapped[int | None] = mapped_column(Integer)
-    incident_auto_resolve: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, server_default="true"
+    alerting: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default=text("'{}'::jsonb")
     )
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

@@ -92,3 +92,25 @@ async def test_unlock_once_with_rewards(gm: GamHarness, client: AsyncClient) -> 
     assert mine["veteran"]["state"] == "locked"
     await gm.module.rewards.grant_manual(gm.p("boss"), user, "xp", 1000, reason="seed", idempotency_key="lvl")
     assert (await client.get("/api/v1/me/progression")).json()["achievements"] == 3
+
+
+async def test_unlock_notification_names_the_achievement(gm: GamHarness) -> None:
+    """027: the member is told the achievement's name and what it rewards — never its technical key."""
+    from portalab.capabilities.notifications import NOTIFY
+    from tests.integration.gamification.test_reward_consumer import Outbox
+
+    outbox = Outbox()
+    gm.ev.full.identity.capabilities.provide(NOTIFY, outbox, instance_ref="t", owner="test")
+    await gm.module.achievements.save(
+        SYSTEM,
+        "first_play",
+        {
+            "label": "First play",
+            "description": "Play something once.",
+            "criteria": [{"kind": "event_count", "event_type": "media.played", "count": 1}],
+        },
+    )
+    gm.clock.advance(timedelta(seconds=1))
+    await gm.module.pipeline.process(gm.envelope(gm.people["ursula"], {"minutes": 1, "genre": "rock"}))
+    [note] = [r for r in outbox.sent if r.category == "gamification.achievement"]
+    assert note.params == {"achievement": "First play", "description": "Play something once."}

@@ -20,6 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.connector_sdk import Connector, ConnectorRegistry, ServiceHandle, TestResult
+from portalab.capabilities.health import clean_alerting
 from portalab.capabilities.isolation import IsolationPolicy, ProviderGuard
 from portalab.capabilities.registry import CapabilityError, CapabilityRegistry
 from portalab.core.audit_port import AuditSink
@@ -98,8 +99,7 @@ class ServiceView:
     updated_at: datetime
     public_url: str | None = None  # 027: where members open it
     importance: str = "major"  # 027: critical | major | minor | internal
-    incident_after_minutes: int | None = None  # None: the importance's default, 0: never
-    incident_auto_resolve: bool = True
+    alerting: dict[str, Any] = field(default_factory=dict)  # 027: overrides of the importance's rules
 
     @property
     def display_state(self) -> str:
@@ -224,8 +224,7 @@ class ServiceManager:
             updated_at=row.updated_at,
             public_url=row.public_url,
             importance=row.importance,
-            incident_after_minutes=row.incident_after_minutes,
-            incident_auto_resolve=row.incident_auto_resolve,
+            alerting=clean_alerting(row.alerting),
         )
 
     async def list(self) -> list[ServiceView]:
@@ -385,8 +384,7 @@ class ServiceManager:
         capabilities: Mapping[str, Mapping[str, Any]] | None = None,
         public_url: str | None = None,
         importance: str | None = None,
-        incident_after_minutes: int | None = None,
-        incident_auto_resolve: bool | None = None,
+        alerting: Mapping[str, Any] | None = None,
     ) -> ServiceView:
         async with self.database.unit_of_work() as uow:
             row = await self._row(uow.session, service_id, lock=True)
@@ -414,12 +412,11 @@ class ServiceManager:
                     raise InvalidServiceConfig("Importance is critical, major, minor or internal.")
                 row.importance = importance
                 changed.append("importance")
-            if incident_after_minutes is not None:  # -1 brings the importance's default back
-                row.incident_after_minutes = None if incident_after_minutes < 0 else incident_after_minutes
-                changed.append("incident_after")
-            if incident_auto_resolve is not None and incident_auto_resolve != row.incident_auto_resolve:
-                row.incident_auto_resolve = incident_auto_resolve
-                changed.append("incident_auto_resolve")
+            if alerting is not None:  # the whole set of overrides; {} follows the importance's rules
+                overrides = clean_alerting(alerting)
+                if overrides != clean_alerting(row.alerting):
+                    row.alerting = overrides
+                    changed.append("alerting")
             for capability, values in (capabilities or {}).items():
                 cap = (
                     await uow.session.execute(

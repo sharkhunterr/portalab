@@ -147,4 +147,57 @@ describe("services admin", () => {
     const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
     expect(results.violations.map((violation) => violation.id)).toEqual([]);
   });
+
+  it("sets the alerting rules by importance and a service's own overrides", async () => {
+    const rule = {
+      incident: true,
+      incident_after: 10,
+      auto_resolve: true,
+      notify_after: 5,
+      notify_members: true,
+      notify_admins: true,
+      email_members: false,
+      email_admins: false,
+      degrades_portal: true,
+    };
+    const rules = { critical: { ...rule, incident_after: 5 }, major: rule, minor: rule, internal: rule };
+    let putRules: Record<string, Record<string, unknown>> = {};
+    let patched: Record<string, unknown> = {};
+    fake.handler = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/v1/health/alert-rules") {
+        if (request.method === "PUT") putRules = (await request.json()) as typeof putRules;
+        return json(200, { rules, defaults: rules });
+      }
+      if (url.pathname === "/api/v1/connectors") return json(200, { items: [] });
+      if (url.pathname === "/api/v1/services" && request.method === "GET") {
+        return json(200, { items: [{ ...SERVICE, importance: "major", alerting: {} }] });
+      }
+      if (request.method === "PATCH") {
+        patched = (await request.json()) as Record<string, unknown>;
+        return json(200, SERVICE);
+      }
+      return json(200, { items: [] });
+    };
+    render(withClient(<ServicesAdmin />));
+    await screen.findByText("Media server");
+
+    const open = await screen.findByRole("button", { name: "Alert rules" });
+    await vi.waitFor(() => expect(open).toBeEnabled());
+    fireEvent.click(open);
+    const dialog = await screen.findByRole("dialog", { name: "Alert rules by importance" });
+    expect(within(dialog).getByRole("tab", { name: /Critical.*incident after 5 min/ })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("tab", { name: /Major/ }));
+    fireEvent.click(within(dialog).getAllByRole("checkbox", { name: "By e-mail too" })[1] as HTMLElement);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save the rules" }));
+    await vi.waitFor(() => expect(putRules.major?.email_admins).toBe(true));
+    expect(putRules.critical?.email_admins).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const edit = await screen.findByRole("dialog", { name: /Media server/ });
+    fireEvent.change(within(edit).getByLabelText("Declare an incident"), { target: { value: "no" } });
+    fireEvent.change(within(edit).getByLabelText(/Notify after/), { target: { value: "0" } });
+    fireEvent.click(within(edit).getByRole("button", { name: "Save the changes" }));
+    await vi.waitFor(() => expect(patched.alerting).toEqual({ incident: false, notify_after: 0 }));
+  });
 });

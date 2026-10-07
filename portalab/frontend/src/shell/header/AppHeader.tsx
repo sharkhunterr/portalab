@@ -189,12 +189,18 @@ export function IncidentsButton() {
     retry: false,
     refetchInterval: 60_000,
     queryFn: async () =>
-      ((await api.GET("/api/v1/services/health")).data as unknown as { items: Array<{ state: string }> })
-        .items,
+      (
+        (await api.GET("/api/v1/services/health")).data as unknown as {
+          items: Array<{ state: string; degrades_portal?: boolean }>;
+        }
+      ).items,
   });
   const incidents = Array.isArray(open.data) ? open.data.length : 0;
   const items = Array.isArray(services.data) ? services.data : [];
-  const troubled = items.filter((s) => s.state === "unavailable" || s.state === "degraded").length;
+  // services whose alerting rule leaves them out of the portal's health (internal ones) do not count
+  const troubled = items.filter(
+    (s) => s.degrades_portal !== false && (s.state === "unavailable" || s.state === "degraded"),
+  ).length;
   if (!incidents && !canRead) return null;
   if (!incidents && !items.length) return null;
   const state = incidents ? "incident" : troubled ? "degraded" : "ok";
@@ -206,9 +212,19 @@ export function IncidentsButton() {
         ? t("shell:health.degraded", { count })
         : t("shell:health.ok");
   return (
-    <Link to="/services" className="shell-health" data-state={state} aria-label={label} title={label}>
-      <Icon name={state === "incident" ? "alert" : state === "degraded" ? "warning" : "heart"} size={18} />
-      {state === "ok" ? null : <span aria-hidden="true">{count}</span>}
+    <Link
+      to="/services"
+      className="ds-button ds-button--ghost ds-button--icon shell-health"
+      data-state={state}
+      aria-label={label}
+      title={label}
+    >
+      <Icon name={state === "incident" ? "alert" : state === "degraded" ? "warning" : "heart"} />
+      {state === "ok" ? null : (
+        <span className="shell-health__count" aria-hidden="true">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
     </Link>
   );
 }

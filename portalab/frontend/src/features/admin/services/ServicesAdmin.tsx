@@ -21,6 +21,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../../state/regions";
 import { UptimeBars } from "../../services/ServicesHealth";
+import { AlertingOverrides, type AlertOverrides, AlertRulesDialog } from "./AlertRules";
 import "../../services/services.css";
 import "../admin.css";
 
@@ -66,8 +67,7 @@ interface ServiceItem {
   config?: Record<string, unknown>;
   sync_interval_seconds?: number | null;
   importance?: "critical" | "major" | "minor" | "internal";
-  incident_after_minutes?: number | null;
-  incident_auto_resolve?: boolean;
+  alerting?: AlertOverrides;
   sync: {
     status: string;
     last_success_at: string | null;
@@ -403,9 +403,6 @@ type Action = "enable" | "disable" | "disconnect" | "sync";
  * a secret is kept), where members open it and how often it syncs. « Test » checks the edited values
  * before saving; the background worker picks the change up within a minute.
  */
-/** 027: minutes of outage before an incident, by importance (none for an internal service). */
-const DEFAULT_AFTER: Record<string, number | null> = { critical: 5, major: 10, minor: 30, internal: null };
-
 function EditService({
   service,
   connector,
@@ -424,14 +421,9 @@ function EditService({
   const [every, setEvery] = useState(
     service.sync_interval_seconds ? String(Math.round(service.sync_interval_seconds / 60)) : "",
   );
-  // 027: how much it matters, and when its outage becomes an incident
+  // 027: how much it matters, and its own overrides of that importance's alerting rule
   const [importance, setImportance] = useState(service.importance ?? "major");
-  const [after, setAfter] = useState(
-    service.incident_after_minutes === null || service.incident_after_minutes === undefined
-      ? ""
-      : String(service.incident_after_minutes),
-  );
-  const [autoResolve, setAutoResolve] = useState(service.incident_auto_resolve ?? true);
+  const [alerting, setAlerting] = useState<AlertOverrides>(service.alerting ?? {});
   const filled = Object.fromEntries(Object.entries(secrets).filter(([, v]) => v.trim()));
   const test = useMutation({
     mutationFn: async () =>
@@ -454,8 +446,7 @@ function EditService({
             public_url: publicUrl.trim(),
             sync_interval_seconds: every.trim() ? Math.max(0, Number(every)) * 60 : 0,
             importance,
-            incident_after_minutes: after.trim() ? Math.max(0, Number(after)) : -1,
-            incident_auto_resolve: autoResolve,
+            alerting,
           },
         }),
       ),
@@ -478,6 +469,8 @@ function EditService({
           setEvery(
             service.sync_interval_seconds ? String(Math.round(service.sync_interval_seconds / 60)) : "",
           );
+          setImportance(service.importance ?? "major");
+          setAlerting(service.alerting ?? {});
           test.reset();
           save.reset();
         }
@@ -586,24 +579,8 @@ function EditService({
                 </option>
               ))}
             </SelectField>
-            <TextField
-              label={t("admin:services.incidents.after")}
-              hint={t("admin:services.incidents.afterHint", {
-                minutes: DEFAULT_AFTER[importance] ?? 0,
-              })}
-              type="number"
-              min={0}
-              max={10080}
-              placeholder={DEFAULT_AFTER[importance] ? String(DEFAULT_AFTER[importance]) : "—"}
-              value={after}
-              onChange={(event) => setAfter(event.target.value)}
-            />
           </FormGrid>
-          <CheckboxField
-            label={t("admin:services.incidents.autoResolve")}
-            checked={autoResolve}
-            onChange={(event) => setAutoResolve(event.target.checked)}
-          />
+          <AlertingOverrides importance={importance} value={alerting} onChange={setAlerting} />
         </fieldset>
         {test.data ? (
           <p role="status" className={test.data.ok ? "services-admin__ok" : "services-admin__ko"}>
@@ -955,6 +932,7 @@ export function ServicesAdmin() {
       icon="plug"
       title={t("admin:services.title")}
       description={t("admin:services.subtitle")}
+      secondary={<AlertRulesDialog />}
       primary={
         <Dialog
           open={open}

@@ -8,8 +8,16 @@ from typing import Any
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from portalab.capabilities.health import INCIDENT_SEVERITY, INCIDENTS, SERVICE_DIRECTORY, ServiceInfo
+from portalab.capabilities.health import (
+    INCIDENT_SEVERITY,
+    INCIDENTS,
+    SERVICE_DIRECTORY,
+    AlertRule,
+    ServiceInfo,
+    alert_rule,
+)
 from portalab.capabilities.i18n import RESOLVER
+from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, WithPermission
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -17,6 +25,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.health.models import HealthSample, MaintenanceWindow, ServiceState, StateHistory
 from portalab.modules.health.observability import log, metric_part, metrics
+from portalab.modules.health.permissions import SERVICES_MANAGE, SERVICES_READ
 from portalab.modules.health.settings import HealthConfig
 from portalab.modules.health.state.deriver import RULES_VERSION, Derived, Inputs, Thresholds, derive
 
@@ -44,6 +53,7 @@ class StateService:
         self.config = config or HealthConfig()
         self.clock = clock
         self._declared: set[str] = set()  # outages already turned into an incident (this process)
+        self._told: set[str] = set()  # outages already announced (this process; the producer dedups too)
 
     def thresholds(self) -> Thresholds:
         return Thresholds(
@@ -114,6 +124,7 @@ class StateService:
     async def evaluate(self, service_id: str, *, occurred_at: datetime | None = None) -> Derived:
         now = utc_now(self.clock)
         outage: tuple[int, datetime, int] | None = None  # (state_seq, since, failed probes)
+        back: tuple[int, datetime] | None = None  # the outage that ended (state_seq, since)
         recovered = False
         async with self.database.unit_of_work() as uow:
             session = uow.session
@@ -148,11 +159,18 @@ class StateService:
             else:
                 at = occurred_at or now
                 recovered = derived.state == "operational" and before in ("unavailable", "degraded")
+                if before == "unavailable" and derived.state in ("operational", "degraded"):
+                    back = (row.state_seq, row.state_since)
                 await self._transition(session, row, service_id, before, derived, at, now)
-        # 027: an outage that lasts becomes an incident; a service that is back closes it
+                if derived.state == "unavailable":
+                    outage = (row.state_seq, row.state_since, inputs.consecutive_failures)
+        # 027: what an outage does follows the service's alerting rule — an incident and a notification
+        # once it lasts, the incident closed and an « it is back » notice when the service answers again
         if outage is not None:
-            await self._auto_incident(service_id, *outage, now)
-        elif recovered:
+            await self._outage(service_id, *outage, now)
+        if back is not None:
+            await self._back(service_id, *back, now)
+        if recovered:
             await self._auto_resolve(service_id)
         return derived
 
@@ -211,16 +229,84 @@ class StateService:
             pass
         return "en"
 
-    async def _auto_incident(
-        self, service_id: str, seq: int, since: datetime, failures: int, now: datetime
-    ) -> None:
-        """027: a service unavailable for longer than its delay (by importance, or its own) gets an
-        incident — once per outage (``outage:<service>:<seq>``), with the importance's severity."""
+    def rule(self, info: ServiceInfo | None) -> AlertRule:
+        """027: the alerting rule in force for a service (its importance's, with its own overrides)."""
+        if info is None:
+            return alert_rule(self.config.alert_rules, "major")
+        return alert_rule(self.config.alert_rules, info.importance, info.alerting)
+
+    async def _outage(self, service_id: str, seq: int, since: datetime, failures: int, now: datetime) -> None:
         info = await self.service_info(service_id)
-        delay = info.incident_after_minutes if info is not None else None
+        rule = self.rule(info)
         minutes = (now - since).total_seconds() / 60
+        if rule.incident and minutes >= rule.incident_after:
+            await self._auto_incident(service_id, info, seq, minutes, failures)
+        if minutes >= rule.notify_after:
+            await self._announce(service_id, info, rule, seq, minutes, back=False)
+
+    async def _back(self, service_id: str, seq: int, since: datetime, now: datetime) -> None:
+        """The outage ended: those who were told it was down are told it is back."""
+        info = await self.service_info(service_id)
+        rule = self.rule(info)
+        minutes = (now - since).total_seconds() / 60
+        if minutes >= rule.notify_after:
+            await self._announce(service_id, info, rule, seq, minutes, back=True)
+
+    async def _announce(
+        self,
+        service_id: str,
+        info: ServiceInfo | None,
+        rule: AlertRule,
+        seq: int,
+        minutes: float,
+        *,
+        back: bool,
+    ) -> None:
+        """One notification per outage and audience: administrators (services.manage) and members
+        (services.read, administrators apart), each by e-mail too when the rule says so."""
+        key = f"{'back' if back else 'outage'}:{service_id}:{seq}"
+        if key in self._told:
+            return
+        providers = self.capabilities.system_providers(NOTIFY)
+        if not providers:
+            return
+        name = info.name if info is not None else service_id
+        importance = info.importance if info is not None else "major"
+        audiences = []
+        if rule.notify_admins:
+            audiences.append(("admins", WithPermission(SERVICES_MANAGE, (service_id,)), rule.email_admins))
+        if rule.notify_members:
+            members = WithPermission(SERVICES_READ, (service_id,), without=SERVICES_MANAGE)
+            audiences.append(("members", members, rule.email_members))
+        for audience_key, audience, email in audiences:
+            try:
+                await providers[0].provider.send(
+                    CommunicationRequest(
+                        category="system.health_email" if email else "system.health",
+                        template_key=f"notifications:service.{'back' if back else 'unavailable'}",
+                        audience=audience,
+                        dedup_key=f"{key}:{audience_key}",
+                        kind="notification" if back else "alert",
+                        priority="normal" if back else ("critical" if importance == "critical" else "high"),
+                        params={"service": name, "minutes": max(1, round(minutes))},
+                        source="module",
+                        subject_ref=f"service:{service_id}",
+                        required_permission=audience.permission,
+                        action_url=f"/services/{service_id}",
+                    )
+                )
+            except Exception as exc:
+                log.warning("outage notification not sent", extra={"fields": {"error": type(exc).__name__}})
+        self._told.add(key)
+        metrics.increment(f"health.notifications.{'back' if back else 'outage'}")
+
+    async def _auto_incident(
+        self, service_id: str, info: ServiceInfo | None, seq: int, minutes: float, failures: int
+    ) -> None:
+        """027: a service unavailable for longer than its rule's delay gets an incident — once per outage
+        (``outage:<service>:<seq>``), with its importance's severity."""
         key = f"outage:{service_id}:{seq}"
-        if not delay or minutes < delay or key in self._declared:
+        if key in self._declared:
             return
         port = self.incidents()
         if port is None:
@@ -250,11 +336,11 @@ class StateService:
 
     async def _auto_resolve(self, service_id: str) -> None:
         """027: the service is back — the incidents the portal declared for it are closed (not the ones a
-        person opened), unless the service asks to keep them open."""
+        person opened), unless its rule keeps them open."""
         info = await self.service_info(service_id)
         port = self.incidents()
         resolve = getattr(port, "resolve_for_service", None)
-        if info is None or not info.incident_auto_resolve or resolve is None:
+        if info is None or not self.rule(info).auto_resolve or resolve is None:
             return
         french = (await self._language()).startswith("fr")
         message = (

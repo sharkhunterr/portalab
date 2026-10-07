@@ -8,7 +8,7 @@ Connector-provided capabilities are bound to one service (the provider instance 
 """
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Any, Literal, Protocol, runtime_checkable
 
@@ -73,6 +73,73 @@ class ServerOperations(Protocol):
     async def execute(self, operation: str, params: Mapping[str, Any]) -> Mapping[str, Any]: ...
 
 
+# --- alerting (027): what an outage does, by importance --------------------------------------------------
+IMPORTANCES: tuple[str, ...] = ("critical", "major", "minor", "internal")
+
+
+@dataclass(frozen=True, slots=True)
+class AlertRule:
+    """What an outage (``unavailable``) of a service does. The administrator sets one rule per importance
+    (``health.alertRules``); a service may override any field (``ServiceInfo.alerting``)."""
+
+    incident: bool = True  # declare an incident when the outage lasts
+    incident_after: int = 10  # minutes unavailable before the incident
+    auto_resolve: bool = True  # the portal's incident is closed when the service is back
+    notify_after: int = 5  # minutes unavailable before members and administrators are told (0: at once)
+    notify_members: bool = True  # holders of services.read (administrators apart)
+    notify_admins: bool = True  # holders of services.manage
+    email_members: bool = False
+    email_admins: bool = False
+    degrades_portal: bool = True  # counts in the portal's health (header indicator, status page)
+
+
+ALERT_FLAGS: tuple[str, ...] = (
+    "incident",
+    "auto_resolve",
+    "notify_members",
+    "notify_admins",
+    "email_members",
+    "email_admins",
+    "degrades_portal",
+)
+ALERT_DELAYS: tuple[str, ...] = ("incident_after", "notify_after")
+MAX_ALERT_DELAY = 1440  # minutes (a day)
+
+DEFAULT_ALERT_RULES: dict[str, AlertRule] = {
+    "critical": AlertRule(incident_after=5, notify_after=0, email_admins=True),
+    "major": AlertRule(),
+    "minor": AlertRule(incident_after=30, notify_after=15, notify_members=False),
+    "internal": AlertRule(incident=False, notify_after=15, notify_members=False, degrades_portal=False),
+}
+
+
+def clean_alerting(values: Mapping[str, Any] | None) -> dict[str, Any]:
+    """The known fields of a rule (or overrides), with their types — anything else is dropped."""
+    out: dict[str, Any] = {}
+    for name, value in (values or {}).items():
+        if value is None:
+            continue
+        if name in ALERT_FLAGS and isinstance(value, bool):
+            out[name] = value
+        elif name in ALERT_DELAYS and isinstance(value, int) and not isinstance(value, bool):
+            out[name] = max(0, min(MAX_ALERT_DELAY, value))
+    return out
+
+
+def alert_rule(
+    rules: Mapping[str, Mapping[str, Any]] | None, importance: str, overrides: Mapping[str, Any] | None = None
+) -> AlertRule:
+    """The rule in force for a service: the default of its importance, then the administrator's rule for
+    that importance, then the service's own overrides."""
+    base = DEFAULT_ALERT_RULES.get(importance, DEFAULT_ALERT_RULES["major"])
+    configured = clean_alerting((rules or {}).get(importance))
+    return replace(base, **{**configured, **clean_alerting(overrides)})
+
+
+def alert_rules(rules: Mapping[str, Mapping[str, Any]] | None) -> dict[str, AlertRule]:
+    return {importance: alert_rule(rules, importance) for importance in IMPORTANCES}
+
+
 # --- provided by connectors (005) ----------------------------------------------------------------------
 @dataclass(frozen=True, slots=True)
 class ServiceInfo:
@@ -85,10 +152,9 @@ class ServiceInfo:
     last_sync_attempt_at: datetime | None = None
     last_sync_error: str | None = None
     link: str | None = None  # 027: where members open it (its public URL, or its https address)
-    # 027: how much it matters and when its outage becomes an incident (minutes; None: never)
+    # 027: how much it matters, and its own overrides of that importance's alerting rules (``AlertRule``)
     importance: str = "major"
-    incident_after_minutes: int | None = None
-    incident_auto_resolve: bool = True
+    alerting: Mapping[str, Any] = field(default_factory=dict)
 
 
 @runtime_checkable
@@ -126,8 +192,7 @@ class IncidentRef:
     extra: Mapping[str, Any] = field(default_factory=dict)
 
 
-# 027: minutes of outage before an incident is declared, by the service's importance (None: never)
-INCIDENT_AFTER: dict[str, int | None] = {"critical": 5, "major": 10, "minor": 30, "internal": None}
+# 027: the severity of the incident an outage declares, by the service's importance
 INCIDENT_SEVERITY: dict[str, str] = {
     "critical": "critical",
     "major": "major",

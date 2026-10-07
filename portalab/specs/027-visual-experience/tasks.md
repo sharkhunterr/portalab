@@ -307,6 +307,8 @@ lossless migration.
 - [X] T165 [US3] The status page shows the last 48 hours of each service as micro-bars (one per hour: ok, partial, down, no check); the health indicator's « all good » is green
 - [X] T166 [US5] Services administration as cards ordered by importance: connector icon, name, state and importance badges (coloured edge), public address, last sync or live progress; « Sync now » and « Edit » at hand, the rest (disable, sync history, follow-up, disconnect with a confirmation) in a « … » menu
 - [X] T167 [US3] A service's health in detail, redesigned: state and for how long, the day in figures (availability, downtime, without checks, last sync), the last 48 hours as micro-bars, the changes as a timeline with their durations, incidents, maintenance, errors and tickets only when there are some; dates in the member's language
+- [X] T168 [US3] Alerting rules by importance (`health.alertRules`, « Alert rules » dialog at the top of the services administration): incident and its delay, auto-close, notify after N minutes members and/or administrators (each also by e-mail, category `system.health_email`), counts in the portal's health; each service overrides any field (`alerting`, migration connectors_0005 folding connectors_0004's columns); Health announces the outage by the service's name and its return to the same people (the notifications source with the service id is gone); internal services leave the header and status page summary
+- [X] T169 [US1] The header's health indicator is an icon button like the bell (no pill), its count in the same small badge; the achievement notification names the achievement and says what it rewards
 
 ## Dependencies & Execution Order
 

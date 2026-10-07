@@ -1,7 +1,7 @@
 """010 T019/T021/T024 — maintenance reminders J-1/H-1 are stored and sent at their time, superseded by a
-reschedule (corrective message to people already told), never sent late (expired); a start alert; a
-service outage raises one critical alert per state change; account security events reach the user on the
-mandatory portal channel; replays and redeliveries produce nothing new."""
+reschedule (corrective message to people already told), never sent late (expired); a start alert; account
+security events reach the user on the mandatory portal channel; replays and redeliveries produce nothing
+new. Service outages are announced by Health itself (027: each service's alerting rule), not from here."""
 
 from datetime import timedelta
 from uuid import uuid4
@@ -99,7 +99,9 @@ async def test_maintenance_reminders(
     assert len(await titles(notify)) == 3  # nothing more on redelivery
 
 
-async def test_outage_and_account_sources(app: FastAPI, notify: NotifyHarness, clock: FixedClock) -> None:
+async def test_account_source_and_outages_left_to_health(
+    app: FastAPI, notify: NotifyHarness, clock: FixedClock
+) -> None:
     alex = await create_user(module_of(app), "alex")
     service = str(uuid4())
     change = {
@@ -129,8 +131,5 @@ async def test_outage_and_account_sources(app: FastAPI, notify: NotifyHarness, c
             .scalars()
             .all()
         )
-    assert [tuple(r) for r in rows] == [
-        ("account.security", "notification", "high"),
-        ("system.health", "alert", "critical"),
-    ]
-    assert inbox == ["account.security", "system.health"]
+    assert [tuple(r) for r in rows] == [("account.security", "notification", "high")]
+    assert inbox == ["account.security"]

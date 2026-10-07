@@ -67,6 +67,8 @@ interface OverviewItem {
   state: HealthState;
   availability: number | null;
   link?: string | null;
+  /** 027: whether its trouble counts in the portal's health (its alerting rule). */
+  degrades_portal?: boolean;
 }
 
 interface Section {
@@ -383,7 +385,9 @@ export function ServicesHealth() {
         }
       >
         {(items) => {
-          const troubled = items.filter((i) => i.state === "unavailable" || i.state === "degraded").length;
+          const troubled = items.filter(
+            (i) => i.degrades_portal !== false && (i.state === "unavailable" || i.state === "degraded"),
+          ).length;
           const maintenance = items.filter((i) => i.state === "maintenance").length;
           const tone = troubled || open.length ? "bad" : maintenance ? "warn" : "ok";
           const sorted = [...items].sort(

@@ -877,6 +877,216 @@
         "title": "AiUsageOut",
         "type": "object"
       },
+      "AlertRuleBody": {
+        "additionalProperties": false,
+        "properties": {
+          "auto_resolve": {
+            "title": "Auto Resolve",
+            "type": "boolean"
+          },
+          "degrades_portal": {
+            "title": "Degrades Portal",
+            "type": "boolean"
+          },
+          "email_admins": {
+            "title": "Email Admins",
+            "type": "boolean"
+          },
+          "email_members": {
+            "title": "Email Members",
+            "type": "boolean"
+          },
+          "incident": {
+            "title": "Incident",
+            "type": "boolean"
+          },
+          "incident_after": {
+            "maximum": 1440.0,
+            "minimum": 1.0,
+            "title": "Incident After",
+            "type": "integer"
+          },
+          "notify_admins": {
+            "title": "Notify Admins",
+            "type": "boolean"
+          },
+          "notify_after": {
+            "maximum": 1440.0,
+            "minimum": 0.0,
+            "title": "Notify After",
+            "type": "integer"
+          },
+          "notify_members": {
+            "title": "Notify Members",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "incident",
+          "incident_after",
+          "auto_resolve",
+          "notify_after",
+          "notify_members",
+          "notify_admins",
+          "email_members",
+          "email_admins",
+          "degrades_portal"
+        ],
+        "title": "AlertRuleBody",
+        "type": "object"
+      },
+      "AlertRulesBody": {
+        "additionalProperties": false,
+        "properties": {
+          "critical": {
+            "$ref": "#/components/schemas/AlertRuleBody"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/AlertRuleBody"
+          },
+          "major": {
+            "$ref": "#/components/schemas/AlertRuleBody"
+          },
+          "minor": {
+            "$ref": "#/components/schemas/AlertRuleBody"
+          }
+        },
+        "required": [
+          "critical",
+          "major",
+          "minor",
+          "internal"
+        ],
+        "title": "AlertRulesBody",
+        "type": "object"
+      },
+      "AlertRulesOut": {
+        "properties": {
+          "defaults": {
+            "$ref": "#/components/schemas/AlertRulesBody"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/AlertRulesBody"
+          }
+        },
+        "required": [
+          "rules",
+          "defaults"
+        ],
+        "title": "AlertRulesOut",
+        "type": "object"
+      },
+      "AlertingOverrides": {
+        "additionalProperties": false,
+        "description": "027: a service's own alerting \u2014 each field left out (or null) follows its importance's rule.",
+        "properties": {
+          "auto_resolve": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Resolve"
+          },
+          "degrades_portal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degrades Portal"
+          },
+          "email_admins": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Admins"
+          },
+          "email_members": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Members"
+          },
+          "incident": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident"
+          },
+          "incident_after": {
+            "anyOf": [
+              {
+                "maximum": 1440.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident After"
+          },
+          "notify_admins": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notify Admins"
+          },
+          "notify_after": {
+            "anyOf": [
+              {
+                "maximum": 1440.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notify After"
+          },
+          "notify_members": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notify Members"
+          }
+        },
+        "title": "AlertingOverrides",
+        "type": "object"
+      },
       "AnnouncementOut": {
         "properties": {
           "banner": {
@@ -11379,6 +11589,16 @@
       "ServicePatch": {
         "additionalProperties": false,
         "properties": {
+          "alerting": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertingOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "capabilities": {
             "anyOf": [
               {
@@ -11421,30 +11641,6 @@
               }
             ],
             "title": "Importance"
-          },
-          "incident_after_minutes": {
-            "anyOf": [
-              {
-                "maximum": 10080.0,
-                "minimum": -1.0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Incident After Minutes"
-          },
-          "incident_auto_resolve": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Incident Auto Resolve"
           },
           "name": {
             "anyOf": [
@@ -27917,6 +28113,66 @@
         "summary": "Add Group Grant",
         "tags": [
           "authz"
+        ]
+      }
+    },
+    "/api/v1/health/alert-rules": {
+      "get": {
+        "operationId": "get_alert_rules_api_v1_health_alert_rules_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertRulesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Alert Rules",
+        "tags": [
+          "health"
+        ]
+      },
+      "put": {
+        "operationId": "put_alert_rules_api_v1_health_alert_rules_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertRulesBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertRulesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Alert Rules",
+        "tags": [
+          "health"
         ]
       }
     },

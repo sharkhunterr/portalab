@@ -65,6 +65,8 @@ DIGEST_JOB = "notifications.digest"
 BUILTIN = (
     ("system.maintenance", "notifications:category.maintenance", "high", ("portal", "email"), (), True),
     ("system.health", "notifications:category.health", "critical", ("portal",), (), True),
+    # 027: an outage the service's alerting rule also sends by e-mail (members may still turn it off)
+    ("system.health_email", "notifications:category.healthEmail", "critical", ("portal", "email"), (), True),
     ("account.security", "notifications:category.security", "high", ("portal", "email"), ("portal",), False),
     ("communications.broadcast", "notifications:category.broadcast", "normal", ("portal",), (), True),
     # 027: an announcement the administrator chose to e-mail (members may still turn it off)

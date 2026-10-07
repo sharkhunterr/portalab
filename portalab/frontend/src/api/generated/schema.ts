@@ -4489,6 +4489,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/health/alert-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Alert Rules */
+        get: operations["get_alert_rules_api_v1_health_alert_rules_get"];
+        /** Put Alert Rules */
+        put: operations["put_alert_rules_api_v1_health_alert_rules_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/help": {
         parameters: {
             query?: never;
@@ -7928,6 +7946,63 @@ export interface components {
             metrics: {
                 [key: string]: number;
             };
+        };
+        /** AlertRuleBody */
+        AlertRuleBody: {
+            /** Auto Resolve */
+            auto_resolve: boolean;
+            /** Degrades Portal */
+            degrades_portal: boolean;
+            /** Email Admins */
+            email_admins: boolean;
+            /** Email Members */
+            email_members: boolean;
+            /** Incident */
+            incident: boolean;
+            /** Incident After */
+            incident_after: number;
+            /** Notify Admins */
+            notify_admins: boolean;
+            /** Notify After */
+            notify_after: number;
+            /** Notify Members */
+            notify_members: boolean;
+        };
+        /** AlertRulesBody */
+        AlertRulesBody: {
+            critical: components["schemas"]["AlertRuleBody"];
+            internal: components["schemas"]["AlertRuleBody"];
+            major: components["schemas"]["AlertRuleBody"];
+            minor: components["schemas"]["AlertRuleBody"];
+        };
+        /** AlertRulesOut */
+        AlertRulesOut: {
+            defaults: components["schemas"]["AlertRulesBody"];
+            rules: components["schemas"]["AlertRulesBody"];
+        };
+        /**
+         * AlertingOverrides
+         * @description 027: a service's own alerting — each field left out (or null) follows its importance's rule.
+         */
+        AlertingOverrides: {
+            /** Auto Resolve */
+            auto_resolve?: boolean | null;
+            /** Degrades Portal */
+            degrades_portal?: boolean | null;
+            /** Email Admins */
+            email_admins?: boolean | null;
+            /** Email Members */
+            email_members?: boolean | null;
+            /** Incident */
+            incident?: boolean | null;
+            /** Incident After */
+            incident_after?: number | null;
+            /** Notify Admins */
+            notify_admins?: boolean | null;
+            /** Notify After */
+            notify_after?: number | null;
+            /** Notify Members */
+            notify_members?: boolean | null;
         };
         /** AnnouncementOut */
         AnnouncementOut: {
@@ -11773,6 +11848,7 @@ export interface components {
         };
         /** ServicePatch */
         ServicePatch: {
+            alerting?: components["schemas"]["AlertingOverrides"] | null;
             /** Capabilities */
             capabilities?: {
                 [key: string]: components["schemas"]["CapabilityPatch"];
@@ -11783,10 +11859,6 @@ export interface components {
             } | null;
             /** Importance */
             importance?: ("critical" | "major" | "minor" | "internal") | null;
-            /** Incident After Minutes */
-            incident_after_minutes?: number | null;
-            /** Incident Auto Resolve */
-            incident_auto_resolve?: boolean | null;
             /** Name */
             name?: string | null;
             /** Public Url */
@@ -22184,6 +22256,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_alert_rules_api_v1_health_alert_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertRulesOut"];
+                };
+            };
+        };
+    };
+    put_alert_rules_api_v1_health_alert_rules_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertRulesBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertRulesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

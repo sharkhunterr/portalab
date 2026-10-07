@@ -38,6 +38,7 @@ class Users:
 class WithPermission:
     permission: str
     service_ids: tuple[str, ...] = ()  # informational scope (e.g. affected services)
+    without: str | None = None  # 027: holders of this other permission are left out (told separately)
 
 
 @dataclass(frozen=True, slots=True)

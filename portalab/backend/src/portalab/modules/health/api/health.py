@@ -22,6 +22,7 @@ async def overview(_: Annotated[Principal, require(SERVICES_READ)], module: Modu
     items = []
     for info in await module.state.services():
         view = states.get(info.id)
+        rule = module.state.rule(info)
         items.append(
             {
                 "id": info.id,
@@ -31,6 +32,9 @@ async def overview(_: Annotated[Principal, require(SERVICES_READ)], module: Modu
                 "since": view.since.isoformat() if view else None,
                 "availability": view.availability if view else None,
                 "link": info.link,  # 027: where members open it (public address), when there is one
+                # 027: how much it matters, and whether its trouble counts in the portal's health
+                "importance": info.importance,
+                "degrades_portal": rule.degrades_portal,
                 "as_of": view.as_of.isoformat() if view else utc_now(module.state.clock).isoformat(),
             }
         )

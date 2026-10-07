@@ -308,8 +308,14 @@ class Achievements:
         ).scalar_one_or_none()
         if inserted is None:
             return []
+        shown = definition.definition  # 027: the member reads its name and what it rewards, not its key
         notes = [
-            Note("achievement", user, f"achievement:{user}:{definition.key}", {"achievement": definition.key})
+            Note(
+                "achievement",
+                user,
+                f"achievement:{user}:{definition.key}",
+                {"achievement": shown.label, "description": shown.description},
+            )
         ]
         ids: list[str] = []
         for reward in definition.definition.rewards:

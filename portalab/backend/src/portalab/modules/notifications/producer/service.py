@@ -137,7 +137,12 @@ class Producer:
         if isinstance(audience, AllAuthenticated):
             return active
         if isinstance(audience, WithPermission):
-            return [u for u in active if await self._allowed(Principal(user_id=u), audience.permission)]
+            return [
+                u
+                for u in active
+                if await self._allowed(Principal(user_id=u), audience.permission)
+                and not (audience.without and await self._allowed(Principal(user_id=u), audience.without))
+            ]
         if isinstance(audience, Role):
             roles = self._provider(ROLES_CAPABILITY)
             if roles is None:

@@ -21,6 +21,8 @@ MANAGE = [
     ("DELETE", f"/api/v1/maintenance/{SID}"),
     ("GET", f"/api/v1/services/{SID}/operations"),
     ("POST", f"/api/v1/services/{SID}/operations/restart"),
+    ("GET", "/api/v1/health/alert-rules"),
+    ("PUT", "/api/v1/health/alert-rules"),
 ]
 READ = [
     ("GET", "/api/v1/services/health"),
@@ -98,3 +100,21 @@ async def test_metrics_and_logs_redacted(hl: HealthHarness, caplog: pytest.LogCa
     assert snapshot["health.probes.ok"] == 1 and snapshot["health.probes.failed"] == 1
     text = " ".join(snapshot) + caplog.text
     assert TOKEN not in text and hl.cn.base_url not in text
+
+
+async def test_alert_rules_round_trip(app: FastAPI, client: httpx.AsyncClient, hl: HealthHarness) -> None:
+    """027: administrators read the rules (with the defaults) and replace them; the overview tells, per
+    service, its importance and whether its trouble counts in the portal's health."""
+    service_id = await hl.service()
+    await hl.module.runner.probe(service_id)
+    await admin_client(app, client, hl.cn)
+    read = (await client.get("/api/v1/health/alert-rules")).json()
+    assert read["rules"] == read["defaults"] and read["rules"]["critical"]["incident_after"] == 5
+    rules = {**read["rules"], "major": {**read["rules"]["major"], "degrades_portal": False}}
+    put = await client.put("/api/v1/health/alert-rules", json=rules)
+    assert put.status_code == 200 and put.json()["rules"]["major"]["degrades_portal"] is False
+    assert hl.module.config.alert_rules["major"]["degrades_portal"] is False
+    [item] = (await client.get("/api/v1/services/health")).json()["items"]
+    assert item["importance"] == "major" and item["degrades_portal"] is False
+    bad = {**rules, "minor": {**rules["minor"], "incident_after": 0}}
+    assert (await client.put("/api/v1/health/alert-rules", json=bad)).status_code == 422

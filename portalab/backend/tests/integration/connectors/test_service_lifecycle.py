@@ -104,3 +104,16 @@ async def test_public_address_is_set_validated_cleared_and_offered(
     assert (await directory.service(service_id)).link == "https://media.example"  # type: ignore[union-attr]
     cleared = await client.patch(f"/api/v1/services/{service_id}", json={"public_url": ""})
     assert cleared.status_code == 200 and cleared.json()["public_url"] is None
+
+    # 027: importance and the service's own alerting overrides (left-out fields follow the importance)
+    alerting = {"incident": False, "email_admins": True, "notify_after": 0}
+    tuned = await client.patch(
+        f"/api/v1/services/{service_id}", json={"importance": "critical", "alerting": alerting}
+    )
+    assert tuned.status_code == 200 and tuned.json()["alerting"] == alerting
+    info = await directory.service(service_id)
+    assert info is not None and info.importance == "critical" and info.alerting == alerting
+    wrong = await client.patch(f"/api/v1/services/{service_id}", json={"alerting": {"incident_after": 0}})
+    assert wrong.status_code == 422
+    reset = await client.patch(f"/api/v1/services/{service_id}", json={"alerting": {}})
+    assert reset.json()["alerting"] == {}
