@@ -86,7 +86,8 @@
     "profile": "lively",
     "celebration": "portal",
     "fastMs": 140,
-    "normalMs": 280
+    "normalMs": 280,
+    "levelUp": "crawl"
   },
   "layout": {
     "nav": {

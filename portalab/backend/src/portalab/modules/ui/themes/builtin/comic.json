@@ -86,7 +86,8 @@
     "profile": "playful",
     "celebration": "stars",
     "fastMs": 140,
-    "normalMs": 260
+    "normalMs": 260,
+    "levelUp": "comic"
   },
   "layout": {
     "nav": {

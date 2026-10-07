@@ -28,7 +28,7 @@ KINDS = {
     # 027: animated layer behind the portal and celebration effect (product types ``ambient``/``effect``)
     "ui.ambient": ("ambient", "ambient", frozenset({"theme", "none"})),
     "ui.celebration": ("effect", "effect", frozenset({"theme", "none", "sparkle", "glow"})),
-    "ui.levelUp": ("level_up", "animation", frozenset({"classic"})),  # 027: the level-up moment
+    "ui.levelUp": ("level_up", "animation", frozenset({"theme", "classic"})),  # 027: the level-up moment
 }
 
 

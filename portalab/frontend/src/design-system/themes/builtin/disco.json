@@ -86,7 +86,8 @@
     "profile": "playful",
     "celebration": "confetti",
     "fastMs": 150,
-    "normalMs": 300
+    "normalMs": 300,
+    "levelUp": "disco"
   },
   "layout": {
     "nav": {

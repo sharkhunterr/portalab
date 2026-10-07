@@ -86,7 +86,8 @@
     "profile": "subtle",
     "celebration": "glow",
     "fastMs": 160,
-    "normalMs": 340
+    "normalMs": 340,
+    "levelUp": "sandstorm"
   },
   "layout": {
     "nav": {

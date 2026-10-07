@@ -109,7 +109,13 @@ LEVEL_BADGES: tuple[str, ...] = (
     "blackhole", "melt", "kapow", "portal", "crown", "inferno",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
-LEVEL_UPS: tuple[str, ...] = ("classic", "arcade", "cosmic", "comic", "elements", "cinema")
+LEVEL_UPS: tuple[str, ...] = (
+    "classic", "arcade", "cosmic", "comic", "elements", "cinema",
+    # 027: one per universe — each theme celebrates its levels its own way (``motion.levelUp``)
+    "crawl", "spell", "decode", "sandstorm", "bloodmoon", "pumpkin", "gift", "manga", "boing", "hearth",
+    "hud", "minimal", "abduction", "hero", "synthwave", "disco", "glitch", "noir", "spotlight", "upsidedown",
+    "onering",
+)  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
     "cozy", "futuristic", "minimal", "alien", "heroes", "neowave", "disco", "cyberpunk", "sincity", "plex",

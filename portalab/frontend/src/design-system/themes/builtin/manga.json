@@ -86,7 +86,8 @@
     "profile": "lively",
     "celebration": "petals",
     "fastMs": 130,
-    "normalMs": 240
+    "normalMs": 240,
+    "levelUp": "manga"
   },
   "layout": {
     "nav": {

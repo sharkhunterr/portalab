@@ -83,7 +83,8 @@
     "fastMs": 160,
     "normalMs": 320,
     "profile": "playful",
-    "celebration": "confetti"
+    "celebration": "confetti",
+    "levelUp": "cosmic"
   },
   "layout": {
     "nav": {

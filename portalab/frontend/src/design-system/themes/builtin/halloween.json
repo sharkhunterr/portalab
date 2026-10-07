@@ -86,7 +86,8 @@
     "profile": "playful",
     "celebration": "bats",
     "fastMs": 160,
-    "normalMs": 320
+    "normalMs": 320,
+    "levelUp": "pumpkin"
   },
   "layout": {
     "nav": {

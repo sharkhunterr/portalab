@@ -123,6 +123,7 @@ export function useTheme(): ThemeContextValue {
       notificationAnimation: "slide",
       ambient: "none",
       celebration: "sparkle",
+      levelUp: "classic",
     },
     themes: BUILTIN_THEMES,
     stateStyle: (state: string) => theme.states[state as keyof ThemeDefinition["states"]],

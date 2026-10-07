@@ -86,7 +86,8 @@
     "profile": "lively",
     "celebration": "shatter",
     "fastMs": 120,
-    "normalMs": 240
+    "normalMs": 240,
+    "levelUp": "hud"
   },
   "layout": {
     "nav": {

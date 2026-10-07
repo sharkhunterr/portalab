@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { type CSSProperties, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
-import { usePreferences } from "../../../design-system/a11y/PreferencesProvider";
 import { LevelBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { sound } from "../../../design-system/sound/SoundService";
@@ -70,6 +69,63 @@ interface Summary {
 
 const VALUE_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "handshake" };
 
+/**
+ * 027: how each look lays the moment out — a card in the middle, a wide banner, an opening crawl, an
+ * unrolled scroll, a terminal, comic panels, or a split screen (the number big on one side).
+ */
+const LAYOUTS: Record<string, string> = {
+  crawl: "crawl",
+  spell: "scroll",
+  onering: "scroll",
+  decode: "terminal",
+  glitch: "terminal",
+  arcade: "terminal",
+  comic: "panel",
+  manga: "panel",
+  hero: "panel",
+  boing: "panel",
+  hud: "banner",
+  minimal: "banner",
+  synthwave: "banner",
+  spotlight: "banner",
+  noir: "split",
+  cinema: "split",
+  upsidedown: "split",
+  sandstorm: "split",
+};
+/** The big word some looks shout (an onomatopoeia, a code). */
+const WORDS: Record<string, string> = {
+  comic: "KAPOW!",
+  manga: "ドン!",
+  hero: "BAM!",
+  boing: "BOING!",
+  glitch: "LVL_UP",
+  decode: "ACCESS GRANTED",
+  pumpkin: "BOO!",
+  gift: "HO HO HO",
+};
+/** How many particles each look scatters. */
+const PARTICLES: Record<string, number> = {
+  arcade: 28,
+  cosmic: 36,
+  elements: 4,
+  crawl: 60,
+  decode: 24,
+  sandstorm: 40,
+  bloodmoon: 14,
+  pumpkin: 10,
+  gift: 30,
+  boing: 10,
+  hearth: 24,
+  disco: 30,
+  upsidedown: 40,
+  onering: 24,
+  spell: 24,
+  abduction: 12,
+  minimal: 0,
+  noir: 50,
+};
+
 function sample(level: number): Summary {
   return {
     level,
@@ -94,8 +150,7 @@ function sample(level: number): Summary {
 export function LevelUpMoment() {
   const t = useT();
   const format = useFormat();
-  const { preferences } = usePreferences();
-  const { effective } = useTheme();
+  const { effective, looks } = useTheme();
   const [event, setEvent] = useState<LevelUpEvent | null>(null);
   useEffect(() => {
     const onLevelUp = (e: Event) => setEvent((e as CustomEvent<LevelUpEvent>).detail);
@@ -127,7 +182,7 @@ export function LevelUpMoment() {
     if (event) void sound.play("levelUp");
   }, [event]);
   if (!event) return null;
-  const look = event.preview ?? preferences.levelUp ?? "classic";
+  const look = event.preview ?? looks.levelUp ?? "classic";
   const data = event.preview ? sample(level) : summary.data;
   const previous = data?.previous ?? from ?? level - 1;
   const coins = (data?.rewards ?? []).reduce((sum, r) => sum + r.coins, 0);
@@ -160,6 +215,7 @@ export function LevelUpMoment() {
         <DialogPrimitive.Content
           className="levelup"
           data-look={look}
+          data-layout={LAYOUTS[look] ?? "card"}
           data-reduced={reduced || undefined}
           aria-describedby={undefined}
         >
@@ -243,12 +299,14 @@ export function LevelUpMoment() {
   );
 }
 
-/** The decoration of each look — particles placed once, animated by CSS. */
+/** The decoration of each look — layers and particles placed once, animated by CSS. */
 function LevelUpFx({ look }: { look: string }) {
-  const count = look === "arcade" ? 28 : look === "cosmic" ? 36 : look === "elements" ? 4 : 18;
+  const count = PARTICLES[look] ?? 18;
+  const word = WORDS[look];
   return (
     <>
       <span className="levelup__rays" />
+      <span className="levelup__scene" />
       {look === "cinema" ? (
         <span className="levelup__countdown">
           {[3, 2, 1].map((n) => (
@@ -258,7 +316,7 @@ function LevelUpFx({ look }: { look: string }) {
           ))}
         </span>
       ) : null}
-      {look === "comic" ? <span className="levelup__burst">KAPOW!</span> : null}
+      {word ? <span className="levelup__burst">{word}</span> : null}
       {Array.from({ length: count }, (_, i) => (
         <span
           // biome-ignore lint/suspicious/noArrayIndexKey: decorative particles, fixed count
@@ -268,8 +326,9 @@ function LevelUpFx({ look }: { look: string }) {
             {
               "--i": i,
               "--n": count,
-              "--x": `${((Math.sin(i * 12.9898) * 43758.5453) % 1) * 50 + 50}%`,
-              "--y": `${((Math.sin(i * 78.233) * 12345.678) % 1) * 50 + 50}%`,
+              "--x": `${(Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1) * 100}%`,
+              "--y": `${(Math.abs(Math.sin(i * 78.233) * 12345.678) % 1) * 100}%`,
+              "--r": (Math.abs(Math.sin(i * 3.7)) % 1).toFixed(2),
             } as CSSProperties
           }
         />

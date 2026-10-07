@@ -135,6 +135,7 @@
 
 /* stage parts, shown by each look */
 .levelup__rays,
+.levelup__scene,
 .levelup__fx,
 .levelup__countdown,
 .levelup__burst {
@@ -321,16 +322,16 @@
   --angle: calc(var(--i) * 90deg);
   animation: levelup-elements 2.4s cubic-bezier(0.5, 0, 0.3, 1) both;
 }
-.levelup[data-look="elements"] .levelup__fx:nth-child(2) {
+.levelup[data-look="elements"] .levelup__fx:nth-child(3) {
   background: radial-gradient(circle, #fde047, #f97316 50%, transparent 70%);
 }
-.levelup[data-look="elements"] .levelup__fx:nth-child(3) {
+.levelup[data-look="elements"] .levelup__fx:nth-child(4) {
   background: radial-gradient(circle, #e0f2fe, #38bdf8 50%, transparent 70%);
 }
-.levelup[data-look="elements"] .levelup__fx:nth-child(4) {
+.levelup[data-look="elements"] .levelup__fx:nth-child(5) {
   background: radial-gradient(circle, #d9f99d, #65a30d 50%, transparent 70%);
 }
-.levelup[data-look="elements"] .levelup__fx:nth-child(5) {
+.levelup[data-look="elements"] .levelup__fx:nth-child(6) {
   background: radial-gradient(circle, #ffffff, #cbd5e1 50%, transparent 70%);
 }
 
@@ -583,4 +584,956 @@
 }
 .product-art__levelup[data-look="cinema"] .product-art__levelup-kicker {
   font-family: "Anton", sans-serif;
+}
+
+/* ================================================================ 027: layouts — the order and the shape vary */
+/* banner: a wide strip across the screen, the badge on the left, the rest beside it */
+.levelup[data-layout="banner"] .levelup__card {
+  inline-size: min(60rem, 100%);
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-flow: dense;
+  align-items: start;
+  justify-items: start;
+  column-gap: var(--space-6, 1.75rem);
+  text-align: start;
+}
+.levelup[data-layout="banner"] .levelup__badge {
+  grid-row: span 4;
+  align-self: center;
+  margin-inline: 1.5rem;
+}
+.levelup[data-layout="banner"] :is(.levelup__title, .levelup__from, .levelup__next, .levelup__actions) {
+  grid-column: 2;
+}
+.levelup[data-layout="banner"] .levelup__section {
+  grid-column: 3;
+}
+.levelup[data-layout="banner"] .levelup__won {
+  justify-content: start;
+}
+@media (max-width: 48rem) {
+  .levelup[data-layout="banner"] .levelup__card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+  .levelup[data-layout="banner"]
+    :is(
+      .levelup__badge,
+      .levelup__title,
+      .levelup__from,
+      .levelup__next,
+      .levelup__actions,
+      .levelup__section
+    ) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+/* split: the level number huge on one side, what it brought on the other */
+.levelup[data-layout="split"] .levelup__card {
+  inline-size: min(52rem, 100%);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  column-gap: var(--space-5, 1.25rem);
+}
+.levelup[data-layout="split"] :is(.levelup__badge, .levelup__title, .levelup__from) {
+  grid-column: 1;
+}
+.levelup[data-layout="split"] .levelup__title {
+  font-size: clamp(2.6rem, 9vw, 5rem);
+}
+.levelup[data-layout="split"] :is(.levelup__section, .levelup__next, .levelup__actions) {
+  grid-column: 2;
+}
+.levelup[data-layout="split"] .levelup__section:first-of-type {
+  grid-row: 1;
+}
+@media (max-width: 40rem) {
+  .levelup[data-layout="split"] .levelup__card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .levelup[data-layout="split"]
+    :is(
+      .levelup__badge,
+      .levelup__title,
+      .levelup__from,
+      .levelup__section,
+      .levelup__next,
+      .levelup__actions
+    ) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+/* crawl: an opening crawl rising into the stars, then settling to be read */
+.levelup[data-layout="crawl"] .levelup__card {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #ffe81f;
+  --color-text: #ffe81f;
+  --color-text-muted: #f5e9a8;
+  transform-origin: 50% 100%;
+  animation: levelup-crawl 3.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.levelup[data-layout="crawl"] .levelup__title {
+  font-family: "Anton", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.levelup[data-layout="crawl"] :is(.levelup__won li, .levelup__list li) {
+  background: transparent;
+  color: #ffe81f;
+}
+/* scroll: a parchment unrolling from its rod */
+.levelup[data-layout="scroll"] .levelup__card {
+  --color-text: #3b2a14;
+  --color-text-muted: #6b5434;
+  border: 0;
+  border-radius: 0.2rem;
+  background:
+    radial-gradient(circle at 20% 15%, #00000010, transparent 40%),
+    radial-gradient(circle at 80% 85%, #00000014, transparent 45%), linear-gradient(#f3e3bf, #e8d29f);
+  color: #3b2a14;
+  font-family: "IM Fell English", "EB Garamond", serif;
+  transform-origin: top;
+  animation: levelup-unroll 1.1s cubic-bezier(0.3, 0.8, 0.2, 1) 0.3s both;
+}
+.levelup[data-layout="scroll"] .levelup__card::before,
+.levelup[data-layout="scroll"] .levelup__card::after {
+  content: "";
+  position: absolute;
+  inset-inline: -0.8rem;
+  block-size: 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(#8a5a2b, #5a3a1a, #8a5a2b);
+}
+.levelup[data-layout="scroll"] .levelup__card::before {
+  inset-block-start: -0.45rem;
+}
+.levelup[data-layout="scroll"] .levelup__card::after {
+  inset-block-end: -0.45rem;
+}
+.levelup[data-layout="scroll"] .levelup__title {
+  font-family: "Cinzel Decorative", "Cinzel", serif;
+}
+.levelup[data-layout="scroll"] :is(.levelup__won li, .levelup__list li) {
+  background: #00000010;
+}
+/* terminal: lines typed on a black screen */
+.levelup[data-layout="terminal"] .levelup__card {
+  --color-text: #4ade80;
+  --color-text-muted: #22c55e;
+  justify-items: start;
+  border: 1px solid #22c55e66;
+  border-radius: 0.2rem;
+  background: #020a04;
+  color: #4ade80;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  text-align: start;
+}
+.levelup[data-layout="terminal"] .levelup__title {
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  border-inline-end: 0.6ch solid #4ade80;
+  inline-size: 0;
+  animation:
+    levelup-type 1.2s steps(14, end) 0.8s forwards,
+    levelup-blink 0.8s steps(2, jump-none) infinite;
+}
+.levelup[data-layout="terminal"] .levelup__section h3::before {
+  content: "> ";
+}
+.levelup[data-layout="terminal"] :is(.levelup__won li, .levelup__list li) {
+  border-radius: 0;
+  background: #22c55e14;
+}
+.levelup[data-layout="terminal"] .levelup__won {
+  justify-content: start;
+}
+/* panel: a comic page — the badge, the title and each section in its own panel */
+.levelup[data-layout="panel"] .levelup__card {
+  inline-size: min(40rem, 100%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: 0.6rem;
+  border: 4px solid #111;
+  border-radius: 0;
+  background: #111;
+  box-shadow: 8px 8px 0 #11111188;
+}
+.levelup[data-layout="panel"] .levelup__card > * {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-block-size: 5rem;
+  margin: 0;
+  padding: var(--space-3);
+  border: 3px solid #111;
+  background: #ffffff;
+  color: #111;
+  --color-text: #111111;
+  --color-text-muted: #3f3f46;
+}
+.levelup[data-layout="panel"] .levelup__title {
+  grid-column: span 1;
+  font-family: "Bangers", "Luckiest Guy", sans-serif;
+  letter-spacing: 0.04em;
+  background: #fde047;
+}
+.levelup[data-layout="panel"] :is(.levelup__from, .levelup__next, .levelup__actions) {
+  grid-column: span 2;
+  min-block-size: auto;
+}
+.levelup[data-layout="panel"] .levelup__card > :nth-child(odd) {
+  transform: rotate(-0.6deg);
+}
+
+/* ================================================================ 027: one look per universe */
+/* crawl (space opera) — a starfield, the crawl rising */
+.levelup[data-look="crawl"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: #000;
+}
+.levelup[data-look="crawl"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 2px;
+  block-size: 2px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: calc(0.3 + var(--r) * 0.7);
+  animation: levelup-twinkle calc(1s + var(--r) * 2s) ease-in-out infinite alternate;
+}
+/* spell (wizardry) — a turning magic circle, golden sparks rising */
+.levelup[data-look="spell"] {
+  --glow: #f5c542;
+}
+.levelup[data-look="spell"] .levelup__rays {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 80vmin;
+  block-size: 80vmin;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg, #f5c54255 0 3deg, transparent 3deg 15deg),
+    radial-gradient(
+      circle,
+      transparent 54%,
+      #f5c542 55%,
+      transparent 56.5%,
+      transparent 64%,
+      #f5c54299 65%,
+      transparent 66%
+    );
+  mask: radial-gradient(circle, transparent 40%, #000 41%, #000 70%, transparent 71%);
+  transform: translate(-50%, -50%);
+  animation:
+    levelup-spin-centered 12s linear infinite,
+    levelup-fade 1s ease-out both;
+}
+.levelup[data-look="spell"] .levelup__fx {
+  display: block;
+  inset-block-end: -2vh;
+  inset-inline-start: var(--x);
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 8px #f5c542;
+  animation: levelup-rise calc(2.5s + var(--r) * 2s) ease-out calc(var(--r) * 1.5s) infinite;
+}
+/* decode (simulation) — green code falling behind a terminal */
+.levelup[data-look="decode"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, #22c55e1f 0 1ch, transparent 1ch 3ch), #000;
+  mask: repeating-linear-gradient(180deg, #000 0 0.8rem, transparent 0.8rem 1.4rem);
+  animation: levelup-fall-bg 1.2s linear infinite;
+}
+.levelup[data-look="decode"] .levelup__burst {
+  display: block;
+  inset-block-start: 10%;
+  inset-inline: 0;
+  color: #4ade80;
+  font-family: "Share Tech Mono", monospace;
+  font-size: clamp(1rem, 3vw, 1.6rem);
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-shadow: 0 0 10px #22c55e;
+  animation: levelup-blink 0.6s steps(2, jump-none) 5 both;
+}
+/* sandstorm (dune) — sand streaks blow across, the card emerges from the haze */
+.levelup[data-look="sandstorm"] {
+  --glow: #e0a96d;
+}
+.levelup[data-look="sandstorm"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: linear-gradient(100deg, #7c4a1e66, #e0a96d88 40%, #f5d6a066 60%, #7c4a1e66);
+  background-size: 200% 100%;
+  animation: levelup-pan 2.5s linear infinite;
+}
+.levelup[data-look="sandstorm"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: -20%;
+  inline-size: calc(2rem + var(--r) * 8rem);
+  block-size: 1px;
+  background: linear-gradient(90deg, transparent, #f5d6a0, transparent);
+  animation: levelup-streak calc(0.6s + var(--r) * 0.8s) linear calc(var(--r) * -1s) infinite;
+}
+.levelup[data-look="sandstorm"] .levelup__card {
+  animation: levelup-haze 1.4s ease-out 0.3s both;
+}
+/* bloodmoon (horror) — a red moon, blood dripping from the top, the card flickers in */
+.levelup[data-look="bloodmoon"] {
+  --glow: #dc2626;
+}
+.levelup[data-look="bloodmoon"] .levelup__rays {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline-end: 12%;
+  inline-size: 28vmin;
+  block-size: 28vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fca5a5, #b91c1c 55%, #450a0a);
+  box-shadow: 0 0 6rem #dc262688;
+}
+.levelup[data-look="bloodmoon"] .levelup__fx {
+  display: block;
+  inset-block-start: 0;
+  inset-inline-start: var(--x);
+  inline-size: 0.45rem;
+  block-size: calc(3rem + var(--r) * 12rem);
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(#7f1d1d, #dc2626);
+  transform-origin: top;
+  animation: levelup-drip calc(1.5s + var(--r) * 2s) ease-in both;
+}
+.levelup[data-look="bloodmoon"] .levelup__card {
+  animation: levelup-flicker-in 1.4s steps(1, end) 0.2s both;
+}
+/* pumpkin (Halloween) — an orange glow, bats flying off, BOO! */
+.levelup[data-look="pumpkin"] {
+  --glow: #f97316;
+}
+.levelup[data-look="pumpkin"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle, #f9731655, transparent 60%);
+  animation: levelup-pulse 1.6s ease-in-out infinite;
+}
+.levelup[data-look="pumpkin"] .levelup__fx {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 2rem;
+  block-size: 1rem;
+  background: #111;
+  clip-path: polygon(0 30%, 18% 0, 30% 40%, 50% 25%, 70% 40%, 82% 0, 100% 30%, 80% 70%, 50% 100%, 20% 70%);
+  --angle: calc(var(--i) * 360deg / var(--n));
+  animation: levelup-burst 2s ease-out calc(var(--i) * 0.08s) both;
+}
+.levelup[data-look="pumpkin"] .levelup__burst {
+  display: block;
+  inset-block-start: 10%;
+  inset-inline-start: 50%;
+  color: #f97316;
+  font-family: "Creepster", "Griffy", cursive;
+  font-size: clamp(2.5rem, 10vw, 5rem);
+  text-shadow: 0 0 20px #f97316;
+  transform: translateX(-50%);
+  animation: levelup-kapow 0.6s cubic-bezier(0.2, 1.8, 0.4, 1) 0.2s both;
+}
+/* gift (Christmas) — the card springs out of a present, snow falling */
+.levelup[data-look="gift"] {
+  --glow: #dc2626;
+}
+.levelup[data-look="gift"] .levelup__scene {
+  display: block;
+  inset-block-end: 12%;
+  inset-inline-start: 50%;
+  inline-size: 9rem;
+  block-size: 6rem;
+  background: linear-gradient(90deg, transparent 44%, #fde047 44% 56%, transparent 56%), #b91c1c;
+  border-radius: 0.3rem;
+  transform: translateX(-50%);
+  animation: levelup-box 1s ease-in 0.8s both;
+}
+.levelup[data-look="gift"] .levelup__fx {
+  display: block;
+  inset-block-start: -2vh;
+  inset-inline-start: var(--x);
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: 50%;
+  background: #fff;
+  animation: levelup-fall calc(3s + var(--r) * 3s) linear calc(var(--r) * -3s) infinite;
+}
+.levelup[data-look="gift"] .levelup__card {
+  border: 3px solid #15803d;
+  background:
+    linear-gradient(90deg, transparent 47%, #fde04755 47% 53%, transparent 53%),
+    color-mix(in srgb, var(--color-surface-raised) 92%, transparent);
+  animation: levelup-spring 0.8s cubic-bezier(0.2, 1.6, 0.4, 1) 0.6s both;
+}
+.levelup[data-look="gift"] .levelup__burst {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline: 0;
+  color: #fff;
+  font-family: "Mountains of Christmas", serif;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  text-align: center;
+  text-shadow: 0 0 12px #dc2626;
+}
+/* manga — speed lines, a slash, ドン! */
+.levelup[data-look="manga"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, #11111133 0 1.5deg, transparent 1.5deg 6deg), #ffffff;
+}
+.levelup[data-look="manga"] .levelup__burst {
+  display: block;
+  inset-block-start: 6%;
+  inset-inline-start: 6%;
+  color: #111;
+  font-family: "Dela Gothic One", sans-serif;
+  font-size: clamp(3rem, 12vw, 6rem);
+  -webkit-text-stroke: 2px #fff;
+  transform: rotate(-12deg);
+  animation: levelup-kapow 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) 0.2s both;
+}
+.levelup[data-look="manga"] .levelup__title {
+  font-family: "Dela Gothic One", sans-serif;
+  background: #ffffff;
+}
+/* boing (cartoon) — the card bounces in, stars spin round */
+.levelup[data-look="boing"] {
+  --glow: #38bdf8;
+}
+.levelup[data-look="boing"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle, #e0f2fe, #38bdf8);
+}
+.levelup[data-look="boing"] .levelup__fx {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  background: #fde047;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  --angle: calc(var(--i) * 360deg / var(--n));
+  animation: levelup-orbit-star 3s linear calc(var(--i) * -0.3s) infinite;
+}
+.levelup[data-look="boing"] .levelup__card {
+  animation: levelup-boing 1.1s cubic-bezier(0.3, 1.8, 0.4, 1) 0.2s both;
+}
+.levelup[data-look="boing"] .levelup__burst {
+  display: block;
+  inset-block-start: 6%;
+  inset-inline-end: 8%;
+  color: #f43f5e;
+  font-family: "Luckiest Guy", sans-serif;
+  font-size: clamp(2rem, 8vw, 4rem);
+  text-shadow: 3px 3px 0 #111;
+  animation: levelup-boing 1s cubic-bezier(0.3, 1.8, 0.4, 1) both;
+}
+/* hearth (cozy) — warm light, embers floating up slowly */
+.levelup[data-look="hearth"] {
+  --glow: #f59e0b;
+}
+.levelup[data-look="hearth"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, #f59e0b55, #7c2d1222 50%, transparent 75%);
+  animation: levelup-pulse 3s ease-in-out infinite;
+}
+.levelup[data-look="hearth"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: var(--x);
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px #f59e0b;
+  animation: levelup-rise calc(4s + var(--r) * 3s) ease-out calc(var(--r) * -4s) infinite;
+}
+.levelup[data-look="hearth"] .levelup__card {
+  border-radius: 1.5rem;
+}
+/* hud (futuristic) — a scanning line, corner brackets, a grid */
+.levelup[data-look="hud"] {
+  --glow: #22d3ee;
+}
+.levelup[data-look="hud"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    linear-gradient(#22d3ee14 1px, transparent 1px) 0 0 / 2.5rem 2.5rem,
+    linear-gradient(90deg, #22d3ee14 1px, transparent 1px) 0 0 / 2.5rem 2.5rem;
+}
+.levelup[data-look="hud"] .levelup__scene {
+  display: block;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 3px;
+  background: #22d3ee;
+  box-shadow: 0 0 18px #22d3ee;
+  animation: levelup-scan 2.4s ease-in-out infinite;
+}
+.levelup[data-look="hud"] .levelup__card {
+  border: 1px solid #22d3ee88;
+  border-radius: 0;
+  background:
+    linear-gradient(#22d3ee 0 0) top left / 1.2rem 2px no-repeat,
+    linear-gradient(#22d3ee 0 0) top left / 2px 1.2rem no-repeat,
+    linear-gradient(#22d3ee 0 0) bottom right / 1.2rem 2px no-repeat,
+    linear-gradient(#22d3ee 0 0) bottom right / 2px 1.2rem no-repeat,
+    #04121acc;
+  font-family: "Exo 2", sans-serif;
+  clip-path: polygon(1rem 0, 100% 0, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%, 0 1rem);
+}
+/* minimal — nothing but a thin line drawing across, and the facts */
+.levelup[data-look="minimal"] {
+  --glow: var(--color-text);
+}
+.levelup[data-look="minimal"] .levelup__scene {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  block-size: 1px;
+  inline-size: 100%;
+  background: var(--color-text);
+  transform-origin: left;
+  animation: levelup-line 1s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+.levelup[data-look="minimal"] .levelup__card {
+  border: 0;
+  border-radius: 0;
+  background: var(--color-surface);
+  box-shadow: none;
+  animation: levelup-fade 0.6s ease-out 0.8s both;
+}
+.levelup[data-look="minimal"] .levelup__kicker {
+  letter-spacing: 0.5em;
+}
+/* abduction (xeno) — a saucer's beam lifts the card up */
+.levelup[data-look="abduction"] {
+  --glow: #a3e635;
+}
+.levelup[data-look="abduction"] .levelup__scene {
+  display: block;
+  inset-block-start: 4%;
+  inset-inline-start: 50%;
+  inline-size: 12rem;
+  block-size: 3rem;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 35%, #d9f99d, #4d7c0f 55%, #1a2e05);
+  box-shadow: 0 0 2rem #a3e63588;
+  transform: translateX(-50%);
+}
+.levelup[data-look="abduction"] .levelup__rays {
+  display: block;
+  inset-block: 8% 0;
+  inset-inline-start: 50%;
+  inline-size: 60vmin;
+  background: linear-gradient(#d9f99d88, #a3e63522 70%, transparent);
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  transform: translateX(-50%);
+  animation: levelup-beam 1.4s ease-out both;
+}
+.levelup[data-look="abduction"] .levelup__card {
+  animation: levelup-lift 1.6s cubic-bezier(0.3, 0.8, 0.3, 1) 0.5s both;
+}
+.levelup[data-look="abduction"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: calc(40% + var(--r) * 20%);
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: #d9f99d;
+  animation: levelup-rise calc(2s + var(--r) * 2s) linear calc(var(--r) * -2s) infinite;
+}
+/* hero — a shield of rings slams down, BAM! */
+.levelup[data-look="hero"] .levelup__rays {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 90vmin;
+  block-size: 90vmin;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #1d4ed8 0 14%,
+    #f8fafc 14% 26%,
+    #dc2626 26% 40%,
+    #f8fafc 40% 54%,
+    #dc2626 54% 68%,
+    transparent 68%
+  );
+  transform: translate(-50%, -50%);
+  animation: levelup-slam-centered 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+.levelup[data-look="hero"] .levelup__burst {
+  display: block;
+  inset-block-end: 10%;
+  inset-inline-start: 8%;
+  padding: 1rem 1.4rem;
+  background: #fde047;
+  color: #1d4ed8;
+  font-family: "Bangers", sans-serif;
+  font-size: clamp(2rem, 8vw, 4rem);
+  text-shadow: 3px 3px 0 #111;
+  clip-path: polygon(
+    50% 0,
+    61% 22%,
+    92% 8%,
+    78% 38%,
+    100% 52%,
+    76% 62%,
+    86% 96%,
+    54% 76%,
+    26% 100%,
+    30% 68%,
+    0 64%,
+    22% 44%,
+    4% 12%,
+    36% 24%
+  );
+  animation: levelup-kapow 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) 0.4s both;
+}
+/* synthwave (neowave) — a sunset over a moving grid */
+.levelup[data-look="synthwave"] {
+  --glow: #ff2fd1;
+}
+.levelup[data-look="synthwave"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 55%, #fde047 0 9vmin, #fb7185 9vmin 18vmin, transparent 18vmin),
+    linear-gradient(#1e0b3a, #4c1d95 55%, #12051f 55%);
+  mask: linear-gradient(#000 0 0);
+}
+.levelup[data-look="synthwave"] .levelup__scene {
+  display: block;
+  inset: 55% -50% 0;
+  background:
+    linear-gradient(#ff2fd1 2px, transparent 2px) 0 0 / 100% 3rem,
+    linear-gradient(90deg, #ff2fd1 2px, transparent 2px) 0 0 / 4rem 100%;
+  transform: perspective(14rem) rotateX(60deg);
+  transform-origin: top;
+  animation: levelup-grid 1s linear infinite;
+}
+.levelup[data-look="synthwave"] .levelup__card {
+  border: 2px solid #ff2fd1;
+  background: #12051fdd;
+  box-shadow: 0 0 2rem #ff2fd188;
+  font-family: "Monoton", "Righteous", sans-serif;
+}
+.levelup[data-look="synthwave"] .levelup__title {
+  font-family: "Monoton", "Righteous", sans-serif;
+  color: #fde047;
+  text-shadow: 0 0 12px #ff2fd1;
+}
+/* disco — a mirror ball's spots sweep the room */
+.levelup[data-look="disco"] .levelup__rays {
+  display: block;
+  inset: -50vmax;
+  background: conic-gradient(from 0deg, #f43f5e33, #fde04733, #22d3ee33, #a855f733, #f43f5e33);
+  animation: levelup-spin 6s linear infinite;
+}
+.levelup[data-look="disco"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  border-radius: 50%;
+  background: hsl(calc(var(--i) * 37) 100% 70%);
+  box-shadow: 0 0 14px hsl(calc(var(--i) * 37) 100% 70%);
+  animation: levelup-spot 2s ease-in-out calc(var(--r) * -2s) infinite alternate;
+}
+/* glitch (cyberpunk) — the screen tears, the title glitches */
+.levelup[data-look="glitch"] {
+  --glow: #fcee0a;
+}
+.levelup[data-look="glitch"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, #fcee0a10 0 2px, transparent 2px 6px), #0a0a0f;
+  animation: levelup-tear 0.4s steps(2, end) 6 both;
+}
+.levelup[data-look="glitch"] .levelup__card {
+  --color-text: #fcee0a;
+  --color-text-muted: #ff2a6d;
+  border-color: #fcee0a;
+  background: #0a0a0f;
+  color: #fcee0a;
+}
+.levelup[data-look="glitch"] .levelup__title {
+  text-shadow:
+    -3px 0 #ff2a6d,
+    3px 0 #00f0ff;
+}
+.levelup[data-look="glitch"] .levelup__burst {
+  display: block;
+  inset-block-end: 8%;
+  inset-inline-end: 6%;
+  color: #ff2a6d;
+  font-family: "Chakra Petch", monospace;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  text-shadow: 3px 0 #00f0ff;
+  animation: levelup-tear 0.3s steps(2, end) infinite;
+}
+/* noir (Sin City) — rain in black and white, the number in red */
+.levelup[data-look="noir"] {
+  --glow: #e10600;
+}
+.levelup[data-look="noir"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: #000;
+}
+.levelup[data-look="noir"] .levelup__fx {
+  display: block;
+  inset-block-start: -10%;
+  inset-inline-start: var(--x);
+  inline-size: 1px;
+  block-size: calc(2rem + var(--r) * 4rem);
+  background: linear-gradient(transparent, #ffffffaa);
+  transform: rotate(12deg);
+  animation: levelup-fall calc(0.5s + var(--r) * 0.5s) linear calc(var(--r) * -1s) infinite;
+}
+.levelup[data-look="noir"] .levelup__card {
+  --color-text: #f5f5f5;
+  --color-text-muted: #b5b5b5;
+  border: 2px solid #f5f5f5;
+  border-radius: 0;
+  background: #000;
+  box-shadow: 8px 8px 0 #e10600;
+  font-family: "Anton", sans-serif;
+}
+.levelup[data-look="noir"] .levelup__title {
+  color: #e10600;
+  text-transform: uppercase;
+}
+/* spotlight (Plex) — an amber spotlight finds you */
+.levelup[data-look="spotlight"] {
+  --glow: #e5a00d;
+}
+.levelup[data-look="spotlight"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(ellipse 40% 60% at 30% 50%, #e5a00d33, transparent 70%), #111214;
+  animation: levelup-sweep 1.4s ease-out both;
+}
+.levelup[data-look="spotlight"] .levelup__card {
+  border-color: #e5a00d;
+  background: #1c1d1fee;
+}
+
+/* keyframes of the universes */
+@keyframes levelup-crawl {
+  from {
+    opacity: 0;
+    transform: perspective(30rem) rotateX(30deg) translateY(60vh) scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: perspective(30rem) rotateX(18deg) translateY(0) scale(0.95);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes levelup-twinkle {
+  to {
+    opacity: 0.15;
+  }
+}
+@keyframes levelup-unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(-1rem -1rem -1rem -1rem);
+  }
+}
+@keyframes levelup-type {
+  to {
+    inline-size: 14ch;
+  }
+}
+@keyframes levelup-rise {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-80vh) scale(0.3);
+    opacity: 0;
+  }
+}
+@keyframes levelup-fall {
+  to {
+    transform: translateY(110vh) rotate(12deg);
+  }
+}
+@keyframes levelup-fall-bg {
+  to {
+    background-position: 0 1.4rem;
+    mask-position: 0 1.4rem;
+  }
+}
+@keyframes levelup-pan {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes levelup-streak {
+  to {
+    transform: translateX(140vw);
+  }
+}
+@keyframes levelup-haze {
+  from {
+    opacity: 0;
+    filter: blur(14px) sepia(1);
+  }
+}
+@keyframes levelup-drip {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes levelup-flicker-in {
+  0%,
+  20%,
+  40% {
+    opacity: 0;
+  }
+  10%,
+  30%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes levelup-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes levelup-box {
+  60% {
+    transform: translateX(-50%) scaleY(0.9);
+  }
+  to {
+    transform: translateX(-50%) translateY(40vh);
+    opacity: 0;
+  }
+}
+@keyframes levelup-spring {
+  from {
+    opacity: 0;
+    transform: translateY(30vh) scale(0.2);
+  }
+}
+@keyframes levelup-orbit-star {
+  from {
+    transform: rotate(var(--angle)) translateX(35vmin) rotate(0);
+  }
+  to {
+    transform: rotate(calc(var(--angle) + 1turn)) translateX(35vmin) rotate(-1turn);
+  }
+}
+@keyframes levelup-boing {
+  0% {
+    opacity: 0;
+    transform: translateY(-60vh) scale(1, 1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(0) scale(1.25, 0.7);
+  }
+  55% {
+    transform: translateY(-6vh) scale(0.9, 1.15);
+  }
+  70% {
+    transform: translateY(0) scale(1.08, 0.92);
+  }
+  85% {
+    transform: scale(0.98, 1.03);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes levelup-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(100vh);
+  }
+}
+@keyframes levelup-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes levelup-beam {
+  from {
+    opacity: 0;
+    clip-path: polygon(49% 0, 51% 0, 51% 0, 49% 0);
+  }
+}
+@keyframes levelup-lift {
+  from {
+    opacity: 0;
+    transform: translateY(40vh) scale(0.6) rotate(-6deg);
+  }
+}
+@keyframes levelup-slam-centered {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
+  }
+}
+@keyframes levelup-grid {
+  to {
+    background-position:
+      0 3rem,
+      0 0;
+  }
+}
+@keyframes levelup-spot {
+  to {
+    transform: translate(10vw, -8vh) scale(1.6);
+  }
+}
+@keyframes levelup-tear {
+  50% {
+    clip-path: inset(20% 0 40% 0);
+    transform: translateX(-8px);
+  }
+}
+@keyframes levelup-sweep {
+  from {
+    background-position: -60vw 0;
+    opacity: 0.3;
+  }
 }

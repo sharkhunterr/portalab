@@ -763,6 +763,38 @@
             "glitch",
             "portal"
           ]
+        },
+        "levelUp": {
+          "type": "string",
+          "enum": [
+            "classic",
+            "arcade",
+            "cosmic",
+            "comic",
+            "elements",
+            "cinema",
+            "crawl",
+            "spell",
+            "decode",
+            "sandstorm",
+            "bloodmoon",
+            "pumpkin",
+            "gift",
+            "manga",
+            "boing",
+            "hearth",
+            "hud",
+            "minimal",
+            "abduction",
+            "hero",
+            "synthwave",
+            "disco",
+            "glitch",
+            "noir",
+            "spotlight",
+            "upsidedown",
+            "onering"
+          ]
         }
       },
       "additionalProperties": false

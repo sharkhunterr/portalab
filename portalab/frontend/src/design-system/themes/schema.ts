@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AMBIENTS, NOTIFICATION_ANIMATIONS, NOTIFICATION_STYLES } from "../a11y/preferences";
+import { AMBIENTS, LEVEL_UPS, NOTIFICATION_ANIMATIONS, NOTIFICATION_STYLES } from "../a11y/preferences";
 import { isColor } from "./contrast";
 
 /**
@@ -257,6 +257,7 @@ export const themeDefinitionSchema = z.strictObject({
       normalMs: z.number().int().min(0).max(2000).optional(),
       profile: z.enum(MOTION_PROFILES).optional(),
       celebration: z.enum(CELEBRATIONS).optional(),
+      levelUp: z.enum(LEVEL_UPS).optional(), // 027: how this theme celebrates a new level
     })
     .optional(),
   layout: layoutSchema.optional(),

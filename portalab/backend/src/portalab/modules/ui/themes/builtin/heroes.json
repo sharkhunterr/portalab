@@ -86,7 +86,8 @@
     "profile": "lively",
     "celebration": "lightning",
     "fastMs": 130,
-    "normalMs": 250
+    "normalMs": 250,
+    "levelUp": "hero"
   },
   "layout": {
     "nav": {

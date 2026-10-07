@@ -86,7 +86,8 @@
     "profile": "subtle",
     "celebration": "hearts",
     "fastMs": 180,
-    "normalMs": 340
+    "normalMs": 340,
+    "levelUp": "hearth"
   },
   "layout": {
     "nav": {

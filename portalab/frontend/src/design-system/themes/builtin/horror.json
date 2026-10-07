@@ -86,7 +86,8 @@
     "profile": "subtle",
     "celebration": "burn",
     "fastMs": 180,
-    "normalMs": 360
+    "normalMs": 360,
+    "levelUp": "bloodmoon"
   },
   "layout": {
     "nav": {

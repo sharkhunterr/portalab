@@ -86,7 +86,8 @@
     "profile": "subtle",
     "celebration": "assemble",
     "fastMs": 90,
-    "normalMs": 180
+    "normalMs": 180,
+    "levelUp": "decode"
   },
   "layout": {
     "nav": {

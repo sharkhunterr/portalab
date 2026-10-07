@@ -86,7 +86,8 @@
     "profile": "lively",
     "celebration": "glitch",
     "fastMs": 110,
-    "normalMs": 220
+    "normalMs": 220,
+    "levelUp": "glitch"
   },
   "layout": {
     "nav": {

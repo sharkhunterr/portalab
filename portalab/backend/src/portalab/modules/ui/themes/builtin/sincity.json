@@ -85,7 +85,8 @@
     "profile": "subtle",
     "celebration": "shatter",
     "fastMs": 120,
-    "normalMs": 260
+    "normalMs": 260,
+    "levelUp": "noir"
   },
   "layout": {
     "nav": {

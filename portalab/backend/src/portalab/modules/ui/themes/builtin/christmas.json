@@ -86,7 +86,8 @@
     "profile": "playful",
     "celebration": "snow",
     "fastMs": 160,
-    "normalMs": 320
+    "normalMs": 320,
+    "levelUp": "gift"
   },
   "layout": {
     "nav": {

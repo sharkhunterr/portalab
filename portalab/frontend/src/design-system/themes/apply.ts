@@ -3,6 +3,7 @@ import { reducedMotionActive, systemPrefersReducedMotion } from "../a11y/motion"
 import type {
   Ambient,
   CelebrationKey,
+  LevelUpLook,
   NotificationAnimation,
   NotificationStyle,
   UiPolicy,
@@ -129,6 +130,8 @@ export interface ResolvedLooks {
   notificationAnimation: NotificationAnimation;
   ambient: Ambient;
   celebration: CelebrationKey;
+  /** 027: the level-up moment's look (the member's, or the theme's own). */
+  levelUp: LevelUpLook;
 }
 
 export function resolveLooks(effective: Effective, preferences: UiPreferences): ResolvedLooks {
@@ -151,6 +154,7 @@ export function resolveLooks(effective: Effective, preferences: UiPreferences): 
       : preferences.celebration === "theme"
         ? presentation.celebration
         : preferences.celebration,
+    levelUp: preferences.levelUp === "theme" ? (theme.motion?.levelUp ?? "classic") : preferences.levelUp,
   };
 }
 

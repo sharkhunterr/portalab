@@ -173,8 +173,36 @@ export const LEVEL_BADGES = [
   "inferno",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
-/** 027: how a level-up is shown — ``classic`` is free, the others are sold in the shop. */
-export const LEVEL_UPS = ["classic", "arcade", "cosmic", "comic", "elements", "cinema"] as const;
+/** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
+export const LEVEL_UPS = [
+  "classic",
+  "arcade",
+  "cosmic",
+  "comic",
+  "elements",
+  "cinema",
+  "crawl",
+  "spell",
+  "decode",
+  "sandstorm",
+  "bloodmoon",
+  "pumpkin",
+  "gift",
+  "manga",
+  "boing",
+  "hearth",
+  "hud",
+  "minimal",
+  "abduction",
+  "hero",
+  "synthwave",
+  "disco",
+  "glitch",
+  "noir",
+  "spotlight",
+  "upsidedown",
+  "onering",
+] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
   "none",
@@ -220,8 +248,8 @@ export interface UiPreferences {
   celebration: CelebrationKey | "theme";
   /** 027: accent colours over the theme (some are sold in the shop). */
   palette: PaletteKey;
-  /** 027: how a level-up is shown (some are sold in the shop). */
-  levelUp: LevelUpLook;
+  /** 027: how a level-up is shown — ``theme`` (the theme's own) or one bought in the shop. */
+  levelUp: LevelUpLook | "theme";
   campaignThemes: "allow" | "ignore";
   /** Light/dark choice for theme families (027 R8): dark by default, or follow the device. */
   colorMode: "dark" | "light" | "system";
@@ -249,7 +277,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   ambient: "theme",
   celebration: "theme",
   palette: "theme",
-  levelUp: "classic",
+  levelUp: "theme",
   campaignThemes: "allow",
   colorMode: "dark",
 };
@@ -310,7 +338,7 @@ export function sanitize(input: object): UiPreferences {
   pick("ambient", ["theme", ...AMBIENTS]);
   pick("celebration", ["theme", ...CELEBRATION_KEYS]);
   pick("palette", PALETTE_KEYS);
-  pick("levelUp", LEVEL_UPS);
+  pick("levelUp", ["theme", ...LEVEL_UPS]);
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;

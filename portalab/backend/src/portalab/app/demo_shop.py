@@ -544,6 +544,30 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
 ):  # fmt: skip
     _p(f"levelup_{value}", "level_up", price, rarity, f"{en} level-up", f"Passage de niveau {fr.lower()}",
        about_en, about_fr, {"animation": value}, collection="levels", icon="trophy", level=level)  # fmt: skip
+# 027: each universe's own level-up — its theme's default, sold to wear with any theme (and in its pack)
+for value, en, fr, about_en, about_fr in (
+    ('crawl', 'Opening crawl', 'Générique spatial', "Your new level rises through the stars like a film's opening crawl.", 'Votre nouveau niveau défile dans les étoiles comme un générique de film.'),
+    ('spell', 'Spell circle', 'Cercle magique', 'A turning magic circle and a parchment that unrolls.', 'Un cercle magique qui tourne et un parchemin qui se déroule.'),
+    ('decode', 'Decode', 'Décodage', 'Green code falls, the terminal types ACCESS GRANTED.', 'Le code vert tombe, le terminal tape ACCESS GRANTED.'),
+    ('sandstorm', 'Sandstorm', 'Tempête de sable', 'Sand blows across; your level emerges from the haze.', 'Le sable souffle ; votre niveau sort de la brume.'),
+    ('bloodmoon', 'Blood moon', 'Lune de sang', 'A red moon, dripping blood, a flickering screen.', 'Une lune rouge, du sang qui coule, un écran qui vacille.'),
+    ('pumpkin', 'Pumpkin night', 'Nuit des citrouilles', 'Bats fly off in an orange glow — BOO!', "Des chauves-souris s'envolent dans une lueur orange — BOU !"),
+    ('gift', 'Christmas present', 'Cadeau de Noël', 'Your level springs out of a present under the snow.', "Votre niveau jaillit d'un cadeau sous la neige."),
+    ('manga', 'Manga panel', 'Planche de manga', 'Speed lines and a big ドン! on a manga page.', 'Lignes de vitesse et un grand ドン ! sur une planche de manga.'),
+    ('boing', 'Boing!', 'Boing !', 'Your level bounces in, stars spinning round.', 'Votre niveau arrive en rebondissant, des étoiles tout autour.'),
+    ('hearth', 'By the hearth', 'Coin du feu', 'Warm light and embers floating up slowly.', 'Une lumière chaude et des braises qui montent doucement.'),
+    ('hud', 'Holographic HUD', 'Interface holographique', 'A scanning line, corner brackets and a grid.', "Une ligne de balayage, des coins d'interface et une grille."),
+    ('minimal', 'Minimal', 'Minimal', 'A thin line, and the facts.', "Un trait fin, et l'essentiel."),
+    ('abduction', 'Abduction', 'Enlèvement', "A saucer's beam lifts your new level up.", "Le rayon d'une soucoupe soulève votre nouveau niveau."),
+    ('hero', 'Hero shield', 'Bouclier de héros', 'A shield of rings slams down — BAM!', "Un bouclier d'anneaux s'abat — BAM !"),
+    ('synthwave', 'Synthwave sunset', 'Coucher synthwave', 'A sunset over a moving neon grid.', 'Un coucher de soleil sur une grille néon en mouvement.'),
+    ('disco', 'Mirror ball', 'Boule à facettes', "The mirror ball's spots sweep the room.", 'Les éclats de la boule à facettes balaient la pièce.'),
+    ('glitch', 'Glitch', 'Glitch', 'The screen tears and the title glitches.', "L'écran se déchire et le titre bugue."),
+    ('noir', 'Film noir', 'Film noir', 'Rain in black and white, your number in red.', 'La pluie en noir et blanc, votre niveau en rouge.'),
+    ('spotlight', 'Spotlight', 'Projecteur', 'An amber spotlight finds you.', 'Un projecteur ambré vous trouve.'),
+):  # fmt: skip
+    _p(f"levelup_{value}", "level_up", 450, "rare", f"{en} level-up", f"Passage de niveau {fr.lower()}",
+       about_en, about_fr, {"animation": value}, collection="levels", icon="trophy")  # fmt: skip
 _p("levelup_cinema", "level_up", None, "legendary", "Premiere level-up", "Passage de niveau avant-première",
    "A film countdown 3-2-1, then your new level on the big screen — for the ten-thousand-XP club.",
    "Un compte à rebours de film 3-2-1, puis votre nouveau niveau sur grand écran — pour le club des dix mille XP.",
@@ -1010,16 +1034,16 @@ UNIVERSES |= {  # 027: the two new universes
 }  # fmt: skip
 # 027: each universe's level badge, notification look and level-up moment
 UNIVERSE_EXTRAS = {
-    "wizard": ("level_crest", "notif_portal"), "galaxy": ("level_blackhole", "notif_saga", "notif_filmwipe",
-    "levelup_cosmic"), "matrix": ("level_vhs", "notif_vhs"), "desert": ("level_gem", "notif_earth"),
-    "horror": ("level_melt", "notif_melt"), "halloween": ("level_inferno", "notif_fire"),
-    "christmas": ("level_gem", "notif_air"), "comic": ("level_kapow", "notif_kapow", "levelup_comic"),
-    "manga": ("level_kapow", "notif_manga", "levelup_comic"), "cartoon": ("level_pixel", "notif_jelly"),
-    "cozy": ("level_crest", "ambient_lanterns"), "futuristic": ("level_hologram", "notif_iris"),
-    "minimal": ("level_neon", "notif_focus"), "alien": ("level_portal", "notif_portal", "levelup_cosmic"),
-    "heroes": ("level_kapow", "notif_kapow", "levelup_comic"), "neowave": ("level_vhs", "ambient_vhs"),
-    "disco": ("level_hologram", "notif_jelly"), "cyberpunk": ("level_neon", "notif_vhs", "levelup_arcade"),
-    "sincity": ("level_melt", "notif_filmwipe", "notif_noir"), "plex": ("level_neon", "notif_iris"),
+    "wizard": ("level_crest", "notif_portal", "levelup_spell"), "galaxy": ("level_blackhole", "notif_saga", "notif_filmwipe",
+    "levelup_cosmic", "levelup_crawl"), "matrix": ("level_vhs", "notif_vhs", "levelup_decode"), "desert": ("level_gem", "notif_earth", "levelup_sandstorm"),
+    "horror": ("level_melt", "notif_melt", "levelup_bloodmoon"), "halloween": ("level_inferno", "notif_fire", "levelup_pumpkin"),
+    "christmas": ("level_gem", "notif_air", "levelup_gift"), "comic": ("level_kapow", "notif_kapow", "levelup_comic"),
+    "manga": ("level_kapow", "notif_manga", "levelup_comic", "levelup_manga"), "cartoon": ("level_pixel", "notif_jelly", "levelup_boing"),
+    "cozy": ("level_crest", "ambient_lanterns", "levelup_hearth"), "futuristic": ("level_hologram", "notif_iris", "levelup_hud"),
+    "minimal": ("level_neon", "notif_focus", "levelup_minimal"), "alien": ("level_portal", "notif_portal", "levelup_cosmic", "levelup_abduction"),
+    "heroes": ("level_kapow", "notif_kapow", "levelup_comic", "levelup_hero"), "neowave": ("level_vhs", "ambient_vhs", "levelup_synthwave"),
+    "disco": ("level_hologram", "notif_jelly", "levelup_disco"), "cyberpunk": ("level_neon", "notif_vhs", "levelup_arcade", "levelup_glitch"),
+    "sincity": ("level_melt", "notif_filmwipe", "notif_noir", "levelup_noir"), "plex": ("level_neon", "notif_iris", "levelup_spotlight"),
 }  # fmt: skip
 for theme, items in UNIVERSES.items():
     en, fr, _, _ = THEME_TEXT[theme]

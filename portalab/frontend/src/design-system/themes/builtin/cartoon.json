@@ -86,7 +86,8 @@
     "profile": "playful",
     "celebration": "bubbles",
     "fastMs": 150,
-    "normalMs": 300
+    "normalMs": 300,
+    "levelUp": "boing"
   },
   "layout": {
     "nav": {

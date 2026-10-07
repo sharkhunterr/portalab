@@ -87,9 +87,9 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ),
     (
         "ui.levelUp",
-        _one_of(LEVEL_UPS),
-        "classic",
-        "How a level-up is shown (027); some are sold in the shop.",
+        _one_of(("theme", *LEVEL_UPS)),
+        "theme",
+        "How a level-up is shown (027; theme: the theme's own); some are sold in the shop.",
     ),
     (
         "ui.celebration",

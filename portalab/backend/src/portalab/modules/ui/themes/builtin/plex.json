@@ -84,7 +84,8 @@
     "profile": "subtle",
     "celebration": "glow",
     "fastMs": 120,
-    "normalMs": 200
+    "normalMs": 200,
+    "levelUp": "spotlight"
   },
   "layout": {
     "nav": {

@@ -86,7 +86,8 @@
     "profile": "lively",
     "celebration": "stars",
     "fastMs": 160,
-    "normalMs": 320
+    "normalMs": 320,
+    "levelUp": "spell"
   },
   "layout": {
     "nav": {

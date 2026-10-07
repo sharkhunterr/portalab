@@ -312,11 +312,19 @@ class Radii(_Closed):
     md: Annotated[float, Field(ge=0, le=3)]
 
 
+LEVEL_UPS = Literal[
+    "classic", "arcade", "cosmic", "comic", "elements", "cinema", "crawl", "spell", "decode", "sandstorm",
+    "bloodmoon", "pumpkin", "gift", "manga", "boing", "hearth", "hud", "minimal", "abduction", "hero",
+    "synthwave", "disco", "glitch", "noir", "spotlight", "upsidedown", "onering",
+]  # fmt: skip
+
+
 class Motion(_Closed):
     fastMs: Annotated[int, Field(ge=0, le=1000)] | None = None
     normalMs: Annotated[int, Field(ge=0, le=2000)] | None = None
     profile: Literal["none", "subtle", "lively", "playful"] | None = None
     celebration: CELEBRATIONS | None = None
+    levelUp: LEVEL_UPS | None = None  # 027: how this theme celebrates a new level
 
 
 class Nav(_Closed):
