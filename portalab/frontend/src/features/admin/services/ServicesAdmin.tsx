@@ -62,6 +62,8 @@ interface ServiceItem {
   stale: boolean;
   secrets_set?: string[];
   public_url?: string | null;
+  config?: Record<string, unknown>;
+  sync_interval_seconds?: number | null;
   sync: {
     status: string;
     last_success_at: string | null;
@@ -392,21 +394,56 @@ function SyncHistory({ service }: { service: ServiceItem }) {
 type Action = "enable" | "disable" | "disconnect" | "sync";
 
 /** The address members open the service at (027: the quick-access widget). */
-function PublicLink({ service }: { service: ServiceItem }) {
+/**
+ * 027: edit a configured service — its name, address and settings, its secrets (write-only: left empty,
+ * a secret is kept), where members open it and how often it syncs. « Test » checks the edited values
+ * before saving; the background worker picks the change up within a minute.
+ */
+function EditService({
+  service,
+  connector,
+}: {
+  service: ServiceItem;
+  connector?: ConnectorItem | undefined;
+}) {
   const t = useT();
   const queryClient = useQueryClient();
+  const fields = Object.entries(connector?.config_schema.properties ?? {});
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(service.public_url ?? "");
+  const [name, setName] = useState(service.name);
+  const [config, setConfig] = useState<Record<string, unknown>>(service.config ?? {});
+  const [secrets, setSecrets] = useState<Record<string, string>>({});
+  const [publicUrl, setPublicUrl] = useState(service.public_url ?? "");
+  const [every, setEvery] = useState(
+    service.sync_interval_seconds ? String(Math.round(service.sync_interval_seconds / 60)) : "",
+  );
+  const filled = Object.fromEntries(Object.entries(secrets).filter(([, v]) => v.trim()));
+  const test = useMutation({
+    mutationFn: async () =>
+      unwrap<TestOutcome>(
+        api.POST("/api/v1/services/{service_id}/test", {
+          params: { path: { service_id: service.id } },
+          body: { config, secrets: filled },
+        }),
+      ),
+  });
   const save = useMutation({
     mutationFn: async () =>
       unwrap<ServiceItem>(
         api.PATCH("/api/v1/services/{service_id}", {
           params: { path: { service_id: service.id } },
-          body: { public_url: value.trim() },
+          body: {
+            name: name.trim(),
+            config,
+            ...(Object.keys(filled).length ? { secrets: filled } : {}),
+            public_url: publicUrl.trim(),
+            sync_interval_seconds: every.trim() ? Math.max(0, Number(every)) * 60 : 0,
+          },
         }),
       ),
     onSuccess: () => {
       setOpen(false);
+      setSecrets({});
       void queryClient.invalidateQueries({ queryKey: SERVICES_KEY });
     },
   });
@@ -415,14 +452,25 @@ function PublicLink({ service }: { service: ServiceItem }) {
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (next) setValue(service.public_url ?? "");
+        if (next) {
+          setName(service.name);
+          setConfig(service.config ?? {});
+          setSecrets({});
+          setPublicUrl(service.public_url ?? "");
+          setEvery(
+            service.sync_interval_seconds ? String(Math.round(service.sync_interval_seconds / 60)) : "",
+          );
+          test.reset();
+          save.reset();
+        }
       }}
-      title={t("admin:services.link.title", { name: service.name })}
+      size="lg"
+      title={t("admin:services.edit.title", { name: service.name })}
       closeLabel={t("admin:services.close")}
       trigger={
-        <Button type="button" variant="ghost" title={service.public_url ?? t("admin:services.link.none")}>
-          <Icon name="link" size={16} />
-          {t("admin:services.link")}
+        <Button type="button" variant="ghost">
+          <Icon name="settings" size={16} />
+          {t("admin:services.edit")}
         </Button>
       }
     >
@@ -433,24 +481,91 @@ function PublicLink({ service }: { service: ServiceItem }) {
           save.mutate();
         }}
       >
-        <TextField
-          label={t("admin:services.link.field")}
-          hint={t("admin:services.link.hint")}
-          inputMode="url"
-          type="url"
-          placeholder="https://plex.example.org"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-        />
+        <FormGrid>
+          <TextField
+            label={t("admin:services.name")}
+            required
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          {fields.map(([field, schema]) => {
+            const label = maybe(t, `admin:services.field.${field}`, schema.title ?? field);
+            if (schema.type === "boolean") {
+              return (
+                <CheckboxField
+                  key={field}
+                  label={label}
+                  checked={Boolean(config[field] ?? true)}
+                  onChange={(event) => setConfig({ ...config, [field]: event.target.checked })}
+                />
+              );
+            }
+            return (
+              <TextField
+                key={field}
+                label={label}
+                hint={maybe(t, `admin:services.field.${field}.hint`, schema.description ?? "") || undefined}
+                required={connector?.config_schema.required?.includes(field) ?? false}
+                inputMode={field === "base_url" ? "url" : undefined}
+                value={String(config[field] ?? "")}
+                onChange={(event) => setConfig({ ...config, [field]: event.target.value })}
+              />
+            );
+          })}
+          {(connector?.secret_fields ?? []).map((field) => (
+            <TextField
+              key={field}
+              label={maybe(t, `admin:services.access.${ACCESS_LABELS[field] ?? field}`, field)}
+              hint={
+                service.secrets_set?.includes(field)
+                  ? t("admin:services.edit.secretKept")
+                  : t("admin:services.writeOnly.hint")
+              }
+              type="password"
+              autoComplete="off"
+              value={secrets[field] ?? ""}
+              onChange={(event) => setSecrets({ ...secrets, [field]: event.target.value })}
+            />
+          ))}
+          <TextField
+            label={t("admin:services.link.field")}
+            hint={t("admin:services.link.hint")}
+            inputMode="url"
+            type="url"
+            placeholder="https://plex.example.org"
+            value={publicUrl}
+            onChange={(event) => setPublicUrl(event.target.value)}
+          />
+          <TextField
+            label={t("admin:services.edit.interval")}
+            hint={t("admin:services.edit.intervalHint")}
+            type="number"
+            min={0}
+            max={10080}
+            value={every}
+            onChange={(event) => setEvery(event.target.value)}
+          />
+        </FormGrid>
+        {test.data ? (
+          <p role="status" className={test.data.ok ? "services-admin__ok" : "services-admin__ko"}>
+            {test.data.ok
+              ? t("admin:services.testOk")
+              : t("admin:services.testFailed", { detail: test.data.detail })}
+          </p>
+        ) : null}
         {save.isError ? (
           <p role="alert" className="services-admin__ko">
             {save.error instanceof ApiError ? save.error.message : t("admin:services.refused")}
           </p>
         ) : null}
         <FormActions>
-          <Button type="submit" disabled={save.isPending}>
+          <Button type="button" variant="secondary" onClick={() => test.mutate()} disabled={test.isPending}>
+            <Icon name={test.isPending ? "spinner" : "plug"} size={16} />
+            {t("admin:services.test")}
+          </Button>
+          <Button type="submit" disabled={save.isPending || !name.trim()}>
             <Icon name="check" size={16} />
-            {t("admin:services.save")}
+            {t("admin:services.edit.save")}
           </Button>
         </FormActions>
       </form>
@@ -518,7 +633,7 @@ function ServiceActions({
           </Button>
         </>
       ) : null}
-      <PublicLink service={service} />
+      <EditService service={service} connector={connector} />
       <Dialog
         title={t("admin:services.historyOf", { name: service.name })}
         closeLabel={t("admin:services.close")}
