@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { type ReactNode, useId } from "react";
+import { useId } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
 import { Icon } from "../../design-system/components/Icon";
@@ -100,115 +100,37 @@ export function HealthBadge({ state }: { state: HealthState }) {
   );
 }
 
-interface ListItem {
-  id?: string;
-  key?: string;
-  title?: string;
-  label?: string;
+interface Transition {
+  from: string | null;
+  to: string;
+  occurred_at: string;
 }
 
-function SectionBody({ name, data }: { name: string; data: unknown }): ReactNode {
-  const s = servicesHealthStrings;
-  const value = data as Record<string, unknown> & unknown[];
-  switch (name) {
-    case "state":
-      return (
-        <p>
-          <HealthBadge state={value.state as HealthState} /> {s.since(String(value.since))}
-        </p>
-      );
-    case "availability":
-      return (
-        <p>
-          {s.availability((value.availability as number | null) ?? null)}
-          {typeof value.downtime_seconds === "number" ? ` · ${s.downtime(value.downtime_seconds)}` : ""}
-          {typeof value.gap_hours === "number" && value.gap_hours > 0 ? ` · ${s.gaps(value.gap_hours)}` : ""}
-        </p>
-      );
-    case "maintenance":
-      return (
-        <ul>
-          {(value as unknown as Array<{ id: string; title: string; starts_at: string; ends_at: string }>).map(
-            (w) => (
-              <li key={w.id}>{s.window(w.title, w.starts_at, w.ends_at)}</li>
-            ),
-          )}
-        </ul>
-      );
-    case "sync":
-      return <p>{s.syncStatus(String(value.status), (value.last_success_at as string | null) ?? null)}</p>;
-    case "history":
-      return (
-        <ul>
-          {(value.transitions as Array<{ from: string | null; to: string; occurred_at: string }>).map((t) => (
-            <li key={`${t.occurred_at}-${t.to}`}>{s.transition(t.from, t.to, t.occurred_at)}</li>
-          ))}
-        </ul>
-      );
-    case "errors":
-      return (
-        <ul>
-          {(value as unknown as Array<{ code: string; count: number; message: string }>).map((e) => (
-            <li key={e.code}>{s.error(e.code, e.count, e.message)}</li>
-          ))}
-        </ul>
-      );
-    case "incidents":
-      // incidents live in Support (016): link to their page
-      return (
-        <ul>
-          {(value as unknown as Array<{ id: string; title: string; status: string }>).map((i) => (
-            <li key={i.id}>
-              <Link to={`/incidents/${i.id}`}>{i.title}</Link> ({i.status})
-            </li>
-          ))}
-        </ul>
-      );
-    case "infrastructure": {
-      const metrics = value.metrics as Record<string, { available: boolean; value?: number; unit?: string }>;
-      return (
-        <dl>
-          {Object.entries(metrics).map(([metric, item]) => (
-            <div key={metric}>
-              <dt>{metric}</dt>
-              <dd>{item.available ? `${item.value} ${item.unit ?? ""}` : s.notAvailable}</dd>
-            </div>
-          ))}
-        </dl>
-      );
-    }
-    default:
-      return (
-        <ul>
-          {((Array.isArray(data) ? data : []) as ListItem[]).map((item) => (
-            <li key={item.id ?? item.key}>{item.title ?? item.label}</li>
-          ))}
-        </ul>
-      );
-  }
+const STATE_TONES: Record<string, string> = {
+  operational: "ok",
+  degraded: "warn",
+  unavailable: "bad",
+  maintenance: "info",
+  unknown: "none",
+};
+
+/** What a section holds, or nothing when it is empty or did not load (a quiet line says which). */
+function sectionData<T>(detail: Detail | undefined, name: string): T | null {
+  const section = detail?.sections[name];
+  if (!section || section.state !== "available") return null;
+  return (section.data ?? null) as T | null;
 }
 
-function SectionView({ name, section }: { name: string; section: Section }) {
-  const headingId = useId();
-  const title = servicesHealthStrings.sections[name] ?? name;
-  return (
-    <section aria-labelledby={headingId} data-section={name}>
-      <h4 id={headingId}>{title}</h4>
-      {section.state === "unavailable" ? (
-        <FunctionalState
-          state="unavailable"
-          detail={section.detail ?? servicesHealthStrings.sectionUnavailable}
-        />
-      ) : section.state === "no-data" ? (
-        <p>{servicesHealthStrings.noData}</p>
-      ) : (
-        <SectionBody name={name} data={section.data} />
-      )}
-    </section>
-  );
-}
-
+/**
+ * A service's health (spec 006 T024; 027 redesign): its state and since when, the day in figures
+ * (availability, downtime, time without monitoring, last sync), the last 48 hours as micro-bars, the
+ * outages as a timeline with their duration, then incidents, planned maintenance, recent errors and
+ * tickets — each shown only when there is something to tell. The server still decides which sections a
+ * viewer may see.
+ */
 export function ServiceDetail({ serviceId, name }: { serviceId: string; name: string }) {
+  const t = useT();
+  const format = useFormat();
   const headingId = useId();
   const query = useQuery({
     queryKey: ["services", serviceId, "health"],
@@ -216,16 +138,194 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
       (await api.GET("/api/v1/services/{service_id}/health", { params: { path: { service_id: serviceId } } }))
         .data as unknown as Detail,
   });
+  const detail = query.data;
+  const ago = (iso: string | null | undefined) =>
+    iso ? format.relative((Date.parse(iso) - Date.now()) / 1000) : "—";
+  const state = sectionData<{ state: HealthState; since: string }>(detail, "state");
+  const availability = sectionData<{
+    availability: number | null;
+    downtime_seconds?: number;
+    gap_hours?: number;
+  }>(detail, "availability");
+  const sync = sectionData<{ status: string; last_success_at: string | null }>(detail, "sync");
+  const transitions = sectionData<{ transitions: Transition[] }>(detail, "history")?.transitions ?? [];
+  const incidents =
+    sectionData<Array<{ id: string; title: string; status: string }>>(detail, "incidents") ?? [];
+  const maintenance =
+    sectionData<Array<{ id: string; title: string; starts_at: string; ends_at: string }>>(
+      detail,
+      "maintenance",
+    ) ?? [];
+  const errors = sectionData<Array<{ code: string; count: number; message: string }>>(detail, "errors") ?? [];
+  const tickets =
+    sectionData<Array<{ id?: string; title?: string; label?: string }>>(detail, "tickets") ?? [];
+  const unavailable = Object.entries(detail?.sections ?? {})
+    // what a member cares about; infrastructure and operations stay quiet when they cannot answer
+    .filter(
+      ([key, section]) => section.state === "unavailable" && !["infrastructure", "operations"].includes(key),
+    )
+    .map(([key, section]) => ({ key, detail: section.detail }));
+  // the periods between changes, newest first, with how long each lasted
+  const periods = [...(Array.isArray(transitions) ? transitions : [])]
+    .map((change, index, list) => {
+      const end = list[index + 1]?.occurred_at ?? null;
+      return {
+        state: change.to,
+        start: change.occurred_at,
+        seconds: (Date.parse(end ?? new Date().toISOString()) - Date.parse(change.occurred_at)) / 1000,
+        current: end === null,
+      };
+    })
+    .reverse()
+    .slice(0, 12);
+  const duration = (seconds: number) =>
+    seconds < 3600
+      ? t("support:status.detail.minutes", { count: Math.max(1, Math.round(seconds / 60)) })
+      : seconds < 172800
+        ? t("support:status.detail.hours", { count: Math.round(seconds / 3600) })
+        : t("support:status.detail.days", { count: Math.round(seconds / 86400) });
   return (
-    <article aria-labelledby={headingId}>
-      <h3 id={headingId}>{servicesHealthStrings.detailTitle(name)}</h3>
+    <article aria-labelledby={headingId} className="svc-detail">
+      <h3 id={headingId} className="visually-hidden">
+        {servicesHealthStrings.detailTitle(name)}
+      </h3>
       {query.isPending ? <FunctionalState state="loading" /> : null}
       {query.isError ? <FunctionalState state="error" onRetry={() => void query.refetch()} /> : null}
-      {query.data
-        ? Object.entries(query.data.sections).map(([section, value]) => (
-            <SectionView key={section} name={section} section={value} />
-          ))
-        : null}
+      {detail ? (
+        <>
+          {state ? (
+            <p className="svc-detail__state">
+              <HealthBadge state={state.state} />
+              <span className="services-page__meta">
+                {t("support:status.detail.since", {
+                  when: duration((Date.now() - Date.parse(state.since)) / 1000),
+                })}
+              </span>
+            </p>
+          ) : null}
+          <ul className="svc-detail__figures">
+            <li>
+              <span>{t("support:status.detail.availability")}</span>
+              <strong>
+                {availability?.availability === null || availability?.availability === undefined
+                  ? "—"
+                  : format.percent(availability.availability)}
+              </strong>
+            </li>
+            <li>
+              <span>{t("support:status.detail.downtime")}</span>
+              <strong>
+                {availability?.downtime_seconds
+                  ? duration(availability.downtime_seconds)
+                  : t("support:status.detail.none")}
+              </strong>
+            </li>
+            <li>
+              <span>{t("support:status.detail.unmonitored")}</span>
+              <strong>
+                {availability?.gap_hours
+                  ? t("support:status.detail.hours", { count: availability.gap_hours })
+                  : t("support:status.detail.none")}
+              </strong>
+            </li>
+            {sync ? (
+              <li>
+                <span>{t("support:status.detail.sync")}</span>
+                <strong title={sync.last_success_at ? format.dateTime(sync.last_success_at) : undefined}>
+                  {sync.status === "running" ? t("support:status.detail.syncing") : ago(sync.last_success_at)}
+                </strong>
+              </li>
+            ) : null}
+          </ul>
+          <section className="svc-detail__block" aria-label={t("support:status.detail.last48")}>
+            <h4>{t("support:status.detail.last48")}</h4>
+            <UptimeBars serviceId={serviceId} />
+          </section>
+          {periods.length ? (
+            <section className="svc-detail__block">
+              <h4>{t("support:status.detail.changes")}</h4>
+              <ol className="svc-timeline">
+                {periods.map((period) => (
+                  <li key={period.start} data-tone={STATE_TONES[period.state] ?? "none"}>
+                    <span className="svc-timeline__dot" aria-hidden="true" />
+                    <span className="svc-timeline__text">
+                      <strong>{servicesHealthStrings.states[period.state] ?? period.state}</strong>
+                      <span className="services-page__meta">
+                        {format.dateTime(period.start)} ·{" "}
+                        {period.current
+                          ? t("support:status.detail.ongoing", { duration: duration(period.seconds) })
+                          : duration(period.seconds)}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+          {incidents.length ? (
+            <section className="svc-detail__block">
+              <h4>{t("support:status.openIncidents")}</h4>
+              <ul className="svc-detail__list">
+                {incidents.map((incident) => (
+                  <li key={incident.id}>
+                    <Icon name="alert" size={16} />
+                    <Link to={`/incidents/${incident.id}`}>{incident.title}</Link>
+                    <span className="services-page__meta">{t(`support:state.${incident.status}`)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+          {maintenance.length ? (
+            <section className="svc-detail__block">
+              <h4>{t("support:status.plannedMaintenance")}</h4>
+              <ul className="svc-detail__list">
+                {maintenance.map((window) => (
+                  <li key={window.id}>
+                    <Icon name="wrench" size={16} />
+                    <strong>{window.title}</strong>
+                    <span className="services-page__meta">
+                      {format.dateTime(window.starts_at)} → {format.dateTime(window.ends_at)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+          {errors.length ? (
+            <section className="svc-detail__block">
+              <h4>{t("support:status.detail.errors")}</h4>
+              <ul className="svc-detail__list">
+                {errors.map((error) => (
+                  <li key={error.code}>
+                    <span className="svc-detail__count">×{error.count}</span>
+                    <span>{error.message}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+          {tickets.length ? (
+            <section className="svc-detail__block">
+              <h4>{t("support:status.detail.tickets")}</h4>
+              <ul className="svc-detail__list">
+                {tickets.map((ticket) => (
+                  <li key={ticket.id ?? ticket.title}>
+                    <Icon name="ticket" size={16} />
+                    <span>{ticket.title ?? ticket.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+          {unavailable.length ? (
+            <p className="services-page__meta svc-detail__missing">
+              <Icon name="info" size={14} />{" "}
+              {unavailable.map((u) => u.detail ?? servicesHealthStrings.sectionUnavailable).join(" · ")}
+            </p>
+          ) : null}
+        </>
+      ) : null}
     </article>
   );
 }

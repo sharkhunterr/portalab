@@ -81,9 +81,10 @@ describe("services health", () => {
     const detail = await screen.findByRole("article", { name: "Media — health" });
     expect(await within(detail).findByText("This section did not load in time.")).toBeInTheDocument();
     expect(within(detail).getByText(/Disk upgrade/)).toBeInTheDocument();
-    expect(within(detail).getByText("No data yet")).toBeInTheDocument();
-    expect(within(detail).getByText("not available")).toBeInTheDocument(); // never zero
-    expect(within(detail).getByText(/idle · last success/)).toBeInTheDocument();
+    // 027: empty sections stay quiet; the infrastructure that cannot answer is not shown to members
+    expect(within(detail).queryByText("No data yet")).toBeNull();
+    expect(within(detail).getByText("Degraded")).toBeInTheDocument(); // the state, with its word
+    expect(within(detail).getByText("Last sync")).toBeInTheDocument();
     const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
     expect(results.violations.map((violation) => violation.id)).toEqual([]);
   });

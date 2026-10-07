@@ -306,6 +306,7 @@ lossless migration.
 - [X] T164 [US3] Services carry an importance (critical, major, minor, internal) and an incident delay (minutes; default by importance 5/10/30/never; 0 never) — an outage lasting longer becomes an incident (one per outage, the importance's severity, the portal's language) and is closed when the service is back (`incident_auto_resolve`); never closing incidents a person opened; migration connectors_0004; edited in « Edit »
 - [X] T165 [US3] The status page shows the last 48 hours of each service as micro-bars (one per hour: ok, partial, down, no check); the health indicator's « all good » is green
 - [X] T166 [US5] Services administration as cards ordered by importance: connector icon, name, state and importance badges (coloured edge), public address, last sync or live progress; « Sync now » and « Edit » at hand, the rest (disable, sync history, follow-up, disconnect with a confirmation) in a « … » menu
+- [X] T167 [US3] A service's health in detail, redesigned: state and for how long, the day in figures (availability, downtime, without checks, last sync), the last 48 hours as micro-bars, the changes as a timeline with their durations, incidents, maintenance, errors and tickets only when there are some; dates in the member's language
 
 ## Dependencies & Execution Order
 
