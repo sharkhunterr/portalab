@@ -130,11 +130,16 @@ describe("services admin", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Sync now" }));
     expect(await screen.findByText("Synchronization queued.")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Sync history" }));
+    // 027: the less frequent actions are in the card's « … » menu
+    const more = () =>
+      fireEvent.keyDown(screen.getByRole("button", { name: /More actions for/ }), { key: "Enter" });
+    more();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Sync history" }));
     expect(await screen.findByText(/manual · succeeded · \+3 ~1 -0/)).toBeInTheDocument();
     fireEvent.keyDown(await screen.findByRole("dialog"), { key: "Escape" });
     await vi.waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: "Disconnect" }));
+    more();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Disconnect" }));
     expect(calls.some((call) => call.endsWith("/disconnect"))).toBe(false);
     fireEvent.click(await screen.findByRole("button", { name: "Confirm disconnection (data is kept)" }));
     await vi.waitFor(() => expect(calls.some((call) => call.endsWith("/disconnect"))).toBe(true));

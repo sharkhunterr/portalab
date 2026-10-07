@@ -7,7 +7,6 @@ import {
   AdminPage,
   AdminSection,
   AdminStats,
-  AdminTable,
   FormActions,
   FormGrid,
   LiveProgress,
@@ -17,7 +16,7 @@ import {
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
-import { Dialog } from "../../../design-system/components/Overlays";
+import { Dialog, Menu, type MenuItem } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../../state/regions";
@@ -626,6 +625,7 @@ function EditService({
   );
 }
 
+/** 027: what a service card offers — the frequent actions as buttons, the rest in a « … » menu. */
 function ServiceActions({
   service,
   connector,
@@ -635,7 +635,8 @@ function ServiceActions({
 }) {
   const t = useT();
   const queryClient = useQueryClient();
-  const [confirming, setConfirming] = useState(false);
+  const [history, setHistory] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const action = useMutation({
     mutationFn: async (kind: Action) => {
@@ -649,68 +650,197 @@ function ServiceActions({
       return api.POST("/api/v1/services/{service_id}/disconnect", params);
     },
     onSuccess: (_, kind) => {
-      setConfirming(false);
+      setDisconnecting(false);
       setMessage(kind === "sync" ? t("admin:services.syncQueued") : null);
       void queryClient.invalidateQueries({ queryKey: SERVICES_KEY });
     },
     onError: (error) => setMessage(error instanceof ApiError ? error.message : t("admin:services.refused")),
   });
   const active = ["enabled", "error", "unavailable", "maintenance"].includes(service.state);
+  const dormant = service.state === "configured" || service.state === "disabled";
+  const syncing = service.sync.status === "running";
+  const items: MenuItem[] = [
+    ...(active
+      ? [
+          {
+            key: "disable",
+            label: t("admin:services.disable"),
+            icon: "minus",
+            onSelect: () => action.mutate("disable"),
+          },
+        ]
+      : []),
+    { key: "history", label: t("admin:services.history"), icon: "clock", onSelect: () => setHistory(true) },
+    ...(continuous(connector)
+      ? [
+          {
+            key: "follow",
+            label: t("admin:services.followUp"),
+            icon: "chart",
+            onSelect: () => window.location.assign("/admin/media-sources"),
+          },
+        ]
+      : []),
+    ...(service.state !== "disconnected"
+      ? [
+          {
+            key: "disconnect",
+            label: t("admin:services.disconnect"),
+            icon: "trash",
+            separated: true,
+            onSelect: () => setDisconnecting(true),
+          },
+        ]
+      : []),
+  ];
   return (
-    <>
-      {message ? (
-        <span role="status" className="admin-muted">
-          {message}
-        </span>
-      ) : null}
-      {service.state === "configured" || service.state === "disabled" ? (
+    <div className="svc-card__actions">
+      {dormant ? (
         <Button type="button" onClick={() => action.mutate("enable")}>
+          <Icon name="zap" size={16} />
           {t("admin:services.enable")}
         </Button>
       ) : null}
-      {active ? (
-        <>
-          {continuous(connector) ? (
-            <Link className="ds-button ds-button--secondary" to="/admin/media-sources">
-              <Icon name="chart" size={16} />
-              {t("admin:services.followUp")}
-            </Link>
-          ) : (
-            <Button type="button" variant="secondary" onClick={() => action.mutate("sync")}>
-              <Icon name="sync" size={16} />
-              {t("admin:services.syncNow")}
-            </Button>
-          )}
-          <Button type="button" variant="ghost" onClick={() => action.mutate("disable")}>
-            {t("admin:services.disable")}
-          </Button>
-        </>
+      {active && !continuous(connector) ? (
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={syncing || action.isPending}
+          onClick={() => action.mutate("sync")}
+        >
+          <Icon name={syncing ? "spinner" : "sync"} size={16} />
+          {t("admin:services.syncNow")}
+        </Button>
       ) : null}
       <EditService service={service} connector={connector} />
-      <Dialog
-        title={t("admin:services.historyOf", { name: service.name })}
-        closeLabel={t("admin:services.close")}
+      <Menu
+        label={t("admin:services.more", { name: service.name })}
+        align="end"
         trigger={
-          <Button type="button" variant="ghost">
-            <Icon name="clock" size={16} />
-            {t("admin:services.history")}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={t("admin:services.more", { name: service.name })}
+          >
+            <Icon name="more" size={18} />
           </Button>
         }
+        items={items}
+      />
+      {message ? (
+        <span role="status" className="svc-card__message">
+          {message}
+        </span>
+      ) : null}
+      <Dialog
+        open={history}
+        onOpenChange={setHistory}
+        title={t("admin:services.historyOf", { name: service.name })}
+        closeLabel={t("admin:services.close")}
+        trigger={<span hidden />}
       >
         <SyncHistory service={service} />
       </Dialog>
-      {service.state !== "disconnected" ? (
-        confirming ? (
+      <Dialog
+        open={disconnecting}
+        onOpenChange={setDisconnecting}
+        title={t("admin:services.disconnectTitle", { name: service.name })}
+        closeLabel={t("admin:services.close")}
+        trigger={<span hidden />}
+      >
+        <p>{t("admin:services.disconnectHint")}</p>
+        <FormActions>
           <Button type="button" variant="danger" onClick={() => action.mutate("disconnect")}>
+            <Icon name="trash" size={16} />
             {t("admin:services.confirmDisconnect")}
           </Button>
-        ) : (
-          <Button type="button" variant="ghost" onClick={() => setConfirming(true)}>
-            {t("admin:services.disconnect")}
-          </Button>
-        )
+        </FormActions>
+      </Dialog>
+    </div>
+  );
+}
+
+const IMPORTANCE_ICONS: Record<string, string> = {
+  critical: "flame",
+  major: "arrow-up",
+  minor: "minus",
+  internal: "lock",
+};
+const IMPORTANCE_ORDER: Record<string, number> = { critical: 0, major: 1, minor: 2, internal: 3 };
+
+/** 027: a configured service as a card — who it is, how much it matters, its state, its sync, its actions. */
+function ServiceCard({
+  service,
+  connector,
+}: {
+  service: ServiceItem;
+  connector?: ConnectorItem | undefined;
+}) {
+  const t = useT();
+  const format = useFormat();
+  const importance = service.importance ?? "major";
+  const p = service.sync.progress;
+  const last = service.sync.last_success_at;
+  return (
+    <li className="svc-card ds-card" data-state={service.display_state} data-importance={importance}>
+      <header className="svc-card__head">
+        <span className="svc-card__icon" aria-hidden="true">
+          <Icon name={connector?.icon ?? "server"} size={22} />
+        </span>
+        <span className="svc-card__who">
+          <strong>{service.name}</strong>
+          <span className="admin-muted">{connector?.name ?? service.connector}</span>
+        </span>
+      </header>
+      <div className="svc-card__badges">
+        <StatusBadge tone={STATE_TONE[service.display_state] ?? "neutral"}>
+          {t(`admin:services.state.${service.display_state}`)}
+        </StatusBadge>
+        <span
+          className="svc-importance"
+          data-importance={importance}
+          title={t(`admin:services.importance.${importance}.hint`)}
+        >
+          <Icon name={IMPORTANCE_ICONS[importance] ?? "minus"} size={12} />
+          {t(`admin:services.importance.${importance}`)}
+        </span>
+      </div>
+      {service.public_url ? (
+        <a className="svc-card__link" href={service.public_url} target="_blank" rel="noreferrer">
+          <Icon name="link" size={14} />
+          {service.public_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+        </a>
       ) : null}
-    </>
+      <div className="svc-card__sync">
+        {service.sync.status === "running" ? (
+          <LiveProgress
+            label={t("admin:services.syncing")}
+            done={p?.done}
+            total={p?.total}
+            detail={
+              p
+                ? p.total
+                  ? `${format.number(p.done)} / ${format.number(p.total)}`
+                  : t("admin:services.syncedSoFar", { count: p.done })
+                : null
+            }
+          />
+        ) : (
+          <span className="admin-muted">
+            <Icon name="sync" size={14} />{" "}
+            {continuous(connector)
+              ? t("admin:services.continuous")
+              : last
+                ? t("admin:services.lastSuccess", {
+                    when: format.relative((Date.parse(last) - Date.now()) / 1000),
+                  })
+                : t("admin:services.never")}
+          </span>
+        )}
+      </div>
+      <ServiceActions service={service} connector={connector} />
+    </li>
   );
 }
 
@@ -718,7 +848,6 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
   const t = useT();
   const format = useFormat();
   const connectors = useConnectors();
-  const names = new Map((connectors.data ?? []).map((c) => [c.key, c.name]));
   const byKey = new Map((connectors.data ?? []).map((c) => [c.key, c]));
   const enabled = services.filter((s) => s.state === "enabled").length;
   const troubled = services.filter((s) => ["error", "unavailable"].includes(s.state)).length;
@@ -767,76 +896,18 @@ function ServiceTable({ services, onAdd }: { services: ServiceItem[]; onAdd: () 
           },
         ]}
       />
-      <AdminSection title={t("admin:services.list")} icon="server" flush>
-        <AdminTable<ServiceItem>
-          label={t("admin:services.list")}
-          rows={services}
-          rowKey={(s) => s.id}
-          columns={[
-            {
-              key: "name",
-              header: t("admin:services.name"),
-              primary: true,
-              render: (s) => (
-                <span className="services-admin__name">
-                  <strong>{s.name}</strong>
-                  <span className="admin-muted">{names.get(s.connector) ?? s.connector}</span>
-                  {s.public_url ? (
-                    <a
-                      className="services-admin__public"
-                      href={s.public_url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <Icon name="link" size={12} />
-                      {s.public_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                    </a>
-                  ) : null}
-                </span>
-              ),
-            },
-            {
-              key: "state",
-              header: t("admin:services.stateColumn"),
-              render: (s) => (
-                <StatusBadge tone={STATE_TONE[s.display_state] ?? "neutral"}>
-                  {t(`admin:services.state.${s.display_state}`)}
-                </StatusBadge>
-              ),
-            },
-            {
-              key: "sync",
-              header: t("admin:services.lastSync"),
-              render: (s) => {
-                if (s.sync.status === "running") {
-                  const p = s.sync.progress;
-                  return (
-                    <LiveProgress
-                      label={t("admin:services.syncing")}
-                      done={p?.done}
-                      total={p?.total}
-                      detail={
-                        p
-                          ? p.total
-                            ? `${format.number(p.done)} / ${format.number(p.total)}`
-                            : t("admin:services.syncedSoFar", { count: p.done })
-                          : null
-                      }
-                    />
-                  );
-                }
-                if (continuous(byKey.get(s.connector))) return t("admin:services.continuous");
-                const last = s.sync.last_success_at;
-                return last
-                  ? t("admin:services.lastSuccess", {
-                      when: format.relative((Date.parse(last) - Date.now()) / 1000),
-                    })
-                  : t("admin:services.never");
-              },
-            },
-          ]}
-          actions={(s) => <ServiceActions service={s} connector={byKey.get(s.connector)} />}
-        />
+      <AdminSection title={t("admin:services.list")} icon="server">
+        <ul className="svc-grid" aria-label={t("admin:services.list")}>
+          {[...services]
+            .sort(
+              (a, b) =>
+                (IMPORTANCE_ORDER[a.importance ?? "major"] ?? 1) -
+                  (IMPORTANCE_ORDER[b.importance ?? "major"] ?? 1) || a.name.localeCompare(b.name),
+            )
+            .map((service) => (
+              <ServiceCard key={service.id} service={service} connector={byKey.get(service.connector)} />
+            ))}
+        </ul>
       </AdminSection>
     </>
   );

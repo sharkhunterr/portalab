@@ -581,3 +581,124 @@
   padding-inline: var(--space-1);
   font-weight: var(--font-weight-bold);
 }
+
+/* 027 — configured services as cards: identity, importance, state, sync, actions */
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.svc-card {
+  --importance: var(--color-accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-3) calc(var(--space-4) + 3px);
+  overflow: hidden;
+}
+.svc-card::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 4px;
+  background: var(--importance);
+}
+.svc-card[data-importance="critical"],
+.svc-importance[data-importance="critical"] {
+  --importance: var(--cal-incident);
+}
+.svc-card[data-importance="major"],
+.svc-importance[data-importance="major"] {
+  --importance: var(--rarity-legendary);
+}
+.svc-card[data-importance="minor"],
+.svc-importance[data-importance="minor"] {
+  --importance: var(--color-accent);
+}
+.svc-card[data-importance="internal"],
+.svc-importance[data-importance="internal"] {
+  --importance: var(--color-text-muted);
+}
+.svc-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.svc-card__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  flex: none;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+.svc-card__who {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+.svc-card__who strong {
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.svc-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.svc-importance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--importance) 45%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--importance) 14%, transparent);
+  color: var(--importance);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+}
+.svc-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.svc-card__sync {
+  min-block-size: 1.5rem;
+  font-size: var(--font-size-sm);
+}
+.svc-card__sync .admin-muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.svc-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: auto;
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--glass-border);
+}
+.svc-card__actions > .ds-button--icon {
+  margin-inline-start: auto;
+}
+.svc-card__message {
+  flex-basis: 100%;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
