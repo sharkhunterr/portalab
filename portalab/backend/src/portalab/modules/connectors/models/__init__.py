@@ -40,10 +40,14 @@ class ConnectorsBase(DeclarativeBase):
     metadata = schema_metadata("connectors")
 
 
+IMPORTANCES: tuple[str, ...] = ("critical", "major", "minor", "internal")
+
+
 class Service(ConnectorsBase):
     __tablename__ = "services"
     __table_args__ = (
         CheckConstraint(_in("state", SERVICE_STATES), name="state"),
+        CheckConstraint(_in("importance", IMPORTANCES), name="importance"),
         Index("ix_services_connector_key", "connector_key"),
     )
 
@@ -63,6 +67,16 @@ class Service(ConnectorsBase):
     # 027: where members open the service (quick links); the connection URL may be internal
     public_url: Mapped[str | None] = mapped_column(
         String(512), info=not_personal("a service's public address")
+    )
+    # 027: how much the service matters (incident severity, status page) and when an outage becomes an
+    # incident — after ``incident_after_minutes`` (NULL: the importance's default, 0: never), closed
+    # again when the service is back (``incident_auto_resolve``)
+    importance: Mapped[str] = mapped_column(
+        String(10), nullable=False, default="major", server_default="major"
+    )
+    incident_after_minutes: Mapped[int | None] = mapped_column(Integer)
+    incident_auto_resolve: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default="true"
     )
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

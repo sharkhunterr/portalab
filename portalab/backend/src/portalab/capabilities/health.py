@@ -85,6 +85,10 @@ class ServiceInfo:
     last_sync_attempt_at: datetime | None = None
     last_sync_error: str | None = None
     link: str | None = None  # 027: where members open it (its public URL, or its https address)
+    # 027: how much it matters and when its outage becomes an incident (minutes; None: never)
+    importance: str = "major"
+    incident_after_minutes: int | None = None
+    incident_auto_resolve: bool = True
 
 
 @runtime_checkable
@@ -120,6 +124,16 @@ class IncidentRef:
     status: str
     opened_at: datetime
     extra: Mapping[str, Any] = field(default_factory=dict)
+
+
+# 027: minutes of outage before an incident is declared, by the service's importance (None: never)
+INCIDENT_AFTER: dict[str, int | None] = {"critical": 5, "major": 10, "minor": 30, "internal": None}
+INCIDENT_SEVERITY: dict[str, str] = {
+    "critical": "critical",
+    "major": "major",
+    "minor": "minor",
+    "internal": "minor",
+}
 
 
 @runtime_checkable

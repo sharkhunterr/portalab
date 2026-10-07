@@ -4,7 +4,7 @@ Secrets are write-only: requests may set them, responses only say which ones are
 """
 
 from collections.abc import Mapping
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, status
@@ -61,6 +61,10 @@ class ServicePatch(BaseModel):
     capabilities: dict[str, CapabilityPatch] | None = None
     # 027: where members open the service ("" clears it)
     public_url: str | None = Field(default=None, max_length=512, pattern=r"^(https?://[^\s]+)?$")
+    # 027: how much it matters, and when its outage becomes an incident (-1: the importance's default)
+    importance: Literal["critical", "major", "minor", "internal"] | None = None
+    incident_after_minutes: int | None = Field(default=None, ge=-1, le=10_080)
+    incident_auto_resolve: bool | None = None
 
 
 class TestIn(BaseModel):
@@ -125,6 +129,9 @@ def service_out(view: ServiceView, *, details: bool = True) -> dict[str, Any]:
         "stale": view.stale,
         "sync_interval_seconds": view.sync_interval_seconds,
         "public_url": view.public_url,
+        "importance": view.importance,
+        "incident_after_minutes": view.incident_after_minutes,
+        "incident_auto_resolve": view.incident_auto_resolve,
         "capabilities": view.capabilities,
         "sync": view.sync,
         "created_at": view.created_at.isoformat(),
@@ -193,6 +200,9 @@ async def update_service(
         sync_interval_seconds=body.sync_interval_seconds,
         capabilities=_patches(body.capabilities),
         public_url=body.public_url,
+        importance=body.importance,
+        incident_after_minutes=body.incident_after_minutes,
+        incident_auto_resolve=body.incident_auto_resolve,
     )
     return service_out(view)
 

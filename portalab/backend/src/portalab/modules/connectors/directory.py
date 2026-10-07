@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from portalab.capabilities.health import ServiceInfo
+from portalab.capabilities.health import INCIDENT_AFTER, ServiceInfo
 from portalab.modules.connectors.models import Service, SyncRun, SyncState
 from portalab.modules.connectors.services.manager import ServiceManager
 
@@ -17,6 +17,13 @@ def _link(row: Service) -> str | None:
         return row.public_url
     base = str((row.config or {}).get("base_url") or "")
     return base if base.startswith("https://") else None
+
+
+def _incident_after(row: Service) -> int | None:
+    """027: minutes of outage before an incident — the service's own setting, else its importance's."""
+    if row.incident_after_minutes is not None:
+        return row.incident_after_minutes or None  # 0: never
+    return INCIDENT_AFTER.get(row.importance, 10)
 
 
 class ConnectorServiceDirectory:
@@ -34,6 +41,9 @@ class ConnectorServiceDirectory:
             last_sync_attempt_at=state.last_attempt_at if state else None,
             last_sync_error=last_error,
             link=_link(row),
+            importance=row.importance,
+            incident_after_minutes=_incident_after(row),
+            incident_auto_resolve=row.incident_auto_resolve,
         )
 
     async def services(self) -> list[ServiceInfo]:

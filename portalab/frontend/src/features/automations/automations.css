@@ -451,7 +451,7 @@
   background: color-mix(in srgb, var(--color-text) 4%, transparent);
 }
 .automation-plan[data-ok] {
-  border-inline-start-color: var(--cal-series);
+  border-inline-start-color: var(--state-available-fg);
 }
 .automation-plan p {
   display: flex;
@@ -515,8 +515,8 @@
 .automation-run__steps [data-status="ok"],
 .automation-timeline [data-status="ok"] > .automation-timeline__dot,
 .automation-timeline [data-status="success"] > .automation-timeline__dot {
-  background: color-mix(in srgb, var(--cal-series) 25%, transparent);
-  color: var(--cal-series);
+  background: color-mix(in srgb, var(--state-available-fg) 25%, transparent);
+  color: var(--state-available-fg);
 }
 .automation-run__steps :is([data-status="failed"], [data-status="refused"], [data-status="timeout"]),
 .automation-timeline
@@ -571,7 +571,7 @@
   gap: 0.35rem;
 }
 .automation-trace [data-result="true"] .ds-icon {
-  color: var(--cal-series);
+  color: var(--state-available-fg);
 }
 .automation-trace [data-result="false"] .ds-icon {
   color: var(--cal-incident);

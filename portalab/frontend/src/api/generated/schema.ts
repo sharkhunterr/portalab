@@ -11781,6 +11781,12 @@ export interface components {
             config?: {
                 [key: string]: unknown;
             } | null;
+            /** Importance */
+            importance?: ("critical" | "major" | "minor" | "internal") | null;
+            /** Incident After Minutes */
+            incident_after_minutes?: number | null;
+            /** Incident Auto Resolve */
+            incident_auto_resolve?: boolean | null;
             /** Name */
             name?: string | null;
             /** Public Url */

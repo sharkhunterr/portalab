@@ -124,22 +124,36 @@
   gap: var(--space-1);
   inline-size: 100%;
 }
-.services-page__bar {
-  display: block;
-  block-size: 6px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+/* 027 — the last 48 hours as a battery of micro-bars (one per hour) */
+.uptime-bars {
+  display: flex;
+  gap: 2px;
+  align-items: stretch;
+  block-size: 1.6rem;
+  inline-size: 100%;
 }
-.services-page__bar > span {
-  display: block;
-  block-size: 100%;
-  border-radius: inherit;
+.uptime-bars[data-empty] {
+  border-radius: var(--radius-sm, 0.3rem);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+.uptime-bars > span {
+  flex: 1;
+  min-inline-size: 2px;
+  border-radius: 2px;
   background: var(--state-available-fg);
+  transition: transform var(--motion-duration-fast, 120ms) ease;
 }
-.services-page__card[data-state="degraded"] .services-page__bar > span,
-.services-page__card[data-state="unavailable"] .services-page__bar > span {
-  background: var(--state-error-fg);
+.uptime-bars > span[data-level="partial"] {
+  background: var(--rarity-legendary);
+}
+.uptime-bars > span[data-level="down"] {
+  background: var(--cal-incident);
+}
+.uptime-bars > span[data-level="none"] {
+  background: color-mix(in srgb, var(--color-text) 14%, transparent);
+}
+.uptime-bars > span:hover {
+  transform: scaleY(1.2);
 }
 .services-page__actions {
   display: flex;

@@ -15,7 +15,7 @@ import {
   type Tone,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -64,6 +64,9 @@ interface ServiceItem {
   public_url?: string | null;
   config?: Record<string, unknown>;
   sync_interval_seconds?: number | null;
+  importance?: "critical" | "major" | "minor" | "internal";
+  incident_after_minutes?: number | null;
+  incident_auto_resolve?: boolean;
   sync: {
     status: string;
     last_success_at: string | null;
@@ -399,6 +402,9 @@ type Action = "enable" | "disable" | "disconnect" | "sync";
  * a secret is kept), where members open it and how often it syncs. « Test » checks the edited values
  * before saving; the background worker picks the change up within a minute.
  */
+/** 027: minutes of outage before an incident, by importance (none for an internal service). */
+const DEFAULT_AFTER: Record<string, number | null> = { critical: 5, major: 10, minor: 30, internal: null };
+
 function EditService({
   service,
   connector,
@@ -417,6 +423,14 @@ function EditService({
   const [every, setEvery] = useState(
     service.sync_interval_seconds ? String(Math.round(service.sync_interval_seconds / 60)) : "",
   );
+  // 027: how much it matters, and when its outage becomes an incident
+  const [importance, setImportance] = useState(service.importance ?? "major");
+  const [after, setAfter] = useState(
+    service.incident_after_minutes === null || service.incident_after_minutes === undefined
+      ? ""
+      : String(service.incident_after_minutes),
+  );
+  const [autoResolve, setAutoResolve] = useState(service.incident_auto_resolve ?? true);
   const filled = Object.fromEntries(Object.entries(secrets).filter(([, v]) => v.trim()));
   const test = useMutation({
     mutationFn: async () =>
@@ -438,6 +452,9 @@ function EditService({
             ...(Object.keys(filled).length ? { secrets: filled } : {}),
             public_url: publicUrl.trim(),
             sync_interval_seconds: every.trim() ? Math.max(0, Number(every)) * 60 : 0,
+            importance,
+            incident_after_minutes: after.trim() ? Math.max(0, Number(after)) : -1,
+            incident_auto_resolve: autoResolve,
           },
         }),
       ),
@@ -546,6 +563,42 @@ function EditService({
             onChange={(event) => setEvery(event.target.value)}
           />
         </FormGrid>
+        <fieldset className="services-admin__incidents">
+          <legend>
+            <Icon name="alert" size={16} /> {t("admin:services.incidents.title")}
+          </legend>
+          <FormGrid>
+            <SelectField
+              label={t("admin:services.importance")}
+              hint={t(`admin:services.importance.${importance}.hint`)}
+              value={importance}
+              onChange={(event) => setImportance(event.target.value as typeof importance)}
+            >
+              {(["critical", "major", "minor", "internal"] as const).map((level) => (
+                <option key={level} value={level}>
+                  {t(`admin:services.importance.${level}`)}
+                </option>
+              ))}
+            </SelectField>
+            <TextField
+              label={t("admin:services.incidents.after")}
+              hint={t("admin:services.incidents.afterHint", {
+                minutes: DEFAULT_AFTER[importance] ?? 0,
+              })}
+              type="number"
+              min={0}
+              max={10080}
+              placeholder={DEFAULT_AFTER[importance] ? String(DEFAULT_AFTER[importance]) : "—"}
+              value={after}
+              onChange={(event) => setAfter(event.target.value)}
+            />
+          </FormGrid>
+          <CheckboxField
+            label={t("admin:services.incidents.autoResolve")}
+            checked={autoResolve}
+            onChange={(event) => setAutoResolve(event.target.checked)}
+          />
+        </fieldset>
         {test.data ? (
           <p role="status" className={test.data.ok ? "services-admin__ok" : "services-admin__ko"}>
             {test.data.ok

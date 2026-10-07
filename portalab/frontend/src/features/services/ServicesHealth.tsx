@@ -366,6 +366,70 @@ export function ServicesHealth() {
   );
 }
 
+interface Bucket {
+  start: string;
+  gap: boolean;
+  availability?: number;
+}
+
+/**
+ * 027: the last 48 hours as a battery of micro-bars — one per hour, green when every check passed, amber
+ * when some failed, red when the service was mostly out, grey without checks; each bar tells its hour.
+ */
+function UptimeBars({ serviceId }: { serviceId: string }) {
+  const t = useT();
+  const format = useFormat();
+  const history = useQuery({
+    queryKey: ["services", serviceId, "uptime48"],
+    staleTime: 5 * 60_000,
+    retry: false,
+    queryFn: async () => {
+      const from = new Date(Date.now() - 48 * 3600_000).toISOString();
+      const data = (
+        await api.GET("/api/v1/services/{service_id}/health/history", {
+          params: { path: { service_id: serviceId }, query: { from } },
+        })
+      ).data as unknown as { buckets?: Bucket[] };
+      return Array.isArray(data?.buckets) ? data.buckets.slice(-48) : [];
+    },
+  });
+  const buckets = history.data ?? [];
+  if (!buckets.length) return <span className="uptime-bars" data-empty="true" aria-hidden="true" />;
+  const level = (b: Bucket) =>
+    b.gap || b.availability === undefined
+      ? "none"
+      : b.availability >= 0.99
+        ? "ok"
+        : b.availability >= 0.75
+          ? "partial"
+          : "down";
+  const measured = buckets.filter((b) => !b.gap && b.availability !== undefined);
+  const mean = measured.length
+    ? measured.reduce((sum, b) => sum + (b.availability ?? 0), 0) / measured.length
+    : null;
+  return (
+    <span
+      className="uptime-bars"
+      role="img"
+      aria-label={t("support:status.uptime48", {
+        percent: mean === null ? "—" : format.percent(mean),
+      })}
+    >
+      {buckets.map((bucket) => (
+        <span
+          key={bucket.start}
+          data-level={level(bucket)}
+          title={`${format.dateTime(bucket.start)} · ${
+            bucket.gap || bucket.availability === undefined
+              ? t("support:status.noCheck")
+              : format.percent(bucket.availability)
+          }`}
+        />
+      ))}
+    </span>
+  );
+}
+
 function ServiceCard({ item }: { item: OverviewItem }) {
   const t = useT();
   const ratio = item.availability;
@@ -379,9 +443,7 @@ function ServiceCard({ item }: { item: OverviewItem }) {
       </span>
       <HealthBadge state={item.state} />
       <span className="services-page__uptime">
-        <span className="services-page__bar" aria-hidden="true">
-          <span style={{ inlineSize: `${Math.round((ratio ?? 0) * 100)}%` }} />
-        </span>
+        <UptimeBars serviceId={item.id} />
         <span className="services-page__meta">{servicesHealthStrings.availability(ratio)}</span>
       </span>
       <span className="services-page__actions">

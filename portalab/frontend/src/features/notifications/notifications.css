@@ -264,7 +264,7 @@
   border-radius: var(--radius-md);
 }
 .notif-row[data-tone="success"] {
-  --tone: var(--cal-series);
+  --tone: var(--state-available-fg);
 }
 .notif-row[data-tone="warning"] {
   --tone: var(--rarity-legendary);

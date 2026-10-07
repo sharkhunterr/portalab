@@ -76,6 +76,16 @@ class IncidentsPort:
         if key is not None:
             await self.service.link(key, service_id)
 
+    async def resolve_for_service(self, service_id: str, *, source: str, message: str) -> int:
+        """027: close the open incidents a source declared for a service (a service that came back) —
+        never the ones a person opened."""
+        closed = 0
+        for view in await self.service.list(state="open", service_id=service_id):
+            if view.source == source:
+                await self.service.resolve(None, view.id, message=message)
+                closed += 1
+        return closed
+
     async def open_for_service(self, service_id: str) -> list[IncidentRef]:
         return [_ref(view) for view in await self.service.list(state="open", service_id=service_id)]
 

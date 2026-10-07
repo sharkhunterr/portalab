@@ -303,6 +303,8 @@ lossless migration.
 - [X] T161 [US6] Pinned widgets may let members move and/or resize them (`move`, `resize` in the policy; `movable`/`resizable` on instances); the dashboard's edit mode links administrators to the members' widgets page
 - [X] T162 [US7] Media statistics: the activity chart in time spent or in plays (per kind)
 - [X] T163 [US1] Health at a glance in the header: all good, degraded (services in trouble) or incident (incidents in progress), opening the status page
+- [X] T164 [US3] Services carry an importance (critical, major, minor, internal) and an incident delay (minutes; default by importance 5/10/30/never; 0 never) — an outage lasting longer becomes an incident (one per outage, the importance's severity, the portal's language) and is closed when the service is back (`incident_auto_resolve`); never closing incidents a person opened; migration connectors_0004; edited in « Edit »
+- [X] T165 [US3] The status page shows the last 48 hours of each service as micro-bars (one per hour: ok, partial, down, no check); the health indicator's « all good » is green
 
 ## Dependencies & Execution Order
 

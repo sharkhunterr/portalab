@@ -99,3 +99,32 @@ async def test_observability_escalation_creates_one_incident(support: SupportHar
     assert attached is not None
     view = await support.module.incidents.get(__import__("uuid").UUID(first.id))
     assert view.evidence == ["observability:anomaly:an-1"]  # pointer only, no payload
+
+
+async def test_service_back_closes_only_the_portals_incidents(support: SupportHarness) -> None:
+    """027: when a service is back, Health closes the incidents it declared for it — never one a person
+    opened; declaring twice for the same outage gives one incident."""
+    port = support.module.port
+    one = await port.create(
+        title="Plex is not responding",
+        source="health",
+        severity="major",
+        evidence={"service_id": "s9"},
+        service_ids=["s9"],
+        dedup_key="outage:s9:3",
+    )
+    again = await port.create(
+        title="Plex is not responding",
+        source="health",
+        severity="major",
+        evidence={"service_id": "s9"},
+        service_ids=["s9"],
+        dedup_key="outage:s9:3",
+    )
+    assert again.id == one.id
+    manual, _ = await support.module.incidents.create(
+        None, title="Plex is slow", severity="minor", source="manual", service_ids=["s9"]
+    )
+    assert await port.resolve_for_service("s9", source="health", message="Plex answers again.") == 1
+    still = {ref.id for ref in await port.open_for_service("s9")}
+    assert still == {str(manual.id)}

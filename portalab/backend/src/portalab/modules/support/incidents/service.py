@@ -369,8 +369,9 @@ class IncidentService:
         return view
 
     async def resolve(
-        self, actor: Principal, incident_id: UUID, *, message: str, if_match: int | None = None
+        self, actor: Principal | None, incident_id: UUID, *, message: str, if_match: int | None = None
     ) -> IncidentView:
+        """``actor`` ``None``: the portal itself closes it (027: a service that came back)."""
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
             session = uow.session
@@ -381,14 +382,15 @@ class IncidentService:
             seq = await self._append(session, row, actor, message.strip()[:4000] or "Resolved.", now)
             row.updated_at, row.version = now, row.version + 1
             await self._publish(session, "incident.resolved", row, seq, actor, now)
-            await self._audit(
-                session,
-                actor,
-                "incident.resolved",
-                row,
-                {"severity": row.severity},
-                row.severity == "critical",
-            )
+            if actor is not None:
+                await self._audit(
+                    session,
+                    actor,
+                    "incident.resolved",
+                    row,
+                    {"severity": row.severity},
+                    row.severity == "critical",
+                )
             view = await self._view(session, row)
         self._notify(
             Change("resolved", view.id, view.number, view.title, view.severity, tuple(view.service_ids))

@@ -2,9 +2,11 @@
 Operational; services are isolated; a monitor that stops reporting turns Unknown, never Operational."""
 
 from datetime import timedelta
+from typing import Any
 
 from sqlalchemy import func, select, text
 
+from portalab.capabilities.health import INCIDENTS
 from portalab.connectors.fake import BACKENDS, FakeBackend
 from portalab.core.time import FixedClock
 from portalab.modules.health.models import HealthSample, RecentError, ServiceState
@@ -114,3 +116,60 @@ async def test_lasting_outage_is_announced_once_per_milestone(hl: HealthHarness,
     lasting = await hl.outbox("service.outage_lasting")
     assert [e["minutes"] for e in lasting] == [5, 10]
     assert lasting[-1]["failures"] == 9 and lasting[-1]["service_id"] == service_id  # probes failed so far
+
+
+class _Incidents:
+    """The Support port as Health sees it (create is idempotent per dedup key; closing by source)."""
+
+    def __init__(self) -> None:
+        self.created: dict[str, dict[str, Any]] = {}
+        self.closed: list[tuple[str, str]] = []
+
+    async def create(self, **kwargs: Any) -> Any:
+        self.created.setdefault(kwargs["dedup_key"], kwargs)
+        return None
+
+    async def resolve_for_service(self, service_id: str, *, source: str, message: str) -> int:
+        self.closed.append((service_id, source))
+        return 1
+
+    async def open_for_service(self, service_id: str) -> list[Any]:
+        return []
+
+    async def link(self, service_id: str, incident_id: str) -> None:
+        return None
+
+    async def attach(self, incident_id: str, evidence: Any) -> Any:
+        return None
+
+    async def get(self, incident_id: str) -> Any:
+        return None
+
+
+async def test_outage_becomes_an_incident_after_its_delay_and_closes_when_back(
+    hl: HealthHarness, clock: FixedClock
+) -> None:
+    """027: no automation needed — a service unavailable for longer than its delay (10 min for a « major »
+    service) gets one incident, with its importance's severity; it is closed when the service is back."""
+    port = _Incidents()
+    hl.cn.full.identity.capabilities.provide(INCIDENTS, port, instance_ref="support", owner="test:support")
+    service_id = await hl.service("Plex")
+    runner = hl.module.runner
+    await runner.probe(service_id)
+    hl.cn.remote.mode = "error"
+    for _ in range(8):  # unavailable within three failures — not yet 10 minutes of outage
+        clock.advance(STEP)
+        await runner.probe(service_id)
+    assert port.created == {}
+    for _ in range(6):
+        clock.advance(STEP)
+        await runner.probe(service_id)
+    assert len(port.created) == 1
+    [incident] = port.created.values()
+    assert incident["severity"] == "major" and incident["service_ids"] == [service_id]
+    assert incident["source"] == "health" and "Plex" in incident["title"]
+
+    hl.cn.remote.mode = "ok"
+    clock.advance(STEP)
+    await runner.probe(service_id)
+    assert port.closed == [(service_id, "health")]

@@ -11405,6 +11405,47 @@
             ],
             "title": "Config"
           },
+          "importance": {
+            "anyOf": [
+              {
+                "enum": [
+                  "critical",
+                  "major",
+                  "minor",
+                  "internal"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Importance"
+          },
+          "incident_after_minutes": {
+            "anyOf": [
+              {
+                "maximum": 10080.0,
+                "minimum": -1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident After Minutes"
+          },
+          "incident_auto_resolve": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Auto Resolve"
+          },
           "name": {
             "anyOf": [
               {

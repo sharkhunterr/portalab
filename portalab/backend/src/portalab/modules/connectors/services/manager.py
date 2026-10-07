@@ -33,6 +33,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.connectors.breaker.breaker import BreakerBoard, BreakerState
 from portalab.modules.connectors.http.client import client_for
 from portalab.modules.connectors.models import (
+    IMPORTANCES,
     CompatibilityCheck,
     Service,
     ServiceCapability,
@@ -96,6 +97,9 @@ class ServiceView:
     created_at: datetime
     updated_at: datetime
     public_url: str | None = None  # 027: where members open it
+    importance: str = "major"  # 027: critical | major | minor | internal
+    incident_after_minutes: int | None = None  # None: the importance's default, 0: never
+    incident_auto_resolve: bool = True
 
     @property
     def display_state(self) -> str:
@@ -219,6 +223,9 @@ class ServiceManager:
             created_at=row.created_at,
             updated_at=row.updated_at,
             public_url=row.public_url,
+            importance=row.importance,
+            incident_after_minutes=row.incident_after_minutes,
+            incident_auto_resolve=row.incident_auto_resolve,
         )
 
     async def list(self) -> list[ServiceView]:
@@ -377,6 +384,9 @@ class ServiceManager:
         sync_interval_seconds: int | None = None,
         capabilities: Mapping[str, Mapping[str, Any]] | None = None,
         public_url: str | None = None,
+        importance: str | None = None,
+        incident_after_minutes: int | None = None,
+        incident_auto_resolve: bool | None = None,
     ) -> ServiceView:
         async with self.database.unit_of_work() as uow:
             row = await self._row(uow.session, service_id, lock=True)
@@ -399,6 +409,17 @@ class ServiceManager:
             if public_url is not None and (public_url or None) != row.public_url:  # "" clears it
                 row.public_url = public_url or None
                 changed.append("public_url")
+            if importance is not None and importance != row.importance:
+                if importance not in IMPORTANCES:
+                    raise InvalidServiceConfig("Importance is critical, major, minor or internal.")
+                row.importance = importance
+                changed.append("importance")
+            if incident_after_minutes is not None:  # -1 brings the importance's default back
+                row.incident_after_minutes = None if incident_after_minutes < 0 else incident_after_minutes
+                changed.append("incident_after")
+            if incident_auto_resolve is not None and incident_auto_resolve != row.incident_auto_resolve:
+                row.incident_auto_resolve = incident_auto_resolve
+                changed.append("incident_auto_resolve")
             for capability, values in (capabilities or {}).items():
                 cap = (
                     await uow.session.execute(

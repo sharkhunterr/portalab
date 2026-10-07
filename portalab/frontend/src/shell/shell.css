@@ -1131,7 +1131,7 @@
 
 /* 027 — the portal's health in the header: ok, degraded (services in trouble), incident (incidents) */
 .shell-health {
-  --health: var(--cal-series);
+  --health: var(--state-available-fg);
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;

@@ -8,14 +8,15 @@ from typing import Any
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from portalab.capabilities.health import SERVICE_DIRECTORY, ServiceInfo
+from portalab.capabilities.health import INCIDENT_SEVERITY, INCIDENTS, SERVICE_DIRECTORY, ServiceInfo
+from portalab.capabilities.i18n import RESOLVER
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.health.models import HealthSample, MaintenanceWindow, ServiceState, StateHistory
-from portalab.modules.health.observability import metric_part, metrics
+from portalab.modules.health.observability import log, metric_part, metrics
 from portalab.modules.health.settings import HealthConfig
 from portalab.modules.health.state.deriver import RULES_VERSION, Derived, Inputs, Thresholds, derive
 
@@ -42,6 +43,7 @@ class StateService:
         self.capabilities = capabilities
         self.config = config or HealthConfig()
         self.clock = clock
+        self._declared: set[str] = set()  # outages already turned into an incident (this process)
 
     def thresholds(self) -> Thresholds:
         return Thresholds(
@@ -111,6 +113,8 @@ class StateService:
 
     async def evaluate(self, service_id: str, *, occurred_at: datetime | None = None) -> Derived:
         now = utc_now(self.clock)
+        outage: tuple[int, datetime, int] | None = None  # (state_seq, since, failed probes)
+        recovered = False
         async with self.database.unit_of_work() as uow:
             session = uow.session
             inputs, maintenance = await self.inputs(session, service_id, now)
@@ -140,40 +144,129 @@ class StateService:
                 row.reason = derived.reason
                 if derived.state == "unavailable":
                     await self._lasting(session, row, inputs, now)
-                return derived
-            at = occurred_at or now
-            row.state, row.reason, row.state_since = derived.state, derived.reason, at
-            row.state_seq += 1
-            row.rules_version = RULES_VERSION
-            await session.flush()
-            session.add(
-                StateHistory(
-                    service_id=service_id,
-                    from_state=before,
-                    to_state=derived.state,
-                    occurred_at=at,
-                    received_at=now,
-                    reason=derived.reason,
-                )
-            )
-            await self.events.publish(
-                session,
-                "service.status_changed",
-                {
-                    "service_id": service_id,
-                    "dimension": "health",
-                    "from_state": before,
-                    "to_state": derived.state,
-                    "state_seq": row.state_seq,
-                    "reason": derived.reason,
-                },
-                occurred_at=at,
-                actor=SYSTEM,
-                subject=SubjectRef("service", service_id),
-                source="health",
-            )
-            metrics.increment(f"health.state_changes.{metric_part(derived.state)}")
+                    outage = (row.state_seq, row.state_since, inputs.consecutive_failures)
+            else:
+                at = occurred_at or now
+                recovered = derived.state == "operational" and before in ("unavailable", "degraded")
+                await self._transition(session, row, service_id, before, derived, at, now)
+        # 027: an outage that lasts becomes an incident; a service that is back closes it
+        if outage is not None:
+            await self._auto_incident(service_id, *outage, now)
+        elif recovered:
+            await self._auto_resolve(service_id)
         return derived
+
+    async def _transition(
+        self,
+        session: AsyncSession,
+        row: ServiceState,
+        service_id: str,
+        before: str | None,
+        derived: Derived,
+        at: datetime,
+        now: datetime,
+    ) -> None:
+        row.state, row.reason, row.state_since = derived.state, derived.reason, at
+        row.state_seq += 1
+        row.rules_version = RULES_VERSION
+        await session.flush()
+        session.add(
+            StateHistory(
+                service_id=service_id,
+                from_state=before,
+                to_state=derived.state,
+                occurred_at=at,
+                received_at=now,
+                reason=derived.reason,
+            )
+        )
+        await self.events.publish(
+            session,
+            "service.status_changed",
+            {
+                "service_id": service_id,
+                "dimension": "health",
+                "from_state": before,
+                "to_state": derived.state,
+                "state_seq": row.state_seq,
+                "reason": derived.reason,
+            },
+            occurred_at=at,
+            actor=SYSTEM,
+            subject=SubjectRef("service", service_id),
+            source="health",
+        )
+        metrics.increment(f"health.state_changes.{metric_part(derived.state)}")
+
+    def incidents(self) -> Any:
+        providers = self.capabilities.system_providers(INCIDENTS)
+        return providers[0].provider if providers else None
+
+    async def _language(self) -> str:
+        try:
+            providers = self.capabilities.system_providers(RESOLVER)
+            if providers:
+                return str((await providers[0].provider.for_user(None)).language or "en")
+        except Exception:  # noqa: S110 — the default language is fine
+            pass
+        return "en"
+
+    async def _auto_incident(
+        self, service_id: str, seq: int, since: datetime, failures: int, now: datetime
+    ) -> None:
+        """027: a service unavailable for longer than its delay (by importance, or its own) gets an
+        incident — once per outage (``outage:<service>:<seq>``), with the importance's severity."""
+        info = await self.service_info(service_id)
+        delay = info.incident_after_minutes if info is not None else None
+        minutes = (now - since).total_seconds() / 60
+        key = f"outage:{service_id}:{seq}"
+        if not delay or minutes < delay or key in self._declared:
+            return
+        port = self.incidents()
+        if port is None:
+            return
+        name = info.name if info is not None else service_id
+        french = (await self._language()).startswith("fr")
+        title = f"{name} ne répond plus" if french else f"{name} is not responding"
+        summary = (
+            f"{name} est injoignable depuis {int(minutes)} minutes ({failures} vérifications échouées)."
+            if french
+            else f"{name} has been unreachable for {int(minutes)} minutes ({failures} failed checks)."
+        )
+        try:
+            await port.create(
+                title=title,
+                source="health",
+                severity=INCIDENT_SEVERITY.get(info.importance if info else "major", "major"),
+                evidence={"service_id": service_id, "state_seq": seq, "failures": failures},
+                service_ids=[service_id],
+                dedup_key=key,
+                summary=summary,
+            )
+            self._declared.add(key)
+            metrics.increment("health.incidents.declared")
+        except Exception as exc:
+            log.warning("automatic incident not declared", extra={"fields": {"error": type(exc).__name__}})
+
+    async def _auto_resolve(self, service_id: str) -> None:
+        """027: the service is back — the incidents the portal declared for it are closed (not the ones a
+        person opened), unless the service asks to keep them open."""
+        info = await self.service_info(service_id)
+        port = self.incidents()
+        resolve = getattr(port, "resolve_for_service", None)
+        if info is None or not info.incident_auto_resolve or resolve is None:
+            return
+        french = (await self._language()).startswith("fr")
+        message = (
+            f"{info.name} répond de nouveau : incident clôturé automatiquement."
+            if french
+            else f"{info.name} answers again: incident closed automatically."
+        )
+        try:
+            if await resolve(service_id, source="health", message=message):
+                metrics.increment("health.incidents.resolved")
+        except Exception as exc:
+            log.warning("automatic incident not resolved", extra={"fields": {"error": type(exc).__name__}})
 
     async def _lasting(self, session: AsyncSession, row: ServiceState, inputs: Inputs, now: datetime) -> None:
         """027: how long the current outage has lasted, once per milestone (5, 10, 15, 30, 60, 120 min)."""
