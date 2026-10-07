@@ -20,6 +20,8 @@ import { Dialog, Menu, type MenuItem } from "../../../design-system/components/O
 import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../../state/regions";
+import { UptimeBars } from "../../services/ServicesHealth";
+import "../../services/services.css";
 import "../admin.css";
 
 /**
@@ -811,6 +813,11 @@ function ServiceCard({
           <Icon name="link" size={14} />
           {service.public_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
         </a>
+      ) : null}
+      {service.state !== "disconnected" ? (
+        <div className="svc-card__uptime">
+          <UptimeBars serviceId={service.id} />
+        </div>
       ) : null}
       <div className="svc-card__sync">
         {service.sync.status === "running" ? (

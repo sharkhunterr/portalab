@@ -1,1 +1,7 @@
-export { HealthBadge, ServiceDetail, ServicesHealth, servicesHealthStrings } from "./ServicesHealth";
+export {
+  HealthBadge,
+  ServiceDetail,
+  ServicesHealth,
+  servicesHealthStrings,
+  UptimeBars,
+} from "./ServicesHealth";

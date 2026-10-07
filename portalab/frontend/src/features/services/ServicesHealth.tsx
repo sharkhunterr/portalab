@@ -376,7 +376,7 @@ interface Bucket {
  * 027: the last 48 hours as a battery of micro-bars — one per hour, green when every check passed, amber
  * when some failed, red when the service was mostly out, grey without checks; each bar tells its hour.
  */
-function UptimeBars({ serviceId }: { serviceId: string }) {
+export function UptimeBars({ serviceId }: { serviceId: string }) {
   const t = useT();
   const format = useFormat();
   const history = useQuery({
