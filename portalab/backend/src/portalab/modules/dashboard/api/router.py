@@ -79,6 +79,8 @@ class DashboardInstanceOut(BaseModel):
     policy: str
     locked: bool
     mandatory: bool
+    movable: bool = True  # 027: a pinned widget members may still move / resize
+    resizable: bool = True
     removable: bool
     hideable: bool
     available: bool
@@ -233,6 +235,8 @@ def _instance(
         policy=instance.policy,
         locked=instance.locked,
         mandatory=instance.mandatory,
+        movable=instance.movable,
+        resizable=instance.resizable,
         removable=instance.removable,
         hideable=instance.hideable,
         available=instance.available,

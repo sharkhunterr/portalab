@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../../api/client";
 import { AdminPage, AdminSection, FormActions, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
@@ -34,7 +34,7 @@ const KEY = ["admin", "dashboard"] as const;
 
 /** A policy without the place fields (only a pinned widget has a place). */
 function withoutPlace(policy: Policy): Policy {
-  const { x: _x, y: _y, w: _w, h: _h, ...rest } = policy;
+  const { x: _x, y: _y, w: _w, h: _h, move: _move, resize: _resize, ...rest } = policy;
   return rest as Policy;
 }
 
@@ -183,6 +183,17 @@ export default function DashboardAdmin() {
                         onChange={(e) => set(widget.key, { ...policy, [field]: Number(e.target.value) })}
                       />
                     ))}
+                    {/* 027: what members may still do with it — it never leaves their dashboard */}
+                    <CheckboxField
+                      label={t("dashboard:admin.allowMove")}
+                      checked={Boolean(policy.move)}
+                      onChange={(e) => set(widget.key, { ...policy, move: e.target.checked })}
+                    />
+                    <CheckboxField
+                      label={t("dashboard:admin.allowResize")}
+                      checked={Boolean(policy.resize)}
+                      onChange={(e) => set(widget.key, { ...policy, resize: e.target.checked })}
+                    />
                   </span>
                 ) : (
                   <span className="admin-muted dashboard-policy__hint">

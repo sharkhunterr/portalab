@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
 import { useAnnounce } from "../../design-system/a11y/Announce";
@@ -12,6 +13,7 @@ import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useMe } from "../auth/useAuth";
+import { useHasPermission } from "../authz/useMyPermissions";
 import { type Change, DASHBOARD_KEY, type Instance, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
@@ -149,6 +151,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
     await session.save();
   };
   /** 027: back to the default dashboard (asks first: my arrangement and widgets are replaced). */
+  const canManage = useHasPermission("dashboard.manage");
   const restoreDefault = async () => {
     if (!window.confirm(t("dashboard:defaultConfirm"))) return;
     await session.cancel();
@@ -261,6 +264,13 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
               <Icon name="sync" size={16} />
               {t("dashboard:default")}
             </Button>
+          ) : null}
+          {arranging && canManage ? (
+            // 027: where the widgets imposed on every member (pinned, required, locked…) are set
+            <Link className="ds-button ds-button--ghost" to="/admin/dashboard">
+              <Icon name="lock" size={16} />
+              {t("dashboard:membersWidgets")}
+            </Link>
           ) : null}
           <p className="dashboard-page__hint">
             {t("dashboard:editHint")}

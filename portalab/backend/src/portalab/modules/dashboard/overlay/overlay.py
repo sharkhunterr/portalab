@@ -47,6 +47,9 @@ class EffectiveInstance:
     available: bool = True  # False: definition gone (plugin disabled) → placeholder
     x: int = 0  # desktop grid coordinates (027 R10)
     y: int = 0
+    # 027: what a member may still do with a widget the administrator pinned or locked
+    movable: bool = True
+    resizable: bool = True
 
     @property
     def removable(self) -> bool:
@@ -90,6 +93,15 @@ def pin_of(policies: Mapping[str, Mapping[str, Any]], key: str) -> tuple[int, in
         return 0, 0, 6, 2
 
 
+def pin_freedom(policies: Mapping[str, Mapping[str, Any]], key: str) -> tuple[bool, bool]:
+    """027: whether members may move (``move``) and resize (``resize``) a pinned widget — neither by
+    default; it stays on their dashboard either way."""
+    raw = policies.get(key) or {}
+    if raw.get("class") != "pinned":
+        return False, False
+    return bool(raw.get("move", False)), bool(raw.get("resize", False))
+
+
 def effective(
     rows: Sequence[StoredInstance],
     policies: Mapping[str, Mapping[str, Any]],
@@ -121,15 +133,19 @@ def effective(
         if definition is not None:
             size = definition.size.clamp(w, h)
             w, h = size.w, size.h
+        pin = pin_of(policies, key)
+        movable, resizable = pin_freedom(policies, key) if pin is not None else (not locked, not locked)
         if locked:
             locked_config = (policies.get(key) or {}).get("lockedConfig")
             if isinstance(locked_config, Mapping):
                 config = {**config, **locked_config}
-            if definition is not None:
+            if definition is not None and not resizable:
                 w, h = definition.size.default.w, definition.size.default.h
-        pin = pin_of(policies, key)
         if pin is not None:
-            x, y, w, h = pin
+            if not movable:
+                x, y = pin[0], pin[1]
+            if not resizable:
+                w, h = pin[2], pin[3]
         out.instances.append(
             EffectiveInstance(
                 row.id,
@@ -145,6 +161,8 @@ def effective(
                 definition is not None,
                 x,
                 y,
+                movable,
+                resizable,
             )
         )
         placed.add(key)
@@ -217,5 +235,5 @@ def _item(index: int, instance: EffectiveInstance, definitions: Mapping[str, Wid
         instance.h,
         GridSize(limits.min.w, limits.min.h) if limits else None,
         GridSize(limits.max.w, limits.max.h) if limits else None,
-        instance.locked,
+        not instance.movable,
     )

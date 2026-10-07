@@ -185,6 +185,21 @@ async def test_pinned_and_reset(app: FastAPI, client: httpx.AsyncClient, dash: D
     view = by_key(await board(client))
     assert (view["t.one"]["x"], view["t.one"]["y"], view["t.one"]["w"]) == (0, 0, 6)  # stays put
 
+    assert not view["t.one"]["movable"] and not view["t.one"]["resizable"]
+
+    # 027: the administrator may let members move (and/or resize) a pinned widget — it still cannot go
+    await login(client, "boss")
+    pins["t.one"] = {**pins["t.one"], "move": True}
+    assert (await client.put("/api/v1/admin/dashboard/policies", json=pins)).status_code == 200
+    await login(client, "alex")
+    view = by_key(await board(client))
+    assert view["t.one"]["movable"] and not view["t.one"]["resizable"]
+    assert (await client.patch(f"/api/v1/dashboard/widgets/{one}", json={"x": 4, "y": 6})).status_code == 200
+    assert (await client.patch(f"/api/v1/dashboard/widgets/{one}", json={"w": 3})).status_code == 409
+    view = by_key(await board(client))
+    assert (view["t.one"]["x"], view["t.one"]["w"]) == (4, 6) and view["t.one"]["mandatory"]
+    assert (await client.delete(f"/api/v1/dashboard/widgets/{one}")).status_code == 409
+
     welcome = view["dashboard.welcome"]["id"]
     assert (await client.delete(f"/api/v1/dashboard/widgets/{welcome}")).status_code == 200
     assert (await client.post("/api/v1/dashboard/widgets", json={"widget_key": "t.many"})).status_code == 201

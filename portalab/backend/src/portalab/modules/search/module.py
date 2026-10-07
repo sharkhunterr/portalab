@@ -222,14 +222,23 @@ class SearchModule:
         )
         return outcome, request_id
 
-    async def suggest(self, principal: Principal, q: str) -> list[dict[str, str]]:
-        """Typeahead: the first matches of each permitted kind (same scoping as ``search``)."""
+    async def suggest(self, principal: Principal, q: str) -> list[dict[str, Any]]:
+        """Typeahead: the first matches of each permitted kind (same scoping as ``search``) — 027: with a
+        line of context and the item's facets, for the header's live results."""
         outcome, _ = await self.search_without_side_effects(principal, q)
         return [
-            {"kind": item.kind, "id": item.id, "title": item.title, "url_ref": item.url_ref}
+            {
+                "kind": item.kind,
+                "id": item.id,
+                "title": item.title,
+                "url_ref": item.url_ref,
+                "snippet": "".join(segment.text for segment in item.snippet)[:160],
+                "facets": dict(item.facets),
+                "group": group.label_key,  # the provider's own label for its kind
+            }
             for group in outcome.groups
-            for item in group.items[:3]
-        ][:10]
+            for item in group.items[:4]
+        ][:16]
 
     async def search_without_side_effects(self, principal: Principal, q: str) -> tuple[SearchOutcome, str]:
         self.limit(principal)

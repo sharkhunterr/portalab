@@ -35,10 +35,9 @@ describe("command palette", () => {
     fake.handler = () => json(200, VIEW);
     const { router } = renderShell();
     await screen.findByRole("link", { name: "Services" });
-    fireEvent.click(screen.getByRole("button", { name: /Search/ }));
-    const input = await screen.findByRole("combobox");
+    const input = screen.getByRole("combobox", { name: /Search/ }); // 027: the header's search
     fireEvent.change(input, { target: { value: "acc" } });
-    const list = screen.getByRole("listbox");
+    const list = await screen.findByRole("listbox");
     expect(within(list).getAllByRole("option")[0]).toHaveTextContent("Account");
     fireEvent.keyDown(input, { key: "Enter" });
     expect(router.state.location.pathname).toBe("/account");

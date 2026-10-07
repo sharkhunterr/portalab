@@ -57,20 +57,50 @@ function Timeline({ data }: { data: Insights }) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  const kinds = KIND_ORDER.filter((k) => data.timeline.points.some((p) => p.seconds[k]));
+  // 027: the same chart in time spent or in plays
+  const [metric, setMetric] = useState<"time" | "plays">("time");
+  const pointValue = (p: Insights["timeline"]["points"][number], kind: string) =>
+    metric === "time"
+      ? Math.round(((p.seconds[kind] ?? 0) / 3600) * 10) / 10
+      : (p.plays_by_kind?.[kind] ?? 0);
+  const kinds = KIND_ORDER.filter((k) => data.timeline.points.some((p) => pointValue(p, k)));
   const rows = data.timeline.points.map((p) => ({
     label: p.date,
-    ...Object.fromEntries(kinds.map((k) => [k, Math.round(((p.seconds[k] ?? 0) / 3600) * 10) / 10])),
+    ...Object.fromEntries(kinds.map((k) => [k, pointValue(p, k)])),
   }));
   const label = (iso: string) =>
     data.timeline.unit === "month"
       ? new Date(iso).toLocaleDateString(undefined, { month: "short", year: "2-digit" })
       : format.date(iso, "short");
+  const toggle = (
+    <fieldset className="insights-toggle">
+      <legend className="visually-hidden">{t("media:insights.chartMetric")}</legend>
+      {(["time", "plays"] as const).map((key) => (
+        <label key={key} className="insights-toggle__item" data-checked={metric === key || undefined}>
+          <input
+            type="radio"
+            name="insights-metric"
+            value={key}
+            checked={metric === key}
+            onChange={() => setMetric(key)}
+          />
+          <Icon name={key === "time" ? "clock" : "play"} size={14} />
+          {t(`media:insights.metric.${key}`)}
+        </label>
+      ))}
+    </fieldset>
+  );
   if (!rows.some((r) => kinds.some((k) => (r as Record<string, number | string>)[k]))) {
-    return <AdminEmpty icon="chart" title={t("media:insights.none")} />;
+    return (
+      <>
+        {toggle}
+        <AdminEmpty icon="chart" title={t("media:insights.none")} />
+      </>
+    );
   }
   return (
     <figure className="insights-chart">
+      {toggle}
       <ResponsiveContainer width="100%" height={240}>
         <BarChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
@@ -85,7 +115,9 @@ function Timeline({ data }: { data: Insights }) {
           <Tooltip
             labelFormatter={(value) => label(String(value))}
             formatter={(value, name) => [
-              measures.duration(Number(value) * 3600),
+              metric === "time"
+                ? measures.duration(Number(value) * 3600)
+                : t("media:insights.playsCount", { count: Number(value) }),
               t(`media:insights.kind.${String(name)}`),
             ]}
             contentStyle={{

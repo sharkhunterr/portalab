@@ -3729,6 +3729,11 @@
             "title": "Mandatory",
             "type": "boolean"
           },
+          "movable": {
+            "default": true,
+            "title": "Movable",
+            "type": "boolean"
+          },
           "policy": {
             "title": "Policy",
             "type": "string"
@@ -3739,6 +3744,11 @@
           },
           "removable": {
             "title": "Removable",
+            "type": "boolean"
+          },
+          "resizable": {
+            "default": true,
+            "title": "Resizable",
             "type": "boolean"
           },
           "status": {

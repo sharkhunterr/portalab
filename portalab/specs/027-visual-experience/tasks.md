@@ -298,6 +298,11 @@ lossless migration.
 - [X] T156 [US3] « A service has been down for N minutes » (`service.outage_lasting` at 5, 10, 15, 30, 60, 120 min, with failed probes) and the automation template « Incident when a service stays down »
 - [X] T157 [US5] Edit a configured service (name, address and settings, write-only secrets kept when empty, public address, sync interval) with a test of the edited values
 - [X] T158 [US10] Automations become an administration hub (overview, new, run history, templates, approvals): cards with trigger sentence, steps and last run; a WHEN / IF / THEN builder with a field per declared parameter, the event's variables, filters, schedules, limits; a detail page with the flow, a dry run on a sample event and runs as step-by-step timelines; `GET /admin/automations` with trigger, steps and runs, `GET /admin/automations/executions`, catalog with event fields; `incident.create`/`ticket.create` declare their parameters
+- [X] T159 [US1] The bell opens a notification panel over the page (sheet; full screen on phones): newest first by day, unread marked, tabs all/unread/alerts, mark all read, open = read + go, archive, preferences and the full center one link away
+- [X] T160 [US1] Search in the header: answers while typing (pages, then the first results of each kind with a line of context and the provider's label, an object opened directly, « all results »), recent searches only before typing, keyboard operable, announced; phones open it over the header; Ctrl/⌘ K and « / » focus it, the command palette moves to Ctrl/⌘ Shift K
+- [X] T161 [US6] Pinned widgets may let members move and/or resize them (`move`, `resize` in the policy; `movable`/`resizable` on instances); the dashboard's edit mode links administrators to the members' widgets page
+- [X] T162 [US7] Media statistics: the activity chart in time spent or in plays (per kind)
+- [X] T163 [US1] Health at a glance in the header: all good, degraded (services in trouble) or incident (incidents in progress), opening the status page
 
 ## Dependencies & Execution Order
 

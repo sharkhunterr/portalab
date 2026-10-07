@@ -52,8 +52,17 @@ function backend(options: { failSearch?: boolean } = {}) {
 
 async function openPalette(text: string) {
   await screen.findByRole("link", { name: "Services" });
-  fireEvent.click(screen.getByRole("button", { name: /Search/ }));
-  const input = await screen.findByRole("combobox");
+  // 027: the palette opens with Mod+Shift+K (Mod+K goes to the header's search)
+  document.body.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "K",
+      ctrlKey: true,
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  const input = within(await screen.findByRole("dialog")).getByRole("combobox");
   fireEvent.change(input, { target: { value: text } });
   return input;
 }

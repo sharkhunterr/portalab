@@ -23,7 +23,7 @@ class DashboardValidators:
             if cls not in POLICY_CLASSES:
                 errors.append(f"{key}: class must be one of {', '.join(POLICY_CLASSES)}")
             allowed = {"class", "condition", "lockedConfig"} | (
-                {"x", "y", "w", "h"} if cls == "pinned" else set()
+                {"x", "y", "w", "h", "move", "resize"} if cls == "pinned" else set()
             )
             extra = set(policy) - allowed if isinstance(policy, dict) else set()
             if extra:
@@ -42,6 +42,9 @@ class DashboardValidators:
                     errors.append(f"{key}: a pinned widget stays inside the 12 columns")
                 elif not (place["y"] >= 0 and 1 <= place["h"] <= 12):
                     errors.append(f"{key}: a pinned widget needs a row and a height")
+            for flag in ("move", "resize"):
+                if flag in policy and not isinstance(policy[flag], bool):
+                    errors.append(f"{key}: « {flag} » is true or false")
             if "lockedConfig" in policy and not isinstance(policy["lockedConfig"], dict):
                 errors.append(f"{key}: lockedConfig must be an object")
         return errors

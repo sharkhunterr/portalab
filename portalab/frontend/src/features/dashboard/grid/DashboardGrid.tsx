@@ -175,6 +175,9 @@ export function DashboardGrid({
       return;
     }
     if (grabbed !== key) return;
+    const freeMove = instance.movable ?? !instance.locked;
+    const freeResize = instance.resizable ?? !instance.locked;
+    if (event.shiftKey ? !freeResize : !freeMove) return;
     const step: Record<string, [number, number]> = {
       ArrowLeft: [-1, 0],
       ArrowRight: [1, 0],
@@ -236,28 +239,35 @@ export function DashboardGrid({
           const dragging = drag?.key === item.id;
           const following = dragging && drag?.mode === "move";
           const at = following && drag ? drag.origin : item;
-          const editable = Boolean(arranger) && !instance.locked;
-          const handles = editable ? (
-            <>
-              <button
-                type="button"
-                className="dash-grip"
-                aria-pressed={grabbed === item.id}
-                aria-label={t("dashboard:arrange", { title: titleOf(instance) })}
-                title={t("dashboard:arrangeHint")}
-                onPointerDown={(event) => begin(event, item.id, "move")}
-                onPointerMove={track}
-                onPointerUp={end}
-                onPointerCancel={() => setDrag(null)}
-                onKeyDown={(event) => onKey(event, item.id)}
-              >
-                <Icon name="grip" size={18} />
-              </button>
-              {edge(item.id, "east")}
-              {edge(item.id, "south")}
-              {edge(item.id, "corner")}
-            </>
-          ) : null;
+          // 027: a pinned widget may be movable and/or resizable when the administrator allows it
+          const movable = Boolean(arranger) && (instance.movable ?? !instance.locked);
+          const resizable = Boolean(arranger) && (instance.resizable ?? !instance.locked);
+          const handles =
+            movable || resizable ? (
+              <>
+                <button
+                  type="button"
+                  className="dash-grip"
+                  aria-pressed={grabbed === item.id}
+                  aria-label={t("dashboard:arrange", { title: titleOf(instance) })}
+                  title={t("dashboard:arrangeHint")}
+                  onPointerDown={(event) => (movable ? begin(event, item.id, "move") : undefined)}
+                  onPointerMove={track}
+                  onPointerUp={end}
+                  onPointerCancel={() => setDrag(null)}
+                  onKeyDown={(event) => onKey(event, item.id)}
+                >
+                  <Icon name="grip" size={18} />
+                </button>
+                {resizable ? (
+                  <>
+                    {edge(item.id, "east")}
+                    {edge(item.id, "south")}
+                    {edge(item.id, "corner")}
+                  </>
+                ) : null}
+              </>
+            ) : null;
           return (
             <li
               key={item.id}

@@ -39,7 +39,9 @@ export function conditionLabel(t: Translate, key: string, catalog?: Catalog): st
 }
 
 export function paramLabel(t: Translate, name: string): string {
-  return maybe(t, `automations:param.${name}`, name.replaceAll("_", " "));
+  // catalogs never name keys or tokens (the secret guard): « dedup_key » is looked up as « dedup_ref »
+  const id = name.replace(/key$/, "ref").replace(/tokens$/, "length");
+  return maybe(t, `automations:param.${id}`, name.replaceAll("_", " "));
 }
 
 export const ACTION_ICONS: Record<string, string> = {

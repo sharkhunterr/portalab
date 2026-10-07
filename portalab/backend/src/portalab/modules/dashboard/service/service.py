@@ -43,6 +43,7 @@ from portalab.modules.dashboard.overlay.overlay import (
     Overlay,
     StoredInstance,
     effective,
+    pin_freedom,
     pin_of,
     policy_class,
 )
@@ -433,7 +434,7 @@ class DashboardService:
             row.h,
             GridSize(limits.min.w, limits.min.h) if limits else None,
             GridSize(limits.max.w, limits.max.h) if limits else None,
-            policy_class(policies, row.widget_key) in LOCKED,
+            policy_class(policies, row.widget_key) in LOCKED and not pin_freedom(policies, row.widget_key)[0],
         )
 
     async def _rearrange(
@@ -457,10 +458,14 @@ class DashboardService:
         )
         policies = self.config().widget_policies
         active = [r for r in rows if r.status == "active"]
-        for row in active:  # 027: pinned widgets always sit at the administrator's place
+        for row in active:  # 027: pinned widgets sit at the administrator's place (unless members move them)
             pin = pin_of(policies, row.widget_key)
             if pin is not None:
-                row.x, row.y, row.w, row.h = pin
+                move, resize = pin_freedom(policies, row.widget_key)
+                if not move or row in session.new:
+                    row.x, row.y = pin[0], pin[1]
+                if not resize or row in session.new:
+                    row.w, row.h = pin[2], pin[3]
         if by_position:  # an ordered list (legacy layout/position writes, starter): flow it into rows
             ordered = sorted(active, key=lambda r: (r.position, str(r.id)))
             pinned = [self._grid(r, policies) for r in ordered if pin_of(policies, r.widget_key)]
@@ -554,8 +559,10 @@ class DashboardService:
                         )
                     row = found
                 pin = pin_of(policies, row.widget_key)
-                if pin is not None:  # 027: pinned — always at the administrator's place
-                    row.x, row.y, row.w, row.h = pin
+                if pin is not None:  # 027: pinned — at the administrator's place, unless members may move it
+                    move, resize = pin_freedom(policies, row.widget_key)
+                    row.x, row.y = (item.x, item.y) if move else (pin[0], pin[1])
+                    row.w, row.h = (item.w, item.h) if resize else (pin[2], pin[3])
                     continue
                 if policy_class(policies, row.widget_key) == "locked":
                     if (item.x, item.y, item.w, item.h) != (
@@ -715,8 +722,16 @@ class DashboardService:
                 if status == "active" and widget is None:
                     raise WidgetUnavailableError("This widget is not available.")
                 row.status = status
-            if cls in LOCKED and any(v is not None for v in (position, w, h, x, y, config)):
-                raise PolicyLocked("This widget is locked by your administrator.")
+            if cls in LOCKED:
+                # 027: a pinned widget may still be moved and/or resized when the administrator allows it
+                move, resize = pin_freedom(policies, row.widget_key)
+                refused = (
+                    config is not None
+                    or (not move and any(v is not None for v in (position, x, y)))
+                    or (not resize and any(v is not None for v in (w, h)))
+                )
+                if refused:
+                    raise PolicyLocked("This widget is locked by your administrator.")
             if position is not None:
                 await self._move(session, user, row, position)
             resize_to: tuple[UUID, int, int] | None = None

@@ -5,10 +5,12 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import type { DeviceClass } from "../../design-system/components/Layout";
 import { useT } from "../../i18n/hooks/useT";
+import { useNavigationView } from "../nav/NavigationProvider";
 import { usePalette } from "../palette/PaletteContext";
 import { RegionBoundary } from "../router/RouteBoundary";
 import { useSlots } from "../slots/providers";
 import { useShellStrings } from "../strings";
+import { HeaderSearch } from "./HeaderSearch";
 import { type PersonalEntry, PersonalMenu } from "./PersonalMenu";
 import { ProgressChip } from "./ProgressChip";
 import type { useHeaderData } from "./useHeaderData";
@@ -57,7 +59,7 @@ export function AppHeader({
           <Link to="/" className="ds-button ds-button--ghost ds-button--icon" aria-label={strings.home}>
             <Icon name="home" />
           </Link>
-          <SearchField compact />
+          <HeaderSearch phone />
         </div>
         <div className="shell-header__end">
           <IncidentsButton />
@@ -90,9 +92,7 @@ export function AppHeader({
         </a>
       </div>
       {bottomBar ? null : (
-        <div className="shell-header__search">
-          <SearchField compact={phone} />
-        </div>
+        <div className="shell-header__search">{phone ? <SearchField compact /> : <HeaderSearch />}</div>
       )}
       <div className="shell-header__end">
         <AssistantButton />
@@ -167,23 +167,48 @@ function AssistantButton() {
   );
 }
 
-/** 027: incidents in progress, with their count — only while there are some. */
+/**
+ * 027: the portal's health at a glance — all good, degraded (with the number of services in trouble) or
+ * incident (with the number of incidents in progress); it opens the service status page.
+ */
 export function IncidentsButton() {
   const t = useT();
+  const { view } = useNavigationView();
+  const canRead = view.groups.some((g) => g.entries.some((e) => e.key === "health.services"));
   const open = useQuery({
     queryKey: ["incidents", "open"],
     retry: false,
     refetchInterval: 60_000,
     queryFn: async () =>
-      ((await api.GET("/api/v1/incidents", { params: { query: { state: "open" } } })).data ?? []) as unknown[],
+      ((await api.GET("/api/v1/incidents", { params: { query: { state: "open" } } })).data ??
+        []) as unknown[],
   });
-  const count = Array.isArray(open.data) ? open.data.length : 0;
-  if (!count) return null;
-  const label = t("shell:incidents", { count });
+  const services = useQuery({
+    queryKey: ["shell", "health-summary"],
+    enabled: canRead,
+    retry: false,
+    refetchInterval: 60_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/services/health")).data as unknown as { items: Array<{ state: string }> })
+        .items,
+  });
+  const incidents = Array.isArray(open.data) ? open.data.length : 0;
+  const items = Array.isArray(services.data) ? services.data : [];
+  const troubled = items.filter((s) => s.state === "unavailable" || s.state === "degraded").length;
+  if (!incidents && !canRead) return null;
+  if (!incidents && !items.length) return null;
+  const state = incidents ? "incident" : troubled ? "degraded" : "ok";
+  const count = incidents || troubled;
+  const label =
+    state === "incident"
+      ? t("shell:incidents", { count })
+      : state === "degraded"
+        ? t("shell:health.degraded", { count })
+        : t("shell:health.ok");
   return (
-    <Link to="/incidents" className="shell-incidents" aria-label={label} title={label}>
-      <Icon name="alert" size={18} />
-      <span aria-hidden="true">{count}</span>
+    <Link to="/services" className="shell-health" data-state={state} aria-label={label} title={label}>
+      <Icon name={state === "incident" ? "alert" : state === "degraded" ? "warning" : "heart"} size={18} />
+      {state === "ok" ? null : <span aria-hidden="true">{count}</span>}
     </Link>
   );
 }

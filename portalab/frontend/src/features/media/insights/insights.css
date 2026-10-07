@@ -340,3 +340,37 @@
   block-size: 100%;
   object-fit: cover;
 }
+
+/* 027 — the activity chart in time spent or in plays */
+.insights-toggle {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 0 var(--space-2);
+  padding: 2px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+}
+.insights-toggle__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.insights-toggle__item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.insights-toggle__item[data-checked] {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+.insights-toggle__item:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+}

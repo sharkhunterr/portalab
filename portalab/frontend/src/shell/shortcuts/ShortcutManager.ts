@@ -17,7 +17,9 @@ export function isTyping(target: EventTarget | null): boolean {
 
 export function keyOf(event: KeyboardEvent): string {
   const mod = event.metaKey || event.ctrlKey ? "mod+" : "";
-  return `${mod}${event.key.toLowerCase()}`;
+  // 027: Shift counts with a modifier and a letter (Mod+Shift+K); « ? » stays « ? »
+  const shift = mod && event.shiftKey && /^[a-z]$/i.test(event.key) ? "shift+" : "";
+  return `${mod}${shift}${event.key.toLowerCase()}`;
 }
 
 export class ShortcutManager {
@@ -45,7 +47,7 @@ export class ShortcutManager {
   handle(event: KeyboardEvent): boolean {
     const key = keyOf(event);
     const typing = isTyping(event.target);
-    if (typing && key !== "mod+k") return false;
+    if (typing && key !== "mod+k" && key !== "mod+shift+k") return false;
     if (this.pendingChord) {
       const chord = `${this.pendingChord} ${key}`;
       this.clearChord();

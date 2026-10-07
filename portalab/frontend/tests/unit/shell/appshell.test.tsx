@@ -26,7 +26,7 @@ describe("AppShell", () => {
     expect(screen.getByRole("banner")).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#main-content");
-    expect(screen.getByRole("button", { name: /Search/ })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /Search/ })).toBeInTheDocument(); // 027: in the header
     expect(screen.queryByRole("button", { name: /Assistant/ })).toBeNull(); // 027: no inert assistant button
     const banner = screen.getByRole("banner");
     await act(() => router.navigate("/account"));
@@ -47,15 +47,16 @@ describe("AppShell", () => {
     await screen.findByRole("link", { name: "Services" });
     fireEvent.click(screen.getByRole("button", { name: "Assistant" }));
     expect(open).toHaveBeenCalledWith({ route: "/" });
-    fireEvent.click(screen.getByRole("button", { name: /Search/ }));
-    expect(await screen.findByRole("combobox")).toBeInTheDocument();
+    // 027: the header's search answers while one types
+    fireEvent.change(screen.getByRole("combobox", { name: /Search/ }), { target: { value: "acc" } });
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
   });
 
   it("degraded navigation is explained without hiding the rest of the shell", async () => {
     fake.handler = () => json(200, { ...VIEW, groups: [], degraded: true });
     renderShell();
     expect(await screen.findByText("Navigation is limited right now.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Search/ })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /Search/ })).toBeInTheDocument();
     expect(within(screen.getByRole("main")).getByRole("heading", { name: "Home page" })).toBeInTheDocument();
   });
 });

@@ -1,6 +1,12 @@
 import { Link } from "react-router";
 import { Avatar } from "../../design-system/components/Avatar";
-import { CoinBadge, compactNumber, LevelBadge, levelProgress, ProgressBar } from "../../design-system/components/Badges";
+import {
+  CoinBadge,
+  compactNumber,
+  LevelBadge,
+  levelProgress,
+  ProgressBar,
+} from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
@@ -56,7 +62,10 @@ export function ProfileCard({
       {progression ? (
         <Link to="/progression" className="shell-profile__progress" onClick={onNavigate}>
           <span className="shell-profile__level">
-            <LevelBadge level={progression.level} label={t("shell:levelLabel", { level: progression.level })} />
+            <LevelBadge
+              level={progression.level}
+              label={t("shell:levelLabel", { level: progression.level })}
+            />
             <span className="shell-profile__bar">
               <ProgressBar value={ratio} label={progressLabel} size="sm" />
             </span>

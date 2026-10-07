@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
+import { focusHeaderSearch } from "./header/HeaderSearch";
 import { ProfileCard } from "./header/ProfileCard";
 import { useHeaderData } from "./header/useHeaderData";
 import { BottomBar } from "./nav/BottomBar";
@@ -60,7 +61,10 @@ export function AppShell({
   const [helpOpen, setHelpOpen] = useState(false);
   const control = useMemo(
     () => ({
-      open: (query = "") => setPalette({ open: true, query }),
+      // 027: the header's search answers first; the palette remains where the header has none
+      open: (query = "") => {
+        if (!focusHeaderSearch(query)) setPalette({ open: true, query });
+      },
       openShortcuts: () => setHelpOpen(true),
     }),
     [],
@@ -69,13 +73,14 @@ export function AppShell({
     () =>
       new ShortcutManager(
         [
+          { id: "search", description: "Search", defaultKeys: "mod+k", run: () => control.open() },
+          { id: "search-slash", description: "Search", defaultKeys: "/", run: () => control.open() },
           {
             id: "palette",
             description: "Open the command palette",
-            defaultKeys: "mod+k",
-            run: () => control.open(),
+            defaultKeys: "mod+shift+k",
+            run: () => setPalette({ open: true, query: "" }),
           },
-          { id: "search", description: "Search", defaultKeys: "/", run: () => control.open() },
           {
             id: "help",
             description: "Show keyboard shortcuts",

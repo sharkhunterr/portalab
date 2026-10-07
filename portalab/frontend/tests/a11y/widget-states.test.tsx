@@ -37,6 +37,8 @@ function frame(state: string) {
     config: {},
     policy: "free",
     locked: false,
+    movable: true,
+    resizable: true,
     mandatory: false,
     removable: true,
     hideable: true,

@@ -63,7 +63,7 @@ describe("personal header", () => {
       await within(banner).findByRole("button", { name: /Notifications: 3 unread/ }),
     ).toBeInTheDocument();
     expect(within(banner).getByRole("button", { name: "Personal menu: Alice" })).toBeInTheDocument();
-    expect(within(banner).getByRole("button", { name: /Search/ })).toBeInTheDocument();
+    expect(within(banner).getByRole("combobox", { name: /Search/ })).toBeInTheDocument();
   });
 
   it("keeps everything else when progression is unavailable", async () => {
@@ -73,7 +73,7 @@ describe("personal header", () => {
     const banner = screen.getByRole("banner");
     expect(await within(banner).findByRole("button", { name: "Personal menu: Alice" })).toBeInTheDocument();
     expect(within(banner).queryByRole("img", { name: /Level/ })).toBeNull();
-    expect(within(banner).getByRole("button", { name: /Search/ })).toBeInTheDocument();
+    expect(within(banner).getByRole("combobox", { name: /Search/ })).toBeInTheDocument();
   });
 
   it("patches the cached progression from a live change", () => {

@@ -75,7 +75,7 @@ def work_key() -> Any:
 
 
 def _point(day: date) -> dict[str, Any]:
-    return {"date": day.isoformat(), "seconds": {}, "plays": 0}
+    return {"date": day.isoformat(), "seconds": {}, "plays": 0, "plays_by_kind": {}}
 
 
 class InsightsQuery:
@@ -251,11 +251,10 @@ class InsightsQuery:
         ).all()
         points: dict[str, dict[str, Any]] = {}
         for at, kind, seconds, plays in rows:
-            point = points.setdefault(
-                at.date().isoformat(), {"date": at.date().isoformat(), "seconds": {}, "plays": 0}
-            )
+            point = points.setdefault(at.date().isoformat(), _point(at.date()))
             point["seconds"][kind] = float(seconds)
             point["plays"] += int(plays)
+            point["plays_by_kind"][kind] = int(plays)  # 027: the activity chart counts plays too
         if win.start is not None and unit == "day":  # days without activity are part of the story
             day = win.start
             while day < win.end:

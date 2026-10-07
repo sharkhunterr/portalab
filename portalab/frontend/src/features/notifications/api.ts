@@ -16,9 +16,10 @@ export interface CenterFilter {
 
 const KEY = ["notifications"] as const;
 
-export function useNotifications(filter: CenterFilter) {
+export function useNotifications(filter: CenterFilter, enabled = true) {
   return useInfiniteQuery({
     queryKey: [...KEY, "list", filter],
+    enabled,
     initialPageParam: null as string | null,
     getNextPageParam: (last: NotificationPage) => last.next_cursor,
     queryFn: async ({ pageParam }) =>

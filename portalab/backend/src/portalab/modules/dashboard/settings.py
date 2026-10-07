@@ -79,7 +79,7 @@ _SCHEMAS: dict[str, Any] = {
 
 _DESCRIPTIONS = {
     "widget_policies": "Per-widget policy: {key: {class: free|default|mandatory|locked|pinned|conditional|"
-    "disabled, condition?, lockedConfig?, x?, y?, w?, h? (pinned)}}.",
+    "disabled, condition?, lockedConfig?, x?, y?, w?, h?, move?, resize? (pinned)}}.",
     "starter_layout": "Starter dashboard applied at onboarding: [{widget_key, w, h, roles?}].",
     "lookback_days": "How far back “Since last login” looks (days).",
     "max_items": "Maximum items shown in “Since last login”.",

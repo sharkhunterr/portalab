@@ -518,7 +518,7 @@ function EditService({
               label={maybe(t, `admin:services.access.${ACCESS_LABELS[field] ?? field}`, field)}
               hint={
                 service.secrets_set?.includes(field)
-                  ? t("admin:services.edit.secretKept")
+                  ? t("admin:services.edit.storedHint")
                   : t("admin:services.writeOnly.hint")
               }
               type="password"

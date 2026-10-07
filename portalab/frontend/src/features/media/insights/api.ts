@@ -46,7 +46,13 @@ export interface Insights {
   by_kind: Array<{ kind: string; plays: number; seconds: number }>;
   timeline: {
     unit: "day" | "week" | "month";
-    points: Array<{ date: string; seconds: Record<string, number>; plays: number }>;
+    points: Array<{
+      date: string;
+      seconds: Record<string, number>;
+      plays: number;
+      /** 027: plays per kind (stacked like the time) */
+      plays_by_kind?: Record<string, number>;
+    }>;
   };
   heatmap: Array<{ weekday: number; hour: number; plays: number; seconds: number }>;
   top_works: Work[];

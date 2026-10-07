@@ -8991,12 +8991,22 @@ export interface components {
             locked: boolean;
             /** Mandatory */
             mandatory: boolean;
+            /**
+             * Movable
+             * @default true
+             */
+            movable: boolean;
             /** Policy */
             policy: string;
             /** Position */
             position: number;
             /** Removable */
             removable: boolean;
+            /**
+             * Resizable
+             * @default true
+             */
+            resizable: boolean;
             /**
              * Status
              * @enum {string}
