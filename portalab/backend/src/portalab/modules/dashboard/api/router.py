@@ -383,13 +383,18 @@ async def widget_data(
     key: Annotated[str, Path(max_length=96)],
     module: Module,
     instance: Annotated[UUID | None, Query()] = None,
+    preview: Annotated[bool, Query()] = False,
 ) -> WidgetPayloadOut:
+    """027: ``preview`` — a widget's miniature in the catalog or the shop, before it is bought (the
+    permission still applies; nothing is stored)."""
     stored = None
     if instance is not None:
         instance_key, stored = await module.service.stored_config(principal, instance)
         if instance_key != key:
             raise NotFound("This widget is not on your dashboard.", code="dashboard.instance_not_found")
-    payload = await module.gateway.load(key, principal, await _locale(module, principal), stored)
+    payload = await module.gateway.load(
+        key, principal, await _locale(module, principal), stored, preview=preview and instance is None
+    )
     if payload is None:
         raise NotFound("This widget does not exist.", code="dashboard.widget_not_found")
     return WidgetPayloadOut(

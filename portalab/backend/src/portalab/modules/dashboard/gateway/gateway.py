@@ -85,8 +85,9 @@ class WidgetGateway:
             return None
         return providers[0].provider if providers else None
 
-    async def allowed(self, widget: RegisteredWidget, principal: Principal) -> bool:
-        """Permission, owner enabled, and entitlement for Marketplace widget products (015 F9)."""
+    async def allowed(self, widget: RegisteredWidget, principal: Principal, *, preview: bool = False) -> bool:
+        """Permission, owner enabled, and entitlement for Marketplace widget products (015 F9). 027: a preview
+        (the shop's and the catalog's miniature) needs the permission, not the purchase."""
         try:
             if not await self.authorizer.is_allowed(principal, widget.definition.required_permission):
                 return False
@@ -94,6 +95,8 @@ class WidgetGateway:
             if extensions is not None and not await extensions.enabled(*module_of(widget.owner)):
                 return False
             product = widget.definition.product
+            if preview:
+                return True
             if product is not None:
                 entitlements = self._provider(ENTITLEMENTS)
                 user = principal.acting_for or principal.user_id
@@ -149,12 +152,14 @@ class WidgetGateway:
         principal: Principal,
         ctx: LocaleContext,
         stored_config: Mapping[str, Any] | None = None,
+        *,
+        preview: bool = False,
     ) -> WidgetPayload | None:
         """``None`` when no such widget is registered (the router answers 404)."""
         widget = self.registry.get(key)
         if widget is None:
             return None
-        if not await self.allowed(widget, principal):
+        if not await self.allowed(widget, principal, preview=preview):
             return WidgetPayload("unauthorized")
         config, invalid = resolved_config(widget, stored_config)
         budget = max(0.1, self.config().widget_timeout_ms / 1000)

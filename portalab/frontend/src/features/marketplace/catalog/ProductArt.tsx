@@ -11,11 +11,32 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ThemeMiniature } from "../../appearance/AppearanceSettings";
 import { useMe } from "../../auth/useAuth";
 import { BannerArt, FramedAvatar, StyledName, WornBadge } from "../../community/profile/ProfileHero";
+import { useCatalog } from "../../dashboard/api";
+import { WidgetPreview } from "../../dashboard/catalog/WidgetPreview";
 import { LevelUpPreview } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useProducts } from "../api";
 import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
 import "../product-art.css";
+
+/** 027: a widget product shows the widget itself, in miniature, with the member's own data. */
+function WidgetArt({ product }: { product: Product }) {
+  const catalog = useCatalog(true);
+  const key = text(product.preview as Preview, "widget");
+  const entry = (catalog.data ?? []).find((e) => e.key === key);
+  return (
+    <span className="product-art__widget product-art__widget--live">
+      <WidgetPreview
+        widget={{
+          key: key ?? "",
+          icon: entry?.widget.icon ?? product.icon,
+          template: entry?.widget.template,
+          component_id: entry?.widget.component_id,
+        }}
+      />
+    </span>
+  );
+}
 
 /**
  * A product's art (027): a small pre-rendering of what it is — a notification in that style or animation,
@@ -351,19 +372,7 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
         </span>
       );
     case "widget":
-      return (
-        <span className="product-art__widget">
-          <span className="product-art__widget-head">
-            <Icon name={product.icon ?? "dashboard"} size={14} />
-            <span />
-          </span>
-          <span className="product-art__widget-tiles">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <span key={i} />
-            ))}
-          </span>
-        </span>
-      );
+      return <WidgetArt product={product} />;
     default:
       return fallback; // what cannot be drawn (features, plugins, access…) keeps its icon
   }

@@ -37079,6 +37079,7 @@
     },
     "/api/v1/widgets/{key}/data": {
       "get": {
+        "description": "027: ``preview`` \u2014 a widget's miniature in the catalog or the shop, before it is bought (the\npermission still applies; nothing is stored).",
         "operationId": "widget_data_api_v1_widgets__key__data_get",
         "parameters": [
           {
@@ -37106,6 +37107,16 @@
                 }
               ],
               "title": "Instance"
+            }
+          },
+          {
+            "in": "query",
+            "name": "preview",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Preview",
+              "type": "boolean"
             }
           }
         ],

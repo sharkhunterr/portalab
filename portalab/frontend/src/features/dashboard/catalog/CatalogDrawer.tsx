@@ -7,6 +7,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { InShop } from "../../appearance/InShop";
 import "../../appearance/notification-looks.css";
 import { type CatalogEntry, type Change, useCatalog } from "../api";
+import { WidgetPreview } from "./WidgetPreview";
 
 /**
  * Widget catalog (spec 009 T019; 027 redesign): only the widgets this member can add — permitted, enabled,
@@ -39,13 +40,15 @@ export function CatalogDrawer({ apply }: { apply: (change: Change) => void }) {
     const title = t(entry.widget.title_key);
     return (
       <li key={entry.key} className="widget-gallery__item" data-placed={entry.placed || undefined}>
-        <span
+        <WidgetPreview
           className="widget-gallery__preview"
-          data-template={entry.widget.template ?? "custom"}
-          aria-hidden="true"
-        >
-          <Icon name={entry.widget.icon ?? "dashboard"} size={24} />
-        </span>
+          widget={{
+            key: entry.key,
+            icon: entry.widget.icon,
+            template: entry.widget.template,
+            component_id: entry.widget.component_id,
+          }}
+        />
         <span className="widget-gallery__text">
           <strong>{title}</strong>
           {entry.widget.description_key ? <span>{t(entry.widget.description_key)}</span> : null}

@@ -384,6 +384,18 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
 }
+/* 027: the real widget in miniature */
+.product-art__widget--live {
+  display: block;
+  inline-size: 86%;
+  block-size: 78%;
+  padding: 0;
+  overflow: hidden;
+}
+.product-art__widget--live .widget-preview {
+  inline-size: 100%;
+  block-size: 100%;
+}
 .product-art[data-size="sheet"] .product-art__widget {
   inline-size: min(22rem, 80%);
 }

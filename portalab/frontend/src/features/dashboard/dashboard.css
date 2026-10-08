@@ -1919,3 +1919,31 @@
   gap: 0.2rem;
   white-space: nowrap;
 }
+
+/* 027: a widget's miniature — the real widget, scaled down and inert (catalog, shop) */
+.widget-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--color-accent);
+}
+.widget-preview[data-live] {
+  place-items: start;
+  background: color-mix(in srgb, var(--color-surface-raised) 85%, transparent);
+}
+.widget-preview__scaled {
+  display: block;
+  inline-size: 200%;
+  padding: var(--space-3);
+  transform: scale(0.5);
+  transform-origin: top left;
+  pointer-events: none;
+}
+.widget-preview[data-live]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  block-size: 30%;
+  background: linear-gradient(transparent, var(--color-surface));
+}

@@ -7514,7 +7514,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Widget Data */
+        /**
+         * Widget Data
+         * @description 027: ``preview`` — a widget's miniature in the catalog or the shop, before it is bought (the
+         *     permission still applies; nothing is stored).
+         */
         get: operations["widget_data_api_v1_widgets__key__data_get"];
         put?: never;
         post?: never;
@@ -28360,6 +28364,7 @@ export interface operations {
         parameters: {
             query?: {
                 instance?: string | null;
+                preview?: boolean;
             };
             header?: never;
             path: {
