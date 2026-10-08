@@ -70,6 +70,7 @@ interface ServiceItem {
   alerting?: AlertOverrides;
   sync: {
     status: string;
+    last_attempt_at?: string | null;
     last_success_at: string | null;
     progress?: { capability: string; done: number; total: number | null; started_at: string } | null;
   };
@@ -824,6 +825,14 @@ function ServiceCard({
                   : null
               }
             />
+          ) : service.sync.status === "failed" && service.sync.last_attempt_at ? (
+            // 027: a sync that just failed says so (and when), not « never synchronised »
+            <span className="svc-card__sync-failed has-tone" data-tone="bad">
+              <Icon name="warning" size={14} />{" "}
+              {t("admin:services.syncFailed", {
+                when: format.relative((Date.parse(service.sync.last_attempt_at) - Date.now()) / 1000),
+              })}
+            </span>
           ) : (
             <span className="admin-muted" title={last ? format.dateTime(last) : undefined}>
               <Icon name="sync" size={14} />{" "}

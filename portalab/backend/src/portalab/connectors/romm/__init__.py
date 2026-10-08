@@ -27,7 +27,11 @@ from portalab.capabilities.media import ACCOUNTS, LIBRARY, ServiceAccount
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
 
-PAGE = 250
+PAGE = 100
+# 027: a RomM 4 page carries each game's full metadata — a large library's pages can weigh tens of MB; a
+# page may take up to this much, and one still too big is asked again in smaller pieces
+PAGE_MAX_BYTES = 32 * 1024 * 1024
+SMALLEST_PAGE = 10
 COVER = re.compile(r"^(?!.*\.\.)[A-Za-z0-9_./ -]{1,300}$")
 
 
@@ -75,8 +79,21 @@ class RommConnector(HttpConnector):
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None
     ) -> AsyncIterator[SourceRecord | SyncProgress]:
         offset = 0
+        size = PAGE
         while True:
-            page = await self.get_json(ctx.service, "/api/roms", limit=PAGE, offset=offset, order_by="name")
+            try:
+                page = await self.request(
+                    ctx.service,
+                    "GET",
+                    "/api/roms",
+                    params={"limit": size, "offset": offset, "order_by": "name"},
+                    max_bytes=PAGE_MAX_BYTES,
+                )
+            except ConnectionError as exc:
+                if "larger than" not in str(exc) or size <= SMALLEST_PAGE:
+                    raise
+                size = max(SMALLEST_PAGE, size // 2)  # too heavy: the same games in smaller pages
+                continue
             if isinstance(page, list):  # RomM 3: the whole list
                 games, total = page, len(page)
             elif isinstance(page, Mapping) and isinstance(page.get("items"), list):

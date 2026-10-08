@@ -176,3 +176,26 @@ async def test_item_links_open_the_title_page() -> None:
     )
     grimmory = GrimmoryConnector().provider(ITEM_LINKS, handle_for("grimmory"))
     assert await grimmory.item_path("42", "book") == "/book/42?tab=view"
+
+
+async def test_romm_heavy_pages_are_asked_again_smaller() -> None:
+    """027: a RomM 4 page full of metadata can exceed the response cap; the same games come in smaller
+    pages instead of failing the whole sync."""
+
+    sizes: list[int] = []
+
+    class Heavy(RommConnector):
+        async def request(self, service: Any, method: str, path: str, **kw: Any) -> Any:
+            if path != "/api/roms":
+                return await super().request(service, method, path, **kw)
+            limit, offset = kw["params"]["limit"], kw["params"]["offset"]
+            sizes.append(limit)
+            if limit > 25:
+                raise ConnectionError("response larger than 33554432 bytes")
+            games = [{"id": i, "name": f"Game {i}"} for i in range(offset, min(offset + limit, 60))]
+            return {"items": games, "total": 60}
+
+    connector = Heavy()
+    found = await records(connector, "romm")
+    assert len(found) == 60
+    assert sizes[:3] == [100, 50, 25]

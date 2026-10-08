@@ -686,6 +686,14 @@
 .svc-card__sync {
   font-size: var(--font-size-sm);
 }
+.svc-card__sync-failed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--tone);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold, 600);
+}
 .svc-card__sync .admin-muted {
   display: inline-flex;
   align-items: center;

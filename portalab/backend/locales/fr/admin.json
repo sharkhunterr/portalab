@@ -438,6 +438,7 @@
   "services.stateColumn": "État",
   "services.status": "Page d'état",
   "services.subtitle": "Connectez les applications que le portail affiche : serveurs média, téléchargeurs, ludothèques…",
+  "services.syncFailed": "La dernière synchro a échoué {when} — voir l'historique",
   "services.syncNow": "Synchroniser",
   "services.syncQueued": "Synchronisation programmée.",
   "services.syncedSoFar": "{count, plural, one {# élément lu} other {# éléments lus}}",

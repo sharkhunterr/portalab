@@ -438,6 +438,7 @@
   "services.stateColumn": "State",
   "services.status": "Status page",
   "services.subtitle": "Connect the applications your portal shows: media servers, downloaders, game libraries…",
+  "services.syncFailed": "Last sync failed {when} — see its history",
   "services.syncNow": "Sync now",
   "services.syncQueued": "Synchronization queued.",
   "services.syncedSoFar": "{count, plural, one {# item read} other {# items read}}",
