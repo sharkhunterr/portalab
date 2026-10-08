@@ -102,7 +102,7 @@ export function departmentOf(type: string): string {
 }
 
 /** The department a product is on (theme packs and other packs part ways). */
-function departmentOfProduct(product: Product): string {
+export function departmentOfProduct(product: Product): string {
   return DEPARTMENTS.find((d) => d.shelves.some((s) => onShelf(s, product)))?.key ?? "features";
 }
 
