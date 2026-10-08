@@ -71,8 +71,11 @@ def parse_time(value: Any) -> datetime | None:
     if value is None or value == "":
         return None
     if isinstance(value, int | float):
-        seconds = value / 1000 if value > 10**11 else value
-        return datetime.fromtimestamp(seconds, tz=UTC)
+        seconds = value / 1000 if abs(value) > 10**11 else value
+        try:
+            return datetime.fromtimestamp(seconds, tz=UTC)
+        except (OverflowError, OSError, ValueError):
+            return None  # 027: a nonsense timestamp from a source is no date, never a failed sync
     try:
         text = str(value).replace("Z", "+00:00")
         if "." in text:  # .NET writes 7 fractional digits; Python accepts at most 6

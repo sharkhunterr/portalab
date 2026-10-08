@@ -105,6 +105,7 @@ class MediaDetail(MediaCard):
     genres: list[str]
     ids: dict[str, str]
     sections: list[str]
+    platform: str | None = None  # 027: a game's console, shown up front
 
 
 class MediaSectionOut(BaseModel):
@@ -240,6 +241,7 @@ def _detail(view: ObjectView) -> MediaDetail:
         genres=[str(g) for g in view.effective.get("genres") or []],
         ids=view.ids,
         sections=list(SECTIONS),
+        platform=view.effective.get("platform") or None,
     )
 
 

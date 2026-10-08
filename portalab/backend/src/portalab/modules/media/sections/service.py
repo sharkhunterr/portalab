@@ -126,6 +126,7 @@ class Sections:
             "publisher",
             "released",
             "tags",
+            "platform",  # 027: a game's console (RomM)
         )
         data = {k: view.effective.get(k) for k in keep if view.effective.get(k) not in (None, "", [])}
         if view.ids.get("isbn"):

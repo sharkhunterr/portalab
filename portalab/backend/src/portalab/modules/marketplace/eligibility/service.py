@@ -15,7 +15,7 @@ from portalab.capabilities.user_grants import ROLES_CAPABILITY
 
 @dataclass(frozen=True, slots=True)
 class Check:
-    name: str  # min_level | achievement | campaign_active | role | coins
+    name: str  # min_level | min_contribution | achievement | campaign_active | role | coins
     value: Any
     met: bool
     reason: str = ""  # "" | "unmet" | "unavailable"
@@ -41,6 +41,12 @@ class Eligibility:
                     return Check(kind, condition["level"], False, "unavailable")
                 ok = await reader.level(user) >= int(condition["level"])
                 return Check(kind, condition["level"], ok, "" if ok else "unmet")
+            if kind == "min_contribution":  # 027: points earned by taking part in the community
+                reader = self._port(PROGRESSION)
+                if reader is None:
+                    return Check(kind, condition["contribution"], False, "unavailable")
+                ok = await reader.contribution(user) >= int(condition["contribution"])
+                return Check(kind, condition["contribution"], ok, "" if ok else "unmet")
             if kind == "achievement":
                 reader = self._port(PROGRESSION)
                 if reader is None:

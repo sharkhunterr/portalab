@@ -226,3 +226,11 @@ def test_romm4_metadata_and_copies() -> None:
     assert payload["tags"] == ["Alien", "Single player"]
     assert payload["publisher"] == "Fox Video Games"
     assert payload["variant"] == "Atari 2600 · USA, Europe · Rev 1"
+
+
+def test_nonsense_timestamps_are_no_date() -> None:
+    """027: a source's absurd release date (RomM had one) leaves the date empty instead of failing."""
+    from portalab.connectors.http_base import parse_time
+
+    assert parse_time(-58_920_000_000_000_000) is None
+    assert game_payload({"id": 1, "first_release_date": -58_920_000_000_000_000}, "X")["year"] is None

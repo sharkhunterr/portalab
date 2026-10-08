@@ -908,3 +908,17 @@ a.media-card__link:focus-visible .media-card__frame {
   font-size: var(--font-size-md);
   padding-inline: var(--space-5);
 }
+
+/* 027: a game's platform, up front in the title */
+.media-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-inline-end: var(--space-2);
+  padding: 0.15rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold, 600);
+}

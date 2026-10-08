@@ -39,6 +39,8 @@ def _p(
     limit: tuple[int, int] | None = None,
     repeatable: bool = False,
     reward_only: bool = False,
+    contribution: int | None = None,
+    config_required: bool = False,
 ) -> None:
     SHOP.append(
         {
@@ -58,6 +60,9 @@ def _p(
             "repeatable": repeatable,
             # 027: given by an achievement only — out of sale (« unavailable »), the design stays exclusive
             "reward_only": reward_only,
+            # 027: Contribution points needed (for those who take part), and a form to fill once bought
+            "contribution": contribution,
+            "config_required": config_required,
         }
     )
 
@@ -1429,7 +1434,15 @@ def definition(product: Product) -> dict[str, Any]:
         "names": product["names"],
         "descriptions": product["descriptions"],
         "payload": product["payload"],
-        "conditions": [{"kind": "min_level", "level": product["level"]}] if product["level"] else [],
+        "conditions": [
+            *([{"kind": "min_level", "level": product["level"]}] if product["level"] else []),
+            *(
+                [{"kind": "min_contribution", "contribution": product["contribution"]}]
+                if product.get("contribution")
+                else []
+            ),
+        ],
+        **({"config_required": True} if product.get("config_required") else {}),
     }
     return {
         "key": product["key"],

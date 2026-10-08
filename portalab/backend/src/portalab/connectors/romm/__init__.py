@@ -23,7 +23,7 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import ACCOUNTS, LIBRARY, ServiceAccount
+from portalab.capabilities.media import ACCOUNTS, ITEM_LINKS, LIBRARY, ServiceAccount
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
 
@@ -93,6 +93,8 @@ def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
         "genres": [g for g in [str(platform) if platform else "", *_names(pick("genres"))] if g][:30],
         "tags": [*_names(pick("franchises")), *_names(pick("game_modes"))][:40],
         "publisher": companies[0][:200] if companies else None,
+        "people": [c[:200] for c in companies[:6]],  # the studios and publishers behind it
+        "platform": str(platform)[:120] if platform else None,
         "image": str(cover).split("?")[0] if cover else None,
         "variant": " · ".join(v for v in variant if v)[:200] or str(game.get("fs_name") or "")[:200] or None,
     }
@@ -110,6 +112,7 @@ class RommConnector(HttpConnector):
         binding(LIBRARY, syncable=True),
         binding(HEALTH_PROBE),
         binding(ACCOUNTS),
+        binding(ITEM_LINKS),  # 027: each game's page in RomM, where it is played
     )
     status_path = "/api/users/me"
     public_path = "/api/heartbeat"
@@ -157,11 +160,15 @@ class RommConnector(HttpConnector):
                 title = game.get("name") or game.get("fs_name_no_ext")
                 if not title:
                     continue
+                try:
+                    payload = game_payload(game, str(title))
+                except (TypeError, ValueError, KeyError, AttributeError):
+                    continue  # 027: one game with odd metadata never stops the whole library
                 yield self.record(
                     ctx.service,
                     safe_id(game.get("id")),
                     "game",
-                    game_payload(game, str(title)),
+                    payload,
                     parse_time(game.get("updated_at") or game.get("created_at")),
                 )
             offset += len(games)
@@ -174,6 +181,8 @@ class RommConnector(HttpConnector):
             return _Covers(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
+        if capability == ITEM_LINKS:
+            return _Links()
         if capability == ACCOUNTS:
             return _Accounts(self, service)
         return None
@@ -185,6 +194,14 @@ class _Covers:
 
     async def fetch_image(self, ref: str) -> bytes:
         return await self.connector.get_bytes(self.service, cover_path(ref))
+
+
+class _Links:
+    """027: a game's page in RomM — its details, with RomM's own « Play » (in the browser when the
+    platform has an emulator)."""
+
+    async def item_path(self, external_id: str, kind: str) -> str | None:
+        return f"/rom/{external_id}" if kind == "game" and external_id.isdigit() else None
 
 
 class _Accounts:

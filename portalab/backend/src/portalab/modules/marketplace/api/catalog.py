@@ -80,6 +80,7 @@ class MarketplaceProductOut(BaseModel):
     limit_count: int | None = None
     limit_days: int | None = None
     min_level: int | None = None
+    min_contribution: int | None = None  # 027: Contribution points needed to acquire it
     # 027: the price now and the campaign reduction behind it (None: the catalog price applies)
     price_now: int | None = None
     discount: MarketplaceDiscountOut | None = None
@@ -184,6 +185,10 @@ def product_out(
         limit_count=product.limit_count,
         limit_days=product.limit_days,
         min_level=max(levels) if levels else None,
+        min_contribution=max(
+            (int(c["contribution"]) for c in version.conditions if c.get("kind") == "min_contribution"),
+            default=None,
+        ),
         price_now=now,
         discount=MarketplaceDiscountOut(
             percent=discount.percent,

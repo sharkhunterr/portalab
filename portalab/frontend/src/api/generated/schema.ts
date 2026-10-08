@@ -9944,12 +9944,15 @@ export interface components {
         };
         /**
          * MarketplaceAvailabilityIn
-         * @description 027: copies, purchase limit per period and minimum level (a condition: a new version).
+         * @description 027: copies, purchase limit per period, minimum level and minimum contribution (conditions: a new
+         *     version).
          */
         MarketplaceAvailabilityIn: {
             availability: components["schemas"]["AvailabilityIn"];
             /** Confirmation */
             confirmation?: string | null;
+            /** Min Contribution */
+            min_contribution?: number | null;
             /** Min Level */
             min_level?: number | null;
         };
@@ -10118,6 +10121,8 @@ export interface components {
             limit_count?: number | null;
             /** Limit Days */
             limit_days?: number | null;
+            /** Min Contribution */
+            min_contribution?: number | null;
             /** Min Level */
             min_level?: number | null;
             /** Name */
@@ -10339,6 +10344,8 @@ export interface components {
             overview: string | null;
             /** Parent Id */
             parent_id: string | null;
+            /** Platform */
+            platform?: string | null;
             /** Position */
             position: number | null;
             /** Sections */

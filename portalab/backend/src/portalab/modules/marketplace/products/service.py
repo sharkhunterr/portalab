@@ -222,10 +222,16 @@ class Catalog:
         return product
 
     async def set_availability(
-        self, actor: Principal, key: str, availability: AvailabilityIn, min_level: int | None
+        self,
+        actor: Principal,
+        key: str,
+        availability: AvailabilityIn,
+        min_level: int | None,
+        min_contribution: int | None = None,
     ) -> Product:
-        """027: copies, purchase limit and minimum level. The level is a condition, so changing it makes a
-        new version (the current one copied with the new condition) — purchases keep their snapshot."""
+        """027: copies, purchase limit, minimum level and minimum contribution. Those two are conditions, so
+        changing one makes a new version (the current one copied with the new conditions) — purchases keep
+        their snapshot."""
         async with self.database.unit_of_work() as uow:
             session = uow.session
             product = await session.scalar(select(Product).where(Product.key == key).with_for_update())
@@ -236,9 +242,21 @@ class Catalog:
             product.updated_at = utc_now(self.clock)
             current = await session.get(ProductVersion, (product.id, product.current_version))
             assert current is not None
-            if min_level != self.min_level_of(current):
-                others = [c for c in current.conditions if c.get("kind") != "min_level"]
-                conditions = others + ([{"kind": "min_level", "level": min_level}] if min_level else [])
+            if min_level != self.min_level_of(current) or min_contribution != self.min_contribution_of(
+                current
+            ):
+                others = [
+                    c for c in current.conditions if c.get("kind") not in ("min_level", "min_contribution")
+                ]
+                conditions = (
+                    others
+                    + ([{"kind": "min_level", "level": min_level}] if min_level else [])
+                    + (
+                        [{"kind": "min_contribution", "contribution": min_contribution}]
+                        if min_contribution
+                        else []
+                    )
+                )
                 number = (
                     int(
                         await session.scalar(
@@ -273,6 +291,7 @@ class Catalog:
                 product,
                 **availability.model_dump(),
                 min_level=min_level,
+                min_contribution=min_contribution,
             )
         return product
 
@@ -280,6 +299,11 @@ class Catalog:
     def min_level_of(version: ProductVersion) -> int | None:
         levels = [int(c["level"]) for c in version.conditions if c.get("kind") == "min_level"]
         return max(levels) if levels else None
+
+    @staticmethod
+    def min_contribution_of(version: ProductVersion) -> int | None:
+        points = [int(c["contribution"]) for c in version.conditions if c.get("kind") == "min_contribution"]
+        return max(points) if points else None
 
     async def move(self, actor: Principal, key: str, target: State) -> Product:
         async with self.database.unit_of_work() as uow:

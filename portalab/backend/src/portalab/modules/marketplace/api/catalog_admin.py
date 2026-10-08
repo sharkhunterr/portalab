@@ -53,10 +53,12 @@ class MarketplacePresentationIn(BaseModel):
 
 
 class MarketplaceAvailabilityIn(BaseModel):
-    """027: copies, purchase limit per period and minimum level (a condition: a new version)."""
+    """027: copies, purchase limit per period, minimum level and minimum contribution (conditions: a new
+    version)."""
 
     availability: AvailabilityIn
     min_level: int | None = Field(default=None, ge=1, le=1000)
+    min_contribution: int | None = Field(default=None, ge=1, le=1_000_000)
     confirmation: str | None = None
 
 
@@ -119,11 +121,16 @@ async def product_availability(
     principal: Manager, key: str, body: MarketplaceAvailabilityIn, module: Module
 ) -> MarketplaceProductOut:
     product, version = await module.catalog.get(key)
-    if product.state != "draft" and body.min_level != module.catalog.min_level_of(version):
+    if product.state != "draft" and (
+        body.min_level != module.catalog.min_level_of(version)
+        or body.min_contribution != module.catalog.min_contribution_of(version)
+    ):
         await _confirm_generic(  # a published product's conditions change is sensitive
             module, principal, MANAGE, f"product:{key}", {"revise": key}, body.confirmation
         )
-    await module.catalog.set_availability(principal, key, body.availability, body.min_level)
+    await module.catalog.set_availability(
+        principal, key, body.availability, body.min_level, body.min_contribution
+    )
     product, version = await module.catalog.get(key)
     stock = await module.availability.stock([product])
     return product_out(product, version, False, categories=await category_keys(module), stock=stock)

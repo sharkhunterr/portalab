@@ -1,8 +1,9 @@
 """Product versions (T020; R7, R8, R12, FR-019/020): a closed definition — price in Coins (none: free),
-conditions from a closed set combined with **AND** (``min_level``, ``achievement``, ``campaign_active``,
-``role``), a refund policy, localized names and descriptions, whether the owner must configure it, and a
-type-specific ``payload`` limited to the keys the product type declares. Nothing may express a priority:
-any priority-like key is rejected (no paid priority anywhere, OQ-72)."""
+conditions from a closed set combined with **AND** (``min_level``, ``min_contribution`` — 027: the
+community points a member has earned, to keep some products for those who take part —, ``achievement``,
+``campaign_active``, ``role``), a refund policy, localized names and descriptions, whether the owner
+must configure it, and a type-specific ``payload`` limited to the keys the product type declares. Nothing
+may express a priority: any priority-like key is rejected (no paid priority anywhere, OQ-72)."""
 
 import re
 from collections.abc import Mapping
@@ -20,6 +21,14 @@ class MinLevel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     kind: Literal["min_level"]
     level: int = Field(ge=1, le=1000)
+
+
+class MinContribution(BaseModel):
+    """027: at least this much Contribution (points earned by helping the community)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    kind: Literal["min_contribution"]
+    contribution: int = Field(ge=1, le=1_000_000)
 
 
 class AchievementCondition(BaseModel):
@@ -41,7 +50,8 @@ class RoleCondition(BaseModel):
 
 
 Condition = Annotated[
-    MinLevel | AchievementCondition | CampaignActive | RoleCondition, Field(discriminator="kind")
+    MinLevel | MinContribution | AchievementCondition | CampaignActive | RoleCondition,
+    Field(discriminator="kind"),
 ]
 
 

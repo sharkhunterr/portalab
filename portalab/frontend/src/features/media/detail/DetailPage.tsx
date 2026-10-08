@@ -117,6 +117,45 @@ function BookFacts({ data }: { data: Data }) {
 
 const BOOKS = ["book", "audiobook"];
 
+/** 027: a game's facts (RomM): its platform, publisher and studios, release date, franchises and modes. */
+function GameFacts({ data }: { data: Data }) {
+  const t = useT();
+  const format = useFormat();
+  const companies = Array.isArray(data.people) ? (data.people as string[]) : [];
+  const studios = companies.filter((c) => c !== data.publisher);
+  const rows = [
+    data.platform ? { key: "platform", value: String(data.platform) } : null,
+    data.publisher ? { key: "publisher", value: String(data.publisher) } : null,
+    studios.length ? { key: "studios", value: studios.join(", ") } : null,
+    data.released
+      ? { key: "releasedOn", value: format.date(`${String(data.released)}T12:00:00Z`, "long") }
+      : data.year
+        ? { key: "releasedOn", value: String(data.year) }
+        : null,
+  ].filter((row) => row !== null);
+  const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
+  if (!rows.length && !tags.length) return null;
+  return (
+    <>
+      <dl className="media-facts">
+        {rows.map((row) => (
+          <div key={row.key}>
+            <dt>{t(`media:facts.${row.key}`)}</dt>
+            <dd>{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {tags.length ? (
+        <ul className="media-enriched__chips" aria-label={t("media:facts.tags")}>
+          {tags.map((tag) => (
+            <li key={tag}>{tag}</li>
+          ))}
+        </ul>
+      ) : null}
+    </>
+  );
+}
+
 function SectionBody({
   name,
   section,
@@ -136,6 +175,7 @@ function SectionBody({
           {/* the enriched details already tell the story: no second summary (027) */}
           {data.overview && !enriched ? <p>{String(data.overview)}</p> : null}
           {BOOKS.includes(String(data.kind)) ? <BookFacts data={data} /> : null}
+          {data.kind === "game" ? <GameFacts data={data} /> : null}
           {list(data.children).length ? (
             <>
               <h4>{t("media:detail.children")}</h4>
@@ -309,7 +349,8 @@ function hasContent(name: string, data: Data, enriched = false): boolean {
         (Boolean(data.overview) && !enriched) ||
         list(data.children).length > 0 ||
         (BOOKS.includes(String(data.kind)) &&
-          Boolean(data.people || data.series || data.publisher || data.pages))
+          Boolean(data.people || data.series || data.publisher || data.pages)) ||
+        (data.kind === "game" && Boolean(data.platform || data.publisher || data.people || data.released))
       );
     case "history":
       return list(data.mine).length > 0 || list(data.concerned_users).length > 0;
@@ -391,7 +432,14 @@ function OpenIn({ objectId, kind }: { objectId: string; kind: string }) {
   const best = [...items].sort((a, b) => rank(a) - rank(b))[0];
   if (!best || rank(best) === 99) return null;
   const connector = String(best.connector ?? "");
-  const verb = READ.includes(connector) ? (kind === "audiobook" ? "listen" : "read") : "watch";
+  const verb =
+    kind === "game"
+      ? "play"
+      : READ.includes(connector)
+        ? kind === "audiobook"
+          ? "listen"
+          : "read"
+        : "watch";
   return (
     <a
       className="ds-button ds-button--primary media-open-in"
@@ -399,7 +447,7 @@ function OpenIn({ objectId, kind }: { objectId: string; kind: string }) {
       target="_blank"
       rel="noopener noreferrer external"
     >
-      <Icon name={verb === "watch" ? "play" : "book"} size={18} />
+      <Icon name={verb === "watch" ? "play" : verb === "play" ? "joystick" : "book"} size={18} />
       {t(`media:detail.openIn.${verb}`, { service: String(best.service_name ?? connector) })}
     </a>
   );
@@ -456,9 +504,18 @@ export function DetailPage() {
         }
         context={
           <>
+            {media.platform ? (
+              // 027: a game's console first, plainly
+              <span className="media-platform">
+                <Icon name="joystick" size={14} />
+                {media.platform}
+              </span>
+            ) : null}
             {t(`media:kind.${media.kind}`)} ·{" "}
             {media.available ? t("media:detail.available") : t("media:detail.unavailable")}
-            {media.genres.length ? ` · ${media.genres.join(", ")}` : ""}
+            {media.genres.filter((g) => g !== media.platform).length
+              ? ` · ${media.genres.filter((g) => g !== media.platform).join(", ")}`
+              : ""}
           </>
         }
         primary={

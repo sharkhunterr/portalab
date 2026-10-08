@@ -32,6 +32,7 @@ FIELDS = (
     "publisher",
     "released",
     "tags",
+    "platform",  # 027: a game's console or system (RomM)
 )
 ADMIN = "admin"
 Priorities = Callable[[str], Awaitable[Mapping[str, Sequence[str]]]]

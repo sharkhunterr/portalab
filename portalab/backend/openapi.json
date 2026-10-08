@@ -6382,7 +6382,7 @@
         "type": "object"
       },
       "MarketplaceAvailabilityIn": {
-        "description": "027: copies, purchase limit per period and minimum level (a condition: a new version).",
+        "description": "027: copies, purchase limit per period, minimum level and minimum contribution (conditions: a new\nversion).",
         "properties": {
           "availability": {
             "$ref": "#/components/schemas/AvailabilityIn"
@@ -6397,6 +6397,19 @@
               }
             ],
             "title": "Confirmation"
+          },
+          "min_contribution": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Contribution"
           },
           "min_level": {
             "anyOf": [
@@ -6876,6 +6889,17 @@
               }
             ],
             "title": "Limit Days"
+          },
+          "min_contribution": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Contribution"
           },
           "min_level": {
             "anyOf": [
@@ -7525,6 +7549,17 @@
               }
             ],
             "title": "Parent Id"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
           },
           "position": {
             "anyOf": [

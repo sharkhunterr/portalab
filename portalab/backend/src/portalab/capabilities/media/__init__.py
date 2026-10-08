@@ -101,6 +101,7 @@ class LibraryPayload(BaseModel):
     tags: list[str] = Field(default_factory=list, max_length=40)  # moods and themes (Grimmory)
     # 027: which copy this item is when a service holds several of one title (a game per platform/region)
     variant: str | None = Field(default=None, max_length=200)
+    platform: str | None = Field(default=None, max_length=120)  # 027: a game's console or system
 
 
 class RequestPayload(BaseModel):
