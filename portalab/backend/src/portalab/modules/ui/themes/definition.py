@@ -200,6 +200,7 @@ NOTIFICATION_STYLES = Literal[
     "elven",
     "onering",
     "island",
+    "nostromo",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -233,6 +234,7 @@ NOTIFICATION_ANIMATIONS = Literal[
     "eye",
     "tracking",
     "morph",
+    "uplink",
 ]
 AMBIENTS = Literal[
     "none",
@@ -266,6 +268,7 @@ AMBIENTS = Literal[
     "meadow",
     "ash",
     "bokeh",
+    "nostromo",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -291,6 +294,7 @@ CELEBRATIONS = Literal[
     "fireworks",
     "rewind",
     "bloom",
+    "tracker",
 ]
 PATTERNS = Literal[
     "none",
@@ -336,6 +340,7 @@ LEVEL_UPS = Literal[
     "synthwave", "disco", "glitch", "noir", "spotlight", "upsidedown", "onering",
     "vhs",
     "nova",
+    "nostromo",
 ]  # fmt: skip
 
 
@@ -363,6 +368,8 @@ class Nav(_Closed):
             "lights",
             "vcr",
             "sheet",
+            "console",
+            "console",
         ]
         | None
     ) = None
@@ -380,6 +387,8 @@ class Nav(_Closed):
             "lights",
             "vcr",
             "sheet",
+            "console",
+            "console",
         ]
         | None
     ) = None
@@ -396,6 +405,8 @@ class Nav(_Closed):
             "lights",
             "vcr",
             "sheet",
+            "console",
+            "console",
         ]
         | None
     ) = None
@@ -420,6 +431,8 @@ class Layout(_Closed):
             "terminal",
             "ornate",
             "hologram",
+            "console",
+            "console",
         ]
         | None
     ) = None

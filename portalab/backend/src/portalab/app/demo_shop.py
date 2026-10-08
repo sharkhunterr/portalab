@@ -153,6 +153,13 @@ for key, label, fr, icon, style, rarity, price, level, en_about, fr_about, suppl
     ("badge_pixel_quest", "Pixel quest", "Badge Quête pixel", "sword", "pixel", "rare", 300, None,
      "The fellowship in 8-bit.", "La communauté en 8 bits.", None),
     # 027: VHS and Nova
+    # 027: Nostromo
+    ("badge_interface_2037", "Interface 2037", "Badge Interface 2037", "terminal", "hazard", "rare", 400, None,
+     "Talks to MU/TH/UR without raising its voice.", "Parle à MU/TH/UR sans hausser le ton.", None),
+    ("badge_last_survivor", "Last survivor", "Badge Dernier survivant", "radiation", "hazard", "epic", 800, 7,
+     "Final report of the commercial starship Nostromo.", "Rapport final du cargo commercial Nostromo.", None),
+    ("badge_space_trucker", "Space trucker", "Badge Routier de l'espace", "package", "hazard", "common", 200, None,
+     "Twenty million tons of ore, and a share of the bonus.", "Vingt millions de tonnes de minerai, et sa part de la prime.", None),
     ("badge_be_kind_rewind", "Be kind, rewind", "Badge Rembobinez, svp", "disc", "vhs", "common", 200, None,
      "Always brings the tape back rewound.", "Rend toujours la cassette rembobinée.", None),
     ("badge_video_club", "Video club member", "Badge Membre du vidéoclub", "store", "vhs", "rare", 400, None,
@@ -209,6 +216,10 @@ for key, label, fr, style, rarity, price, level, en_about, fr_about in (
      "The bridge holds.", "Le pont tient."),
     ("title_second_breakfast", "Second breakfast champion", "Titre : Champion du second petit-déjeuner", "none",
      "common", 150, None, "What about elevenses?", "Et l'en-cas de onze heures ?"),
+    ("title_crew_expendable", "Crew expendable", "Titre : Équipage sacrifiable", "hazard", "rare", 400, None,
+     "Special order 937 — read it twice.", "Ordre spécial 937 — à relire deux fois."),
+    ("title_perfect_organism", "Perfect organism", "Titre : Organisme parfait", "hazard", "epic", 750, 7,
+     "Its structural perfection is matched only by its hostility.", "Sa perfection n'a d'égale que son hostilité."),
     ("title_be_kind_rewind", "Be kind, rewind", "Titre : Rembobinez, svp", "vhs", "common", 200, None,
      "The video store's golden rule.", "La règle d'or du vidéoclub."),
     ("title_late_fees", "Late fees collector", "Titre : Roi des pénalités de retard", "vhs", "rare", 350, None,
@@ -340,6 +351,13 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
     ("notif_tracking", "notification_animation", "animation", "tracking", "Bad tracking notifications",
      "Notifications mauvais tracking", "rare", 450, "They arrive torn by bad tracking and leave like a TV switched off.",
      "Elles arrivent déchirées par un mauvais tracking et repartent comme une télé qu'on éteint."),
+    ("notif_nostromo", "notification_style", "style", "nostromo", "Onboard computer notifications",
+     "Notifications ordinateur de bord", "epic", 650,
+     "MU/TH/UR's transmissions: an amber strip, phosphor text, corner brackets and a blinking cursor.",
+     "Les transmissions de MU/TH/UR : bandeau ambre, texte phosphore, coins de cadre et curseur qui clignote."),
+    ("notif_uplink", "notification_animation", "animation", "uplink", "Uplink notifications",
+     "Notifications liaison montante", "rare", 450, "Received line by line with a flicker; they cut out like a monitor.",
+     "Reçues ligne par ligne avec un scintillement ; elles s'éteignent comme un moniteur."),
     ("notif_island", "notification_style", "style", "island", "Island notifications", "Notifications îlot",
      "epic", 650, "A black capsule at the top of the screen, like a phone's island.",
      "Une capsule noire en haut de l'écran, comme l'îlot d'un téléphone."),
@@ -372,6 +390,7 @@ for key, value, en, fr, rarity, price, level in (
     ("effect_fireworks", "fireworks", "Wizard's fireworks", "Feux d'artifice du magicien", "epic", 700, 6),
     ("effect_rewind", "rewind", "Rewind", "Rembobinage", "rare", 400, None),
     ("effect_bloom", "bloom", "Bloom", "Éclosion", "rare", 450, None),
+    ("effect_tracker", "tracker", "Motion tracker", "Détecteur de mouvement", "epic", 650, 6),
 ):  # fmt: skip
     _p(key, "effect", price, rarity, f"{en} celebration", f"Célébration {fr.lower()}",
        f"{en} burst out when you earn a reward or level up.",
@@ -410,6 +429,7 @@ AMBIENT_NAMES = {
     "meadow": ("Shire meadow", "Prairie de la Comté", "rare", 400),
     "ash": ("Ash of Mordor", "Cendres du Mordor", "rare", 450),
     "bokeh": ("Bokeh", "Bokeh", "rare", 450),
+    "nostromo": ("Onboard computer", "Ordinateur de bord", "epic", 700),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -420,7 +440,7 @@ for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
 
 # --------------------------------------------------------------------------------- animated profile backgrounds
 for value in ("starfield", "code-rain", "snow", "embers", "petals", "aurora", "disco", "bats", "fireflies",
-              "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash", "vhs", "bokeh"):  # fmt: skip
+              "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash", "vhs", "bokeh", "nostromo"):  # fmt: skip
     en, fr, rarity, price = AMBIENT_NAMES[value]
     rarity = "legendary" if value == "aurora" else "epic" if rarity in ("epic", "legendary") else "rare"
     _p(f"bg_{value.replace('-', '_')}", "profile_background", {"rare": 450, "epic": 800, "legendary": 1300}[rarity],
@@ -484,6 +504,9 @@ for key, value, en, fr, rarity, price, level, en_about, fr_about in (
     ("banner_vhs", "vhs", "VHS blue screen banner", "Bannière écran bleu VHS", "rare", 450, None,
      "PLAY ▶ on a blue screen, a tracking band and the tape's rainbow.",
      "PLAY ▶ sur écran bleu, une bande de tracking et l'arc-en-ciel de la cassette."),
+    ("banner_nostromo", "nostromo", "Onboard computer banner", "Bannière ordinateur de bord", "epic", 650, 6,
+     "A phosphor grid, a heartbeat running across and a bulkhead's hazard stripe.",
+     "Une grille phosphore, un battement de cœur qui défile et la bande de danger d'une cloison."),
     ("banner_mesh", "mesh", "Colour mesh banner", "Bannière dégradé fluide", "epic", 650, 5,
      "Soft colours drifting like a phone's wallpaper.", "Des couleurs douces qui dérivent comme un fond d'écran de téléphone."),
 ):  # fmt: skip
@@ -539,6 +562,8 @@ for key, value, en, fr, rarity, price, level, en_about, fr_about in (
      "Silver and green, like Lothlórien.", "Argent et vert, comme la Lothlórien."),
     ("frame_vhs", "vhs", "VHS rainbow frame", "Cadre arc-en-ciel VHS", "rare", 400, None,
      "The tape's rainbow around you, slipping now and then.", "L'arc-en-ciel de la cassette autour de vous, qui décroche parfois."),
+    ("frame_tracker", "tracker", "Motion tracker frame", "Cadre détecteur de mouvement", "epic", 650, 6,
+     "Amber brackets and a tracker's sweep going round you.", "Des coins ambrés et le balayage d'un détecteur autour de vous."),
     ("frame_rings", "rings", "Activity rings frame", "Cadre anneaux d'activité", "epic", 700, 6,
      "Three rings filling up around your avatar.", "Trois anneaux qui se remplissent autour de votre avatar."),
 ):  # fmt: skip
@@ -563,6 +588,7 @@ for value, en, fr, rarity, price, level in (
     ("mordor", "Fires of Mordor", "Feux du Mordor", "rare", 450, None),
     ("vhs", "VHS", "Magnétoscope", "rare", 400, None),
     ("nova", "Nova gradient", "Dégradé Nova", "epic", 650, 5),
+    ("nostromo", "Phosphor", "Phosphore", "rare", 450, None),
     ("galaxy", "Galactic", "Galactique", "rare", 400, None),
     ("matrix", "Simulation", "Simulation", "epic", 700, 5),
     ("desert", "Dune sand", "Sable des dunes", "rare", 400, None),
@@ -621,6 +647,7 @@ for value, en, fr, rarity, price, level in (
     ("gondor", "Gondor", "Gondor", "epic", 550, 4),
     ("vhs", "VHS", "Vidéoclub", "rare", 300, None),
     ("nova", "Nova", "Violet Nova", "epic", 550, 4),
+    ("nostromo", "Nostromo", "Nostromo", "rare", 350, None),
 ):  # fmt: skip
     _p(f"palette_{value}", "palette", price, rarity, f"{en} palette", f"Palette {fr.lower()}",
        "Accent colours laid over any theme — try it before buying.",
@@ -653,6 +680,8 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
     ("inferno", "Inferno", "Brasier", "epic", 700, 6, "Your level burns with living flames.", "Votre niveau brûle de flammes vives."),
     ("cassette", "Cassette", "Cassette", "rare", 450, None, "Your level written on the label of a tape.",
      "Votre niveau écrit sur l'étiquette d'une cassette."),
+    ("tracker", "Motion tracker", "Détecteur de mouvement", "epic", 650, 6,
+     "A phosphor disc, the tracker's sweep going round your level.", "Un disque phosphore, le balayage du détecteur autour de votre niveau."),
     ("squircle", "App icon", "Icône d'app", "rare", 450, None, "Your level as a glossy app icon.",
      "Votre niveau en icône d'application brillante."),
     ("upsidedown", "Upside Down", "Monde à l'envers", "epic", 750, 6, "Red neon, a faint mirror, and now and then it turns over.",
@@ -714,6 +743,9 @@ for value, en, fr, about_en, about_fr in (
      "Un anneau d'or tourne dans l'ombre ; le parchemin de votre voyage se déroule."),
     ("vhs", "VHS tape", "Magnétoscope", "The TV comes on: a blue screen, PLAY ▶ and your level in the VCR's letters.",
      "La télé s'allume : écran bleu, PLAY ▶ et votre niveau en lettres de magnétoscope."),
+    ("nostromo", "Onboard computer", "Ordinateur de bord",
+     "The CRT switches on, the motion tracker sweeps behind, MU/TH/UR types your crew file update.",
+     "L'écran s'allume, le détecteur de mouvement balaie, MU/TH/UR tape la mise à jour de votre dossier."),
     ("nova", "Nova sheet", "Volet dépoli", "Soft colours breathe while a frosted sheet slides up with your new level.",
      "Des couleurs douces respirent pendant qu'un volet dépoli glisse avec votre nouveau niveau."),
 ):  # fmt: skip
@@ -912,6 +944,12 @@ THEME_TEXT |= {
         "Back to the video store: a blue screen, PLAY ▶, a VCR to zap between sections like channels, bad tracking and tapes rewinding.",
         "Retour au vidéoclub : écran bleu, PLAY ▶, un magnétoscope pour zapper entre les rubriques comme des chaînes, du mauvais tracking et des cassettes qui rembobinent.",
     ),
+    "nostromo": (
+        "Nostromo",
+        "Nostromo",
+        "The onboard computer of a commercial starship: phosphor and amber on black, a console docked at the bottom with the ship's clock and a heartbeat, MU/TH/UR's transmissions and the motion tracker's pings.",
+        "L'ordinateur de bord d'un cargo spatial : phosphore et ambre sur noir, une console à quai en bas avec l'horloge du vaisseau et un battement de cœur, les transmissions de MU/TH/UR et les bips du détecteur de mouvement.",
+    ),
     "nova": (
         "Nova",
         "Nova",
@@ -928,7 +966,7 @@ THEME_RARITY = {
     "heroes": ("legendary", 1500, 12), "neowave": ("epic", 900, 6), "disco": ("epic", 900, 5),
     "cyberpunk": ("legendary", 1500, 14), "sincity": ("legendary", 1500, 12), "plex": ("epic", 900, 4),
     "upsidedown": ("legendary", 1500, 12), "middleearth": ("legendary", 1500, 12),
-    "vhs": ("epic", 900, 5), "nova": ("legendary", 1500, 10),
+    "vhs": ("epic", 900, 5), "nova": ("legendary", 1500, 10), "nostromo": ("legendary", 1500, 12),
 }  # fmt: skip
 # 027: an interface (the « theme » product) is its colours, fonts, layout, navigation and words; its sold
 # looks (animated background, notifications, celebration, level-up) come with its theme pack
@@ -1282,6 +1320,8 @@ UNIVERSES |= {  # 027: the VHS tape and the phone-like Nova
             "title_be_kind_rewind"),
     "nova": ("banner_mesh", "frame_rings", "name_nova", "notif_island", "effect_bloom", "ambient_bokeh",
              "badge_early_adopter", "title_one_more_thing"),
+    "nostromo": ("banner_nostromo", "frame_tracker", "name_nostromo", "notif_nostromo", "effect_tracker",
+                 "ambient_nostromo", "badge_last_survivor", "title_crew_expendable"),
 }  # fmt: skip
 # 027: each universe's level badge, notification look and level-up moment
 UNIVERSE_EXTRAS = {
@@ -1306,6 +1346,8 @@ UNIVERSE_EXTRAS = {
             "badge_be_kind_rewind", "title_late_fees"),
     "nova": ("level_squircle", "notif_morph", "levelup_nova", "bg_bokeh", "palette_nova", "badge_power_user",
              "title_beta_tester"),
+    "nostromo": ("level_tracker", "notif_uplink", "levelup_nostromo", "bg_nostromo", "palette_nostromo",
+                 "badge_interface_2037", "badge_space_trucker", "title_perfect_organism"),
 }  # fmt: skip
 
 
@@ -1421,6 +1463,11 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Tout pour le vidéoclub : notifications VHS et mauvais tracking, ambiance, bannière, cadre et nom VHS, badges de niveau VHS et cassette, passage de niveau VHS, célébration rembobinage et deux badges.",
      ["notif_vhs", "notif_tracking", "ambient_vhs", "banner_vhs", "frame_vhs", "name_vhs", "level_vhs",
       "level_cassette", "levelup_vhs", "effect_rewind", "badge_rewinder", "badge_be_kind_rewind"], "epic", 6),
+    ("pack_nostromo", "Nostromo pack", "Pack Nostromo",
+     "The onboard computer, without the interface: MU/TH/UR notifications and their uplink, the console ambience, the motion tracker frame, level badge and celebration, the computer's level-up, the banner and the phosphor name.",
+     "L'ordinateur de bord, sans l'interface : notifications MU/TH/UR et leur liaison montante, l'ambiance console, le cadre, le badge de niveau et la célébration détecteur de mouvement, le passage de niveau de l'ordinateur, la bannière et le nom phosphore.",
+     ["notif_nostromo", "notif_uplink", "ambient_nostromo", "frame_tracker", "level_tracker", "effect_tracker",
+      "levelup_nostromo", "banner_nostromo", "name_nostromo"], "epic", 7),
     ("pack_nova", "Nova pack", "Pack Nova",
      "A phone's look: island and morph notifications, the app-icon level badge, the sheet level-up, colour mesh, activity rings, the gradient name, bloom and bokeh.",
      "Le style d'un téléphone : notifications îlot et métamorphose, badge de niveau icône d'app, passage de niveau en volet, dégradé fluide, anneaux d'activité, nom en dégradé, éclosion et bokeh.",
@@ -1455,6 +1502,15 @@ for product in SHOP:
             "en": f"{product['descriptions']['en']} — {saved} Coins saved.",
             "fr": f"{product['descriptions']['fr']} — {saved} Coins d'économie.",
         }
+        # 027: a pack is as rare as what it holds is worth — a few legendary flagships, then epic, rare, common
+        if product["key"] in LEGENDARY or price >= 7500:
+            product["rarity"] = "legendary"
+        elif price >= (5000 if product["key"].startswith("ultimate_") else 3500):  # theme packs hold more
+            product["rarity"] = "epic"
+        elif price >= 1500:
+            product["rarity"] = "rare"
+        else:
+            product["rarity"] = "common"
 
 COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("ultimate", "Theme packs", "crown", 1),

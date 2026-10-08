@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "key": "nostromo",
+  "name": "Nostromo",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#05080c",
+    "surfaceRaised": "#0b1219",
+    "text": "#dce6f0",
+    "textMuted": "#8796a3",
+    "border": "#2c3842",
+    "accent": "#e8c234",
+    "accentContrast": "#05080c",
+    "focus": "#3de88a",
+    "accentAlt": "#3de88a",
+    "rarity": {
+      "common": "#8796a3",
+      "rare": "#5ab0e8",
+      "epic": "#a98bf0",
+      "legendary": "#e8c234"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#c9d4de",
+      "bg": "#111a22",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#3de88a",
+      "bg": "#0b1f16",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#e8c234",
+      "bg": "#211c0b",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f5dc6e",
+      "bg": "#211d0f",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ff8a6b",
+      "bg": "#2a130e",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#ff9c82",
+      "bg": "#26140f",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6f6",
+      "bg": "#1a1628",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#ffb39e",
+      "bg": "#28150f",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#9aa8b4",
+      "bg": "#111a22",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ad0f2",
+      "bg": "#0d1a26",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"JetBrains Mono\", ui-monospace, monospace",
+    "headingFamily": "\"JetBrains Mono\", ui-monospace, monospace",
+    "headingCase": "uppercase",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0,
+    "md": 0.1
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "tracker",
+    "fastMs": 100,
+    "normalMs": 200,
+    "levelUp": "nostromo"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "console",
+      "tablet": "console",
+      "phone": "console"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "console",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "gauge",
+      "film": "film",
+      "media": "database",
+      "compass": "satellite",
+      "server": "cpu",
+      "users": "users",
+      "shop": "package",
+      "lifebuoy": "activity",
+      "trophy": "target",
+      "search": "scan"
+    }
+  },
+  "background": {
+    "fallback": "#05080c",
+    "pattern": "scanlines",
+    "ambient": "nostromo"
+  },
+  "sounds": {
+    "notification": "asset:tracker/notification.wav",
+    "alert": "asset:tracker/alert.wav",
+    "success": "asset:tracker/success.wav",
+    "reward": "asset:tracker/reward.wav",
+    "levelUp": "asset:tracker/level-up.wav",
+    "ui": "asset:tracker/ui.wav"
+  },
+  "notification": {
+    "style": "nostromo",
+    "animation": "uplink"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le pont",
+      "nav:nav.section.home": "Le pont",
+      "dashboard:title": "Le pont",
+      "nav:nav.media": "Archives audiovisuelles",
+      "nav:nav.section.media": "Archives audiovisuelles",
+      "media:home.title": "Archives audiovisuelles",
+      "nav:nav.media_requests": "Demandes de ravitaillement",
+      "nav:nav.media_insights": "Télémétrie",
+      "media:insights.title": "Télémétrie",
+      "nav:nav.section.content": "Journal de bord",
+      "nav:nav.news": "Transmissions",
+      "news:title": "Transmissions",
+      "nav:nav.wiki": "Manuel de bord",
+      "wiki:title": "Manuel de bord",
+      "nav:nav.search": "Balayage",
+      "search:title": "Balayage",
+      "nav:nav.calendar": "Plan de vol",
+      "calendar:title": "Plan de vol",
+      "nav:nav.services": "Systèmes du vaisseau",
+      "nav:nav.section.services": "Systèmes du vaisseau",
+      "nav:nav.statistics": "Télémétrie de bord",
+      "statistics:title": "Télémétrie de bord",
+      "nav:nav.community": "L'équipage",
+      "nav:nav.section.community": "L'équipage",
+      "community:title": "L'équipage",
+      "nav:nav.progression": "Dossier d'équipage",
+      "gamification:progression.title": "Dossier d'équipage",
+      "nav:nav.campaigns": "Ordres de mission",
+      "campaigns:page.title": "Ordres de mission",
+      "nav:nav.marketplace": "L'intendance",
+      "nav:nav.section.marketplace": "L'intendance",
+      "marketplace:catalog.title": "L'intendance",
+      "nav:nav.projects": "Projets de la Compagnie",
+      "marketplace:projects.title": "Projets de la Compagnie",
+      "marketplace:owned.title": "Ma cargaison",
+      "nav:nav.support": "L'infirmerie",
+      "nav:nav.section.support": "L'infirmerie",
+      "nav:nav.incidents": "Anomalies",
+      "support:incident.title": "Anomalies",
+      "nav:nav.feedback": "Rapports d'équipage",
+      "support:feedback.title": "Rapports d'équipage",
+      "gamification:value.coins": "Crédits"
+    },
+    "en": {
+      "nav:nav.home": "The bridge",
+      "nav:nav.section.home": "The bridge",
+      "dashboard:title": "The bridge",
+      "nav:nav.media": "Audiovisual archives",
+      "nav:nav.section.media": "Audiovisual archives",
+      "media:home.title": "Audiovisual archives",
+      "nav:nav.media_requests": "Supply requests",
+      "nav:nav.media_insights": "Telemetry",
+      "media:insights.title": "Telemetry",
+      "nav:nav.section.content": "Ship's log",
+      "nav:nav.news": "Transmissions",
+      "news:title": "Transmissions",
+      "nav:nav.wiki": "Ship's manual",
+      "wiki:title": "Ship's manual",
+      "nav:nav.search": "Scan",
+      "search:title": "Scan",
+      "nav:nav.calendar": "Flight plan",
+      "calendar:title": "Flight plan",
+      "nav:nav.services": "Ship systems",
+      "nav:nav.section.services": "Ship systems",
+      "nav:nav.statistics": "Ship telemetry",
+      "statistics:title": "Ship telemetry",
+      "nav:nav.community": "The crew",
+      "nav:nav.section.community": "The crew",
+      "community:title": "The crew",
+      "nav:nav.progression": "Crew file",
+      "gamification:progression.title": "Crew file",
+      "nav:nav.campaigns": "Mission orders",
+      "campaigns:page.title": "Mission orders",
+      "nav:nav.marketplace": "The commissary",
+      "nav:nav.section.marketplace": "The commissary",
+      "marketplace:catalog.title": "The commissary",
+      "nav:nav.projects": "Company projects",
+      "marketplace:projects.title": "Company projects",
+      "marketplace:owned.title": "My cargo",
+      "nav:nav.support": "The med bay",
+      "nav:nav.section.support": "The med bay",
+      "nav:nav.incidents": "Anomalies",
+      "support:incident.title": "Anomalies",
+      "nav:nav.feedback": "Crew reports",
+      "support:feedback.title": "Crew reports",
+      "gamification:value.coins": "Credits"
+    }
+  }
+}

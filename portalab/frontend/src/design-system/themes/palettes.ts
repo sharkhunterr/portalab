@@ -123,6 +123,10 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#ffd23f", accentAlt: "#00d1ff", contrast: "#141000" },
     light: { accent: "#1d2bd6", accentAlt: "#a16207", contrast: "#ffffff" },
   },
+  nostromo: {
+    dark: { accent: "#e8c234", accentAlt: "#3de88a", contrast: "#05080c" },
+    light: { accent: "#8a6d0b", accentAlt: "#15803d", contrast: "#ffffff" },
+  },
   nova: {
     dark: { accent: "#8b7bff", accentAlt: "#22d3ee", contrast: "#0b0820" },
     light: { accent: "#5b3df5", accentAlt: "#0e7490", contrast: "#ffffff" },

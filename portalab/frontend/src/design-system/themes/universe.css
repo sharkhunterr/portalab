@@ -328,6 +328,55 @@ h3,
   outline-offset: -6px;
   box-shadow: var(--shadow-2);
 }
+/* 027 console (Nostromo): a thin frame, amber corner brackets, section titles led by a line and widely spaced */
+[data-cards="console"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
+  --bracket: color-mix(in srgb, var(--color-accent) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  border-radius: 0;
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) top left / 0.9rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top left / 1px 0.9rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top right / 0.9rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top right / 1px 0.9rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom left / 0.9rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom left / 1px 0.9rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 0.9rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 1px 0.9rem no-repeat,
+    color-mix(in srgb, var(--color-surface-raised) 70%, transparent);
+  box-shadow: none;
+}
+[data-cards="console"] .admin-section__header {
+  border-block-end-color: color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: none;
+}
+[data-cards="console"] .admin-section__title {
+  gap: 0.6rem;
+  color: var(--color-accent-alt);
+  font-size: 0.82rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+[data-cards="console"] .admin-section__title::before {
+  content: "";
+  inline-size: 1.6rem;
+  block-size: 1px;
+  background: currentColor;
+}
+[data-cards="console"] .admin-section__description {
+  letter-spacing: 0.04em;
+}
+[data-cards="console"] :is(.admin-stat, .ds-stat) {
+  border-radius: 0;
+  border-inline-start-width: 3px;
+  background:
+    repeating-linear-gradient(180deg, #ffffff07 0 1px, transparent 1px 3px),
+    color-mix(in srgb, var(--tone, var(--color-accent)) 12%, var(--color-surface-raised));
+}
+[data-cards="console"] .admin-stat__label {
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
 [data-cards="hologram"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget) {
   border: 1px solid transparent;
   background:
@@ -2321,5 +2370,127 @@ h3,
     opacity: 0;
     transform: scale(0.3, 0.5);
     filter: blur(4px);
+  }
+}
+
+/* ================================================================ 027: Nostromo */
+/* nostromo — MU/TH/UR's terminal: an amber transmission strip, phosphor text, corner brackets, a cursor */
+.ds-notifications[data-style="nostromo"] .ds-notification {
+  --bracket: #e8c234;
+  padding-block-start: 2.1rem;
+  border: 1px solid #3de88a55;
+  border-radius: 0;
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) top left / 0.8rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top left / 1px 0.8rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 0.8rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 1px 0.8rem no-repeat,
+    repeating-linear-gradient(180deg, #3de88a0a 0 1px, transparent 1px 3px),
+    #05080cf2;
+  color: #c9f7dd;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  box-shadow:
+    0 0 1.4rem -0.4rem #3de88a55,
+    0 0.8rem 1.6rem -0.8rem #000000;
+}
+.ds-notifications[data-style="nostromo"] .ds-notification::before {
+  content: "INCOMING TRANSMISSION // MU-TH-UR 6000";
+  position: absolute;
+  inset: 0 0 auto;
+  display: block;
+  inline-size: auto;
+  padding: 0.3rem 0.8rem;
+  border-block-end: 1px solid #e8c23455;
+  background: repeating-linear-gradient(-45deg, #e8c2341f 0 6px, transparent 6px 12px), #0b1219;
+  color: #e8c234;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ds-notifications[data-style="nostromo"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.55rem;
+  inset-inline-end: 0.7rem;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  background: #3de88a;
+  box-shadow: 0 0 0.5rem #3de88a;
+  animation: nostromo-lamp 1.6s steps(2, jump-none) infinite;
+}
+.ds-notifications[data-style="nostromo"] .ds-notification__title {
+  color: #e8c234;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 0 0.6rem #e8c23455;
+}
+.ds-notifications[data-style="nostromo"] .ds-notification__body {
+  color: #a9e9c5;
+  text-shadow: 0 0 0.4rem #3de88a40;
+}
+.ds-notifications[data-style="nostromo"] .ds-notification__body::after {
+  content: "";
+  display: inline-block;
+  inline-size: 0.55em;
+  block-size: 1em;
+  margin-inline-start: 0.3em;
+  vertical-align: -0.12em;
+  background: #3de88a;
+  animation: nostromo-lamp 1s steps(2, jump-none) infinite;
+}
+.ds-notifications[data-style="nostromo"] .ds-notification__icon {
+  border: 1px solid #3de88a88;
+  border-radius: 0;
+  background: #3de88a14;
+  color: #3de88a;
+}
+@keyframes nostromo-lamp {
+  50% {
+    opacity: 0.15;
+  }
+}
+/* uplink — the transmission is received line by line, a scan bar running down, a flicker; it cuts out
+   like a monitor switched off */
+.ds-notifications[data-animation="uplink"] .ds-notification {
+  animation-name: universe-notify-uplink;
+  animation-duration: 0.9s;
+  animation-timing-function: steps(9, end);
+}
+.ds-notifications[data-animation="uplink"] .ds-notification[data-leaving] {
+  animation: universe-notify-cutout 0.45s ease-in forwards !important;
+}
+@keyframes universe-notify-uplink {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes universe-notify-cutout {
+  40% {
+    opacity: 1;
+    transform: scaleY(0.04) scaleX(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.02) scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-notifications[data-style="nostromo"] .ds-notification::after,
+  .ds-notifications[data-style="nostromo"] .ds-notification__body::after {
+    animation: none;
   }
 }

@@ -94,6 +94,7 @@ const LAYOUTS: Record<string, string> = {
   sandstorm: "split",
   vhs: "terminal",
   nova: "sheet",
+  nostromo: "terminal",
 };
 /** The big word some looks shout (an onomatopoeia, a code). */
 const WORDS: Record<string, string> = {
@@ -106,6 +107,7 @@ const WORDS: Record<string, string> = {
   pumpkin: "BOO!",
   gift: "HO HO HO",
   vhs: "PLAY ▶",
+  nostromo: "MU/TH/UR 6000",
 };
 /** How many particles each look scatters. */
 const PARTICLES: Record<string, number> = {
@@ -129,6 +131,7 @@ const PARTICLES: Record<string, number> = {
   noir: 50,
   vhs: 14,
   nova: 10,
+  nostromo: 12,
 };
 
 function sample(level: number): Summary {

@@ -57,6 +57,7 @@ PROFILE_BANNERS: tuple[str, ...] = (
     "neon-grid", "mono", "nebula", "skyline", "mirrorball", "night-city",
     "upsidedown", "hawkins", "shire", "mordor", "pixelshire",
     "vhs", "mesh",
+    "vhs", "nostromo",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -64,6 +65,7 @@ AVATAR_FRAMES: tuple[str, ...] = (
     "hero", "disco", "toxic", "sakura",
     "veins", "lights", "onering", "elven",
     "vhs", "rings",
+    "vhs", "tracker",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -71,6 +73,7 @@ PALETTES: tuple[str, ...] = (
     "bubblegum", "polar", "copper", "solar", "berry", "slate", "peach", "crimson",
     "hawkins", "gondor",
     "vhs", "nova",
+    "vhs", "nostromo",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -80,12 +83,14 @@ AMBIENTS: tuple[str, ...] = (
     "vhs", "wind", "tide", "lanterns", "pixelsky",
     "upsidedown", "veins", "meadow", "ash",
     "bokeh",
+    "nostromo",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
     "petals", "bubbles", "assemble", "burn", "shatter", "freeze", "glitch", "portal",
     "flicker", "fireworks",
     "rewind", "bloom",
+    "rewind", "tracker",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -94,6 +99,7 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     "saga", "pirate", "manga", "noir", "vhs",
     "upsidedown", "elven", "onering",
     "island",
+    "nostromo",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -104,6 +110,7 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "blackhole", "melt", "kapow", "portal",
     "flipup", "balrog", "eye",
     "tracking", "morph",
+    "tracking", "uplink",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -112,6 +119,7 @@ NAME_STYLES: tuple[str, ...] = (
     "handwritten", "fire", "ice", "rainbow", "royal",
     "upsidedown", "elvish", "mordor",
     "vhs", "nova",
+    "vhs", "nostromo",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
@@ -119,6 +127,7 @@ BADGE_STYLES: tuple[str, ...] = (
     "vhs", "pixel", "terminal", "water", "wind", "saber",
     "veins", "mirror", "ring", "elven",
     "glass",
+    "hazard",
 )  # fmt: skip
 # 027: the look of the level badge (the « XP badge » in the header, the navigation and on the profile, seen
 # by everyone): ``classic`` is free and changes with the level (a new rank every ten levels)
@@ -127,6 +136,7 @@ LEVEL_BADGES: tuple[str, ...] = (
     "blackhole", "melt", "kapow", "portal", "crown", "inferno",
     "upsidedown", "veins", "lights", "onering", "eye", "mithril", "balrog", "frost", "nebula", "circuit",
     "cassette", "squircle",
+    "cassette", "tracker",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -136,12 +146,14 @@ LEVEL_UPS: tuple[str, ...] = (
     "hud", "minimal", "abduction", "hero", "synthwave", "disco", "glitch", "noir", "spotlight", "upsidedown",
     "onering",
     "vhs", "nova",
+    "vhs", "nostromo",
 )  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
     "cozy", "futuristic", "minimal", "alien", "heroes", "neowave", "disco", "cyberpunk", "sincity", "plex",
     "upsidedown", "middleearth",
     "vhs", "nova",
+    "vhs", "nostromo",
 )  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),

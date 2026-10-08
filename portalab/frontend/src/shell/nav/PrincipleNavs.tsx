@@ -741,3 +741,73 @@ export function SheetNav({ sections }: { sections: readonly NavSection[] }) {
     </nav>
   );
 }
+
+/** The ship's clock: date and time, ticking each second (in the theme's monospaced figures). */
+function ShipClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <span className="shell-console__clock" aria-hidden="true">
+      {now.getFullYear()}.{pad(now.getMonth() + 1)}.{pad(now.getDate())} · {pad(now.getHours())}:
+      {pad(now.getMinutes())}:{pad(now.getSeconds())}
+    </span>
+  );
+}
+
+/**
+ * 027 console (Nostromo): a ship's console docked at the bottom — a status line (MU/TH/UR, the section, NOMINAL,
+ * the ship's clock and a heartbeat trace), then the sections as icons, the current one opened out with its
+ * name in an amber frame; a section with pages opens them above, like the dock.
+ */
+export function ConsoleNav({ sections }: { sections: readonly NavSection[] }) {
+  const strings = useShellStrings();
+  const { current, isActive } = useCurrent(sections);
+  const { open, setOpen, root } = useOpenSection();
+  const section = sections.find((s) => s.key === open);
+  const here = sections.find(isActive);
+  return (
+    <nav ref={root} className="shell-dock shell-console" aria-label={strings.mainNav}>
+      {section ? (
+        <div className="shell-dock__panel shell-console__panel">
+          <p className="shell-dock__title">{strings.label(section.label_key)}</p>
+          <DestinationList section={section} currentKey={current?.key} />
+        </div>
+      ) : null}
+      <p className="shell-console__status" aria-hidden="true">
+        <span className="shell-console__lamp" />
+        <span>MU/TH/UR 6000</span>
+        <span className="shell-console__sep">·</span>
+        <span className="shell-console__here">{here ? strings.label(here.label_key) : "—"}</span>
+        <span className="shell-console__sep">·</span>
+        <span>NOMINAL</span>
+        <ShipClock />
+        <svg
+          className="shell-console__ecg"
+          viewBox="0 0 120 24"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path d="M0 12 H34 L39 12 L42 4 L46 20 L50 2 L54 16 L57 12 H86 L90 9 L93 12 H120" />
+        </svg>
+      </p>
+      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: arrow keys move along the console */}
+      <ul className="shell-dock__bar shell-console__bar" onKeyDown={(event) => moveFocus(event)}>
+        {sections.map((s) => (
+          <li key={s.key}>
+            <SectionItem
+              section={s}
+              active={isActive(s)}
+              open={open === s.key}
+              onToggle={() => setOpen(open === s.key ? null : s.key)}
+              className="shell-dock__item"
+            />
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}

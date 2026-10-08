@@ -14,6 +14,7 @@ import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
 import {
+  ConsoleNav,
   DockNav,
   LauncherNav,
   LightsNav,
@@ -178,6 +179,7 @@ export function AppShell({
         {nav === "dock" ? <DockNav sections={sections} /> : null}
         {nav === "launcher" ? <LauncherNav sections={sections} /> : null}
         {nav === "sheet" ? <SheetNav sections={sections} /> : null}
+        {nav === "console" ? <ConsoleNav sections={sections} /> : null}
         {drawerNav ? (
           <Drawer
             title={shellStrings.mainNav}

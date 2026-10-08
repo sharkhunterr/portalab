@@ -24,6 +24,8 @@ import "@fontsource/fredoka/latin-400.css";
 import "@fontsource/fredoka/latin-700.css";
 import "@fontsource/griffy/latin-400.css";
 import "@fontsource/im-fell-english/latin-400.css";
+import "@fontsource/jetbrains-mono/latin-400.css";
+import "@fontsource/jetbrains-mono/latin-700.css";
 import "@fontsource/luckiest-guy/latin-400.css";
 import "@fontsource/michroma/latin-400.css";
 import "@fontsource/monoton/latin-400.css";

@@ -70,6 +70,21 @@ const SETS = {
     levelUp: [n(300, 0, 0.6, 0.3, { to: 1600 }), n(1600, 0.55, 0.4, 0.22, { vibrato: 8 })],
     ui: [n(1200, 0, 0.05, 0.12, { to: 1800 })],
   },
+  // 027 Nostromo: the motion tracker's pings, the ship's klaxon, MU/TH/UR's terminal blips
+  tracker: {
+    notification: [n(1180, 0, 0.22, 0.26, { decay: 14 }), n(1180, 0.32, 0.18, 0.14, { decay: 16 })],
+    alert: [
+      n(440, 0, 0.32, 0.24, { to: 330, wave: "saw" }),
+      n(440, 0.4, 0.32, 0.24, { to: 330, wave: "saw" }),
+    ],
+    success: arpeggio([660, 880, 1320], 0.06, 0.07, 0.14, { wave: "square" }),
+    reward: [n(1180, 0, 0.2, 0.22, { decay: 14 }), n(1760, 0.14, 0.24, 0.18, { decay: 12 })],
+    levelUp: [
+      ...[0, 0.42, 0.74, 0.98, 1.16, 1.3].map((at, i) => n(1100 + i * 40, at, 0.16, 0.2, { decay: 16 })),
+      n(1760, 1.42, 0.5, 0.2, { decay: 6 }),
+    ],
+    ui: [n(2400, 0, 0.02, 0.08, { wave: "square" })],
+  },
   // simulation, cyberpunk: digital bleeps and glitches
   digital: {
     notification: [n(1320, 0, 0.05, 0.18, { wave: "square" }), n(1760, 0.07, 0.05, 0.18, { wave: "square" })],

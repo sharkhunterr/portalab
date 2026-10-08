@@ -21,7 +21,8 @@ export type NavVariant =
   | "reel"
   | "lights"
   | "vcr"
-  | "sheet";
+  | "sheet"
+  | "console";
 
 export interface Arrangement {
   device: DeviceClass;

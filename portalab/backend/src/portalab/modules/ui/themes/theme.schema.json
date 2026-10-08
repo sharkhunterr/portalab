@@ -765,7 +765,8 @@
             "flicker",
             "fireworks",
             "rewind",
-            "bloom"
+            "bloom",
+            "tracker"
           ]
         },
         "levelUp": {
@@ -799,7 +800,8 @@
             "upsidedown",
             "onering",
             "vhs",
-            "nova"
+            "nova",
+            "nostromo"
           ]
         }
       },
@@ -825,7 +827,8 @@
                 "reel",
                 "lights",
                 "vcr",
-                "sheet"
+                "sheet",
+                "console"
               ]
             },
             "tablet": {
@@ -842,7 +845,8 @@
                 "reel",
                 "lights",
                 "vcr",
-                "sheet"
+                "sheet",
+                "console"
               ]
             },
             "phone": {
@@ -858,7 +862,8 @@
                 "reel",
                 "lights",
                 "vcr",
-                "sheet"
+                "sheet",
+                "console"
               ]
             }
           },
@@ -892,7 +897,8 @@
             "pixel",
             "terminal",
             "ornate",
-            "hologram"
+            "hologram",
+            "console"
           ]
         },
         "content": {
@@ -1027,7 +1033,8 @@
             "veins",
             "meadow",
             "ash",
-            "bokeh"
+            "bokeh",
+            "nostromo"
           ]
         }
       },
@@ -1120,7 +1127,8 @@
             "upsidedown",
             "elven",
             "onering",
-            "island"
+            "island",
+            "nostromo"
           ]
         },
         "animation": {
@@ -1156,7 +1164,8 @@
             "balrog",
             "eye",
             "tracking",
-            "morph"
+            "morph",
+            "uplink"
           ]
         }
       },

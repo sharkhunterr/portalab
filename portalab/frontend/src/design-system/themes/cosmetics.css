@@ -2167,3 +2167,138 @@
     inset 0 -2px 5px #0000002e,
     0 4px 12px #6d5cff55;
 }
+
+/* ================================================================ 027: Nostromo */
+/* banner — the onboard computer: a phosphor grid, a heartbeat running across, the hazard stripe of a
+   bulkhead and MU/TH/UR's header in the corner */
+.profile-banner[data-banner="nostromo"] {
+  background:
+    linear-gradient(90deg, transparent 0 46%, #3de88a 46% 46.4%, transparent 46.4%) 0 0 / 300% 100%,
+    repeating-linear-gradient(-45deg, #e8c234 0 10px, #05080c 10px 20px) 0 100% / 100% 0.55rem no-repeat,
+    repeating-linear-gradient(180deg, #3de88a0d 0 1px, transparent 1px 3px),
+    linear-gradient(#3de88a14 1px, transparent 1px) 0 0 / 2rem 2rem,
+    linear-gradient(90deg, #3de88a14 1px, transparent 1px) 0 0 / 2rem 2rem,
+    radial-gradient(ellipse at 70% 120%, #3de88a26, transparent 60%),
+    #05080c;
+  animation: banner-nostromo-scan 5s linear infinite;
+}
+.profile-banner[data-banner="nostromo"]::before {
+  content: "";
+  position: absolute;
+  inset: 22% 0 32%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 H70 L78 20 L84 6 L92 34 L100 2 L106 28 L112 20 H170 L176 15 L182 20 H240' fill='none' stroke='%233de88a' stroke-width='1.6'/%3E%3C/svg%3E")
+    0 50% / 50% 100% repeat-x;
+  filter: drop-shadow(0 0 4px #3de88a);
+  animation: banner-ecg 3s linear infinite;
+}
+.profile-banner[data-banner="nostromo"]::after {
+  content: "MU/TH/UR 6000 · INTERFACE 2037";
+  position: absolute;
+  inset-block-start: 0.7rem;
+  inset-inline-start: 1rem;
+  color: #e8c234;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 6px #e8c23488;
+  animation: name-flicker 6s steps(1, end) infinite;
+}
+@keyframes banner-nostromo-scan {
+  to {
+    background-position:
+      100% 0,
+      0 100%,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+  }
+}
+@keyframes banner-ecg {
+  to {
+    background-position: -50% 50%;
+  }
+}
+/* frame — the motion tracker: amber brackets round the avatar and a sweep going round */
+.avatar-frame[data-frame="tracker"] {
+  margin: 6px;
+  background: #3de88a55;
+  box-shadow:
+    0 0 0 3px #05080c,
+    0 0 0 4px #e8c23499,
+    0 0 1rem #3de88a55;
+}
+.avatar-frame[data-frame="tracker"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -7px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #3de88a, #3de88a00 32%, transparent 100%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: frame-tracker 2.4s linear infinite;
+}
+@keyframes frame-tracker {
+  to {
+    rotate: 1turn;
+  }
+}
+/* name — phosphor letters in the onboard computer's typeface, a faint flicker */
+.name-style[data-name="nostromo"] {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3de88a;
+  text-shadow:
+    0 0 6px #3de88aaa,
+    0 0 18px #3de88a55;
+  animation: name-flicker 6s steps(1, end) infinite;
+}
+/* badge and title style — hazard: a bulkhead's yellow and black stripes */
+:is(.cosmetic-badge, .cosmetic-title)[data-style="hazard"] {
+  border: 1px solid #e8c234;
+  border-radius: 0;
+  background: repeating-linear-gradient(-45deg, #e8c23433 0 6px, transparent 6px 12px), #05080c;
+  color: #e8c234;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px #05080c;
+}
+.cosmetic-title[data-style="hazard"] {
+  border: 0;
+  background: none;
+  text-shadow: 0 0 8px #e8c23466;
+}
+/* level badge — the tracker's read-out: a phosphor disc, its sweep going round the level */
+:is(:root[data-level-badge="tracker"] .ds-level:not([data-look]), .ds-level[data-look="tracker"]) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #3de88a99;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0 4px, #3de88a26 4px 5px), #05080c;
+  color: #3de88a;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 700;
+  text-shadow: 0 0 6px #3de88a;
+  box-shadow: 0 0 0.6rem #3de88a55;
+}
+:is(:root[data-level-badge="tracker"] .ds-level:not([data-look]), .ds-level[data-look="tracker"])::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  z-index: -1;
+  background: conic-gradient(from 0deg, #3de88a66, transparent 25%);
+  animation: frame-tracker 2.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner[data-banner="nostromo"],
+  .profile-banner[data-banner="nostromo"]::before,
+  .avatar-frame[data-frame="tracker"]::before,
+  :is(:root[data-level-badge="tracker"] .ds-level:not([data-look]), .ds-level[data-look="tracker"])::before {
+    animation: none;
+  }
+}

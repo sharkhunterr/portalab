@@ -1110,3 +1110,112 @@
     opacity: 1;
   }
 }
+
+/* 027 nostromo: an onboard computer's screen — phosphor scanlines, a refresh bar rolling down, the motion
+   tracker's echoes widening from the bottom and blips lighting up here and there; a faint flicker */
+[data-ambient="nostromo"] {
+  background:
+    repeating-linear-gradient(180deg, #3de88a08 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 50% 120%, #3de88a14, transparent 55%),
+    radial-gradient(ellipse at center, transparent 55%, #00000073 100%);
+  animation: ambient-crt-flicker 7s steps(1, end) infinite;
+}
+[data-ambient="nostromo"] > span {
+  inline-size: 0.32rem;
+  block-size: 0.32rem;
+  border-radius: 50%;
+  background: #3de88a;
+  box-shadow: 0 0 0.6rem #3de88acc;
+  opacity: 0;
+  animation-name: ambient-blip;
+  animation-duration: calc(4s + var(--size) * 5s);
+  animation-timing-function: ease-out;
+}
+/* the refresh bar */
+[data-ambient="nostromo"] > span:nth-child(1) {
+  left: 0;
+  top: 0;
+  inline-size: 100%;
+  block-size: 7rem;
+  border-radius: 0;
+  background: linear-gradient(180deg, transparent, #3de88a0a 60%, #3de88a1a 96%, #3de88a33);
+  box-shadow: none;
+  opacity: 1;
+  animation-name: ambient-refresh;
+  animation-duration: 9s;
+  animation-timing-function: linear;
+}
+/* the tracker's echoes: rings widening from the bottom centre, three at a time */
+[data-ambient="nostromo"] > span:nth-child(2),
+[data-ambient="nostromo"] > span:nth-child(3),
+[data-ambient="nostromo"] > span:nth-child(4) {
+  left: calc(50% - 60vmax);
+  top: calc(100% - 60vmax);
+  inline-size: 120vmax;
+  block-size: 120vmax;
+  background: none;
+  border: 1px solid #3de88a59;
+  box-shadow:
+    0 0 1.2rem #3de88a26,
+    inset 0 0 1.2rem #3de88a1a;
+  animation-name: ambient-echo;
+  animation-duration: 6s;
+  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+}
+[data-ambient="nostromo"] > span:nth-child(3) {
+  animation-delay: -2s;
+}
+[data-ambient="nostromo"] > span:nth-child(4) {
+  animation-delay: -4s;
+}
+@keyframes ambient-refresh {
+  from {
+    transform: translate3d(0, -8rem, 0);
+  }
+  to {
+    transform: translate3d(0, 105vh, 0);
+  }
+}
+@keyframes ambient-echo {
+  from {
+    opacity: 0.9;
+    transform: scale(0.02);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+@keyframes ambient-blip {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  68% {
+    opacity: 0.95;
+    transform: scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+@keyframes ambient-crt-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 0.86;
+  }
+  42% {
+    opacity: 1;
+  }
+  77% {
+    opacity: 0.92;
+  }
+  78% {
+    opacity: 1;
+  }
+}

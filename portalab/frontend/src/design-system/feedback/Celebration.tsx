@@ -89,6 +89,8 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   // 027: a tape rewinding (tracking bars racing across); soft colour blooms opening like a phone's wallpaper
   rewind: { count: 10, layer: "screen" },
   bloom: { count: 12, layer: "screen" },
+  // 027: the motion tracker — echoes widening from the bubble, blips lighting up around it
+  tracker: { count: 10, layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

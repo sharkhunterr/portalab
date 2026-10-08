@@ -40,6 +40,11 @@
   --rarity: var(--rarity-common);
 }
 
+/* 027: an item of a pack shows its own rarity, never the pack's (common included) */
+[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+
 [data-rarity="rare"] {
   --rarity: var(--rarity-rare);
 }

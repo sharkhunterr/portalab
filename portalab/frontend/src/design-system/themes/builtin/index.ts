@@ -20,6 +20,7 @@ import matrix from "./matrix.json";
 import middleearth from "./middleearth.json";
 import minimal from "./minimal.json";
 import neowave from "./neowave.json";
+import nostromo from "./nostromo.json";
 import nova from "./nova.json";
 import orbit from "./orbit.json";
 import plex from "./plex.json";
@@ -64,6 +65,7 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   upsidedown,
   middleearth,
   vhs,
+  nostromo,
   nova,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */

@@ -38,6 +38,7 @@ const COUNTS: Partial<Record<Ambient, number>> = {
   upsidedown: 46,
   veins: 14,
   bokeh: 14,
+  nostromo: 12,
   meadow: 60,
   ash: 50,
 };

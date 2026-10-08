@@ -859,3 +859,67 @@
     0 10px 40px #8b7bff66,
     inset 0 0 0 1px #ffffff26;
 }
+
+/* 027 tracker (Nostromo): the motion tracker — echoes widen from the bubble, blips light up around it and
+   draw closer; the bubble is a phosphor read-out */
+[data-effect="tracker"] .celebration-fx {
+  inline-size: 7rem;
+  aspect-ratio: 1;
+  border: 1px solid #3de88a;
+  border-radius: 50%;
+  box-shadow:
+    0 0 1rem #3de88a66,
+    inset 0 0 1rem #3de88a33;
+  translate: -50% -50%;
+  animation-name: fx-echo;
+  animation-duration: 1.4s;
+  animation-delay: calc(var(--i) * 0.28s);
+  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+}
+[data-effect="tracker"] .celebration-fx:nth-child(n + 5) {
+  inline-size: 0.55rem;
+  border: 0;
+  background: #3de88a;
+  box-shadow: 0 0 0.7rem #3de88a;
+  --angle: calc(360deg / 6 * var(--i) + 17deg);
+  animation-name: fx-blip;
+  animation-duration: 1.8s;
+  animation-delay: calc(0.4s + var(--i) * 0.12s);
+}
+@keyframes fx-echo {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+@keyframes fx-blip {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-7rem);
+  }
+  20%,
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-3.2rem);
+  }
+}
+[data-effect="tracker"] .ds-celebration__badge {
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, #3de88a12 0 1px, transparent 1px 3px), #05080cee;
+  color: #3de88a;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 0.6rem #3de88a99;
+  box-shadow:
+    0 0 0 1px #3de88a88,
+    0 0 0 4px #05080c,
+    0 0 0 5px #e8c23488,
+    0 0 26px #3de88a55;
+}
