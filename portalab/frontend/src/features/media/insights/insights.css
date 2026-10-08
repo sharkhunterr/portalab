@@ -159,6 +159,33 @@
   background: color-mix(in srgb, var(--color-text) 8%, transparent);
   overflow: hidden;
 }
+/* 027: people with their portrait on the left of the name, the bar under both */
+.insights-bars li[data-portrait] {
+  grid-template-columns: 2.6rem 1fr auto;
+  align-items: center;
+}
+.insights-bars li[data-portrait] .insights-bars__track {
+  grid-column: 2 / -1;
+}
+.insights-bars__portrait {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+.insights-bars__portrait img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
 .insights-bars__fill {
   display: block;
   block-size: 100%;

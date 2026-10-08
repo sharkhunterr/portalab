@@ -14,6 +14,7 @@ import { showLevelUp } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useAcquire, useDescribe, useProducts } from "../api";
 import { Price, priceOf } from "../catalog/Price";
 import { ProductArt, TYPE_BADGE_ICON } from "../catalog/ProductArt";
+import { useEquipment } from "../equip";
 import { ConditionsChecklist } from "./ConditionsChecklist";
 
 /**
@@ -310,6 +311,7 @@ export function PurchaseBar({ product }: { product: Product }) {
   const t = useT();
   const canBuy = useHasPermission("marketplace.purchase");
   const acquire = useAcquire(product.key);
+  const gear = useEquipment();
   const [confirming, setConfirming] = useState(false);
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
   const policy = product.refund_policy as { refundable?: boolean; window_days?: number; percent?: number };
@@ -330,6 +332,20 @@ export function PurchaseBar({ product }: { product: Product }) {
   const unmet = (product.eligibility ?? []).some((c) => !c.met);
   const owned = product.owned && !product.repeatable;
   const blocked = owned ? "owned" : soldOut ? "soldOut" : unmet ? "locked" : null;
+  if (owned && gear.wearable(product)) {
+    // 027: an owned look — worn now, or one tap to wear it
+    return gear.equipped(product) ? (
+      <span className="purchase-bar__blocked" data-equipped="">
+        <Icon name="check" size={16} />
+        {t("marketplace:equip.equippedLong")}
+      </span>
+    ) : (
+      <Button onClick={() => void gear.equip(product)} disabled={gear.pending}>
+        <Icon name="sparkles" size={16} />
+        {t("marketplace:equip.action")}
+      </Button>
+    );
+  }
   if (blocked) {
     return (
       <span className="purchase-bar__blocked">

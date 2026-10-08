@@ -27,6 +27,8 @@ export interface Ranked {
   plays: number;
   seconds: number;
   works?: number;
+  /** 027: a person's portrait (the metadata provider's image ref). */
+  image?: string | null;
 }
 
 export interface Insights {

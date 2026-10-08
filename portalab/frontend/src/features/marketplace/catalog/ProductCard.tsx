@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Product } from "../api";
+import { useEquipment } from "../equip";
 import { LazyArt } from "./LazyArt";
 import { Price } from "./Price";
 
@@ -23,16 +24,24 @@ export function ProductCard({
   const t = useT();
   const Tag = as;
   const rarity = product.rarity ?? "common";
+  const gear = useEquipment();
+  const worn = Boolean(product.owned && gear.equipped(product)); // 027: what the member wears now
   return (
     <Tag
       className="product-card"
       data-type={product.type}
       data-rarity={rarity}
       data-owned={product.owned ? "true" : undefined}
+      data-equipped={worn || undefined}
       data-soldout={product.remaining === 0 && !product.owned ? "true" : undefined}
     >
       {product.remaining === 0 && !product.owned ? (
         <span className="product-card__soldout">{t("marketplace:stock.soldOut")}</span>
+      ) : null}
+      {worn ? (
+        <span className="product-card__equipped">
+          <Icon name="check" size={12} /> {t("marketplace:equip.equipped")}
+        </span>
       ) : null}
       <LazyArt product={product} />
       <div className="product-card__body">
@@ -72,9 +81,23 @@ export function ProductCard({
           </span>
         ) : null}
         <div className="product-card__footer">
-          {product.owned ? (
+          {product.owned && !worn && gear.wearable(product) ? (
+            <button
+              type="button"
+              className="product-card__equip"
+              disabled={gear.pending}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                void gear.equip(product);
+              }}
+            >
+              <Icon name="sparkles" size={14} /> {t("marketplace:equip.action")}
+            </button>
+          ) : product.owned ? (
             <span className="product-card__owned">
-              <Icon name="check" size={16} /> {t("marketplace:product.owned")}
+              <Icon name="check" size={16} />{" "}
+              {t(worn ? "marketplace:equip.equipped" : "marketplace:product.owned")}
             </span>
           ) : product.price_coins ? (
             <Price product={product} compact />

@@ -169,6 +169,61 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* 027: what the member wears now — a « Equipped » ribbon and a frame of its own; owned looks offer to equip */
+.product-card[data-equipped] {
+  border-color: var(--state-available-fg);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--state-available-fg) 45%, transparent),
+    0 0 22px color-mix(in srgb, var(--state-available-fg) 30%, transparent);
+}
+
+.product-card__equipped {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-available-fg);
+  color: var(--color-surface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+.product-card__equip {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.product-card__equip:hover,
+.product-card__equip:focus-visible {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.purchase-bar__blocked[data-equipped] {
+  color: var(--state-available-fg);
+  font-weight: var(--font-weight-semibold);
+}
+
 /* poster + effects */
 .product-poster {
   position: relative;

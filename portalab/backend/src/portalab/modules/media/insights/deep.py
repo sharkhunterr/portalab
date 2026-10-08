@@ -21,7 +21,7 @@ from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
@@ -458,3 +458,18 @@ class DeepInsights:
             "hours": hours,
             "weekdays": weekdays,
         }
+
+
+async def portraits(database: Database, names: Sequence[str]) -> dict[str, str]:
+    """027: a portrait for each person named (the metadata provider's image, from any title they are in)."""
+    if not names:
+        return {}
+    query = text(
+        "SELECT DISTINCT ON (p->>'name') p->>'name', p->>'image' "
+        "FROM media.object_metadata m, jsonb_array_elements(m.data->'people') p "
+        "WHERE m.status = 'found' AND p->>'name' = ANY(:names) AND coalesce(p->>'image', '') <> '' "
+        "ORDER BY p->>'name'"
+    )
+    async with database.session() as session:
+        rows = await session.execute(query, {"names": list(names)})
+        return {str(name): str(image) for name, image in rows.all()}

@@ -45,6 +45,7 @@ import {
 } from "./api";
 import "../../admin/admin.css";
 import "../media.css";
+import "../insights/insights.css"; // 027: the poster rows are the statistics' own
 import "./requests.css";
 import { AcquisitionView } from "./Acquisition";
 import { Poster, SoonList } from "./SoonList";

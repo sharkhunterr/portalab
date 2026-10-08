@@ -26,6 +26,7 @@ from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.images.service import CONTENT_TYPE
 from portalab.modules.media.insights.continuing import in_progress, recently
+from portalab.modules.media.insights.deep import portraits
 from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
 from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
 from portalab.modules.media.insights.progress import history_task
@@ -411,6 +412,9 @@ async def insights(
     for row in data.get("recent") or []:
         row["image_id"] = images.get(UUID(row["work_id"])) if row.get("work_id") else None
     await _provider_posters(module, data)
+    faces = await portraits(module.database, [p["name"] for p in data.get("people") or []])
+    for person in data.get("people") or []:
+        person["image"] = faces.get(person["name"])  # 027: their portrait, as on the Casting tab
     data["manager"] = manager
     return data
 

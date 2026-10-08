@@ -220,14 +220,28 @@ function Bars({
   rows,
   value,
 }: {
-  rows: Array<{ key: string; label: string; amount: number; hint?: string }>;
+  rows: Array<{ key: string; label: string; amount: number; hint?: string; image?: string | null }>;
   value: (n: number) => string;
 }) {
   const max = Math.max(1, ...rows.map((r) => r.amount));
   return (
     <ol className="insights-bars">
       {rows.map((row) => (
-        <li key={row.key}>
+        <li key={row.key} data-portrait={row.image !== undefined || undefined}>
+          {row.image !== undefined ? (
+            <span className="insights-bars__portrait" aria-hidden="true">
+              {row.image ? (
+                <img src={metadataImage(row.image, "w185") ?? ""} alt="" loading="lazy" />
+              ) : (
+                row.label
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()
+              )}
+            </span>
+          ) : null}
           <span className="insights-bars__label">
             {row.label}
             {row.hint ? <span className="admin-muted"> · {row.hint}</span> : null}
@@ -277,8 +291,9 @@ function TopWorks({ data }: { data: Insights }) {
   );
 }
 
-function ranked(rows: Ranked[], t: ReturnType<typeof useT>) {
+function ranked(rows: Ranked[], t: ReturnType<typeof useT>, portraits = false) {
   return rows.map((r) => ({
+    ...(portraits ? { image: r.image ?? null } : {}),
     key: r.name,
     label: r.name,
     amount: r.seconds,
@@ -578,7 +593,7 @@ export default function InsightsPage() {
                   {locked("people") ? <LockedStat name="people" icon="user" /> : null}
                   {data.people.length ? (
                     <AdminSection title={t("media:insights.people")} icon="user">
-                      <Bars rows={ranked(data.people, t)} value={measures.hours} />
+                      <Bars rows={ranked(data.people, t, true)} value={measures.hours} />
                     </AdminSection>
                   ) : null}
                   {locked("decades") ? <LockedStat name="decades" icon="calendar" /> : null}
