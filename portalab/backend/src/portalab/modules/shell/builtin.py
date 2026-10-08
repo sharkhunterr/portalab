@@ -797,6 +797,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 2,
         "required_permission": "notifications.broadcast",
     },
+    {
+        "key": "privacy.terms",
+        "owner": "module:privacy",
+        "kind": "entry",
+        "label_key": "nav.admin.terms",
+        "icon": "shield",
+        "route": "/admin/terms",
+        "group": "admin",
+        "topic": "communication",
+        "order_hint": 4,
+        "required_permission": "terms.manage",
+    },
 )
 
 

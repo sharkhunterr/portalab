@@ -8,6 +8,7 @@ import {
   ProgressBar,
 } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
+import { TermsMenuEntry } from "../../features/terms/TermsViewer";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -95,6 +96,7 @@ export function ProfileCard({
                 </Link>
               </li>
             ))}
+          <TermsMenuEntry onOpen={onNavigate} />
           <li>
             <button type="button" onClick={onSignOut}>
               <Icon name="logout" size={16} />

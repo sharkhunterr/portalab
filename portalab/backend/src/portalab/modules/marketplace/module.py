@@ -32,6 +32,7 @@ from portalab.capabilities.observability import (
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.search import SearchRegistry, default_search
+from portalab.capabilities.terms import CAPABILITY as TERMS
 from portalab.capabilities.themes import COSMETICS
 from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
 from portalab.core.audit_port import AuditSink
@@ -204,12 +205,25 @@ class MarketplaceModule:
                     return account.login, account.display_name or account.login, account.email
         raise Unavailable("This member's account cannot be read.", code="marketplace.member_unknown")
 
+    async def _must_accept_terms(self, user: UUID) -> bool:
+        """027: a service opens only to a member who accepted the terms of use in force."""
+        try:
+            providers = self.capabilities.system_providers(TERMS)
+        except Exception:
+            return False
+        return bool(providers) and await providers[0].provider.must_accept(user)
+
     async def _provision(self, user: UUID, details: Mapping[str, Any], create: bool) -> str:
         """027: an approved service access — the member's account in the identity provider (created when
         asked and missing), put in the service's group; a new account gets a link to set its password."""
         group = str(details.get("group") or "")
         if not group:
             return "approved"
+        if await self._must_accept_terms(user):
+            raise Conflict(
+                "This member has not accepted the terms of use in force yet.",
+                code="marketplace.terms_pending",
+            )
         provider = self._identity_provider()
         login, name, email = await self._member(user)
         account = await provider.find_user(email, login)

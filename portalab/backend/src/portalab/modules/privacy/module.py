@@ -6,7 +6,9 @@ from typing import Any
 
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.aggregation import CAPABILITY as AGGREGATION_GUARD
+from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.terms import CAPABILITY as TERMS
 from portalab.core.audit_port import AuditSink
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
@@ -23,6 +25,7 @@ from portalab.modules.privacy.purge.service import ServicePurge
 from portalab.modules.privacy.retention import registry as _targets  # noqa: F401 — kernel targets
 from portalab.modules.privacy.retention.engine import RetentionEngine
 from portalab.modules.privacy.settings import PrivacyConfig
+from portalab.modules.privacy.terms.service import TermsParticipant, TermsService
 from portalab.modules.privacy.visibility.filter import PrivacyVisibilityFilter
 from portalab.modules.privacy.visibility.providers import PreferenceProviders
 from portalab.modules.privacy.visibility.service import VisibilityService
@@ -54,9 +57,16 @@ class PrivacyModule:
         self.purge = ServicePurge(database, capabilities, audit, events, clock=clock)
         self.center = PrivacyCenter(self.visibility, self.providers, config=self.config)
         self.guard = AggregationGuard(self.config.min_aggregate_size)
+        self.terms = TermsService(database, audit, clock=clock)  # 027: terms of use
 
     def register_capabilities(self) -> None:
         self.capabilities.provide(AGGREGATION_GUARD, self.guard, instance_ref="privacy", owner=OWNER)
+        if not self.capabilities.system_providers(TERMS):
+            self.capabilities.provide(TERMS, self.terms, instance_ref="terms", owner=OWNER)
+        participant = TermsParticipant(self.terms)
+        for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
+            if not any(p.instance_ref == "terms" for p in self.capabilities.system_providers(capability)):
+                self.capabilities.provide(capability, participant, instance_ref="terms", owner=OWNER)
         default_admin_surfaces.register(
             AdminSurface("privacy", "admin.surface.privacy", "/admin/privacy", "privacy.manage", OWNER)
         )

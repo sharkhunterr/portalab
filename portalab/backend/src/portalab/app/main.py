@@ -20,7 +20,7 @@ import portalab
 from portalab.app.composition import BACKEND_DIR
 from portalab.app.health import router as health_router
 from portalab.app.migrations import expected_heads
-from portalab.app.security import PrincipalResolver, SecurityMiddleware, enforce_default_deny
+from portalab.app.security import PrincipalResolver, SecurityMiddleware, enforce_default_deny, enforce_terms
 from portalab.app.spa import SPAStaticFiles, spa_directory
 from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
@@ -236,7 +236,7 @@ def create_app(
         title="Portalab API",
         version=portalab.__version__,
         lifespan=lifespan,
-        dependencies=[Depends(enforce_default_deny)],
+        dependencies=[Depends(enforce_default_deny), Depends(enforce_terms)],
         docs_url=None,
         redoc_url=None,
         openapi_url=None,  # schema exported by `portalab openapi`; the portal is authenticated-only (CD-025)

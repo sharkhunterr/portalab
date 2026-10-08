@@ -3156,6 +3156,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Terms History */
+        get: operations["terms_history_api_v1_admin_terms_get"];
+        put?: never;
+        /** Publish Terms */
+        post: operations["publish_terms_api_v1_admin_terms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/terms/enforcement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Terms Enforcement */
+        put: operations["set_terms_enforcement_api_v1_admin_terms_enforcement_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/toggles/{kind}/{ref}": {
         parameters: {
             query?: never;
@@ -5871,6 +5906,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Terms */
+        get: operations["my_terms_api_v1_me_terms_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/terms/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept Terms */
+        post: operations["accept_terms_api_v1_me_terms_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/tickets": {
         parameters: {
             query?: never;
@@ -7024,6 +7093,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current Terms */
+        get: operations["current_terms_api_v1_terms_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tickets": {
         parameters: {
             query?: never;
@@ -7804,6 +7890,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcceptIn */
+        AcceptIn: {
+            /** Version */
+            version: number;
+        };
         /** Accepted */
         Accepted: {
             /** Detail */
@@ -9394,6 +9485,11 @@ export interface components {
              */
             username: string;
         };
+        /** EnforcementIn */
+        EnforcementIn: {
+            /** Enabled */
+            enabled: boolean;
+        };
         /** EntryIn */
         EntryIn: {
             /** Key */
@@ -10851,6 +10947,16 @@ export interface components {
             multiplier: number;
             next: components["schemas"]["StreakNextOut"] | null;
         };
+        /** MyTermsOut */
+        MyTermsOut: {
+            /** Accepted At */
+            accepted_at: string | null;
+            /** Accepted Version */
+            accepted_version: number | null;
+            /** Required */
+            required: boolean;
+            terms: components["schemas"]["TermsOut"] | null;
+        };
         /** NewsArticleIn */
         NewsArticleIn: {
             audience?: components["schemas"]["Audience"] | null;
@@ -11764,6 +11870,23 @@ export interface components {
             /** Version */
             version?: number | null;
         };
+        /** PublishIn */
+        PublishIn: {
+            /** Body Md */
+            body_md: string;
+            /**
+             * Requires Acceptance
+             * @default true
+             */
+            requires_acceptance: boolean;
+            /**
+             * Summary
+             * @default
+             */
+            summary: string;
+            /** Title */
+            title: string;
+        };
         /** PurgeIn */
         PurgeIn: {
             /** Confirmation */
@@ -12434,6 +12557,59 @@ export interface components {
             key: string;
             /** Version */
             version: number;
+        };
+        /** TermsAdminOut */
+        TermsAdminOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Members Up To Date */
+            members_up_to_date: number;
+            /** Versions */
+            versions: components["schemas"]["TermsEditorOut"][];
+        };
+        /** TermsEditorOut */
+        TermsEditorOut: {
+            /** Acceptances */
+            acceptances: number;
+            /** Body Md */
+            body_md: string;
+            /** Html */
+            html: string;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Requires Acceptance */
+            requires_acceptance: boolean;
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+            /** Version */
+            version: number;
+        };
+        /** TermsOut */
+        TermsOut: {
+            /** Html */
+            html: string;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Requires Acceptance */
+            requires_acceptance: boolean;
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+            /** Version */
+            version: number;
+        };
+        /** TermsPublic */
+        TermsPublic: {
+            terms: components["schemas"]["TermsOut"] | null;
         };
         /** TestIn */
         TestIn: {
@@ -19749,6 +19925,90 @@ export interface operations {
             };
         };
     };
+    terms_history_api_v1_admin_terms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TermsAdminOut"];
+                };
+            };
+        };
+    };
+    publish_terms_api_v1_admin_terms_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TermsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_terms_enforcement_api_v1_admin_terms_enforcement_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnforcementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     toggle_api_v1_admin_toggles__kind___ref__post: {
         parameters: {
             query?: never;
@@ -24984,6 +25244,66 @@ export interface operations {
             };
         };
     };
+    my_terms_api_v1_me_terms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyTermsOut"];
+                };
+            };
+        };
+    };
+    accept_terms_api_v1_me_terms_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyTermsOut"];
+                };
+            };
+            /** @description terms.outdated */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_tickets_api_v1_me_tickets_get: {
         parameters: {
             query?: never;
@@ -27299,6 +27619,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_terms_api_v1_terms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TermsPublic"];
                 };
             };
         };

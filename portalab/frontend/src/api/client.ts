@@ -25,6 +25,9 @@ const problems: Middleware = {
       problem = {};
     }
     const { title, detail, code, ...extensions } = problem;
+    if (code === "terms.acceptance_required") {
+      globalThis.dispatchEvent?.(new Event("portalab:terms-required")); // 027: the terms sheet comes back
+    }
     throw new ApiError(response.status, detail ?? title ?? response.statusText, code, extensions);
   },
 };

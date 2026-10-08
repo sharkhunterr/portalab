@@ -24,6 +24,10 @@ ALLOW_LISTED = {
     "/api/v1/auth/register",
     "/api/v1/auth/verify",
     "/api/v1/auth/deletion/cancel",
+    "/api/v1/auth/oidc",  # 027: the single sign-on (whether offered, start, the provider's way back)
+    "/api/v1/auth/oidc/start",
+    "/api/v1/auth/oidc/callback",
+    "/api/v1/terms",  # 027: the terms of use in force (the sign-in page links them)
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check
 }

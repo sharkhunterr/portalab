@@ -3,6 +3,7 @@
 from portalab.core.permissions import PermissionRegistry, default_permissions
 
 OWNER = "module:privacy"
+TERMS_MANAGE = "terms.manage"
 
 
 def declare_privacy_permissions(registry: PermissionRegistry = default_permissions) -> None:
@@ -16,6 +17,8 @@ def declare_privacy_permissions(registry: PermissionRegistry = default_permissio
         requires_confirmation=True,
         owner=OWNER,
     )
+    if registry.get(TERMS_MANAGE) is None:  # 027
+        registry.declare(TERMS_MANAGE, "Publish the terms of use", sensitive=True, owner=OWNER)
 
 
 declare_privacy_permissions()

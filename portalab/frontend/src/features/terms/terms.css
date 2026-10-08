@@ -1,0 +1,186 @@
+/* 027 — terms of use: the small window asking to accept (with the terms in a modal), the member's reading
+   modal, the administrators' editor. Theme tokens only. */
+
+.terms-wait {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-4);
+  background: radial-gradient(
+    circle at 50% 120%,
+    color-mix(in srgb, var(--color-accent) 22%, transparent),
+    transparent 65%
+  );
+}
+
+/* the small window at the bottom: accept, refuse, or read first */
+.terms-prompt {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-3);
+  width: min(44rem, 100%);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow:
+    var(--shadow-sm),
+    0 24px 60px -24px color-mix(in srgb, var(--color-accent) 50%, transparent);
+  animation: terms-rise var(--motion-duration-normal, 0.3s) var(--motion-easing, ease-out) both;
+}
+
+@keyframes terms-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terms-prompt {
+    animation: none;
+  }
+}
+
+.terms-prompt__seal {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt, var(--color-accent)));
+  color: var(--color-accent-contrast);
+}
+
+.terms-prompt__text {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.terms-prompt__text h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+}
+
+.terms-prompt__text p {
+  margin: 0;
+}
+
+.terms-prompt__meta,
+.terms-prompt__fine {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.terms-prompt__summary,
+.terms-prompt__changes {
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  white-space: pre-line;
+}
+
+.terms-prompt__changes {
+  margin-bottom: var(--space-3);
+}
+
+.terms-prompt__changes p {
+  margin: var(--space-1) 0 0;
+}
+
+.terms-prompt__error {
+  color: var(--state-error-fg);
+}
+
+.terms-prompt__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.terms-prompt__actions > :first-child:not(.terms-prompt__warn) {
+  margin-inline-end: auto;
+}
+
+.terms-prompt__warn {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--state-error-fg);
+  font-size: var(--font-size-sm);
+}
+
+.terms-prompt__fine {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.terms-prompt__doc {
+  max-height: 60dvh;
+  overflow-y: auto;
+}
+
+@media (max-width: 40rem) {
+  .terms-wait {
+    padding: var(--space-2);
+  }
+
+  .terms-prompt {
+    grid-template-columns: 1fr;
+    padding: var(--space-3);
+  }
+
+  .terms-prompt__actions > * {
+    flex: 1 1 auto;
+  }
+
+  .terms-prompt__actions > :first-child:not(.terms-prompt__warn) {
+    flex-basis: 100%;
+    margin-inline-end: 0;
+  }
+}
+
+/* the member's reading modal */
+.terms-viewer {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.terms-page__accepted {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--state-available-bg);
+  color: var(--state-available-fg);
+  font-size: var(--font-size-sm);
+}
+
+.terms-page__none {
+  color: var(--color-text-muted);
+}
+
+/* the administrators' editor */
+.terms-admin__switch {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.terms-admin__switch p {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.terms-admin__form {
+  display: grid;
+  gap: var(--space-3);
+}

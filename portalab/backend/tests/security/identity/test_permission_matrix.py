@@ -26,6 +26,7 @@ PUBLIC_ROUTES = {
     "/api/v1/auth/oidc",  # 027: the single sign-on (whether offered, start, the provider's way back)
     "/api/v1/auth/oidc/start",
     "/api/v1/auth/oidc/callback",
+    "/api/v1/terms",  # 027: the terms of use in force (the sign-in page links them)
 }
 
 EXPECTED_PERMISSIONS = {

@@ -37,6 +37,7 @@ __all__ = [
     "api_routes",
     "current_principal",
     "enforce_default_deny",
+    "enforce_terms",
     "public",
     "require",
     "route_access",
@@ -51,6 +52,47 @@ async def enforce_default_deny(request: Request) -> None:
         if not principal.is_authenticated:
             raise Unauthorized()
         raise Forbidden()
+
+
+class TermsNotAccepted(Forbidden):
+    default_code = "terms.acceptance_required"
+    default_title = "The terms of use must be accepted"
+
+
+# What a member may still do before accepting the terms in force (027): sign in or out, read and accept the
+# terms, load the portal's look and words, and exercise their rights on their own data (export, deletion).
+TERMS_OPEN_PATHS = frozenset({"/api/v1/me", "/api/v1/me/preferences", "/api/v1/terms"})
+TERMS_OPEN_PREFIXES = (
+    "/api/v1/auth/",
+    "/api/v1/me/terms",
+    "/api/v1/me/privacy",
+    "/api/v1/me/export",
+    "/api/v1/me/deletion",
+    "/api/v1/ui/",
+    "/api/v1/i18n/",
+)
+
+
+async def enforce_terms(request: Request) -> None:
+    """App-wide dependency (027): a signed-in member who has not accepted the terms in force cannot use the
+    portal — every protected route answers ``terms.acceptance_required`` until they do."""
+    route = request.scope.get("route")
+    if not isinstance(route, APIRoute) or route_access(route) in (None, "public"):
+        return
+    path = request.url.path
+    if path in TERMS_OPEN_PATHS or path.startswith(TERMS_OPEN_PREFIXES):
+        return
+    terms = getattr(getattr(request.app.state, "privacy_module", None), "terms", None)
+    if terms is None:
+        return
+    try:
+        principal = await current_principal(request)
+    except Exception:
+        return  # the route's own permission check answers
+    if principal.user_id is None or principal.channel != "user" or principal.acting_for is not None:
+        return
+    if await terms.must_accept(principal.user_id):
+        raise TermsNotAccepted("Accept the terms of use to continue.")
 
 
 # --- security hardening baseline (spec 021 T033, research R10) ------------------------------------------

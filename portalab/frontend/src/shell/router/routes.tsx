@@ -19,6 +19,7 @@ const Configuration = lazy(() => import("../../pages/admin/ConfigurationRoute"))
 const ServicesAdmin = lazy(() => import("../../pages/admin/ServicesAdminRoute"));
 const Roles = lazy(() => import("../../pages/admin/RolesRoute"));
 const PrivacyAdmin = lazy(() => import("../../pages/admin/PrivacyAdminRoute"));
+const TermsAdmin = lazy(() => import("../../features/terms/TermsAdmin"));
 const Audit = lazy(() => import("../../pages/admin/AuditRoute"));
 const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
@@ -326,6 +327,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "themes", element: <ThemeStudio />, handle: h({ crumb: "Theme studio" }) },
             { path: "members", element: <MembersAdmin />, handle: h({ crumb: "Members" }) },
             { path: "announcements", element: <AnnouncementsAdmin />, handle: h({ crumb: "Announcements" }) },
+            { path: "terms", element: <TermsAdmin />, handle: h({ crumb: "Terms of use" }) },
             { path: "dashboard", element: <DashboardAdmin />, handle: h({ crumb: "Members' dashboard" }) },
             { path: "maintenance", element: <Navigate to="/admin/announcements?tab=maintenance" replace /> },
             { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },

@@ -1,6 +1,21 @@
 {
   "components": {
     "schemas": {
+      "AcceptIn": {
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "AcceptIn",
+        "type": "object"
+      },
       "Accepted": {
         "properties": {
           "detail": {
@@ -4451,6 +4466,20 @@
         "title": "EmailConfigIn",
         "type": "object"
       },
+      "EnforcementIn": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "EnforcementIn",
+        "type": "object"
+      },
       "EntryIn": {
         "additionalProperties": false,
         "properties": {
@@ -8514,6 +8543,55 @@
         "title": "MyStreakOut",
         "type": "object"
       },
+      "MyTermsOut": {
+        "properties": {
+          "accepted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At"
+          },
+          "accepted_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Version"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TermsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "terms",
+          "accepted_version",
+          "accepted_at",
+          "required"
+        ],
+        "title": "MyTermsOut",
+        "type": "object"
+      },
       "NewsArticleIn": {
         "additionalProperties": false,
         "properties": {
@@ -10909,6 +10987,40 @@
         "title": "ProjectValidateIn",
         "type": "object"
       },
+      "PublishIn": {
+        "additionalProperties": false,
+        "properties": {
+          "body_md": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "title": "Body Md",
+            "type": "string"
+          },
+          "requires_acceptance": {
+            "default": true,
+            "title": "Requires Acceptance",
+            "type": "boolean"
+          },
+          "summary": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "body_md"
+        ],
+        "title": "PublishIn",
+        "type": "object"
+      },
       "PurgeIn": {
         "additionalProperties": false,
         "properties": {
@@ -12783,6 +12895,139 @@
           "definition"
         ],
         "title": "SupportWorkflowOut",
+        "type": "object"
+      },
+      "TermsAdminOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "members_up_to_date": {
+            "title": "Members Up To Date",
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/TermsEditorOut"
+            },
+            "title": "Versions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "versions",
+          "members_up_to_date",
+          "enabled"
+        ],
+        "title": "TermsAdminOut",
+        "type": "object"
+      },
+      "TermsEditorOut": {
+        "properties": {
+          "acceptances": {
+            "title": "Acceptances",
+            "type": "integer"
+          },
+          "body_md": {
+            "title": "Body Md",
+            "type": "string"
+          },
+          "html": {
+            "title": "Html",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "requires_acceptance": {
+            "title": "Requires Acceptance",
+            "type": "boolean"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "title",
+          "summary",
+          "html",
+          "requires_acceptance",
+          "published_at",
+          "body_md",
+          "acceptances"
+        ],
+        "title": "TermsEditorOut",
+        "type": "object"
+      },
+      "TermsOut": {
+        "properties": {
+          "html": {
+            "title": "Html",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "requires_acceptance": {
+            "title": "Requires Acceptance",
+            "type": "boolean"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "title",
+          "summary",
+          "html",
+          "requires_acceptance",
+          "published_at"
+        ],
+        "title": "TermsOut",
+        "type": "object"
+      },
+      "TermsPublic": {
+        "properties": {
+          "terms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TermsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "terms"
+        ],
+        "title": "TermsPublic",
         "type": "object"
       },
       "TestIn": {
@@ -24189,6 +24434,100 @@
         ]
       }
     },
+    "/api/v1/admin/terms": {
+      "get": {
+        "operationId": "terms_history_api_v1_admin_terms_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Terms History",
+        "tags": [
+          "terms"
+        ]
+      },
+      "post": {
+        "operationId": "publish_terms_api_v1_admin_terms_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Publish Terms",
+        "tags": [
+          "terms"
+        ]
+      }
+    },
+    "/api/v1/admin/terms/enforcement": {
+      "put": {
+        "operationId": "set_terms_enforcement_api_v1_admin_terms_enforcement_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnforcementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Terms Enforcement",
+        "tags": [
+          "terms"
+        ]
+      }
+    },
     "/api/v1/admin/toggles/{kind}/{ref}": {
       "post": {
         "operationId": "toggle_api_v1_admin_toggles__kind___ref__post",
@@ -31829,6 +32168,71 @@
         ]
       }
     },
+    "/api/v1/me/terms": {
+      "get": {
+        "operationId": "my_terms_api_v1_me_terms_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyTermsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Terms",
+        "tags": [
+          "terms"
+        ]
+      }
+    },
+    "/api/v1/me/terms/accept": {
+      "post": {
+        "operationId": "accept_terms_api_v1_me_terms_accept_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyTermsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "terms.outdated"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accept Terms",
+        "tags": [
+          "terms"
+        ]
+      }
+    },
     "/api/v1/me/tickets": {
       "get": {
         "operationId": "my_tickets_api_v1_me_tickets_get",
@@ -35538,6 +35942,27 @@
         "summary": "Queue",
         "tags": [
           "support"
+        ]
+      }
+    },
+    "/api/v1/terms": {
+      "get": {
+        "operationId": "current_terms_api_v1_terms_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsPublic"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Current Terms",
+        "tags": [
+          "terms"
         ]
       }
     },

@@ -126,3 +126,34 @@ async def test_approval_creates_the_account_in_the_identity_provider(mk: MkHarne
     done = await mk.module.requests.decide(mk.p("boss"), pending.id, "done", None, True)
     assert done.state == "done" and "account created" in done.details["outcome"]
     assert calls == [("create", "ursula"), ("group", "42", "romm")]
+
+
+async def test_a_service_opens_only_once_the_terms_are_accepted(mk: MkHarness) -> None:
+    """027: approving a service access waits for the member to accept the terms of use in force."""
+    from portalab.capabilities.terms import CAPABILITY as TERMS
+    from portalab.capabilities.terms import SPEC as TERMS_SPEC
+
+    pending_terms = {"ursula": True}
+
+    class Terms:
+        async def must_accept(self, user_id: UUID) -> bool:
+            return pending_terms["ursula"] and user_id == mk.people["ursula"]
+
+    registry = mk.module.capabilities
+    if TERMS not in {spec.name for spec in getattr(registry, "_specs", {}).values()}:
+        registry.declare(TERMS_SPEC)
+    providers = registry.system_providers(TERMS)
+    if providers:  # the privacy module's own: answer as if the member had not accepted yet
+        providers[0].provider.must_accept = Terms().must_accept
+    else:
+        registry.provide(TERMS, Terms(), instance_ref="terms", owner="test")
+    await published(
+        mk, "romm_access", "service_access", price_coins=100, payload={"service": "romm", "group": "romm"}
+    )
+    await mk.coins("ursula", 100)
+    mk.module.requests.provision = mk.module._provision  # the module's own, with the terms check
+    await mk.module.purchases.acquire(mk.p("ursula"), "romm_access", "t1")
+    (pending,) = await mk.module.requests.queue(None)
+    with pytest.raises(Conflict) as refused:
+        await mk.module.requests.decide(mk.p("boss"), pending.id, "done", None, True)
+    assert refused.value.code == "marketplace.terms_pending"

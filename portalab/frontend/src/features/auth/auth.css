@@ -97,3 +97,23 @@
   font-size: var(--font-size-sm);
   text-align: center;
 }
+
+/* 027: the terms of use, readable before signing in */
+.auth-terms {
+  margin: 0;
+  text-align: center;
+}
+
+.auth-terms__link {
+  background: none;
+  border: 0;
+  padding: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-terms__link:hover {
+  color: var(--color-accent);
+}

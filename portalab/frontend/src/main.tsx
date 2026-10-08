@@ -7,6 +7,7 @@ import { DirectionProvider } from "./design-system/rtl/DirectionProvider";
 import { applyFirstPaint } from "./design-system/themes/firstPaint";
 import { AppearanceRoot } from "./features/appearance";
 import { AuthGate } from "./features/auth";
+import { TermsGate } from "./features/terms/TermsGate";
 import { DirectionBridge, I18nProvider } from "./i18n";
 import { NavigationProvider } from "./shell/nav/NavigationProvider";
 import { createRouter } from "./shell/router/routes";
@@ -59,9 +60,11 @@ void renderGallery().then((gallery) => {
                 <I18nProvider>
                   <DirectionBridge>
                     <AppearanceRoot>
-                      <NavigationProvider>
-                        <RouterProvider router={router} />
-                      </NavigationProvider>
+                      <TermsGate>
+                        <NavigationProvider>
+                          <RouterProvider router={router} />
+                        </NavigationProvider>
+                      </TermsGate>
                     </AppearanceRoot>
                   </DirectionBridge>
                 </I18nProvider>
