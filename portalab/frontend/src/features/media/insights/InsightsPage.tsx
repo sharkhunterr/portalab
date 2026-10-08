@@ -28,6 +28,7 @@ import {
   useInsights,
   useMeasures,
 } from "./api";
+import { CastingTab, PlaybackTab, ProductionTab, ProfileTab, RequestsTab } from "./DeepTabs";
 import "../../admin/admin.css";
 import "./insights.css";
 
@@ -38,6 +39,17 @@ import "./insights.css";
  * the whole server (anonymous for members; members, devices and ingestion sources for media managers).
  */
 const KIND_ORDER = ["movie", "episode", "live", "track", "book", "audiobook", "other"];
+
+/** 027: the tabs of each category (after Telemetra): overview, casting, production, playback, profile. */
+const SECTIONS: Record<Category, string[]> = {
+  all: ["overview", "playback", "profile"],
+  movies: ["overview", "casting", "production", "playback", "profile"],
+  series: ["overview", "casting", "production", "playback", "profile"],
+  live: ["overview", "playback", "profile"],
+  music: ["overview", "profile"],
+  books: ["overview", "profile"],
+  audiobooks: ["overview", "profile"],
+};
 
 function Trend({ now, before }: { now: number; before: number | undefined }) {
   const t = useT();
@@ -385,9 +397,12 @@ export default function InsightsPage() {
   const measures = useMeasures();
   const [params, setParams] = useSearchParams();
   const scope: Scope = params.get("scope") === "all" ? "all" : "me";
+  const requests = params.get("category") === "requests"; // 027: my requests, as a category of their own
   const category = (CATEGORIES as string[]).includes(params.get("category") ?? "")
     ? (params.get("category") as Category)
     : "all";
+  const sections = SECTIONS[category];
+  const section = sections.includes(params.get("tab") ?? "") ? (params.get("tab") as string) : "overview";
   const [period, setPeriod] = useState(params.get("period") ?? "30d");
   const insights = useInsights(scope, category, period);
   const set = (key: string, value: string, fallback: string) => {
@@ -436,239 +451,275 @@ export default function InsightsPage() {
     >
       <AdminTabs
         label={t("media:insights.category")}
-        current={category}
-        onChange={(next) => set("category", next, "all")}
-        tabs={CATEGORIES.map((c) => ({ key: c, label: t(`media:insights.categories.${c}`) }))}
+        current={requests ? "requests" : category}
+        onChange={(next) => {
+          const following = new URLSearchParams(params);
+          following.delete("tab");
+          if (next === "all") following.delete("category");
+          else following.set("category", next);
+          setParams(following, { replace: true });
+        }}
+        tabs={[...CATEGORIES, "requests"].map((c) => ({
+          key: c,
+          label: t(`media:insights.categories.${c}`),
+        }))}
       />
-      {insights.isPending ? <FunctionalState state="loading" /> : null}
-      {insights.isError ? <FunctionalState state="error" onRetry={() => insights.refetch()} /> : null}
-      {data ? (
-        <>
-          <AdminStats
-            label={t("media:insights.title")}
-            stats={[
-              {
-                key: "time",
-                label: t("media:insights.stat.time"),
-                value: measures.duration(data.totals.seconds),
-                hint: <Trend now={data.totals.seconds} before={data.previous?.seconds} />,
-                icon: "clock",
-                tone: "info",
-              },
-              {
-                key: "plays",
-                label: t("media:insights.stat.plays"),
-                value: format.number(data.totals.plays),
-                hint: <Trend now={data.totals.plays} before={data.previous?.plays} />,
-                icon: "activity",
-                tone: "info",
-              },
-              {
-                key: "works",
-                label: t("media:insights.stat.works"),
-                value: format.number(data.totals.works),
-                hint: t("media:insights.completedCount", { count: data.totals.completed }),
-                icon: "film",
-                tone: "neutral",
-              },
-              data.totals.members !== null
-                ? {
-                    key: "members",
-                    label: t("media:insights.stat.members"),
-                    value: format.number(data.totals.members),
-                    icon: "users",
-                    tone: "neutral" as const,
-                  }
-                : {
-                    key: "days",
-                    label: t("media:insights.stat.days"),
-                    value: format.number(data.totals.active_days),
-                    icon: "calendar",
-                    tone: "neutral" as const,
-                  },
-            ]}
+      {requests ? <RequestsTab period={period} /> : null}
+      {!requests && sections.length > 1 ? (
+        <div className="deep-tabs">
+          <AdminTabs
+            label={t("media:deep.tabs.label")}
+            current={section}
+            onChange={(next) => set("tab", next, "overview")}
+            tabs={sections.map((key) => ({ key, label: t(`media:deep.tabs.${key}`) }))}
           />
-          {data.totals.plays === 0 ? (
-            <AdminEmpty
-              icon="chart"
-              title={t("media:insights.empty")}
-              action={<span className="admin-muted">{t("media:insights.emptyHint")}</span>}
-            />
-          ) : (
-            <AdminGrid>
-              <AdminSection title={t("media:insights.activity")} icon="chart" span="full">
-                <Timeline data={data} />
-              </AdminSection>
-              <AdminSection title={t("media:insights.top")} icon="trophy" span="full" flush>
-                <TopWorks data={data} />
-              </AdminSection>
-              {locked("when") ? (
-                <LockedStat name="when" icon="clock" />
-              ) : (
-                <AdminSection title={t("media:insights.when")} icon="clock">
-                  <Heatmap data={data} />
-                </AdminSection>
-              )}
-              <AdminSection title={t("media:insights.byKind")} icon="list">
-                <Bars
-                  rows={data.by_kind.map((k) => ({
-                    key: k.kind,
-                    label: t(`media:insights.kind.${k.kind}`),
-                    amount: k.seconds,
-                    hint: t("media:insights.plays", { count: k.plays }),
-                  }))}
-                  value={measures.duration}
-                />
-              </AdminSection>
-              {locked("genres") ? <LockedStat name="genres" icon="palette" /> : null}
-              {data.genres.length ? (
-                <AdminSection title={t("media:insights.genres")} icon="palette">
-                  <Bars rows={ranked(data.genres, t)} value={measures.hours} />
-                </AdminSection>
-              ) : null}
-              {locked("people") ? <LockedStat name="people" icon="user" /> : null}
-              {data.people.length ? (
-                <AdminSection title={t("media:insights.people")} icon="user">
-                  <Bars rows={ranked(data.people, t)} value={measures.hours} />
-                </AdminSection>
-              ) : null}
-              {locked("decades") ? <LockedStat name="decades" icon="calendar" /> : null}
-              {data.decades.length ? (
-                <AdminSection title={t("media:insights.decades")} icon="calendar">
-                  <Bars
-                    rows={data.decades.map((d) => ({
-                      key: String(d.decade),
-                      label: t("media:insights.decade", { decade: d.decade }),
-                      amount: d.seconds,
-                      hint: t("media:insights.plays", { count: d.plays }),
-                    }))}
-                    value={measures.hours}
-                  />
-                </AdminSection>
-              ) : null}
-              {locked("records") ? (
-                <LockedStat name="records" icon="star" />
-              ) : (
-                <AdminSection title={t("media:insights.records.title")} icon="star">
-                  <Records data={data} />
-                </AdminSection>
-              )}
-              {locked("box_office") ? <LockedStat name="box_office" icon="coins" /> : null}
-              {data.box_office ? (
-                <AdminSection
-                  title={t("media:insights.box.title")}
-                  description={t("media:insights.box.hint")}
-                  icon="coins"
-                >
-                  <BoxOffice data={data.box_office} />
-                </AdminSection>
-              ) : null}
-              {data.requests?.total ? (
-                <AdminSection title={t("media:insights.requests")} icon="inbox">
-                  <Bars
-                    rows={Object.entries(data.requests.states).map(([state, count]) => ({
-                      key: state,
-                      label: t(`media:requests.state.${state}`),
-                      amount: count,
-                    }))}
-                    value={format.number}
-                  />
-                </AdminSection>
-              ) : null}
-              {locked("platforms") ? <LockedStat name="platforms" icon="gauge" /> : null}
-              {data.platforms?.length ? (
-                <AdminSection title={t("media:insights.platforms")} icon="gauge">
-                  <Bars
-                    rows={data.platforms.map((p) => ({
-                      key: p.name,
-                      label: p.name,
-                      amount: p.plays,
-                      hint: measures.duration(p.seconds),
-                    }))}
-                    value={(n) => t("media:insights.plays", { count: n })}
-                  />
-                </AdminSection>
-              ) : null}
-              {data.members?.length ? (
-                <AdminSection title={t("media:insights.members")} icon="users" flush span="full">
-                  <AdminTable
-                    label={t("media:insights.members")}
-                    rows={data.members}
-                    rowKey={(m) => m.user_id ?? "unknown"}
-                    columns={[
-                      {
-                        key: "who",
-                        header: t("media:insights.member"),
-                        primary: true,
-                        render: (m) => <strong>{m.name ?? t("media:insights.unknownMember")}</strong>,
-                      },
-                      {
-                        key: "time",
-                        header: t("media:insights.stat.time"),
-                        render: (m) => measures.duration(m.seconds),
-                      },
-                      {
-                        key: "plays",
-                        header: t("media:insights.stat.plays"),
-                        render: (m) => format.number(m.plays),
-                      },
-                      {
-                        key: "days",
-                        header: t("media:insights.stat.days"),
-                        render: (m) => format.number(m.active_days),
-                      },
-                      {
-                        key: "last",
-                        header: t("media:insights.lastDay"),
-                        render: (m) => format.date(m.last_day),
-                      },
-                    ]}
-                  />
-                </AdminSection>
-              ) : null}
-              {data.recent?.length ? (
-                <AdminSection title={t("media:insights.recent")} icon="activity" flush span="full">
-                  <ul className="admin-list">
-                    {data.recent.map((r) => {
-                      // a series' episode or a show on live TV: the show first; a book: its title, then the author
-                      const grouped = r.parent_title && !["book", "audiobook"].includes(r.kind);
-                      const head = grouped ? (r.parent_title as string) : r.title;
-                      const sub = grouped ? r.title : r.parent_title;
-                      const thumb = imageUrl(r.image_id) ?? metadataImage(r.poster_ref, "w185");
-                      return (
-                        <li key={`${r.at}-${r.title}`} className="insights-play">
-                          <span className="insights-play__thumb" aria-hidden="true">
-                            {thumb ? (
-                              <img src={thumb} alt="" loading="lazy" />
-                            ) : (
-                              <Icon name={KIND_ICONS[r.kind] ?? "film"} size={18} />
-                            )}
-                          </span>
-                          <span className="admin-list__main">
-                            <strong>
-                              {r.work_id ? <Link to={`/media/${r.work_id}`}>{head}</Link> : head}
-                            </strong>
-                            <span className="admin-muted">
-                              {sub ? `${sub} · ` : ""}
-                              {t(`media:insights.kind.${r.kind}`)} · {format.dateTime(r.at)} ·{" "}
-                              {measures.duration(r.seconds)}
-                              {r.member ? ` · ${r.member}` : ""}
-                              {r.platform ? ` · ${r.platform}` : ""}
-                            </span>
-                          </span>
-                          {r.progress !== null ? (
-                            <span className="admin-muted">{format.percent(r.progress)}</span>
-                          ) : null}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </AdminSection>
-              ) : null}
-            </AdminGrid>
-          )}
-        </>
+        </div>
       ) : null}
+      {!requests && section === "casting" ? (
+        <CastingTab scope={scope} category={category} period={period} />
+      ) : null}
+      {!requests && section === "production" ? (
+        <ProductionTab scope={scope} category={category} period={period} />
+      ) : null}
+      {!requests && section === "playback" ? (
+        <PlaybackTab scope={scope} category={category} period={period} />
+      ) : null}
+      {!requests && section === "profile" ? (
+        <ProfileTab scope={scope} category={category} period={period} />
+      ) : null}
+      {requests || section !== "overview" ? null : (
+        <>
+          {insights.isPending ? <FunctionalState state="loading" /> : null}
+          {insights.isError ? <FunctionalState state="error" onRetry={() => insights.refetch()} /> : null}
+          {data ? (
+            <>
+              <AdminStats
+                label={t("media:insights.title")}
+                stats={[
+                  {
+                    key: "time",
+                    label: t("media:insights.stat.time"),
+                    value: measures.duration(data.totals.seconds),
+                    hint: <Trend now={data.totals.seconds} before={data.previous?.seconds} />,
+                    icon: "clock",
+                    tone: "info",
+                  },
+                  {
+                    key: "plays",
+                    label: t("media:insights.stat.plays"),
+                    value: format.number(data.totals.plays),
+                    hint: <Trend now={data.totals.plays} before={data.previous?.plays} />,
+                    icon: "activity",
+                    tone: "info",
+                  },
+                  {
+                    key: "works",
+                    label: t("media:insights.stat.works"),
+                    value: format.number(data.totals.works),
+                    hint: t("media:insights.completedCount", { count: data.totals.completed }),
+                    icon: "film",
+                    tone: "neutral",
+                  },
+                  data.totals.members !== null
+                    ? {
+                        key: "members",
+                        label: t("media:insights.stat.members"),
+                        value: format.number(data.totals.members),
+                        icon: "users",
+                        tone: "neutral" as const,
+                      }
+                    : {
+                        key: "days",
+                        label: t("media:insights.stat.days"),
+                        value: format.number(data.totals.active_days),
+                        icon: "calendar",
+                        tone: "neutral" as const,
+                      },
+                ]}
+              />
+              {data.totals.plays === 0 ? (
+                <AdminEmpty
+                  icon="chart"
+                  title={t("media:insights.empty")}
+                  action={<span className="admin-muted">{t("media:insights.emptyHint")}</span>}
+                />
+              ) : (
+                <AdminGrid>
+                  <AdminSection title={t("media:insights.activity")} icon="chart" span="full">
+                    <Timeline data={data} />
+                  </AdminSection>
+                  <AdminSection title={t("media:insights.top")} icon="trophy" span="full" flush>
+                    <TopWorks data={data} />
+                  </AdminSection>
+                  {locked("when") ? (
+                    <LockedStat name="when" icon="clock" />
+                  ) : (
+                    <AdminSection title={t("media:insights.when")} icon="clock">
+                      <Heatmap data={data} />
+                    </AdminSection>
+                  )}
+                  <AdminSection title={t("media:insights.byKind")} icon="list">
+                    <Bars
+                      rows={data.by_kind.map((k) => ({
+                        key: k.kind,
+                        label: t(`media:insights.kind.${k.kind}`),
+                        amount: k.seconds,
+                        hint: t("media:insights.plays", { count: k.plays }),
+                      }))}
+                      value={measures.duration}
+                    />
+                  </AdminSection>
+                  {locked("genres") ? <LockedStat name="genres" icon="palette" /> : null}
+                  {data.genres.length ? (
+                    <AdminSection title={t("media:insights.genres")} icon="palette">
+                      <Bars rows={ranked(data.genres, t)} value={measures.hours} />
+                    </AdminSection>
+                  ) : null}
+                  {locked("people") ? <LockedStat name="people" icon="user" /> : null}
+                  {data.people.length ? (
+                    <AdminSection title={t("media:insights.people")} icon="user">
+                      <Bars rows={ranked(data.people, t)} value={measures.hours} />
+                    </AdminSection>
+                  ) : null}
+                  {locked("decades") ? <LockedStat name="decades" icon="calendar" /> : null}
+                  {data.decades.length ? (
+                    <AdminSection title={t("media:insights.decades")} icon="calendar">
+                      <Bars
+                        rows={data.decades.map((d) => ({
+                          key: String(d.decade),
+                          label: t("media:insights.decade", { decade: d.decade }),
+                          amount: d.seconds,
+                          hint: t("media:insights.plays", { count: d.plays }),
+                        }))}
+                        value={measures.hours}
+                      />
+                    </AdminSection>
+                  ) : null}
+                  {locked("records") ? (
+                    <LockedStat name="records" icon="star" />
+                  ) : (
+                    <AdminSection title={t("media:insights.records.title")} icon="star">
+                      <Records data={data} />
+                    </AdminSection>
+                  )}
+                  {locked("box_office") ? <LockedStat name="box_office" icon="coins" /> : null}
+                  {data.box_office ? (
+                    <AdminSection
+                      title={t("media:insights.box.title")}
+                      description={t("media:insights.box.hint")}
+                      icon="coins"
+                    >
+                      <BoxOffice data={data.box_office} />
+                    </AdminSection>
+                  ) : null}
+                  {data.requests?.total ? (
+                    <AdminSection title={t("media:insights.requests")} icon="inbox">
+                      <Bars
+                        rows={Object.entries(data.requests.states).map(([state, count]) => ({
+                          key: state,
+                          label: t(`media:requests.state.${state}`),
+                          amount: count,
+                        }))}
+                        value={format.number}
+                      />
+                    </AdminSection>
+                  ) : null}
+                  {locked("platforms") ? <LockedStat name="platforms" icon="gauge" /> : null}
+                  {data.platforms?.length ? (
+                    <AdminSection title={t("media:insights.platforms")} icon="gauge">
+                      <Bars
+                        rows={data.platforms.map((p) => ({
+                          key: p.name,
+                          label: p.name,
+                          amount: p.plays,
+                          hint: measures.duration(p.seconds),
+                        }))}
+                        value={(n) => t("media:insights.plays", { count: n })}
+                      />
+                    </AdminSection>
+                  ) : null}
+                  {data.members?.length ? (
+                    <AdminSection title={t("media:insights.members")} icon="users" flush span="full">
+                      <AdminTable
+                        label={t("media:insights.members")}
+                        rows={data.members}
+                        rowKey={(m) => m.user_id ?? "unknown"}
+                        columns={[
+                          {
+                            key: "who",
+                            header: t("media:insights.member"),
+                            primary: true,
+                            render: (m) => <strong>{m.name ?? t("media:insights.unknownMember")}</strong>,
+                          },
+                          {
+                            key: "time",
+                            header: t("media:insights.stat.time"),
+                            render: (m) => measures.duration(m.seconds),
+                          },
+                          {
+                            key: "plays",
+                            header: t("media:insights.stat.plays"),
+                            render: (m) => format.number(m.plays),
+                          },
+                          {
+                            key: "days",
+                            header: t("media:insights.stat.days"),
+                            render: (m) => format.number(m.active_days),
+                          },
+                          {
+                            key: "last",
+                            header: t("media:insights.lastDay"),
+                            render: (m) => format.date(m.last_day),
+                          },
+                        ]}
+                      />
+                    </AdminSection>
+                  ) : null}
+                  {data.recent?.length ? (
+                    <AdminSection title={t("media:insights.recent")} icon="activity" flush span="full">
+                      <ul className="admin-list">
+                        {data.recent.map((r) => {
+                          // a series' episode or a show on live TV: the show first; a book: its title, then the author
+                          const grouped = r.parent_title && !["book", "audiobook"].includes(r.kind);
+                          const head = grouped ? (r.parent_title as string) : r.title;
+                          const sub = grouped ? r.title : r.parent_title;
+                          const thumb = imageUrl(r.image_id) ?? metadataImage(r.poster_ref, "w185");
+                          return (
+                            <li key={`${r.at}-${r.title}`} className="insights-play">
+                              <span className="insights-play__thumb" aria-hidden="true">
+                                {thumb ? (
+                                  <img src={thumb} alt="" loading="lazy" />
+                                ) : (
+                                  <Icon name={KIND_ICONS[r.kind] ?? "film"} size={18} />
+                                )}
+                              </span>
+                              <span className="admin-list__main">
+                                <strong>
+                                  {r.work_id ? <Link to={`/media/${r.work_id}`}>{head}</Link> : head}
+                                </strong>
+                                <span className="admin-muted">
+                                  {sub ? `${sub} · ` : ""}
+                                  {t(`media:insights.kind.${r.kind}`)} · {format.dateTime(r.at)} ·{" "}
+                                  {measures.duration(r.seconds)}
+                                  {r.member ? ` · ${r.member}` : ""}
+                                  {r.platform ? ` · ${r.platform}` : ""}
+                                </span>
+                              </span>
+                              {r.progress !== null ? (
+                                <span className="admin-muted">{format.percent(r.progress)}</span>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </AdminSection>
+                  ) : null}
+                </AdminGrid>
+              )}
+            </>
+          ) : null}
+        </>
+      )}
     </AdminPage>
   );
 }

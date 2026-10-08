@@ -24,6 +24,7 @@ from portalab.capabilities.media import (
     ActivityPage,
     ServiceAccount,
     SourceActivity,
+    resolution_of,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.http_base import HttpConnector, binding, parse_time
@@ -48,6 +49,19 @@ def _ids(row: Mapping[str, Any]) -> dict[str, str]:
             if scheme in GUID_SCHEMES and value and scheme not in ids:
                 ids[scheme] = value.split("?")[0][:200]
     return ids
+
+
+STREAMS = {"direct play": "direct", "copy": "copy", "direct stream": "copy", "transcode": "transcode"}
+
+
+def stream_of(row: Mapping[str, Any]) -> str | None:
+    """027: how the play was streamed — direct play, direct stream (``copy``) or transcoded."""
+    return STREAMS.get(str(row.get("transcode_decision") or row.get("video_decision") or "").lower())
+
+
+def quality_of(row: Mapping[str, Any]) -> str | None:
+    """027: the resolution played (the stream's, else the file's): ``4k``, ``1080p``, ``720p`` or ``sd``."""
+    return resolution_of(row.get("stream_video_resolution") or row.get("video_resolution"))
 
 
 def map_history_row(row: Mapping[str, Any]) -> SourceActivity | None:
@@ -85,6 +99,8 @@ def map_history_row(row: Mapping[str, Any]) -> SourceActivity | None:
         platform=row.get("platform") or None,
         family="plex",
         priority=20,
+        stream=stream_of(row),
+        quality=quality_of(row),
     )
 
 

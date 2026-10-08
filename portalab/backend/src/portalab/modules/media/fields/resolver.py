@@ -33,6 +33,7 @@ FIELDS = (
     "released",
     "tags",
     "platform",  # 027: a game's console or system (RomM)
+    "resolution",  # 027: the video file's resolution (statistics)
 )
 ADMIN = "admin"
 Priorities = Callable[[str], Awaitable[Mapping[str, Sequence[str]]]]

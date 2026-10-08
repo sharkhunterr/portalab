@@ -6,7 +6,7 @@ import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 export type Scope = "me" | "all";
 export type Category = "all" | "movies" | "series" | "live" | "music" | "books" | "audiobooks";
 export const CATEGORIES: Category[] = ["all", "movies", "series", "live", "music", "books", "audiobooks"];
-export const PERIODS = ["7d", "30d", "90d", "365d", "all"] as const;
+export const PERIODS = ["7d", "30d", "90d", "ytd", "365d", "all"] as const;
 
 export interface Work {
   id: string | null;
@@ -138,6 +138,110 @@ export interface Sources {
     progress: TaskProgress;
   };
   unattributed: number;
+}
+
+/** 027: the statistics in depth — one tab each, compared with the previous period of the same length. */
+export type Section = "casting" | "production" | "playback" | "profile";
+
+interface SectionBase {
+  section: Section;
+  unit: "day" | "week" | "month";
+  buckets: string[];
+  has_previous: boolean;
+}
+
+export interface Person {
+  name: string;
+  image: string | null;
+  works: number;
+  seconds: number;
+  previous: number;
+  titles: string[];
+}
+
+export interface Casting extends SectionBase {
+  directors: Person[];
+  actors: Person[];
+  with_metadata: number;
+}
+
+export interface Film {
+  id: string;
+  title: string;
+  poster_ref: string | null;
+  image_id?: string | null;
+  budget: number | null;
+  revenue: number | null;
+  roi: number | null;
+  year: number | null;
+}
+
+export interface Production extends SectionBase {
+  films: number;
+  years: Array<{ year: number; count: number; previous: number }>;
+  year_average: number | null;
+  year_average_previous: number | null;
+  countries: Array<{ code: string; count: number }>;
+  most_expensive?: Film | null;
+  cheapest?: Film | null;
+  most_profitable?: Film | null;
+  budget_average?: number | null;
+  budgets?: Array<{ range: string; count: number; previous: number }>;
+  successes?: Film[];
+  flops?: Film[];
+}
+
+export interface Breakdown {
+  totals: Array<{ key: string; count: number; previous: number }>;
+  series: Array<{ current: Record<string, number>; previous: Record<string, number> }>;
+}
+
+export interface Playback extends SectionBase {
+  total: number;
+  total_previous: number;
+  streams: Breakdown;
+  qualities: Breakdown;
+  platforms: Array<{ name: string; count: number }>;
+  devices: Array<{ name: string; count: number }> | null;
+}
+
+export interface Profile extends SectionBase {
+  genres: Array<{ name: string; count: number; previous: number }>;
+  summary: { new: string[]; rising: string[]; always: string[]; gone: string[] };
+  genre_series: string[];
+  genre_buckets: Array<Record<string, number>>;
+  activity: Array<{ plays: number; completed: number; previous_plays: number; previous_completed: number }>;
+  hours: number[];
+  weekdays: number[];
+}
+
+export interface SectionData {
+  casting: Casting;
+  production: Production;
+  playback: Playback;
+  profile: Profile;
+}
+
+export function useInsightSection<S extends Section>(
+  section: S,
+  scope: Scope,
+  category: Category,
+  period: string,
+) {
+  const { time_zone } = useLocaleContext();
+  return useQuery({
+    queryKey: ["media", "insights", section, scope, category, period, time_zone],
+    staleTime: 60_000,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/media/insights/{section}", {
+          params: {
+            path: { section },
+            query: { scope, category, period, tz: time_zone || "UTC" },
+          },
+        })
+      ).data as unknown as SectionData[S],
+  });
 }
 
 /** When an update was last asked for: the panel refreshes quickly until it shows up as running. */

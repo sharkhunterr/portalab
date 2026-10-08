@@ -99,6 +99,8 @@ class LibraryPayload(BaseModel):
     series_position: float | None = Field(default=None, ge=0, le=100_000)
     publisher: str | None = Field(default=None, max_length=200)
     tags: list[str] = Field(default_factory=list, max_length=40)  # moods and themes (Grimmory)
+    # 027: the video file's resolution (``4k``, ``1080p``, ``720p``, ``sd``) — statistics' quality fallback
+    resolution: str | None = Field(default=None, pattern=r"^(4k|1080p|720p|sd)$")
     # 027: which copy this item is when a service holds several of one title (a game per platform/region)
     variant: str | None = Field(default=None, max_length=200)
     platform: str | None = Field(default=None, max_length=120)  # 027: a game's console or system
@@ -187,6 +189,27 @@ class ServiceAccounts(Protocol):
     async def list_accounts(self) -> Sequence[ServiceAccount]: ...
 
 
+def resolution_of(raw: object) -> str | None:
+    """027: a resolution as a source names it (« 4k », « 2160 », « 1080 », « 720p », « 480 », « sd »…) or a
+    frame height, as ``4k``, ``1080p``, ``720p`` or ``sd``."""
+    text = str(raw or "").strip().lower()
+    if not text:
+        return None
+    if "4k" in text or "uhd" in text:
+        return "4k"
+    digits = "".join(ch for ch in text if ch.isdigit())
+    height = int(digits) if digits else None
+    if height is None:
+        return "sd" if text == "sd" else None
+    if height >= 1440:
+        return "4k"
+    if height >= 900:
+        return "1080p"
+    if height >= 600:
+        return "720p"
+    return "sd"
+
+
 @dataclass(frozen=True, slots=True)
 class SourceActivity:
     """One play or reading session as the source recorded it (027, Telemetra-style raw history)."""
@@ -208,6 +231,10 @@ class SourceActivity:
     platform: str | None = None
     family: str | None = None  # sources reporting the same plays share it (``plex`` for Plex + Tautulli)
     priority: int = 10  # within a family, the higher source wins
+    # 027: how it was streamed (``direct``, ``copy`` — direct stream —, ``transcode``) and the resolution
+    # played (``4k``, ``1080p``, ``720p``, ``sd``), when the source tells
+    stream: str | None = None
+    quality: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

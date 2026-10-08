@@ -61,6 +61,8 @@ def window(period: str, now: datetime) -> Window:
     end = datetime(now.year, now.month, now.day, tzinfo=UTC) + timedelta(days=1)
     if period in PERIODS:
         return Window(end - timedelta(days=PERIODS[period]), end, period)
+    if period == "ytd":  # 027: since the 1st of January
+        return Window(datetime(now.year, 1, 1, tzinfo=UTC), end, period)
     if period.isdigit() and len(period) == 4:  # a calendar year: « my 2025 »
         year = int(period)
         return Window(datetime(year, 1, 1, tzinfo=UTC), datetime(year + 1, 1, 1, tzinfo=UTC), period)

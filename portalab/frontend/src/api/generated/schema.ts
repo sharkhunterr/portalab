@@ -6062,6 +6062,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/insights/{section}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Insights Section
+         * @description 027: one tab of the statistics in depth (casting, production, playback, profile), compared with the
+         *     previous period — mine, or the server's (devices only for « me » and media managers).
+         */
+        get: operations["insights_section_api_v1_media_insights__section__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/metadata-images": {
         parameters: {
             query?: never;
@@ -25487,6 +25508,44 @@ export interface operations {
             };
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    insights_section_api_v1_media_insights__section__get: {
+        parameters: {
+            query?: {
+                period?: string;
+                category?: string;
+                scope?: "me" | "all";
+                tz?: string;
+            };
+            header?: never;
+            path: {
+                section: string;
+            };
             cookie?: never;
         };
         requestBody?: never;

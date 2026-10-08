@@ -66,6 +66,7 @@ from portalab.modules.media.images.service import ImageService
 from portalab.modules.media.insights.aggregate import JOB as AGGREGATE_JOB
 from portalab.modules.media.insights.aggregate import ActivityAggregator
 from portalab.modules.media.insights.calendar_source import MediaReleaseCalendarSource
+from portalab.modules.media.insights.deep import DeepInsights
 from portalab.modules.media.insights.digest import LibraryDigest
 from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
 from portalab.modules.media.insights.enrich import MetadataEnricher
@@ -211,6 +212,7 @@ class MediaModule:
         self.aggregator = ActivityAggregator(database)
         self.enricher = MetadataEnricher(database, capabilities, self.language, blobs=blobs, clock=clock)
         self.insights = InsightsQuery(database, clock=clock)
+        self.deep_insights = DeepInsights(database, clock=clock)  # 027: the statistics' tabs
         self.upcoming = Upcoming(database, capabilities, clock=clock)
         self.calendar = calendar
         self.request_insights = RequestInsights(

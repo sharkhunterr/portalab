@@ -7,6 +7,27 @@
   --kind-book: var(--state-available-fg);
   --kind-audiobook: color-mix(in oklab, var(--state-available-fg) 55%, var(--color-accent-alt));
   --kind-other: var(--color-text-muted);
+  /* 027: the statistics in depth — a palette, the previous period, streams and resolutions */
+  --chart-1: var(--color-accent);
+  --chart-2: var(
+    --color-accent-alt,
+    color-mix(in oklab, var(--color-accent) 50%, var(--state-maintenance-fg))
+  );
+  --chart-3: var(--state-available-fg);
+  --chart-4: var(--state-partial-fg);
+  --chart-5: var(--state-error-fg);
+  --chart-6: var(--state-syncing-fg);
+  --chart-7: color-mix(in oklab, var(--color-accent) 50%, var(--state-available-fg));
+  --chart-8: color-mix(in oklab, var(--state-error-fg) 55%, var(--state-partial-fg));
+  --chart-other: color-mix(in oklab, var(--color-text-muted) 70%, transparent);
+  --chart-previous: color-mix(in oklab, var(--color-text-muted) 45%, transparent);
+  --stream-direct: var(--state-available-fg);
+  --stream-copy: var(--state-syncing-fg);
+  --stream-transcode: var(--state-error-fg);
+  --quality-4k: var(--color-accent-alt, var(--state-maintenance-fg));
+  --quality-1080: var(--state-partial-fg);
+  --quality-720: var(--color-accent);
+  --quality-sd: var(--color-text-muted);
 }
 
 .insights-trend {
@@ -373,4 +394,635 @@
 }
 .insights-toggle__item:has(input:focus-visible) {
   outline: 2px solid var(--color-accent);
+}
+
+/* ---- 027: statistics in depth (Telemetra-style tabs) ---------------------------------------------- */
+.deep-tabs {
+  margin-block: calc(-1 * var(--space-2)) var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.deep-figure {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.deep-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deep-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.deep-legend__swatch {
+  inline-size: 0.85rem;
+  block-size: 0.55rem;
+  border-radius: 2px;
+}
+
+.deep-legend__item[data-dashed] .deep-legend__swatch {
+  block-size: 2px;
+  background: repeating-linear-gradient(90deg, var(--chart-previous) 0 4px, transparent 4px 7px);
+}
+
+.deep-split {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+}
+
+@media (max-width: 52rem) {
+  .deep-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* genre profile: new, rising, always, gone */
+.deep-summary {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deep-summary__card {
+  --tone: var(--color-text-muted);
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in oklab, var(--tone) 35%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--tone) 7%, transparent);
+}
+
+.deep-summary__card[data-tone="ok"] {
+  --tone: var(--state-available-fg);
+}
+
+.deep-summary__card[data-tone="info"] {
+  --tone: var(--color-accent);
+}
+
+.deep-summary__card[data-tone="bad"] {
+  --tone: var(--state-error-fg);
+}
+
+.deep-summary__card[data-empty] {
+  border-style: dashed;
+  background: transparent;
+  opacity: 0.7;
+}
+
+.deep-summary__count {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  color: var(--tone);
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+}
+
+.deep-summary__text {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.deep-summary__text strong {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: var(--font-size-sm);
+}
+
+.deep-summary__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.deep-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.deep-chip {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--tone) 55%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--tone);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.deep-chips__more {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  align-self: center;
+}
+
+/* viewing footprint: a clock and a week wheel */
+.deep-wheels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-4);
+}
+
+.deep-wheel {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
+.deep-wheel figcaption {
+  color: var(--chart-1);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.deep-wheel svg {
+  inline-size: min(100%, 17rem);
+  overflow: visible;
+}
+
+.deep-wheel__ring {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-dasharray: 2 4;
+}
+
+.deep-wheel__wedge,
+.deep-wheel__slice {
+  fill: var(--chart-1);
+  transition: opacity var(--motion-duration-fast) linear;
+}
+
+.deep-wheel__wedge:hover,
+.deep-wheel__slice:hover {
+  filter: brightness(1.35);
+}
+
+.deep-wheel__tick {
+  fill: var(--color-text-muted);
+  font-size: 9px;
+  text-anchor: middle;
+}
+
+.deep-wheel__tick[data-peak] {
+  fill: var(--chart-1);
+  font-weight: var(--font-weight-bold);
+}
+
+/* casting registry */
+.deep-registry {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.deep-registry__head {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in oklab, var(--chart-1) 8%, transparent);
+  color: var(--chart-1);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.deep-registry__sync {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--state-available-fg);
+}
+
+.deep-registry__sync span {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  background: currentColor;
+  animation: deep-blink 2.4s steps(2, jump-none) infinite;
+}
+
+@keyframes deep-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.deep-registry ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deep-registry li {
+  display: grid;
+  grid-template-columns: 2rem 3rem 1fr;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+}
+
+.deep-registry li:last-child {
+  border-bottom: 0;
+}
+
+.deep-registry__rank {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.deep-registry__portrait {
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--chart-1) 45%, var(--color-border));
+  border-radius: var(--radius-sm);
+  color: var(--chart-1);
+  font-weight: var(--font-weight-bold);
+}
+
+.deep-registry__portrait img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.deep-registry__body {
+  display: grid;
+  gap: 0.3rem;
+  min-inline-size: 0;
+}
+
+.deep-registry__line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.deep-registry__line strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deep-registry__count {
+  color: var(--chart-1);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.deep-delta {
+  margin-inline-start: var(--space-1);
+  color: var(--state-available-fg);
+  font-size: var(--font-size-xs);
+}
+
+.deep-registry__bar {
+  block-size: 3px;
+  background: color-mix(in oklab, var(--color-border) 60%, transparent);
+}
+
+.deep-registry__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--chart-1);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--chart-1) 60%, transparent);
+}
+
+.deep-registry__titles {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* production: tiles, ROI rows, world map */
+.deep-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deep-tile {
+  --tone: var(--chart-1);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in oklab, var(--tone) 60%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--tone) 16%, transparent);
+  text-align: center;
+}
+
+.deep-tile[data-tone="bad"] {
+  --tone: var(--state-error-fg);
+}
+
+.deep-tile[data-tone="ok"] {
+  --tone: var(--state-available-fg);
+}
+
+.deep-tile[data-tone="neutral"] {
+  --tone: var(--color-accent);
+}
+
+.deep-tile__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.deep-tile__value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--tone);
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.deep-tile__film {
+  overflow: hidden;
+  max-inline-size: 100%;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deep-roi {
+  --tone: var(--state-available-fg);
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deep-roi[data-tone="bad"] {
+  --tone: var(--state-error-fg);
+}
+
+.deep-roi li {
+  display: grid;
+  grid-template-columns: 2rem 2.5rem minmax(8rem, 1.4fr) minmax(5rem, 1fr) auto minmax(5rem, 1fr) auto minmax(
+      5rem,
+      1fr
+    );
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in oklab, var(--tone) 30%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--tone) 5%, transparent);
+}
+
+.deep-roi > li > svg {
+  color: var(--color-text-muted);
+}
+
+.deep-roi__rank {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.deep-roi__art {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.deep-roi__art img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.deep-roi__title {
+  overflow: hidden;
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deep-roi__cell {
+  display: grid;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.deep-roi__cell[data-accent] {
+  border-color: color-mix(in oklab, var(--tone) 50%, transparent);
+  color: var(--tone);
+}
+
+.deep-roi__cell span {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.deep-roi__cell small {
+  font-size: 0.65rem;
+}
+
+@media (max-width: 52rem) {
+  .deep-roi li {
+    grid-template-columns: 2.5rem 1fr 1fr 1fr;
+  }
+
+  .deep-roi__rank,
+  .deep-roi > li > svg {
+    display: none;
+  }
+
+  .deep-roi__title {
+    grid-column: 2 / -1;
+  }
+
+  .deep-roi__art {
+    grid-row: span 2;
+  }
+}
+
+.deep-map {
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-surface) 70%, transparent);
+}
+
+.deep-map svg {
+  display: block;
+  inline-size: 100%;
+}
+
+.deep-map__land {
+  fill: color-mix(in oklab, var(--color-text-muted) 18%, transparent);
+  stroke: var(--color-surface);
+  stroke-width: 0.5;
+}
+
+.deep-map__land[data-on] {
+  fill: var(--chart-1);
+}
+
+.deep-map__tag polyline {
+  fill: none;
+}
+
+.deep-map__tag polyline,
+.deep-map__tag line {
+  stroke: var(--chart-1);
+  stroke-width: 1;
+}
+
+.deep-map__tag circle {
+  fill: var(--chart-1);
+  filter: drop-shadow(0 0 4px var(--chart-1));
+}
+
+.deep-map__tag rect {
+  fill: var(--color-surface-raised);
+  stroke: var(--chart-1);
+}
+
+.deep-map__tag text {
+  fill: var(--color-text);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+}
+
+.deep-map__tag .deep-map__count {
+  fill: var(--chart-1);
+  text-anchor: end;
+}
+
+.deep-map__loading {
+  aspect-ratio: 2.5 / 1;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-border) 30%, transparent);
+}
+
+/* playback: donuts side by side */
+.deep-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-4);
+}
+
+.deep-pair > [data-previous] {
+  opacity: 0.8;
+}
+
+.deep-pair__title {
+  margin: 0 0 var(--space-1);
+  color: var(--chart-1);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.deep-donut {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.deep-donut__chart {
+  position: relative;
+}
+
+.deep-donut__center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.deep-donut__center strong {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+}
+
+.deep-donut__center span {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.deep-donut__callouts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deep-donut__callouts li {
+  display: inline-flex;
+  gap: var(--space-2);
+  padding: 0.15rem var(--space-2);
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deep-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
 }

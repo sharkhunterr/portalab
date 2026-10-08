@@ -340,6 +340,8 @@ class Activity(MediaBase):
     progress: Mapped[float | None] = mapped_column(Float)
     device: Mapped[str | None] = mapped_column(String(120), info=pii("activity"))
     platform: Mapped[str | None] = mapped_column(String(60))
+    stream: Mapped[str | None] = mapped_column(String(12))  # direct, copy, transcode (027)
+    quality: Mapped[str | None] = mapped_column(String(12))  # 4k, 1080p, 720p, sd (027)
     received_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 

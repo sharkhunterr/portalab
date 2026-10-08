@@ -36,6 +36,7 @@ from portalab.capabilities.media import (
     SourceActivity,
     SourceHistoryItem,
     SourcePlayback,
+    resolution_of,
 )
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
@@ -177,6 +178,7 @@ class PlexConnector(HttpConnector):
                             "image": key if item.get("thumb") else None,
                             # 027: release (or air) date, for « Recent releases »
                             "released": _day(item.get("originallyAvailableAt")),
+                            "resolution": resolution_of(_media(item).get("videoResolution")),
                         }
                         yield self.record(service, key, kind, payload, parse_time(item.get("addedAt")))
                         count += 1
@@ -298,6 +300,13 @@ def map_history(item: Mapping[str, Any]) -> SourceActivity | None:
         family="plex",
         priority=10,
     )
+
+
+def _media(item: Mapping[str, Any]) -> Mapping[str, Any]:
+    """027: an item's first media version (its file's resolution, codecs…)."""
+    versions = item.get("Media")
+    first = versions[0] if isinstance(versions, list) and versions else None
+    return first if isinstance(first, Mapping) else {}
 
 
 class _History:

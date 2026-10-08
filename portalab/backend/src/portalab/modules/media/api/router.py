@@ -8,7 +8,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi import APIRouter, Depends, Path, Query, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
@@ -325,7 +325,7 @@ async def cancel_request(principal: Requester, request_id: UUID, module: Module)
 
 
 # --- 027: statistics, upcoming releases, enriched details -------------------------------------------------
-INSIGHT_PERIOD = r"^(7d|30d|90d|365d|all|\d{4})$"
+INSIGHT_PERIOD = r"^(7d|30d|90d|365d|ytd|all|\d{4})$"
 INSIGHT_CATEGORY = r"^(all|movies|series|live|music|books|audiobooks)$"
 IMAGE_SIZE = r"^(w92|w154|w185|w300|w342|w500|w780|w1280|h632|original)$"
 
@@ -412,6 +412,35 @@ async def insights(
         row["image_id"] = images.get(UUID(row["work_id"])) if row.get("work_id") else None
     await _provider_posters(module, data)
     data["manager"] = manager
+    return data
+
+
+@router.get("/media/insights/{section}")
+async def insights_section(
+    principal: Reader,
+    module: Module,
+    section: Annotated[str, Path(pattern=r"^(casting|production|playback|profile)$")],
+    period: Annotated[str, Query(pattern=INSIGHT_PERIOD)] = "30d",
+    category: Annotated[str, Query(pattern=INSIGHT_CATEGORY)] = "all",
+    scope: Literal["me", "all"] = "me",
+    tz: Annotated[str, Query(max_length=64)] = "UTC",
+) -> dict[str, Any]:
+    """027: one tab of the statistics in depth (casting, production, playback, profile), compared with the
+    previous period — mine, or the server's (devices only for « me » and media managers)."""
+    manager = await module.authorizer.is_allowed(principal, MEDIA_MANAGE)
+    data = await module.deep_insights.section(
+        section,
+        period=period,
+        category=category,
+        user=_me(principal) if scope == "me" else None,
+        detailed=scope == "me" or manager,
+        tz=_zone(tz),
+    )
+    films = [*(data.get("successes") or []), *(data.get("flops") or [])]
+    films += [data[k] for k in ("most_expensive", "cheapest", "most_profitable") if data.get(k)]
+    images = await posters(module.database, (UUID(f["id"]) for f in films))
+    for film in films:
+        film["image_id"] = images.get(UUID(film["id"]))
     return data
 
 

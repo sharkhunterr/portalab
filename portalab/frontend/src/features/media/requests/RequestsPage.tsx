@@ -279,7 +279,7 @@ function Genres({ data }: { data: RequestInsights }) {
   );
 }
 
-function Overview({ data }: { data: RequestInsights }) {
+export function Overview({ data }: { data: RequestInsights }) {
   const t = useT();
   const measures = useMeasures();
   if (!data.summary.total) {

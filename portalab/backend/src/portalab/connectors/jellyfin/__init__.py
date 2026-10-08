@@ -29,6 +29,7 @@ from portalab.capabilities.media import (
     ServiceAccount,
     SourceHistoryItem,
     SourcePlayback,
+    resolution_of,
 )
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
@@ -135,6 +136,7 @@ class JellyfinConnector(HttpConnector):
                     "people": [p.get("Name") for p in item.get("People") or [] if p.get("Name")][:50],
                     "duration_s": _seconds(item.get("RunTimeTicks")),
                     "image": item_id if (item.get("ImageTags") or {}).get("Primary") else None,
+                    "resolution": resolution_of(item.get("Height")),  # 027: the file's frame height
                 }
                 yield self.record(service, item_id, kind, payload, parse_time(item.get("DateCreated")))
             start += len(page["Items"])

@@ -356,6 +356,8 @@ class ActivityIngestor:
                         "progress": item.progress,
                         "device": (item.device or None) and item.device[:120],
                         "platform": (item.platform or None) and item.platform[:60],
+                        "stream": (item.stream or None) and item.stream[:12],
+                        "quality": (item.quality or None) and item.quality[:12],
                         "received_at": now,
                     }
                 )
@@ -376,6 +378,8 @@ class ActivityIngestor:
                             "user_id": statement.excluded.user_id,
                             "object_id": func.coalesce(statement.excluded.object_id, Activity.object_id),
                             "work_id": func.coalesce(statement.excluded.work_id, Activity.work_id),
+                            "stream": func.coalesce(statement.excluded.stream, Activity.stream),
+                            "quality": func.coalesce(statement.excluded.quality, Activity.quality),
                         },
                     )
                 )

@@ -31035,7 +31035,7 @@
             "required": false,
             "schema": {
               "default": "365d",
-              "pattern": "^(7d|30d|90d|365d|all|\\d{4})$",
+              "pattern": "^(7d|30d|90d|365d|ytd|all|\\d{4})$",
               "title": "Period",
               "type": "string"
             }
@@ -32562,7 +32562,7 @@
             "required": false,
             "schema": {
               "default": "30d",
-              "pattern": "^(7d|30d|90d|365d|all|\\d{4})$",
+              "pattern": "^(7d|30d|90d|365d|ytd|all|\\d{4})$",
               "title": "Period",
               "type": "string"
             }
@@ -32629,6 +32629,99 @@
           }
         },
         "summary": "Insights",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/insights/{section}": {
+      "get": {
+        "description": "027: one tab of the statistics in depth (casting, production, playback, profile), compared with the\nprevious period \u2014 mine, or the server's (devices only for \u00ab me \u00bb and media managers).",
+        "operationId": "insights_section_api_v1_media_insights__section__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "section",
+            "required": true,
+            "schema": {
+              "pattern": "^(casting|production|playback|profile)$",
+              "title": "Section",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "pattern": "^(7d|30d|90d|365d|ytd|all|\\d{4})$",
+              "title": "Period",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "pattern": "^(all|movies|series|live|music|books|audiobooks)$",
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "me",
+              "enum": [
+                "me",
+                "all"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tz",
+            "required": false,
+            "schema": {
+              "default": "UTC",
+              "maxLength": 64,
+              "title": "Tz",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Insights Section Api V1 Media Insights  Section  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Insights Section",
         "tags": [
           "media"
         ]
