@@ -134,27 +134,65 @@ export interface ResolvedLooks {
   levelUp: LevelUpLook;
 }
 
-export function resolveLooks(effective: Effective, preferences: UiPreferences): ResolvedLooks {
+/**
+ * 027: the looks a member may not wear (sold in the shop, not owned, not free), per kind. A theme's own
+ * look counts as one of them: the theme alone brings its colours, fonts, layout and words, while its
+ * sold looks (ambience, notifications, celebration, level-up) come with the universe's pack — without
+ * them, « follow the theme » falls back to the free default. ``null``: not known yet (all fall back).
+ */
+export interface LockedLooks {
+  notificationStyle?: ReadonlySet<string>;
+  notificationAnimation?: ReadonlySet<string>;
+  ambient?: ReadonlySet<string>;
+  celebration?: ReadonlySet<string>;
+  levelUp?: ReadonlySet<string>;
+}
+
+/** The free defaults a theme's look falls back to when the member does not own it. */
+export const FREE_LOOKS: ResolvedLooks = {
+  notificationStyle: "toast",
+  notificationAnimation: "slide",
+  ambient: "none",
+  celebration: "sparkle",
+  levelUp: "classic",
+};
+
+export function resolveLooks(
+  effective: Effective,
+  preferences: UiPreferences,
+  locked?: LockedLooks | null,
+): ResolvedLooks {
   const theme = effective.theme;
   const presentation = presentationOf(theme);
+  // the theme's own look, if the member may wear it
+  const own = <K extends keyof ResolvedLooks>(kind: K, value: ResolvedLooks[K]): ResolvedLooks[K] => {
+    if (locked === undefined || value === FREE_LOOKS[kind]) return value;
+    if (locked === null || locked[kind]?.has(value)) return FREE_LOOKS[kind];
+    return value;
+  };
   const ambient =
-    preferences.ambient === "theme" ? (theme.background?.ambient ?? "none") : preferences.ambient;
+    preferences.ambient === "theme"
+      ? own("ambient", (theme.background?.ambient ?? "none") as Ambient)
+      : preferences.ambient;
   return {
     notificationStyle:
       preferences.notificationStyle === "theme"
-        ? (theme.notification?.style ?? "toast")
+        ? own("notificationStyle", (theme.notification?.style ?? "toast") as NotificationStyle)
         : preferences.notificationStyle,
     notificationAnimation:
       preferences.notificationAnimation === "theme"
-        ? (theme.notification?.animation ?? "slide")
+        ? own("notificationAnimation", (theme.notification?.animation ?? "slide") as NotificationAnimation)
         : preferences.notificationAnimation,
     ambient: effective.reducedMotion || preferences.contrast === "high" ? "none" : ambient,
     celebration: effective.reducedMotion
       ? "none"
       : preferences.celebration === "theme"
-        ? presentation.celebration
+        ? own("celebration", presentation.celebration as CelebrationKey)
         : preferences.celebration,
-    levelUp: preferences.levelUp === "theme" ? (theme.motion?.levelUp ?? "classic") : preferences.levelUp,
+    levelUp:
+      preferences.levelUp === "theme"
+        ? own("levelUp", (theme.motion?.levelUp ?? "classic") as LevelUpLook)
+        : preferences.levelUp,
   };
 }
 
@@ -167,6 +205,7 @@ export function applyToDocument(
   effective: Effective,
   preferences: UiPreferences,
   root: HTMLElement = document.documentElement,
+  locked?: LockedLooks | null,
 ): void {
   const { theme } = effective;
   for (const [role, variable] of Object.entries(COLOR_VARS)) {
@@ -214,7 +253,7 @@ export function applyToDocument(
   root.dataset.corners = presentation.corners;
   root.dataset.widgetFrame = presentation.widgetFrame;
   root.dataset.motion = effective.reducedMotion ? "none" : presentation.motion;
-  const looks = resolveLooks(effective, preferences);
+  const looks = resolveLooks(effective, preferences, locked);
   root.dataset.celebration = looks.celebration;
   root.dataset.ambient = looks.ambient;
   root.style.setProperty("--text-scale", String(effective.textScale));

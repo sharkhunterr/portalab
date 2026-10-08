@@ -303,6 +303,7 @@
   "universe.celebrations.stars": "Stars",
   "universe.followTheme": "Follow the theme",
   "universe.hint": "A discreet animation behind the portal and the effect played for your rewards — the theme's, none, or ones from the shop.",
+  "universe.themeLookInPack": "The theme's own look comes with its universe's ultimate pack — until then, the free default shows.",
   "universe.title": "Ambience and celebrations",
   "verification.body": "Your confirmation code: {token} (valid until {expires}).",
   "verification.subject": "Confirm your Portalab account"

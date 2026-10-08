@@ -120,7 +120,11 @@ export function useAcquire(key: string) {
           params: { path: { key }, header: { "Idempotency-Key": requestKey } },
         })
       ).data as OwnershipRow,
-    onSuccess: () => client.invalidateQueries({ queryKey: KEY }),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: KEY });
+      // 027: a bought look (or a pack's) is worn at once, the theme's own included
+      void client.invalidateQueries({ queryKey: ["ui", "notification-looks"] });
+    },
   });
 }
 

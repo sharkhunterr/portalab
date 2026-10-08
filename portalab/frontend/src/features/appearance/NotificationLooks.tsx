@@ -43,9 +43,15 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
   const notify = useNotify();
   const { preferences, setPreference } = usePreferences();
   const looks = useLooks();
-  const themeStyle = useTheme().effective.theme.notification?.style ?? "toast";
+  const themeNotification = useTheme().effective.theme.notification;
   const locked = (list: Choice[] | undefined, key: string) =>
     Boolean(list?.find((c) => c.key === key)?.locked);
+  // 027: the theme's own look is worn with its universe's pack; without it the free default shows
+  const ownStyle = themeNotification?.style ?? "toast";
+  const themeStyle = locked(looks.data?.styles, ownStyle) ? "toast" : ownStyle;
+  const inPack =
+    locked(looks.data?.styles, ownStyle) ||
+    locked(looks.data?.animations, themeNotification?.animation ?? "slide");
   const tryIt = () =>
     notify({
       severity: "success",
@@ -137,6 +143,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
         })}
       </fieldset>
       <InShop count={lockedCount(looks.data?.animations)} type="notification_animation" />
+      {inPack ? <p className="looks__more">{t("notifications:universe.themeLookInPack")}</p> : null}
     </section>
   );
 }

@@ -6,6 +6,7 @@ import { PreferencesProvider } from "../../design-system/a11y/PreferencesProvide
 import { NotificationArea } from "../../design-system/components/Notification";
 import { CelebrationProvider } from "../../design-system/feedback/Celebration";
 import { AmbientLayer } from "../../design-system/themes/AmbientLayer";
+import type { LockedLooks } from "../../design-system/themes/apply";
 import { ThemeProvider, useTheme } from "../../design-system/themes/ThemeProvider";
 import { VocabularyContext } from "../../i18n";
 import { useCampaignOverlay } from "../campaigns/presentation/CampaignPresentationProvider";
@@ -26,6 +27,40 @@ function ThemeUniverse({ children }: { children: ReactNode }) {
   );
 }
 
+interface LooksCatalog {
+  styles?: Array<{ key: string; locked: boolean }>;
+  animations?: Array<{ key: string; locked: boolean }>;
+  ambients?: Array<{ key: string; locked: boolean }>;
+  celebrations?: Array<{ key: string; locked: boolean }>;
+  level_ups?: Array<{ key: string; locked: boolean }>;
+}
+
+/**
+ * 027: what the member may not wear. A universe theme alone brings its colours, layout and words; its sold
+ * looks (ambience, notifications, celebration, level-up) come with the universe's pack. While the
+ * catalog loads they wait (``null``); if it cannot be read, nothing is withheld.
+ */
+function useLockedLooks(): LockedLooks | null | undefined {
+  const catalog = useQuery({
+    queryKey: ["ui", "notification-looks"],
+    retry: false,
+    queryFn: async () => (await api.GET("/api/v1/ui/notification-looks")).data as unknown as LooksCatalog,
+  });
+  return useMemo(() => {
+    if (catalog.isError) return undefined;
+    if (!catalog.data) return null;
+    const set = (list?: Array<{ key: string; locked: boolean }>) =>
+      new Set((list ?? []).filter((c) => c.locked).map((c) => c.key));
+    return {
+      notificationStyle: set(catalog.data.styles),
+      notificationAnimation: set(catalog.data.animations),
+      ambient: set(catalog.data.ambients),
+      celebration: set(catalog.data.celebrations),
+      levelUp: set(catalog.data.level_ups),
+    };
+  }, [catalog.data, catalog.isError]);
+}
+
 /** Signed-in presentation root: account preferences (synced), the allowed theme catalog, notifications. */
 function Themed({ children }: { children: ReactNode }) {
   const catalog = useQuery({
@@ -37,8 +72,9 @@ function Themed({ children }: { children: ReactNode }) {
     staleTime: 5 * 60_000,
   });
   const overlay = useCampaignOverlay(catalog.data ?? []); // 014 campaign theme, 022 keeps a11y above it
+  const lockedLooks = useLockedLooks();
   return (
-    <ThemeProvider themes={catalog.data ?? []} overlay={overlay}>
+    <ThemeProvider themes={catalog.data ?? []} overlay={overlay} lockedLooks={lockedLooks}>
       <ThemeUniverse>
         <NotificationArea>
           <CelebrationProvider>{children}</CelebrationProvider>

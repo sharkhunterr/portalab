@@ -17,7 +17,7 @@ import { InShop } from "./InShop";
 export function LevelUpPicker() {
   const t = useT();
   const { preferences, setPreference } = usePreferences();
-  const { looks: themed } = useTheme();
+  const { looks: themed, effective } = useTheme();
   const level = (useProgression().data?.level ?? 11) + 1;
   const catalog = useQuery({
     queryKey: ["ui", "notification-looks"],
@@ -66,6 +66,9 @@ export function LevelUpPicker() {
         </Button>
       </p>
       <InShop count={LEVEL_UPS.length - owned.length} type="level_up" />
+      {locked(effective.theme.motion?.levelUp ?? "classic") ? (
+        <p className="looks__more">{t("notifications:universe.themeLookInPack")}</p>
+      ) : null}
     </section>
   );
 }

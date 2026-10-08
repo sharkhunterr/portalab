@@ -7,9 +7,15 @@ Prices follow the rarity (common about 100 to 200, rare 250 to 450, epic 500 to 
 the rarest need a level; a pack costs about 80 % of what it contains. Copies come from the rarity's supply
 unless a product sets its own (themes and ultimate packs have a few more). Demo data only."""
 
+import json
+from pathlib import Path
 from typing import Any
 
+from portalab.capabilities.themes import UNIVERSE_THEMES
+from portalab.modules.ui import themes as themes_package
+
 Product = dict[str, Any]
+BUILTIN_THEMES = Path(themes_package.__file__).parent / "builtin"
 
 SHOP: list[Product] = []
 
@@ -919,8 +925,16 @@ THEME_RARITY = {
     "upsidedown": ("legendary", 1500, 12), "middleearth": ("legendary", 1500, 12),
     "vhs": ("epic", 900, 5), "nova": ("legendary", 1500, 10),
 }  # fmt: skip
+# 027: the theme alone is its colours, fonts, layout, navigation and words; its sold looks (animated
+# background, notifications, celebration, level-up) come with its universe's ultimate pack
+PACK_NOTE = (
+    " Its animated background, notifications, celebration and level-up come with its ultimate pack.",
+    " Son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack ultime.",
+)
 for theme, (en, fr, about_en, about_fr) in THEME_TEXT.items():
     rarity, price, level = THEME_RARITY[theme]
+    if theme in UNIVERSE_THEMES:
+        about_en, about_fr = about_en + PACK_NOTE[0], about_fr + PACK_NOTE[1]
     _p(f"theme_{theme}", "theme", price, rarity, f"{en} theme", f"Thème {fr}", about_en, about_fr,
        {"theme": theme}, collection="themes", icon="palette", featured=False, level=level,
        supply={"legendary": 10, "epic": 25}.get(rarity))  # fmt: skip
@@ -1236,10 +1250,30 @@ UNIVERSE_EXTRAS = {
     "nova": ("level_squircle", "notif_morph", "levelup_nova", "bg_bokeh", "palette_nova", "badge_power_user",
              "title_beta_tester"),
 }  # fmt: skip
+
+
+def theme_looks(theme: str) -> list[str]:
+    """The sold products a universe theme's own looks need (its notification style and entrance, ambience,
+    celebration and level-up): the theme alone shows the free defaults instead, its ultimate pack has them."""
+    definition = json.loads((BUILTIN_THEMES / f"{theme}.json").read_text(encoding="utf-8"))
+    wanted = {
+        ("notification_style", "style", definition.get("notification", {}).get("style")),
+        ("notification_animation", "animation", definition.get("notification", {}).get("animation")),
+        ("ambient", "ambient", definition.get("background", {}).get("ambient")),
+        ("effect", "effect", definition.get("motion", {}).get("celebration")),
+        ("level_up", "animation", definition.get("motion", {}).get("levelUp")),
+    }
+    found: list[str] = []
+    for kind, field, value in wanted:
+        keys = [p["key"] for p in SHOP if p["type"] == kind and value and p["payload"].get(field) == value]
+        found.extend(keys[:1])
+    return sorted(found)
+
+
 for theme, items in UNIVERSES.items():
     en, fr, _, _ = THEME_TEXT[theme]
-    extras = [item for item in UNIVERSE_EXTRAS.get(theme, ()) if item not in items]
-    contents = [f"theme_{theme}", *[item for item in items if item], *extras]
+    extras = [item for item in (*UNIVERSE_EXTRAS.get(theme, ()), *theme_looks(theme)) if item not in items]
+    contents = [f"theme_{theme}", *[item for item in items if item], *dict.fromkeys(extras)]
     level = max(THEME_RARITY[theme][2] or 0, 8)
     _p(f"ultimate_{theme}", "bundle", None, "legendary", f"Ultimate {en} pack", f"Pack ultime {fr}",
        f"The whole {en} universe: the theme and everything that goes with it — banner, frame, name style, level badge, notifications, effects and its badge.",

@@ -5,6 +5,7 @@ import {
   applyToDocument,
   type CampaignOverlay,
   type Effective,
+  type LockedLooks,
   type ResolvedLooks,
   resolve,
   resolveLooks,
@@ -42,9 +43,12 @@ export interface ThemeProviderProps {
   themes?: readonly unknown[];
   overlay?: CampaignOverlay | null;
   root?: HTMLElement;
+  /** 027: the theme looks the member does not own (they fall back to the free defaults); ``null`` while
+   * not known, absent when nothing is sold (a gallery, no Marketplace). */
+  lockedLooks?: LockedLooks | null | undefined;
 }
 
-export function ThemeProvider({ children, themes, overlay = null, root }: ThemeProviderProps) {
+export function ThemeProvider({ children, themes, overlay = null, root, lockedLooks }: ThemeProviderProps) {
   const { preferences, policy, preview } = usePreferences();
   const available = useMemo(() => {
     const valid = validThemes(themes ?? []);
@@ -65,13 +69,16 @@ export function ThemeProvider({ children, themes, overlay = null, root }: ThemeP
   useEffect(() => {
     sound.sounds = { ...(effective.theme.sounds ?? {}) }; // the theme's sound set (027 R18)
     try {
-      applyToDocument(effective, preferences, root);
+      applyToDocument(effective, preferences, root, lockedLooks);
     } catch {
       const fallback = builtinTheme(policy.defaultTheme) ?? (BUILTIN_THEMES[0] as ThemeDefinition);
-      applyToDocument({ ...effective, theme: fallback }, preferences, root);
+      applyToDocument({ ...effective, theme: fallback }, preferences, root, lockedLooks);
     }
-  }, [effective, preferences, policy.defaultTheme, root]);
-  const looks = useMemo(() => resolveLooks(effective, preferences), [effective, preferences]);
+  }, [effective, preferences, policy.defaultTheme, root, lockedLooks]);
+  const looks = useMemo(
+    () => resolveLooks(effective, preferences, lockedLooks),
+    [effective, preferences, lockedLooks],
+  );
   const value = useMemo<ThemeContextValue>(
     () => ({
       effective,

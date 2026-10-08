@@ -41,7 +41,12 @@ export function UniverseLooks() {
   });
   const locked = (list: Choice[] | undefined, key: string) =>
     Boolean(list?.find((c) => c.key === key)?.locked);
-  const themeAmbient = effective.theme.background?.ambient ?? "none";
+  // 027: the theme's own ambience and celebration are worn with its universe's pack
+  const ownAmbient = effective.theme.background?.ambient ?? "none";
+  const themeAmbient = locked(catalog.data?.ambients, ownAmbient) ? "none" : ownAmbient;
+  const inPack =
+    locked(catalog.data?.ambients, ownAmbient) ||
+    locked(catalog.data?.celebrations, effective.theme.motion?.celebration ?? "sparkle");
   const tryIt = () => celebrate({ kind: "reward", text: "+40 XP" });
   const ambients = (["theme", ...AMBIENTS] as const).filter(
     (key) => key === "theme" || !locked(catalog.data?.ambients, key),
@@ -112,6 +117,7 @@ export function UniverseLooks() {
         </Button>
       </p>
       <InShop count={lockedCount(catalog.data?.celebrations)} type="effect" />
+      {inPack ? <p className="looks__more">{t("notifications:universe.themeLookInPack")}</p> : null}
     </section>
   );
 }

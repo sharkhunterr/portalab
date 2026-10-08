@@ -303,6 +303,7 @@
   "universe.celebrations.stars": "Étoiles",
   "universe.followTheme": "Selon le thème",
   "universe.hint": "Une animation discrète derrière le portail et l'effet joué pour vos récompenses — celles du thème, aucune, ou celles de la boutique.",
+  "universe.themeLookInPack": "Le style propre au thème est inclus dans le pack ultime de son univers — en attendant, c'est le style gratuit par défaut.",
   "universe.title": "Ambiance et célébrations",
   "verification.body": "Votre code de confirmation : {token} (valable jusqu’au {expires}).",
   "verification.subject": "Confirmez votre compte Portalab"
