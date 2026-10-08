@@ -290,7 +290,6 @@
   "sheet.limitValue": "{count, plural, one {# achat} other {# achats}} par {days, plural, one {jour} other {# jours}}",
   "sheet.minLevel": "Niveau minimum",
   "sheet.noRefund": "Non",
-  "sheet.oneOf": "Un élément parmi ses {items}, réunis moins cher",
   "sheet.packContents": "{count, plural, one {Ce pack contient # produit} other {Ce pack contient # produits}}",
   "sheet.price": "Prix",
   "sheet.refund": "Remboursement",

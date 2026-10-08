@@ -619,7 +619,45 @@
   gap: 0.1rem;
   min-inline-size: 0;
 }
-/* 027: a pack's item and a product's pack link to their own page */
+/* 027: the packs a product is part of — one compact line each: name, rarity, price, « see the pack » */
+.pack-refs {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pack-ref {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--rarity) 40%, var(--color-border));
+  border-inline-start-width: 3px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.pack-ref[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+.pack-ref__name {
+  flex: 1;
+  min-inline-size: 8rem;
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+}
+.pack-ref__name:hover,
+.pack-ref__name:focus-visible {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+.pack-ref__see {
+  min-block-size: 2rem;
+  padding-block: 0.2rem;
+}
+/* 027: a pack's item links to its own page */
 .pack-item__name {
   color: var(--color-text);
   font-weight: var(--font-weight-bold);

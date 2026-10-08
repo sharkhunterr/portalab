@@ -290,7 +290,6 @@
   "sheet.limitValue": "{count, plural, one {# purchase} other {# purchases}} per {days, plural, one {day} other {# days}}",
   "sheet.minLevel": "Minimum level",
   "sheet.noRefund": "No",
-  "sheet.oneOf": "One item among its {items}, together for less",
   "sheet.packContents": "{count, plural, one {This pack contains # product} other {This pack contains # products}}",
   "sheet.price": "Price",
   "sheet.refund": "Refund",

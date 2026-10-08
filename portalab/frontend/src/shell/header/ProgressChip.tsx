@@ -17,7 +17,7 @@ export function ProgressChip({
 }: {
   progression: Progression;
   compact?: boolean;
-  /** 027: the phone header leaves Coins to the menu */
+  /** 027: whether Coins show beside the level (always in the header, phones included) */
   coins?: boolean;
 }) {
   const t = useT();

@@ -50,7 +50,7 @@ export function AppHeader({
   const phone = device === "phone";
   const name = data.me?.display_name ?? data.me?.login ?? fallbackName;
   // 027: on a phone with the menu in a panel, the header keeps the essentials — home and search on the
-  // left; incidents, level, notifications and the menu on the right (profile, Coins… live in the menu)
+  // left; incidents, level and Coins, notifications and the menu on the right (the profile lives in the menu)
   const compactPhone = phone && Boolean(onOpenNavigation);
   if (compactPhone) {
     return (
@@ -65,7 +65,7 @@ export function AppHeader({
           <IncidentsButton />
           {data.progression ? (
             <RegionBoundary resetKey="progression">
-              <ProgressChip progression={data.progression} compact coins={false} />
+              <ProgressChip progression={data.progression} compact />
             </RegionBoundary>
           ) : null}
           <NotificationButton unread={data.unread} />

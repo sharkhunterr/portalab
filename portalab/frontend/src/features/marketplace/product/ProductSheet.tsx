@@ -96,30 +96,28 @@ function InPacks({ product }: { product: Product }) {
   return (
     <section className="product-sheet__section" aria-labelledby="in-packs">
       <h3 id="in-packs">{t("marketplace:sheet.inPacks", { count: packs.length })}</h3>
-      <ul className="pack-items">
-        {packs.map((pack) => {
-          const count = ((pack.preview?.products as string[] | undefined) ?? []).length;
-          return (
-            <li key={pack.key} className="pack-item" data-rarity={pack.rarity ?? "common"}>
-              <ProductArt product={pack} size="mini" />
-              <div className="pack-item__text">
-                <Link to={`/marketplace/products/${pack.key}`} className="pack-item__name">
-                  {pack.name}
-                </Link>
-                <span className="pack-item__meta">{t("marketplace:sheet.oneOf", { items: count })}</span>
-              </div>
-              {pack.owned ? (
-                <span className="product-card__owned">
-                  <Icon name="check" size={14} /> {t("marketplace:product.owned")}
-                </span>
-              ) : (
-                <Link to={`/marketplace/products/${pack.key}`} className="ds-button ds-button--secondary">
-                  {t("marketplace:sheet.seePack")}
-                </Link>
-              )}
-            </li>
-          );
-        })}
+      <ul className="pack-refs">
+        {packs.map((pack) => (
+          <li key={pack.key} className="pack-ref" data-rarity={pack.rarity ?? "common"}>
+            <Link to={`/marketplace/products/${pack.key}`} className="pack-ref__name">
+              {pack.name}
+            </Link>
+            <span className="product-card__rarity">{t(`marketplace:rarity.${pack.rarity ?? "common"}`)}</span>
+            {pack.owned ? (
+              <span className="product-card__owned">
+                <Icon name="check" size={14} /> {t("marketplace:product.owned")}
+              </span>
+            ) : pack.price_coins ? (
+              <CoinBadge amount={pack.price_coins} label={t("gamification:value.coins")} />
+            ) : null}
+            <Link
+              to={`/marketplace/products/${pack.key}`}
+              className="ds-button ds-button--secondary pack-ref__see"
+            >
+              {t("marketplace:sheet.seePack")}
+            </Link>
+          </li>
+        ))}
       </ul>
     </section>
   );
