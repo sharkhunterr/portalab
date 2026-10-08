@@ -31,6 +31,10 @@ class MediaConfig:
     discovery_new_days: int = 30
     discovery_shelf_size: int = 20
     thresholds: dict[str, float] = field(default_factory=dict)  # per-kind overrides (0 = explicit only)
+    # 027 (#2): the portal's player
+    player_enabled: bool = True
+    player_owner_fallback: bool = False  # members with no linked account play through the service's own
+    player_max_quality: str = "original"  # the best quality members may pick (a key of QUALITIES)
 
 
 SETTINGS: dict[str, str] = {
@@ -43,6 +47,9 @@ SETTINGS: dict[str, str] = {
     "match_auto_threshold": "media.match.autoThreshold",
     "discovery_new_days": "media.discovery.newDays",
     "discovery_shelf_size": "media.discovery.shelfSize",
+    "player_enabled": "media.player.enabled",
+    "player_owner_fallback": "media.player.ownerFallback",
+    "player_max_quality": "media.player.maxQuality",
 }
 
 _DESCRIPTIONS = {
@@ -56,6 +63,11 @@ _DESCRIPTIONS = {
     "automatically).",
     "discovery_new_days": "Days an object stays on the 'new' shelf.",
     "discovery_shelf_size": "Items per discovery shelf.",
+    "player_enabled": "Members may watch films and series in the portal's own player (transcoded by Plex).",
+    "player_owner_fallback": "Members with no linked account on the media server watch through the "
+    "server's own account (their plays are then not theirs on the server).",
+    "player_max_quality": "Best quality members may pick in the player: original, 20m, 12m, 10m, 8m, 4m, "
+    "3m, 2m, 1500k, 720k or 320k.",
 }
 
 

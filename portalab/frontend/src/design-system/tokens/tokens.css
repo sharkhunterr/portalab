@@ -204,6 +204,22 @@ body {
     );
 
   --color-accent-alt: var(--color-accent);
+  /* 027 (#2): the video player — a dark stage in every theme; themes may restyle it through these */
+  --player-stage: #000000;
+  --player-ink: #ffffff;
+  --player-ink-muted: #ffffffb3;
+  --player-scrim: #000000b8;
+  --player-track: #ffffff40;
+  --player-buffer: #ffffff73;
+  --player-accent: var(--color-accent);
+  --player-subtitle-ink: #ffffff;
+  --player-subtitle-shadow: #000000;
+  --player-subtitle-back: #00000059;
+  --player-panel: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  --player-panel-ink: var(--color-text);
+  --player-radius: var(--radius-md);
+  --player-font: var(--font-sans);
+  --player-title-font: var(--font-display);
   /* 027: sticky notes — paper colours with dark ink, the same in every theme */
   --note-yellow: #fff3a8;
   --note-pink: #ffd1e3;

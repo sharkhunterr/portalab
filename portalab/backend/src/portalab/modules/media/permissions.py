@@ -7,6 +7,7 @@ OWNER = "module:media"
 MEDIA_READ = "media.read"
 MEDIA_REQUEST = "media.request"
 MEDIA_MANAGE = "media.manage"
+MEDIA_PLAY = "media.play"  # 027 (#2): watch in the portal's own player
 # 027: the indexers' interactive search on a title's page — an advanced feature, unlocked per member (a
 # Marketplace « access » product grants it); administrators have it
 MEDIA_RELEASE_SEARCH = "media.release_search"
@@ -19,6 +20,10 @@ def declare_media_permissions(registry: PermissionRegistry = default_permissions
     if registry.get(MEDIA_REQUEST) is None:
         registry.declare(
             MEDIA_REQUEST, "Request media (within the quota)", default_roles=("user",), owner=OWNER
+        )
+    if registry.get(MEDIA_PLAY) is None:
+        registry.declare(
+            MEDIA_PLAY, "Watch films and series in the portal's player", default_roles=("user",), owner=OWNER
         )
     if registry.get(MEDIA_MANAGE) is None:
         registry.declare(

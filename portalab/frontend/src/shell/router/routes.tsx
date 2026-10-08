@@ -35,6 +35,7 @@ const NotificationSettings = lazy(
 const MediaHome = lazy(() => import("../../features/media/home/MediaHome"));
 const MediaCatalog = lazy(() => import("../../features/media/catalog/CatalogPage"));
 const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"));
+const MediaPlayer = lazy(() => import("../../features/media/player/PlayerPage"));
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
@@ -204,6 +205,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               path: ":objectId",
               element: <MediaDetail />,
               handle: h({ crumb: "Media", existenceSensitive: true }),
+            },
+            {
+              // 027 (#2): the portal's own player, over the whole window
+              path: ":objectId/watch",
+              element: <MediaPlayer />,
+              handle: h({ crumb: "Watch", requiredPermission: "media.play", existenceSensitive: true }),
             },
           ],
         },

@@ -224,6 +224,7 @@ def wire_platform(
         authz.engine,
         blobs=context.blobs,
         visibility=privacy.filter,
+        player_key=hmac.new(secret_key, b"portalab.media.player", hashlib.sha256).digest(),
     )
     media.register()
     content = ContentModule(database, capabilities, authz.engine, blobs=context.blobs)

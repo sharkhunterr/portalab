@@ -8,6 +8,7 @@
 * ``media.activity_history`` (027): the whole watch history, paged oldest first, for the statistics. When
   Tautulli watches the same server its richer rows win (same ``plex`` family, higher priority).
 * ``service.health_probe``: an authenticated ``/`` round trip.
+* ``media.streaming`` (027, #2): the portal's own player, fed by the universal transcoder (``streaming``).
 
 Authentication uses the server's ``X-Plex-Token`` (Plex Web → any item → *Get Info* → *View XML*: the
 ``X-Plex-Token`` parameter of the address, or ``Preferences.xml`` → ``PlexOnlineToken``).
@@ -31,6 +32,7 @@ from portalab.capabilities.media import (
     ITEM_LINKS,
     LIBRARY,
     PLAYBACK,
+    STREAMING,
     ActivityPage,
     ServiceAccount,
     SourceActivity,
@@ -98,6 +100,7 @@ class PlexConnector(HttpConnector):
         binding(ACCOUNTS),
         binding(ACTIVITY_HISTORY, driven=True),
         binding(ITEM_LINKS),
+        binding(STREAMING),
     )
     status_path = "/"
     public_path = "/identity"
@@ -201,6 +204,10 @@ class PlexConnector(HttpConnector):
             return _History(self, service)
         if capability == ITEM_LINKS:
             return _Links(self, service)
+        if capability == STREAMING:
+            from portalab.connectors.plex.streaming import PlexStreaming
+
+            return PlexStreaming(self, service)
         return None
 
 

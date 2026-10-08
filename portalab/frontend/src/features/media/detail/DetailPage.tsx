@@ -16,6 +16,7 @@ import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { usePlayerInfo } from "../player/api";
 import { artworkSlides, Backdrop, Enrichment, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 
@@ -418,7 +419,15 @@ const WATCH = ["plex", "jellyfin", "emby"];
 const READ = ["grimmory", "romm"];
 
 /** 027: open the title where it is played or read — its own page in Plex, Jellyfin, Grimmory… */
-function OpenIn({ objectId, kind }: { objectId: string; kind: string }) {
+function OpenIn({
+  objectId,
+  kind,
+  secondary = false,
+}: {
+  objectId: string;
+  kind: string;
+  secondary?: boolean;
+}) {
   const t = useT();
   const sources = useSection(objectId, "sources");
   const items = list((sources.data?.data as Data | undefined)?.sources).filter(
@@ -442,7 +451,7 @@ function OpenIn({ objectId, kind }: { objectId: string; kind: string }) {
         : "watch";
   return (
     <a
-      className="ds-button ds-button--primary media-open-in"
+      className={`ds-button ${secondary ? "ds-button--secondary" : "ds-button--primary"} media-open-in`}
       href={String(best.item_link)}
       target="_blank"
       rel="noopener noreferrer external"
@@ -450,6 +459,36 @@ function OpenIn({ objectId, kind }: { objectId: string; kind: string }) {
       <Icon name={verb === "watch" ? "play" : verb === "play" ? "joystick" : "book"} size={18} />
       {t(`media:detail.openIn.${verb}`, { service: String(best.service_name ?? connector) })}
     </a>
+  );
+}
+
+const PLAYABLE = ["movie", "episode", "series", "season"];
+
+/** 027 (#2): watch here, in the portal's own player — the service's page stays one click away. */
+function Watch({ objectId, kind }: { objectId: string; kind: string }) {
+  const t = useT();
+  const player = usePlayerInfo(objectId, null, PLAYABLE.includes(kind));
+  const code = player.error instanceof MediaError ? player.error.code : undefined;
+  const item = player.data?.item;
+  const resume = item && item.resume_s > 30 && (!item.duration_s || item.resume_s < item.duration_s * 0.95);
+  return (
+    <div className="media-watch">
+      {item ? (
+        <Link className="ds-button ds-button--primary media-watch-here" to={`/media/${objectId}/watch`}>
+          <Icon name="play" size={18} />
+          {item.kind === "episode" && item.label
+            ? t(resume ? "media:player.cta.resumeEpisode" : "media:player.cta.episode", { label: item.label })
+            : t(resume ? "media:player.cta.resume" : "media:player.cta.watch")}
+        </Link>
+      ) : null}
+      <OpenIn objectId={objectId} kind={kind} secondary={Boolean(item)} />
+      {code === "media.player_unlinked" ? (
+        <Link className="media-watch-hint" to="/settings/media-accounts">
+          <Icon name="link" size={14} />
+          {t("media:player.cta.link")}
+        </Link>
+      ) : null}
+    </div>
   );
 }
 
@@ -520,7 +559,7 @@ export function DetailPage() {
         }
         primary={
           media.available ? (
-            <OpenIn objectId={media.id} kind={media.kind} />
+            <Watch objectId={media.id} kind={media.kind} />
           ) : requested ? null : (
             <RequestButton objectId={media.id} />
           )

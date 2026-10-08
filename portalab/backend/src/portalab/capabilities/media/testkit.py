@@ -13,7 +13,8 @@ The fakes below are what Media's own tests use; they simulate outages, timeouts 
 """
 
 import asyncio
-from collections.abc import Mapping, Sequence
+from collections.abc import AsyncIterator, Mapping, Sequence
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -23,12 +24,20 @@ from portalab.capabilities.media import (
     REQUEST_STATES,
     LibraryPayload,
     MediaPlayback,
+    PlayableItem,
     RequestPayload,
     RequestService,
     SourceHistoryItem,
     SourcePlayback,
     SourceRequest,
+    StreamBody,
+    StreamOptions,
+    StreamStart,
+    StreamTrack,
+    StreamVersion,
+    SubtitleCue,
 )
+from portalab.capabilities.results import ProviderAuthError, ProviderNotFound
 
 PNG_1PX = (
     b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde"
@@ -210,3 +219,98 @@ class RequestServiceContractKit:
 
     async def test_request_records_validate(self) -> None:
         RequestPayload.model_validate({"title": "x", "kind": "movie", "state": "pending"})
+
+
+# --- 027 (#2): the portal's player ----------------------------------------------------------------------
+@dataclass
+class FakeStreaming:
+    """``media.streaming``: one film (``m1``) with a text and an image subtitle; account ``denied`` has no
+    access. Records every call as ``(account, operation, details)``."""
+
+    calls: list[tuple[str | None, str, Any]] = field(default_factory=list)
+    cues: list[SubtitleCue] = field(
+        default_factory=lambda: [SubtitleCue(1.0, 2.5, "Hello"), SubtitleCue(300.0, 302.0, "Later")]
+    )
+
+    def channel(self, external_user_id: str | None) -> "FakeChannel":
+        return FakeChannel(self, external_user_id)
+
+
+class FakeChannel:
+    def __init__(self, owner: FakeStreaming, account: str | None) -> None:
+        self.owner, self.account = owner, account
+
+    def _check(self, external_id: str) -> None:
+        if self.account == "denied":
+            raise ProviderAuthError("no access")
+        if external_id not in ("m1", "e2"):
+            raise ProviderNotFound("no such item")
+
+    async def playable(self, external_id: str) -> PlayableItem:
+        self._check(external_id)
+        self.owner.calls.append((self.account, "playable", external_id))
+        version = StreamVersion(
+            index=0,
+            label="1080p · H.264",
+            resolution="1080p",
+            audio=(StreamTrack("a1", "audio", "English", language="en", selected=True),),
+            subtitles=(
+                StreamTrack("s1", "subtitle", "Français", language="fr"),
+                StreamTrack("s2", "subtitle", "PGS", codec="pgs", text=False),
+            ),
+        )
+        return PlayableItem(
+            external_id=external_id,
+            kind="movie",
+            title="Film",
+            duration_s=6000.0,
+            resume_s=60.0,
+            versions=(version,),
+        )
+
+    async def start(self, external_id: str, options: StreamOptions, session: str) -> StreamStart:
+        self._check(external_id)
+        self.owner.calls.append((self.account, "start", options))
+        burn = options.subtitle == "s2" or (options.subtitle is not None and options.burn)
+        return StreamStart(
+            session=session,
+            playlist=f"session/{session}/base/index.m3u8",
+            video="copy",
+            audio="transcode",
+            subtitles="burn" if burn else ("text" if options.subtitle else "none"),
+        )
+
+    @asynccontextmanager
+    async def open(self, session: str, path: str) -> AsyncIterator[StreamBody]:
+        if not path.startswith(f"session/{session}/base/"):
+            raise ProviderNotFound("no such part")
+        self.owner.calls.append((self.account, "open", path))
+        data = b"#EXTM3U\n#EXTINF:10,\n00000.ts\n" if path.endswith(".m3u8") else b"\x47" * 1880
+
+        async def chunks() -> AsyncIterator[bytes]:
+            yield data[: len(data) // 2]
+            yield data[len(data) // 2 :]
+
+        kind = "application/vnd.apple.mpegurl" if path.endswith(".m3u8") else "video/mp2t"
+        yield StreamBody(status=200, content_type=kind, length=len(data), chunks=chunks())
+
+    @asynccontextmanager
+    async def subtitles(
+        self, external_id: str, options: StreamOptions, session: str
+    ) -> AsyncIterator[AsyncIterator[SubtitleCue]]:
+        self.owner.calls.append((self.account, "subtitles", options.subtitle))
+
+        async def cues() -> AsyncIterator[SubtitleCue]:
+            for cue in self.owner.cues:
+                yield cue
+            await asyncio.sleep(3600)  # the feed stays open, as the service's does
+
+        yield cues()
+
+    async def report(
+        self, external_id: str, session: str, state: str, position_s: float, duration_s: float | None
+    ) -> None:
+        self.owner.calls.append((self.account, "report", (state, position_s, duration_s)))
+
+    async def stop(self, session: str) -> None:
+        self.owner.calls.append((self.account, "stop", session))

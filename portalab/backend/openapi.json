@@ -9835,6 +9835,222 @@
         "title": "PermissionOut",
         "type": "object"
       },
+      "PlayableItemOut": {
+        "properties": {
+          "chapters": {
+            "items": {
+              "$ref": "#/components/schemas/StreamMarkerOut"
+            },
+            "title": "Chapters",
+            "type": "array"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "external_id": {
+            "title": "External Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "markers": {
+            "items": {
+              "$ref": "#/components/schemas/StreamMarkerOut"
+            },
+            "title": "Markers",
+            "type": "array"
+          },
+          "next_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Id"
+          },
+          "next_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Label"
+          },
+          "parent_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Title"
+          },
+          "previous_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Id"
+          },
+          "resume_s": {
+            "title": "Resume S",
+            "type": "number"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/StreamVersionOut"
+            },
+            "title": "Versions",
+            "type": "array"
+          },
+          "watched": {
+            "title": "Watched",
+            "type": "boolean"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "external_id",
+          "kind",
+          "title",
+          "duration_s",
+          "resume_s",
+          "watched",
+          "parent_title",
+          "label",
+          "year",
+          "versions",
+          "markers",
+          "chapters",
+          "previous_id",
+          "next_id",
+          "next_label"
+        ],
+        "title": "PlayableItemOut",
+        "type": "object"
+      },
+      "PlayerInfoOut": {
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/PlayableItemOut"
+          },
+          "linked": {
+            "title": "Linked",
+            "type": "boolean"
+          },
+          "qualities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Qualities",
+            "type": "array"
+          },
+          "service_id": {
+            "format": "uuid",
+            "title": "Service Id",
+            "type": "string"
+          },
+          "service_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Name"
+          }
+        },
+        "required": [
+          "service_id",
+          "service_name",
+          "linked",
+          "item",
+          "qualities"
+        ],
+        "title": "PlayerInfoOut",
+        "type": "object"
+      },
+      "PlayerTimelineIn": {
+        "properties": {
+          "duration_s": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "position_s": {
+            "minimum": 0.0,
+            "title": "Position S",
+            "type": "number"
+          },
+          "state": {
+            "pattern": "^(playing|paused|buffering|stopped)$",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "position_s"
+        ],
+        "title": "PlayerTimelineIn",
+        "type": "object"
+      },
       "PluginDisableIn": {
         "properties": {
           "cascade": {
@@ -12483,6 +12699,436 @@
         "title": "StreakNextOut",
         "type": "object"
       },
+      "StreamMarkerOut": {
+        "properties": {
+          "end_s": {
+            "title": "End S",
+            "type": "number"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "start_s": {
+            "title": "Start S",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "start_s",
+          "end_s",
+          "label"
+        ],
+        "title": "StreamMarkerOut",
+        "type": "object"
+      },
+      "StreamStartIn": {
+        "properties": {
+          "audio": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio"
+          },
+          "boost": {
+            "default": 100,
+            "maximum": 300.0,
+            "minimum": 100.0,
+            "title": "Boost",
+            "type": "integer"
+          },
+          "burn": {
+            "default": false,
+            "title": "Burn",
+            "type": "boolean"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "item": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Item",
+            "type": "string"
+          },
+          "quality": {
+            "default": "original",
+            "maxLength": 20,
+            "title": "Quality",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "subtitle_size": {
+            "default": 100,
+            "maximum": 300.0,
+            "minimum": 50.0,
+            "title": "Subtitle Size",
+            "type": "integer"
+          },
+          "version": {
+            "default": 0,
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "item"
+        ],
+        "title": "StreamStartIn",
+        "type": "object"
+      },
+      "StreamStartOut": {
+        "properties": {
+          "audio": {
+            "title": "Audio",
+            "type": "string"
+          },
+          "audio_codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio Codec"
+          },
+          "bitrate_kbps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Kbps"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "playlist": {
+            "title": "Playlist",
+            "type": "string"
+          },
+          "subtitles": {
+            "title": "Subtitles",
+            "type": "string"
+          },
+          "ticket": {
+            "title": "Ticket",
+            "type": "string"
+          },
+          "video": {
+            "title": "Video",
+            "type": "string"
+          },
+          "video_codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Video Codec"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "ticket",
+          "playlist",
+          "video",
+          "audio",
+          "subtitles",
+          "width",
+          "height",
+          "bitrate_kbps",
+          "video_codec",
+          "audio_codec"
+        ],
+        "title": "StreamStartOut",
+        "type": "object"
+      },
+      "StreamTrackOut": {
+        "properties": {
+          "channels": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channels"
+          },
+          "codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codec"
+          },
+          "default": {
+            "title": "Default",
+            "type": "boolean"
+          },
+          "external": {
+            "title": "External",
+            "type": "boolean"
+          },
+          "forced": {
+            "title": "Forced",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "selected": {
+            "title": "Selected",
+            "type": "boolean"
+          },
+          "text": {
+            "title": "Text",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "language",
+          "codec",
+          "channels",
+          "default",
+          "forced",
+          "selected",
+          "text",
+          "external"
+        ],
+        "title": "StreamTrackOut",
+        "type": "object"
+      },
+      "StreamVersionOut": {
+        "properties": {
+          "audio": {
+            "items": {
+              "$ref": "#/components/schemas/StreamTrackOut"
+            },
+            "title": "Audio",
+            "type": "array"
+          },
+          "audio_codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio Codec"
+          },
+          "bitrate_kbps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Kbps"
+          },
+          "container": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Container"
+          },
+          "hdr": {
+            "title": "Hdr",
+            "type": "boolean"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "subtitles": {
+            "items": {
+              "$ref": "#/components/schemas/StreamTrackOut"
+            },
+            "title": "Subtitles",
+            "type": "array"
+          },
+          "video_codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Video Codec"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "index",
+          "label",
+          "resolution",
+          "width",
+          "height",
+          "bitrate_kbps",
+          "container",
+          "video_codec",
+          "audio_codec",
+          "hdr",
+          "size",
+          "audio",
+          "subtitles"
+        ],
+        "title": "StreamVersionOut",
+        "type": "object"
+      },
       "SubscriptionsIn": {
         "additionalProperties": false,
         "properties": {
@@ -12499,6 +13145,45 @@
           "changes"
         ],
         "title": "SubscriptionsIn",
+        "type": "object"
+      },
+      "SubtitleCueOut": {
+        "properties": {
+          "end_s": {
+            "title": "End S",
+            "type": "number"
+          },
+          "start_s": {
+            "title": "Start S",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_s",
+          "end_s",
+          "text"
+        ],
+        "title": "SubtitleCueOut",
+        "type": "object"
+      },
+      "SubtitleCuesOut": {
+        "properties": {
+          "cues": {
+            "items": {
+              "$ref": "#/components/schemas/SubtitleCueOut"
+            },
+            "title": "Cues",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cues"
+        ],
+        "title": "SubtitleCuesOut",
         "type": "object"
       },
       "SummaryOut": {
@@ -32780,6 +33465,152 @@
         ]
       }
     },
+    "/api/v1/media/player/{ticket}/stop": {
+      "post": {
+        "operationId": "player_stop_api_v1_media_player__ticket__stop_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Stop",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/player/{ticket}/subtitles": {
+      "get": {
+        "operationId": "player_subtitles_api_v1_media_player__ticket__subtitles_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "at",
+            "required": false,
+            "schema": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "At",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seek",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Seek",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubtitleCuesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Subtitles",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/player/{ticket}/timeline": {
+      "post": {
+        "operationId": "player_timeline_api_v1_media_player__ticket__timeline_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerTimelineIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Timeline",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/requests": {
       "post": {
         "operationId": "create_request_api_v1_media_requests_post",
@@ -33087,6 +33918,120 @@
           }
         },
         "summary": "Object Metadata",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/player": {
+      "get": {
+        "operationId": "player_info_api_v1_media__object_id__player_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "item",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Item"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerInfoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Info",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/player/start": {
+      "post": {
+        "operationId": "player_start_api_v1_media__object_id__player_start_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StreamStartIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamStartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Start",
         "tags": [
           "media"
         ]

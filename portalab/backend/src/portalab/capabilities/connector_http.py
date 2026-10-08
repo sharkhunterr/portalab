@@ -7,7 +7,8 @@ never contains credentials. Homelab services live on private addresses, so priva
 """
 
 import asyncio
-from collections.abc import Mapping
+from collections.abc import AsyncIterator, Mapping
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urljoin, urlsplit
@@ -42,6 +43,13 @@ class HttpResponse:
         import json
 
         return json.loads(self.content)
+
+
+@dataclass(frozen=True, slots=True)
+class StreamedResponse:
+    status_code: int
+    headers: Mapping[str, str]
+    chunks: AsyncIterator[bytes]
 
 
 class ConnectorHttpClient:
@@ -143,6 +151,37 @@ class ConnectorHttpClient:
                     raise ResponseTooLarge(f"response larger than {cap} bytes")
                 chunks.append(chunk)
             return HttpResponse(response.status_code, dict(response.headers), b"".join(chunks))
+
+    @asynccontextmanager
+    async def stream(
+        self,
+        method: str,
+        path: str,
+        *,
+        headers: Mapping[str, str] | None = None,
+        params: Mapping[str, Any] | None = None,
+        read_timeout: float | None = None,
+    ) -> AsyncIterator[StreamedResponse]:
+        """027 (#2): an answer read as it comes (video segments, a subtitle feed) — no size cap, no retry
+        and no redirect; the caller relays the chunks and the connection closes with the block."""
+        url = urljoin(self.base_url, path.lstrip("/"))
+        sent = {**self.default_headers, **(headers or {})}
+        correlation = get_correlation_id()
+        if correlation:
+            sent["X-Correlation-Id"] = correlation
+        timeout = httpx.Timeout(self.timeout, read=read_timeout or self.timeout)
+        try:
+            async with (
+                httpx.AsyncClient(
+                    timeout=timeout, verify=self.verify_tls, follow_redirects=False, transport=self.transport
+                ) as client,
+                client.stream(method.upper(), url, headers=sent, params=params) as response,
+            ):
+                if response.is_redirect:
+                    raise RedirectRefused("redirect refused on a stream")
+                yield StreamedResponse(response.status_code, dict(response.headers), response.aiter_bytes())
+        except (httpx.TransportError, httpx.TimeoutException) as exc:
+            raise ConnectorHttpError(redact_text(f"{type(exc).__name__}: {exc}")) from exc
 
     async def get(self, path: str, **kwargs: Any) -> HttpResponse:
         return await self.request("GET", path, **kwargs)

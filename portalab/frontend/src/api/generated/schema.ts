@@ -6103,6 +6103,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/player/{ticket}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Player Stop */
+        post: operations["player_stop_api_v1_media_player__ticket__stop_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/player/{ticket}/subtitles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Player Subtitles */
+        get: operations["player_subtitles_api_v1_media_player__ticket__subtitles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/player/{ticket}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Player Timeline */
+        post: operations["player_timeline_api_v1_media_player__ticket__timeline_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/requests": {
         parameters: {
             query?: never;
@@ -6228,6 +6279,40 @@ export interface paths {
         get: operations["object_metadata_api_v1_media__object_id__metadata_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/player": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Player Info */
+        get: operations["player_info_api_v1_media__object_id__player_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/player/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Player Start */
+        post: operations["player_start_api_v1_media__object_id__player_start_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -11453,6 +11538,63 @@ export interface components {
             /** User Grantable */
             user_grantable: boolean;
         };
+        /** PlayableItemOut */
+        PlayableItemOut: {
+            /** Chapters */
+            chapters: components["schemas"]["StreamMarkerOut"][];
+            /** Duration S */
+            duration_s: number | null;
+            /** External Id */
+            external_id: string;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string | null;
+            /** Markers */
+            markers: components["schemas"]["StreamMarkerOut"][];
+            /** Next Id */
+            next_id: string | null;
+            /** Next Label */
+            next_label: string | null;
+            /** Parent Title */
+            parent_title: string | null;
+            /** Previous Id */
+            previous_id: string | null;
+            /** Resume S */
+            resume_s: number;
+            /** Title */
+            title: string;
+            /** Versions */
+            versions: components["schemas"]["StreamVersionOut"][];
+            /** Watched */
+            watched: boolean;
+            /** Year */
+            year: number | null;
+        };
+        /** PlayerInfoOut */
+        PlayerInfoOut: {
+            item: components["schemas"]["PlayableItemOut"];
+            /** Linked */
+            linked: boolean;
+            /** Qualities */
+            qualities: string[];
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string | null;
+        };
+        /** PlayerTimelineIn */
+        PlayerTimelineIn: {
+            /** Duration S */
+            duration_s?: number | null;
+            /** Position S */
+            position_s: number;
+            /** State */
+            state: string;
+        };
         /** PluginDisableIn */
         PluginDisableIn: {
             /**
@@ -12404,12 +12546,150 @@ export interface components {
             /** Multiplier */
             multiplier: number;
         };
+        /** StreamMarkerOut */
+        StreamMarkerOut: {
+            /** End S */
+            end_s: number;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string | null;
+            /** Start S */
+            start_s: number;
+        };
+        /** StreamStartIn */
+        StreamStartIn: {
+            /** Audio */
+            audio?: string | null;
+            /**
+             * Boost
+             * @default 100
+             */
+            boost: number;
+            /**
+             * Burn
+             * @default false
+             */
+            burn: boolean;
+            /** Duration S */
+            duration_s?: number | null;
+            /** Item */
+            item: string;
+            /**
+             * Quality
+             * @default original
+             */
+            quality: string;
+            /** Subtitle */
+            subtitle?: string | null;
+            /**
+             * Subtitle Size
+             * @default 100
+             */
+            subtitle_size: number;
+            /**
+             * Version
+             * @default 0
+             */
+            version: number;
+        };
+        /** StreamStartOut */
+        StreamStartOut: {
+            /** Audio */
+            audio: string;
+            /** Audio Codec */
+            audio_codec: string | null;
+            /** Bitrate Kbps */
+            bitrate_kbps: number | null;
+            /** Height */
+            height: number | null;
+            /** Playlist */
+            playlist: string;
+            /** Subtitles */
+            subtitles: string;
+            /** Ticket */
+            ticket: string;
+            /** Video */
+            video: string;
+            /** Video Codec */
+            video_codec: string | null;
+            /** Width */
+            width: number | null;
+        };
+        /** StreamTrackOut */
+        StreamTrackOut: {
+            /** Channels */
+            channels: number | null;
+            /** Codec */
+            codec: string | null;
+            /** Default */
+            default: boolean;
+            /** External */
+            external: boolean;
+            /** Forced */
+            forced: boolean;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Language */
+            language: string | null;
+            /** Selected */
+            selected: boolean;
+            /** Text */
+            text: boolean;
+        };
+        /** StreamVersionOut */
+        StreamVersionOut: {
+            /** Audio */
+            audio: components["schemas"]["StreamTrackOut"][];
+            /** Audio Codec */
+            audio_codec: string | null;
+            /** Bitrate Kbps */
+            bitrate_kbps: number | null;
+            /** Container */
+            container: string | null;
+            /** Hdr */
+            hdr: boolean;
+            /** Height */
+            height: number | null;
+            /** Index */
+            index: number;
+            /** Label */
+            label: string;
+            /** Resolution */
+            resolution: string | null;
+            /** Size */
+            size: number | null;
+            /** Subtitles */
+            subtitles: components["schemas"]["StreamTrackOut"][];
+            /** Video Codec */
+            video_codec: string | null;
+            /** Width */
+            width: number | null;
+        };
         /** SubscriptionsIn */
         SubscriptionsIn: {
             /** Changes */
             changes: {
                 [key: string]: boolean;
             };
+        };
+        /** SubtitleCueOut */
+        SubtitleCueOut: {
+            /** End S */
+            end_s: number;
+            /** Start S */
+            start_s: number;
+            /** Text */
+            text: string;
+        };
+        /** SubtitleCuesOut */
+        SubtitleCuesOut: {
+            /** Cues */
+            cues: components["schemas"]["SubtitleCueOut"][];
         };
         /** SummaryOut */
         SummaryOut: {
@@ -25604,6 +25884,102 @@ export interface operations {
             };
         };
     };
+    player_stop_api_v1_media_player__ticket__stop_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    player_subtitles_api_v1_media_player__ticket__subtitles_get: {
+        parameters: {
+            query?: {
+                at?: number;
+                seek?: boolean;
+            };
+            header?: never;
+            path: {
+                ticket: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubtitleCuesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    player_timeline_api_v1_media_player__ticket__timeline_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlayerTimelineIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_request_api_v1_media_requests_post: {
         parameters: {
             query?: never;
@@ -25818,6 +26194,74 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    player_info_api_v1_media__object_id__player_get: {
+        parameters: {
+            query?: {
+                item?: string | null;
+            };
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerInfoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    player_start_api_v1_media__object_id__player_start_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StreamStartIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreamStartOut"];
                 };
             };
             /** @description Validation Error */

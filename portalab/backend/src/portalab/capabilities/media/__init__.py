@@ -13,6 +13,9 @@
 * ``media.downloads`` (027): what a download manager is fetching or importing now (Radarr, Sonarr queues).
 * ``media.metadata`` (027): a metadata provider (TMDB…) enriching catalog objects — backdrop, cast,
   collection, budget, revenue, genres… — and serving its images.
+* ``media.streaming`` (027, #2): play a title inside the portal, the service deciding between direct
+  stream and transcoding (Plex's universal transcoder) — HLS relayed by the portal, so no service address
+  or token ever reaches a browser; played as the member's own account on the service.
 
 Providers are bound to one service (``instance_ref`` = the service id) and are usually wrapped by the 001
 isolation guard, so calls may return a :class:`~portalab.capabilities.results.CapabilityResult`;
@@ -20,7 +23,8 @@ isolation guard, so calls may return a :class:`~portalab.capabilities.results.Ca
 the core: a Plex, Jellyfin or Sonarr connector only maps its API onto these shapes.
 """
 
-from collections.abc import Mapping, Sequence
+from collections.abc import AsyncIterator, Mapping, Sequence
+from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Literal, Protocol, runtime_checkable
@@ -41,6 +45,7 @@ DOWNLOADS = "media.downloads"
 ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one title (Radarr, Sonarr)
 DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
 ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
+STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -435,6 +440,171 @@ class MetadataProvider(Protocol):
     async def fetch_image(self, ref: str, size: str) -> bytes: ...
 
 
+# --- 027 (#2): the portal's player ---------------------------------------------------------------------
+# The qualities a member picks, as Plex offers them: ``original`` streams the file as it is whenever the
+# browser can (the video copied, at most the audio converted); the others cap the bitrate and the size.
+QUALITIES: dict[str, tuple[int, int, int] | None] = {  # key → (max kbps, width, height)
+    "original": None,
+    "20m": (20_000, 1920, 1080),
+    "12m": (12_000, 1920, 1080),
+    "10m": (10_000, 1920, 1080),
+    "8m": (8_000, 1920, 1080),
+    "4m": (4_000, 1280, 720),
+    "3m": (3_000, 1280, 720),
+    "2m": (2_000, 1280, 720),
+    "1500k": (1_500, 854, 480),
+    "720k": (720, 640, 360),
+    "320k": (320, 426, 240),
+}
+
+
+@dataclass(frozen=True, slots=True)
+class StreamTrack:
+    """An audio or subtitle track of one version of a title."""
+
+    id: str
+    kind: str  # audio | subtitle
+    label: str
+    language: str | None = None
+    codec: str | None = None
+    channels: int | None = None
+    default: bool = False
+    forced: bool = False
+    selected: bool = False  # the member's current choice on the service
+    text: bool = True  # a subtitle drawn as text by the player; image formats (PGS, VobSub) are burnt in
+    external: bool = False  # a sidecar file next to the video
+
+
+@dataclass(frozen=True, slots=True)
+class StreamVersion:
+    """One copy of a title (a 4K and a 1080p file of one film, say), with its tracks."""
+
+    index: int
+    label: str
+    resolution: str | None = None  # 4k | 1080p | 720p | sd
+    width: int | None = None
+    height: int | None = None
+    bitrate_kbps: int | None = None
+    container: str | None = None
+    video_codec: str | None = None
+    audio_codec: str | None = None
+    hdr: bool = False
+    size: int | None = None
+    audio: tuple[StreamTrack, ...] = ()
+    subtitles: tuple[StreamTrack, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class StreamMarker:
+    """A stretch of the title: ``intro`` and ``credits`` (skippable), or a ``chapter`` with its name."""
+
+    kind: str
+    start_s: float
+    end_s: float
+    label: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PlayableItem:
+    """What the player needs to know of a title before playing it, as the member's account sees it."""
+
+    external_id: str
+    kind: str  # movie | episode
+    title: str
+    duration_s: float | None = None
+    resume_s: float = 0.0  # where the member stopped last time (0 = from the start)
+    watched: bool = False
+    parent_title: str | None = None  # the series of an episode
+    label: str | None = None  # « S02E05 »
+    year: int | None = None
+    versions: tuple[StreamVersion, ...] = ()
+    markers: tuple[StreamMarker, ...] = ()
+    chapters: tuple[StreamMarker, ...] = ()
+    previous_id: str | None = None  # the episodes around this one
+    next_id: str | None = None
+    next_label: str | None = None
+    image: str | None = None  # opaque ref served by ``media.library``'s ``fetch_image``
+
+
+@dataclass(frozen=True, slots=True)
+class StreamOptions:
+    version: int = 0
+    quality: str = "original"  # a key of QUALITIES
+    audio: str | None = None  # a track id, or the member's current choice
+    subtitle: str | None = None  # a track id, or ``None`` for none
+    burn: bool = False  # burn the subtitle into the picture (always so for image formats)
+    subtitle_size: int = 100  # percent, for burnt subtitles
+    boost: int = 100  # audio boost, percent (Plex: 100 to 300)
+
+
+@dataclass(frozen=True, slots=True)
+class StreamStart:
+    """A started stream: its media playlist (relative to the session), and what the service decided."""
+
+    session: str
+    playlist: str  # e.g. ``session/<id>/base/index.m3u8``
+    video: str  # direct | copy | transcode
+    audio: str  # copy | transcode
+    subtitles: str  # none | text | burn
+    width: int | None = None
+    height: int | None = None
+    bitrate_kbps: int | None = None
+    video_codec: str | None = None
+    audio_codec: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class StreamBody:
+    """An answer of the service streamed through the portal (a playlist or a segment)."""
+
+    status: int
+    content_type: str
+    length: int | None
+    chunks: AsyncIterator[bytes]
+
+
+@dataclass(frozen=True, slots=True)
+class SubtitleCue:
+    start_s: float
+    end_s: float
+    text: str
+
+
+@runtime_checkable
+class StreamChannel(Protocol):
+    """One member's line to the service: every call is made as their account on it."""
+
+    async def playable(self, external_id: str) -> PlayableItem: ...
+
+    async def start(self, external_id: str, options: StreamOptions, session: str) -> StreamStart: ...
+
+    def open(self, session: str, path: str) -> AbstractAsyncContextManager[StreamBody]:
+        """A playlist or segment of a started stream (``path`` relative to the transcoder)."""
+        ...
+
+    def subtitles(
+        self, external_id: str, options: StreamOptions, session: str
+    ) -> AbstractAsyncContextManager[AsyncIterator[SubtitleCue]]:
+        """The selected text subtitle as the transcoder reaches it, from where the stream stands."""
+        ...
+
+    async def report(
+        self, external_id: str, session: str, state: str, position_s: float, duration_s: float | None
+    ) -> None:
+        """Where the member is (``playing``, ``paused``, ``stopped``): resume point, « watched », and the
+        service's own activity (Tautulli sees the play)."""
+        ...
+
+    async def stop(self, session: str) -> None: ...
+
+
+@runtime_checkable
+class MediaStreaming(Protocol):
+    def channel(self, external_user_id: str | None) -> StreamChannel:
+        """The channel of one account on the service (``None``: the service's own account)."""
+        ...
+
+
 DIGEST = "media.digest"
 
 
@@ -478,6 +648,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(ACQUISITION, Acquisition, "Where a download manager stands on one title, and its search (027)"),
     _spec(DOWNLOAD_CLIENTS, DownloadClient, "Transfers of a torrent client, by hash (027)"),
     _spec(ITEM_LINKS, ItemLinks, "Where a title opens in its service (027)"),
+    _spec(STREAMING, MediaStreaming, "Play a title in the portal, transcoded by its service (027)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

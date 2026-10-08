@@ -11,7 +11,10 @@ import { fileURLToPath } from "node:url";
 const SRC = join(dirname(fileURLToPath(import.meta.url)), "..", "src");
 const ROUTES = join(SRC, "shell", "router", "routes.tsx");
 /** Routed modules that are not pages of their own (redirects, error pages rendered by the shell). */
-const EXEMPT = new Set(["pages/NotAvailablePage"]);
+const EXEMPT = new Set([
+  "pages/NotAvailablePage",
+  "features/media/player/PlayerPage", // 027 (#2): the video player covers the whole window, no page chrome
+]);
 
 function resolveModule(spec) {
   const base = join(dirname(ROUTES), spec);

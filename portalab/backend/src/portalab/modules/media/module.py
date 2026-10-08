@@ -1,5 +1,6 @@
 """Media module facade (spec 024)."""
 
+import os
 from dataclasses import replace
 from datetime import timedelta
 from typing import Any
@@ -81,6 +82,7 @@ from portalab.modules.media.observability import log, metrics
 from portalab.modules.media.participant import MediaParticipant
 from portalab.modules.media.playback.poller import JOB as POLL_JOB
 from portalab.modules.media.playback.poller import PlaybackPoller
+from portalab.modules.media.player.service import PlayerService
 from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
     MY_SOON,
@@ -158,6 +160,7 @@ class MediaModule:
         search: SearchRegistry = default_search,
         categories: CategoryRegistry = default_categories,
         observables: ObservableRegistry = default_observables,
+        player_key: bytes | None = None,
     ) -> None:
         self.database = database
         self.events = events
@@ -222,6 +225,10 @@ class MediaModule:
             database, capabilities, self.catalog, self.request_insights, clock=clock
         )
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
+        # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
+        self.player = PlayerService(
+            database, capabilities, lambda: self.config, player_key or os.urandom(32), clock=clock
+        )
 
     # --- configuration ---------------------------------------------------------------------------------
     def _config_reader(self) -> Any | None:

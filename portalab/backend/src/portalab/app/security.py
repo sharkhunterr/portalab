@@ -107,7 +107,8 @@ SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
     (
         b"content-security-policy",
         b"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; "
-        b"font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; "
+        b"font-src 'self'; connect-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'self'; "
+        b"form-action 'self'; "
         b"frame-ancestors 'none'",
     ),
     (b"strict-transport-security", b"max-age=31536000; includeSubDomains"),
