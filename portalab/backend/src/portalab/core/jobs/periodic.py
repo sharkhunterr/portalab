@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from portalab.core.db import Database
-from portalab.core.jobs.queue import enqueue
+from portalab.core.jobs.queue import DEFAULT_QUEUE, enqueue
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock, utc_now
 
@@ -21,13 +21,19 @@ def slot_of(at: datetime, interval: timedelta) -> datetime:
 
 
 async def schedule(
-    database: Database, kind: str, at: datetime, interval: timedelta, clock: Clock | None
+    database: Database,
+    kind: str,
+    at: datetime,
+    interval: timedelta,
+    clock: Clock | None,
+    queue: str = DEFAULT_QUEUE,
 ) -> None:
     slot = slot_of(at, interval)
     async with database.unit_of_work() as uow:
         await enqueue(
             uow.session,
             kind=kind,
+            queue=queue,
             dedup_key=f"{kind}:{slot.strftime('%Y%m%dT%H%M')}",
             run_at=slot,
             clock=clock,
@@ -44,12 +50,13 @@ def register_periodic(
     owner: str,
     clock: Clock | None = None,
     timeout_seconds: float = 300,
+    queue: str = DEFAULT_QUEUE,
 ) -> Callable[[], Awaitable[None]]:
     """Register ``kind`` and return a ``seed()`` coroutine function to call at worker start."""
 
     async def handler(payload: dict[str, Any]) -> None:
         await func()
-        await schedule(database, kind, utc_now(clock) + interval, interval, clock)
+        await schedule(database, kind, utc_now(clock) + interval, interval, clock, queue)
 
     registry.register(
         kind,
@@ -60,6 +67,6 @@ def register_periodic(
     )
 
     async def seed() -> None:
-        await schedule(database, kind, utc_now(clock), interval, clock)
+        await schedule(database, kind, utc_now(clock), interval, clock, queue)
 
     return seed

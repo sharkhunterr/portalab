@@ -20,7 +20,7 @@ from portalab.capabilities.media import LIBRARY, SourceUnavailable, unwrap
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
-from portalab.core.jobs.queue import enqueue
+from portalab.core.jobs.queue import BULK_QUEUE, enqueue
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import payload_hash
 from portalab.modules.media.identity.resolver import MediaNotFound
@@ -95,6 +95,7 @@ class ImageService:
             await enqueue(
                 uow.session,
                 kind=JOB,
+                queue=BULK_QUEUE,
                 payload={"object": str(object_id)},
                 dedup_key=f"{JOB}:{object_id}:later:{now.strftime('%Y%m%d%H')}{now.minute // 10}",
                 run_at=now + RETRY_LATER,
@@ -116,6 +117,7 @@ class ImageService:
             await enqueue(
                 session,
                 kind=JOB,
+                queue=BULK_QUEUE,
                 payload={"object": str(object_id)},
                 dedup_key=f"{JOB}:{object_id}:{payload_hash({'ref': ref})[:16]}",
                 clock=self.clock,
@@ -226,9 +228,10 @@ class ImageService:
                 await enqueue(
                     uow.session,
                     kind=JOB,
+                    queue=BULK_QUEUE,
                     payload={"object": str(object_id)},
                     dedup_key=f"{JOB}:{object_id}:backfill:{day}",
-                    # spread out: the other jobs (syncs, health probes) keep their turn in the queue
+                    # spread out: the source is not hammered (other work runs in its own lanes)
                     run_at=now + BACKFILL_SPACING * index,
                     clock=self.clock,
                 )

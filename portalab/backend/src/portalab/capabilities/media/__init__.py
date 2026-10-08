@@ -99,6 +99,8 @@ class LibraryPayload(BaseModel):
     series_position: float | None = Field(default=None, ge=0, le=100_000)
     publisher: str | None = Field(default=None, max_length=200)
     tags: list[str] = Field(default_factory=list, max_length=40)  # moods and themes (Grimmory)
+    # 027: which copy this item is when a service holds several of one title (a game per platform/region)
+    variant: str | None = Field(default=None, max_length=200)
 
 
 class RequestPayload(BaseModel):

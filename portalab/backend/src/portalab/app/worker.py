@@ -8,6 +8,7 @@ from portalab.app.composition import import_all_models
 from portalab.app.wiring import Platform, wire_platform
 from portalab.capabilities.catalog import new_registry
 from portalab.core.db import Database
+from portalab.core.jobs.queue import QUEUES
 from portalab.core.jobs.registry import default_registry
 from portalab.core.jobs.worker import Worker
 from portalab.core.logging import get_logger
@@ -74,7 +75,7 @@ async def run_worker(settings: BootstrapSettings) -> None:
     dispatcher = asyncio.create_task(dispatch_events(platform, stop))
     services = asyncio.create_task(provide_services(platform, stop))
     try:
-        await Worker(database, default_registry).run_forever(stop)
+        await Worker(database, default_registry, queues=QUEUES).run_forever(stop)
     finally:
         stop.set()
         await scheduler

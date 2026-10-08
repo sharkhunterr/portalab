@@ -99,16 +99,30 @@ class Worker:
                 await succeed(self.database, job.id, worker_id=self.worker_id, clock=self.clock)
 
     async def run_forever(self, stop: asyncio.Event) -> None:
+        """027: one loop per queue, side by side — a long job in one lane never holds up the others."""
         log.info(
             "worker started", extra={"fields": {"worker_id": self.worker_id, "queues": list(self.queues)}}
         )
+        await asyncio.gather(*(self._lane(queue, stop) for queue in self.queues))
+        log.info("worker stopped", extra={"fields": {"worker_id": self.worker_id}})
+
+    async def _lane(self, queue: str, stop: asyncio.Event) -> None:
         while not stop.is_set():
             try:
-                handled = await self.run_once()
+                jobs = await claim(
+                    self.database,
+                    queue=queue,
+                    worker_id=self.worker_id,
+                    limit=self.batch_size,
+                    lock_seconds=self.lock_seconds,
+                    clock=self.clock,
+                )
+                for job in jobs:
+                    await self._execute(job)
+                handled = len(jobs)
             except Exception:
-                log.exception("worker loop error (will retry)")
+                log.exception("worker loop error (will retry)", extra={"fields": {"queue": queue}})
                 handled = 0
             if handled == 0:
                 with contextlib.suppress(TimeoutError):
                     await asyncio.wait_for(stop.wait(), timeout=self.poll_interval)
-        log.info("worker stopped", extra={"fields": {"worker_id": self.worker_id}})

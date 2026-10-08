@@ -47,6 +47,57 @@ def cover_path(ref: str) -> str:
     return f"/{path}" if path.startswith("assets/") else f"/assets/romm/resources/{path}"
 
 
+def _names(values: Any) -> list[str]:
+    """Names out of a RomM list — plain strings (RomM 3) or ``{name: …}`` objects (RomM 4 metadata)."""
+    out: list[str] = []
+    for value in values if isinstance(values, list) else []:
+        name = value.get("name") if isinstance(value, Mapping) else value
+        if isinstance(name, str) and name.strip() and name not in out:
+            out.append(name.strip())
+    return out
+
+
+def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
+    """027: a game's metadata from RomM 3 (on the game itself) or RomM 4 (``metadatum`` — the merged
+    metadata — and the IGDB block): year, genres (the platform first), franchises and game modes as tags,
+    the publisher; and which copy this is (platform, regions, revision) when RomM holds several."""
+    sources: list[Mapping[str, Any]] = [game]
+    for block in ("metadatum", "igdb_metadata"):
+        if isinstance(game.get(block), Mapping):
+            sources.append(game[block])
+
+    def pick(key: str) -> Any:
+        for source in sources:
+            value = source.get(key)
+            if value not in (None, "", [], {}):
+                return value
+        return None
+
+    platform = (
+        game.get("platform_display_name") or game.get("platform_name") or game.get("platform_custom_name")
+    )
+    released = parse_time(pick("first_release_date"))
+    cover = game.get("path_cover_large") or game.get("path_cover_l")
+    companies = _names(pick("companies"))
+    variant = [
+        str(platform) if platform else "",
+        ", ".join(_names(game.get("regions"))),
+        str(game.get("revision") or ""),
+    ]
+    return {
+        "title": title[:500],
+        "ids": {"igdb": str(game["igdb_id"])} if game.get("igdb_id") else {},
+        "year": released.year if released and 1950 <= released.year <= 2200 else None,
+        "released": released.date().isoformat() if released and released.year >= 1950 else None,
+        "overview": (game.get("summary") or "")[:5000] or None,
+        "genres": [g for g in [str(platform) if platform else "", *_names(pick("genres"))] if g][:30],
+        "tags": [*_names(pick("franchises")), *_names(pick("game_modes"))][:40],
+        "publisher": companies[0][:200] if companies else None,
+        "image": str(cover).split("?")[0] if cover else None,
+        "variant": " · ".join(v for v in variant if v)[:200] or str(game.get("fs_name") or "")[:200] or None,
+    }
+
+
 class RommConnector(HttpConnector):
     key = "romm"
     name = "RomM"
@@ -106,28 +157,11 @@ class RommConnector(HttpConnector):
                 title = game.get("name") or game.get("fs_name_no_ext")
                 if not title:
                     continue
-                cover = game.get("path_cover_large") or game.get("path_cover_l")
-                released = parse_time(game.get("first_release_date"))
-                payload = {
-                    "title": str(title)[:500],
-                    "ids": {"igdb": str(game["igdb_id"])} if game.get("igdb_id") else {},
-                    "year": released.year if released else None,
-                    "overview": (game.get("summary") or "")[:5000] or None,
-                    "genres": [
-                        g
-                        for g in [
-                            game.get("platform_name") or game.get("platform_display_name"),
-                            *(game.get("genres") or []),
-                        ]
-                        if isinstance(g, str) and g
-                    ][:30],
-                    "image": str(cover).split("?")[0] if cover else None,
-                }
                 yield self.record(
                     ctx.service,
                     safe_id(game.get("id")),
                     "game",
-                    payload,
+                    game_payload(game, str(title)),
                     parse_time(game.get("updated_at") or game.get("created_at")),
                 )
             offset += len(games)

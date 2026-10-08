@@ -157,6 +157,7 @@ class Sections:
                         "service_id": s.service_id,
                         "service_name": s.service_name,
                         "connector": s.connector,
+                        "variant": s.variant,
                         "present": s.present,
                         "availability": s.availability,
                         "last_seen_at": s.last_seen_at.isoformat(),

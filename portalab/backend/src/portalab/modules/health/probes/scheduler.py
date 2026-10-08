@@ -7,7 +7,7 @@ from typing import Any
 
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.core.jobs.periodic import register_periodic, slot_of
-from portalab.core.jobs.queue import enqueue
+from portalab.core.jobs.queue import HEALTH_QUEUE, enqueue
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.partitions import ensure_month_partitions
 from portalab.core.time import utc_now
@@ -48,6 +48,7 @@ class ProbeScheduler:
                 await enqueue(
                     uow.session,
                     kind=PROBE_JOB,
+                    queue=HEALTH_QUEUE,  # 027: probes never wait behind syncs or bulk work
                     payload={"service_id": service_id},
                     dedup_key=f"{PROBE_JOB}:{service_id}:{slot}",
                     max_attempts=1,
@@ -77,4 +78,5 @@ class ProbeScheduler:
             self.sweep,
             owner=OWNER,
             clock=self.state.clock,
+            queue=HEALTH_QUEUE,
         )

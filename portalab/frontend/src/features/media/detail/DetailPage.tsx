@@ -153,9 +153,14 @@ function SectionBody({
     case "sources":
       return (
         <ul className="media-list">
-          {list(data.sources).map((source) => (
-            <li key={String(source.service_id)} className="media-source">
+          {list(data.sources).map((source, index) => (
+            // 027: a service may hold several copies of one title (a game per platform or region)
+            // biome-ignore lint/suspicious/noArrayIndexKey: copies of one service share its id
+            <li key={`${String(source.service_id)}-${index}`} className="media-source">
               <strong>{String(source.service_name ?? source.connector ?? source.service_id)}</strong>
+              {source.variant ? (
+                <span className="media-source__variant">{String(source.variant)}</span>
+              ) : null}
               {source.link ? (
                 <a
                   className="media-source__link"

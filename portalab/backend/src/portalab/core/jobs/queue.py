@@ -24,6 +24,11 @@ from portalab.core.logging import get_correlation_id, is_secret_key, redact_text
 from portalab.core.time import Clock, require_aware, utc_now
 
 DEFAULT_QUEUE = "default"
+# 027: lanes the worker runs side by side — health probes never wait behind a sync or bulk work, and bulk
+# work (thousands of covers after a big library sync) never starves the rest
+HEALTH_QUEUE = "health"
+BULK_QUEUE = "bulk"
+QUEUES: tuple[str, ...] = (DEFAULT_QUEUE, HEALTH_QUEUE, BULK_QUEUE)
 DEFAULT_LOCK_SECONDS = 300
 MAX_ERROR_LENGTH = 2000
 BASE_BACKOFF_SECONDS = 5

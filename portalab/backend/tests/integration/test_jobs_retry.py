@@ -78,3 +78,32 @@ async def test_a_failing_handler_never_blocks_other_jobs(database: Database) -> 
     }
     failed = next(job for job in await all_jobs(database) if job.kind == "demo.fail")
     assert failed.last_error is not None and "abcdef123456" not in failed.last_error
+
+
+async def test_lanes_run_side_by_side(database: Database) -> None:
+    """027: a long job in the bulk lane (thousands of covers) never holds up a health probe."""
+    import asyncio
+
+    clk = clock()
+    registry = JobRegistry()
+    probed = asyncio.Event()
+
+    @registry.handler("demo.cover", idempotency="no side effects", timeout_seconds=10)
+    async def cover(payload: dict[str, str]) -> None:
+        await asyncio.sleep(3)
+
+    @registry.handler("demo.probe", idempotency="sets an event")
+    async def probe(payload: dict[str, str]) -> None:
+        probed.set()
+
+    for _ in range(3):
+        await add_job(database, clk, kind="demo.cover", queue="bulk")
+    await add_job(database, clk, kind="demo.probe", queue="health")
+    stop = asyncio.Event()
+    worker = Worker(
+        database, registry, worker_id="w", clock=clk, queues=("default", "health", "bulk"), poll_interval=0.05
+    )
+    running = asyncio.create_task(worker.run_forever(stop))
+    await asyncio.wait_for(probed.wait(), timeout=1.5)  # well before the first cover is done
+    stop.set()
+    running.cancel()

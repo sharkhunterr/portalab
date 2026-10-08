@@ -37,6 +37,7 @@ class SourceStatus:
     last_sync_attempt_at: datetime | None = None  # 027: an error only counts when no success came after
     link: str | None = None
     item_link: str | None = None  # 027: this title's page in the service, at its public address
+    variant: str | None = None  # 027: which copy this is in the service (a game's platform, region…)
 
 
 class AvailabilityService:
@@ -115,6 +116,7 @@ class AvailabilityService:
                     last_sync_attempt_at=getattr(info, "last_sync_attempt_at", None),
                     link=getattr(info, "link", None),
                     item_link=await self._item_link(item, getattr(info, "link", None)),
+                    variant=str((item.payload or {}).get("variant") or "")[:200] or None,
                 )
             )
         as_of = max((s.last_seen_at for s in out), default=utc_now(self.clock))

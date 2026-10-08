@@ -367,6 +367,13 @@ a.media-card__link:focus-visible .media-card__frame {
   justify-content: space-between;
   gap: var(--space-2);
 }
+/* 027: which copy (platform, region…) when a service holds several */
+.media-source__variant {
+  flex-basis: 100%;
+  order: 1;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
 .media-source__badges {
   display: inline-flex;
   flex-wrap: wrap;

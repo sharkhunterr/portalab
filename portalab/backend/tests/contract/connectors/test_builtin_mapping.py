@@ -24,7 +24,7 @@ from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.http_base import parse_time, safe_id
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
-from portalab.connectors.romm import RommConnector, cover_path
+from portalab.connectors.romm import RommConnector, cover_path, game_payload
 from portalab.connectors.seerr import SeerrConnector
 from tests.contract.connectors.builtin_fixtures import ROUTES, SEERR, handle_for
 
@@ -199,3 +199,30 @@ async def test_romm_heavy_pages_are_asked_again_smaller() -> None:
     found = await records(connector, "romm")
     assert len(found) == 60
     assert sizes[:3] == [100, 50, 25]
+
+
+def test_romm4_metadata_and_copies() -> None:
+    """027: RomM 4 keeps a game's metadata in ``metadatum`` (names as objects, dates in milliseconds); each
+    copy says which one it is (platform, regions, revision)."""
+    payload = game_payload(
+        {
+            "id": 7,
+            "igdb_id": 1234,
+            "platform_display_name": "Atari 2600",
+            "regions": ["USA", "Europe"],
+            "revision": "Rev 1",
+            "metadatum": {
+                "first_release_date": 410227200000,
+                "genres": [{"name": "Arcade"}, "Shooter"],
+                "franchises": ["Alien"],
+                "game_modes": [{"name": "Single player"}],
+                "companies": [{"name": "Fox Video Games"}],
+            },
+        },
+        "Alien",
+    )
+    assert payload["year"] == 1983 and payload["released"] == "1983-01-01"
+    assert payload["genres"] == ["Atari 2600", "Arcade", "Shooter"]
+    assert payload["tags"] == ["Alien", "Single player"]
+    assert payload["publisher"] == "Fox Video Games"
+    assert payload["variant"] == "Atari 2600 · USA, Europe · Rev 1"
