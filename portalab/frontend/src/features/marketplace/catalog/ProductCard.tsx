@@ -49,12 +49,18 @@ export function ProductCard({
             {product.name}
           </Link>
         </h3>
-        {product.min_level || (product.limit_count && product.limit_days) ? (
+        {product.min_level || product.min_contribution || (product.limit_count && product.limit_days) ? (
           <span className="product-card__chips">
             {product.min_level ? (
               <span className="product-chip">
                 <Icon name="trophy" size={12} />
                 {t("marketplace:card.level", { level: product.min_level })}
+              </span>
+            ) : null}
+            {product.min_contribution ? (
+              <span className="product-chip">
+                <Icon name="handshake" size={12} />
+                {t("marketplace:card.contribution", { points: product.min_contribution })}
               </span>
             ) : null}
             {product.limit_count && product.limit_days ? (

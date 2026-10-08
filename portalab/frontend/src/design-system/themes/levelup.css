@@ -1212,13 +1212,18 @@
 .levelup[data-look="synthwave"] {
   --glow: #ff2fd1;
 }
+/* the floor's perspective is the stage's (sturdier than a perspective() on the floor itself) */
+.levelup[data-look="synthwave"] .levelup__stage {
+  perspective: 14rem;
+  perspective-origin: 50% 55%;
+}
 .levelup[data-look="synthwave"] .levelup__rays {
   display: block;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 55%, #fde047 0 9vmin, #fb7185 9vmin 18vmin, transparent 18vmin),
+    radial-gradient(circle at 50% 100%, #fde047 0 9vmin, #fb7185 9vmin 18vmin, transparent 18vmin) 0 0 / 100%
+    55% no-repeat,
     linear-gradient(#1e0b3a, #4c1d95 55%, #12051f 55%);
-  mask: linear-gradient(#000 0 0);
 }
 .levelup[data-look="synthwave"] .levelup__scene {
   display: block;
@@ -1226,13 +1231,13 @@
   background:
     linear-gradient(#ff2fd1 2px, transparent 2px) 0 0 / 100% 3rem,
     linear-gradient(90deg, #ff2fd1 2px, transparent 2px) 0 0 / 4rem 100%;
-  transform: perspective(14rem) rotateX(60deg);
+  transform: rotateX(60deg);
   transform-origin: top;
   animation: levelup-grid 1s linear infinite;
 }
 .levelup[data-look="synthwave"] .levelup__card {
   border: 2px solid #ff2fd1;
-  background: #12051fdd;
+  background: #12051f;
   box-shadow: 0 0 2rem #ff2fd188;
   font-family: "Monoton", "Righteous", sans-serif;
 }

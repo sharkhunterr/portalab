@@ -196,6 +196,11 @@ export function ProductSheet({ product }: { product: Product }) {
               {t("marketplace:sheet.level", { level: product.min_level })}
             </Fact>
           ) : null}
+          {product.min_contribution ? (
+            <Fact icon="handshake" label={t("marketplace:sheet.minContribution")}>
+              {t("marketplace:sheet.contribution", { points: product.min_contribution })}
+            </Fact>
+          ) : null}
           {product.limit_count && product.limit_days ? (
             <Fact icon="clock" label={t("marketplace:sheet.limit")}>
               {t("marketplace:sheet.limitValue", { count: product.limit_count, days: product.limit_days })}

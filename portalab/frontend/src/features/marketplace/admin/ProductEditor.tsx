@@ -162,9 +162,17 @@ export interface AvailabilityForm {
   limitCount: string;
   limitDays: string;
   minLevel: string;
+  /** 027: Contribution points needed (to keep a product for those who take part) */
+  minContribution: string;
 }
 
-const EMPTY_AVAILABILITY: AvailabilityForm = { supply: "", limitCount: "", limitDays: "", minLevel: "" };
+const EMPTY_AVAILABILITY: AvailabilityForm = {
+  supply: "",
+  limitCount: "",
+  limitDays: "",
+  minLevel: "",
+  minContribution: "",
+};
 
 function numberOrNull(value: string): number | null {
   const parsed = Number(value);
@@ -181,6 +189,7 @@ export function availabilityBody(value: AvailabilityForm) {
       limit_days: count && days ? days : null,
     },
     min_level: numberOrNull(value.minLevel),
+    min_contribution: numberOrNull(value.minContribution),
   };
 }
 
@@ -207,6 +216,7 @@ function AvailabilityFields({
       <legend>{t("marketplace:admin.availability")}</legend>
       {field("supply", t("marketplace:admin.supply"), 1000000)}
       {field("minLevel", t("marketplace:admin.minLevel"), 1000)}
+      {field("minContribution", t("marketplace:admin.minContribution"), 1000000)}
       {field("limitCount", t("marketplace:admin.limitCount"), 1000)}
       {field("limitDays", t("marketplace:admin.limitDays"), 366)}
       <p className="ds-field__hint">{t("marketplace:admin.repeatHint")}</p>
@@ -256,6 +266,7 @@ export function PresentationDialog({
             limitCount: product.limit_count ? String(product.limit_count) : "",
             limitDays: product.limit_days ? String(product.limit_days) : "",
             minLevel: product.min_level ? String(product.min_level) : "",
+            minContribution: product.min_contribution ? String(product.min_contribution) : "",
           });
           setError(false);
         }
@@ -411,9 +422,14 @@ export function NewProductDialog({
             })(),
             version: {
               price_coins: price,
-              ...(numberOrNull(availability.minLevel)
-                ? { conditions: [{ kind: "min_level", level: numberOrNull(availability.minLevel) }] }
-                : {}),
+              conditions: [
+                ...(numberOrNull(availability.minLevel)
+                  ? [{ kind: "min_level", level: numberOrNull(availability.minLevel) }]
+                  : []),
+                ...(numberOrNull(availability.minContribution)
+                  ? [{ kind: "min_contribution", contribution: numberOrNull(availability.minContribution) }]
+                  : []),
+              ],
               names: { en: nameEn, ...(nameFr ? { fr: nameFr } : {}) },
               descriptions: description ? { en: description } : {},
               payload: payload(),
