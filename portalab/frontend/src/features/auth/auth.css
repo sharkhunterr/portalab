@@ -69,3 +69,31 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* 027: the single sign-on — the provider's button first, the password form below */
+.auth-sso {
+  display: grid;
+  gap: var(--space-2);
+}
+.auth-sso__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt));
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+}
+.auth-sso__button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.auth-sso__or {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}

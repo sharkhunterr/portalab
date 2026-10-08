@@ -164,6 +164,7 @@ def test_builtin_catalog_registers_once() -> None:
         "tmdb",
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
+        "authentik",  # 027: the single sign-on, for services' access
     }
 
 
@@ -234,3 +235,22 @@ def test_nonsense_timestamps_are_no_date() -> None:
 
     assert parse_time(-58_920_000_000_000_000) is None
     assert game_payload({"id": 1, "first_release_date": -58_920_000_000_000_000}, "X")["year"] is None
+
+
+async def test_authentik_provisions_an_account_in_a_group() -> None:
+    """027: an approved service access — the account found or created, put in the service's group, and a
+    link for the member to set their password; the API token goes as a bearer."""
+    from portalab.capabilities.identity_provider import PROVISIONING
+    from portalab.connectors.authentik import AuthentikConnector
+
+    seen: list[httpx.Request] = []
+    provisioning = AuthentikConnector().provider(PROVISIONING, handle_for("authentik", seen=seen))
+    assert await provisioning.find_user("ada@example.org", None) == "7"
+    assert await provisioning.find_user("nobody@example.org", None) is None
+    user = await provisioning.create_user("ursula", "Ursula", "ursula@example.org")
+    assert user == "42"
+    await provisioning.add_to_group(user, "romm-users")
+    assert await provisioning.recovery_link(user) == "https://sso.example.org/recovery/abc"
+    added = next(r for r in seen if r.url.path.endswith("/add_user/"))
+    assert added.method == "POST" and b'"pk":42' in added.content.replace(b" ", b"")
+    assert seen[0].headers["authorization"] == "Bearer authentik-secret-token"

@@ -16,6 +16,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -252,3 +253,35 @@ class ExportJob(IdentityBase):
     blob_key: Mapped[str | None] = mapped_column(String(128))
     completed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     expires_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+
+
+class ExternalIdentity(IdentityBase):
+    """027: an account of the single sign-on (OIDC: issuer + subject) linked to a portal member — found
+    again at each sign-on, whatever the e-mail becomes."""
+
+    __tablename__ = "external_identities"
+    __table_args__ = (UniqueConstraint("issuer", "subject", name="uq_external_identities_issuer_subject"),)
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False, index=True
+    )
+    issuer: Mapped[str] = mapped_column(String(512), nullable=False, info=not_personal("the provider's URL"))
+    subject: Mapped[str] = mapped_column(
+        String(255), nullable=False, info=pii("identifier", tombstone="")
+    )  # the rows are deleted with the account (deletion saga); the tombstone is never reached
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    last_sign_in_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+
+
+class OidcLogin(IdentityBase):
+    """027: a single sign-on started and not finished yet — its state, nonce and PKCE verifier, kept a few
+    minutes and used once."""
+
+    __tablename__ = "oidc_logins"
+
+    state: Mapped[str] = mapped_column(String(64), primary_key=True, info=not_personal("a random token"))
+    nonce: Mapped[str] = mapped_column(String(64), nullable=False, info=not_personal("a random token"))
+    verifier: Mapped[str] = mapped_column(String(128), nullable=False, info=not_personal("a random token"))
+    next_path: Mapped[str] = mapped_column(String(512), nullable=False, info=not_personal("a portal route"))
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

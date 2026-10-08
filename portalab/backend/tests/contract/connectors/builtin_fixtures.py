@@ -410,6 +410,25 @@ CALENDAR_SONARR = [
     }
 ]
 
+# 027: Authentik — the single sign-on; users and groups (a POST answers as Authentik does)
+AUTHENTIK = {
+    "/api/v3/core/users/me/": {"user": {"pk": 1, "username": "portal"}},
+    "/api/v3/core/users/": lambda request: (
+        {"pk": 42, "username": "ursula"}
+        if request.method == "POST"
+        else {
+            "pagination": {"next": 0},
+            "results": [{"pk": 7, "username": "ada", "email": "ada@example.org"}]
+            if request.url.params.get("email") in (None, "ada@example.org")
+            else [],
+        }
+    ),
+    "/api/v3/core/groups/": {"pagination": {"next": 0}, "results": [{"pk": "g-uuid", "name": "romm-users"}]},
+    "/api/v3/core/groups/g-uuid/add_user/": {},
+    "/api/v3/core/groups/g-uuid/remove_user/": {},
+    "/api/v3/core/users/42/recovery/": {"link": "https://sso.example.org/recovery/abc"},
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -420,6 +439,7 @@ SECRETS = {
     "tautulli": {"api_key": "tautulli-secret-key"},
     "grimmory": {"password": "grimmory-secret-pass"},
     "tmdb": {"api_key": "tmdb-secret-key"},
+    "authentik": {"api_token": "authentik-secret-token"},
 }
 ROUTES = {
     "jellyfin": JELLYFIN,
@@ -431,6 +451,7 @@ ROUTES = {
     "tautulli": TAUTULLI,
     "grimmory": GRIMMORY,
     "tmdb": TMDB,
+    "authentik": AUTHENTIK,
 }
 
 

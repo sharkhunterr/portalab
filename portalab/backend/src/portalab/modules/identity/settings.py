@@ -109,6 +109,35 @@ _DECLARATIONS: tuple[tuple[str, Any, Any, str], ...] = (
 )
 
 
+# 027: single sign-on (OIDC — Authentik): members sign in with their homelab account
+OIDC_ENABLED = "identity.oidc.enabled"
+OIDC_ISSUER = "identity.oidc.issuer"
+OIDC_CLIENT_ID = "identity.oidc.clientId"
+OIDC_CLIENT_SECRET = "identity.oidc.clientSecret"  # noqa: S105 — the setting's key, not a secret
+OIDC_LABEL = "identity.oidc.label"
+OIDC_CREATE = "identity.oidc.createAccounts"
+_OIDC: tuple[tuple[str, Any, Any, str, bool], ...] = (
+    (OIDC_ENABLED, bool, False, "Offer « Sign in with » the single sign-on on the sign-in page.", False),
+    (
+        OIDC_ISSUER,
+        str | None,
+        None,
+        "The provider's issuer URL, e.g. https://sso.example.org/application/o/portalab/",
+        False,
+    ),
+    (OIDC_CLIENT_ID, str | None, None, "The OAuth2/OpenID client ID given by the provider.", False),
+    (OIDC_CLIENT_SECRET, str | None, None, "The client secret given by the provider (secret).", True),
+    (OIDC_LABEL, str, "Authentik", "The provider's name on the sign-in button.", False),
+    (
+        OIDC_CREATE,
+        bool,
+        True,
+        "Create the portal account of a provider user signing in for the first time.",
+        False,
+    ),
+)
+
+
 def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None:
     """Declare the identity keys through the kernel ``declare_setting`` (idempotent per catalog)."""
     declare = declare_setting if catalog is default_catalog else catalog.declare
@@ -123,6 +152,18 @@ def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None
             default=default,
             owner=OWNER,
             description=description,
+        )
+    for key, schema, default, description, sensitive in _OIDC:
+        if key in known:
+            continue
+        declare(
+            scope="global",
+            key=key,
+            schema=schema,
+            default=default,
+            owner=OWNER,
+            description=description,
+            **({"sensitive": True} if sensitive else {}),
         )
 
 

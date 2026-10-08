@@ -78,3 +78,51 @@ async def test_service_access_opens_a_request_and_provisions_on_approval(mk: MkH
     assert done.state == "done" and done.details["outcome"] == "account created"
     assert provisioned == [(mk.people["ursula"], {"service": "romm", "group": "romm"}, True)]
     assert await mk.module.requests.queue(None) == []
+
+
+async def test_approval_creates_the_account_in_the_identity_provider(mk: MkHarness) -> None:
+    """027: with Authentik connected, approving a service access finds or creates the member's account and
+    puts it in the service's group; without « create », a missing account keeps the request open."""
+    from portalab.capabilities.identity_directory import ACCOUNTS, AccountSummary
+    from portalab.capabilities.identity_provider import PROVISIONING, SPECS
+
+    calls: list[tuple[str, ...]] = []
+
+    class Sso:
+        async def find_user(self, email: str | None, username: str | None) -> str | None:
+            return None
+
+        async def create_user(self, username: str, name: str, email: str | None) -> str:
+            calls.append(("create", username))
+            return "42"
+
+        async def add_to_group(self, user: str, group: str) -> None:
+            calls.append(("group", user, group))
+
+        async def remove_from_group(self, user: str, group: str) -> None:
+            calls.append(("leave", user, group))
+
+        async def recovery_link(self, user: str) -> str | None:
+            return "https://sso.example.org/recovery/x"
+
+    class Accounts:
+        async def accounts(self) -> list[AccountSummary]:
+            return [AccountSummary(mk.people["ursula"], "ursula", "Ursula", "ursula@example.org")]
+
+    registry = mk.module.capabilities
+    if PROVISIONING not in {spec.name for spec in getattr(registry, "_specs", {}).values()}:
+        registry.declare(SPECS[0])
+    registry.provide(PROVISIONING, Sso(), instance_ref="sso", owner="test")
+    if not mk.module.capabilities.system_providers(ACCOUNTS):
+        mk.module.capabilities.provide(ACCOUNTS, Accounts(), instance_ref="accounts", owner="test")
+    await published(
+        mk, "romm_access", "service_access", price_coins=100, payload={"service": "romm", "group": "romm"}
+    )
+    await mk.coins("ursula", 100)
+    await mk.module.purchases.acquire(mk.p("ursula"), "romm_access", "s2")
+    (pending,) = await mk.module.requests.queue(None)
+    with pytest.raises(Conflict):  # no account and « create » not ticked
+        await mk.module.requests.decide(mk.p("boss"), pending.id, "done", None, False)
+    done = await mk.module.requests.decide(mk.p("boss"), pending.id, "done", None, True)
+    assert done.state == "done" and "account created" in done.details["outcome"]
+    assert calls == [("create", "ursula"), ("group", "42", "romm")]

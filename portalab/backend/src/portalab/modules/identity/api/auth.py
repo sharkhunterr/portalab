@@ -3,6 +3,8 @@
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 from sqlalchemy import select
 
 from portalab.core.authorization import public, require
@@ -60,6 +62,63 @@ async def login(body: LoginRequest, request: Request, response: Response, module
         csrf_token=signed_in.issued.csrf_token,
         expires_at=signed_in.issued.expires_at,
     )
+
+
+class SingleSignOn(BaseModel):
+    """027: whether the sign-in page offers the single sign-on, and under which name."""
+
+    enabled: bool
+    label: str
+
+
+def _callback(request: Request) -> str:
+    return str(request.url_for("oidc_callback"))
+
+
+@router.get("/auth/oidc", response_model=SingleSignOn)
+@public
+async def oidc_status(module: Module) -> SingleSignOn:
+    config = await module.oidc.settings()
+    return SingleSignOn(enabled=config.ready, label=config.label)
+
+
+@router.get("/auth/oidc/start", response_class=RedirectResponse, status_code=status.HTTP_302_FOUND)
+@public
+async def oidc_start(request: Request, module: Module, next: str | None = None) -> RedirectResponse:
+    """027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``)."""
+    return RedirectResponse(await module.oidc.start(_callback(request), next), status_code=302)
+
+
+@router.get(
+    "/auth/oidc/callback",
+    name="oidc_callback",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_302_FOUND,
+)
+@public
+async def oidc_callback(
+    request: Request, module: Module, code: str | None = None, state: str | None = None
+) -> RedirectResponse:
+    """027: back from the provider — the session opens and the member lands where they were going; a refusal
+    lands on the sign-in page saying so."""
+    if not code or not state:
+        return RedirectResponse("/login?sso=failed", status_code=302)
+    try:
+        signed, next_path = await module.oidc.finish(
+            code,
+            state,
+            _callback(request),
+            client_ip=client_ip(request),
+            user_agent=request.headers.get("user-agent"),
+            previous_token=request.cookies.get(SESSION_COOKIE),
+        )
+    except Exception as exc:
+        code_name = getattr(exc, "code", "auth.sso_failed")
+        reason = "unavailable" if code_name == "auth.account_unavailable" else "failed"
+        return RedirectResponse(f"/login?sso={reason}", status_code=302)
+    response = RedirectResponse(next_path, status_code=302)
+    set_session_cookies(response, signed.issued, module.ctx.config.session_absolute_hours * 3600)
+    return response
 
 
 @router.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)

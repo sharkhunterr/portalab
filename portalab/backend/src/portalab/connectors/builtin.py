@@ -2,6 +2,7 @@
 
 from portalab.capabilities.connector_sdk import Connector, ConnectorRegistry
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
+from portalab.connectors.authentik import AuthentikConnector
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
@@ -27,6 +28,7 @@ def builtin_connectors() -> list[Connector]:
         TmdbConnector(),
         QBittorrentConnector(),
         DelugeConnector(),
+        AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service
     ]
 
 

@@ -23,6 +23,9 @@ PUBLIC_ROUTES = {
     "/api/v1/auth/register",
     "/api/v1/auth/verify",
     "/api/v1/auth/deletion/cancel",
+    "/api/v1/auth/oidc",  # 027: the single sign-on (whether offered, start, the provider's way back)
+    "/api/v1/auth/oidc/start",
+    "/api/v1/auth/oidc/callback",
 }
 
 EXPECTED_PERMISSIONS = {

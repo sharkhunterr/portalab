@@ -11928,6 +11928,25 @@
         "title": "SessionInfo",
         "type": "object"
       },
+      "SingleSignOn": {
+        "description": "027: whether the sign-in page offers the single sign-on, and under which name.",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "label"
+        ],
+        "title": "SingleSignOn",
+        "type": "object"
+      },
       "SourceDayOut": {
         "properties": {
           "amounts": {
@@ -25342,6 +25361,129 @@
           }
         },
         "summary": "Logout",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/auth/oidc": {
+      "get": {
+        "operationId": "oidc_status_api_v1_auth_oidc_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleSignOn"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Oidc Status",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/auth/oidc/callback": {
+      "get": {
+        "description": "027: back from the provider \u2014 the session opens and the member lands where they were going; a refusal\nlands on the sign-in page saying so.",
+        "operationId": "oidc_callback_api_v1_auth_oidc_callback_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Oidc Callback",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/auth/oidc/start": {
+      "get": {
+        "description": "027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``).",
+        "operationId": "oidc_start_api_v1_auth_oidc_start_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Oidc Start",
         "tags": [
           "identity"
         ]

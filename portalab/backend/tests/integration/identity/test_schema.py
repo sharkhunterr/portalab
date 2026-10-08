@@ -21,6 +21,8 @@ TABLES = {
     "deletion_requests",
     "onboarding_progress",
     "export_jobs",
+    "external_identities",  # 027: single sign-on accounts linked to members
+    "oidc_logins",  # 027: single sign-ons in progress
 }
 
 INSERT_USER = (

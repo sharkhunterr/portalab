@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY
@@ -23,7 +23,7 @@ from portalab.core.jobs.queue import enqueue
 from portalab.core.tombstone import scrub
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState
-from portalab.modules.identity.models import DeletionRequest, User
+from portalab.modules.identity.models import DeletionRequest, ExternalIdentity, User
 from portalab.modules.identity.observability import log_event, metrics
 from portalab.modules.identity.services.account_service import AccountService
 from portalab.modules.identity.services.common import (
@@ -220,6 +220,8 @@ class DeletionService:
         user.deletion_due_at = None
         await session.flush()
         await scrub(session, User.__table__, where=User.__table__.c.id == user.id)  # type: ignore[arg-type]
+        # 027: the single sign-on accounts linked to the member go with the account
+        await session.execute(delete(ExternalIdentity).where(ExternalIdentity.user_id == user.id))
 
 
 def requester(principal: Principal, *, as_admin: bool) -> Actor:

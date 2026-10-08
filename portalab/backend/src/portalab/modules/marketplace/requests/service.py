@@ -278,6 +278,26 @@ class Requests:
         except Exception:
             log.warning("request notification not sent")
 
+    async def send_account_link(self, user: UUID, link: str) -> None:
+        """027: a new account in the identity provider — the member sets their password from this link."""
+        notify = self._port(NOTIFY)
+        if notify is None:
+            return
+        try:
+            await notify.send(
+                CommunicationRequest(
+                    category="marketplace.request",
+                    template_key="marketplace:notify.request.account",
+                    audience=Users((user,)),
+                    dedup_key=f"request-account:{user}:{link[-16:]}",
+                    params={"link": link[:400]},  # outside: in the text; the button stays in-portal
+                    subject_ref=f"user:{user}",
+                    action_url="/marketplace/owned",
+                )
+            )
+        except Exception:
+            log.warning("account link not sent")
+
     async def close_for(self, ownership: OwnershipView) -> None:
         """A revoked or refunded purchase: its open request is closed and a granted access withdrawn."""
         async with self.database.unit_of_work() as uow:

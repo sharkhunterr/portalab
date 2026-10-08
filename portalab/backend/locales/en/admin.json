@@ -346,6 +346,7 @@
   "services.category.books": "Books",
   "services.category.downloads": "Downloads",
   "services.category.games": "Games",
+  "services.category.identity": "Identity (single sign-on)",
   "services.category.media": "Media server",
   "services.category.metadata": "Metadata",
   "services.category.requests": "Requests",

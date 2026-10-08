@@ -5,6 +5,7 @@ milestones), account-deletion handling (R6), reconciliation and notifications. S
 product types, versioned products, atomic acquisition with named conditions, activation, refunds, grants,
 revocation, quota products (no paid priority), entitlements and integrations."""
 
+from collections.abc import Mapping
 from dataclasses import replace
 from datetime import timedelta
 from typing import Any
@@ -17,6 +18,8 @@ from portalab.capabilities.community import SectionRegistry, default_sections
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import ENTITLEMENTS, WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
+from portalab.capabilities.identity_directory import ACCOUNTS as IDENTITY_ACCOUNTS
+from portalab.capabilities.identity_provider import PROVISIONING
 from portalab.capabilities.marketplace import GIFTS, LIFECYCLE, ProductTypeRegistry, default_product_types
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
@@ -34,6 +37,7 @@ from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
+from portalab.core.errors import Conflict, Unavailable
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
@@ -159,6 +163,8 @@ class MarketplaceModule:
         self.requests.refund = lambda actor, ownership, reason: self.refunds.refund(
             actor, ownership, reason, by_admin=True, percent=100, ground="refund"
         )
+        self.requests.provision = self._provision
+        self.requests.unprovision = self._unprovision
 
     async def _grant_from_bundle(self, user: UUID, product_key: str, bundle: str) -> bool:
         """027: a pack grants each product it contains (one already owned is kept as is)."""
@@ -173,6 +179,64 @@ class MarketplaceModule:
         project = await self.projects.register(f"purchase:{ownership}", user, title)
         if project.state == "idea":
             await self.transition(SYSTEM_PRINCIPAL, project.id, "proposal", note=pitch or None)
+
+    def _identity_provider(self) -> Any:
+        try:
+            providers = self.capabilities.system_providers(PROVISIONING)
+        except Exception:  # no connector declares it in this process
+            providers = []
+        if not providers:
+            raise Unavailable(
+                "No identity provider is connected — add Authentik in Services first.",
+                code="marketplace.no_identity_provider",
+            )
+        return providers[0].provider
+
+    async def _member(self, user: UUID) -> tuple[str, str, str | None]:
+        """(login, name, e-mail) of a member, for their account in the identity provider."""
+        try:
+            accounts = self.capabilities.system_providers(IDENTITY_ACCOUNTS)
+        except Exception:
+            accounts = []
+        if accounts:
+            for account in await accounts[0].provider.accounts():
+                if account.id == user and account.login:
+                    return account.login, account.display_name or account.login, account.email
+        raise Unavailable("This member's account cannot be read.", code="marketplace.member_unknown")
+
+    async def _provision(self, user: UUID, details: Mapping[str, Any], create: bool) -> str:
+        """027: an approved service access — the member's account in the identity provider (created when
+        asked and missing), put in the service's group; a new account gets a link to set its password."""
+        group = str(details.get("group") or "")
+        if not group:
+            return "approved"
+        provider = self._identity_provider()
+        login, name, email = await self._member(user)
+        account = await provider.find_user(email, login)
+        created = False
+        if account is None:
+            if not create:
+                raise Conflict(
+                    "This member has no account in the identity provider yet — tick « create the account ».",
+                    code="marketplace.no_identity_account",
+                )
+            account, created = await provider.create_user(login, name, email), True
+        await provider.add_to_group(account, group)
+        link = await provider.recovery_link(account) if created else None
+        if link:
+            await self.requests.send_account_link(user, link)
+        return f"account created, added to « {group} »" if created else f"added to « {group} »"
+
+    async def _unprovision(self, user: UUID, details: Mapping[str, Any]) -> None:
+        """A withdrawn service access: the member leaves the service's group (the account stays)."""
+        group = str(details.get("group") or "")
+        if not group:
+            return
+        provider = self._identity_provider()
+        login, _, email = await self._member(user)
+        account = await provider.find_user(email, login)
+        if account is not None:
+            await provider.remove_from_group(account, group)
 
     def register(self) -> None:
         register_event_types(self.event_types)

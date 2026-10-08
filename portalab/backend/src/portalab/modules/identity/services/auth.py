@@ -143,6 +143,20 @@ class AuthService:
         previous_token: str | None = None,
     ) -> SignedIn:
         user_id = await self.verify_credentials(login, password, client_ip=client_ip)
+        return await self.open_session(
+            user_id, client_ip=client_ip, user_agent=user_agent, previous_token=previous_token
+        )
+
+    async def open_session(
+        self,
+        user_id: UUID,
+        *,
+        client_ip: str | None,
+        user_agent: str | None,
+        previous_token: str | None = None,
+    ) -> SignedIn:
+        """Open a session for an authenticated user — a password sign-in or (027) the single sign-on — once
+        the account's state allows it."""
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:
             user = await self.accounts.get_for_update(uow.session, user_id)

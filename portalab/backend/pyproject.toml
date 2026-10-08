@@ -24,6 +24,7 @@ dependencies = [
     "nh3>=0.3.7",
     "diff-match-patch>=20241021",
     "packaging>=24",
+    "pyjwt[crypto]>=2.9",
 ]
 
 [project.scripts]

@@ -484,6 +484,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "marketplace.manage",
     },
     {
+        # 027: what I bought — its settings, the requests it opened, refunds and history
+        "key": "marketplace.owned",
+        "owner": "module:marketplace",
+        "kind": "entry",
+        "label_key": "nav.marketplace_owned",
+        "icon": "package",
+        "route": "/marketplace/owned",
+        "group": "marketplace",
+        "order_hint": 62,
+        "required_permission": "marketplace.read",
+    },
+    {
         "key": "marketplace.projects",
         "owner": "module:marketplace",
         "kind": "entry",
@@ -491,7 +503,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "lightbulb",
         "route": "/projects",
         "group": "marketplace",
-        "order_hint": 62,  # 027: the shop first — the section opens on it
+        "order_hint": 63,  # 027: the shop first — the section opens on it
         "required_permission": "marketplace.read",
     },
     {

@@ -18,6 +18,11 @@ export const authStrings = {
   cancelDeletion: "Cancel the deletion",
   deletionCancelled: "The deletion was cancelled. You can sign in again.",
   unavailable: "Sign-in is temporarily unavailable. Try again later.",
+  // 027: the single sign-on (OIDC — Authentik)
+  ssoSignIn: (provider: string) => `Sign in with ${provider}`,
+  ssoOr: "or with your portal password",
+  ssoFailed: "The single sign-on did not succeed. Try again, or sign in with your password.",
+  ssoUnavailable: "This account cannot sign in right now.",
   verifyTitle: "Activate your account",
   tokenField: "Activation code",
   newPasswordField: "Choose a password",

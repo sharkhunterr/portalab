@@ -955,10 +955,19 @@ _p("quota_requests", "quota", 150, "common", "+5 media requests", "+5 demandes d
    {"kind": "media_requests", "units": 5}, collection="essentials", icon="inbox", limit=(2, 30),
    repeatable=True)  # fmt: skip
 
+
 # 027: requests the administrators handle — a film in 4K with one's wishes, a homelab service's access — kept
 # for members who take part (a minimum Contribution) and limited in time
-def _field(key: str, kind: str, en: str, fr: str, options: tuple[str, ...] = (), required: bool = False) -> dict[str, Any]:
-    return {"key": key, "type": kind, "labels": {"en": en, "fr": fr}, "options": list(options), "required": required}
+def _field(
+    key: str, kind: str, en: str, fr: str, options: tuple[str, ...] = (), required: bool = False
+) -> dict[str, Any]:
+    return {
+        "key": key,
+        "type": kind,
+        "labels": {"en": en, "fr": fr},
+        "options": list(options),
+        "required": required,
+    }
 
 
 _p("request_4k", "special_request", 1500, "epic", "A film in 4K", "Un film en 4K",
@@ -975,12 +984,22 @@ _p("request_4k", "special_request", 1500, "epic", "A film in 4K", "Un film en 4K
    collection="essentials", icon="clapperboard", featured=True, level=10, contribution=50, limit=(1, 30),
    repeatable=True)  # fmt: skip
 for service, en, fr, group, about_en, about_fr in (
-    ("romm", "RomM games", "Jeux RomM", "romm-users",
-     "Your own account on RomM: thousands of retro games to play in the browser, your saves kept.",
-     "Votre compte sur RomM : des milliers de jeux rétro à jouer dans le navigateur, vos sauvegardes gardées."),
-    ("grimmory", "Grimmory library", "Bibliothèque Grimmory", "grimmory-users",
-     "Your own account on Grimmory: the books and audiobooks to read and listen to, your progress kept.",
-     "Votre compte sur Grimmory : les livres et livres audio à lire et écouter, votre progression gardée."),
+    (
+        "romm",
+        "RomM games",
+        "Jeux RomM",
+        "romm-users",
+        "Your own account on RomM: thousands of retro games to play in the browser, your saves kept.",
+        "Votre compte sur RomM : des milliers de jeux rétro à jouer dans le navigateur, vos sauvegardes gardées.",
+    ),
+    (
+        "grimmory",
+        "Grimmory library",
+        "Bibliothèque Grimmory",
+        "grimmory-users",
+        "Your own account on Grimmory: the books and audiobooks to read and listen to, your progress kept.",
+        "Votre compte sur Grimmory : les livres et livres audio à lire et écouter, votre progression gardée.",
+    ),
 ):
     _p(f"access_{service}", "service_access", 800, "rare", f"{en} access", f"Accès {fr}",
        about_en + " An administrator approves it and your account is created.",

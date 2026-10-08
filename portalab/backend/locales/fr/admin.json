@@ -346,6 +346,7 @@
   "services.category.books": "Livres",
   "services.category.downloads": "Téléchargements",
   "services.category.games": "Jeux",
+  "services.category.identity": "Identité (authentification unique)",
   "services.category.media": "Serveur média",
   "services.category.metadata": "Métadonnées",
   "services.category.requests": "Demandes",

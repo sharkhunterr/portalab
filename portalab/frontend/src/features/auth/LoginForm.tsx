@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { api } from "../../api/client";
 import { ApiError } from "../../state/regions";
@@ -21,6 +22,30 @@ export function loginErrorMessage(error: unknown): string {
   return t.invalidCredentials;
 }
 
+/** 027: « Sign in with Authentik » when the single sign-on is set up; it comes back with the session. */
+function SingleSignOn() {
+  const sso = useQuery({
+    queryKey: ["auth", "oidc"],
+    retry: false,
+    staleTime: 60_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/auth/oidc")).data ?? { enabled: false, label: "" }) as {
+        enabled: boolean;
+        label: string;
+      },
+  });
+  if (!sso.data?.enabled) return null;
+  const next = new URLSearchParams(window.location.search).get("next") ?? "/";
+  return (
+    <div className="auth-sso">
+      <a className="auth-sso__button" href={`/api/v1/auth/oidc/start?next=${encodeURIComponent(next)}`}>
+        {t.ssoSignIn(sso.data.label)}
+      </a>
+      <p className="auth-sso__or">{t.ssoOr}</p>
+    </div>
+  );
+}
+
 export function LoginForm() {
   const loginId = useId();
   const passwordId = useId();
@@ -32,6 +57,7 @@ export function LoginForm() {
   const error = mutation.error;
   const pendingDeletion =
     error instanceof ApiError && typeof error.extensions.deletion_cancellable_until === "string";
+  const sso = new URLSearchParams(window.location.search).get("sso"); // 027: back from a failed sign-on
 
   useEffect(() => {
     if (error || cancelled) messageRef.current?.focus();
@@ -52,6 +78,10 @@ export function LoginForm() {
   return (
     <form onSubmit={submit} aria-labelledby={`${loginId}-title`} className="auth-form" noValidate>
       <h1 id={`${loginId}-title`}>{t.loginTitle}</h1>
+      {sso && !error ? (
+        <FormMessage kind="error">{sso === "unavailable" ? t.ssoUnavailable : t.ssoFailed}</FormMessage>
+      ) : null}
+      <SingleSignOn />
       {error ? (
         <FormMessage ref={messageRef} kind="error">
           {loginErrorMessage(error)}

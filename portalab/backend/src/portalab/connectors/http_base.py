@@ -31,12 +31,13 @@ from portalab.capabilities.connector_sdk import (
 )
 from portalab.capabilities.health import HEALTH_PROBE, ProbeResult
 from portalab.capabilities.health import SPECS as HEALTH_SPECS
+from portalab.capabilities.identity_provider import SPECS as IDENTITY_SPECS
 from portalab.capabilities.media import SPECS as MEDIA_SPECS
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
 
 EPOCH = datetime(2000, 1, 1, tzinfo=UTC)
 LIBRARY_LISTING_BYTES = 100 * 1024 * 1024  # 027: whole-library answers (Radarr /movie) of large libraries
-SPECS = {spec.name: spec for spec in (*HEALTH_SPECS, *MEDIA_SPECS)}
+SPECS = {spec.name: spec for spec in (*HEALTH_SPECS, *MEDIA_SPECS, *IDENTITY_SPECS)}
 SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 

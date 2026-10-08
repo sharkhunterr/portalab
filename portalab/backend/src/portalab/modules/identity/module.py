@@ -22,6 +22,7 @@ from portalab.modules.identity.services.credentials import CredentialHasher
 from portalab.modules.identity.services.deletion import DeletionService
 from portalab.modules.identity.services.directory import register_directory
 from portalab.modules.identity.services.export import BUILD_JOB, EXPIRE_JOB, ExportService
+from portalab.modules.identity.services.oidc import OidcService
 from portalab.modules.identity.services.onboarding import OnboardingService
 from portalab.modules.identity.services.participants import register_participants
 from portalab.modules.identity.services.profile import AVATAR_GC_JOB, ProfileService, collect_avatar_blob
@@ -45,6 +46,7 @@ class IdentityModule:
         self.auth = AuthService(
             ctx, LocalAuthProvider(self.hasher, ctx), self.sessions, self.throttle, self.accounts
         )
+        self.oidc = OidcService(ctx, self.auth, self.accounts)  # 027: the single sign-on (Authentik)
         self.registration = RegistrationService(ctx, self.accounts, self.hasher, self.onboarding, channel)
         self.bootstrap = IdentityBootstrap(ctx, self.accounts, self.hasher, self.onboarding)
         self.admin = AdminOperations(ctx, self.accounts, self.sessions)
