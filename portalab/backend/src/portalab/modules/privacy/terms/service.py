@@ -5,8 +5,9 @@ Optional: with nothing published, or with the switch off (``set_enabled``), the 
 A version is published once and never changed (``terms_versions`` is append-only); a new one supersedes it.
 A version that ``requires_acceptance`` (the default — a typo fix may opt out) asks every member to accept it
 again: until they do, the portal and the services it opens stay closed to them (``must_accept``, checked on
-every API call — cached, so it costs nothing while the member is up to date). Publishing counts as the
-publisher's own acceptance. Acceptances are the member's data: exported, erased with the account.
+every API call — cached, so it costs nothing while the member is up to date). The administrators accept
+like every member — publishing is not accepting. Acceptances are the member's data: exported, erased
+with the account.
 """
 
 import time
@@ -232,8 +233,6 @@ class TermsService:
                 ),
             )
         self._required = None
-        if actor.user_id is not None:  # publishing is the publisher's own acceptance
-            await self._record(actor.user_id, published.version)
         return published
 
 

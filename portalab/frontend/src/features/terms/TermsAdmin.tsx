@@ -18,7 +18,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { ApiError } from "../../state/regions";
 import { MarkdownEditor } from "../content/MarkdownEditor";
 import { SafeHtml } from "../content/SafeHtml";
-import { MY_TERMS_KEY, useMyTerms, usePublishTerms, useTermsAdmin } from "./api";
+import { MY_TERMS_KEY, usePublishTerms, useTermsAdmin } from "./api";
 import "../admin/admin.css";
 import "./terms.css";
 
@@ -157,7 +157,6 @@ export default function TermsAdmin() {
   const t = useT();
   const format = useFormat();
   const admin = useTermsAdmin();
-  useMyTerms(); // the publisher's own standing refreshes with the publication
   const versions = admin.data?.versions ?? [];
   const current = versions[0];
   const enabled = admin.data?.enabled ?? true;

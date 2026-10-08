@@ -34,7 +34,7 @@ async def test_members_must_accept_the_terms_in_force(
         requires_acceptance=False,  # the first terms are always to accept
     )
     assert first.version == 1 and first.requires_acceptance and "<script" not in first.body_html
-    assert not await full.privacy.terms.must_accept(boss)  # publishing is the publisher's acceptance
+    assert await full.privacy.terms.must_accept(boss)  # the administrators accept like every member
 
     blocked = await client.get("/api/v1/me/onboarding")
     assert blocked.status_code == 403 and blocked.json()["code"] == "terms.acceptance_required"
@@ -70,8 +70,8 @@ async def test_members_must_accept_the_terms_in_force(
     assert (await client.get("/api/v1/me/onboarding")).status_code == 200
 
     history = [(entry.version.version, entry.acceptances) for entry in await full.privacy.terms.history()]
-    assert history == [(3, 2), (2, 1), (1, 2)]
-    assert await full.privacy.terms.up_to_date() == 2
+    assert history == [(3, 1), (2, 0), (1, 1)]
+    assert await full.privacy.terms.up_to_date() == 1
 
     participant = TermsParticipant(full.privacy.terms)
     assert [r.data["version"] for r in await participant.export(member)] == [1, 3]
