@@ -9,6 +9,7 @@ import { ApiError } from "../../../state/regions";
 import { type OwnershipRow, useOwnedActions, usePurchases } from "../api";
 import "../marketplace.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { MyRequests, RequestForm } from "./Requests";
 
 /** 027: a bought project launch — name the project and pitch it; it opens as a community proposal. */
 function ProjectLaunchForm({ row }: { row: OwnershipRow }) {
@@ -54,6 +55,7 @@ function NeedsConfiguration({ row }: { row: OwnershipRow }) {
   const { configure } = useOwnedActions();
   const [value, setValue] = useState("");
   if (row.product_type === "project_launch") return <ProjectLaunchForm row={row} />;
+  if (row.product_type === "special_request") return <RequestForm row={row} />; // 027: a film in 4K…
   return (
     <form
       className="ds-stack--row"
@@ -137,6 +139,7 @@ export default function OwnedPage() {
         ))}
       </ul>
       {live.length === 0 && purchases.isSuccess ? <p>{t("marketplace:owned.empty")}</p> : null}
+      <MyRequests />
       <section aria-labelledby="marketplace-history" className="ds-stack">
         <h2 id="marketplace-history">{t("marketplace:history.title")}</h2>
         {(purchases.data ?? []).length ? (

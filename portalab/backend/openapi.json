@@ -7073,6 +7073,156 @@
         "title": "MarketplaceRefundIn",
         "type": "object"
       },
+      "MarketplaceRequestCountOut": {
+        "properties": {
+          "open": {
+            "title": "Open",
+            "type": "integer"
+          },
+          "overdue": {
+            "title": "Overdue",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "open",
+          "overdue"
+        ],
+        "title": "MarketplaceRequestCountOut",
+        "type": "object"
+      },
+      "MarketplaceRequestDecisionIn": {
+        "properties": {
+          "create_account": {
+            "default": false,
+            "title": "Create Account",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "MarketplaceRequestDecisionIn",
+        "type": "object"
+      },
+      "MarketplaceRequestOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "due_at": {
+            "format": "date-time",
+            "title": "Due At",
+            "type": "string"
+          },
+          "form": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Form",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "overdue": {
+            "title": "Overdue",
+            "type": "boolean"
+          },
+          "product_key": {
+            "title": "Product Key",
+            "type": "string"
+          },
+          "product_name": {
+            "title": "Product Name",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "state",
+          "product_key",
+          "product_name",
+          "user_id",
+          "user_name",
+          "details",
+          "form",
+          "due_at",
+          "overdue",
+          "note",
+          "decided_at",
+          "created_at"
+        ],
+        "title": "MarketplaceRequestOut",
+        "type": "object"
+      },
       "MarketplaceRevokeIn": {
         "properties": {
           "confirmation": {
@@ -19551,6 +19701,141 @@
         ]
       }
     },
+    "/api/v1/admin/marketplace/requests": {
+      "get": {
+        "operationId": "requests_queue_api_v1_admin_marketplace_requests_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "settled",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Settled",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceRequestOut"
+                  },
+                  "title": "Response Requests Queue Api V1 Admin Marketplace Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Requests Queue",
+        "tags": [
+          "marketplace-requests"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/requests/count": {
+      "get": {
+        "operationId": "requests_count_api_v1_admin_marketplace_requests_count_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceRequestCountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Requests Count",
+        "tags": [
+          "marketplace-requests"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/requests/{request_id}/{action}": {
+      "post": {
+        "operationId": "decide_request_api_v1_admin_marketplace_requests__request_id___action__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "start",
+                "done",
+                "decline"
+              ],
+              "title": "Action",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceRequestDecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide Request",
+        "tags": [
+          "marketplace-requests"
+        ]
+      }
+    },
     "/api/v1/admin/media/accounts": {
       "get": {
         "description": "027: every account of the connected services, its member (or a suggestion) \u2014 for the mapping screen.",
@@ -29916,6 +30201,31 @@
         "summary": "Purchases",
         "tags": [
           "marketplace"
+        ]
+      }
+    },
+    "/api/v1/me/marketplace/requests": {
+      "get": {
+        "operationId": "my_requests_api_v1_me_marketplace_requests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketplaceRequestOut"
+                  },
+                  "title": "Response My Requests Api V1 Me Marketplace Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Requests",
+        "tags": [
+          "marketplace-requests"
         ]
       }
     },

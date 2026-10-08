@@ -14,6 +14,7 @@ CATEGORIES = {
     "marketplace.purchase": "marketplace:category.purchase",
     "marketplace.refund": "marketplace:category.refund",
     "marketplace.revocation": "marketplace:category.revocation",
+    "marketplace.request": "marketplace:category.request",  # 027: a request to handle, followed
 }
 
 

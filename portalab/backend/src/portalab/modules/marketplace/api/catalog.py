@@ -108,6 +108,9 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "level_up": ("animation",),
     "widget_option": ("option",),
     "project_launch": ("kind",),
+    # 027: what a request asks for and how soon it is handled (the shop shows it; « My purchases » asks it)
+    "special_request": ("form", "deadline_days"),
+    "service_access": ("service", "deadline_days"),
     "statistic": ("statistic",),
 }
 

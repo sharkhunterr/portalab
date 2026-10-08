@@ -955,6 +955,39 @@ _p("quota_requests", "quota", 150, "common", "+5 media requests", "+5 demandes d
    {"kind": "media_requests", "units": 5}, collection="essentials", icon="inbox", limit=(2, 30),
    repeatable=True)  # fmt: skip
 
+# 027: requests the administrators handle — a film in 4K with one's wishes, a homelab service's access — kept
+# for members who take part (a minimum Contribution) and limited in time
+def _field(key: str, kind: str, en: str, fr: str, options: tuple[str, ...] = (), required: bool = False) -> dict[str, Any]:
+    return {"key": key, "type": kind, "labels": {"en": en, "fr": fr}, "options": list(options), "required": required}
+
+
+_p("request_4k", "special_request", 1500, "epic", "A film in 4K", "Un film en 4K",
+   "Ask for a film in 4K UHD with what matters to you — Dolby Atmos, HDR, languages, subtitles. An administrator finds it within a week; declined, your Coins come back.",
+   "Demandez un film en 4K UHD avec ce qui compte pour vous — Dolby Atmos, HDR, langues, sous-titres. Un administrateur le trouve sous une semaine ; refusée, vos Coins vous sont rendus.",
+   {"deadline_days": 7, "form": [
+       _field("film", "text", "Which film (title and year)", "Quel film (titre et année)", required=True),
+       _field("sound", "multi", "Sound", "Son", ("Dolby Atmos", "DTS:X", "Dolby TrueHD 7.1", "5.1")),
+       _field("hdr", "choice", "Picture", "Image", ("Dolby Vision", "HDR10+", "HDR10", "No preference")),
+       _field("languages", "multi", "Languages", "Langues", ("French (VFF)", "Quebec French (VFQ)", "Original (VO)")),
+       _field("subtitles", "choice", "Subtitles", "Sous-titres", ("French", "English", "Forced only", "None")),
+       _field("notes", "textarea", "Anything else", "Autre chose"),
+   ]},
+   collection="essentials", icon="clapperboard", featured=True, level=10, contribution=50, limit=(1, 30),
+   repeatable=True)  # fmt: skip
+for service, en, fr, group, about_en, about_fr in (
+    ("romm", "RomM games", "Jeux RomM", "romm-users",
+     "Your own account on RomM: thousands of retro games to play in the browser, your saves kept.",
+     "Votre compte sur RomM : des milliers de jeux rétro à jouer dans le navigateur, vos sauvegardes gardées."),
+    ("grimmory", "Grimmory library", "Bibliothèque Grimmory", "grimmory-users",
+     "Your own account on Grimmory: the books and audiobooks to read and listen to, your progress kept.",
+     "Votre compte sur Grimmory : les livres et livres audio à lire et écouter, votre progression gardée."),
+):
+    _p(f"access_{service}", "service_access", 800, "rare", f"{en} access", f"Accès {fr}",
+       about_en + " An administrator approves it and your account is created.",
+       about_fr + " Un administrateur la valide et votre compte est créé.",
+       {"service": service, "group": group, "deadline_days": 3},
+       collection="essentials", icon="server", level=5, contribution=30)  # fmt: skip
+
 # --------------------------------------------------------------------------------- dashboard and statistics
 for key, widget, en, fr, about_en, about_fr, rarity, price, level in (
     ("widget_calendar", "calendar.month", "Calendar widget", "Widget Calendrier",

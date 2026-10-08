@@ -15,7 +15,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from portalab.core.append_only import APPEND_ONLY_INFO
 from portalab.core.db import TZDateTime, schema_metadata
 from portalab.core.ids import new_id
-from portalab.core.privacy_registry import not_personal
+from portalab.core.privacy_registry import not_personal, pii
 
 STATES = (
     "'idea', 'proposal', 'open', 'validation', 'development', 'beta', 'released', 'rejected', 'abandoned'"
@@ -241,4 +241,36 @@ class Equipped(MarketplaceBase):
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
     slot: Mapped[str] = mapped_column(String(16), primary_key=True)
     value: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class MarketRequest(MarketplaceBase):
+    """027: a request a purchase opens for the administrators to handle by a deadline — a special request
+    (a film in 4K with the member's wishes) or access to a service (approved, the account created). Declined,
+    the Coins are given back."""
+
+    __tablename__ = "requests"
+    __table_args__ = (
+        CheckConstraint("kind IN ('special', 'service')", name="kind"),
+        CheckConstraint("state IN ('pending', 'in_progress', 'done', 'declined')", name="state"),
+        Index("ix_requests_state_due", "state", "due_at"),
+        Index("ix_requests_user", "user_id", "created_at"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    ownership_id: Mapped[UUID] = mapped_column(
+        ForeignKey("marketplace.ownerships.id"), nullable=False, unique=True
+    )
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    product_id: Mapped[UUID] = mapped_column(ForeignKey("marketplace.products.id"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(10), nullable=False)
+    details: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, info=pii("content", tombstone={})
+    )
+    state: Mapped[str] = mapped_column(String(12), nullable=False)
+    due_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    note: Mapped[str | None] = mapped_column(String(1000), info=pii("content"))
+    decided_by: Mapped[UUID | None] = mapped_column()
+    decided_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

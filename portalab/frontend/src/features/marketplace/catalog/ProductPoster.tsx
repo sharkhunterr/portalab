@@ -24,6 +24,8 @@ export const TYPE_ICONS: Record<string, string> = {
   level_up: "trophy",
   widget_option: "settings",
   project_launch: "lightbulb",
+  special_request: "clapperboard", // 027: a film in 4K, by hand
+  service_access: "server", // 027: a homelab service's access
 };
 
 export function ProductPoster({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {

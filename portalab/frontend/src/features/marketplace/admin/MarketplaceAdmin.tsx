@@ -12,6 +12,7 @@ import { type Category, type Product, useCategories } from "../api";
 import { ProductArt } from "../catalog/ProductArt";
 import { NewProductDialog, PresentationDialog } from "./ProductEditor";
 import { RaritySupply } from "./RaritySupply";
+import { RequestsQueue } from "./RequestsQueue";
 import "../marketplace.css";
 import { withConfirmation } from "./confirm";
 
@@ -76,6 +77,7 @@ export default function MarketplaceAdmin() {
       }
     >
       {message ? <p role="status">{message}</p> : null}
+      <RequestsQueue />
       <AdminSection title={t("marketplace:admin.products")} icon="shop">
         {products.isError ? <FunctionalState state="unavailable" /> : null}
         <ul className="admin-products">

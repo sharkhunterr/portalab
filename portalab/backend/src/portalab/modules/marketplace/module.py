@@ -67,6 +67,7 @@ from portalab.modules.marketplace.products.service import Catalog
 from portalab.modules.marketplace.projects.service import Projects
 from portalab.modules.marketplace.purchase.service import AlreadyOwned, Purchases
 from portalab.modules.marketplace.refunds.service import Refunds
+from portalab.modules.marketplace.requests.service import Requests
 from portalab.modules.marketplace.resolution.service import Resolution
 from portalab.modules.marketplace.revocation.service import Revocations
 from portalab.modules.marketplace.settings import SETTINGS, MarketplaceConfig
@@ -153,6 +154,11 @@ class MarketplaceModule:
         self.entitlements = Entitlements(database)
         self.cosmetics = CosmeticsReader(database)
         self.looks = ProfileLooks(database, self.cosmetics, clock=clock)
+        # 027: requests to handle (a special request, a service's access); declined, the Coins come back
+        self.requests = Requests(database, capabilities, clock=clock)
+        self.requests.refund = lambda actor, ownership, reason: self.refunds.refund(
+            actor, ownership, reason, by_admin=True, percent=100, ground="refund"
+        )
 
     async def _grant_from_bundle(self, user: UUID, product_key: str, bundle: str) -> bool:
         """027: a pack grants each product it contains (one already owned is kept as is)."""
@@ -191,6 +197,7 @@ class MarketplaceModule:
             lambda: self.config,
             bundle_grant=self._grant_from_bundle,
             project_launch=self._launch_project,
+            requests=self.requests,
         )
         if self.search.provider("product") is None:
             self.search.register(ProductSearchProvider(self.catalog, self.authorizer), owner=OWNER)

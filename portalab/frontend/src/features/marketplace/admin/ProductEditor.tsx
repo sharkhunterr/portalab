@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../../../api/client";
 import {
@@ -47,6 +48,9 @@ const TYPES = [
   "quota",
   "feature",
   "statistic",
+  // 027: requests the administrators handle (a film in 4K…) and a homelab service's access
+  "special_request",
+  "service_access",
 ] as const;
 /** 027: the designs each cosmetic type can sell (keys shared with the backend). */
 const DESIGNS: Partial<
@@ -177,6 +181,152 @@ const EMPTY_AVAILABILITY: AvailabilityForm = {
 function numberOrNull(value: string): number | null {
   const parsed = Number(value);
   return value.trim() && Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : null;
+}
+
+/** 027: one field of a special request's form, as the administrator writes it. */
+interface FormFieldDraft {
+  label: string;
+  type: "text" | "textarea" | "choice" | "multi" | "boolean";
+  options: string;
+  required: boolean;
+}
+
+function slug(text: string, index: number): string {
+  const base = text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return /^[a-z]/.test(base) ? base.slice(0, 40) : `field_${index + 1}`;
+}
+
+export function formOf(fields: FormFieldDraft[]) {
+  return fields
+    .filter((f) => f.label.trim())
+    .map((f, index) => ({
+      key: slug(f.label, index),
+      type: f.type,
+      labels: { en: f.label.trim(), fr: f.label.trim() },
+      options: f.options
+        .split(",")
+        .map((o) => o.trim())
+        .filter(Boolean),
+      required: f.required,
+    }));
+}
+
+/** 027: the questions a special request asks once bought (a film in 4K: which film, sound, languages…). */
+function FormBuilder({
+  value,
+  onChange,
+}: {
+  value: FormFieldDraft[];
+  onChange: (value: FormFieldDraft[]) => void;
+}) {
+  const t = useT();
+  const set = (index: number, patch: Partial<FormFieldDraft>) =>
+    onChange(value.map((f, i) => (i === index ? { ...f, ...patch } : f)));
+  return (
+    <fieldset className="product-editor__form">
+      <legend>{t("marketplace:admin.form")}</legend>
+      <p className="ds-field__hint">{t("marketplace:admin.formHint")}</p>
+      {value.map((field, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: rows the administrator adds and removes in place
+        <div key={index} className="product-editor__form-row">
+          <TextField
+            label={t("marketplace:admin.fieldLabel")}
+            value={field.label}
+            onChange={(e) => set(index, { label: e.target.value })}
+          />
+          <SelectField
+            label={t("marketplace:admin.fieldType")}
+            value={field.type}
+            onChange={(e) => set(index, { type: e.target.value as FormFieldDraft["type"] })}
+          >
+            {(["text", "textarea", "choice", "multi", "boolean"] as const).map((kind) => (
+              <option key={kind} value={kind}>
+                {t(`marketplace:admin.fieldTypes.${kind}`)}
+              </option>
+            ))}
+          </SelectField>
+          {field.type === "choice" || field.type === "multi" ? (
+            <TextField
+              label={t("marketplace:admin.fieldOptions")}
+              value={field.options}
+              onChange={(e) => set(index, { options: e.target.value })}
+            />
+          ) : null}
+          <label className="request-form__choice">
+            <input
+              type="checkbox"
+              checked={field.required}
+              onChange={(e) => set(index, { required: e.target.checked })}
+            />
+            {t("marketplace:admin.fieldRequired")}
+          </label>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t("marketplace:admin.fieldRemove")}
+            onClick={() => onChange(value.filter((_, i) => i !== index))}
+          >
+            <Icon name="trash" size={16} />
+          </Button>
+        </div>
+      ))}
+      <Button
+        variant="secondary"
+        onClick={() => onChange([...value, { label: "", type: "text", options: "", required: false }])}
+      >
+        <Icon name="plus" size={16} />
+        {t("marketplace:admin.fieldAdd")}
+      </Button>
+    </fieldset>
+  );
+}
+
+/** 027: which homelab service a purchase opens, and the identity provider's group that grants it. */
+function ServiceAccessFields({
+  service,
+  group,
+  onService,
+  onGroup,
+}: {
+  service: string;
+  group: string;
+  onService: (value: string) => void;
+  onGroup: (value: string) => void;
+}) {
+  const t = useT();
+  const services = useQuery({
+    queryKey: ["admin", "services"],
+    queryFn: async () =>
+      ((await api.GET("/api/v1/services")).data as unknown as { items: Array<{ id: string; name: string }> })
+        .items,
+  });
+  return (
+    <>
+      <SelectField
+        label={t("marketplace:admin.service")}
+        value={service}
+        onChange={(e) => onService(e.target.value)}
+      >
+        <option value="">—</option>
+        {(services.data ?? []).map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.name}
+          </option>
+        ))}
+      </SelectField>
+      <TextField
+        label={t("marketplace:admin.group")}
+        hint={t("marketplace:admin.groupHint")}
+        value={group}
+        onChange={(e) => onGroup(e.target.value)}
+      />
+    </>
+  );
 }
 
 export function availabilityBody(value: AvailabilityForm) {
@@ -356,6 +506,12 @@ export function NewProductDialog({
   const [style, setStyle] = useState("none");
   const [packed, setPacked] = useState<string[]>([]);
   const [extra, setExtra] = useState("{}");
+  const [deadline, setDeadline] = useState(7);
+  const [fields, setFields] = useState<FormFieldDraft[]>([
+    { label: "", type: "text", options: "", required: true },
+  ]);
+  const [service, setService] = useState("");
+  const [group, setGroup] = useState("");
   const [presentation, setPresentation] = useState<Presentation>(DEFAULT_PRESENTATION);
   const [availability, setAvailability] = useState<AvailabilityForm>(EMPTY_AVAILABILITY);
   const [category, setCategory] = useState("");
@@ -378,6 +534,10 @@ export function NewProductDialog({
         return { widget };
       case "bundle":
         return { products: packed };
+      case "special_request":
+        return { deadline_days: deadline, form: formOf(fields) };
+      case "service_access":
+        return { deadline_days: deadline, service, ...(group.trim() ? { group: group.trim() } : {}) };
       default:
         {
           const designed = DESIGNS[type];
@@ -633,6 +793,20 @@ export function NewProductDialog({
               value={String(units)}
               onChange={(e) => setUnits(Number(e.target.value))}
             />
+          ) : null}
+          {type === "special_request" || type === "service_access" ? (
+            <TextField
+              label={t("marketplace:admin.deadline")}
+              type="number"
+              min={1}
+              max={365}
+              value={String(deadline)}
+              onChange={(e) => setDeadline(Number(e.target.value))}
+            />
+          ) : null}
+          {type === "special_request" ? <FormBuilder value={fields} onChange={setFields} /> : null}
+          {type === "service_access" ? (
+            <ServiceAccessFields service={service} group={group} onService={setService} onGroup={setGroup} />
           ) : null}
           {["feature", "widget", "statistic"].includes(type) ? (
             <div className="ds-field">

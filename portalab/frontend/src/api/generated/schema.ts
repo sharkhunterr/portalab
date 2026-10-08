@@ -1532,6 +1532,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/marketplace/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Requests Queue */
+        get: operations["requests_queue_api_v1_admin_marketplace_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/requests/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Requests Count */
+        get: operations["requests_count_api_v1_admin_marketplace_requests_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/requests/{request_id}/{action}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decide Request */
+        post: operations["decide_request_api_v1_admin_marketplace_requests__request_id___action__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/media/accounts": {
         parameters: {
             query?: never;
@@ -5109,6 +5160,23 @@ export interface paths {
         };
         /** Purchases */
         get: operations["purchases_api_v1_me_marketplace_purchases_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/marketplace/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Requests */
+        get: operations["my_requests_api_v1_me_marketplace_requests_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10184,6 +10252,70 @@ export interface components {
              * @default Changed my mind
              */
             reason: string;
+        };
+        /** MarketplaceRequestCountOut */
+        MarketplaceRequestCountOut: {
+            /** Open */
+            open: number;
+            /** Overdue */
+            overdue: number;
+        };
+        /** MarketplaceRequestDecisionIn */
+        MarketplaceRequestDecisionIn: {
+            /**
+             * Create Account
+             * @default false
+             */
+            create_account: boolean;
+            /** Note */
+            note?: string | null;
+        };
+        /** MarketplaceRequestOut */
+        MarketplaceRequestOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /** Form */
+            form: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Note */
+            note: string | null;
+            /** Overdue */
+            overdue: boolean;
+            /** Product Key */
+            product_key: string;
+            /** Product Name */
+            product_name: string;
+            /** State */
+            state: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string | null;
         };
         /** MarketplaceRevokeIn */
         MarketplaceRevokeIn: {
@@ -16311,6 +16443,93 @@ export interface operations {
                     "application/json": {
                         [key: string]: number | null;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    requests_queue_api_v1_admin_marketplace_requests_get: {
+        parameters: {
+            query?: {
+                settled?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceRequestOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    requests_count_api_v1_admin_marketplace_requests_count_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceRequestCountOut"];
+                };
+            };
+        };
+    };
+    decide_request_api_v1_admin_marketplace_requests__request_id___action__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+                action: "start" | "done" | "decline";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarketplaceRequestDecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceRequestOut"];
                 };
             };
             /** @description Validation Error */
@@ -23475,6 +23694,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarketplaceOwnershipOut"][];
+                };
+            };
+        };
+    };
+    my_requests_api_v1_me_marketplace_requests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceRequestOut"][];
                 };
             };
         };

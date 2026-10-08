@@ -24,7 +24,10 @@ from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.core.permissions import PermissionRegistry
 
 OWNER = "module:marketplace"
-NOT_REFUNDABLE = frozenset({"plugin", "access", "quota", "bundle", "project_launch"})
+# 027: a request (special, service) is settled by the administrators — declined, its Coins come back
+NOT_REFUNDABLE = frozenset(
+    {"plugin", "access", "quota", "bundle", "project_launch", "special_request", "service_access"}
+)
 
 
 def _port(capabilities: CapabilityRegistry, name: str) -> Any | None:
@@ -204,6 +207,58 @@ class ProjectLaunchHandler(Owned):
         return ActivationResult("active")
 
 
+class SpecialRequestHandler(Owned):
+    """``special_request`` (027): something the administrators deliver by hand — a film in 4K with the
+    member's wishes. The owner fills the product's form (``payload.form``: title, sound, languages…), then
+    a request opens, to be handled within ``payload.deadline_days``."""
+
+    def __init__(self, requests: Any | None) -> None:
+        self.requests = requests
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        from portalab.modules.marketplace.requests.service import answers, form_of
+
+        form = form_of(ownership.payload)
+        if form and not ownership.configuration:
+            return ActivationResult("needs_configuration")
+        if self.requests is None:
+            return ActivationResult("failed", "requests unavailable")
+        try:
+            details = answers(form, ownership.configuration)
+        except Exception:
+            return ActivationResult("needs_configuration")
+        await self.requests.open(ownership, "special", details)
+        return ActivationResult("active")
+
+    async def deactivate(self, ownership: OwnershipView) -> None:
+        if self.requests is not None:
+            await self.requests.close_for(ownership)
+
+
+class ServiceAccessHandler(Owned):
+    """``service_access`` (027): access to a service of the homelab (``payload.service``, joined through the
+    identity provider's ``payload.group``). Buying it opens a request; an administrator approves it — and
+    Portalab offers to create the account — or declines it (the Coins come back). Revoked, the access is
+    withdrawn."""
+
+    def __init__(self, requests: Any | None) -> None:
+        self.requests = requests
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        if self.requests is None:
+            return ActivationResult("failed", "requests unavailable")
+        details = {
+            "service": str(ownership.payload.get("service") or "")[:64],
+            "group": str(ownership.payload.get("group") or "")[:120],
+        }
+        await self.requests.open(ownership, "service", details)
+        return ActivationResult("active")
+
+    async def deactivate(self, ownership: OwnershipView) -> None:
+        if self.requests is not None:
+            await self.requests.close_for(ownership)
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
@@ -213,6 +268,7 @@ def register_builtin_types(
     *,
     bundle_grant: Callable[[UUID, str, str], Awaitable[bool]] | None = None,
     project_launch: Callable[[UUID, UUID, str, str], Awaitable[None]] | None = None,
+    requests: Any | None = None,
 ) -> None:
     owned = Owned()
     for key, handler, fields in (
@@ -240,6 +296,9 @@ def register_builtin_types(
         ("level_up", owned, ("animation",)),  # how a level-up is shown
         ("widget_option", owned, ("option",)),  # a widget setting value: ``<widget>:<field>=<value>``
         ("project_launch", ProjectLaunchHandler(project_launch), ("kind",)),  # a community project
+        # 027: requests the administrators handle: a special one (a film in 4K…) and a service's access
+        ("special_request", SpecialRequestHandler(requests), ("form", "deadline_days")),
+        ("service_access", ServiceAccessHandler(requests), ("service", "group", "deadline_days")),
     ):
         if registry.get(key) is None:
             registry.register(

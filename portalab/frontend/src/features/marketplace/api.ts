@@ -169,3 +169,55 @@ export function useDescribe(): (product: Pick<Product, "descriptions">) => strin
   return (product) =>
     product.descriptions[language] ?? product.descriptions.en ?? Object.values(product.descriptions)[0];
 }
+
+// --- 027: requests to handle (a special request, a service's access) --------------------------------------
+export type MarketRequest = components["schemas"]["MarketplaceRequestOut"];
+export interface RequestField {
+  key: string;
+  type: "text" | "textarea" | "choice" | "multi" | "boolean";
+  labels: Record<string, string>;
+  options: string[];
+  required: boolean;
+}
+const REQUESTS = ["marketplace", "requests"] as const;
+
+export function useMyRequests() {
+  return useQuery({
+    queryKey: [...REQUESTS, "mine"],
+    queryFn: async () => ((await api.GET("/api/v1/me/marketplace/requests")).data ?? []) as MarketRequest[],
+  });
+}
+
+export function useRequestsQueue(settled = false) {
+  return useQuery({
+    queryKey: [...REQUESTS, "queue", settled],
+    queryFn: async () =>
+      ((await api.GET("/api/v1/admin/marketplace/requests", { params: { query: { settled } } })).data ??
+        []) as MarketRequest[],
+  });
+}
+
+export function useDecideRequest() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      action,
+      note,
+      createAccount,
+    }: {
+      id: string;
+      action: "start" | "done" | "decline";
+      note?: string;
+      createAccount?: boolean;
+    }) => {
+      const result = await api.POST("/api/v1/admin/marketplace/requests/{request_id}/{action}", {
+        params: { path: { request_id: id, action } },
+        body: { note: note ?? null, create_account: Boolean(createAccount) },
+      });
+      if (result.error) throw new Error("decide failed");
+      return result.data as MarketRequest;
+    },
+    onSuccess: () => client.invalidateQueries({ queryKey: REQUESTS }),
+  });
+}
