@@ -588,6 +588,47 @@
   font-size: var(--font-size-xs);
 }
 
+/* 027: the catalog in a modal — a grid of cards, the widget's look on top */
+.widget-catalog[data-modal] .widget-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.widget-catalog[data-modal] .widget-gallery__item {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  align-items: start;
+  padding: 0 0 var(--space-3);
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+.widget-catalog[data-modal] .widget-gallery__item:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--glass-border));
+  transform: translateY(-2px);
+}
+.widget-catalog[data-modal] .widget-gallery__preview {
+  grid-column: 1 / -1;
+  inline-size: auto;
+  block-size: 5.5rem;
+  border-radius: 0;
+}
+.widget-catalog[data-modal] .widget-gallery__text {
+  padding-inline: var(--space-3);
+}
+.widget-catalog[data-modal] :is(.widget-gallery__item > .ds-button, .widget-gallery__added) {
+  justify-self: end;
+  margin-inline-end: var(--space-3);
+}
+@media (prefers-reduced-motion: reduce) {
+  .widget-catalog[data-modal] .widget-gallery__item {
+    transition: none;
+  }
+}
+
 /* 027 FR-029: first-visit welcome */
 .welcome-card {
   display: flex;
