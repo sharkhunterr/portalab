@@ -619,6 +619,17 @@
   gap: 0.1rem;
   min-inline-size: 0;
 }
+/* 027: a pack's item and a product's pack link to their own page */
+.pack-item__name {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+}
+.pack-item__name:hover,
+.pack-item__name:focus-visible {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
 .pack-item__meta {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);

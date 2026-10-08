@@ -38,6 +38,7 @@ describe("marketplace product", () => {
       if (path === "/api/v1/me/permissions") {
         return json(200, { permissions: ["marketplace.read", "marketplace.purchase"], roles: ["user"] });
       }
+      if (path === "/api/v1/marketplace/products") return json(200, []); // 027: the packs it is part of
       return json(200, {
         key: "night_owl",
         type: "badge",

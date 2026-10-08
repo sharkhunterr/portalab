@@ -1,11 +1,11 @@
 # ruff: noqa: E501 — a data table of product texts
 """Demo shop catalog (027): every product of the demo Marketplace in one place — the universe themes and
-their ultimate packs, profile cosmetics (banners, frames, name styles, animated backgrounds), ambient
+their theme packs, profile cosmetics (banners, frames, name styles, animated backgrounds), ambient
 animations, celebrations, notification looks, palettes, animated badges and titles, packs and features.
 
 Prices follow the rarity (common about 100 to 200, rare 250 to 450, epic 500 to 900, legendary from 1000 Coins) and
 the rarest need a level; a pack costs about 80 % of what it contains. Copies come from the rarity's supply
-unless a product sets its own (themes and ultimate packs have a few more). Demo data only."""
+unless a product sets its own (interfaces and theme packs have a few more). Demo data only."""
 
 import json
 from pathlib import Path
@@ -925,17 +925,17 @@ THEME_RARITY = {
     "upsidedown": ("legendary", 1500, 12), "middleearth": ("legendary", 1500, 12),
     "vhs": ("epic", 900, 5), "nova": ("legendary", 1500, 10),
 }  # fmt: skip
-# 027: the theme alone is its colours, fonts, layout, navigation and words; its sold looks (animated
-# background, notifications, celebration, level-up) come with its universe's ultimate pack
+# 027: an interface (the « theme » product) is its colours, fonts, layout, navigation and words; its sold
+# looks (animated background, notifications, celebration, level-up) come with its theme pack
 PACK_NOTE = (
-    " Its animated background, notifications, celebration and level-up come with its ultimate pack.",
-    " Son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack ultime.",
+    " The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    " L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème.",
 )
 for theme, (en, fr, about_en, about_fr) in THEME_TEXT.items():
     rarity, price, level = THEME_RARITY[theme]
     if theme in UNIVERSE_THEMES:
         about_en, about_fr = about_en + PACK_NOTE[0], about_fr + PACK_NOTE[1]
-    _p(f"theme_{theme}", "theme", price, rarity, f"{en} theme", f"Thème {fr}", about_en, about_fr,
+    _p(f"theme_{theme}", "theme", price, rarity, f"{en} interface", f"Interface {fr}", about_en, about_fr,
        {"theme": theme}, collection="themes", icon="palette", featured=False, level=level,
        supply={"legendary": 10, "epic": 25}.get(rarity))  # fmt: skip
 
@@ -1254,7 +1254,7 @@ UNIVERSE_EXTRAS = {
 
 def theme_looks(theme: str) -> list[str]:
     """The sold products a universe theme's own looks need (its notification style and entrance, ambience,
-    celebration and level-up): the theme alone shows the free defaults instead, its ultimate pack has them."""
+    celebration and level-up): the interface alone shows the free defaults instead, its theme pack has them."""
     definition = json.loads((BUILTIN_THEMES / f"{theme}.json").read_text(encoding="utf-8"))
     wanted = {
         ("notification_style", "style", definition.get("notification", {}).get("style")),
@@ -1275,9 +1275,9 @@ for theme, items in UNIVERSES.items():
     extras = [item for item in (*UNIVERSE_EXTRAS.get(theme, ()), *theme_looks(theme)) if item not in items]
     contents = [f"theme_{theme}", *[item for item in items if item], *dict.fromkeys(extras)]
     level = max(THEME_RARITY[theme][2] or 0, 8)
-    _p(f"ultimate_{theme}", "bundle", None, "legendary", f"Ultimate {en} pack", f"Pack ultime {fr}",
-       f"The whole {en} universe: the theme and everything that goes with it — banner, frame, name style, level badge, notifications, effects and its badge.",
-       f"Tout l'univers {fr} : le thème et tout ce qui va avec — bannière, cadre, style de nom, badge de niveau, notifications, effets et son badge.",
+    _p(f"ultimate_{theme}", "bundle", None, "legendary", f"{en} theme pack", f"Pack de thème {fr}",
+       f"The whole {en} theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge and its badges.",
+       f"Tout le thème {fr} : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau et ses badges.",
        {"products": contents}, collection="ultimate", icon="crown", featured=theme in ("wizard", "cyberpunk"),
        level=level + 4, supply=5)  # fmt: skip
 
@@ -1400,8 +1400,8 @@ for product in SHOP:
         }
 
 COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
-    ("ultimate", "Ultimate packs", "crown", 1),
-    ("themes", "Universe themes", "palette", 3),
+    ("ultimate", "Theme packs", "crown", 1),
+    ("themes", "Interfaces", "palette", 3),
     ("packs", "Packs", "shop", 5),
     ("halloween", "Halloween", "moon", 10),
     ("new_wave", "New Wave", "zap", 20),

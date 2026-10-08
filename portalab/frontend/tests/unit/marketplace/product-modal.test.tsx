@@ -94,6 +94,8 @@ describe("shop product modal", () => {
 
   it("previews a notification style with a sample notification", async () => {
     show();
+    // 027: notification looks are in the « Notifications & effects » department
+    fireEvent.click(await screen.findByRole("button", { name: /^Notifications & effects/ }));
     fireEvent.click(await screen.findByRole("link", { name: "Neon notifications" }));
     const dialog = await screen.findByRole("dialog", { name: "Neon notifications" });
     const stage = dialog.querySelector(".product-art__notify");
@@ -105,6 +107,7 @@ describe("shop product modal", () => {
 describe("shop scarcity", () => {
   it("shows the copies left inside the card and refuses a sold-out product", async () => {
     show();
+    fireEvent.click(await screen.findByRole("button", { name: /^Profile/ })); // 027: titles are on the profile
     const link = await screen.findByRole("link", { name: "Crown" });
     const card = link.closest(".product-card") as HTMLElement;
     expect(card.querySelector(".product-art__stock")?.textContent).toBe("Sold out");

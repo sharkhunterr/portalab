@@ -14,35 +14,55 @@ import { ProductModal } from "./ProductModal";
 import "../marketplace.css";
 
 /**
- * ``/marketplace`` (spec 015 T021, 027 US8): a shop in three departments — looks (themes, profile,
- * notifications, effects, badges), features (widgets and their settings, statistics, bonuses, project
- * launches) and packs — each a few shelves by kind, the first items shown and « see all » for the rest;
- * art is drawn when a card comes near the screen. A product opens in a modal. Bought with Coins earned on
- * the portal, never real money.
+ * ``/marketplace`` (spec 015 T021, 027 US8): a shop in departments — themes (theme packs, interfaces,
+ * palettes), profile (banners, frames, backgrounds, names, badges, titles, level badges), notifications
+ * and effects, features (widgets and their settings, statistics, bonuses, project launches) and packs —
+ * each a shelf per kind, the first items shown and « see all » for the rest; art is drawn when a card
+ * comes near the screen. A product opens in a modal. Bought with Coins earned on the portal, never real
+ * money.
  */
 export interface Shelf {
   key: string;
   icon: string;
   types: string[];
+  /** Only the products of this collection (theme packs among the packs), or all but it. */
+  category?: string;
+  notCategory?: string;
 }
 
 export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }> = [
   {
-    key: "looks",
+    key: "themes",
     icon: "palette",
     shelves: [
-      { key: "themes", icon: "palette", types: ["theme"] },
+      // a theme pack is the whole theme; an interface is the theme's look of the portal only
+      { key: "themePacks", icon: "crown", types: ["bundle"], category: "ultimate" },
+      { key: "interfaces", icon: "palette", types: ["theme"] },
       { key: "palettes", icon: "palette", types: ["palette"] },
-      {
-        key: "profile",
-        icon: "user",
-        types: ["profile_banner", "avatar_frame", "profile_backdrop", "profile_background", "name_style"],
-      },
-      { key: "notifications", icon: "bell", types: ["notification_style", "notification_animation"] },
-      { key: "effects", icon: "sparkles", types: ["effect", "ambient"] },
-      { key: "badges", icon: "star", types: ["badge", "title"] },
-      // 027: the level badge's looks and the level-up moments
-      { key: "levels", icon: "trophy", types: ["level_badge", "level_up"] },
+    ],
+  },
+  {
+    key: "profile",
+    icon: "user",
+    shelves: [
+      { key: "banners", icon: "image", types: ["profile_banner", "profile_backdrop"] },
+      { key: "frames", icon: "user", types: ["avatar_frame"] },
+      { key: "backgrounds", icon: "sparkles", types: ["profile_background"] },
+      { key: "names", icon: "feather", types: ["name_style"] },
+      { key: "badges", icon: "star", types: ["badge"] },
+      { key: "titles", icon: "award", types: ["title"] },
+      { key: "levelBadges", icon: "trophy", types: ["level_badge"] },
+    ],
+  },
+  {
+    key: "effects",
+    icon: "sparkles",
+    shelves: [
+      { key: "notificationStyles", icon: "bell", types: ["notification_style"] },
+      { key: "notificationAnimations", icon: "bell-ring", types: ["notification_animation"] },
+      { key: "ambients", icon: "snowflake", types: ["ambient"] },
+      { key: "celebrations", icon: "party", types: ["effect"] },
+      { key: "levelUps", icon: "trophy", types: ["level_up"] },
     ],
   },
   {
@@ -59,15 +79,29 @@ export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }>
   {
     key: "packs",
     icon: "shop",
-    shelves: [{ key: "packs", icon: "shop", types: ["bundle"] }],
+    shelves: [{ key: "packs", icon: "shop", types: ["bundle"], notCategory: "ultimate" }],
   },
 ];
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
 const FIRST = 8; // shown per shelf before « see all »
 
+function onShelf(shelf: Shelf, product: Product): boolean {
+  return (
+    shelf.types.includes(product.type) &&
+    (!shelf.category || product.category === shelf.category) &&
+    (!shelf.notCategory || product.category !== shelf.notCategory)
+  );
+}
+
+/** The department a kind of product is in (an « in the shop » link lands on one type). */
 export function departmentOf(type: string): string {
   return DEPARTMENTS.find((d) => d.shelves.some((s) => s.types.includes(type)))?.key ?? "features";
+}
+
+/** The department a product is on (theme packs and other packs part ways). */
+function departmentOfProduct(product: Product): string {
+  return DEPARTMENTS.find((d) => d.shelves.some((s) => onShelf(s, product)))?.key ?? "features";
 }
 
 /** Shelf order (027): what is for sale first (sold out last, still shown), featured first, then from the
@@ -120,7 +154,7 @@ export default function CatalogPage() {
   const describe = useDescribe();
   const [params, setParams] = useSearchParams();
   const type = params.get("type") ?? ""; // « in the shop » links land on one type
-  const department = params.get("department") ?? (type ? departmentOf(type) : "looks");
+  const department = params.get("department") ?? (type ? departmentOf(type) : "themes");
   const [rarity, setRarity] = useState("");
   const [q, setQ] = useState("");
   const [opened, setOpened] = useState<Product | null>(null);
@@ -134,18 +168,18 @@ export default function CatalogPage() {
         .sort(shelfOrder),
     [products.data, rarity, type],
   );
-  const inDepartment = all.filter((p) => departmentOf(p.type) === current.key);
+  const inDepartment = all.filter((p) => departmentOfProduct(p) === current.key);
   const featured = inDepartment.filter((p) => p.featured).slice(0, 3);
   const counts = Object.fromEntries(
-    DEPARTMENTS.map((d) => [d.key, all.filter((p) => departmentOf(p.type) === d.key).length]),
+    DEPARTMENTS.map((d) => [d.key, all.filter((p) => departmentOfProduct(p) === d.key).length]),
   );
-  const go = (key: string) => setParams(key === "looks" ? {} : { department: key });
+  const go = (key: string) => setParams(key === "themes" ? {} : { department: key });
   const wanted = params.get("product"); // a product sheet opened from elsewhere (the shop window widget)
   useEffect(() => {
     if (!wanted || !products.data) return;
     const found = products.data.find((p) => p.key === wanted);
     if (found) setOpened(found);
-    setParams(found ? { department: departmentOf(found.type) } : {}, { replace: true });
+    setParams(found ? { department: departmentOfProduct(found) } : {}, { replace: true });
   }, [wanted, products.data, setParams]);
 
   return (
@@ -272,7 +306,7 @@ export default function CatalogPage() {
         />
       ) : null}
       {current.shelves.map((shelf) => {
-        const items = inDepartment.filter((p) => shelf.types.includes(p.type));
+        const items = inDepartment.filter((p) => onShelf(shelf, p));
         return items.length ? (
           <ShelfView key={shelf.key} shelf={shelf} items={items} onOpen={setOpened} />
         ) : null;

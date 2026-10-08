@@ -18,8 +18,8 @@ import { ConditionsChecklist } from "./ConditionsChecklist";
 
 /**
  * A product sheet (027), shared by the shop's modal and the product page: a pre-rendering of what it is,
- * its rarity, type and description, what a pack contains (a small card per product), and the facts on the
- * side — price, copies left, minimum level, purchase limit, refund policy and the named conditions.
+ * its rarity, type and description, what a pack contains (a small card per product, each linking to its
+ * own page) or the packs a product is part of (with a link to each), and the facts on the side — price, copies left, minimum level, purchase limit, refund policy and the named conditions.
  */
 function PackItem({ item }: { item: Product }) {
   const t = useT();
@@ -28,7 +28,9 @@ function PackItem({ item }: { item: Product }) {
     <li className="pack-item" data-rarity={item.rarity ?? "common"}>
       <ProductArt product={item} size="mini" />
       <div className="pack-item__text">
-        <strong>{item.name}</strong>
+        <Link to={`/marketplace/products/${item.key}`} className="pack-item__name">
+          {item.name}
+        </Link>
         <span className="pack-item__meta">
           <span className="product-card__rarity">{t(`marketplace:rarity.${item.rarity ?? "common"}`)}</span>
           {" · "}
@@ -72,6 +74,52 @@ function PackContents({ product }: { product: Product }) {
         {items.map((item) => (
           <PackItem key={item.key} item={item} />
         ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * 027: the packs a product is part of — the product is one item among each, the pack sells them together
+ * for less; each links to the pack's page.
+ */
+function InPacks({ product }: { product: Product }) {
+  const t = useT();
+  const products = useProducts({ category: "", q: "" });
+  const packs = (products.data ?? []).filter(
+    (p) =>
+      p.type === "bundle" &&
+      Array.isArray(p.preview?.products) &&
+      (p.preview.products as string[]).includes(product.key),
+  );
+  if (!packs.length) return null;
+  return (
+    <section className="product-sheet__section" aria-labelledby="in-packs">
+      <h3 id="in-packs">{t("marketplace:sheet.inPacks", { count: packs.length })}</h3>
+      <ul className="pack-items">
+        {packs.map((pack) => {
+          const count = ((pack.preview?.products as string[] | undefined) ?? []).length;
+          return (
+            <li key={pack.key} className="pack-item" data-rarity={pack.rarity ?? "common"}>
+              <ProductArt product={pack} size="mini" />
+              <div className="pack-item__text">
+                <Link to={`/marketplace/products/${pack.key}`} className="pack-item__name">
+                  {pack.name}
+                </Link>
+                <span className="pack-item__meta">{t("marketplace:sheet.oneOf", { items: count })}</span>
+              </div>
+              {pack.owned ? (
+                <span className="product-card__owned">
+                  <Icon name="check" size={14} /> {t("marketplace:product.owned")}
+                </span>
+              ) : (
+                <Link to={`/marketplace/products/${pack.key}`} className="ds-button ds-button--secondary">
+                  {t("marketplace:sheet.seePack")}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
@@ -123,7 +171,7 @@ export function ProductSheet({ product }: { product: Product }) {
             <h3 id="product-what">{t("marketplace:sheet.what")}</h3>
             <p>{t(`marketplace:what.${product.type}`)}</p>
           </section>
-          {product.type === "bundle" ? <PackContents product={product} /> : null}
+          {product.type === "bundle" ? <PackContents product={product} /> : <InPacks product={product} />}
         </div>
         <dl className="product-sheet__facts">
           <Fact icon="coins" label={t("marketplace:sheet.price")}>
