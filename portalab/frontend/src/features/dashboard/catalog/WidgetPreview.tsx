@@ -5,6 +5,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import type { WidgetPayload } from "../api";
 import { TEMPLATES } from "../templates/Templates";
 import { widgetComponent } from "../widgets/registry";
+import { previewPayload } from "./mocks";
 import "../widgets/tiles";
 import "../widgets/layout";
 import "../widgets/builtin";
@@ -13,8 +14,8 @@ import "../widgets/calendar";
 
 /**
  * 027: a widget's miniature — the real widget with the member's own data (``preview``: before it is bought,
- * the permission still applies), scaled down and inert. Loaded only when it comes into view; while loading,
- * or when it has nothing to show, its icon stands in.
+ * the permission still applies), scaled down and inert; with nothing to show yet, sample data (mocks.ts).
+ * Loaded only when it comes into view; the icon stands in while loading.
  */
 export interface PreviewWidget {
   key: string;
@@ -55,7 +56,9 @@ export function WidgetPreview({ widget, className }: { widget: PreviewWidget; cl
   const Rendered =
     widgetComponent(widget.component_id) ??
     (widget.template ? TEMPLATES[widget.template as keyof typeof TEMPLATES] : undefined);
-  const live = Rendered && data.data && ["available", "partial", "stale"].includes(String(data.data.state));
+  const shown =
+    data.isSuccess || data.isError ? previewPayload(data.data, widget.component_id, widget.template) : null;
+  const live = Boolean(Rendered && shown);
   return (
     <span
       ref={box}
@@ -63,9 +66,9 @@ export function WidgetPreview({ widget, className }: { widget: PreviewWidget; cl
       data-live={live || undefined}
       aria-hidden="true"
     >
-      {live && Rendered && data.data ? (
-        <span className="widget-preview__scaled" inert>
-          <Rendered payload={data.data} config={widget.config_defaults ?? {}} icon={widget.icon} />
+      {live && Rendered && shown ? (
+        <span className="widget-preview__scaled" inert data-sample={shown.sample || undefined}>
+          <Rendered payload={shown.payload} config={widget.config_defaults ?? {}} icon={widget.icon} />
         </span>
       ) : (
         <Icon name={widget.icon ?? "dashboard"} size={26} />

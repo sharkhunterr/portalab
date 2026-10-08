@@ -1947,3 +1947,65 @@
   block-size: 30%;
   background: linear-gradient(transparent, var(--color-surface));
 }
+
+/* 027: the poster wall — a dense grid of posters, the first two larger, plays on each */
+.widget-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  grid-auto-flow: dense;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.widget-wall > li {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.4rem);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--color-accent) 30%, var(--color-surface-raised)),
+    var(--color-surface-raised)
+  );
+}
+.widget-wall > li[data-rank] {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.widget-wall :is(a, span):first-child {
+  display: block;
+  block-size: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.widget-wall img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+.widget-wall li:hover img {
+  transform: scale(1.05);
+}
+.widget-wall__title {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  padding: 0.4rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold, 600);
+  text-align: center;
+}
+.widget-wall__plays {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 0.35rem 0.25rem;
+  background: linear-gradient(transparent, color-mix(in srgb, black 75%, transparent));
+  color: white;
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold, 600);
+}

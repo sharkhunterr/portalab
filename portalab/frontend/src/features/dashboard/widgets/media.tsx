@@ -94,6 +94,47 @@ function Posters({ payload }: WidgetProps) {
   );
 }
 
+/**
+ * « Poster wall » (027, sold in the shop): the month's most watched titles as a dense wall of posters, the
+ * plays on each, the first ones larger — it fills its block, and opens each title.
+ */
+function PosterWall({ payload }: WidgetProps) {
+  const t = useT();
+  const items = ((payload.data ?? {}) as { items?: Card[] }).items ?? [];
+  return (
+    <ul className="widget-wall">
+      {items.map((card, index) => {
+        const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
+        const body = (
+          <>
+            {src ? (
+              <img src={src} alt="" loading="lazy" />
+            ) : (
+              <span className="widget-wall__title">{card.title}</span>
+            )}
+            {card.plays ? (
+              <span className="widget-wall__plays">
+                <Icon name="play" size={10} />
+                {t("media:insights.plays", { count: card.plays })}
+              </span>
+            ) : null}
+          </>
+        );
+        return (
+          <li
+            // biome-ignore lint/suspicious/noArrayIndexKey: a title may appear once per kind
+            key={`${card.id ?? card.title}-${index}`}
+            data-rank={index < 2 ? "top" : undefined}
+            title={card.title}
+          >
+            {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 const KIND_ICON: Record<string, string> = {
   movie: "film",
   episode: "tv",
@@ -273,6 +314,7 @@ function Soon({ payload }: WidgetProps) {
 }
 
 registerWidgetComponent("media.posters", Posters);
+registerWidgetComponent("media.wall", PosterWall);
 registerWidgetComponent("media.soon", Soon);
 registerWidgetComponent("media.continue", Continue);
 registerWidgetComponent("media.stats", Stats);
