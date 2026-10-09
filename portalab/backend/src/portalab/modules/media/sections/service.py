@@ -10,8 +10,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import String, cast, func, literal, or_, select
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.media_core import DetailBlockRegistry
 from portalab.capabilities.registry import CapabilityRegistry
@@ -23,6 +24,7 @@ from portalab.core.visibility_port import OwnerOnlyVisibility, Redacted, Visibil
 from portalab.modules.media.availability.service import AvailabilityService
 from portalab.modules.media.catalog import CatalogQuery
 from portalab.modules.media.models import (
+    Activity,
     HistoryEntry,
     MediaObject,
     MediaRequest,
@@ -47,8 +49,11 @@ SECTIONS = (
     "actions",
     "links",
     "blocks",
+    "viewing",  # 027 (#22): my plays of the title and how many watched it (no names)
 )
 COHORT = 5
+SEEN = 0.9  # past this share a play counts as « seen »
+STARTED = 0.03
 LINKS = {
     "tmdb": ("TMDB", "https://www.themoviedb.org/{kind}/{value}"),
     "imdb": ("IMDb", "https://www.imdb.com/title/{value}/"),
@@ -324,6 +329,85 @@ class Sections:
         if count < COHORT:
             return Section("insufficient_data", utc_now(self.clock), {"min_cohort_size": COHORT})
         return Section("available", utc_now(self.clock), {"finished_by": count})
+
+    async def _cohort(self) -> int:
+        """The portal's privacy floor for community figures (statistics' minimum cohort)."""
+        try:
+            reader = self.capabilities.system_providers(CONFIG)[0].provider
+            return max(1, int((await reader.get("statistics.defaultMinCohortSize")).value))
+        except Exception:
+            return COHORT
+
+    async def _viewing(self, object_id: UUID, view: Any, viewer: Principal) -> Section:
+        """027 (#22): the viewer's own plays of this title (a series: of its episodes) from the services'
+        history — when, how long, how far, on what — whether they saw it, and how many plays and members the
+        title had, as two bare figures shown only past the privacy floor (no one is named)."""
+        user = self._user(viewer)
+        scope = or_(Activity.object_id == object_id, Activity.work_id == object_id)
+        counted = (scope, Activity.counted.is_(True), Activity.kind != "live")
+        who = func.coalesce(
+            cast(Activity.user_id, String),
+            func.concat(cast(Activity.service_id, String), literal(":"), Activity.external_user_id),
+        )
+        async with self.database.session() as session:
+            mine = (
+                (
+                    await session.execute(
+                        select(Activity)
+                        .where(*counted, Activity.user_id == user)
+                        .order_by(Activity.started_at.desc())
+                        .limit(30)
+                    )
+                )
+                .scalars()
+                .all()
+                if user
+                else []
+            )
+            mine_total = (
+                await session.scalar(select(func.count()).where(*counted, Activity.user_id == user))
+                if user
+                else 0
+            )
+            plays, viewers = (
+                await session.execute(select(func.count(), func.count(func.distinct(who))).where(*counted))
+            ).one()
+
+        def share(row: Activity) -> float | None:
+            if row.progress is not None:
+                return float(row.progress)
+            return min(1.0, row.watched_s / row.duration_s) if row.duration_s else None
+
+        seen = any((share(r) or 0) >= SEEN for r in mine)
+        latest = share(mine[0]) if mine else None
+        status = "seen" if seen else "in_progress" if latest is not None and latest >= STARTED else None
+        floor = await self._cohort()
+        data: dict[str, Any] = {
+            "mine": [
+                {
+                    "at": r.started_at.isoformat(),
+                    "title": r.title,
+                    "series": r.parent_title if r.kind == "episode" else None,
+                    "kind": r.kind,
+                    "watched_s": round(r.watched_s, 1),
+                    "duration_s": r.duration_s,
+                    "progress": share(r),
+                    "device": r.device,
+                    "platform": r.platform,
+                    "stream": r.stream,
+                    "quality": r.quality,
+                }
+                for r in mine
+            ],
+            "mine_total": int(mine_total or 0),
+            "status": status,
+            "percent": latest if status == "in_progress" else None,
+            "community": {"plays": int(plays or 0), "viewers": int(viewers or 0)}
+            if int(viewers or 0) >= floor
+            else None,
+            "min_cohort_size": floor,
+        }
+        return Section("available" if mine or data["community"] else "no-data", utc_now(self.clock), data)
 
     async def _events(self, object_id: UUID, view: Any, viewer: Principal) -> Section:
         async with self.database.session() as session:

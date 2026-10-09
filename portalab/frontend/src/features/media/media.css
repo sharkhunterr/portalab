@@ -959,3 +959,143 @@ a.media-card__link:focus-visible .media-card__frame {
   color: var(--color-text);
   font-weight: var(--font-weight-semibold, 600);
 }
+
+/* 027 (#22): up top — here or on its way, seen or how far */
+.media-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin-inline-end: var(--space-2);
+  vertical-align: middle;
+}
+
+.media-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  border: 1px solid transparent;
+  backdrop-filter: blur(6px);
+}
+
+.media-badge[data-tone="available"] {
+  background: var(--state-available-bg);
+  color: var(--state-available-fg);
+  border-color: color-mix(in srgb, var(--state-available-fg) 40%, transparent);
+}
+
+.media-badge[data-tone="requested"],
+.media-badge[data-tone="downloading"] {
+  background: var(--state-syncing-bg);
+  color: var(--state-syncing-fg);
+}
+
+.media-badge[data-tone="unavailable"] {
+  background: var(--state-unavailable-bg);
+  color: var(--state-unavailable-fg);
+}
+
+.media-badge[data-tone="progress"] {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color: var(--color-text);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+.media-badge[data-tone="seen"] {
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+/* 027 (#22): the journey folded into one line once the title is here */
+.journey-compact {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.journey-compact p {
+  margin: 0;
+  flex: 1;
+  min-inline-size: 12rem;
+}
+
+.media-journey[data-compact="true"] {
+  padding-block: var(--space-3);
+}
+
+.media-journey[data-compact="true"] .journey-step__dot {
+  position: static;
+  border-color: var(--state-available-fg);
+  background: var(--state-available-fg);
+  color: var(--color-surface);
+}
+
+/* 027 (#22): my plays, and how many watched (two figures) */
+.media-viewing-counts {
+  margin-block-end: var(--space-3);
+}
+
+.media-viewing-counts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.media-viewing {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.media-viewing li {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) minmax(4rem, 8rem) auto 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.media-viewing__bar {
+  block-size: 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text) 15%, transparent);
+  overflow: hidden;
+}
+
+.media-viewing__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--color-accent);
+}
+
+.media-viewing__share {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+}
+
+.media-viewing__details {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 40rem) {
+  .media-viewing li {
+    grid-template-columns: 1fr auto;
+  }
+
+  .media-viewing__bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .media-viewing__details {
+    grid-column: 1 / -1;
+  }
+}

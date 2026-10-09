@@ -25,18 +25,8 @@ import { RequestJourney, useJourney } from "./Journey";
  * and retries on its own, so one unavailable source only greys out its own frame. Availability, service
  * health and sync state are separate facts in the sources section (text, never color alone).
  */
-const SECTIONS = [
-  "info",
-  "sources",
-  "progress",
-  "history",
-  "requests",
-  "people",
-  "statistics",
-  "events",
-  "links",
-  "blocks",
-];
+// 027 (#22): « viewing » (my plays and how many watched it) replaces progress, history and statistics
+const SECTIONS = ["info", "sources", "viewing", "requests", "people", "events", "links", "blocks"];
 type Data = Record<string, unknown>;
 
 const ICONS: Record<string, string> = {
@@ -47,6 +37,7 @@ const ICONS: Record<string, string> = {
   requests: "inbox",
   people: "users",
   statistics: "chart",
+  viewing: "clock",
   events: "activity",
   links: "link",
   blocks: "list",
@@ -154,6 +145,144 @@ function GameFacts({ data }: { data: Data }) {
         </ul>
       ) : null}
     </>
+  );
+}
+
+const SHOWN = 5;
+const PLAYABLE = ["movie", "episode", "series", "season"];
+
+/** 027 (#22): my plays of the title — newest first, how far, how long, on what — and, past the privacy
+ * floor, how many plays and members it had (two figures, no names). */
+function ViewingBody({ data }: { data: Data }) {
+  const t = useT();
+  const format = useFormat();
+  const [all, setAll] = useState(false);
+  const mine = list(data.mine);
+  const community = data.community as { plays: number; viewers: number } | null | undefined;
+  return (
+    <>
+      {community ? (
+        <ul className="media-chips media-viewing-counts">
+          <li>
+            <Icon name="play" size={14} />
+            {t("media:viewing.plays", { count: community.plays })}
+          </li>
+          <li>
+            <Icon name="users" size={14} />
+            {t("media:viewing.viewers", { count: community.viewers })}
+          </li>
+        </ul>
+      ) : null}
+      {mine.length ? (
+        <ul className="media-viewing">
+          {(all ? mine : mine.slice(0, SHOWN)).map((play) => {
+            const share =
+              play.progress === null || play.progress === undefined ? null : Number(play.progress);
+            const details = [
+              play.series ? String(play.title) : null,
+              Number(play.watched_s) > 0 ? clock(Number(play.watched_s)) : null,
+              play.device ? String(play.device) : null,
+              play.quality ? String(play.quality).toUpperCase() : null,
+            ].filter(Boolean);
+            return (
+              <li key={`${String(play.at)}-${String(play.title)}`}>
+                <span className="media-viewing__when">{format.dateTime(String(play.at))}</span>
+                <span className="media-viewing__bar" aria-hidden="true">
+                  <span style={{ inlineSize: `${Math.round((share ?? 0) * 100)}%` }} />
+                </span>
+                <span className="media-viewing__share">
+                  {share === null
+                    ? "—"
+                    : share >= 0.9
+                      ? t("media:viewing.finished")
+                      : `${Math.round(share * 100)} %`}
+                </span>
+                <span className="media-viewing__details">{details.join(" · ")}</span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="media-muted">{t("media:viewing.none")}</p>
+      )}
+      {mine.length > SHOWN ? (
+        <button type="button" className="ds-button ds-button--quiet" onClick={() => setAll((v) => !v)}>
+          {all
+            ? t("media:viewing.less")
+            : t("media:viewing.all", { count: Number(data.mine_total ?? mine.length) })}
+        </button>
+      ) : null}
+    </>
+  );
+}
+
+const SEEN_WORD: Record<string, string> = {
+  book: "read",
+  audiobook: "listened",
+  game: "played",
+  album: "listened",
+};
+
+/** 027 (#22): up top — is it here (or on its way), and did I see it already (or how far I am). */
+function TitleBadges({ media }: { media: { id: string; kind: string; available: boolean } }) {
+  const t = useT();
+  const journey = useJourney(media.id).data as { request?: { state?: string } | null } | undefined;
+  const player = usePlayerInfo(media.id, null, media.available && PLAYABLE.includes(media.kind)).data?.item;
+  const viewing = (useSection(media.id, "viewing").data?.data ?? {}) as Data;
+  const request = journey?.request?.state;
+  const availability = media.available
+    ? "available"
+    : request === "processing"
+      ? "downloading"
+      : request === "pending" || request === "approved"
+        ? "requested"
+        : "unavailable";
+  const resume =
+    player && player.resume_s > 30 && (!player.duration_s || player.resume_s < player.duration_s * 0.95)
+      ? player
+      : null;
+  const series = media.kind === "series" || media.kind === "season";
+  const seen = !series && (Boolean(player?.watched) || viewing.status === "seen");
+  const percent = resume?.duration_s
+    ? resume.resume_s / resume.duration_s
+    : viewing.status === "in_progress"
+      ? Number(viewing.percent ?? 0)
+      : null;
+  return (
+    <span className="media-badges">
+      <span className="media-badge" data-tone={availability}>
+        <Icon
+          name={
+            availability === "available"
+              ? "check"
+              : availability === "downloading"
+                ? "package"
+                : availability === "requested"
+                  ? "hourglass"
+                  : "blocked"
+          }
+          size={14}
+        />
+        {t(`media:badge.${availability}`)}
+      </span>
+      {resume && series && resume.label ? (
+        <span className="media-badge" data-tone="progress">
+          <Icon name="play" size={14} />
+          {t("media:badge.inProgressEpisode", { label: resume.label })}
+        </span>
+      ) : percent !== null ? (
+        <span className="media-badge" data-tone="progress">
+          <Icon name="play" size={14} />
+          {t("media:badge.inProgress", { percent: Math.round(percent * 100) })}
+        </span>
+      ) : null}
+      {seen ? (
+        <span className="media-badge" data-tone="seen">
+          <Icon name="eye" size={14} />
+          {t(`media:badge.seen.${SEEN_WORD[media.kind] ?? "watched"}`)}
+        </span>
+      ) : null}
+    </span>
   );
 }
 
@@ -290,6 +419,8 @@ function SectionBody({
       return <p>{(data.people as string[] | undefined)?.join(", ")}</p>;
     case "statistics":
       return <p>{t("media:detail.finishedBy", { count: Number(data.finished_by ?? 0) })}</p>;
+    case "viewing":
+      return <ViewingBody data={data} />;
     case "events":
       return (
         <ol className="media-list">
@@ -361,6 +492,8 @@ function hasContent(name: string, data: Data, enriched = false): boolean {
       return Array.isArray(data.people) && data.people.length > 0;
     case "statistics":
       return Number(data.finished_by ?? 0) > 0;
+    case "viewing":
+      return list(data.mine).length > 0 || Boolean(data.community);
     case "events":
       return list(data.events).length > 0;
     case "links":
@@ -461,8 +594,6 @@ function OpenIn({
     </a>
   );
 }
-
-const PLAYABLE = ["movie", "episode", "series", "season"];
 
 /** 027 (#2): watch here, in the portal's own player — the service's page stays one click away. */
 function Watch({ objectId, kind }: { objectId: string; kind: string }) {
@@ -575,8 +706,8 @@ export function DetailPage() {
                 {media.platform}
               </span>
             ) : null}
-            {t(`media:kind.${media.kind}`)} ·{" "}
-            {media.available ? t("media:detail.available") : t("media:detail.unavailable")}
+            <TitleBadges media={media} />
+            {t(`media:kind.${media.kind}`)}
             {media.genres.filter((g) => g !== media.platform).length
               ? ` · ${media.genres.filter((g) => g !== media.platform).join(", ")}`
               : ""}

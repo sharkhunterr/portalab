@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -251,6 +251,7 @@ export function RequestJourney({ objectId }: { objectId: string }) {
   const headingId = useId();
   const client = useQueryClient();
   const journey = useJourney(objectId);
+  const [open, setOpen] = useState(false);
   const search = useMutation({
     mutationFn: async () =>
       (
@@ -267,12 +268,53 @@ export function RequestJourney({ objectId }: { objectId: string }) {
   const transfers = data.steps.flatMap((s) =>
     s.key === "downloading" || s.key === "imported" ? (s.items ?? []) : [],
   );
+  // 027 (#22): once the title is here, its journey folds into one line — opened on demand
+  const settled = data.available && !active && transfers.length === 0;
+  if (settled && !open) {
+    const arrived =
+      data.steps.find((s) => s.key === "available")?.at ?? data.steps.find((s) => s.key === "imported")?.at;
+    const byMe = Boolean(data.steps.find((s) => s.key === "requested")?.by?.me);
+    return (
+      <section className="media-journey" data-compact="true" aria-labelledby={headingId}>
+        <div className="journey-compact">
+          <span className="journey-step__dot" data-status="done" aria-hidden="true">
+            <Icon name="check" size={14} />
+          </span>
+          <p id={headingId}>
+            <strong>{t("media:journey.compact.here")}</strong>
+            {arrived
+              ? ` · ${t("media:journey.compact.since", { date: format.date(arrived, "medium") })}`
+              : ""}
+            {byMe ? ` · ${t("media:journey.compact.byYou")}` : ""}
+          </p>
+          <button
+            type="button"
+            className="ds-button ds-button--quiet"
+            aria-expanded={false}
+            onClick={() => setOpen(true)}
+          >
+            {t("media:journey.compact.show")}
+          </button>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="media-journey" aria-labelledby={headingId}>
       <header className="media-journey__head">
         <h3 id={headingId}>
           <Icon name="activity" size={18} /> {t("media:journey.title")}
         </h3>
+        {settled ? (
+          <button
+            type="button"
+            className="ds-button ds-button--quiet"
+            aria-expanded={true}
+            onClick={() => setOpen(false)}
+          >
+            {t("media:journey.compact.hide")}
+          </button>
+        ) : null}
       </header>
       <ol className="journey-steps">
         {data.steps.map((step) => (

@@ -67,7 +67,7 @@ describe("media detail", () => {
           sections: [],
         });
       const name = path.split("/").pop() ?? "";
-      if (name === "history") return json(500, { code: "error" });
+      if (name === "viewing") return json(500, { code: "error" });
       if (name === "sources")
         return section("sources", "partial", {
           available: false,
@@ -102,7 +102,7 @@ describe("media detail", () => {
     };
     renderAt(`/media/${ID}`, [{ path: "/media/:objectId", element: <DetailPage /> }]);
     expect(await screen.findByRole("heading", { name: /Arrival/ })).toBeTruthy();
-    const history = (await screen.findByRole("heading", { name: "History" })).closest(
+    const history = (await screen.findByRole("heading", { name: "My history" })).closest(
       "section",
     ) as HTMLElement;
     await waitFor(() => expect(within(history).getByRole("button", { name: "Retry" })).toBeTruthy());
@@ -160,6 +160,83 @@ describe("watching from the title's page", () => {
     await waitFor(() => expect(resets).toEqual([{ item: "100" }]));
     expect(await screen.findByRole("link", { name: "Watch" })).toBeTruthy(); // nothing left to resume
     expect(screen.queryByRole("button", { name: "Back to zero" })).toBeNull();
+  });
+});
+
+describe("the title's page at a glance", () => {
+  it("shows availability and seen badges, folds the journey and lists my plays with the counts", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path.endsWith("/player"))
+        return json(200, { ...INFO, item: { ...INFO.item, resume_s: 0, watched: true } });
+      if (path.endsWith("/journey"))
+        return json(200, {
+          kind: "movie",
+          available: true,
+          request: { state: "available", requested_at: "2026-09-01T10:00:00Z" },
+          manager: null,
+          steps: [
+            { key: "requested", status: "done", at: "2026-09-01T10:00:00Z", by: { me: true } },
+            { key: "available", status: "done", at: "2026-09-03T10:00:00Z" },
+          ],
+          can_search: false,
+          search: null,
+        });
+      if (path === `/api/v1/media/${ID}`)
+        return json(200, {
+          id: ID,
+          kind: "movie",
+          title: "Alien",
+          year: 1979,
+          available: true,
+          image_id: null,
+          status: "active",
+          parent_id: null,
+          position: null,
+          overview: null,
+          genres: [],
+          ids: {},
+          sections: [],
+        });
+      const name = path.split("/").pop() ?? "";
+      if (name === "viewing")
+        return section("viewing", "available", {
+          mine: [
+            {
+              at: "2026-10-08T20:00:00Z",
+              title: "Alien",
+              series: null,
+              kind: "movie",
+              watched_s: 7000,
+              duration_s: 7000,
+              progress: 1,
+              device: "Portalab",
+              platform: null,
+              stream: "copy",
+              quality: "1080p",
+            },
+          ],
+          mine_total: 1,
+          status: "seen",
+          percent: null,
+          community: { plays: 12, viewers: 6 },
+          min_cohort_size: 5,
+        });
+      return section(name, "no-data");
+    };
+    renderAt(`/media/${ID}`, [{ path: "/media/:objectId", element: <DetailPage /> }]);
+    expect(await screen.findByText("Available", { selector: ".media-badge" })).toBeTruthy();
+    expect(await screen.findByText("Watched", { selector: ".media-badge" })).toBeTruthy();
+    // the journey folds into one line once the title is here
+    const show = await screen.findByRole("button", { name: "See the journey" });
+    expect(screen.getByText(/you requested it/)).toBeTruthy();
+    fireEvent.click(show);
+    expect(await screen.findByRole("button", { name: "Fold" })).toBeTruthy();
+    // my history, and how many watched it (no names)
+    expect(await screen.findByRole("heading", { name: "My history" })).toBeTruthy();
+    expect(screen.getByText("12 plays")).toBeTruthy();
+    expect(screen.getByText("6 members watched it")).toBeTruthy();
+    expect(screen.getByText(/Portalab · 1080P/)).toBeTruthy();
   });
 });
 
