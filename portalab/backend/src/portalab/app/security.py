@@ -106,10 +106,10 @@ ASGIApp = Callable[[Scope, Receive, Send], Awaitable[None]]
 SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
     (
         b"content-security-policy",
-        b"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; "
-        b"font-src 'self'; connect-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'self'; "
-        b"form-action 'self'; "
-        b"frame-ancestors 'none'",
+        # 027 (#11): www.gstatic.com serves the Cast SDK (the player's Chromecast button)
+        b"default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; "
+        b"img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self' blob:; "
+        b"object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
     ),
     (b"strict-transport-security", b"max-age=31536000; includeSubDomains"),
     (b"x-content-type-options", b"nosniff"),

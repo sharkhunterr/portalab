@@ -35,6 +35,7 @@ class MediaConfig:
     player_enabled: bool = True
     player_owner_fallback: bool = False  # members with no linked account play through the service's own
     player_max_quality: str = "original"  # the best quality members may pick (a key of QUALITIES)
+    player_cast_base_url: str = ""  # 027 (#11): the portal's address as Chromecasts/Apple TVs reach it
 
 
 SETTINGS: dict[str, str] = {
@@ -50,6 +51,7 @@ SETTINGS: dict[str, str] = {
     "player_enabled": "media.player.enabled",
     "player_owner_fallback": "media.player.ownerFallback",
     "player_max_quality": "media.player.maxQuality",
+    "player_cast_base_url": "media.player.castBaseUrl",
 }
 
 _DESCRIPTIONS = {
@@ -68,6 +70,9 @@ _DESCRIPTIONS = {
     "server's own account (their plays are then not theirs on the server).",
     "player_max_quality": "Best quality members may pick in the player: original, 20m, 12m, 10m, 8m, 4m, "
     "3m, 2m, 1500k, 720k or 320k.",
+    "player_cast_base_url": "Address Chromecasts and Apple TVs fetch the stream from, when it differs "
+    "from the portal's (empty: the portal's own). They refuse self-signed certificates: give an address "
+    "with a valid certificate, or a plain http one on the local network.",
 }
 
 

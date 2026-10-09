@@ -23,6 +23,7 @@ import {
   stopStream,
   streamUrl,
 } from "./api";
+import { airPlayCapable, useAirPlay, useCast } from "./cast";
 import { loadPrefs, type PlayerPrefs, savePrefs } from "./prefs";
 import { clock, initialAudio, initialSubtitle, qualitiesFor, trackById } from "./quality";
 import { SettingsMenu } from "./SettingsMenu";
@@ -93,11 +94,21 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
   const [stream, setStream] = useState<StreamStarted | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
-  const burntSize = prefs.burn ? prefs.subtitleSize : 100;
+  // 027 (#11): Chromecast, and AirPlay through Safari's own HLS — the TV cannot draw our subtitles: burnt in
+  const cast = useCast();
+  const casting = cast.state.connected;
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
+  useEffect(() => setVideoElement(videoRef.current), []);
+  const airplay = useAirPlay(videoElement);
+  const nativeHls = airPlayCapable();
+  const burn = prefs.burn || casting || airplay.wireless;
+  const burntSize = burn ? prefs.subtitleSize : 100;
+  const castTicket = useRef<string | null>(null);
+  const title = item.parent_title ? `${item.parent_title} · ${item.label ?? ""} ${item.title}` : item.title;
 
   useEffect(() => {
     const video = videoRef.current;
-    if (startAt === null || !video) return;
+    if (startAt === null || !video || casting) return; // while casting, the TV plays
     // ``attempt`` restarts the same stream after a failure
     void attempt;
     let cancelled = false;
@@ -112,10 +123,11 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
       quality,
       audio,
       subtitle,
-      burn: prefs.burn,
+      burn,
       subtitle_size: burntSize,
       boost: prefs.boost,
       duration_s: duration,
+      remote: nativeHls, // Safari: the playlist an Apple TV can fetch too (AirPlay)
     })
       .then((started) => {
         if (cancelled) {
@@ -126,7 +138,17 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
         streamRef.current = started;
         setStream(started);
         const url = streamUrl(started);
-        if (Hls.isSupported()) {
+        if (nativeHls && started.remote_playlist && video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = started.remote_playlist; // Safari plays HLS itself, and hands it to AirPlay
+          video.addEventListener(
+            "loadedmetadata",
+            () => {
+              video.currentTime = from;
+              video.play().catch(() => undefined);
+            },
+            { once: true },
+          );
+        } else if (Hls.isSupported()) {
           hls = new Hls({
             enableWorker: false,
             startPosition: from,
@@ -189,6 +211,7 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
     };
   }, [
     startAt,
+    casting,
     attempt,
     objectId,
     item.external_id,
@@ -196,16 +219,107 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
     quality,
     audio,
     subtitle,
-    prefs.burn,
+    burn,
     burntSize,
     prefs.boost,
     duration,
+    nativeHls,
+  ]);
+
+  // 027 (#11): casting — a stream of its own, fetched by the TV through its remote playlist
+  const castLoad = cast.load;
+  useEffect(() => {
+    if (!casting || startAt === null) return;
+    void attempt;
+    let cancelled = false;
+    let ticket: string | null = null;
+    const from = positionRef.current || startAt;
+    setFailure(null);
+    startStream(objectId, {
+      item: item.external_id,
+      version: versionIndex,
+      quality,
+      audio,
+      subtitle,
+      burn,
+      subtitle_size: burntSize,
+      boost: prefs.boost,
+      duration_s: duration,
+      remote: true,
+    })
+      .then(async (started) => {
+        if (cancelled || !started.remote_playlist) {
+          void stopStream(started.ticket);
+          return;
+        }
+        ticket = started.ticket;
+        castTicket.current = ticket;
+        const base = info.cast_base_url ?? window.location.origin;
+        await castLoad({ url: `${base}${started.remote_playlist}`, title, startAt: from });
+      })
+      .catch(() => {
+        if (!cancelled) setFailure(tRef.current("media:player.error.cast"));
+      });
+    return () => {
+      cancelled = true;
+      castTicket.current = null;
+      if (ticket) {
+        void reportTimeline(ticket, "stopped", positionRef.current, duration);
+        void stopStream(ticket);
+      }
+    };
+  }, [
+    casting,
+    startAt,
+    attempt,
+    objectId,
+    item.external_id,
+    versionIndex,
+    quality,
+    audio,
+    subtitle,
+    burn,
+    burntSize,
+    prefs.boost,
+    duration,
+    info.cast_base_url,
+    title,
+    castLoad,
   ]);
 
   // --- the video's state --------------------------------------------------------------------------------
-  const [paused, setPaused] = useState(true);
+  const [localPaused, setPaused] = useState(true);
   const [waiting, setWaiting] = useState(false);
-  const [time, setTime] = useState(0);
+  const [localTime, setTime] = useState(0);
+  // while casting, the TV's position and state are the player's
+  const time = casting ? cast.state.time : localTime;
+  const paused = casting ? cast.state.paused : localPaused;
+  useEffect(() => {
+    if (casting && cast.state.time > 0) positionRef.current = cast.state.time;
+  }, [casting, cast.state.time]);
+  useEffect(() => {
+    if (!casting) return;
+    const tell = () => {
+      const ticket = castTicket.current;
+      if (ticket)
+        void reportTimeline(ticket, paused ? "paused" : "playing", positionRef.current, duration).catch(
+          () => undefined,
+        );
+    };
+    tell();
+    const timer = window.setInterval(tell, REPORT_EVERY_MS);
+    return () => window.clearInterval(timer);
+  }, [casting, paused, duration]);
+  // leaving the player ends the cast too (its stream stops with the page)
+  const castEnd = cast.end;
+  const castingRef = useRef(casting);
+  castingRef.current = casting;
+  useEffect(
+    () => () => {
+      if (castingRef.current) castEnd();
+    },
+    [castEnd],
+  );
   const [buffered, setBuffered] = useState(0);
   const [ended, setEnded] = useState(false);
   const report = useCallback(
@@ -332,21 +446,33 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
   useEffect(() => () => window.clearTimeout(hideTimer.current), []);
   const visible = active || paused || menuOpen || !stream || ended;
 
+  const castPlayOrPause = cast.playOrPause;
+  const castSeek = cast.seek;
   const toggle = useCallback(() => {
+    if (casting) {
+      castPlayOrPause();
+      return;
+    }
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) video.play().catch(() => undefined);
     else video.pause();
-  }, []);
+  }, [casting, castPlayOrPause]);
   const seek = useCallback(
     (to: number) => {
+      if (casting) {
+        const limit = duration ?? cast.state.duration;
+        castSeek(Math.max(0, limit ? Math.min(to, limit - 1) : to));
+        poke();
+        return;
+      }
       const video = videoRef.current;
       if (!video) return;
       const limit = duration ?? video.duration;
       video.currentTime = Math.max(0, Number.isFinite(limit) ? Math.min(to, limit - 1) : to);
       poke();
     },
-    [duration, poke],
+    [duration, poke, casting, castSeek, cast.state.duration],
   );
   const [fullscreen, setFullscreen] = useState(false);
   useEffect(() => {
@@ -439,7 +565,6 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
           ? playerImage(stream.ticket, hoverChapter.image)
           : null
       : null;
-  const title = item.parent_title ? `${item.parent_title} · ${item.label ?? ""} ${item.title}` : item.title;
 
   return (
     <section
@@ -466,7 +591,23 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
         onDoubleClick={toggleFullscreen}
       />
 
-      {showing.length > 0 ? (
+      {casting || airplay.wireless ? (
+        <div className="player-casting" role="status">
+          <Icon name={casting ? "cast" : "airplay"} size={44} />
+          <p>
+            {t("media:player.castingTo", {
+              device: casting ? (cast.state.device ?? "Chromecast") : "AirPlay",
+            })}
+          </p>
+          {casting ? (
+            <button type="button" className="player-pill" onClick={cast.end}>
+              {t("media:player.castStop")}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {showing.length > 0 && !casting && !airplay.wireless ? (
         <div className="player-subtitles" aria-live="off">
           {showing.map((cue) => (
             <p key={cueKey(cue)}>{cue.text}</p>
@@ -474,7 +615,19 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
         </div>
       ) : null}
 
-      {waiting && !paused ? (
+      {paused && stream && !casting && !failure && !ended && !menuOpen ? (
+        // a browser may refuse to start with sound unasked (a link opened directly): one press does
+        <button
+          type="button"
+          className="player-center-play"
+          onClick={toggle}
+          aria-label={t("media:player.play")}
+        >
+          <Icon name="play" size={40} />
+        </button>
+      ) : null}
+
+      {waiting && !paused && !casting ? (
         <div className="player-spinner" role="status" aria-label={t("media:player.loading")} />
       ) : null}
 
@@ -696,7 +849,7 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
             <button
               type="button"
               className="player-icon"
-              onClick={() => updatePrefs({ muted: !prefs.muted })}
+              onClick={() => (casting ? cast.toggleMute() : updatePrefs({ muted: !prefs.muted }))}
               aria-label={prefs.muted ? t("media:player.unmute") : t("media:player.mute")}
             >
               <Icon
@@ -715,8 +868,12 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
               min={0}
               max={1}
               step={0.05}
-              value={prefs.muted ? 0 : prefs.volume}
-              onChange={(event) => updatePrefs({ volume: Number(event.target.value), muted: false })}
+              value={casting ? (cast.state.muted ? 0 : cast.state.volume) : prefs.muted ? 0 : prefs.volume}
+              onChange={(event) =>
+                casting
+                  ? cast.setVolume(Number(event.target.value))
+                  : updatePrefs({ volume: Number(event.target.value), muted: false })
+              }
               aria-label={t("media:player.volume")}
               style={{ "--level": `${(prefs.muted ? 0 : prefs.volume) * 100}%` } as CSSProperties}
             />
@@ -776,7 +933,30 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
               />
             ) : null}
           </div>
-          {pipSupported ? (
+          {cast.state.available || casting ? (
+            <button
+              type="button"
+              className="player-icon"
+              data-on={casting}
+              aria-pressed={casting}
+              onClick={casting ? cast.end : cast.request}
+              aria-label={casting ? t("media:player.castStop") : t("media:player.cast")}
+            >
+              <Icon name="cast" size={22} />
+            </button>
+          ) : null}
+          {airplay.available ? (
+            <button
+              type="button"
+              className="player-icon"
+              data-on={airplay.wireless}
+              onClick={airplay.pick}
+              aria-label={t("media:player.airplay")}
+            >
+              <Icon name="airplay" size={22} />
+            </button>
+          ) : null}
+          {pipSupported && !casting ? (
             <button
               type="button"
               className="player-icon"

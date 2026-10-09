@@ -28,6 +28,7 @@ ALLOW_LISTED = {
     "/api/v1/auth/oidc/start",
     "/api/v1/auth/oidc/callback",
     "/api/v1/terms",  # 027: the terms of use in force (the sign-in page links them)
+    "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check
 }

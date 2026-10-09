@@ -23,7 +23,7 @@ from portalab.capabilities.media import (
     StreamTrack,
     StreamVersion,
 )
-from portalab.core.authorization import require
+from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
 from portalab.modules.media.api.router import Module, _me
 from portalab.modules.media.permissions import MEDIA_PLAY
@@ -97,6 +97,7 @@ class PlayerInfoOut(BaseModel):
     linked: bool
     item: PlayableItemOut
     qualities: list[str]
+    cast_base_url: str | None = None
 
 
 class StreamStartIn(BaseModel):
@@ -109,11 +110,13 @@ class StreamStartIn(BaseModel):
     subtitle_size: int = Field(default=100, ge=50, le=300)
     boost: int = Field(default=100, ge=100, le=300)
     duration_s: float | None = Field(default=None, ge=0)
+    remote: bool = False  # 027 (#11): for a Chromecast or AirPlay — also a playlist fetched without session
 
 
 class StreamStartOut(BaseModel):
     ticket: str
     playlist: str  # the media playlist, under ``/api/v1/media/player/{ticket}/``
+    remote_playlist: str | None = None  # 027 (#11): the whole path a casting device reads, with no session
     video: str
     audio: str
     subtitles: str
@@ -215,6 +218,7 @@ async def player_info(
         linked=info.linked,
         item=_playable(info.item),
         qualities=info.qualities,
+        cast_base_url=info.cast_base_url,
     )
 
 
@@ -231,12 +235,13 @@ async def player_start(
         subtitle_size=body.subtitle_size,
         boost=body.boost,
     )
-    ticket, started = await module.player.start(
-        _me(principal), object_id, body.item, options, body.duration_s
+    ticket, remote, started = await module.player.start(
+        _me(principal), object_id, body.item, options, body.duration_s, remote=body.remote
     )
     return StreamStartOut(
         ticket=ticket,
         playlist=started.playlist,
+        remote_playlist=f"/api/v1/media/remote/{remote}/{started.playlist}" if remote else None,
         video=started.video,
         audio=started.audio,
         subtitles=started.subtitles,
@@ -307,6 +312,29 @@ async def player_stream(
             await stack.aclose()
 
     headers = dict(NO_STORE)
+    if body.length is not None:
+        headers["Content-Length"] = str(body.length)
+    return StreamingResponse(relay(), media_type=body.content_type, headers=headers)
+
+
+@router.get("/media/remote/{ticket}/session/{path:path}", include_in_schema=False)
+@public
+async def remote_stream(
+    module: Module, ticket: Annotated[str, Path(pattern=TICKET)], path: str
+) -> StreamingResponse:
+    """027 (#11): the stream for a Chromecast or an Apple TV. The device has no session: the remote ticket,
+    signed for this one stream and short-lived, is the key. Readable from the cast receiver's origin."""
+    stack = AsyncExitStack()
+    body = await module.player.open_remote(ticket, f"session/{path}", stack)
+
+    async def relay() -> AsyncIterator[bytes]:
+        try:
+            async for chunk in body.chunks:
+                yield chunk
+        finally:
+            await stack.aclose()
+
+    headers = {**NO_STORE, "Access-Control-Allow-Origin": "*"}
     if body.length is not None:
         headers["Content-Length"] = str(body.length)
     return StreamingResponse(relay(), media_type=body.content_type, headers=headers)

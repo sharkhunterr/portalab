@@ -48,80 +48,10 @@ vi.mock("hls.js", () => {
 import { PlayerPage } from "../../../src/features/media/player/PlayerPage";
 import { clock, qualitiesFor } from "../../../src/features/media/player/quality";
 import { json } from "../../support/fake-api";
+import { INFO, VERSION } from "./player-fixtures";
 
 const ID = "0190f0a0-0000-7000-8000-0000000000bb";
 const TICKET = `${"a".repeat(40)}.${"b".repeat(24)}`;
-const VERSION = {
-  index: 0,
-  label: "1080p · H.264 · mkv",
-  resolution: "1080p",
-  width: 1920,
-  height: 800,
-  bitrate_kbps: 7500,
-  container: "mkv",
-  video_codec: "h264",
-  audio_codec: "eac3",
-  hdr: false,
-  size: 1,
-  previews: null,
-  audio: [
-    {
-      id: "a1",
-      kind: "audio",
-      label: "VO",
-      language: "en",
-      codec: "eac3",
-      channels: 6,
-      default: true,
-      forced: false,
-      selected: true,
-      text: true,
-      external: false,
-    },
-  ],
-  subtitles: [
-    {
-      id: "s1",
-      kind: "subtitle",
-      label: "Français",
-      language: "fr",
-      codec: "srt",
-      channels: null,
-      default: false,
-      forced: false,
-      selected: true,
-      text: true,
-      external: false,
-    },
-  ],
-};
-const INFO = {
-  service_id: "0190f0a0-0000-7000-8000-000000000009",
-  service_name: "Plex",
-  linked: true,
-  qualities: ["original", "20m", "12m", "10m", "8m", "4m", "3m", "2m", "1500k", "720k", "320k"],
-  item: {
-    external_id: "100",
-    kind: "movie",
-    title: "Alien",
-    duration_s: 7000,
-    resume_s: 1234,
-    watched: false,
-    parent_title: null,
-    label: null,
-    year: 1979,
-    versions: [VERSION],
-    markers: [],
-    chapters: [
-      { kind: "chapter", start_s: 0, end_s: 3000, label: null, image: "chapter:7:1" },
-      { kind: "chapter", start_s: 3000, end_s: 7000, label: "Finale", image: null },
-    ],
-    previous_id: null,
-    next_id: null,
-    next_label: null,
-  },
-};
-
 beforeAll(() => {
   Object.defineProperty(HTMLMediaElement.prototype, "play", {
     configurable: true,

@@ -395,6 +395,33 @@ html[data-playing="true"] body {
     0 0.06em 0.12em var(--player-subtitle-shadow);
 }
 
+/* --- casting (027, #11): the TV plays, the page is its remote ------------------------------------------- */
+.player-casting {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  background: radial-gradient(
+    circle at 50% 40%,
+    color-mix(in srgb, var(--player-accent) 22%, var(--player-stage)),
+    var(--player-stage) 70%
+  );
+}
+
+.player-casting svg {
+  color: var(--player-accent);
+}
+
+.player-casting p {
+  margin: 0;
+  font-family: var(--player-title-font);
+  font-size: var(--font-size-xl);
+}
+
 /* --- overlays: resume, skip, next episode, failure ----------------------------------------------------- */
 .player-resume,
 .player-failure,
@@ -470,6 +497,34 @@ html[data-playing="true"] body {
 
 .player-next p {
   margin: 0;
+}
+
+.player-center-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: 5rem;
+  block-size: 5rem;
+  translate: -50% -50%;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--player-accent) 85%, transparent);
+  color: var(--color-accent-contrast);
+  cursor: pointer;
+  box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--player-stage) 60%, transparent);
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+
+.player-center-play:hover {
+  transform: scale(1.06);
+}
+
+.player-center-play:focus-visible {
+  outline: var(--focus-ring-width) solid var(--player-ink);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .player-spinner {

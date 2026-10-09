@@ -17,6 +17,14 @@ from portalab.capabilities.media import StreamOptions
 from portalab.core.errors import NotFound
 
 LIFETIME_S = 12 * 3600
+REMOTE_LIFETIME_S = 8 * 3600
+
+
+def remote_key(key: bytes) -> bytes:
+    """027 (#11): the key of **remote** tickets — the URL a Chromecast or an Apple TV fetches the stream
+    with, without the member's session. Distinct from the player's, so neither ticket opens the other's
+    door."""
+    return hmac.new(key, b"portalab.media.player.remote", hashlib.sha256).digest()
 
 
 class TicketInvalid(NotFound):
@@ -60,7 +68,8 @@ def sign(key: bytes, ticket: Ticket) -> str:
     return f"{payload}.{_b64(mac)}"
 
 
-def read(key: bytes, token: str, *, user: UUID, now: datetime) -> Ticket:
+def read(key: bytes, token: str, *, user: UUID | None, now: datetime) -> Ticket:
+    """``user=None`` for a remote ticket: the device holding it has no session (its bearer is the key)."""
     payload, _, mac = token.partition(".")
     try:
         expected = hmac.new(key, payload.encode(), hashlib.sha256).digest()[:18]
@@ -79,6 +88,6 @@ def read(key: bytes, token: str, *, user: UUID, now: datetime) -> Ticket:
         )
     except (ValueError, KeyError, TypeError) as exc:
         raise TicketInvalid("This stream does not exist.") from exc
-    if ticket.user != user or ticket.expires < now.timestamp():
+    if (user is not None and ticket.user != user) or ticket.expires < now.timestamp():
         raise TicketInvalid("This stream has ended.")
     return ticket

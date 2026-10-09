@@ -1,5 +1,6 @@
 import {
   Activity,
+  Airplay,
   AlertTriangle,
   Armchair,
   ArrowDown,
@@ -29,6 +30,7 @@ import {
   Calendar,
   Candy,
   Captions,
+  Cast,
   Castle,
   Cat,
   ChartColumn,
@@ -228,6 +230,8 @@ export const ICONS: Record<string, LucideIcon> = {
   fullscreen: Maximize,
   "exit-fullscreen": Minimize,
   pip: PictureInPicture2,
+  cast: Cast,
+  airplay: Airplay,
   audio: AudioLines,
   layers: Layers,
   chapters: ListVideo,

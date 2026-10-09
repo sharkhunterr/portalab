@@ -11593,6 +11593,8 @@ export interface components {
         };
         /** PlayerInfoOut */
         PlayerInfoOut: {
+            /** Cast Base Url */
+            cast_base_url?: string | null;
             item: components["schemas"]["PlayableItemOut"];
             /** Linked */
             linked: boolean;
@@ -12602,6 +12604,11 @@ export interface components {
              * @default original
              */
             quality: string;
+            /**
+             * Remote
+             * @default false
+             */
+            remote: boolean;
             /** Subtitle */
             subtitle?: string | null;
             /**
@@ -12627,6 +12634,8 @@ export interface components {
             height: number | null;
             /** Playlist */
             playlist: string;
+            /** Remote Playlist */
+            remote_playlist?: string | null;
             /** Subtitles */
             subtitles: string;
             /** Ticket */

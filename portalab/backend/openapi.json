@@ -9978,6 +9978,17 @@
       },
       "PlayerInfoOut": {
         "properties": {
+          "cast_base_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cast Base Url"
+          },
           "item": {
             "$ref": "#/components/schemas/PlayableItemOut"
           },
@@ -12796,6 +12807,11 @@
             "title": "Quality",
             "type": "string"
           },
+          "remote": {
+            "default": false,
+            "title": "Remote",
+            "type": "boolean"
+          },
           "subtitle": {
             "anyOf": [
               {
@@ -12871,6 +12887,17 @@
           "playlist": {
             "title": "Playlist",
             "type": "string"
+          },
+          "remote_playlist": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remote Playlist"
           },
           "subtitles": {
             "title": "Subtitles",

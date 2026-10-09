@@ -81,6 +81,21 @@ async def test_play_as_the_members_account(
     assert (await client.post(f"{base}/stop")).status_code == 204
     assert fake.calls[-1][:2] == ("7", "stop")
 
+    # a casting device: the remote playlist works without any session, and only with its remote ticket
+    casting = await client.post(
+        f"/api/v1/media/{object_id}/player/start",
+        json={"item": "m1", "remote": True, "subtitle": "s1", "burn": True},
+    )
+    remote_path = casting.json()["remote_playlist"]
+    assert remote_path.startswith("/api/v1/media/remote/") and casting.json()["subtitles"] == "burn"
+    async with httpx.AsyncClient(transport=client._transport, base_url="https://portal.test") as device:
+        fetched = await device.get(remote_path)
+        assert fetched.status_code == 200 and fetched.headers["access-control-allow-origin"] == "*"
+        player_ticket = casting.json()["ticket"]
+        assert (await device.get(f"/api/v1/media/remote/{player_ticket}/{playlist}")).status_code == 404
+        assert (await device.get(f"/api/v1/media/player/{player_ticket}/{playlist}")).status_code == 401
+    assert started.json().get("remote_playlist") is None  # only when asked for
+
     # someone else cannot use Zoé's ticket
     await login(client, "max")
     stolen = await client.get(f"{base}/{playlist}")

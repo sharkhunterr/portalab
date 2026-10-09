@@ -36,7 +36,14 @@ from portalab.core.errors import Conflict, Forbidden, NotFound, PortalError, Una
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.models import SourceItem, UserLink
 from portalab.modules.media.player.subtitles import SubtitleFeeds
-from portalab.modules.media.player.tickets import LIFETIME_S, Ticket, read, sign
+from portalab.modules.media.player.tickets import (
+    LIFETIME_S,
+    REMOTE_LIFETIME_S,
+    Ticket,
+    read,
+    remote_key,
+    sign,
+)
 from portalab.modules.media.settings import MediaConfig
 
 PLAYABLE = ("movie", "episode", "series", "season")
@@ -77,6 +84,7 @@ class PlayerInfo:
     linked: bool  # played as the member's own account on the service
     item: PlayableItem
     qualities: list[str]
+    cast_base_url: str | None = None  # 027 (#11): where casting devices reach the portal, when not its own
 
 
 async def _call[T](operation: Any, limit: float = TIMEOUT_S) -> T:
@@ -190,11 +198,21 @@ class PlayerService:
             linked=account is not None,
             item=playable,
             qualities=self.qualities(),
+            cast_base_url=self.config().player_cast_base_url.strip().rstrip("/") or None,
         )
 
     async def start(
-        self, user: UUID, object_id: UUID, item: str, options: StreamOptions, duration_s: float | None
-    ) -> tuple[str, StreamStart]:
+        self,
+        user: UUID,
+        object_id: UUID,
+        item: str,
+        options: StreamOptions,
+        duration_s: float | None,
+        *,
+        remote: bool = False,
+    ) -> tuple[str, str | None, StreamStart]:
+        """The stream's ticket — and, for a ``remote`` device (Chromecast, AirPlay), a remote ticket its
+        playlist and segments are fetched with, without a session."""
         self._enabled()
         source = await self._source(object_id)
         account = await self._account(user, source.service_id)
@@ -216,7 +234,11 @@ class PlayerService:
             duration_s=duration_s,
             expires=int(utc_now(self.clock).timestamp()) + LIFETIME_S,
         )
-        return sign(self.key, ticket), started
+        remote_ticket = None
+        if remote:
+            expires = int(utc_now(self.clock).timestamp()) + REMOTE_LIFETIME_S
+            remote_ticket = sign(remote_key(self.key), replace(ticket, expires=expires))
+        return sign(self.key, ticket), remote_ticket, started
 
     # --- while playing ------------------------------------------------------------------------------------
     def ticket(self, user: UUID, token: str) -> Ticket:
@@ -225,6 +247,19 @@ class PlayerService:
     async def open(self, user: UUID, token: str, path: str, stack: AsyncExitStack) -> StreamBody:
         """A playlist or segment, entered on ``stack`` (closed by the caller once relayed)."""
         ticket = self.ticket(user, token)
+        channel = self._channel(ticket.service, ticket.account)
+        try:
+            body: StreamBody = await _call(
+                stack.enter_async_context(channel.open(ticket.session, path)), SEGMENT_TIMEOUT_S
+            )
+        except BaseException:
+            await stack.aclose()
+            raise
+        return body
+
+    async def open_remote(self, token: str, path: str, stack: AsyncExitStack) -> StreamBody:
+        """027 (#11): the same stream for a casting device, addressed by the remote ticket alone."""
+        ticket = read(remote_key(self.key), token, user=None, now=utc_now(self.clock))
         channel = self._channel(ticket.service, ticket.account)
         try:
             body: StreamBody = await _call(
