@@ -88,10 +88,25 @@ function Body({ instance }: { instance: Instance }) {
   );
 }
 
+/** 027 (#12): the lists that fill their block — their rows stretch to its bottom edge. */
+const FILL = [
+  ".widget-rows",
+  ".widget-shortcuts",
+  ".widget-links",
+  ".widget-services__grid",
+  ".dashboard-summary__list",
+  ".daily-objectives__list",
+].join(", ");
+const STRETCH = 2.4; // a row grows at most this much past its natural height
+
 /**
  * 027: the content fits its block — list items that would spill over the bottom are left out (no inner
  * scrollbar) and counted; recomputed when the block is resized or the content changes. The count opens
  * the whole widget in a dialog, where nothing is left out.
+ *
+ * 027 (#12): and the rows that stay **fill** the block: measured at their natural height, they are then
+ * laid out as exactly that many rows stretched to the block's bottom (at most ``STRETCH`` times their
+ * height), their pictures and text growing with them — no hole under a list, no row cut in half.
  */
 function useFit(ref: RefObject<HTMLElement | null>): number {
   const [hidden, setHidden] = useState(0);
@@ -99,21 +114,49 @@ function useFit(ref: RefObject<HTMLElement | null>): number {
     const body = ref.current;
     if (!body || typeof ResizeObserver === "undefined") return;
     let frame = 0;
+    const measure = (limit: number): number => {
+      let count = 0;
+      for (const item of body.querySelectorAll<HTMLElement>("ul > li, ol > li")) {
+        if (item.closest("svg, .recharts-wrapper, [data-nofit]")) continue;
+        const box = item.getBoundingClientRect();
+        // the first row of a list always stays (cropped if need be): a block never looks empty
+        const first = item.parentElement?.firstElementChild?.getBoundingClientRect();
+        const firstRow = !first || box.top <= first.top + 2;
+        const over = box.height > 0 && box.bottom > limit && !firstRow;
+        if (over !== item.hasAttribute("data-overflow")) item.toggleAttribute("data-overflow", over);
+        if (over && !item.parentElement?.closest("li[data-overflow]")) count += 1;
+      }
+      return count;
+    };
     const fit = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         // items are hidden with « visibility » (layout unchanged), so measuring never re-flows the content
-        const limit = body.getBoundingClientRect().bottom + 1;
-        let count = 0;
-        for (const item of body.querySelectorAll<HTMLElement>("ul > li, ol > li")) {
-          if (item.closest("svg, .recharts-wrapper, [data-nofit]")) continue;
-          const box = item.getBoundingClientRect();
-          // the first row of a list always stays (cropped if need be): a block never looks empty
-          const first = item.parentElement?.firstElementChild?.getBoundingClientRect();
-          const firstRow = !first || box.top <= first.top + 2;
-          const over = box.height > 0 && box.bottom > limit && !firstRow;
-          if (over !== item.hasAttribute("data-overflow")) item.toggleAttribute("data-overflow", over);
-          if (over && !item.parentElement?.closest("li[data-overflow]")) count += 1;
+        const lists = [...body.querySelectorAll<HTMLElement>(FILL)].filter(
+          (list) => !list.closest("[data-nofit]") && !list.parentElement?.closest("[data-filled]"),
+        );
+        for (const list of lists) {
+          list.removeAttribute("data-filled");
+          list.style.removeProperty("--fit-rows");
+          list.style.removeProperty("--fill-height");
+        }
+        // the « +N » button sits in the header: the rows may reach the block's bottom edge
+        const limit = body.getBoundingClientRect().bottom;
+        const count = measure(limit + 1);
+        for (const list of lists) {
+          const top = list.getBoundingClientRect().top;
+          const shown = [...list.children].filter(
+            (child): child is HTMLElement =>
+              child instanceof HTMLElement && !child.hasAttribute("data-overflow"),
+          );
+          if (!shown.length) continue;
+          const tops = new Set(shown.map((child) => Math.round(child.getBoundingClientRect().top)));
+          const natural = Math.max(...shown.map((child) => child.getBoundingClientRect().bottom)) - top;
+          const room = limit - top;
+          if (natural <= 0 || room <= natural + 2) continue; // already full (or cropped): leave it be
+          list.style.setProperty("--fit-rows", String(tops.size));
+          list.style.setProperty("--fill-height", `${Math.floor(Math.min(room, natural * STRETCH))}px`);
+          list.setAttribute("data-filled", "");
         }
         setHidden(count);
       });
@@ -174,6 +217,32 @@ export function WidgetFrame({
             {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
           </>
         )}
+        {hidden && instance.available ? (
+          <Dialog
+            size="lg"
+            title={title}
+            closeLabel={t("dashboard:close")}
+            trigger={
+              <button
+                type="button"
+                className="widget-frame__more"
+                aria-label={t("dashboard:seeAll", { count: hidden })}
+                title={t("dashboard:seeAll", { count: hidden })}
+              >
+                +{hidden}
+                <Icon name="maximize" size={12} />
+              </button>
+            }
+          >
+            <div className="widget-frame__full" data-widget={instance.widget_key}>
+              <FrameBoundary fallback={<FunctionalState state="error" />}>
+                <Suspense fallback={<FunctionalState state="loading" />}>
+                  <Body instance={instance} />
+                </Suspense>
+              </FrameBoundary>
+            </div>
+          </Dialog>
+        ) : null}
         {controls}
       </header>
       <div className="widget-frame__body" ref={body}>
@@ -187,32 +256,6 @@ export function WidgetFrame({
           <FunctionalState state="unavailable" label={t("dashboard:unavailableWidget")} />
         )}
       </div>
-      {hidden && instance.available ? (
-        <Dialog
-          size="lg"
-          title={title}
-          closeLabel={t("dashboard:close")}
-          trigger={
-            <button
-              type="button"
-              className="widget-frame__more"
-              aria-label={t("dashboard:seeAll", { count: hidden })}
-              title={t("dashboard:seeAll", { count: hidden })}
-            >
-              +{hidden}
-              <Icon name="maximize" size={12} />
-            </button>
-          }
-        >
-          <div className="widget-frame__full" data-widget={instance.widget_key}>
-            <FrameBoundary fallback={<FunctionalState state="error" />}>
-              <Suspense fallback={<FunctionalState state="loading" />}>
-                <Body instance={instance} />
-              </Suspense>
-            </FrameBoundary>
-          </div>
-        </Dialog>
-      ) : null}
     </section>
   );
 }

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -179,7 +179,8 @@ function Continue({ payload }: WidgetProps) {
                 >
                   <span style={{ inlineSize: `${percent}%` }} />
                 </span>
-              ) : (
+              ) : card.subtitle ? null : (
+                // the kind only when nothing else says what it is (an episode has its « S02E11 »)
                 <span className="widget-continue__meta">{t(`media:kind.${card.kind ?? "movie"}`)}</span>
               )}
             </span>
@@ -316,5 +317,80 @@ function Soon({ payload }: WidgetProps) {
 registerWidgetComponent("media.posters", Posters);
 registerWidgetComponent("media.wall", PosterWall);
 registerWidgetComponent("media.soon", Soon);
+interface ShuffleCard extends Card {
+  year?: number | null;
+  genres?: string[];
+  overview?: string | null;
+}
+
+/**
+ * « Shuffle » (027, #12): a title drawn at random from the library — the media home's « what are we
+ * watching » banner, its posters scrolling behind as a frieze. « Another one » draws again among the batch
+ * (never the same twice in a row); the picked poster stands in front when the block is large enough.
+ */
+function Shuffle({ payload }: WidgetProps) {
+  const t = useT();
+  const items = ((payload.data ?? {}) as { items?: ShuffleCard[] }).items ?? [];
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * Math.max(1, items.length)));
+  const pick = items[index % Math.max(1, items.length)];
+  if (!pick) return <p className="widget-empty">{t("media:widget.shuffle.empty")}</p>;
+  const another = () =>
+    setIndex((current) => {
+      if (items.length < 2) return current;
+      let next = current;
+      while (next === current) next = Math.floor(Math.random() * items.length);
+      return next;
+    });
+  const frieze = items.map((card) => poster(card.image_id)).filter((src): src is string => Boolean(src));
+  const meta = [
+    pick.year ? String(pick.year) : null,
+    pick.kind ? t(`media:kind.${pick.kind}`) : null,
+    ...(pick.genres ?? []),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const art = poster(pick.image_id);
+  return (
+    <div className="widget-shuffle" data-nofit>
+      <span className="widget-shuffle__frieze" aria-hidden="true">
+        <span className="widget-shuffle__track">
+          {[...frieze, ...frieze].map((src, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: the frieze repeats itself to loop seamlessly
+            <img key={`${src}-${i}`} src={src} alt="" loading="lazy" />
+          ))}
+        </span>
+      </span>
+      <div className="widget-shuffle__text" key={pick.id ?? pick.title}>
+        <span className="widget-shuffle__eyebrow">
+          <Icon name="shuffle" size={14} />
+          {t("media:widget.shuffle.eyebrow")}
+        </span>
+        <strong className="widget-shuffle__title">{pick.title}</strong>
+        {meta ? <span className="widget-shuffle__meta">{meta}</span> : null}
+        {pick.overview ? <p className="widget-shuffle__overview">{pick.overview}</p> : null}
+        <span className="widget-shuffle__actions">
+          {pick.route ? (
+            <Link className="ds-button ds-button--primary" to={pick.route}>
+              <Icon name="play" size={16} />
+              {t("media:widget.shuffle.open")}
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            className="ds-button ds-button--secondary"
+            onClick={another}
+            disabled={items.length < 2}
+          >
+            <Icon name="shuffle" size={16} />
+            {t("media:widget.shuffle.another")}
+          </button>
+        </span>
+      </div>
+      {art ? <img className="widget-shuffle__poster" key={art} src={art} alt="" /> : null}
+    </div>
+  );
+}
+
+registerWidgetComponent("media.shuffle", Shuffle);
 registerWidgetComponent("media.continue", Continue);
 registerWidgetComponent("media.stats", Stats);

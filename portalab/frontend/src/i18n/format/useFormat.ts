@@ -39,6 +39,9 @@ export function useFormat() {
         ...(hour12 === undefined ? {} : { hour12 }),
       }).format(new Date(value)),
     number: (value: number) => new Intl.NumberFormat(ctx.locale).format(value),
+    /** 027: « 956.5K » — a large figure in a small place (dashboard chips) */
+    compact: (value: number) =>
+      new Intl.NumberFormat(ctx.locale, { notation: "compact", maximumFractionDigits: 1 }).format(value),
     percent: (ratio: number) => new Intl.NumberFormat(ctx.locale, { style: "percent" }).format(ratio),
     relative: (seconds: number) => {
       const rtf = new Intl.RelativeTimeFormat(ctx.locale, { numeric: "auto" });

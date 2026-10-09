@@ -94,10 +94,12 @@ from portalab.modules.media.providers.insight_widgets import (
     PosterWallWidget,
     RecentlyAddedWidget,
     RecentlyRequestedWidget,
+    ShuffleWidget,
     StatsWidget,
     TopWidget,
     UpcomingWidget,
 )
+from portalab.modules.media.providers.insight_widgets import SHUFFLE as SHUFFLE_WIDGET
 from portalab.modules.media.providers.insight_widgets import STATS as STATS_WIDGET
 from portalab.modules.media.providers.insight_widgets import TOP as TOP_WIDGET
 from portalab.modules.media.providers.insight_widgets import UPCOMING as UPCOMING_WIDGET
@@ -349,6 +351,7 @@ class MediaModule:
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
             (MY_SOON, MySoonWidget(self.database, self.request_insights, self.clock, self.enricher)),
             (POSTER_WALL, PosterWallWidget(self.database, self.insights, self.clock)),
+            (SHUFFLE_WIDGET, ShuffleWidget(self.database, self.clock)),
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:

@@ -1079,3 +1079,111 @@
   background: color-mix(in srgb, var(--color-accent-alt) 20%, transparent);
   font-weight: var(--font-weight-semibold);
 }
+
+/* 027 (#12): « my progression » — the level as a ring filled up to the next one, sized to its block */
+.widget-level {
+  --level-ring: clamp(4rem, 78cqh, 8.5rem);
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-3), 6cqw, var(--space-6));
+  color: inherit;
+  text-decoration: none;
+}
+.widget-frame__body .widget-level {
+  block-size: 100cqh;
+}
+.widget-level__ring {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: var(--level-ring);
+  block-size: var(--level-ring);
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--color-surface-raised) 78%, transparent 80% 100%),
+    conic-gradient(
+      var(--color-accent) calc(var(--ratio, 0) * 1turn),
+      color-mix(in srgb, var(--color-text) 12%, transparent) 0
+    );
+}
+.widget-level__ring strong {
+  font-family: var(--font-display);
+  font-size: calc(var(--level-ring) * 0.32);
+  line-height: 1;
+}
+.widget-level__side {
+  flex: 1;
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.widget-level__name {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(var(--font-size-md), calc(0.6rem + 6cqh), var(--font-size-xl));
+}
+.widget-level__next {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--color-text-muted);
+}
+.widget-level__bar {
+  display: block;
+  block-size: 0.4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+  overflow: hidden;
+}
+.widget-level__bar span {
+  display: block;
+  inline-size: calc(var(--ratio, 0) * 100%);
+  block-size: 100%;
+  background: var(--xp-gradient, var(--color-accent));
+}
+.widget-level__values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.widget-level__values li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  font-size: var(--font-size-sm);
+}
+.widget-level__values li span {
+  color: var(--color-text-muted);
+}
+.widget-level__values li[data-value="coins"] svg {
+  color: var(--coin, var(--color-accent));
+}
+/* a narrow but tall block stacks the ring above; a low block keeps the ring beside a shorter text */
+@container (max-width: 17rem) and (min-height: 11rem) {
+  .widget-level {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+  .widget-level__values {
+    justify-content: center;
+  }
+}
+@container (max-height: 8rem) {
+  .widget-level {
+    --level-ring: clamp(3rem, 90cqh, 5rem);
+  }
+  .widget-level__name {
+    display: none;
+  }
+}
+@container (max-height: 8rem) and (max-width: 22rem) {
+  .widget-level__values {
+    display: none;
+  }
+}

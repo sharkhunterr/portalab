@@ -8,7 +8,7 @@ from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
 from portalab.capabilities.i18n import LocaleContext
@@ -125,6 +125,14 @@ POSTER_WALL = _definition(  # 027: a Marketplace widget — owners only (product
     icon="image",
     size=SizeLimits(default=Size(12, 4), min=Size(6, 3), max=Size(12, 8)),
     product="widget_poster_wall",
+)
+SHUFFLE = _definition(  # 027 (#12): a title drawn at random from the library, on a frieze of posters
+    "media.shuffle",
+    component="media.shuffle",
+    icon="shuffle",
+    size=SizeLimits(default=Size(12, 3), min=Size(4, 2), max=Size(12, 6)),
+    schema=KIND_FILTER,
+    defaults={"kind": "all"},
 )
 MY_SOON = _definition(
     "media.my_soon",
@@ -404,6 +412,49 @@ class TopWidget(_Base):
             for w in data["top_works"]
         ]
         return self.payload({"items": await self.cards(items)})
+
+
+class ShuffleWidget(_Base):
+    """027 (#12): « shuffle » — titles drawn at random among what the library holds (films and series by
+    default, or one kind), each with its poster, year, genres and overview. The block shows one and lets
+    the member draw another; the others scroll behind it as a frieze."""
+
+    DRAW = 24
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        kinds = KINDS_OF.get(str(config.get("kind") or "all")) or ("movie", "series")
+        async with self.database.session() as session:
+            rows = (
+                (
+                    await session.execute(
+                        select(MediaObject)
+                        .where(
+                            MediaObject.status == "active",
+                            MediaObject.available.is_(True),
+                            MediaObject.kind.in_(kinds),
+                        )
+                        .order_by(func.random())
+                        .limit(self.DRAW * 3)  # some have no poster
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        items = [
+            {
+                "id": str(row.id),
+                "title": row.title,
+                "kind": row.kind,
+                "year": row.year,
+                "genres": [str(g) for g in (row.effective.get("genres") or [])][:3],
+                "overview": str(row.effective.get("overview") or "")[:400] or None,
+            }
+            for row in rows
+        ]
+        cards = [card for card in await self.cards(items) if card.get("image_id")][: self.DRAW]
+        return self.payload({"items": cards})
 
 
 class PosterWallWidget(TopWidget):

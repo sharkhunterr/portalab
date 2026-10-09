@@ -54,6 +54,14 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
   "dashboard.countdown": () => ({ label: "Movie night", date: inDays(3) }),
   "media.posters": () => ({ items: cards(6), mode: "added" }),
   "media.wall": () => ({ items: cards(8) }),
+  "media.shuffle": () => ({
+    items: cards(6).map((c) => ({
+      ...c,
+      year: 2024,
+      genres: ["Sci-Fi"],
+      overview: "A crew far from home, a signal nobody expected.",
+    })),
+  }),
   "media.continue": () => ({
     items: cards(3).map((c, i) => ({ ...c, subtitle: c.meta, progress: 0.25 + i * 0.25 })),
   }),

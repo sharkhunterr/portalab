@@ -1,30 +1,61 @@
 import { Link } from "react-router";
+import { levelProgress } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
-import { toQuestItem } from "./api";
+import { toQuestItem, useProgression } from "./api";
 import type { QuestItem } from "./quests/QuestList";
 import "./gamification.css";
 
-/** Dashboard widget ``gamification.progress`` (spec 013 T030): level and the three values, separately. */
+const VALUE_ICON: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
+
+/** Dashboard widget ``gamification.progress`` (spec 013 T030; 027 #12): the level as a ring filled up to the
+ * next one, the XP still to earn, and the three values as chips — all sized to the block. */
 function ProgressWidget({ payload }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const data = (payload.data ?? {}) as { level?: number; xp?: number; contribution?: number; coins?: number };
+  const progression = useProgression().data;
+  const level = progression?.level ?? data.level ?? 1;
+  const next = progression?.next_level_at ?? null;
+  const ratio = progression ? levelProgress(progression.xp, progression.level_floor, next) : 0;
   return (
-    <div className="widget-progress">
-      <p>
-        <Link to="/progression">{t("gamification:level", { level: data.level ?? 1 })}</Link>
-      </p>
-      <ul className="widget-list">
-        {(["xp", "contribution", "coins"] as const).map((value) => (
-          <li key={value}>
-            {t(`gamification:value.${value}`)}: {format.number(data[value] ?? 0)}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Link to="/progression" className="widget-level" style={{ "--ratio": ratio } as React.CSSProperties}>
+      <span
+        className="widget-level__ring"
+        role="progressbar"
+        aria-label={t("gamification:level", { level })}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(ratio * 100)}
+      >
+        <strong>{format.number(level)}</strong>
+      </span>
+      <span className="widget-level__side">
+        <span className="widget-level__name">{t("gamification:level", { level })}</span>
+        {progression && next !== null ? (
+          <span className="widget-level__next">
+            <span className="widget-level__bar" aria-hidden="true">
+              <span />
+            </span>
+            <small>
+              {format.number(progression.xp - progression.level_floor)} /{" "}
+              {format.number(next - progression.level_floor)} XP
+            </small>
+          </span>
+        ) : null}
+        <ul className="widget-level__values">
+          {(["xp", "coins", "contribution"] as const).map((value) => (
+            <li key={value} data-value={value}>
+              <Icon name={VALUE_ICON[value] ?? "star"} size={14} />
+              <strong>{format.compact(data[value] ?? 0)}</strong>
+              <span>{t(`gamification:value.${value}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </span>
+    </Link>
   );
 }
 
