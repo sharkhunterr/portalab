@@ -437,3 +437,84 @@
     flex-direction: column;
   }
 }
+
+/* 027: « community activity » on the dashboard — who (avatar and kind), what, when; rows fill the block,
+   two columns on a wide one, the latest alone on a single row */
+.widget-activity {
+  display: grid;
+  gap: var(--space-1, 0.25rem) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@container (min-width: 40rem) {
+  .widget-activity:not(.widget-activity--compact) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.widget-activity > li,
+.widget-activity--compact {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1, 0.25rem) var(--space-2);
+  border-radius: var(--radius-md);
+}
+.widget-activity > li:hover {
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+.widget-activity--compact {
+  block-size: 100%;
+  padding-inline: var(--space-3);
+}
+.widget-activity__who {
+  position: relative;
+  display: inline-grid;
+}
+.widget-activity__icon {
+  position: absolute;
+  inset-block-end: -0.2rem;
+  inset-inline-end: -0.3rem;
+  display: grid;
+  place-items: center;
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  border: 2px solid var(--color-surface-raised);
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.widget-activity [data-kind="achievement.unlocked"] .widget-activity__icon,
+.widget-activity[data-kind="achievement.unlocked"] .widget-activity__icon {
+  background: var(--rarity-legendary, var(--color-accent));
+}
+.widget-activity__text {
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.widget-activity__text a {
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+.widget-activity time {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+.widget-activity__all {
+  display: grid;
+  place-items: center;
+  inline-size: 1.7rem;
+  block-size: 1.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-text);
+}
+.widget-activity__all:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}

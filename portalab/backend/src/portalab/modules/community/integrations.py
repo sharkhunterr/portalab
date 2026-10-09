@@ -43,7 +43,7 @@ class ActivityWidget:
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
-        items, _ = await self.feed.page(principal, limit=5)
+        items, _ = await self.feed.page(principal, limit=8)
         if not items:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
         return WidgetPayload(
@@ -56,6 +56,7 @@ class ActivityWidget:
                         "actor_id": str(i.actor_id),
                         "actor_name": i.actor_name,
                         "text_key": i.text_key,
+                        "kind": i.kind,  # 027: what the widget names it by (as the feed does)
                         "params": i.params,
                         "occurred_at": i.occurred_at.isoformat(),
                     }

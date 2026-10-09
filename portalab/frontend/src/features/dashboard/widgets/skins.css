@@ -665,23 +665,23 @@
   background: currentColor;
   animation: skin-live-dot 1.6s ease-in-out infinite;
 }
-.skin-live .widget-list > li {
+.skin-live .widget-activity > li {
   animation: skin-live-in 0.5s ease-out both;
 }
-.skin-live .widget-list > li:first-child {
+.skin-live .widget-activity > li:first-child {
   padding-inline-start: 0.5rem;
   border-inline-start: 2px solid var(--color-accent);
 }
-.skin-live .widget-list > li:nth-child(2) {
+.skin-live .widget-activity > li:nth-child(2) {
   animation-delay: 0.08s;
 }
-.skin-live .widget-list > li:nth-child(3) {
+.skin-live .widget-activity > li:nth-child(3) {
   animation-delay: 0.16s;
 }
-.skin-live .widget-list > li:nth-child(4) {
+.skin-live .widget-activity > li:nth-child(4) {
   animation-delay: 0.24s;
 }
-.skin-live .widget-list > li:nth-child(n + 5) {
+.skin-live .widget-activity > li:nth-child(n + 5) {
   animation-delay: 0.32s;
 }
 @keyframes skin-live-dot {
@@ -957,8 +957,9 @@
 /* --- next releases: a modern countdown ---------------------------------------------------------------------- */
 .widget-next {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: var(--space-2);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-3);
   block-size: 100%;
 }
 .widget-next__hero {
@@ -977,8 +978,7 @@
   display: grid;
   flex: none;
   place-items: center;
-  block-size: min(100%, 11rem);
-  min-block-size: 4.5rem;
+  block-size: clamp(5rem, 40cqh, 16rem); /* the hero grows with the block */
   aspect-ratio: 2 / 3;
   overflow: hidden;
   border-radius: var(--radius-md);
@@ -1003,6 +1003,7 @@
 }
 .widget-next__reason {
   display: inline-flex;
+  white-space: nowrap;
   align-items: center;
   gap: 0.3rem;
   padding: 0.1rem 0.55rem;
@@ -1292,4 +1293,337 @@
 .skin-deck__text {
   max-block-size: 100%;
   overflow: hidden;
+}
+
+/* --- playing on the server (027): one session takes the block, several are cards ------------------------ */
+.widget-playing {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.widget-playing :is(a, li > span, .widget-playing--one > span) {
+  color: inherit;
+  text-decoration: none;
+}
+.widget-playing--one {
+  block-size: 100%;
+}
+.widget-playing--one > :is(a, span) {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-3), 4cqw, var(--space-6));
+  block-size: 100%;
+}
+.widget-playing--one .widget-playing__poster {
+  block-size: min(100%, 14rem);
+  min-block-size: 5rem;
+}
+.widget-playing--one .widget-playing__title {
+  font-size: clamp(var(--font-size-md), calc(0.6rem + 6cqh), var(--font-size-2xl, 1.6rem));
+  white-space: normal;
+}
+.widget-playing--one .widget-playing__bar {
+  block-size: 0.45rem;
+}
+/* several sessions: a track swiped sideways, each session in full, dots below */
+.widget-playing--many {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  block-size: 100%;
+}
+.widget-playing__track {
+  display: grid;
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+.widget-playing__track::-webkit-scrollbar {
+  display: none;
+}
+@container (min-width: 40rem) {
+  .widget-playing__track {
+    grid-auto-columns: calc(50% - var(--space-3) / 2);
+  }
+}
+.widget-playing__track > li {
+  min-inline-size: 0;
+  scroll-snap-align: start;
+}
+.widget-playing__track > li > :is(a, span) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  block-size: 100%;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.widget-playing__track > li[data-mine] > :is(a, span) {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+.widget-playing__track .widget-playing__poster {
+  block-size: min(100%, 12rem);
+  min-block-size: 4.5rem;
+}
+.widget-playing__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+}
+.widget-playing__dots button {
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 25%, transparent);
+  cursor: pointer;
+  transition: inline-size 0.25s;
+}
+.widget-playing__dots button[aria-current="true"] {
+  inline-size: 1.2rem;
+  background: var(--color-accent);
+}
+.widget-playing__poster {
+  block-size: min(100%, 14rem);
+  min-block-size: 5rem;
+}
+.widget-playing--one .widget-playing__title {
+  font-size: clamp(var(--font-size-md), calc(0.6rem + 6cqh), var(--font-size-2xl, 1.6rem));
+  white-space: normal;
+}
+.widget-playing--one .widget-playing__bar {
+  block-size: 0.45rem;
+}
+.widget-playing--many {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-2);
+}
+.widget-playing--many li > :is(a, span) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.4rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.widget-playing--many li[data-mine] > :is(a, span) {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+.widget-playing--many .widget-playing__poster {
+  inline-size: 3rem;
+}
+.widget-playing__poster {
+  display: grid;
+  flex: none;
+  place-items: center;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  box-shadow: 0 0.3rem 0.9rem color-mix(in srgb, var(--color-text) 16%, transparent);
+}
+.widget-playing__poster img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.widget-playing__info {
+  display: grid;
+  gap: 0.25rem;
+  flex: 1;
+  min-inline-size: 0;
+}
+.widget-playing__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.widget-playing__state[data-playback="paused"] {
+  color: var(--color-text-muted);
+}
+.widget-playing__title {
+  overflow: hidden;
+  font-family: var(--font-display);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.widget-playing__subtitle {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.widget-playing__progress {
+  display: grid;
+  gap: 0.2rem;
+}
+.widget-playing__progress small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.widget-playing__bar {
+  display: block;
+  block-size: 0.3rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+.widget-playing__bar span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: inline-size 1s linear;
+}
+.widget-playing--compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  block-size: 100%;
+  padding-inline: var(--space-3);
+}
+.widget-playing--compact > :is(a, span):last-child {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.widget-playing--compact .widget-playing__poster {
+  inline-size: 1.8rem;
+}
+.widget-playing--compact .widget-playing__info {
+  grid-template-columns: minmax(0, 1fr) minmax(4rem, 30%);
+  align-items: center;
+}
+.widget-playing--compact
+  :is(.widget-playing__state, .widget-playing__subtitle, .widget-playing__progress small) {
+  display: none;
+}
+
+/* --- a year ago (027): one year at a time, its shelves of posters -------------------------------------- */
+.widget-on-this-day__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1, 0.25rem) var(--space-3);
+}
+.widget-on-this-day__years {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+.widget-on-this-day__years button {
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+.widget-on-this-day__years button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.widget-on-this-day__shelves {
+  display: grid;
+  gap: var(--space-2) var(--space-4);
+  min-block-size: 0;
+  animation: skin-rise 0.5s ease-out both;
+}
+@container (min-width: 40rem) {
+  .widget-on-this-day__shelves:has(> :nth-child(2)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.widget-on-this-day__shelf {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-1, 0.25rem);
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+.widget-on-this-day__shelf h4 {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.widget-on-this-day__shelf h4 small {
+  color: var(--color-text-muted);
+}
+.widget-on-this-day__shelf ul {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0.3rem 0.2rem 0.4rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  list-style: none;
+}
+.widget-on-this-day__shelf ul::-webkit-scrollbar {
+  display: none;
+}
+.widget-on-this-day__shelf li {
+  flex: none;
+  inline-size: clamp(4rem, 20cqh, 7rem);
+  margin: 0;
+  transform: rotate(var(--tilt, 0deg));
+  scroll-snap-align: start;
+}
+.widget-on-this-day__shelf li:first-child {
+  margin: 0;
+}
+.widget-on-this-day--compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  block-size: 100%;
+  padding-inline: var(--space-3);
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+.widget-on-this-day--compact span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* a tall block: the next ones on several rows, larger, filling the room left (the frame counts the rest) */
+@container (min-height: 20rem) {
+  .widget-next__more {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+    align-content: start;
+    overflow: hidden;
+    mask-image: none;
+  }
+  .widget-next__more li {
+    flex: initial;
+  }
+  .widget-next__mini {
+    inline-size: 2.4rem;
+  }
+  .widget-next__mini-text {
+    font-size: var(--font-size-sm);
+  }
 }

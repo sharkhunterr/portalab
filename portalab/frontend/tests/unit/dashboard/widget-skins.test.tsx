@@ -129,19 +129,32 @@ describe("living wall", () => {
 });
 
 describe("playing on the server", () => {
-  it("lists what plays now, with its progress and the viewer's own marked", () => {
+  it("gives one session the whole block: what it is, its state and how long is left, the viewer's own marked", () => {
+    show("media.server_playing", {
+      count: 1,
+      items: [{ ...card(1), state: "playing", progress: 0.5, remaining_s: 3900, mine: true, year: 2026 }],
+    });
+    expect(screen.getByText("You")).toBeInTheDocument();
+    expect(screen.getByText("Playing")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("50");
+    expect(screen.getByText(/left$/)).toBeInTheDocument();
+    expect(document.querySelector(".widget-playing--one")).not.toBeNull();
+  });
+
+  it("lets several sessions be swiped through, a dot each", () => {
     show("media.server_playing", {
       count: 2,
       items: [
-        { ...card(1), state: "playing", progress: 0.5, mine: true },
+        { ...card(1), state: "playing", progress: 0.5, mine: false },
         { ...card(2), title: "Arcane", subtitle: "Episode 3", state: "paused", progress: 0.1, mine: false },
       ],
     });
-    expect(screen.getByText("2 streams")).toBeInTheDocument();
-    expect(screen.getByText("You")).toBeInTheDocument();
+    expect(document.querySelectorAll(".widget-playing__track > li")).toHaveLength(2);
+    const dots = screen.getAllByRole("button", { name: /^Show stream/ });
+    expect(dots).toHaveLength(2);
+    expect(dots[0]?.getAttribute("aria-current")).toBe("true");
     expect(screen.getByText("Paused")).toBeInTheDocument();
     expect(screen.getByText("Episode 3")).toBeInTheDocument();
-    expect(screen.getAllByRole("progressbar")[0]?.getAttribute("aria-valuenow")).toBe("50");
   });
 
   it("says when nothing plays", () => {
@@ -188,21 +201,23 @@ describe("next releases", () => {
 });
 
 describe("a year ago", () => {
-  it("shows what I watched and what came in, around this date back then", () => {
+  it("shows one year at a time — what I watched and what came in — and lets me pick another", () => {
     show("media.on_this_day", {
-      years: 1,
-      date: "2025-10-09",
-      watched: [card(1)],
-      added: [card(2), card(3)],
+      moments: [
+        { years: 1, date: "2025-10-09", watched: [], added: [card(2), card(3)] },
+        { years: 2, date: "2024-10-09", watched: [card(1)], added: [] },
+      ],
     });
     expect(screen.getByText(/A year ago ·/)).toBeInTheDocument();
-    expect(screen.getByText("You watched")).toBeInTheDocument();
     expect(screen.getByText("New in the library")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "2 years" }));
+    expect(screen.getByText(/2 years ago ·/)).toBeInTheDocument();
+    expect(screen.getByText("You watched")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Title 1/ }).getAttribute("href")).toBe("/media/id1");
   });
 
   it("says when past years have nothing", () => {
-    show("media.on_this_day", { years: null, watched: [], added: [] });
+    show("media.on_this_day", { moments: [] });
     expect(screen.getByText("Nothing around this date in past years yet.")).toBeInTheDocument();
   });
 });

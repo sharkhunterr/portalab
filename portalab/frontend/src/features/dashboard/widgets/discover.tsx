@@ -4,6 +4,8 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
+import { useMeasures } from "../../media/insights/api";
+import { WidgetHeaderAction } from "../frame/actions";
 import { TitleFacts } from "./facts";
 import { reducedMotion, useLively } from "./motion";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
@@ -101,10 +103,137 @@ function LivingWall({ payload }: WidgetProps) {
 }
 
 // --- playing on the server -----------------------------------------------------------------------------------
-function ServerPlaying({ payload }: WidgetProps) {
+interface Playing extends Card {
+  remaining_s?: number | null;
+  year?: number | null;
+  genres?: string[] | null;
+  rating?: number | null;
+  overview?: string | null;
+}
+
+function StateIcon({ state }: { state?: string | undefined }) {
+  return (
+    <Icon name={state === "paused" ? "pause" : state === "buffering" ? "hourglass" : "play"} size={11} />
+  );
+}
+
+/** A session's progress: the bar, then how far and how long is left. */
+function Progress({ card }: { card: Playing }) {
   const t = useT();
-  const data = (payload.data ?? {}) as { items?: Card[]; count?: number };
+  const format = useFormat();
+  const measures = useMeasures();
+  const percent =
+    card.progress !== null && card.progress !== undefined ? Math.round(card.progress * 100) : null;
+  if (percent === null) return null;
+  return (
+    <span className="widget-playing__progress">
+      <span
+        className="widget-playing__bar"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={card.title}
+      >
+        <span style={{ inlineSize: `${percent}%` }} />
+      </span>
+      <small>
+        {format.percent(percent / 100)}
+        {card.remaining_s
+          ? ` · ${t("media:widget.server_playing.left", { time: measures.duration(card.remaining_s) })}`
+          : ""}
+      </small>
+    </span>
+  );
+}
+
+function PlayingCard({ card, hero = false }: { card: Playing; hero?: boolean }) {
+  const t = useT();
+  const src = art(card);
+  const body = (
+    <>
+      <span className="widget-playing__poster">
+        {src ? (
+          <img src={src} alt="" loading="lazy" />
+        ) : (
+          <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={22} />
+        )}
+      </span>
+      <span className="widget-playing__info">
+        <span className="widget-playing__state" data-playback={card.state}>
+          <StateIcon state={card.state} />
+          {t(
+            card.state === "paused" || card.state === "buffering"
+              ? `media:widget.server_playing.${card.state}`
+              : "media:widget.server_playing.playing",
+          )}
+          {card.mine ? (
+            <span className="widget-server-playing__you">{t("media:widget.server_playing.you")}</span>
+          ) : null}
+        </span>
+        <strong className="widget-playing__title">{card.title}</strong>
+        {card.subtitle ? <small className="widget-playing__subtitle">{card.subtitle}</small> : null}
+        {hero ? <TitleFacts facts={{ ...card, kind: card.kind }} /> : null}
+        <Progress card={card} />
+      </span>
+    </>
+  );
+  return card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>;
+}
+
+/** Several sessions: each one in full, swiped sideways (two at a time on a wide block), dots saying which. */
+function Sessions({ items }: { items: Playing[] }) {
+  const t = useT();
+  const track = useRef<HTMLUListElement>(null);
+  const [shown, setShown] = useState(0);
+  const onScroll = () => {
+    const list = track.current;
+    const first = list?.firstElementChild as HTMLElement | null;
+    if (!list || !first) return;
+    setShown(Math.round(list.scrollLeft / Math.max(1, first.offsetWidth)));
+  };
+  const go = (index: number) => {
+    const list = track.current;
+    const target = list?.children[index] as HTMLElement | undefined;
+    if (list && target) list.scrollTo({ left: target.offsetLeft - list.offsetLeft, behavior: "smooth" });
+  };
+  return (
+    <div className="widget-playing widget-playing--many">
+      <ul ref={track} className="widget-playing__track" onScroll={onScroll} data-nofit>
+        {items.map((card, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may play the same title
+          <li key={`${card.id ?? card.title}-${index}`} data-mine={card.mine || undefined}>
+            <PlayingCard card={card} hero />
+          </li>
+        ))}
+      </ul>
+      <span className="widget-playing__dots">
+        {items.map((card, index) => (
+          <button
+            // biome-ignore lint/suspicious/noArrayIndexKey: one dot per session, in order
+            key={`${card.id ?? card.title}-dot-${index}`}
+            type="button"
+            aria-label={t("media:widget.server_playing.show", { n: index + 1, title: card.title })}
+            aria-current={index === shown || undefined}
+            onClick={() => go(index)}
+          />
+        ))}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * « Playing on the server » (027, #31): what runs now — titles, state and progress, never who (only the
+ * viewer's own are marked). One session gets the whole block (poster, what it is, how long is left);
+ * several are swiped through, a dot each (two at a time when wide); on a single row, how many and the
+ * first one.
+ */
+function ServerPlaying({ payload, compact }: WidgetProps) {
+  const t = useT();
+  const data = (payload.data ?? {}) as { items?: Playing[]; count?: number };
   const items = data.items ?? [];
+  const count = data.count ?? items.length;
   if (!items.length)
     return (
       <p className="widget-server-playing__none">
@@ -112,80 +241,51 @@ function ServerPlaying({ payload }: WidgetProps) {
         {t("media:widget.server_playing.none")}
       </p>
     );
+  const first = items[0] as Playing;
+  const streams = (
+    <span className="widget-server-playing__count">
+      <span className="widget-server-playing__dot" aria-hidden="true" />
+      {t("media:widget.server_playing.count", { count })}
+    </span>
+  );
+  if (compact)
+    return (
+      <div className="widget-playing widget-playing--compact">
+        {streams}
+        <PlayingCard card={first} />
+      </div>
+    );
   return (
-    <div className="widget-server-playing">
-      <span className="widget-server-playing__count">
-        <span className="widget-server-playing__dot" aria-hidden="true" />
-        {t("media:widget.server_playing.count", { count: data.count ?? items.length })}
-      </span>
-      <ul>
-        {items.map((card, index) => {
-          const src = art(card);
-          const percent =
-            card.progress !== null && card.progress !== undefined ? Math.round(card.progress * 100) : null;
-          const body = (
-            <>
-              <span className="widget-server-playing__art">
-                {src ? (
-                  <img src={src} alt="" loading="lazy" />
-                ) : (
-                  <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={20} />
-                )}
-              </span>
-              <span className="widget-server-playing__text">
-                <span className="widget-server-playing__title">
-                  {card.title}
-                  {card.mine ? (
-                    <span className="widget-server-playing__you">{t("media:widget.server_playing.you")}</span>
-                  ) : null}
-                </span>
-                {card.subtitle ? <span className="widget-server-playing__meta">{card.subtitle}</span> : null}
-                <span className="widget-server-playing__state" data-playback={card.state}>
-                  <Icon
-                    name={
-                      card.state === "paused" ? "pause" : card.state === "buffering" ? "hourglass" : "play"
-                    }
-                    size={11}
-                  />
-                  {card.state === "paused" || card.state === "buffering" ? (
-                    <span>{t(`media:widget.server_playing.${card.state}`)}</span>
-                  ) : null}
-                  {percent !== null ? (
-                    <span
-                      className="widget-server-playing__bar"
-                      role="progressbar"
-                      aria-valuenow={percent}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-label={card.title}
-                    >
-                      <span style={{ inlineSize: `${percent}%` }} />
-                    </span>
-                  ) : null}
-                </span>
-              </span>
-            </>
-          );
-          return (
-            // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may play the same title
-            <li key={`${card.id ?? card.title}-${index}`} data-mine={card.mine || undefined}>
-              {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <>
+      <WidgetHeaderAction>{streams}</WidgetHeaderAction>
+      {items.length === 1 ? (
+        <div className="widget-playing widget-playing--one">
+          <PlayingCard card={first} hero />
+        </div>
+      ) : (
+        <Sessions items={items} />
+      )}
+    </>
   );
 }
 
 // --- a year ago ----------------------------------------------------------------------------------------------
-function Stack({ label, cards }: { label: string; cards: Card[] }) {
+interface Moment {
+  years: number;
+  date: string;
+  watched: Card[];
+  added: Card[];
+}
+
+function Shelf({ label, cards }: { label: string; cards: Card[] }) {
   if (!cards.length) return null;
   return (
-    <section className="widget-on-this-day__stack">
-      <h4>{label}</h4>
-      <ul>
-        {cards.slice(0, 8).map((card, index) => {
+    <section className="widget-on-this-day__shelf">
+      <h4>
+        {label} <small>{cards.length}</small>
+      </h4>
+      <ul data-nofit>
+        {cards.map((card, index) => {
           const src = art(card);
           const body = (
             <>
@@ -215,34 +315,79 @@ function Stack({ label, cards }: { label: string; cards: Card[] }) {
   );
 }
 
-function OnThisDay({ payload }: WidgetProps) {
+/**
+ * « A year ago » (027, #31): around this date one, two… five years back — what I watched then and what
+ * came into the library — one year at a time, picked with chips (the nearest first, turning on its own
+ * until one is picked); on a single row, the nearest year in a sentence.
+ */
+function OnThisDay({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
-  const data = (payload.data ?? {}) as {
-    years?: number | null;
-    date?: string;
-    watched?: Card[];
-    added?: Card[];
-  };
-  if (!data.years || !data.date)
+  const ref = useRef<HTMLDivElement>(null);
+  const lively = useLively(ref);
+  const moments = ((payload.data ?? {}) as { moments?: Moment[] }).moments ?? [];
+  const [index, setIndex] = useState(0);
+  const [picked, setPicked] = useState(false);
+  useEffect(() => {
+    if (!lively || picked || moments.length < 2) return;
+    const timer = window.setInterval(() => setIndex((n) => (n + 1) % moments.length), 9000);
+    return () => window.clearInterval(timer);
+  }, [lively, picked, moments.length]);
+  if (!moments.length)
     return (
       <p className="widget-on-this-day__none">
         <Icon name="hourglass" size={16} />
         {t("media:widget.on_this_day.none")}
       </p>
     );
-  return (
-    <div className="widget-on-this-day">
-      <span className="widget-on-this-day__when">
+  const moment = moments[index % moments.length] as Moment;
+  const when = t("media:widget.on_this_day.when", {
+    years: moment.years,
+    date: format.date(`${moment.date}T12:00:00`, "medium"),
+  });
+  if (compact) {
+    const first = moment.watched[0] ?? moment.added[0];
+    return (
+      <div ref={ref} className="widget-on-this-day widget-on-this-day--compact">
         <Icon name="hourglass" size={14} />
-        {t("media:widget.on_this_day.when", {
-          years: data.years,
-          date: format.date(`${data.date}T12:00:00`, "medium"),
-        })}
-      </span>
-      <div className="widget-on-this-day__stacks">
-        <Stack label={t("media:widget.on_this_day.watched")} cards={data.watched ?? []} />
-        <Stack label={t("media:widget.on_this_day.added")} cards={data.added ?? []} />
+        <span>
+          <strong>{when}</strong>
+          {first ? ` · ${first.title}` : ""}
+          {moment.added.length
+            ? ` · ${t("media:widget.on_this_day.arrivals", { count: moment.added.length })}`
+            : ""}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div ref={ref} className="widget-on-this-day">
+      <div className="widget-on-this-day__head">
+        <span className="widget-on-this-day__when">
+          <Icon name="hourglass" size={14} />
+          {when}
+        </span>
+        {moments.length > 1 ? (
+          <span className="widget-on-this-day__years">
+            {moments.map((m, i) => (
+              <button
+                key={m.years}
+                type="button"
+                aria-pressed={i === index % moments.length}
+                onClick={() => {
+                  setIndex(i);
+                  setPicked(true);
+                }}
+              >
+                {t("media:widget.on_this_day.chip", { years: m.years })}
+              </button>
+            ))}
+          </span>
+        ) : null}
+      </div>
+      <div className="widget-on-this-day__shelves" key={moment.years}>
+        <Shelf label={t("media:widget.on_this_day.watched")} cards={moment.watched} />
+        <Shelf label={t("media:widget.on_this_day.added")} cards={moment.added} />
       </div>
     </div>
   );
@@ -375,7 +520,7 @@ function NextReleases({ payload, compact }: WidgetProps) {
         )}
       </Link>
       {items.length > 1 ? (
-        <ul className="widget-next__more" data-nofit>
+        <ul className="widget-next__more">
           {items.map((release, index) =>
             index === chosen ? null : (
               // biome-ignore lint/suspicious/noArrayIndexKey: a title comes once, its index is stable

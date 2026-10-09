@@ -100,6 +100,7 @@ const FILL = [
   ".widget-services__grid",
   ".dashboard-summary__list",
   ".daily-objectives__list",
+  ".widget-activity:not(.widget-activity--compact)",
 ].join(", ");
 const STRETCH = 2.4; // a row grows at most this much past its natural height
 

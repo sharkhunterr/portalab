@@ -112,8 +112,8 @@ async def test_a_year_ago(app: FastAPI, media: MediaHarness) -> None:
     await media.module.library.upsert(
         [
             library_record("m1", title="Alien", year=1979),
-            library_record("m2", title="Heat", year=1995),
-            library_record("m3", title="Today", year=2026),
+            library_record("m2", title="Heat", year=1995, at=NOW - timedelta(days=366)),  # came in then
+            library_record("m3", title="Today", year=2026, at=NOW - timedelta(days=2)),
         ],
         media.service(3, "plex"),
     )
@@ -121,30 +121,25 @@ async def test_a_year_ago(app: FastAPI, media: MediaHarness) -> None:
     await _watched(media, people["zoe"], objects["Alien"], "Alien", 365)
     await _watched(media, people["zoe"], objects["Alien"], "Alien", 364)  # once per title
     await _watched(media, people["zoe"], objects["Heat"], "Heat", 340)  # too far from the date
+    await _watched(media, people["zoe"], objects["Heat"], "Heat", 365 * 2 + 1)  # two years back
     await _watched(media, people["max"], objects["Heat"], "Heat", 365)  # someone else's
-    async with media.database.unit_of_work() as uow:
-        await uow.session.execute(
-            text("UPDATE media.objects SET first_seen_at = :at WHERE title = 'Heat'"),
-            {"at": NOW - timedelta(days=366)},
-        )
 
     widget = OnThisDayWidget(media.database, media.module.clock, media.module.enricher)
-    load = widget.load
-    data = (await load(Principal(user_id=people["zoe"]), {}, LocaleContext(locale="en"))).data
+    ctx = LocaleContext(locale="en")
+    data = (await widget.load(Principal(user_id=people["zoe"]), {}, ctx)).data
     assert data is not None
-    assert data["years"] == 1 and data["date"] == (NOW - timedelta(days=365)).date().isoformat()
-    assert [w["title"] for w in data["watched"]] == ["Alien"]
-    assert data["watched"][0]["route"] == f"/media/{objects['Alien']}"
-    assert data["added"] == []  # Heat came in a year ago, but has no poster to show
+    moments = {m["years"]: m for m in data["moments"]}
+    assert sorted(moments) == [1, 2]
+    one = moments[1]
+    assert one["date"] == (NOW - timedelta(days=365)).date().isoformat()
+    assert [w["title"] for w in one["watched"]] == ["Alien"]
+    assert one["watched"][0]["route"] == f"/media/{objects['Alien']}"
+    assert one["added"] == []  # Heat came in a year ago (the service's date), but has no poster to show
+    assert [w["title"] for w in moments[2]["watched"]] == ["Heat"]
 
-    # nobody watched anything back then and nothing came in: nothing to show
-    async with media.database.unit_of_work() as uow:
-        await uow.session.execute(text("UPDATE media.objects SET first_seen_at = :at"), {"at": NOW})
-    empty = (await load(Principal(user_id=people["max"]), {}, LocaleContext(locale="en"))).data
-    assert empty is not None and empty["years"] == 1 and [w["title"] for w in empty["watched"]] == ["Heat"]
     lone = await users(app, media, "ana")
-    nothing = (await load(Principal(user_id=lone["ana"]), {}, LocaleContext(locale="en"))).data
-    assert nothing == {"years": None, "watched": [], "added": []}
+    nothing = await widget.load(Principal(user_id=lone["ana"]), {}, ctx)
+    assert nothing.state == "no-data"  # nothing watched, nothing with a poster came in
 
 
 async def test_detailed_cards_tell_about_their_title(media: MediaHarness) -> None:

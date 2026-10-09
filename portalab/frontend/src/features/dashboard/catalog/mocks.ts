@@ -75,6 +75,7 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
       subtitle: c.kind === "series" ? c.meta : null,
       state: i === 1 ? "paused" : "playing",
       progress: 0.2 + i * 0.3,
+      remaining_s: 3600 - i * 900,
       mine: i === 0,
     })),
   }),
@@ -87,10 +88,10 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
     })),
   }),
   "media.on_this_day": () => ({
-    years: 1,
-    date: inDays(-365).slice(0, 10),
-    watched: cards(3),
-    added: cards(7).slice(3),
+    moments: [
+      { years: 1, date: inDays(-365).slice(0, 10), watched: cards(3), added: cards(7).slice(3) },
+      { years: 2, date: inDays(-730).slice(0, 10), watched: cards(2), added: [] },
+    ],
   }),
   "media.soon": () => ({
     items: cards(3).map((c, i) => ({

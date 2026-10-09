@@ -34,6 +34,7 @@ from portalab.modules.media.models import (
     MediaRequest,
     ObjectMetadata,
     PlaybackSession,
+    SourceItem,
 )
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 from portalab.modules.media.requests.insights import GROUPS, RequestInsights, ids_of, kind_of, lookup_of
@@ -711,96 +712,113 @@ class ServerPlayingWidget(_Base):
                     "kind": session_row.kind,
                     "state": session_row.state,
                     "progress": min(1.0, session_row.position_s / duration) if duration else None,
+                    # 027: how long is left (whole minutes), never who
+                    "remaining_s": max(0, round(duration - session_row.position_s)) if duration else None,
                     "mine": session_row.user_id is not None and session_row.user_id == me,
                 }
             )
-        cards = await self.cards(items)
+        cards = await self.cards(items, detailed=True)
         return self.payload({"items": cards, "count": len(cards)})
 
 
 class OnThisDayWidget(_Base):
-    """027 (#31): « a year ago » — around this date (± 3 days) one, two… years back: what I watched then,
-    and what came into the library (the first year that has something)."""
+    """027 (#31): « a year ago » — around this date (± 5 days), each year back up to five: what I watched
+    then (one card per title), and what came into the library (the services' own date). Every year that
+    has something, the nearest first."""
 
     YEARS = 5
-    AROUND = timedelta(days=3)
+    AROUND = timedelta(days=5)
+    ADDED = 12
 
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
         me = principal.acting_for or principal.user_id
         today = utc_now(self.clock)
+        moments = []
+        for years in range(1, self.YEARS + 1):
+            try:
+                then = today.replace(year=today.year - years)
+            except ValueError:  # the 29th of February
+                then = today.replace(year=today.year - years, day=28)
+            watched, added = await self._then(me, then)
+            shown = {
+                "watched": await self.cards(watched[:12]),
+                "added": [c for c in await self.cards(added) if c.get("image_id")],  # with a poster
+            }
+            if shown["watched"] or shown["added"]:
+                moments.append({"years": years, "date": then.date().isoformat(), **shown})
+        return self.payload({"moments": moments} if moments else None)
+
+    async def _then(self, me: UUID | None, then: Any) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        start, end = then - self.AROUND, then + self.AROUND
         async with self.database.session() as session:
-            for years in range(1, self.YEARS + 1):
-                try:
-                    then = today.replace(year=today.year - years)
-                except ValueError:  # the 29th of February
-                    then = today.replace(year=today.year - years, day=28)
-                watched_rows = (
-                    (
-                        await session.execute(
-                            select(Activity)
-                            .where(
-                                Activity.user_id == me,
-                                Activity.counted.is_(True),
-                                Activity.kind != "live",
-                                Activity.started_at.between(then - self.AROUND, then + self.AROUND),
-                            )
-                            .order_by(Activity.started_at)
-                            .limit(40)
+            plays = (
+                (
+                    await session.execute(
+                        select(Activity)
+                        .where(
+                            Activity.user_id == me,
+                            Activity.counted.is_(True),
+                            Activity.kind != "live",
+                            Activity.started_at.between(start, end),
                         )
+                        .order_by(Activity.started_at)
+                        .limit(80)
                     )
-                    .scalars()
-                    .all()
-                    if me
-                    else []
                 )
-                added_rows = (
-                    (
-                        await session.execute(
-                            select(MediaObject)
-                            .where(
-                                MediaObject.status == "active",
-                                MediaObject.kind.in_(("movie", "series", "book", "audiobook")),
-                                MediaObject.first_seen_at.between(then - self.AROUND, then + self.AROUND),
-                            )
-                            .order_by(func.random())
-                            .limit(12)
-                        )
+                .scalars()
+                .all()
+                if me
+                else []
+            )
+            # the services' own date of addition (what the library got then), one card per title
+            arrivals = (
+                await session.execute(
+                    select(SourceItem.object_id, func.min(SourceItem.observed_at))
+                    .join(MediaObject, MediaObject.id == SourceItem.object_id)
+                    .where(
+                        SourceItem.kind.in_(("movie", "series", "book", "audiobook")),
+                        SourceItem.observed_at.between(start, end),
+                        MediaObject.status == "active",
                     )
-                    .scalars()
-                    .all()
+                    .group_by(SourceItem.object_id)
+                    .order_by(func.min(SourceItem.observed_at))
+                    .limit(self.ADDED)
                 )
-                if watched_rows or added_rows:
-                    break
-            else:
-                return self.payload({"years": None, "watched": [], "added": []})
+            ).all()
+            objects = {
+                o.id: o
+                for o in (
+                    await session.execute(
+                        select(MediaObject).where(MediaObject.id.in_([r[0] for r in arrivals]))
+                    )
+                ).scalars()
+            }
         seen: set[Any] = set()
         watched = []
-        for row in watched_rows:
+        for row in plays:
             key = row.work_id or row.object_id or (row.parent_title or row.title)
             if key in seen:
                 continue
             seen.add(key)
             series = row.kind == "episode" and row.parent_title
+            work = row.work_id or row.object_id
             watched.append(
                 {
-                    "id": str(row.work_id or row.object_id) if (row.work_id or row.object_id) else None,
+                    "id": str(work) if work else None,
                     "title": row.parent_title if series else row.title,
                     "subtitle": row.title if series else None,
                     "kind": "series" if series else row.kind,
                     "at": row.started_at.isoformat(),
                 }
             )
-        added = [{"id": str(o.id), "title": o.title, "kind": o.kind, "year": o.year} for o in added_rows]
-        return self.payload(
-            {
-                "years": years,
-                "date": then.date().isoformat(),
-                "watched": await self.cards(watched[:12]),
-                "added": [c for c in await self.cards(added) if c.get("image_id")],
-            }
-        )
+        added = [
+            {"id": str(o.id), "title": o.title, "kind": o.kind, "year": o.year}
+            for o in (objects.get(r[0]) for r in arrivals)
+            if o is not None
+        ]
+        return watched, added
 
 
 class PosterWallWidget(TopWidget):
