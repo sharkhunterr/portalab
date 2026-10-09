@@ -5,6 +5,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useNavigationView } from "../../../shell/nav/NavigationProvider";
 import { useShellStrings } from "../../../shell/strings";
+import { CONNECTOR_ICON } from "../../services/connectorIcons";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 
 /** First-party widgets (spec 009 T013): welcome / next steps and the services health summary. */
@@ -38,23 +39,6 @@ const HEALTH_TONES: Record<string, Tone> = {
   unavailable: "bad",
   maintenance: "info",
   unknown: "neutral",
-};
-
-const CONNECTOR_ICON: Record<string, string> = {
-  plex: "film",
-  jellyfin: "film",
-  emby: "film",
-  tautulli: "chart",
-  radarr: "clapperboard",
-  sonarr: "tv",
-  lidarr: "music",
-  seerr: "inbox",
-  overseerr: "inbox",
-  jellyseerr: "inbox",
-  grimmory: "book",
-  audiobookshelf: "headphones",
-  romm: "joystick",
-  tmdb: "database",
 };
 
 interface ServiceItem {

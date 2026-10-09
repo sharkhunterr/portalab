@@ -11,6 +11,7 @@ import { ApiError } from "../../../state/regions";
 import { type FieldDef, type PrecheckResult, precheck, useTicketActions, useTicketTypes } from "./api";
 import { DiagnosisPanel } from "./DiagnosisPanel";
 import { FieldInputs } from "./FieldInputs";
+import { ServicePicker } from "./ServicePicker";
 
 /**
  * New ticket (spec 016 T025/T028): describe → precheck (open incidents and wiki suggestions, no AI) →
@@ -27,6 +28,8 @@ export function NewTicketForm({
 }) {
   const t = useT();
   const headingId = useId();
+  const generated = useId();
+  const form = formId ?? generated;
   const types = useTicketTypes();
   const { create } = useTicketActions("");
   const [typeKey, setTypeKey] = useState("");
@@ -74,9 +77,18 @@ export function NewTicketForm({
   };
   const missing =
     create.error instanceof ApiError ? ((create.error.extensions.fields as string[] | undefined) ?? []) : [];
+  // #27: the title first; fields outside the <form> belong to it through ``form``, so « required » holds
   return (
     <div className="new-ticket">
+      <TextField
+        label={`${t("support:new.ticketTitle")} *`}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        form={form}
+        required
+      />
       <SelectField
+        form={form}
         label={t("support:new.type")}
         value={typeKey}
         onChange={(e) => setTypeKey(e.target.value)}
@@ -89,11 +101,7 @@ export function NewTicketForm({
           </option>
         ))}
       </SelectField>
-      <TextField
-        label={t("support:new.service")}
-        value={serviceId}
-        onChange={(e) => setServiceId(e.target.value)}
-      />
+      <ServicePicker value={serviceId} onChange={setServiceId} />
       <div className="ds-field">
         <label htmlFor={`${headingId}-problem`}>{t("support:new.problem")}</label>
         <textarea
@@ -151,13 +159,7 @@ export function NewTicketForm({
         </section>
       ) : null}
       {draftId ? <p role="status">{t("support:new.draftLoaded")}</p> : null}
-      <form onSubmit={submit} {...(formId ? { id: formId } : {})}>
-        <TextField
-          label={`${t("support:new.ticketTitle")} *`}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+      <form onSubmit={submit} id={form}>
         {type ? (
           <FieldInputs
             defs={type.fields as unknown as FieldDef[]}

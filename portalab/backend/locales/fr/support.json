@@ -185,6 +185,7 @@
   "new.incidents": "Incidents connus",
   "new.linkIncident": "Mon problème est cet incident",
   "new.missing": "À remplir : {fields}",
+  "new.noService": "Aucun",
   "new.problem": "Décrivez le problème",
   "new.service": "Service (facultatif)",
   "new.submit": "Ouvrir le ticket",
