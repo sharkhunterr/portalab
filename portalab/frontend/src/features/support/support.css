@@ -1111,5 +1111,5 @@
   gap: var(--space-3);
 }
 .new-ticket form > button[type="submit"] {
-  justify-self: start;
+  justify-self: end; /* #25: the form's action on the right, where the eye ends */
 }

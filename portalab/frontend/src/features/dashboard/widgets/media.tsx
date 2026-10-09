@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -317,6 +317,8 @@ function Soon({ payload }: WidgetProps) {
 registerWidgetComponent("media.posters", Posters);
 registerWidgetComponent("media.wall", PosterWall);
 registerWidgetComponent("media.soon", Soon);
+const MAX_LINES = 4;
+
 interface ShuffleCard extends Card {
   year?: number | null;
   genres?: string[];
@@ -333,6 +335,36 @@ function Shuffle({ payload }: WidgetProps) {
   const items = ((payload.data ?? {}) as { items?: ShuffleCard[] }).items ?? [];
   const [index, setIndex] = useState(() => Math.floor(Math.random() * Math.max(1, items.length)));
   const pick = items[index % Math.max(1, items.length)];
+  // #26: the overview gives up lines (4 → 0), then the title keeps one, until everything fits the block
+  const box = useRef<HTMLDivElement>(null);
+  const [lines, setLines] = useState(MAX_LINES);
+  const [measure, setMeasure] = useState(0);
+  useEffect(() => {
+    const element = box.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const again = new ResizeObserver(() => setMeasure((n) => n + 1));
+    again.observe(element);
+    return () => again.disconnect();
+  }, []);
+  // a new title or a new size starts the fitting over (a new round, from the most lines)
+  const [round, setRound] = useState(0);
+  const pickId = pick?.id ?? null;
+  useLayoutEffect(() => {
+    if (pickId === undefined) return;
+    void measure;
+    setLines(MAX_LINES);
+    setRound((n) => n + 1);
+  }, [pickId, measure]);
+  useLayoutEffect(() => {
+    void round;
+    const element = box.current;
+    const text = element?.querySelector<HTMLElement>(".widget-shuffle__text");
+    if (!element || !text) return;
+    const style = getComputedStyle(element);
+    const room =
+      element.clientHeight - Number.parseFloat(style.paddingTop) - Number.parseFloat(style.paddingBottom);
+    if (text.scrollHeight > room + 1 && lines > -1) setLines((n) => n - 1);
+  }, [lines, round]);
   if (!pick) return <p className="widget-empty">{t("media:widget.shuffle.empty")}</p>;
   const another = () =>
     setIndex((current) => {
@@ -351,7 +383,13 @@ function Shuffle({ payload }: WidgetProps) {
     .join(" · ");
   const art = poster(pick.image_id);
   return (
-    <div className="widget-shuffle" data-nofit>
+    <div
+      ref={box}
+      className="widget-shuffle"
+      data-nofit
+      data-tight={lines < 0 || undefined}
+      style={{ "--overview-lines": Math.max(lines, 0) } as React.CSSProperties}
+    >
       <span className="widget-shuffle__frieze" aria-hidden="true">
         <span className="widget-shuffle__track">
           {[...frieze, ...frieze].map((src, i) => (
@@ -367,7 +405,7 @@ function Shuffle({ payload }: WidgetProps) {
         </span>
         <strong className="widget-shuffle__title">{pick.title}</strong>
         {meta ? <span className="widget-shuffle__meta">{meta}</span> : null}
-        {pick.overview ? <p className="widget-shuffle__overview">{pick.overview}</p> : null}
+        {pick.overview && lines > 0 ? <p className="widget-shuffle__overview">{pick.overview}</p> : null}
         <span className="widget-shuffle__actions">
           {pick.route ? (
             <Link className="ds-button ds-button--primary" to={pick.route}>
