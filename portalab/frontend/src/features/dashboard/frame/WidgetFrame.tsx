@@ -17,6 +17,7 @@ import { type Instance, useWidgetData } from "../api";
 import { keyOf } from "../edit/EditSession";
 import { TEMPLATES } from "../templates/Templates";
 import { widgetComponent } from "../widgets/registry";
+import { HeaderSlot } from "./actions";
 import { useEmptyReport } from "./emptiness";
 
 /**
@@ -188,6 +189,7 @@ export function WidgetFrame({
   const headingId = useId();
   const body = useRef<HTMLDivElement>(null);
   const hidden = useFit(body);
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
   // 027: the member may show the content alone — without its title, without its box, or both
   const frame = (instance.config ?? {}) as Record<string, unknown>;
@@ -217,41 +219,46 @@ export function WidgetFrame({
             {instance.locked ? <span className="widget__badge">{t("dashboard:locked")}</span> : null}
           </>
         )}
-        {hidden && instance.available ? (
-          <Dialog
-            size="lg"
-            title={title}
-            closeLabel={t("dashboard:close")}
-            trigger={
-              <button
-                type="button"
-                className="widget-frame__more"
-                aria-label={t("dashboard:seeAll", { count: hidden })}
-                title={t("dashboard:seeAll", { count: hidden })}
-              >
-                +{hidden}
-                <Icon name="maximize" size={12} />
-              </button>
-            }
-          >
-            <div className="widget-frame__full" data-widget={instance.widget_key}>
-              <FrameBoundary fallback={<FunctionalState state="error" />}>
-                <Suspense fallback={<FunctionalState state="loading" />}>
-                  <Body instance={instance} />
-                </Suspense>
-              </FrameBoundary>
-            </div>
-          </Dialog>
-        ) : null}
+        <span className="widget-frame__tools">
+          <span className="widget-frame__actions" ref={setSlot} />
+          {hidden && instance.available ? (
+            <Dialog
+              size="lg"
+              title={title}
+              closeLabel={t("dashboard:close")}
+              trigger={
+                <button
+                  type="button"
+                  className="widget-frame__more"
+                  aria-label={t("dashboard:seeAll", { count: hidden })}
+                  title={t("dashboard:seeAll", { count: hidden })}
+                >
+                  +{hidden}
+                  <Icon name="maximize" size={12} />
+                </button>
+              }
+            >
+              <div className="widget-frame__full" data-widget={instance.widget_key}>
+                <FrameBoundary fallback={<FunctionalState state="error" />}>
+                  <Suspense fallback={<FunctionalState state="loading" />}>
+                    <Body instance={instance} />
+                  </Suspense>
+                </FrameBoundary>
+              </div>
+            </Dialog>
+          ) : null}
+        </span>
         {controls}
       </header>
       <div className="widget-frame__body" ref={body}>
         {instance.available ? (
-          <FrameBoundary fallback={<FunctionalState state="error" />}>
-            <Suspense fallback={<FunctionalState state="loading" />}>
-              <Body instance={instance} />
-            </Suspense>
-          </FrameBoundary>
+          <HeaderSlot.Provider value={slot}>
+            <FrameBoundary fallback={<FunctionalState state="error" />}>
+              <Suspense fallback={<FunctionalState state="loading" />}>
+                <Body instance={instance} />
+              </Suspense>
+            </FrameBoundary>
+          </HeaderSlot.Provider>
         ) : (
           <FunctionalState state="unavailable" label={t("dashboard:unavailableWidget")} />
         )}

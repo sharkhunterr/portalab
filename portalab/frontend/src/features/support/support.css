@@ -1089,3 +1089,27 @@
     flex-wrap: wrap;
   }
 }
+
+/* 027 (#25): « my tickets » — the new ticket's confirmation above the list */
+.widget-tickets__created {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-2);
+  color: var(--state-available-fg);
+  font-size: var(--font-size-sm);
+}
+
+/* 027 (#25): the ticket form, on its page or in the dashboard's dialog — fields given room */
+.new-ticket {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: var(--space-2);
+}
+.new-ticket form {
+  display: grid;
+  gap: var(--space-3);
+}
+.new-ticket form > button[type="submit"] {
+  justify-self: start;
+}

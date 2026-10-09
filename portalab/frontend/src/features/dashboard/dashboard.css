@@ -263,11 +263,39 @@
 .widget-frame__body li[data-overflow] {
   visibility: hidden;
 }
-/* 027 (#12): « +N » sits in the header, at the end of the title's line: the content keeps the whole block */
+/* 027 (#12, #25): the widget's own buttons and « +N » sit in the header, at the end of the title's line —
+   the content keeps the whole block */
+.widget-frame__tools {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+}
+.widget-frame__actions {
+  display: contents;
+}
+.widget-frame__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: 1.6rem;
+  padding: 0.1rem 0.65rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+.widget-frame__action:hover {
+  transform: scale(1.05);
+}
 .widget-frame__more {
   position: relative;
   flex: none;
-  margin-inline-start: auto;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -1379,11 +1407,11 @@
 .dashboard-grid:not([data-editing])
   .widget-frame[data-no-title]
   > .widget-frame__header
-  > :not(.widget-frame__more) {
+  > :not(.widget-frame__tools) {
   display: none;
 }
 /* 027 (#12): without a title, « +N » floats in the top corner */
-.dashboard-grid:not([data-editing]) .widget-frame[data-no-title] .widget-frame__more {
+.dashboard-grid:not([data-editing]) .widget-frame[data-no-title] .widget-frame__tools {
   position: absolute;
   inset-block-start: var(--space-2);
   inset-inline-end: var(--space-2);

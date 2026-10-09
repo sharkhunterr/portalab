@@ -15,10 +15,10 @@ import { FieldInputs } from "./FieldInputs";
 /**
  * New ticket (spec 016 T025/T028): describe → precheck (open incidents and wiki suggestions, no AI) →
  * optional assistant diagnosis (prefills a draft) → the form; the user always submits explicitly.
+ * 027 (#25): the form alone, shared by the page and the dashboard's « new ticket » dialog.
  */
-export function NewTicket() {
+export function NewTicketForm({ onCreated }: { onCreated: (ticket: { id: string }) => void }) {
   const t = useT();
-  const navigate = useNavigate();
   const headingId = useId();
   const types = useTicketTypes();
   const { create } = useTicketActions("");
@@ -62,14 +62,13 @@ export function NewTicket() {
         ...(incident ? { incident_id: incident } : {}),
         ...(draftId ? { draft_id: draftId } : {}),
       },
-      { onSuccess: (ticket) => navigate(`/support/tickets/${ticket.id}`) },
+      { onSuccess: (ticket) => onCreated(ticket) },
     );
   };
   const missing =
     create.error instanceof ApiError ? ((create.error.extensions.fields as string[] | undefined) ?? []) : [];
   return (
-    <section aria-labelledby={headingId}>
-      <PageHeader titleId={headingId} level={2} icon="ticket" title={t("support:new.title")} />
+    <div className="new-ticket">
       <SelectField
         label={t("support:new.type")}
         value={typeKey}
@@ -171,6 +170,18 @@ export function NewTicket() {
           </p>
         ) : null}
       </form>
+    </div>
+  );
+}
+
+export function NewTicket() {
+  const t = useT();
+  const navigate = useNavigate();
+  const headingId = useId();
+  return (
+    <section aria-labelledby={headingId}>
+      <PageHeader titleId={headingId} level={2} icon="ticket" title={t("support:new.title")} />
+      <NewTicketForm onCreated={(ticket) => navigate(`/support/tickets/${ticket.id}`)} />
     </section>
   );
 }

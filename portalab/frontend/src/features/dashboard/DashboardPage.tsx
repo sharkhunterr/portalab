@@ -33,6 +33,7 @@ import "../gamification/widget";
 import "../community/widget";
 import "../marketplace/widget";
 import "../support/incidents/widget";
+import "../support/tickets/widget";
 import "../campaigns/widget";
 
 const ONBOARDED = "portalab.onboarding.dashboard";

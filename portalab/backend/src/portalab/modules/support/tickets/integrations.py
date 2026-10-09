@@ -5,6 +5,7 @@
 
 import time
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from typing import Any
 from uuid import UUID
 
@@ -171,7 +172,9 @@ def _widget(key: str, permission: str) -> WidgetDefinition:
     )
 
 
-MY_TICKETS = _widget("support.my_tickets", TICKETS_CREATE)
+MY_TICKETS = replace(  # 027 (#25): its own component — the list, and « new ticket » in a dialog
+    _widget("support.my_tickets", TICKETS_CREATE), component_id="support.my_tickets"
+)
 QUEUE = _widget("support.queue", TICKETS_MANAGE)
 
 
@@ -194,8 +197,9 @@ class TicketsWidget:
                 if user
                 else []
             )
-        if not rows:
+        if not rows and self.is_queue:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        # 027 (#25): « my tickets » stays « available » when empty — its « new ticket » button shows anyway
         items = [
             {
                 "title": r.title,
