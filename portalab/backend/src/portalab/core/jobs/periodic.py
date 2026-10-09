@@ -29,12 +29,15 @@ async def schedule(
     queue: str = DEFAULT_QUEUE,
 ) -> None:
     slot = slot_of(at, interval)
+    # the key names the slot to its own precision: a job run more often than once a minute (the playback
+    # poll, every 15 s) would otherwise find its next slot taken by itself and never run again
+    precision = "%Y%m%dT%H%M%S" if interval < timedelta(minutes=1) else "%Y%m%dT%H%M"
     async with database.unit_of_work() as uow:
         await enqueue(
             uow.session,
             kind=kind,
             queue=queue,
-            dedup_key=f"{kind}:{slot.strftime('%Y%m%dT%H%M')}",
+            dedup_key=f"{kind}:{slot.strftime(precision)}",
             run_at=slot,
             clock=clock,
         )
@@ -55,8 +58,11 @@ def register_periodic(
     """Register ``kind`` and return a ``seed()`` coroutine function to call at worker start."""
 
     async def handler(payload: dict[str, Any]) -> None:
-        await func()
-        await schedule(database, kind, utc_now(clock) + interval, interval, clock, queue)
+        try:
+            await func()
+        finally:
+            # the next run is booked even when this one fails (its retries share the same next slot)
+            await schedule(database, kind, utc_now(clock) + interval, interval, clock, queue)
 
     registry.register(
         kind,
