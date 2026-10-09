@@ -17,7 +17,14 @@ import { FieldInputs } from "./FieldInputs";
  * optional assistant diagnosis (prefills a draft) → the form; the user always submits explicitly.
  * 027 (#25): the form alone, shared by the page and the dashboard's « new ticket » dialog.
  */
-export function NewTicketForm({ onCreated }: { onCreated: (ticket: { id: string }) => void }) {
+export function NewTicketForm({
+  onCreated,
+  formId,
+}: {
+  onCreated: (ticket: { id: string }) => void;
+  /** #25: in a dialog, the send button sits in its footer (``form={formId}``) beside « Close » */
+  formId?: string;
+}) {
   const t = useT();
   const headingId = useId();
   const types = useTicketTypes();
@@ -144,7 +151,7 @@ export function NewTicketForm({ onCreated }: { onCreated: (ticket: { id: string 
         </section>
       ) : null}
       {draftId ? <p role="status">{t("support:new.draftLoaded")}</p> : null}
-      <form onSubmit={submit}>
+      <form onSubmit={submit} {...(formId ? { id: formId } : {})}>
         <TextField
           label={`${t("support:new.ticketTitle")} *`}
           value={title}
@@ -159,9 +166,11 @@ export function NewTicketForm({ onCreated }: { onCreated: (ticket: { id: string 
             errors={missing}
           />
         ) : null}
-        <Button type="submit" disabled={!typeKey || !title || create.isPending}>
-          {t("support:new.submit")}
-        </Button>
+        {formId ? null : (
+          <Button type="submit" disabled={!typeKey || !title || create.isPending}>
+            {t("support:new.submit")}
+          </Button>
+        )}
         {create.isError ? (
           <p role="alert">
             {missing.length

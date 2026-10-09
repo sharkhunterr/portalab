@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
+import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
@@ -14,6 +15,8 @@ import "../support.css";
  * « My tickets » (016; 027 #25): my open tickets, and « new ticket » in the widget's header — the form in a
  * dialog, without leaving the dashboard; the new ticket shows in the list at once, with a link to it.
  */
+const FORM = "dashboard-new-ticket";
+
 function MyTicketsWidget(props: WidgetProps) {
   const t = useT();
   const client = useQueryClient();
@@ -29,6 +32,11 @@ function MyTicketsWidget(props: WidgetProps) {
           closeLabel={t("support:widget.my_tickets.close")}
           open={open}
           onOpenChange={setOpen}
+          footer={
+            <Button type="submit" form={FORM}>
+              {t("support:new.submit")}
+            </Button>
+          }
           trigger={
             <button type="button" className="widget-frame__action">
               <Icon name="plus" size={12} />
@@ -37,6 +45,7 @@ function MyTicketsWidget(props: WidgetProps) {
           }
         >
           <NewTicketForm
+            formId={FORM}
             onCreated={(ticket) => {
               setOpen(false);
               setCreated(ticket.id);
