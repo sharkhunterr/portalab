@@ -26,77 +26,115 @@
   position: relative;
   block-size: 100%;
 }
-.skin-pulse,
 .skin-liquid {
   display: contents;
 }
 
-/* --- continue: ambient light ------------------------------------------------------------------------------ */
-.skin-ambient {
-  isolation: isolate;
+/* --- continue: ambient light — each poster casts its colours around it (no box behind the widget) ---- */
+.widget-continue[data-ambient] {
+  padding-block-start: 0.5rem;
 }
-.skin-ambient::before {
-  content: "";
-  position: absolute;
-  inset: -25%;
-  z-index: -1;
-  background: var(--ambient-art) center / cover no-repeat;
-  filter: blur(2.2rem) saturate(1.5);
-  opacity: 0.5;
-  animation: skin-ambient-drift 22s ease-in-out infinite alternate;
+.widget-continue[data-ambient] :is(.widget-continue__glow, .widget-continue__art) {
+  grid-area: 1 / 1;
 }
-.skin-ambient::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-surface-raised) 35%, transparent),
-    color-mix(in srgb, var(--color-surface-raised) 70%, transparent)
-  );
+.widget-continue__glow {
+  place-self: stretch;
+  border-radius: var(--radius-md);
+  background: center / cover no-repeat;
+  filter: blur(1.1rem) saturate(2);
+  opacity: 0.85;
+  animation: skin-glow 6s ease-in-out infinite alternate;
 }
-.skin-ambient[data-still]::before {
-  animation: none;
+.widget-continue[data-ambient] > li:nth-child(2n) .widget-continue__glow {
+  animation-delay: -2s;
 }
-@keyframes skin-ambient-drift {
+.widget-continue[data-ambient] > li:nth-child(3n) .widget-continue__glow {
+  animation-delay: -4s;
+}
+@keyframes skin-glow {
   from {
-    transform: scale(1) translate(0, 0);
+    opacity: 0.6;
+    transform: scale(1.05);
   }
   to {
-    transform: scale(1.15) translate(-4%, 3%);
+    opacity: 1;
+    transform: scale(1.2);
   }
 }
 
-/* --- services: heartbeat --------------------------------------------------------------------------------- */
-.skin-pulse .widget-service__icon {
-  animation: skin-pulse-beat 2.8s ease-out infinite;
+/* --- services: heartbeat ---------------------------------------------------------------------------------- */
+.skin-pulse {
+  isolation: isolate;
+  block-size: auto;
 }
-.skin-pulse .widget-service:nth-child(3n + 2) .widget-service__icon {
-  animation-delay: 0.5s;
+.skin-pulse__trace {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: -1;
+  inline-size: 100%;
+  block-size: 3.6rem;
+  fill: none;
+  stroke: var(--tone, var(--color-accent));
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  opacity: 0.6;
 }
-.skin-pulse .widget-service:nth-child(3n + 3) .widget-service__icon {
-  animation-delay: 1s;
+.skin-pulse__trace path {
+  vector-effect: non-scaling-stroke;
 }
-.skin-pulse .widget-service[data-tone="bad"] .widget-service__icon {
-  animation-duration: 1.1s;
+.skin-pulse__beam {
+  stroke-width: 2.5;
+  stroke-dasharray: 14 86;
+  animation: skin-ecg 2.6s linear infinite;
+  filter: drop-shadow(0 0 3px var(--tone, var(--color-accent)));
 }
-.skin-pulse .widget-service[data-tone="warn"] .widget-service__icon {
-  animation-duration: 1.8s;
+.skin-pulse__trace path:first-child {
+  opacity: 0.35;
 }
-@keyframes skin-pulse-beat {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent);
+@keyframes skin-ecg {
+  from {
+    stroke-dashoffset: 100;
   }
-  14% {
-    transform: scale(1.08);
+  to {
+    stroke-dashoffset: 0;
   }
-  28% {
+}
+.skin-pulse .widget-services__ring {
+  animation: skin-heart 1.3s ease-in-out infinite;
+}
+.skin-pulse .widget-service .status-dot {
+  animation: skin-dot 1.3s ease-out infinite;
+}
+.skin-pulse[data-tone="bad"] :is(.widget-services__ring, .status-dot, .skin-pulse__beam) {
+  animation-duration: 0.7s;
+}
+.skin-pulse[data-tone="warn"] :is(.widget-services__ring, .status-dot) {
+  animation-duration: 0.95s;
+}
+@keyframes skin-heart {
+  0%,
+  45%,
+  100% {
     transform: scale(1);
+  }
+  12% {
+    transform: scale(1.1);
+  }
+  24% {
+    transform: scale(1);
+  }
+  34% {
+    transform: scale(1.06);
+  }
+}
+@keyframes skin-dot {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone, var(--color-accent)) 70%, transparent);
   }
   70%,
   100% {
-    box-shadow: 0 0 0 0.7rem transparent;
+    box-shadow: 0 0 0 0.45rem transparent;
   }
 }
 

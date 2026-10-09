@@ -38,27 +38,26 @@ const itemsOf = (props: WidgetProps): Card[] =>
   ((props.payload.data ?? {}) as { items?: Card[] }).items ?? [];
 const ISO = /^\d{4}-\d{2}-\d{2}(T|$)/;
 
-// --- continue: « ambient » — the title's poster as a blurred light behind ----------------------------------
-function Ambient({ Original, ...props }: SkinProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const lively = useLively(ref);
-  const src = art(itemsOf(props).find((c) => c.image_id || c.poster_ref));
-  return (
-    <div
-      ref={ref}
-      className="skin skin-ambient"
-      data-still={!lively || undefined}
-      style={src ? ({ "--ambient-art": `url("${src}")` } as CSSProperties) : undefined}
-    >
-      <Original {...props} />
-    </div>
-  );
-}
+// continue: « ambient » is drawn by the widget itself (media.tsx: a glow behind each poster)
 
-// --- services: « pulse » — a heartbeat per service, the light following the health ------------------------
+// --- services: « pulse » — a heartbeat trace under the summary, the ring and the state dots beating -----------
+// two beats across the block (the line is stretched to its width)
+const BEAT = "H{x} l3 -3 l3 3 h5 l2 -13 l4 27 l3 -18 l2 4 h8 q4 -7 8 0";
+const TRACE = `M0 20 ${BEAT.replace("{x}", "22")} H122 ${BEAT.replace("{x}", "122").slice(5)} H200`;
+
 function Pulse({ Original, ...props }: SkinProps) {
+  const items = ((props.payload.data ?? {}) as { items?: Array<{ state?: string }> }).items ?? [];
+  const tone = items.some((s) => s.state === "unavailable")
+    ? "bad"
+    : items.some((s) => s.state && s.state !== "operational")
+      ? "warn"
+      : "ok";
   return (
-    <div className="skin skin-pulse">
+    <div className="skin skin-pulse has-tone" data-tone={tone}>
+      <svg className="skin-pulse__trace" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d={TRACE} />
+        <path className="skin-pulse__beam" d={TRACE} pathLength={100} />
+      </svg>
       <Original {...props} />
     </div>
   );
@@ -497,7 +496,6 @@ function skin(
   registerWidgetComponent(id, Skinned);
 }
 
-skin("media.continue", { ambient: Ambient });
 skin("health.services_summary", { pulse: Pulse });
 skin("gamification.progress", { odometer: Odometer });
 skin("gamification.daily_objectives", { liquid: Liquid });

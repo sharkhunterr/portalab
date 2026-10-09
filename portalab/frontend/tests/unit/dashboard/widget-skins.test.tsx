@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it } from "vitest";
+import "../../../src/features/dashboard/widgets/builtin";
 import "../../../src/features/dashboard/widgets/layout";
 import "../../../src/features/dashboard/widgets/media";
 import "../../../src/features/dashboard/widgets/discover";
@@ -43,6 +44,29 @@ describe("widget looks", () => {
     expect(document.querySelector(".widget-clock")).toBeNull();
     expect(document.querySelectorAll(".skin-analog__tick")).toHaveLength(12);
     expect(document.querySelector(".skin-analog__second")).not.toBeNull();
+  });
+
+  it("lights each poster of « continue » with its own colours, never the whole block", () => {
+    const classic = show("media.continue", { items: [card(1), card(2)] });
+    expect(document.querySelector(".widget-continue__glow")).toBeNull();
+    classic.unmount();
+    show("media.continue", { items: [card(1), card(2)] }, { style: "ambient" });
+    const glows = document.querySelectorAll<HTMLElement>(".widget-continue__glow");
+    expect(glows).toHaveLength(2);
+    expect(glows[0]?.style.backgroundImage).toContain("/api/v1/media/images/img1");
+  });
+
+  it("draws a heartbeat under the services, in the tone of their health", () => {
+    show(
+      "health.services_summary",
+      {
+        items: [{ id: "s1", name: "Plex", state: "degraded", route: "/services/s1" }],
+        counts: { degraded: 1 },
+      },
+      { style: "pulse" },
+    );
+    expect(document.querySelector('.skin-pulse[data-tone="warn"] .skin-pulse__beam')).not.toBeNull();
+    expect(screen.getByText("Plex")).toBeInTheDocument();
   });
 
   it("shows a countdown on a flip board", () => {
