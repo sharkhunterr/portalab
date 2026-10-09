@@ -337,7 +337,7 @@ class MediaModule:
         if self.consumers.get(consumer.name) is None:
             self.consumers.register(consumer)
         widgets: tuple[tuple[Any, Any], ...] = (
-            (CONTINUE, ContinueWidget(self.history, self.clock, self.enricher)),
+            (CONTINUE, ContinueWidget(self.history, self.clock, self.enricher, self.player)),
             (RECENT, RecentWidget(self.discovery, self.clock)),
             (NOW_PLAYING, NowPlayingWidget(self.poller, self.clock)),
             (REQUESTS_WIDGET, RequestsWidget(self.requests, self.clock)),

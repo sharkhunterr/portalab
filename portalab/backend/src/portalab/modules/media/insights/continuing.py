@@ -8,6 +8,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 
+from portalab.capabilities.media import ResumePoint
 from portalab.core.db import Database
 from portalab.modules.media.models import Activity
 
@@ -72,17 +73,60 @@ def _item(row: Activity, progress: float | None) -> dict[str, Any]:
     }
 
 
+def resume_item(point: ResumePoint, object_id: UUID | None) -> dict[str, Any]:
+    """027 (#23): a card from a server's own « Continue watching » (a position, or the next episode)."""
+    series = point.kind == "episode" and point.parent_title
+    progress = (
+        min(1.0, point.position_s / point.duration_s) if point.position_s and point.duration_s else None
+    )
+    episode = f"{point.label} · {point.title}" if point.label else point.title
+    return {
+        "id": str(object_id) if object_id else None,
+        "title": point.parent_title if series else point.title,
+        "subtitle": episode if series else None,
+        "kind": point.kind,
+        "progress": progress,
+        "meta": f"{round(progress * 100)} %" if progress is not None else point.label,
+        "at": point.at.isoformat() if point.at else None,
+        "_lookup": (
+            TMDB_KIND.get(point.kind, "movie"),
+            dict(point.ids or {}),
+            point.parent_title if series else point.title,
+            point.year,
+        ),
+    }
+
+
+def _key(item: dict[str, Any]) -> Any:
+    return item.get("id") or (item.get("kind"), item.get("title"))
+
+
 async def in_progress(
-    database: Database, user: UUID, now: datetime, *, limit: int = 8
+    database: Database,
+    user: UUID,
+    now: datetime,
+    *,
+    limit: int = 8,
+    live: list[dict[str, Any]] | None = None,
+    skip_families: set[str] | frozenset[str] = frozenset(),
 ) -> list[dict[str, Any]]:
-    out: list[dict[str, Any]] = []
+    """``live``: the servers' own « Continue watching » first (#23); their history families are then left
+    out, so a title finished or set back to zero there leaves the shelf too."""
+    out: list[dict[str, Any]] = list(live or [])[:limit]
+    keys = {_key(item) for item in out}
     for row in await _latest(database, user, now):
+        if len(out) >= limit:
+            break
+        if row.family and row.family in skip_families:
+            continue
         progress = progress_of(row)
         if progress is not None and not STARTED <= progress < FINISHED:
             continue  # finished (or barely started): not « continue »
-        out.append(_item(row, progress))
-        if len(out) >= limit:
-            break
+        item = _item(row, progress)
+        if _key(item) in keys:
+            continue
+        keys.add(_key(item))
+        out.append(item)
     return out
 
 

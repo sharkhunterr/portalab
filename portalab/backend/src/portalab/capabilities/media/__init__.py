@@ -529,6 +529,23 @@ class PlayableItem:
 
 
 @dataclass(frozen=True, slots=True)
+class ResumePoint:
+    """027 (#23): a title the member is in the middle of on the service — or, without a position, the next
+    episode of a series they follow (the service's own « Continue watching »)."""
+
+    external_id: str
+    kind: str  # movie | episode
+    title: str
+    parent_title: str | None = None  # the series of an episode
+    label: str | None = None  # « S02E05 »
+    position_s: float = 0.0  # 0: up next, not started
+    duration_s: float | None = None
+    at: datetime | None = None  # when the member last watched
+    ids: Mapping[str, str] = field(default_factory=dict)
+    year: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class StreamOptions:
     version: int = 0
     quality: str = "original"  # a key of QUALITIES
@@ -605,6 +622,10 @@ class StreamChannel(Protocol):
 
     async def reset(self, external_id: str) -> None:
         """Forget where the member stopped (no resume point), keeping « watched » as it was."""
+        ...
+
+    async def continuing(self, limit: int) -> Sequence[ResumePoint]:
+        """The member's « Continue watching » on the service, most recent first."""
         ...
 
 

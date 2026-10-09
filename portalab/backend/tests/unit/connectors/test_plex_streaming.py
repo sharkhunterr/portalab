@@ -119,6 +119,21 @@ class _Server:
             return httpx.Response(
                 200, content=b"#EXTM3U\n", headers={"content-type": "application/vnd.apple.mpegurl"}
             )
+        if path == "/hubs/continueWatching":
+            hub = [
+                {**FILM, "viewOffset": 700_000, "lastViewedAt": 1791527096},
+                {
+                    "ratingKey": "201",
+                    "type": "episode",
+                    "title": "Pilot",
+                    "grandparentTitle": "Firefly",
+                    "parentIndex": 1,
+                    "index": 2,
+                    "duration": 2_400_000,
+                },
+                {"ratingKey": "300", "type": "track", "title": "Song"},
+            ]
+            return httpx.Response(200, json={"MediaContainer": {"Hub": [{"Metadata": hub}]}})
         if path.endswith("/subtitles"):
             return httpx.Response(200, text=ASS)
         return httpx.Response(200)
@@ -203,6 +218,15 @@ async def test_an_image_subtitle_is_burnt_and_unknown_accounts_refused(server: _
         await _streaming(server).channel("99").playable("100")
     with pytest.raises(ProviderNotFound):
         await owner.playable("404")
+
+
+async def test_continue_watching_is_plexs_own(server: _Server) -> None:
+    points = await _streaming(server).channel("42").continuing(10)
+    assert [(p.external_id, p.kind, p.position_s, p.label) for p in points] == [
+        ("100", "movie", 700.0, None),
+        ("201", "episode", 0.0, "S01E02"),  # the next episode: no position
+    ]
+    assert points[0].at is not None and points[1].parent_title == "Firefly"
 
 
 async def test_the_subtitle_feed_becomes_cues() -> None:

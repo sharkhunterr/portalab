@@ -61,21 +61,34 @@ class ContinueWidget(_Base):
     """What I am in the middle of: the portal's own playback progress and (027) the services' history —
     films and episodes from Plex/Tautulli, books and audiobooks from Grimmory — with posters."""
 
-    def __init__(self, history: HistoryProjection, clock: Clock | None = None, enricher: Any = None) -> None:
+    def __init__(
+        self, history: HistoryProjection, clock: Clock | None = None, enricher: Any = None, player: Any = None
+    ) -> None:
         super().__init__(clock)
         self.history = history
         self.enricher = enricher
+        self.player = player  # 027 (#23): the media servers' own « Continue watching »
 
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
-        from portalab.modules.media.insights.continuing import in_progress
+        from portalab.modules.media.insights.continuing import in_progress, resume_item
         from portalab.modules.media.providers.insight_widgets import with_posters
 
         user = principal.acting_for or principal.user_id
         if user is None:
             return self.payload([])
+        live = await self.player.continuing(user, limit=12) if self.player is not None else None
         rows = await self.history.continue_items(user, limit=8)
+        if live is not None and live.services:  # those servers speak for their titles: their word wins
+            theirs = await self.player.objects_on(live.services, [o.id for _, o in rows])
+            rows = [(p, o) for p, o in rows if o.id not in theirs]
+        known_live = await with_posters(
+            self.history.database,
+            self.enricher,
+            [resume_item(point, object_id) for point, object_id in (live.points if live else [])],
+            lookups=12,
+        )
         images = await posters(self.history.database, (o.id for _, o in rows))
         items = [
             {
@@ -87,11 +100,20 @@ class ContinueWidget(_Base):
             }
             for p, o in rows
         ]
+        items = [{**row, "route": row.get("route") or "/media/insights"} for row in known_live] + [
+            item for item in items if item["route"] not in {row.get("route") for row in known_live}
+        ]
         known = {item["route"] for item in items}
         history = await with_posters(
             self.history.database,
             self.enricher,
-            await in_progress(self.history.database, user, utc_now(self.clock), limit=12),
+            await in_progress(
+                self.history.database,
+                user,
+                utc_now(self.clock),
+                limit=12,
+                skip_families=live.families if live is not None else frozenset(),
+            ),
             lookups=12,
         )
         for row in history:

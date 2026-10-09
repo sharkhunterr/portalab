@@ -24,6 +24,7 @@ from portalab.capabilities.media import (
     QUALITIES,
     STREAMING,
     PlayableItem,
+    ResumePoint,
     StreamBody,
     StreamOptions,
     StreamStart,
@@ -75,6 +76,16 @@ class NothingToPlay(NotFound):
 class PlayerFailed(Unavailable):
     default_code = "media.player_unavailable"
     default_title = "The media server did not answer"
+
+
+@dataclass(frozen=True, slots=True)
+class Continuing:
+    """027 (#23): the services' own « Continue watching » for a member — with the catalog object of each
+    title — and which services and history families it speaks for (their history no longer decides)."""
+
+    points: list[tuple[ResumePoint, UUID | None]]
+    services: set[UUID]
+    families: set[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -173,6 +184,14 @@ class PlayerService:
             return None
         raise PlayerUnlinked("Link your account on the media server to watch here.")
 
+    def _registrations(self) -> dict[str, tuple[Any, str]]:
+        """Streaming providers by service, with their connector (the history family they speak for)."""
+        try:
+            registrations = self.capabilities.system_providers(STREAMING)
+        except Exception:
+            return {}
+        return {r.instance_ref: (r.provider, str(r.metadata.get("connector") or "")) for r in registrations}
+
     def _channel(self, service_id: UUID | str, account: str | None) -> Any:
         provider = self._providers().get(str(service_id))
         if provider is None:
@@ -239,6 +258,66 @@ class PlayerService:
             expires = int(utc_now(self.clock).timestamp()) + REMOTE_LIFETIME_S
             remote_ticket = sign(remote_key(self.key), replace(ticket, expires=expires))
         return sign(self.key, ticket), remote_ticket, started
+
+    async def continuing(self, user: UUID, limit: int = 12) -> Continuing:
+        """What the member is in the middle of, as each media server they are linked to keeps it (Plex's
+        « Continue watching »): exact, at once, and empty again after « Back to zero ». A server that does
+        not answer leaves the decision to the imported history."""
+        providers = self._registrations()
+        if not providers:
+            return Continuing([], set(), set())
+        async with self.database.session() as session:
+            links = (
+                await session.execute(
+                    select(UserLink.service_id, UserLink.external_user_id).where(
+                        UserLink.user_id == user, UserLink.verified.is_(True)
+                    )
+                )
+            ).all()
+        points: list[tuple[ResumePoint, UUID]] = []
+        services: set[UUID] = set()
+        families: set[str] = set()
+        for service_id, account in links:
+            registration = providers.get(str(service_id))
+            if registration is None:
+                continue
+            try:
+                found = await asyncio.wait_for(registration[0].channel(account).continuing(limit), timeout=8)
+            except Exception:  # noqa: S112 — this server's say is skipped: the history still speaks
+                continue
+            services.add(service_id)
+            families.add(registration[1])
+            points.extend((point, service_id) for point in found)
+        async with self.database.session() as session:
+            objects = {
+                (row.service_id, row.external_id): row.object_id
+                for row in (
+                    await session.execute(
+                        select(SourceItem).where(
+                            SourceItem.service_id.in_(services or {UUID(int=0)}),
+                            SourceItem.external_id.in_([p.external_id for p, _ in points] or [""]),
+                        )
+                    )
+                ).scalars()
+            }
+        points.sort(key=lambda p: p[0].at.timestamp() if p[0].at else 0.0, reverse=True)
+        return Continuing(
+            [(point, objects.get((service, point.external_id))) for point, service in points][:limit],
+            services,
+            families,
+        )
+
+    async def objects_on(self, services: set[UUID], object_ids: list[UUID]) -> set[UUID]:
+        """The objects among ``object_ids`` that the given services hold."""
+        if not services or not object_ids:
+            return set()
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(SourceItem.object_id).where(
+                    SourceItem.service_id.in_(services), SourceItem.object_id.in_(object_ids)
+                )
+            )
+            return {r[0] for r in rows if r[0] is not None}
 
     async def reset(self, user: UUID, object_id: UUID, item: str | None = None) -> None:
         """« Back to zero » without playing: the member's resume point on the service is forgotten."""

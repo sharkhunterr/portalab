@@ -28,6 +28,7 @@ from portalab.capabilities.connector_sdk import ServiceHandle
 from portalab.capabilities.media import (
     QUALITIES,
     PlayableItem,
+    ResumePoint,
     StreamBody,
     StreamMarker,
     StreamOptions,
@@ -38,7 +39,7 @@ from portalab.capabilities.media import (
     resolution_of,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
-from portalab.connectors.http_base import HttpConnector, safe_id
+from portalab.connectors.http_base import HttpConnector, parse_time, safe_id
 from portalab.core.logging import register_secret_value
 
 PLEX_TV = "https://plex.tv"
@@ -170,6 +171,15 @@ def _chapters(item: Mapping[str, Any]) -> tuple[StreamMarker, ...]:
                 )
             )
     return tuple(out)
+
+
+def _guids(item: Mapping[str, Any]) -> dict[str, str]:
+    ids: dict[str, str] = {}
+    for guid in item.get("Guid") or []:
+        scheme, _, value = str(guid.get("id", "")).partition("://")
+        if scheme in ("tmdb", "imdb", "tvdb") and value:
+            ids[scheme] = value
+    return ids
 
 
 def _episode_label(item: Mapping[str, Any]) -> str | None:
@@ -592,6 +602,38 @@ class PlexChannel:
         await self._call("GET", "/:/unscrobble", target)
         if item.get("viewCount"):
             await self._call("GET", "/:/scrobble", target)
+
+    async def continuing(self, limit: int) -> list[ResumePoint]:
+        """Plex's own « Continue watching » hub for the account: titles started (with their position)
+        and the next episode of the series being followed (no position)."""
+        container = _container(
+            await self._call(
+                "GET", "/hubs/continueWatching", {"count": max(1, min(limit, 50)), "includeGuids": 1}
+            )
+        )
+        items = list(container.get("Metadata") or [])
+        for hub in container.get("Hub") or []:
+            items.extend(hub.get("Metadata") or [])
+        out: list[ResumePoint] = []
+        for item in items:
+            kind = item.get("type")
+            if kind not in ("movie", "episode") or not item.get("ratingKey"):
+                continue
+            out.append(
+                ResumePoint(
+                    external_id=str(item["ratingKey"]),
+                    kind=str(kind),
+                    title=str(item.get("title") or "?")[:500],
+                    parent_title=item.get("grandparentTitle") if kind == "episode" else None,
+                    label=_episode_label(item) if kind == "episode" else None,
+                    position_s=_seconds(item.get("viewOffset")) or 0.0,
+                    duration_s=_seconds(item.get("duration")),
+                    at=parse_time(item.get("lastViewedAt")),
+                    ids=_guids(item),
+                    year=_int(item.get("year")),
+                )
+            )
+        return out[:limit]
 
     async def stop(self, session: str) -> None:
         await self._call("GET", f"{TRANSCODER}/stop", {"session": session}, session=session)

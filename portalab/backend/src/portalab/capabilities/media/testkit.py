@@ -27,6 +27,7 @@ from portalab.capabilities.media import (
     PlayableItem,
     RequestPayload,
     RequestService,
+    ResumePoint,
     SourceHistoryItem,
     SourcePlayback,
     SourceRequest,
@@ -228,6 +229,7 @@ class FakeStreaming:
     access. Records every call as ``(account, operation, details)``."""
 
     calls: list[tuple[str | None, str, Any]] = field(default_factory=list)
+    resume: list[ResumePoint] = field(default_factory=list)
     cues: list[SubtitleCue] = field(
         default_factory=lambda: [SubtitleCue(1.0, 2.5, "Hello"), SubtitleCue(300.0, 302.0, "Later")]
     )
@@ -314,6 +316,12 @@ class FakeChannel:
 
     async def stop(self, session: str) -> None:
         self.owner.calls.append((self.account, "stop", session))
+
+    async def continuing(self, limit: int) -> list[ResumePoint]:
+        if self.account == "denied":
+            raise ProviderAuthError("no access")
+        self.owner.calls.append((self.account, "continuing", limit))
+        return list(self.owner.resume)[:limit]
 
     async def reset(self, external_id: str) -> None:
         self._check(external_id)

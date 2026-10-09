@@ -158,3 +158,57 @@ async def test_no_streaming_source_and_denied_account(
     assert nothing.status_code == 404 and nothing.json()["code"] == "media.player_nothing"
     denied = await client.get(f"/api/v1/media/{object_id}/player")
     assert denied.status_code == 403 and denied.json()["code"] == "media.player_denied"
+
+
+async def test_continue_follows_the_servers_own_continue_watching(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """#23: the media home's « Continue » shows what Plex itself has in progress for the member (a film
+    paused a minute ago, before any history arrives), leaves out Plex history rows (Plex speaks for its
+    titles: a title set back to zero leaves), and keeps other services' history (Grimmory)."""
+    from datetime import timedelta
+    from uuid import uuid4
+
+    from portalab.capabilities.media import ResumePoint
+    from portalab.modules.media.models import Activity
+    from tests.integration.privacy.conftest import NOW
+
+    people = await users(app, media, "zoe")
+    plex = media.service(3, "plex")
+    await media.module.library.upsert([library_record("m1", title="Film", year=2020)], plex)
+    fake = FakeStreaming(
+        resume=[ResumePoint("m1", "movie", "Film", position_s=1500, duration_s=6000, at=NOW)]
+    )
+    media.ev.full.identity.capabilities.provide(
+        STREAMING, fake, instance_ref=str(plex.service_id), owner="service:3", metadata={"connector": "plex"}
+    )
+    await media.module.links.claim(people["zoe"], plex.service_id, "7", verified=True)
+    async with media.database.unit_of_work() as uow:
+        for title, family in (("Old Plex film", "plex"), ("A book", "grimmory")):
+            uow.session.add(
+                Activity(
+                    service_id=uuid4(),
+                    ref=str(uuid4()),
+                    family=family,
+                    priority=10,
+                    counted=True,
+                    external_user_id="7",
+                    user_id=people["zoe"],
+                    kind="movie" if family == "plex" else "book",
+                    title=title,
+                    ids={},
+                    started_at=NOW - timedelta(days=2),
+                    watched_s=100.0,
+                    duration_s=1000.0,
+                    progress=0.4,
+                    received_at=NOW,
+                )
+            )
+    await login(client, "zoe")
+    shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
+    assert [(c["title"], c["progress"]) for c in shelf] == [("Film", 0.25), ("A book", 0.4)]
+    assert shelf[0]["route"].startswith("/media/")  # tied to the catalog's object
+
+    fake.resume.clear()  # « Back to zero » on Plex
+    shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
+    assert [c["title"] for c in shelf] == ["A book"]

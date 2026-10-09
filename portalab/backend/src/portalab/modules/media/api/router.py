@@ -25,7 +25,7 @@ from portalab.modules.media.discovery.shelves import SHELVES
 from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.images.service import CONTENT_TYPE
-from portalab.modules.media.insights.continuing import in_progress, recently
+from portalab.modules.media.insights.continuing import in_progress, recently, resume_item
 from portalab.modules.media.insights.deep import portraits
 from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
 from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
@@ -610,7 +610,15 @@ async def my_journal(principal: User, module: Module) -> dict[str, Any]:
     in the middle of and what I opened lately, with posters (the library's, else the metadata provider's)."""
     now = utc_now(module.clock)
     user = _me(principal)
-    going = await in_progress(module.database, user, now, limit=12)
+    live = await module.player.continuing(user, limit=12)  # 027 (#23): the servers' own « Continue »
+    going = await in_progress(
+        module.database,
+        user,
+        now,
+        limit=12,
+        live=[resume_item(point, object_id) for point, object_id in live.points],
+        skip_families=live.families,
+    )
     lately = await recently(module.database, user, now, limit=16)
     return {
         "continue": await with_posters(module.database, module.enricher, going, lookups=12),
