@@ -17,6 +17,7 @@ export function PlayerPage() {
   const { objectId = "" } = useParams();
   const [search, setSearch] = useSearchParams();
   const item = search.get("item");
+  const fromStart = search.get("start") === "0"; // « Start over » from the title's page
   const info = usePlayerInfo(objectId, item);
   const exit = useCallback(() => navigate(`/media/${objectId}`), [navigate, objectId]);
   const episode = useCallback((next: string) => setSearch({ item: next }, { replace: true }), [setSearch]);
@@ -78,6 +79,7 @@ export function PlayerPage() {
         key={info.data.item.external_id}
         objectId={objectId}
         info={info.data}
+        fromStart={fromStart}
         onExit={exit}
         onEpisode={episode}
       />

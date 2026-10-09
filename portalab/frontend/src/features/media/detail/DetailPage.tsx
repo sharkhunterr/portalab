@@ -481,6 +481,12 @@ function Watch({ objectId, kind }: { objectId: string; kind: string }) {
             : t(resume ? "media:player.cta.resume" : "media:player.cta.watch")}
         </Link>
       ) : null}
+      {item && resume ? (
+        <Link className="ds-button ds-button--secondary" to={`/media/${objectId}/watch?start=0`}>
+          <Icon name="replay" size={16} />
+          {t("media:player.cta.restart")}
+        </Link>
+      ) : null}
       <OpenIn objectId={objectId} kind={kind} secondary={Boolean(item)} />
       {code === "media.player_unlinked" ? (
         <Link className="media-watch-hint" to="/settings/media-accounts">

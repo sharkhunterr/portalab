@@ -38,6 +38,7 @@ import "./player.css";
 export interface VideoPlayerProps {
   objectId: string;
   info: PlayerInfo;
+  fromStart?: boolean; // « Start over »: no resume question, from 0
   onExit: () => void;
   onEpisode: (item: string) => void;
 }
@@ -58,7 +59,7 @@ function mergeCues(previous: Cue[], incoming: Cue[]): Cue[] {
   return [...all.values()].sort((a, b) => a.start_s - b.start_s).slice(-4000);
 }
 
-export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerProps) {
+export function VideoPlayer({ objectId, info, fromStart = false, onExit, onEpisode }: VideoPlayerProps) {
   const t = useT();
   const item = info.item;
   const duration = item.duration_s ?? null;
@@ -81,7 +82,7 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
   const qualities = useMemo(() => qualitiesFor(info.qualities, version), [info.qualities, version]);
   const quality = qualities.includes(prefs.quality) ? prefs.quality : (qualities[0] ?? "original");
   const resumable = item.resume_s > 30 && (!duration || item.resume_s < duration * 0.95);
-  const [startAt, setStartAt] = useState<number | null>(resumable ? null : 0); // null: asking
+  const [startAt, setStartAt] = useState<number | null>(resumable && !fromStart ? null : 0); // null: asking
 
   // --- the stream ---------------------------------------------------------------------------------------
   const frameRef = useRef<HTMLElement>(null);
@@ -933,14 +934,24 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
               />
             ) : null}
           </div>
-          {cast.state.available || casting ? (
+          {cast.state.ready || casting ? (
+            // shown wherever the browser can cast; dimmed while no device is found (Chrome's own
+            // dialog, opened by a press, keeps looking)
             <button
               type="button"
               className="player-icon"
               data-on={casting}
+              data-idle={!casting && !cast.state.available}
               aria-pressed={casting}
               onClick={casting ? cast.end : cast.request}
-              aria-label={casting ? t("media:player.castStop") : t("media:player.cast")}
+              aria-label={
+                casting
+                  ? t("media:player.castStop")
+                  : cast.state.available
+                    ? t("media:player.cast")
+                    : t("media:player.castNoDevice")
+              }
+              title={cast.state.available || casting ? undefined : t("media:player.castNoDevice")}
             >
               <Icon name="cast" size={22} />
             </button>

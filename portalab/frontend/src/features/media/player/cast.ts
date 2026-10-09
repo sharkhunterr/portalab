@@ -111,6 +111,7 @@ export function loadCastSdk(): Promise<boolean> {
 }
 
 export interface CastState {
+  ready: boolean; // the browser can cast (Chrome or Edge with the Cast SDK)
   available: boolean; // a Cast device is around
   connected: boolean;
   device: string | null;
@@ -123,6 +124,7 @@ export interface CastState {
 }
 
 const IDLE: CastState = {
+  ready: false,
   available: false,
   connected: false,
   device: null,
@@ -165,6 +167,7 @@ export function useCast() {
       const sync = () =>
         setState((current) => ({
           ...current,
+          ready: true,
           available: context.getCastState() !== framework.CastState.NO_DEVICES_AVAILABLE,
           connected: player.isConnected,
           device: context.getCurrentSession()?.getCastDevice().friendlyName ?? null,

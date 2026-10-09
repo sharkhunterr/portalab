@@ -66,7 +66,7 @@ afterEach(() => {
   localStorage.clear();
 });
 
-function show() {
+function show(query = "") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const router = createMemoryRouter(
     [
@@ -74,7 +74,7 @@ function show() {
       { path: "/media/:objectId", element: <p>Title page</p> },
       { path: "/settings/media-accounts", element: <p>Accounts</p> },
     ],
-    { initialEntries: [`/media/${ID}/watch`] },
+    { initialEntries: [`/media/${ID}/watch${query}`] },
   );
   return render(
     <QueryClientProvider client={client}>
@@ -170,6 +170,34 @@ describe("player", () => {
     await waitFor(() => expect(hls.instances[1]?.config.startPosition).toBe(1235)); // where it was
     await waitFor(() => expect(posts).toContain("stop")); // the first stream is let go
     expect(JSON.parse(localStorage.getItem("portalab.player") ?? "{}").quality).toBe("4m");
+  });
+
+  it("starts over from the beginning when asked, without the resume question", async () => {
+    const starts: Array<Record<string, unknown>> = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path.endsWith("/player")) return json(200, INFO);
+      if (path.endsWith("/player/start")) {
+        starts.push((await request.json()) as Record<string, unknown>);
+        return json(200, {
+          ticket: TICKET,
+          playlist: "session/s9/base/index.m3u8",
+          video: "copy",
+          audio: "copy",
+          subtitles: "none",
+          width: null,
+          height: null,
+          bitrate_kbps: null,
+          video_codec: null,
+          audio_codec: null,
+        });
+      }
+      return new Response(null, { status: 204 });
+    };
+    show("?start=0");
+    await waitFor(() => expect(starts).toHaveLength(1));
+    await waitFor(() => expect(hls.instances[0]?.config.startPosition).toBe(0));
+    expect(screen.queryByRole("button", { name: /20:34/ })).toBeNull();
   });
 
   it("asks a member with no linked account to link it", async () => {

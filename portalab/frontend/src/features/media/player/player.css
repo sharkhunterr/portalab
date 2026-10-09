@@ -122,6 +122,10 @@ html[data-playing="true"] body {
   transform: scale(0.92);
 }
 
+.player-icon[data-idle="true"] {
+  opacity: 0.55;
+}
+
 .player-icon[data-on="true"] {
   color: var(--player-accent);
 }
