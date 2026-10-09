@@ -6103,6 +6103,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/player/{ticket}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Player Image
+         * @description A chapter's picture, or the seek-bar preview at ``at`` seconds (JPEG from the media server).
+         */
+        get: operations["player_image_api_v1_media_player__ticket__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/player/{ticket}/stop": {
         parameters: {
             query?: never;
@@ -12550,6 +12570,8 @@ export interface components {
         StreamMarkerOut: {
             /** End S */
             end_s: number;
+            /** Image */
+            image: string | null;
             /** Kind */
             kind: string;
             /** Label */
@@ -12659,6 +12681,8 @@ export interface components {
             index: number;
             /** Label */
             label: string;
+            /** Previews */
+            previews: string | null;
             /** Resolution */
             resolution: string | null;
             /** Size */
@@ -25872,6 +25896,38 @@ export interface operations {
                 content: {
                     "application/json": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    player_image_api_v1_media_player__ticket__image_get: {
+        parameters: {
+            query: {
+                ref: string;
+                at?: number | null;
+            };
+            header?: never;
+            path: {
+                ticket: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

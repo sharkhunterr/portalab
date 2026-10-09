@@ -26,7 +26,15 @@ FILM = {
     "viewOffset": 1_234_000,
     "thumb": "/t",
     "Marker": [{"type": "credits", "startTimeOffset": 6_800_000, "endTimeOffset": 7_000_000}],
-    "Chapter": [{"tag": "Nostromo", "startTimeOffset": 0, "endTimeOffset": 600_000}],
+    "Chapter": [
+        {
+            "tag": "Nostromo",
+            "startTimeOffset": 0,
+            "endTimeOffset": 600_000,
+            "thumb": "/library/media/77/chapterImages/1",
+        },
+        {"startTimeOffset": 600_000, "endTimeOffset": 7_000_000},
+    ],
     "Media": [
         {
             "videoResolution": "1080",
@@ -39,6 +47,7 @@ FILM = {
                 {
                     "id": 5,
                     "size": 10,
+                    "indexes": "sd",
                     "Stream": [
                         {"id": 1, "streamType": 1, "codec": "h264", "displayTitle": "1080p"},
                         {
@@ -82,6 +91,8 @@ class _Server:
             return httpx.Response(404)
         if path == "/library/parts/5":
             return httpx.Response(200)
+        if path == "/photo/:/transcode" or path.startswith("/library/parts/5/indexes/sd/"):
+            return httpx.Response(200, content=b"\xff\xd8jpeg")
         if path.endswith("/decision"):
             media = {
                 "width": 1920,
@@ -135,7 +146,20 @@ async def test_a_shared_member_plays_as_themself(server: _Server) -> None:
     assert version.label == "1080p · H.264 · mkv"
     assert [(t.id, t.text) for t in version.subtitles] == [("3", True), ("4", False)]
     assert version.audio[0].selected and item.markers[0].kind == "credits"
-    assert item.chapters[0].label == "Nostromo"
+    assert item.chapters[0].label == "Nostromo" and item.chapters[0].image == "chapter:77:1"
+    assert item.chapters[1].label is None and item.chapters[1].image is None
+    assert version.previews == "preview:5"
+    assert await channel.image("chapter:77:1") == b"\xff\xd8jpeg"
+    scaled = [r for r in server.requests if r.url.path == "/photo/:/transcode"][-1]
+    assert (
+        scaled.url.params["url"] == "/library/media/77/chapterImages/1"
+        and scaled.url.params["width"] == "320"
+    )
+    assert await channel.image("preview:5", 61.5) == b"\xff\xd8jpeg"
+    assert server.requests[-1].url.path == "/library/parts/5/indexes/sd/61500"
+    for bad in ("chapter:77", "preview:5:1", "file:/etc/passwd", "chapter:../1:1"):
+        with pytest.raises(ProviderNotFound):
+            await channel.image(bad)
     plex_calls = [r for r in server.requests if r.url.host == "plex.lan"]
     assert {r.headers["X-Plex-Token"] for r in plex_calls if r.url.path != "/identity"} == {"tok42"}
 

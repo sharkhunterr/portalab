@@ -314,3 +314,9 @@ class FakeChannel:
 
     async def stop(self, session: str) -> None:
         self.owner.calls.append((self.account, "stop", session))
+
+    async def image(self, ref: str, at_s: float | None = None) -> bytes:
+        if ref != "chapter:1:2":
+            raise ProviderNotFound("no such picture")
+        self.owner.calls.append((self.account, "image", ref))
+        return PNG_1PX

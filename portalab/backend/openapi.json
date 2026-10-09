@@ -12705,6 +12705,17 @@
             "title": "End S",
             "type": "number"
           },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          },
           "kind": {
             "title": "Kind",
             "type": "string"
@@ -12729,7 +12740,8 @@
           "kind",
           "start_s",
           "end_s",
-          "label"
+          "label",
+          "image"
         ],
         "title": "StreamMarkerOut",
         "type": "object"
@@ -13059,6 +13071,17 @@
             "title": "Label",
             "type": "string"
           },
+          "previews": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previews"
+          },
           "resolution": {
             "anyOf": [
               {
@@ -13124,7 +13147,8 @@
           "hdr",
           "size",
           "audio",
-          "subtitles"
+          "subtitles",
+          "previews"
         ],
         "title": "StreamVersionOut",
         "type": "object"
@@ -33460,6 +33484,71 @@
           }
         },
         "summary": "Metadata Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/player/{ticket}/image": {
+      "get": {
+        "description": "A chapter's picture, or the seek-bar preview at ``at`` seconds (JPEG from the media server).",
+        "operationId": "player_image_api_v1_media_player__ticket__image_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 60,
+              "pattern": "^(chapter|preview):[0-9:]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "at",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "At"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Image",
         "tags": [
           "media"
         ]

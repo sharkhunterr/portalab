@@ -46,6 +46,8 @@ TOKEN_TTL = 1800.0
 OWNER = "1"  # the server owner's account id on the server (``/accounts``)
 TRANSCODER = "/video/:/transcode/universal"
 SEGMENT = re.compile(r"^session/([A-Za-z0-9_-]{1,80})/base/(index\.m3u8|\d{1,6}\.ts)$")
+CHAPTER_IMAGE = re.compile(r"^/library/media/(\d{1,12})/chapterImages/(\d{1,4})$")
+IMAGE_REF = re.compile(r"^(chapter|preview):(\d{1,12})(?::(\d{1,4}))?$")
 IMAGE_SUBTITLES = frozenset({"pgs", "hdmv_pgs_subtitle", "vobsub", "dvd_subtitle", "dvdsub", "dvb_subtitle"})
 RESOLUTION_LABELS = {"4k": "4K", "1080p": "1080p", "720p": "720p", "sd": "SD"}
 CODEC_LABELS = {
@@ -137,6 +139,8 @@ def _version(index: int, media: Mapping[str, Any]) -> StreamVersion:
         size=_int(parts[0].get("size")),
         audio=tuple(_track(s) for s in streams if s.get("streamType") == 2),
         subtitles=tuple(_track(s) for s in streams if s.get("streamType") == 3),
+        # the server's preview thumbnails, when it generates them (Plex: « video preview thumbnails »)
+        previews=f"preview:{parts[0]['id']}" if parts[0].get("indexes") and parts[0].get("id") else None,
     )
 
 
@@ -155,7 +159,16 @@ def _chapters(item: Mapping[str, Any]) -> tuple[StreamMarker, ...]:
     for chapter in item.get("Chapter") or []:
         start, end = _seconds(chapter.get("startTimeOffset")) or 0.0, _seconds(chapter.get("endTimeOffset"))
         if end and end > start:
-            out.append(StreamMarker(kind="chapter", start_s=start, end_s=end, label=chapter.get("tag")))
+            thumb = CHAPTER_IMAGE.match(str(chapter.get("thumb") or ""))
+            out.append(
+                StreamMarker(
+                    kind="chapter",
+                    start_s=start,
+                    end_s=end,
+                    label=chapter.get("tag") or None,
+                    image=f"chapter:{thumb.group(1)}:{thumb.group(2)}" if thumb else None,
+                )
+            )
     return tuple(out)
 
 
@@ -545,6 +558,30 @@ class PlexChannel:
         await self._call("GET", "/:/timeline", params, session=session)
         if state == "paused":  # the transcoder stops a session it has not heard from for a while
             await self._call("GET", f"{TRANSCODER}/ping", {"session": session}, session=session)
+
+    async def image(self, ref: str, at_s: float | None = None) -> bytes:
+        match = IMAGE_REF.match(ref)
+        if not match or (match.group(1) == "chapter") != (match.group(3) is not None):
+            raise ProviderNotFound("no such picture")
+        kind, key, number = match.groups()
+        params: dict[str, Any] = {}
+        if kind == "chapter":  # scaled down by the server's photo transcoder (the original is full size)
+            path = "/photo/:/transcode"
+            params = {"url": f"/library/media/{key}/chapterImages/{number}", "width": 320, "height": 180}
+        else:
+            path = f"/library/parts/{key}/indexes/sd/{int(max(at_s or 0.0, 0.0) * 1000)}"
+        token = await self._token()
+        try:
+            response = await self.connector._http(self.service).get(
+                path, headers=self._headers(token), params=params
+            )
+        except ConnectorHttpError as exc:
+            raise ConnectionError(str(exc)) from exc
+        if response.status_code in (401, 403):
+            raise ProviderAuthError("the server refused this account")
+        if response.status_code >= 400 or not response.content:
+            raise ProviderNotFound("no such picture")
+        return response.content
 
     async def stop(self, session: str) -> None:
         await self._call("GET", f"{TRANSCODER}/stop", {"session": session}, session=session)

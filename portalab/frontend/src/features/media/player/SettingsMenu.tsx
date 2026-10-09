@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
-import type { PlayerInfo, PlayerTrack, StreamStarted } from "./api";
+import { type PlayerInfo, type PlayerTrack, playerImage, type StreamStarted } from "./api";
 import type { PlayerPrefs } from "./prefs";
 import { bitrateLabel, clock, QUALITY_INFO, trackById } from "./quality";
 
@@ -344,6 +344,14 @@ export function SettingsMenu(props: SettingsMenuProps) {
                 onSelect={pick(() => props.onSeek(chapter.start_s))}
                 hint={clock(chapter.start_s)}
               >
+                {chapter.image && stream ? (
+                  <img
+                    className="player-chapter-thumb"
+                    src={playerImage(stream.ticket, chapter.image)}
+                    alt=""
+                    loading="lazy"
+                  />
+                ) : null}
                 {chapter.label ?? t("media:player.chapter", { number: index + 1 })}
               </Choice>
             ))}

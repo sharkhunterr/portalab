@@ -261,6 +261,13 @@ class PlayerService:
             )
         )
 
+    async def image(self, user: UUID, token: str, ref: str, at_s: float | None) -> bytes:
+        """A chapter's picture or a seek-bar preview of the stream's title, as the member's account."""
+        ticket = self.ticket(user, token)
+        channel = self._channel(ticket.service, ticket.account)
+        data: bytes = await _call(channel.image(ref, at_s), 15.0)
+        return data
+
     async def stop(self, user: UUID, token: str) -> None:
         ticket = self.ticket(user, token)
         self.feeds.close(ticket.session)

@@ -492,6 +492,7 @@ class StreamVersion:
     size: int | None = None
     audio: tuple[StreamTrack, ...] = ()
     subtitles: tuple[StreamTrack, ...] = ()
+    previews: str | None = None  # the service's seek-bar previews of this file, an opaque ref (``image``)
 
 
 @dataclass(frozen=True, slots=True)
@@ -502,6 +503,7 @@ class StreamMarker:
     start_s: float
     end_s: float
     label: str | None = None
+    image: str | None = None  # a chapter's picture, an opaque ref read through the channel's ``image``
 
 
 @dataclass(frozen=True, slots=True)
@@ -596,6 +598,10 @@ class StreamChannel(Protocol):
         ...
 
     async def stop(self, session: str) -> None: ...
+
+    async def image(self, ref: str, at_s: float | None = None) -> bytes:
+        """A chapter's picture, or the preview of ``previews`` at ``at_s`` (JPEG)."""
+        ...
 
 
 @runtime_checkable

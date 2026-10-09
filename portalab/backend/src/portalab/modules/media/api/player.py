@@ -11,7 +11,7 @@ from contextlib import AsyncExitStack
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Path, Query, status
+from fastapi import APIRouter, Path, Query, Response, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -62,6 +62,7 @@ class StreamVersionOut(BaseModel):
     size: int | None
     audio: list[StreamTrackOut]
     subtitles: list[StreamTrackOut]
+    previews: str | None
 
 
 class StreamMarkerOut(BaseModel):
@@ -69,6 +70,7 @@ class StreamMarkerOut(BaseModel):
     start_s: float
     end_s: float
     label: str | None
+    image: str | None
 
 
 class PlayableItemOut(BaseModel):
@@ -169,11 +171,14 @@ def _version(version: StreamVersion) -> StreamVersionOut:
         size=version.size,
         audio=[_track(t) for t in version.audio],
         subtitles=[_track(t) for t in version.subtitles],
+        previews=version.previews,
     )
 
 
 def _marker(marker: StreamMarker) -> StreamMarkerOut:
-    return StreamMarkerOut(kind=marker.kind, start_s=marker.start_s, end_s=marker.end_s, label=marker.label)
+    return StreamMarkerOut(
+        kind=marker.kind, start_s=marker.start_s, end_s=marker.end_s, label=marker.label, image=marker.image
+    )
 
 
 def _playable(item: PlayableItem) -> PlayableItemOut:
@@ -267,6 +272,23 @@ async def player_stop(
     principal: Player, module: Module, ticket: Annotated[str, Path(pattern=TICKET)]
 ) -> None:
     await module.player.stop(_me(principal), ticket)
+
+
+@router.get("/media/player/{ticket}/image", response_class=Response)
+async def player_image(
+    principal: Player,
+    module: Module,
+    ticket: Annotated[str, Path(pattern=TICKET)],
+    ref: Annotated[str, Query(max_length=60, pattern=r"^(chapter|preview):[0-9:]+$")],
+    at: Annotated[float | None, Query(ge=0)] = None,
+) -> Response:
+    """A chapter's picture, or the seek-bar preview at ``at`` seconds (JPEG from the media server)."""
+    data = await module.player.image(_me(principal), ticket, ref, at)
+    return Response(
+        content=data,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "private, max-age=3600", "X-Content-Type-Options": "nosniff"},
+    )
 
 
 @router.get("/media/player/{ticket}/session/{path:path}", include_in_schema=False)

@@ -70,6 +70,11 @@ async def test_play_as_the_members_account(
     cues = (await client.get(f"{base}/subtitles", params={"at": 0})).json()["cues"]
     assert cues == [{"start_s": 1.0, "end_s": 2.5, "text": "Hello"}]  # « Later » is beyond the window
 
+    picture = await client.get(f"{base}/image", params={"ref": "chapter:1:2"})
+    assert picture.status_code == 200 and picture.headers["content-type"] == "image/jpeg"
+    assert (await client.get(f"{base}/image", params={"ref": "chapter:9:9"})).status_code == 404
+    assert (await client.get(f"{base}/image", params={"ref": "../etc"})).status_code == 422
+
     timeline = await client.post(f"{base}/timeline", json={"state": "paused", "position_s": 42.5})
     assert timeline.status_code == 204
     assert fake.calls[-1] == ("7", "report", ("paused", 42.5, 6000.0))

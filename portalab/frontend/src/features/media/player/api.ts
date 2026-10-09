@@ -43,6 +43,13 @@ export function streamUrl(stream: StreamStarted): string {
   return `/api/v1/media/player/${stream.ticket}/${stream.playlist}`;
 }
 
+/** 027 (#13): a chapter's picture, or the server's seek-bar preview at ``at`` seconds. */
+export function playerImage(ticket: string, ref: string, at?: number): string {
+  const query = new URLSearchParams({ ref });
+  if (at !== undefined) query.set("at", String(Math.max(0, at)));
+  return `/api/v1/media/player/${ticket}/image?${query}`;
+}
+
 export async function fetchCues(ticket: string, at: number, seek: boolean): Promise<Cue[]> {
   const { data } = await api.GET("/api/v1/media/player/{ticket}/subtitles", {
     params: { path: { ticket }, query: { at: Math.max(0, at), seek } },

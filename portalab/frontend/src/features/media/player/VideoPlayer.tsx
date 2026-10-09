@@ -16,6 +16,7 @@ import {
   fetchCues,
   type PlaybackState,
   type PlayerInfo,
+  playerImage,
   reportTimeline,
   type StreamStarted,
   startStream,
@@ -426,6 +427,18 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
   const bufferedPercent = total > 0 ? Math.min(100, (buffered / total) * 100) : 0;
   const [hover, setHover] = useState<{ x: number; at: number } | null>(null);
   const subtitleTrack = trackById(textTracks, subtitle);
+  // 027 (#13): the chapter under the pointer, its picture — or the server's preview of that moment
+  const hoverChapter = hover
+    ? item.chapters.find((c) => hover.at >= c.start_s && hover.at < c.end_s)
+    : undefined;
+  const hoverPicture =
+    hover && stream
+      ? version?.previews
+        ? playerImage(stream.ticket, version.previews, Math.round(hover.at / 5) * 5)
+        : hoverChapter?.image
+          ? playerImage(stream.ticket, hoverChapter.image)
+          : null
+      : null;
   const title = item.parent_title ? `${item.parent_title} · ${item.label ?? ""} ${item.title}` : item.title;
 
   return (
@@ -598,12 +611,28 @@ export function VideoPlayer({ objectId, info, onExit, onEpisode }: VideoPlayerPr
               />
             ) : null,
           )}
+          {hoverChapter && total > 0 ? (
+            <span
+              className="player-chapter-hover"
+              aria-hidden="true"
+              style={{
+                left: `${(hoverChapter.start_s / total) * 100}%`,
+                width: `${((hoverChapter.end_s - hoverChapter.start_s) / total) * 100}%`,
+              }}
+            />
+          ) : null}
           {hover ? (
             <span className="player-hover" style={{ left: `${hover.x}%` }} aria-hidden="true">
-              {clock(hover.at)}
-              {item.chapters.find((c) => hover.at >= c.start_s && hover.at < c.end_s)?.label ? (
-                <small>{item.chapters.find((c) => hover.at >= c.start_s && hover.at < c.end_s)?.label}</small>
+              {hoverPicture ? (
+                <img src={hoverPicture} alt="" onError={(e) => e.currentTarget.remove()} />
               ) : null}
+              {hoverChapter ? (
+                <small>
+                  {hoverChapter.label ??
+                    t("media:player.chapter", { number: item.chapters.indexOf(hoverChapter) + 1 })}
+                </small>
+              ) : null}
+              <span>{clock(hover.at)}</span>
             </span>
           ) : null}
           <input

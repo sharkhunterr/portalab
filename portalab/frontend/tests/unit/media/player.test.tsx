@@ -63,6 +63,7 @@ const VERSION = {
   audio_codec: "eac3",
   hdr: false,
   size: 1,
+  previews: null,
   audio: [
     {
       id: "a1",
@@ -111,7 +112,10 @@ const INFO = {
     year: 1979,
     versions: [VERSION],
     markers: [],
-    chapters: [],
+    chapters: [
+      { kind: "chapter", start_s: 0, end_s: 3000, label: null, image: "chapter:7:1" },
+      { kind: "chapter", start_s: 3000, end_s: 7000, label: "Finale", image: null },
+    ],
     previous_id: null,
     next_id: null,
     next_label: null,
@@ -213,6 +217,20 @@ describe("player", () => {
       video.dispatchEvent(new Event("timeupdate"));
     });
     expect(await screen.findByText("Mother?")).toBeTruthy();
+
+    // the chapters: the one under the pointer, named (or numbered) with its picture
+    const bar = document.querySelector(".player-bar") as HTMLElement;
+    bar.getBoundingClientRect = () => ({ left: 0, width: 1000, top: 0, height: 10 }) as DOMRect;
+    expect(document.querySelectorAll('.player-mark[data-kind="chapter"]')).toHaveLength(1);
+    fireEvent.pointerMove(bar, { clientX: 200 });
+    expect(await screen.findByText("Chapter 1")).toBeTruthy();
+    expect(document.querySelector(".player-hover img")?.getAttribute("src")).toMatch(
+      /image\?ref=chapter%3A7%3A1$/,
+    );
+    fireEvent.pointerMove(bar, { clientX: 600 });
+    expect(await screen.findByText("Finale")).toBeTruthy();
+    expect(document.querySelector(".player-hover img")).toBeNull();
+    fireEvent.pointerLeave(bar);
 
     fireEvent.click(screen.getByRole("button", { name: "Playback settings" }));
     fireEvent.click(await screen.findByRole("button", { name: /Quality/ }));

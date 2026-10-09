@@ -226,9 +226,24 @@ html[data-playing="true"] body {
   z-index: 1;
 }
 
+/* 027 (#13): chapters cut the bar into segments, the one under the pointer lit up */
 .player-mark[data-kind="chapter"] {
-  inline-size: 2px;
+  inline-size: 4px;
+  block-size: 0.9rem;
+  translate: -50% -50%;
   background: var(--player-stage);
+  z-index: 2;
+}
+
+.player-chapter-hover {
+  position: absolute;
+  top: 50%;
+  block-size: 0.5rem;
+  translate: 0 -50%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--player-ink) 45%, transparent);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .player-mark[data-kind="intro"],
@@ -255,7 +270,33 @@ html[data-playing="true"] body {
 }
 
 .player-hover small {
+  max-inline-size: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--font-weight-semibold);
+}
+
+.player-hover img {
+  display: block;
+  inline-size: 10rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-block-end: 0.2rem;
+  background: var(--player-stage);
+}
+
+.player-hover > span {
   color: var(--player-ink-muted);
+}
+
+.player-chapter-thumb {
+  inline-size: 4.5rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-inline-end: var(--space-2);
+  vertical-align: middle;
 }
 
 /* --- controls ----------------------------------------------------------------------------------------- */
