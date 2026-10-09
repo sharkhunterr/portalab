@@ -55,7 +55,7 @@ SERVICES_SUMMARY = WidgetDefinition(
         "additionalProperties": False,
     },
     config_defaults={"show": "all", "limit": 8},
-    size=SizeLimits(default=Size(6, 2), min=Size(3, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 2), min=Size(3, 1), max=Size(12, 6)),  # 027: one row = compact
     refresh=Refresh(mode="event", events=(STATUS_CHANGED,)),
     stale_after_s=600,
     template="status",

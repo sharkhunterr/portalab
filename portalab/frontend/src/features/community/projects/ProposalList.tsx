@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
-import { Dialog } from "../../../design-system/components/Overlays";
+import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
@@ -79,9 +79,11 @@ export function ProposalList() {
                 />
               </div>
               {create.isError ? <p role="alert">{t("community:proposals.error.generic")}</p> : null}
-              <Button type="submit" disabled={create.isPending || !title.trim()}>
-                {t("community:proposals.submit")}
-              </Button>
+              <DialogActions>
+                <Button type="submit" disabled={create.isPending || !title.trim()}>
+                  {t("community:proposals.submit")}
+                </Button>
+              </DialogActions>
             </form>
           </Dialog>
         </div>

@@ -35,7 +35,7 @@ def _definition(key: str, permission: str, events: tuple[str, ...]) -> WidgetDef
         description_key=f"media:widget.{name}.description",
         icon="film",
         required_permission=permission,
-        size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),  # 027: one row = compact
         refresh=Refresh(mode="event", events=events) if events else Refresh(),
         stale_after_s=900,
         template="list",

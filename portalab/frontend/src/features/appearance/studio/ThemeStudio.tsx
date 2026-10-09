@@ -7,7 +7,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Card } from "../../../design-system/components/Content";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
-import { Dialog } from "../../../design-system/components/Overlays";
+import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { sound } from "../../../design-system/sound/SoundService";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { applyToDocument } from "../../../design-system/themes/apply";
@@ -831,10 +831,12 @@ function SellDialog({
             {status.text}
           </p>
         ) : null}
-        <Button type="submit" disabled={sell.isPending || Boolean(status?.ok)}>
-          <Icon name="shop" size={16} />
-          {t("admin:studio.sell.publish")}
-        </Button>
+        <DialogActions>
+          <Button type="submit" disabled={sell.isPending || Boolean(status?.ok)}>
+            <Icon name="shop" size={16} />
+            {t("admin:studio.sell.publish")}
+          </Button>
+        </DialogActions>
       </form>
     </Dialog>
   );

@@ -1040,3 +1040,6 @@ input[type="file"] {
   cursor: pointer;
   line-height: 1.25rem;
 }
+.ds-dialog__actions {
+  display: contents;
+}

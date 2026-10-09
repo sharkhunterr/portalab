@@ -277,6 +277,7 @@
   opacity: 0;
 }
 .skin-deck__text {
+  flex: 1;
   display: grid;
   align-content: center;
   justify-items: start;
@@ -961,15 +962,20 @@
   block-size: 100%;
 }
 .widget-next__hero {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "poster info" "poster count";
+  align-content: center;
   align-items: center;
-  gap: clamp(var(--space-3), 4cqw, var(--space-5, 1.5rem));
+  column-gap: clamp(var(--space-3), 4cqw, var(--space-5, 1.5rem));
+  row-gap: 0.3rem;
   min-block-size: 0;
   color: inherit;
   text-decoration: none;
   animation: skin-rise 0.5s ease-out both;
 }
 .widget-next__poster {
+  grid-area: poster;
   display: grid;
   flex: none;
   place-items: center;
@@ -987,6 +993,8 @@
   object-fit: cover;
 }
 .widget-next__info {
+  grid-area: info;
+  align-self: end;
   display: grid;
   align-content: center;
   justify-items: start;
@@ -1021,10 +1029,36 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.widget-next__count,
+.widget-next__out {
+  grid-area: count;
+  align-self: start;
+  justify-self: start;
+}
 .widget-next__count {
   display: flex;
   gap: clamp(0.3rem, 1.5cqw, 0.6rem);
-  margin-block-start: 0.2rem;
+}
+/* a wide block: the countdown on the right, larger */
+@container (min-width: 36rem) {
+  .widget-next__hero {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "poster info count";
+  }
+  .widget-next__info {
+    align-self: center;
+  }
+  .widget-next__count,
+  .widget-next__out {
+    align-self: center;
+    justify-self: end;
+  }
+  .widget-next__unit {
+    inline-size: clamp(3rem, min(9cqw, 30cqh), 5rem);
+  }
+  .widget-next__unit strong {
+    font-size: clamp(1rem, min(3cqw, 10cqh), 1.8rem);
+  }
 }
 /* each unit in a ring filled by its share (days of a month, hours of a day…) */
 .widget-next__unit {
@@ -1060,17 +1094,25 @@
   color: var(--color-accent-contrast);
   font-weight: var(--font-weight-bold);
 }
+/* the next ones: swiped sideways (no scrollbar), each snapping into place */
 .widget-next__more {
   display: flex;
   gap: var(--space-2);
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
   list-style: none;
+  mask-image: linear-gradient(90deg, black 85%, transparent);
+}
+.widget-next__more::-webkit-scrollbar {
+  display: none;
 }
 .widget-next__more li {
-  flex: 0 1 12rem;
-  min-inline-size: 7rem;
+  flex: 0 0 11rem;
+  scroll-snap-align: start;
 }
 .widget-next__more button {
   display: flex;
@@ -1124,4 +1166,195 @@
   .widget-next__more {
     display: none;
   }
+}
+
+/* 027: compact forms — a single row */
+.widget-next--compact {
+  block-size: 100%;
+}
+.widget-next--compact > a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  block-size: 100%;
+  padding-inline: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+}
+.widget-next--compact .widget-next__mini-text {
+  min-inline-size: 0;
+  flex: 1;
+}
+.widget-next__inline {
+  flex: none;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.widget-frame[data-tile] .widget-continue[data-compact] {
+  block-size: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+.widget-frame[data-tile] .widget-continue[data-compact] li,
+.widget-frame[data-tile] .widget-continue[data-compact] li > :is(a, span) {
+  block-size: 100%;
+}
+.widget-frame[data-tile] .widget-continue[data-compact] li > :is(a, span) {
+  grid-template-columns: auto minmax(0, 1fr);
+  padding-block: 0.3rem;
+  background: none;
+}
+.widget-frame[data-tile] .widget-continue[data-compact] .widget-continue__art {
+  block-size: 100%;
+  max-block-size: 4rem;
+}
+.widget-frame[data-tile] .widget-services[data-compact] {
+  display: flex;
+  align-items: center;
+  block-size: 100%;
+  padding-inline: var(--space-3);
+}
+.widget-frame[data-tile] .widget-services[data-compact] .widget-services__head {
+  flex: 1;
+}
+.widget-frame[data-tile] .widget-services[data-compact] .widget-services__ring {
+  inline-size: 2.3rem;
+  block-size: 2.3rem;
+  font-size: var(--font-size-xs);
+}
+/* 027: a single row — the widgets' own forms size to the row, the empty state on one line */
+.widget-frame[data-tile] .widget-level {
+  block-size: 100%;
+}
+.widget-frame[data-tile] .widget-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 100%;
+  padding-block: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* the next cards of the deck, a row of posters on the right of a wide block */
+.skin-deck__queue {
+  display: none;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+@container (min-width: 34rem) {
+  .skin-deck__queue {
+    display: flex;
+  }
+}
+.skin-deck__queue li {
+  flex: none;
+  block-size: 86%;
+  animation: skin-rise 0.5s ease-out both;
+}
+.skin-deck__queue li:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.skin-deck__queue li:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.skin-deck__queue li:nth-child(4) {
+  animation-delay: 0.18s;
+}
+/* fewer of them when the block is narrower */
+@container (max-width: 52rem) {
+  .skin-deck__queue li:nth-child(n + 3) {
+    display: none;
+  }
+}
+.skin-deck__queue button {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.3rem;
+  block-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.skin-deck__queue img {
+  block-size: 100%;
+  min-block-size: 0;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0.3rem 0.8rem color-mix(in srgb, var(--color-text) 18%, transparent);
+  opacity: 0.75;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
+}
+.skin-deck__queue button:hover img {
+  opacity: 1;
+  transform: translateY(-0.25rem) rotate(-2deg);
+}
+.skin-deck__queue span {
+  display: grid;
+  max-inline-size: 6.5rem;
+  min-inline-size: 0;
+}
+.skin-deck__queue strong,
+.skin-deck__queue small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.skin-deck__queue strong {
+  font-size: var(--font-size-xs);
+}
+/* a narrow but tall block (a phone): the next two, stacked on the right */
+@container (max-width: 34rem) and (min-height: 13rem) {
+  .skin-deck__queue {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+  .skin-deck__queue li {
+    block-size: auto;
+    inline-size: clamp(3rem, 16cqw, 5rem);
+  }
+  .skin-deck__queue li:nth-child(n + 3) {
+    display: none;
+  }
+  .skin-deck__queue button {
+    display: block;
+    inline-size: 100%;
+  }
+  .skin-deck__queue img {
+    block-size: auto;
+    inline-size: 100%;
+  }
+  .skin-deck__queue span {
+    display: none;
+  }
+}
+.skin-deck__queue small {
+  display: none;
+}
+/* the analog clock fits its block (a one-row tile has no block to measure: it takes the row) */
+.skin-analog svg {
+  block-size: min(calc(100cqh - 0.5rem), 14rem);
+}
+.widget-frame[data-tile] .skin-analog svg {
+  block-size: 100%;
 }

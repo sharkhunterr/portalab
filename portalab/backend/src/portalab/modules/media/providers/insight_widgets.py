@@ -170,7 +170,7 @@ NEXT_RELEASES = _definition(  # 027: what comes out next among what I asked for 
     "media.next_releases",
     component="media.next_releases",
     icon="rocket",
-    size=SizeLimits(default=Size(6, 3), min=Size(4, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(4, 1), max=Size(12, 6)),  # one row = compact
 )
 MY_SOON = _definition(
     "media.my_soon",

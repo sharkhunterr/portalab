@@ -2,6 +2,7 @@ import { type ReactNode, useId } from "react";
 import { Link } from "react-router";
 import { Progress } from "../components/Content";
 import { Icon } from "../components/Icon";
+import { DialogActions, useInDialog } from "../components/Overlays";
 import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/Placeholders";
 import "./admin-kit.css";
@@ -298,8 +299,14 @@ export function FormGrid({ children }: { children: ReactNode }) {
   return <div className="admin-form-grid">{children}</div>;
 }
 
+/** A form's actions — in a dialog, they go to its footer, on the same line as « Cancel » (027). */
 export function FormActions({ children }: { children: ReactNode }) {
-  return <div className="admin-form-actions">{children}</div>;
+  const inDialog = useInDialog();
+  return inDialog ? (
+    <DialogActions>{children}</DialogActions>
+  ) : (
+    <div className="admin-form-actions">{children}</div>
+  );
 }
 
 export function KeyValues({ items }: { items: Array<{ key: string; label: string; value: ReactNode }> }) {

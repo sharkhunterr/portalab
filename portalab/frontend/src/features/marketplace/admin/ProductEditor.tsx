@@ -13,7 +13,7 @@ import {
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { ICONS, Icon } from "../../../design-system/components/Icon";
-import { Dialog } from "../../../design-system/components/Overlays";
+import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { BANNER_KEYS, FRAME_KEYS, NAME_KEYS } from "../../../design-system/themes/cosmetics";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { useT } from "../../../i18n/hooks/useT";
@@ -830,9 +830,11 @@ export function NewProductDialog({
         />
         <AvailabilityFields value={availability} onChange={setAvailability} />
         {error ? <p role="alert">{error}</p> : null}
-        <Button type="submit" disabled={!key || !nameEn}>
-          {t("marketplace:admin.create")}
-        </Button>
+        <DialogActions>
+          <Button type="submit" disabled={!key || !nameEn}>
+            {t("marketplace:admin.create")}
+          </Button>
+        </DialogActions>
       </form>
     </Dialog>
   );

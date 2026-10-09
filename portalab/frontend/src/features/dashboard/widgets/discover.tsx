@@ -285,7 +285,7 @@ function episodeOf(release: Release): string | null {
 
 /** « Next releases » (027): the soonest of what I asked for or follow, counting down to the second; the
  * others below — picking one brings it forward. */
-function NextReleases({ payload }: WidgetProps) {
+function NextReleases({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const ref = useRef<HTMLDivElement>(null);
@@ -307,6 +307,27 @@ function NextReleases({ payload }: WidgetProps) {
   const minutes = Math.floor((left % 3_600_000) / 60_000);
   const seconds = Math.floor((left % 60_000) / 1000);
   const src = art(hero);
+  if (compact)
+    // 027: on a single row — the soonest, and how long until it is out
+    return (
+      <div ref={ref} className="widget-next--compact">
+        <Link to={hero.route ?? "/media"}>
+          <span className="widget-next__mini">{src ? <img src={src} alt="" /> : null}</span>
+          <span className="widget-next__mini-text">
+            <span>{hero.title}</span>
+            <small>
+              {episodeOf(hero) ??
+                (hero.type && RELEASE_TYPES.has(hero.type) ? t(`media:widget.release.${hero.type}`) : "")}
+            </small>
+          </span>
+          <span className="widget-next__inline" role="timer">
+            {left > 0
+              ? `${days}${t("media:widget.next_releases.d")} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+              : t("media:widget.next_releases.out")}
+          </span>
+        </Link>
+      </div>
+    );
   const details = [
     episodeOf(hero),
     hero.subtitle,
@@ -331,24 +352,24 @@ function NextReleases({ payload }: WidgetProps) {
           ) : null}
           <strong className="widget-next__title">{hero.title}</strong>
           <small className="widget-next__details">{details.join(" · ")}</small>
-          {left > 0 ? (
-            <span
-              className="widget-next__count"
-              role="timer"
-              aria-label={t("media:widget.next_releases.left", { days, hours, minutes })}
-            >
-              <Unit value={days} of={30} label={t("media:widget.next_releases.days")} />
-              <Unit value={hours} of={24} label={t("media:widget.next_releases.hours")} />
-              <Unit value={minutes} of={60} label={t("media:widget.next_releases.minutes")} />
-              <Unit value={seconds} of={60} label={t("media:widget.next_releases.seconds")} />
-            </span>
-          ) : (
-            <span className="widget-next__out">{t("media:widget.next_releases.out")}</span>
-          )}
         </span>
+        {left > 0 ? (
+          <span
+            className="widget-next__count"
+            role="timer"
+            aria-label={t("media:widget.next_releases.left", { days, hours, minutes })}
+          >
+            <Unit value={days} of={30} label={t("media:widget.next_releases.days")} />
+            <Unit value={hours} of={24} label={t("media:widget.next_releases.hours")} />
+            <Unit value={minutes} of={60} label={t("media:widget.next_releases.minutes")} />
+            <Unit value={seconds} of={60} label={t("media:widget.next_releases.seconds")} />
+          </span>
+        ) : (
+          <span className="widget-next__out">{t("media:widget.next_releases.out")}</span>
+        )}
       </Link>
       {items.length > 1 ? (
-        <ul className="widget-next__more">
+        <ul className="widget-next__more" data-nofit>
           {items.map((release, index) =>
             index === chosen ? null : (
               // biome-ignore lint/suspicious/noArrayIndexKey: a title comes once, its index is stable

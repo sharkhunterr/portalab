@@ -77,7 +77,7 @@ PROGRESS_WIDGET = WidgetDefinition(
     description_key="gamification:widget.progress.description",
     icon="trophy",
     required_permission=READ,
-    size=SizeLimits(default=Size(4, 2), min=Size(3, 2), max=Size(6, 4)),
+    size=SizeLimits(default=Size(4, 2), min=Size(3, 1), max=Size(6, 4)),  # 027: one row = compact
     refresh=Refresh(mode="event", events=("reward.granted", "user.level_up", "achievement.unlocked")),
     stale_after_s=900,
     component_id="gamification.progress",
@@ -117,7 +117,7 @@ DAILY_WIDGET = WidgetDefinition(
     description_key="gamification:widget.daily.description",
     icon="target",
     required_permission=READ,
-    size=SizeLimits(default=Size(4, 2), min=Size(3, 2), max=Size(6, 4)),
+    size=SizeLimits(default=Size(4, 2), min=Size(3, 1), max=Size(6, 4)),  # 027: one row = compact
     refresh=Refresh(mode="event", events=("quest.completed", "reward.granted")),
     stale_after_s=900,
     component_id="gamification.daily_objectives",

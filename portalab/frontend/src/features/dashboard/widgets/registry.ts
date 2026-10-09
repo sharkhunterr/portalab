@@ -10,6 +10,8 @@ export interface WidgetProps {
   config: Record<string, unknown>;
   /** The widget's icon (027: shown on rows without an image). */
   icon?: string | null | undefined;
+  /** 027: the widget sits on a single row — it shows its compact form (one line: the essentials). */
+  compact?: boolean | undefined;
 }
 
 const components = new Map<string, ComponentType<WidgetProps>>();

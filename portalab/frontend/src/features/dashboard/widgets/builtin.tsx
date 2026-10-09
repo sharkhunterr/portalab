@@ -78,7 +78,7 @@ function HealthRing({ ok, total }: { ok: number; total: number }) {
  * per service — its kind's icon ringed with its state, its name, its state in words and its last 24 hours
  * as a thin bar. Trouble first, then the most important. Narrow blocks list them.
  */
-function ServicesHealth({ payload }: WidgetProps) {
+function ServicesHealth({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const data = servicesData(payload);
@@ -88,7 +88,8 @@ function ServicesHealth({ payload }: WidgetProps) {
   const ok = counts.operational ?? 0;
   const troubled = total - ok;
   return (
-    <div className="widget-services">
+    // 027: on a single row, the summary line alone
+    <div className="widget-services" data-compact={compact || undefined}>
       <div
         className="widget-services__head has-tone"
         data-tone={troubled ? "warn" : "ok"}
@@ -120,44 +121,46 @@ function ServicesHealth({ payload }: WidgetProps) {
           <Icon name="chevron-right" size={14} />
         </Link>
       </div>
-      <ul className="widget-services__grid">
-        {items.map((item) => {
-          const tone = HEALTH_TONES[item.state] ?? "neutral";
-          const availability = typeof item.availability === "number" ? item.availability : null;
-          return (
-            <li key={item.id}>
-              <Link to={item.route} className="widget-service has-tone" data-tone={tone}>
-                <span className="widget-service__icon" aria-hidden="true">
-                  <Icon name={CONNECTOR_ICON[item.connector ?? ""] ?? "server"} size={18} />
-                </span>
-                <span className="widget-service__text">
-                  <span className="widget-service__name">
-                    {item.name}
-                    {item.importance === "critical" ? (
-                      <Icon name="star" size={11} className="widget-service__critical" />
-                    ) : null}
+      {compact ? null : (
+        <ul className="widget-services__grid">
+          {items.map((item) => {
+            const tone = HEALTH_TONES[item.state] ?? "neutral";
+            const availability = typeof item.availability === "number" ? item.availability : null;
+            return (
+              <li key={item.id}>
+                <Link to={item.route} className="widget-service has-tone" data-tone={tone}>
+                  <span className="widget-service__icon" aria-hidden="true">
+                    <Icon name={CONNECTOR_ICON[item.connector ?? ""] ?? "server"} size={18} />
                   </span>
-                  <span className="widget-service__state">
-                    <span className="status-dot" data-tone={tone} />
-                    {t(`dashboard:health.${HEALTH_TONES[item.state] ? item.state : "unknown"}`)}
-                  </span>
-                </span>
-                {availability !== null ? (
-                  <span
-                    className="widget-service__uptime"
-                    title={t("dashboard:services.uptime", { value: format.percent(availability) })}
-                  >
-                    <span className="widget-service__bar" aria-hidden="true">
-                      <span style={{ inlineSize: `${Math.round(availability * 100)}%` }} />
+                  <span className="widget-service__text">
+                    <span className="widget-service__name">
+                      {item.name}
+                      {item.importance === "critical" ? (
+                        <Icon name="star" size={11} className="widget-service__critical" />
+                      ) : null}
                     </span>
-                    <span>{format.percent(availability)}</span>
+                    <span className="widget-service__state">
+                      <span className="status-dot" data-tone={tone} />
+                      {t(`dashboard:health.${HEALTH_TONES[item.state] ? item.state : "unknown"}`)}
+                    </span>
                   </span>
-                ) : null}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                  {availability !== null ? (
+                    <span
+                      className="widget-service__uptime"
+                      title={t("dashboard:services.uptime", { value: format.percent(availability) })}
+                    >
+                      <span className="widget-service__bar" aria-hidden="true">
+                        <span style={{ inlineSize: `${Math.round(availability * 100)}%` }} />
+                      </span>
+                      <span>{format.percent(availability)}</span>
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

@@ -2,7 +2,16 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as MenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { Fragment, type ReactNode } from "react";
+import {
+  createContext,
+  Fragment,
+  type MouseEvent,
+  type ReactNode,
+  useContext,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 
@@ -25,6 +34,50 @@ export interface DialogProps {
   footer?: ReactNode;
 }
 
+/** 027: where a dialog's own actions go — its footer, on the close button's line. */
+const FooterSlot = createContext<HTMLElement | null>(null);
+
+/**
+ * 027: a dialog's action buttons (« Save », « Send »…), written where they belong — at the end of its form,
+ * even in a child component — and shown in the dialog's footer, on the same line as « Cancel ». A submit
+ * button still submits the form it was written in (with its validation). Outside a dialog, they stay
+ * where they are.
+ */
+/** Whether this content is inside a dialog (its actions then go to the footer). */
+export function useInDialog(): boolean {
+  return useContext(FooterSlot) !== null;
+}
+
+export function DialogActions({ children }: { children: ReactNode }) {
+  const slot = useContext(FooterSlot);
+  const marker = useRef<HTMLSpanElement>(null);
+  if (!slot) return <>{children}</>;
+  const submit = (event: MouseEvent<HTMLSpanElement>) => {
+    const button = (event.target as HTMLElement).closest("button");
+    if (!button || button.type !== "submit" || button.form) return;
+    const form = marker.current?.closest("form");
+    if (!form) return;
+    event.preventDefault();
+    form.requestSubmit();
+  };
+  return (
+    <>
+      {/* the form's own default button: Enter still submits it */}
+      <span ref={marker} hidden>
+        <button type="submit" tabIndex={-1} aria-hidden="true" />
+      </span>
+      {createPortal(
+        // biome-ignore lint/a11y/noStaticElementInteractions: forwards a click on a submit button to its form
+        // biome-ignore lint/a11y/useKeyWithClickEvents: buttons fire click on Enter and Space
+        <span className="ds-dialog__actions" onClick={submit}>
+          {children}
+        </span>,
+        slot,
+      )}
+    </>
+  );
+}
+
 export function Dialog({
   trigger,
   title,
@@ -37,6 +90,7 @@ export function Dialog({
   size = "md",
   footer,
 }: DialogProps) {
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Root
       {...(open !== undefined ? { open } : {})}
@@ -55,19 +109,14 @@ export function Dialog({
           ) : (
             <DialogPrimitive.Description className="visually-hidden">{title}</DialogPrimitive.Description>
           )}
-          {children}
-          {footer !== undefined ? (
-            <div className="ds-dialog__footer">
-              <DialogPrimitive.Close asChild>
-                <Button variant="secondary">{closeLabel}</Button>
-              </DialogPrimitive.Close>
-              {footer}
-            </div>
-          ) : (
+          <FooterSlot.Provider value={slot}>{children}</FooterSlot.Provider>
+          <div className="ds-dialog__footer">
             <DialogPrimitive.Close asChild>
               <Button variant="secondary">{closeLabel}</Button>
             </DialogPrimitive.Close>
-          )}
+            {footer}
+            <span className="ds-dialog__actions" ref={setSlot} />
+          </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

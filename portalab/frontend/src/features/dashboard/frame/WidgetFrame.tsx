@@ -42,7 +42,7 @@ class FrameBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   }
 }
 
-function Body({ instance }: { instance: Instance }) {
+function Body({ instance, full = false }: { instance: Instance; full?: boolean }) {
   const t = useT();
   const widget = instance.widget;
   const interval = widget?.refresh_mode === "interval" ? (widget.refresh_interval_s ?? null) : null;
@@ -85,7 +85,14 @@ function Body({ instance }: { instance: Instance }) {
         />
       ) : null}
       {payload.config_invalid ? <p className="widget__meta">{t("dashboard:configInvalid")}</p> : null}
-      {Rendered ? <Rendered payload={payload} config={instance.config} icon={widget?.icon} /> : null}
+      {Rendered ? (
+        <Rendered
+          payload={payload}
+          config={instance.config}
+          icon={widget?.icon}
+          compact={!full && instance.h <= 1}
+        />
+      ) : null}
     </>
   );
 }
@@ -243,7 +250,7 @@ export function WidgetFrame({
               <div className="widget-frame__full" data-widget={instance.widget_key}>
                 <FrameBoundary fallback={<FunctionalState state="error" />}>
                   <Suspense fallback={<FunctionalState state="loading" />}>
-                    <Body instance={instance} />
+                    <Body instance={instance} full />
                   </Suspense>
                 </FrameBoundary>
               </div>

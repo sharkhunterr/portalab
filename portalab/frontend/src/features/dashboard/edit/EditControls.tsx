@@ -11,7 +11,7 @@ import {
   TextField,
 } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
-import { Dialog } from "../../../design-system/components/Overlays";
+import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Change, Instance } from "../api";
 
@@ -100,6 +100,12 @@ function ConfigDialog({
     if (shared !== key) {
       const common = t(shared === "dashboard:style" ? "dashboard:style.title" : shared);
       if (!common.startsWith("style.")) return common;
+    }
+    // 027: the usual settings (kind, scope, period…) are named once for every widget
+    const usual = key.replace(`${base}.`, "dashboard:field.");
+    if (usual !== key) {
+      const common = t(usual);
+      if (common !== usual.split(":").slice(1).join(":")) return common;
     }
     return fallback;
   };
@@ -220,7 +226,9 @@ function ConfigDialog({
             <Link to="/marketplace?type=widget_option">{t("dashboard:moreOptions")}</Link>
           </p>
         ) : null}
-        <Button type="submit">{t("dashboard:save")}</Button>
+        <DialogActions>
+          <Button type="submit">{t("dashboard:save")}</Button>
+        </DialogActions>
       </form>
     </Dialog>
   );

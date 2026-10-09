@@ -656,6 +656,7 @@
   "widget.my_soon.config.scope.me": "Me",
   "widget.my_soon.description": "What is downloading, importing or releasing soon among your requests.",
   "widget.my_soon.title": "My requests coming soon",
+  "widget.next_releases.d": "d",
   "widget.next_releases.days": "days",
   "widget.next_releases.description": "What comes out next among the titles you asked for and the series you follow, counting down.",
   "widget.next_releases.hours": "hours",

@@ -144,20 +144,26 @@ const KIND_ICON: Record<string, string> = {
 };
 
 /** « Continue » (027): what I am in the middle of — poster, title, episode or author, a progress bar. */
-function Continue({ payload, config }: WidgetProps) {
+function Continue({ payload, config, compact }: WidgetProps) {
   const t = useT();
-  const items = ((payload.data ?? {}) as { items?: Array<Card & { progress?: number | null }> }).items ?? [];
+  const all = ((payload.data ?? {}) as { items?: Array<Card & { progress?: number | null }> }).items ?? [];
+  // 027: on a single row, the latest one only
+  const items = compact ? all.slice(0, 1) : all;
   // 027 (#31): « ambient » (bought in the shop) — each poster casts its own colours around it
   const ambient = (config ?? {}).style === "ambient";
   return (
-    <ul className="widget-continue" data-ambient={ambient || undefined}>
+    <ul
+      className="widget-continue"
+      data-ambient={(ambient && !compact) || undefined}
+      data-compact={compact || undefined}
+    >
       {items.map((card, index) => {
         const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
         const percent =
           card.progress !== null && card.progress !== undefined ? Math.round(card.progress * 100) : null;
         const body = (
           <>
-            {ambient && src ? (
+            {ambient && !compact && src ? (
               // behind the poster, in the same cell: its colours spill around it
               <span
                 className="widget-continue__glow"

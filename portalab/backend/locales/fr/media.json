@@ -656,6 +656,7 @@
   "widget.my_soon.config.scope.me": "Moi",
   "widget.my_soon.description": "Ce qui se télécharge, s'importe ou sort bientôt parmi vos demandes.",
   "widget.my_soon.title": "Mes demandes bientôt disponibles",
+  "widget.next_releases.d": "j",
   "widget.next_releases.days": "jours",
   "widget.next_releases.description": "Ce qui sort bientôt parmi les titres que vous avez demandés et les séries que vous suivez, avec le décompte.",
   "widget.next_releases.hours": "heures",

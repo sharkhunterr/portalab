@@ -1303,3 +1303,56 @@
 .widget-curves__chart {
   min-block-size: 0;
 }
+
+/* 027: compact forms — a single row */
+.daily-objectives--compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  block-size: 100%;
+  padding-inline: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+}
+.daily-objectives--compact .daily-objectives__track {
+  flex: 1;
+  block-size: 0.5rem;
+}
+.widget-level--compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  block-size: 100%;
+  padding-inline: var(--space-3);
+}
+.widget-level--compact .widget-level__bar {
+  flex: 1;
+}
+.widget-level__badge,
+.widget-level__streak {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+}
+.widget-level__badge {
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+.widget-level__streak svg {
+  color: var(--rarity-legendary, var(--color-accent));
+}
+.widget-level--compact .widget-level__next {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+@container (max-width: 16rem) {
+  .widget-level--compact .widget-level__next {
+    display: none;
+  }
+}

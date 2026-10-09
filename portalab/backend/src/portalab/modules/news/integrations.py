@@ -152,7 +152,12 @@ def _widget(key: str, title: str) -> WidgetDefinition:
 
 FEATURED = _widget("news.featured", "featured")
 LATEST = with_styles(  # 027 (#31): the list, or « carousel » — one article at a time, then the next
-    replace(_widget("news.latest", "latest"), component_id="news.latest"), "carousel"
+    replace(
+        _widget("news.latest", "latest"),
+        component_id="news.latest",
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),  # one row: the latest headline
+    ),
+    "carousel",
 )
 
 

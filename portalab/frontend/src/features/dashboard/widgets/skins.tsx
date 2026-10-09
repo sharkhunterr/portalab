@@ -216,6 +216,25 @@ function Deck({ payload }: SkinProps) {
           ))}
         </span>
       </div>
+      {/* the next cards of the pile: a wide block shows them on the right, one click deals one */}
+      <ul className="skin-deck__queue" data-nofit>
+        {[1, 2, 3, 4].map((step) => {
+          if (step >= cards.length) return null;
+          const index = (front + step) % cards.length;
+          const card = cards[index] as Card;
+          return (
+            <li key={`${card.id ?? card.title}-${step}`}>
+              <button type="button" onClick={() => setFront(index)} title={card.title}>
+                <img src={art(card) ?? ""} alt="" loading="lazy" />
+                <span>
+                  <strong>{card.title}</strong>
+                  {card.subtitle || card.meta ? <small>{card.subtitle ?? card.meta}</small> : null}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -477,7 +496,8 @@ function skin(
   if (!found) return;
   const Original: ComponentType<WidgetProps> = found;
   function Skinned(props: WidgetProps) {
-    const Look = looks[String((props.config ?? {}).style ?? "classic")];
+    // the looks dress the full widget; on a single row, every look shares the widget's compact form
+    const Look = props.compact ? undefined : looks[String((props.config ?? {}).style ?? "classic")];
     return Look ? <Look {...props} Original={Original} /> : <Original {...props} />;
   }
   registerWidgetComponent(id, Skinned);
