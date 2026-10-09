@@ -78,6 +78,14 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
       mine: i === 0,
     })),
   }),
+  "media.next_releases": () => ({
+    items: cards(4).map((c, i) => ({
+      ...c,
+      at: inDays(i * 4 + 2),
+      reason: i % 2 ? "requested" : "watching",
+      type: c.kind === "series" ? "air" : "digital",
+    })),
+  }),
   "media.on_this_day": () => ({
     years: 1,
     date: inDays(-365).slice(0, 10),

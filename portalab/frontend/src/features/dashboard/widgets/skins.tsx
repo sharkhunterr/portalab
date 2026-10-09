@@ -1,4 +1,4 @@
-import { type ComponentType, type CSSProperties, useEffect, useRef, useState } from "react";
+import { type ComponentType, type CSSProperties, lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { levelProgress } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
@@ -6,7 +6,10 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { useProgression } from "../../gamification/api";
+import { ProgressBoosts } from "../../gamification/widget";
 import { metadataImage } from "../../media/detail/Enrichment";
+import { Cover } from "../../news/cover";
+import "../../news/news.css";
 import { WidgetHeaderAction } from "../frame/actions";
 import { TEMPLATES } from "../templates/Templates";
 import { daysUntil } from "./layout";
@@ -29,6 +32,8 @@ type Card = {
   route?: string | null;
   image_id?: string | null;
   poster_ref?: string | null;
+  summary?: string | null;
+  cover?: string | null;
 };
 type SkinProps = WidgetProps & { Original: ComponentType<WidgetProps> };
 
@@ -80,58 +85,72 @@ function Odometer({ payload }: SkinProps) {
   const shownLevel = useCountUp(level, lively, 900);
   const shownRatio = useCountUp(ratio, lively, 1400); // the ring fills up
   return (
-    <Link
-      ref={ref}
-      to="/progression"
-      className="widget-level skin-odometer"
-      data-near={ratio >= 0.75 || undefined}
-      style={{ "--ratio": shownRatio } as CSSProperties}
-    >
-      <span
-        className="widget-level__ring"
-        role="progressbar"
-        aria-label={t("gamification:level", { level })}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(ratio * 100)}
+    <div className="widget-level-box">
+      <Link
+        ref={ref}
+        to="/progression"
+        className="widget-level skin-odometer"
+        data-near={ratio >= 0.75 || undefined}
+        style={{ "--ratio": shownRatio } as CSSProperties}
       >
-        <strong>{format.number(Math.round(shownLevel))}</strong>
-        <span className="skin-odometer__sparks" aria-hidden="true">
-          {[0, 1, 2, 3, 4, 5].map((n) => (
-            <span key={n} style={{ "--n": n } as CSSProperties} />
-          ))}
-        </span>
-      </span>
-      <span className="widget-level__side">
-        <span className="widget-level__name">{t("gamification:level", { level })}</span>
-        {progression && next !== null ? (
-          <span className="widget-level__next">
-            <span className="widget-level__bar" aria-hidden="true">
-              <span />
-            </span>
-            <small>
-              {format.number(progression.xp - progression.level_floor)} /{" "}
-              {format.number(next - progression.level_floor)} XP
-            </small>
+        <span
+          className="widget-level__ring"
+          role="progressbar"
+          aria-label={t("gamification:level", { level })}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(ratio * 100)}
+        >
+          <strong>{format.number(Math.round(shownLevel))}</strong>
+          <span className="skin-odometer__sparks" aria-hidden="true">
+            {[0, 1, 2, 3, 4, 5].map((n) => (
+              <span key={n} style={{ "--n": n } as CSSProperties} />
+            ))}
           </span>
-        ) : null}
-        <ul className="widget-level__values">
-          {(
-            [
-              ["xp", xp, "sparkles"],
-              ["coins", coins, "coins"],
-              ["contribution", contribution, "heart"],
-            ] as const
-          ).map(([value, amount, icon]) => (
-            <li key={value} data-value={value}>
-              <Icon name={icon} size={14} />
-              <strong className="skin-odometer__digits">{format.number(Math.round(amount))}</strong>
-              <span>{t(`gamification:value.${value}`)}</span>
-            </li>
-          ))}
-        </ul>
-      </span>
-    </Link>
+        </span>
+        <span className="widget-level__side">
+          <span className="widget-level__name">{t("gamification:level", { level })}</span>
+          {progression && next !== null ? (
+            <span className="widget-level__next">
+              <span className="widget-level__bar" aria-hidden="true">
+                <span />
+              </span>
+              <small>
+                {format.number(progression.xp - progression.level_floor)} /{" "}
+                {format.number(next - progression.level_floor)} XP
+              </small>
+            </span>
+          ) : null}
+          <ul className="widget-level__values">
+            {(
+              [
+                ["xp", xp, "sparkles"],
+                ["coins", coins, "coins"],
+                ["contribution", contribution, "heart"],
+              ] as const
+            ).map(([value, amount, icon]) => (
+              <li key={value} data-value={value}>
+                <Icon name={icon} size={14} />
+                <strong className="skin-odometer__digits">{format.number(Math.round(amount))}</strong>
+                <span>{t(`gamification:value.${value}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </span>
+      </Link>
+      <ProgressBoosts />
+    </div>
+  );
+}
+
+// --- my progression: « chart » — my gains as rising curves (the chart library loaded on demand) -----------
+const ProgressCurves = lazy(() => import("../../gamification/ProgressCurves"));
+
+function Curves({ Original: _, ...props }: SkinProps) {
+  return (
+    <Suspense fallback={<div className="widget-curves" />}>
+      <ProgressCurves {...props} />
+    </Suspense>
   );
 }
 
@@ -201,7 +220,7 @@ function Deck({ payload }: SkinProps) {
   );
 }
 
-// --- flip digits (upcoming, countdown) ---------------------------------------------------------------------
+// --- flip digits (countdown) ---------------------------------------------------------------------
 function FlipNumber({ value, label }: { value: number; label: string }) {
   const digits = String(Math.max(0, value)).padStart(2, "0").split("");
   return (
@@ -229,54 +248,6 @@ function useNow(lively: boolean, everyMs: number): Date {
     return () => window.clearInterval(timer);
   }, [lively, everyMs]);
   return now;
-}
-
-function UpcomingFlip({ Original, ...props }: SkinProps) {
-  const t = useT();
-  const format = useFormat();
-  const ref = useRef<HTMLDivElement>(null);
-  const lively = useLively(ref);
-  const now = useNow(lively, 30_000);
-  const items = itemsOf(props);
-  const startOf = (item: Card) => {
-    const when = String(item.at ?? item.meta ?? "");
-    return ISO.test(when) ? new Date(when.length === 10 ? `${when}T00:00:00` : when) : null;
-  };
-  // the first one still to come (one already under way has nothing left to count)
-  const index = items.findIndex((item) => (startOf(item)?.getTime() ?? 0) > now.getTime());
-  const next = items[index];
-  const at = next ? startOf(next) : null;
-  if (!next || !at) return <Original {...props} />;
-  const left = Math.max(0, at.getTime() - now.getTime());
-  const days = Math.floor(left / 86_400_000);
-  const hours = Math.floor((left % 86_400_000) / 3_600_000);
-  const minutes = Math.floor((left % 3_600_000) / 60_000);
-  const List = TEMPLATES.list;
-  return (
-    <div ref={ref} className="skin-flip">
-      <Link className="skin-flip__next" to={next.route ?? "/calendar"}>
-        <span className="skin-flip__title">
-          <strong>{next.title}</strong>
-          <small>{format.dateTime(at)}</small>
-        </span>
-        <span
-          className="skin-flip__board"
-          role="timer"
-          aria-label={t("dashboard:flip.left", { days, hours, minutes })}
-        >
-          <FlipNumber value={days} label={t("dashboard:flip.days")} />
-          <FlipNumber value={hours} label={t("dashboard:flip.hours")} />
-          <FlipNumber value={minutes} label={t("dashboard:flip.minutes")} />
-        </span>
-      </Link>
-      {items.length > 1 ? (
-        <List
-          {...props}
-          payload={{ ...props.payload, data: { items: items.filter((_, i) => i !== index) } } as never}
-        />
-      ) : null}
-    </div>
-  );
 }
 
 function CountdownFlip({ payload }: SkinProps) {
@@ -362,41 +333,57 @@ function KenBurns({ Original, ...props }: SkinProps) {
   );
 }
 
-// --- latest news: « ticker » — the headlines running across, the list below -------------------------------
-function Ticker({ Original, ...props }: SkinProps) {
+// --- latest news: « carousel » — one article at a time (its cover, date, title and summary), then the next --
+const SLIDE_MS = 7000;
+
+function Carousel({ Original, ...props }: SkinProps) {
   const t = useT();
+  const format = useFormat();
+  const [index, setIndex] = useState(0);
   const items = itemsOf(props).filter((c) => c.title);
   if (!items.length) return <Original {...props} />;
-  const lane = [...items, ...items];
+  const at = index % items.length;
+  const item = items[at] as Card;
+  const go = (step: number) => setIndex((n) => (n + step + items.length) % items.length);
+  const date =
+    item.meta && ISO.test(item.meta)
+      ? format.date(`${item.meta.slice(0, 10)}T12:00:00`, "medium")
+      : item.meta;
+  const several = items.length > 1;
   return (
-    <div className="skin-ticker">
-      <div className="skin-ticker__band" style={{ "--ticker-items": items.length } as CSSProperties}>
-        <span className="skin-ticker__label">
-          <Icon name="newspaper" size={14} />
-          {t("dashboard:ticker.label")}
+    <div className="skin-carousel" style={{ "--slide-ms": `${SLIDE_MS}ms` } as CSSProperties}>
+      {several ? (
+        <span className="skin-carousel__bars" aria-hidden="true">
+          {items.map((entry, i) => (
+            <span
+              // biome-ignore lint/suspicious/noArrayIndexKey: one bar per article, in order
+              key={`${entry.title}-${i}`}
+              data-at={i < at ? "past" : i === at ? "now" : undefined}
+            >
+              {/* the bar of the shown article fills up, then the next one comes (paused out of sight) */}
+              <span onAnimationEnd={i === at ? () => go(1) : undefined} />
+            </span>
+          ))}
         </span>
-        <div className="skin-ticker__lane">
-          <div className="skin-ticker__track">
-            {lane.map((item, index) => (
-              <span
-                // biome-ignore lint/suspicious/noArrayIndexKey: the lane repeats itself to loop
-                key={`${item.title}-${index}`}
-                className="skin-ticker__item"
-                aria-hidden={index >= items.length || undefined}
-              >
-                {item.route ? (
-                  <Link to={item.route} tabIndex={index >= items.length ? -1 : undefined}>
-                    {item.title}
-                  </Link>
-                ) : (
-                  item.title
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-      <Original {...props} />
+      ) : null}
+      <Link key={at} to={item.route ?? "/news"} className="skin-carousel__slide" aria-live="polite">
+        <Cover seed={item.cover ?? item.title ?? ""} />
+        <span className="skin-carousel__text">
+          {date ? <small>{date}</small> : null}
+          <strong>{item.title}</strong>
+          {item.summary ? <span>{item.summary}</span> : null}
+        </span>
+      </Link>
+      {several ? (
+        <span className="skin-carousel__nav">
+          <button type="button" onClick={() => go(-1)} aria-label={t("dashboard:carousel.previous")}>
+            <Icon name="chevron-left" size={16} />
+          </button>
+          <button type="button" onClick={() => go(1)} aria-label={t("dashboard:carousel.next")}>
+            <Icon name="chevron-right" size={16} />
+          </button>
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -497,13 +484,12 @@ function skin(
 }
 
 skin("health.services_summary", { pulse: Pulse });
-skin("gamification.progress", { odometer: Odometer });
+skin("gamification.progress", { odometer: Odometer, chart: Curves });
 skin("gamification.daily_objectives", { liquid: Liquid });
 skin("media.posters", { deck: Deck });
-skin("calendar.upcoming", { flip: UpcomingFlip }, "list");
 skin("media.stats", { countup: CountUp });
 skin("media.wall", { kenburns: KenBurns });
-skin("news.latest", { ticker: Ticker }, "list");
+skin("news.latest", { carousel: Carousel }, "list");
 skin("dashboard.clock", { analog: AnalogClock });
 skin("dashboard.countdown", { flip: CountdownFlip });
 skin("community.activity", { live: Live });

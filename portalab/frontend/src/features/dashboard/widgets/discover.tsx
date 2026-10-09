@@ -247,6 +247,131 @@ function OnThisDay({ payload }: WidgetProps) {
   );
 }
 
+// --- next releases ---------------------------------------------------------------------------------------------
+interface Release extends Card {
+  at: string;
+  reason?: "requested" | "watching";
+  type?: string;
+  season?: number | null;
+  episode?: number | null;
+}
+const RELEASE_TYPES = new Set(["air", "cinema", "digital", "physical", "release"]);
+
+function useTick(lively: boolean): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!lively) return;
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [lively]);
+  return now;
+}
+
+function Unit({ value, of, label }: { value: number; of: number; label: string }) {
+  return (
+    <span className="widget-next__unit" style={{ "--part": Math.min(1, value / of) } as CSSProperties}>
+      <strong>{String(value).padStart(2, "0")}</strong>
+      <small>{label}</small>
+    </span>
+  );
+}
+
+function episodeOf(release: Release): string | null {
+  if (release.season === null || release.season === undefined) return null;
+  const pad = (n: number | null | undefined) => String(n ?? 0).padStart(2, "0");
+  return `S${pad(release.season)}E${pad(release.episode)}`;
+}
+
+/** « Next releases » (027): the soonest of what I asked for or follow, counting down to the second; the
+ * others below — picking one brings it forward. */
+function NextReleases({ payload }: WidgetProps) {
+  const t = useT();
+  const format = useFormat();
+  const ref = useRef<HTMLDivElement>(null);
+  const lively = useLively(ref);
+  const now = useTick(lively);
+  const [chosen, setChosen] = useState(0);
+  const items = (((payload.data ?? {}) as { items?: Release[] }).items ?? []).filter((r) => r.at);
+  if (!items.length)
+    return (
+      <p className="widget-server-playing__none">
+        <Icon name="rocket" size={16} />
+        {t("media:widget.next_releases.none")}
+      </p>
+    );
+  const hero = items[Math.min(chosen, items.length - 1)] as Release;
+  const left = Math.max(0, Date.parse(hero.at) - now);
+  const days = Math.floor(left / 86_400_000);
+  const hours = Math.floor((left % 86_400_000) / 3_600_000);
+  const minutes = Math.floor((left % 3_600_000) / 60_000);
+  const seconds = Math.floor((left % 60_000) / 1000);
+  const src = art(hero);
+  const details = [
+    episodeOf(hero),
+    hero.subtitle,
+    hero.type && RELEASE_TYPES.has(hero.type) ? t(`media:widget.release.${hero.type}`) : null,
+    // a date without its time (a film's release) says the day only
+    /T00:00(:00)?([.+Z]|$)/.test(hero.at)
+      ? format.date(`${hero.at.slice(0, 10)}T12:00:00`, "medium")
+      : format.dateTime(new Date(hero.at)),
+  ].filter(Boolean);
+  return (
+    <div ref={ref} className="widget-next">
+      <Link className="widget-next__hero" to={hero.route ?? "/media"} key={hero.id ?? hero.title}>
+        <span className="widget-next__poster">
+          {src ? <img src={src} alt="" /> : <Icon name={KIND_ICON[hero.kind ?? ""] ?? "film"} size={26} />}
+        </span>
+        <span className="widget-next__info">
+          {hero.reason ? (
+            <span className="widget-next__reason" data-reason={hero.reason}>
+              <Icon name={hero.reason === "requested" ? "inbox" : "eye"} size={12} />
+              {t(`media:widget.next_releases.reason.${hero.reason}`)}
+            </span>
+          ) : null}
+          <strong className="widget-next__title">{hero.title}</strong>
+          <small className="widget-next__details">{details.join(" · ")}</small>
+          {left > 0 ? (
+            <span
+              className="widget-next__count"
+              role="timer"
+              aria-label={t("media:widget.next_releases.left", { days, hours, minutes })}
+            >
+              <Unit value={days} of={30} label={t("media:widget.next_releases.days")} />
+              <Unit value={hours} of={24} label={t("media:widget.next_releases.hours")} />
+              <Unit value={minutes} of={60} label={t("media:widget.next_releases.minutes")} />
+              <Unit value={seconds} of={60} label={t("media:widget.next_releases.seconds")} />
+            </span>
+          ) : (
+            <span className="widget-next__out">{t("media:widget.next_releases.out")}</span>
+          )}
+        </span>
+      </Link>
+      {items.length > 1 ? (
+        <ul className="widget-next__more">
+          {items.map((release, index) =>
+            index === chosen ? null : (
+              // biome-ignore lint/suspicious/noArrayIndexKey: a title comes once, its index is stable
+              <li key={`${release.id ?? release.title}-${index}`}>
+                <button type="button" onClick={() => setChosen(index)} title={release.title}>
+                  <span className="widget-next__mini">
+                    {art(release) ? <img src={art(release) ?? ""} alt="" loading="lazy" /> : null}
+                  </span>
+                  <span className="widget-next__mini-text">
+                    <span>{release.title}</span>
+                    <small>{format.relative((Date.parse(release.at) - now) / 1000)}</small>
+                  </span>
+                </button>
+              </li>
+            ),
+          )}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+registerWidgetComponent("media.next_releases", NextReleases);
 registerWidgetComponent("media.living_wall", LivingWall);
 registerWidgetComponent("media.server_playing", ServerPlaying);
 registerWidgetComponent("media.on_this_day", OnThisDay);

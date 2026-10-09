@@ -2285,6 +2285,24 @@
         "title": "CampaignAnnounceIn",
         "type": "object"
       },
+      "CampaignBoostOut": {
+        "properties": {
+          "factor": {
+            "title": "Factor",
+            "type": "number"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "factor"
+        ],
+        "title": "CampaignBoostOut",
+        "type": "object"
+      },
       "CampaignCreateIn": {
         "additionalProperties": false,
         "properties": {
@@ -2475,6 +2493,14 @@
       },
       "CampaignSummaryOut": {
         "properties": {
+          "boosts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CampaignBoostOut"
+            },
+            "title": "Boosts",
+            "type": "array"
+          },
           "ends_at": {
             "anyOf": [
               {

@@ -78,4 +78,23 @@ describe("my progression", () => {
     expect(ring.getAttribute("aria-valuenow")).toBe("50");
     expect(screen.getByText("956.5K")).toBeTruthy(); // a large figure in a small place
   });
+
+  it("says what boosts my gains now: my play streak and the campaigns running for me", async () => {
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (path.endsWith("/me/streak"))
+        return json(200, { enabled: true, days: 6, multiplier: 2, next: null });
+      if (path.endsWith("/campaigns/active"))
+        return json(200, [
+          { key: "autumn", name: "Autumn festival", ends_at: null, boosts: [{ value: "xp", factor: 1.5 }] },
+          { key: "quiet", name: "No boost", ends_at: null, boosts: [] },
+        ]);
+      return json(200, { level: 12, xp: 1500, level_floor: 1000, next_level_at: 2000 });
+    };
+    show("gamification.progress", { level: 12, xp: 1500, coins: 10, contribution: 3 });
+    expect(await screen.findByText("6 days in a row")).toBeTruthy();
+    expect(screen.getByText("×2")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Autumn festival/ }).textContent).toContain("×1.5 XP");
+    expect(screen.queryByText("No boost")).toBeNull(); // a campaign boosting nothing is not a bonus
+  });
 });

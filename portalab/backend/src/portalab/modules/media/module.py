@@ -87,6 +87,7 @@ from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
     LIVING_WALL,
     MY_SOON,
+    NEXT_RELEASES,
     ON_THIS_DAY,
     POSTER_WALL,
     RECENT_RELEASES,
@@ -95,6 +96,7 @@ from portalab.modules.media.providers.insight_widgets import (
     SERVER_PLAYING,
     LivingWallWidget,
     MySoonWidget,
+    NextReleasesWidget,
     OnThisDayWidget,
     PosterWallWidget,
     RecentlyAddedWidget,
@@ -356,6 +358,7 @@ class MediaModule:
             (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
             (MY_SOON, MySoonWidget(self.database, self.request_insights, self.clock, self.enricher)),
+            (NEXT_RELEASES, NextReleasesWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (POSTER_WALL, PosterWallWidget(self.database, self.insights, self.clock)),
             (SHUFFLE_WIDGET, ShuffleWidget(self.database, self.clock)),
             (LIVING_WALL, LivingWallWidget(self.database, self.clock)),

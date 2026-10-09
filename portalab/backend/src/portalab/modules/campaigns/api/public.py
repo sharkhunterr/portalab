@@ -35,10 +35,17 @@ Me = Annotated[Principal, require(SELF)]
 Reader = Annotated[Principal, require(READ)]
 
 
+class CampaignBoostOut(BaseModel):
+    value: str
+    factor: float
+
+
 class CampaignSummaryOut(BaseModel):
     key: str
     name: str
     ends_at: datetime | None
+    # 027: what it multiplies (XP, Coins…) and by how much — shown with the member's progression
+    boosts: list[CampaignBoostOut] = []
 
 
 class CampaignPresentationOut(BaseModel):
@@ -54,10 +61,12 @@ def _user(principal: Principal) -> UUID:
 
 @router.get("/campaigns/active", response_model=list[CampaignSummaryOut])
 async def active(principal: Me, module: Module) -> list[CampaignSummaryOut]:
-    return [
-        CampaignSummaryOut(key=c.key, name=c.name, ends_at=c.ends_at)
-        for c in await module.presentation.active_for_user(_user(principal))
-    ]
+    out = []
+    for c in await module.presentation.active_for_user(_user(principal)):
+        view = await module.presentation.public_view(c.key)
+        boosts = [CampaignBoostOut.model_validate(m) for m in (view or {}).get("modifiers") or []]
+        out.append(CampaignSummaryOut(key=c.key, name=c.name, ends_at=c.ends_at, boosts=boosts))
+    return out
 
 
 @router.get("/campaigns/active/presentation", response_model=CampaignPresentationOut)

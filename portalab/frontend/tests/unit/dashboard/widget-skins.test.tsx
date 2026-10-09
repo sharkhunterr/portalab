@@ -9,6 +9,7 @@ import "../../../src/features/dashboard/widgets/media";
 import "../../../src/features/dashboard/widgets/discover";
 import { widgetComponent } from "../../../src/features/dashboard/widgets/registry";
 import { partOf } from "../../../src/features/dashboard/widgets/skins";
+import { cumulate } from "../../../src/features/gamification/ProgressCurves";
 
 // 027 (#31) — the widgets' other looks: the classic look stays the default (and what a member who did not
 // buy another one sees), a look is picked with ``style``; and the three media widgets « living wall »,
@@ -75,17 +76,6 @@ describe("widget looks", () => {
     expect(screen.getByText("Holidays")).toBeInTheDocument();
   });
 
-  it("counts down to the next event still to come on a flip board, the others listed", () => {
-    const items = [
-      { title: "Festival under way", route: "/calendar/1", meta: "2020-01-01T20:00:00Z" },
-      { title: "Movie night", route: "/calendar/2", meta: "2999-01-01T20:00:00Z" },
-    ];
-    show("calendar.upcoming", { items }, { style: "flip" });
-    expect(document.querySelector(".skin-flip__next")?.textContent).toContain("Movie night");
-    expect(screen.getByText("Festival under way")).toBeInTheDocument(); // still in the list
-    expect(screen.getByRole("timer").getAttribute("aria-label")).toMatch(/days/);
-  });
-
   it("deals the posters as a deck, the next card on a click", () => {
     show("media.posters", { items: [card(1), card(2), card(3)] }, { style: "deck" });
     expect(document.querySelectorAll(".skin-deck__pile img")).toHaveLength(3);
@@ -94,18 +84,23 @@ describe("widget looks", () => {
     expect(screen.getByText("Title 2")).toBeInTheDocument();
   });
 
-  it("runs the latest news on a ticker, the list kept below; the classic look is the list alone", () => {
+  it("shows the latest news one at a time, then the next; the classic look is the list", () => {
     const items = [
-      { title: "Server upgraded", route: "/news/1" },
-      { title: "Movie night", route: "/news/2" },
+      { title: "Server upgraded", route: "/news/1", meta: "2026-10-04", summary: "More room.", cover: "c1" },
+      { title: "Movie night", route: "/news/2", meta: "2026-10-02", summary: "Friday.", cover: "c2" },
     ];
     const classic = show("news.latest", { items });
-    expect(document.querySelector(".skin-ticker")).toBeNull();
-    expect(screen.getByText("Server upgraded")).toBeInTheDocument();
+    expect(document.querySelector(".skin-carousel")).toBeNull();
+    expect(screen.getByText("Movie night")).toBeInTheDocument();
     classic.unmount();
-    show("news.latest", { items }, { style: "ticker" });
-    // twice in the lane for the loop, once in the list
-    expect(screen.getAllByText("Server upgraded")).toHaveLength(3);
+    show("news.latest", { items }, { style: "carousel" });
+    expect(screen.getByText("Server upgraded")).toBeInTheDocument();
+    expect(screen.getByText("More room.")).toBeInTheDocument();
+    expect(screen.queryByText("Movie night")).toBeNull(); // one at a time
+    expect(document.querySelectorAll(".skin-carousel__bars > span")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("button", { name: "Next article" }));
+    expect(screen.getByText("Movie night")).toBeInTheDocument();
+    expect(screen.queryByText("Server upgraded")).toBeNull();
   });
 
   it("counts a figure up with its separators in place", () => {
@@ -147,6 +142,32 @@ describe("playing on the server", () => {
   });
 });
 
+describe("next releases", () => {
+  it("counts down to the soonest, says why it is there, and brings another forward", () => {
+    const at = (days: number) => new Date(Date.now() + days * 86_400_000 + 3_600_000).toISOString();
+    show("media.next_releases", {
+      items: [
+        { ...card(1), title: "Severance", season: 2, episode: 5, type: "air", at: at(3), reason: "watching" },
+        { ...card(2), title: "Dune: Part Three", type: "cinema", at: at(20), reason: "requested" },
+      ],
+    });
+    expect(document.querySelector(".widget-next__title")?.textContent).toBe("Severance");
+    expect(screen.getByText("You follow it")).toBeInTheDocument();
+    expect(screen.getByText(/S02E05/)).toBeInTheDocument();
+    const units = document.querySelectorAll(".widget-next__unit strong");
+    expect(units).toHaveLength(4);
+    expect(units[0]?.textContent).toBe("03");
+    fireEvent.click(screen.getByRole("button", { name: /Dune: Part Three/ }));
+    expect(document.querySelector(".widget-next__title")?.textContent).toBe("Dune: Part Three");
+    expect(screen.getByText("You asked for it")).toBeInTheDocument();
+  });
+
+  it("says when nothing followed comes out soon", () => {
+    show("media.next_releases", { items: [] });
+    expect(screen.getByText("Nothing you follow comes out in the next two months.")).toBeInTheDocument();
+  });
+});
+
 describe("a year ago", () => {
   it("shows what I watched and what came in, around this date back then", () => {
     show("media.on_this_day", {
@@ -164,5 +185,25 @@ describe("a year ago", () => {
   it("says when past years have nothing", () => {
     show("media.on_this_day", { years: null, watched: [], added: [] });
     expect(screen.getByText("Nothing around this date in past years yet.")).toBeInTheDocument();
+  });
+});
+
+describe("my progression as curves", () => {
+  it("sums the gains of each day of the period into a rising curve", () => {
+    const today = new Date("2026-10-09T12:00:00Z");
+    const points = cumulate(
+      [
+        { day: "2026-10-07", amounts: { media: 30, quests: 20 } },
+        { day: "2026-10-09", amounts: { media: 10 } },
+      ],
+      today,
+      4,
+    );
+    expect(points).toEqual([
+      { day: "2026-10-06", total: 0 },
+      { day: "2026-10-07", total: 50 },
+      { day: "2026-10-08", total: 50 },
+      { day: "2026-10-09", total: 60 },
+    ]);
   });
 });

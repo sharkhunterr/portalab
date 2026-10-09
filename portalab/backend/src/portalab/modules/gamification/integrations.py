@@ -257,5 +257,5 @@ class CatalogFacade:
         return list(await self.quests.mine(user_id))
 
 
-PROGRESS_WIDGET = with_styles(PROGRESS_WIDGET, "odometer")  # 027 (#31)
+PROGRESS_WIDGET = with_styles(PROGRESS_WIDGET, "odometer", "chart")  # 027 (#31)
 DAILY_WIDGET = with_styles(DAILY_WIDGET, "liquid")  # 027 (#31)

@@ -18,6 +18,8 @@ Product = dict[str, Any]
 BUILTIN_THEMES = Path(themes_package.__file__).parent / "builtin"
 
 SHOP: list[Product] = []
+# 027: products taken out of the shop — archived (no longer sold, their option no longer offered)
+RETIRED: tuple[str, ...] = ("opt_style_upcoming_flip",)
 
 
 def _p(
@@ -1107,14 +1109,14 @@ for key, option, en, fr, rarity, price in (
     ("opt_style_continue_ambient", "media.continue:style=ambient", "Ambient light for « Continue »", "Lumière d'ambiance pour « Continuer »", "rare", 350),
     ("opt_style_services_pulse", "health.services_summary:style=pulse", "Heartbeat for « Services »", "Pouls pour « Services »", "rare", 300),
     ("opt_style_progress_odometer", "gamification.progress:style=odometer", "Odometer for « My progression »", "Compteur animé pour « Ma progression »", "epic", 450),
+    ("opt_style_progress_chart", "gamification.progress:style=chart", "Curves for « My progression »", "Courbes pour « Ma progression »", "epic", 500),
     ("opt_style_daily_liquid", "gamification.daily_objectives:style=liquid", "Liquid gauges for « Daily objectives »", "Jauges liquides pour « Objectifs du jour »", "rare", 300),
     ("opt_style_added_deck", "media.recently_added:style=deck", "Card deck for « Recently added »", "Pile de cartes pour « Ajouts récents »", "common", 200),
     ("opt_style_releases_deck", "media.recent_releases:style=deck", "Card deck for « Recent releases »", "Pile de cartes pour « Sorties récentes »", "common", 200),
     ("opt_style_requested_deck", "media.recently_requested:style=deck", "Card deck for « Recently requested »", "Pile de cartes pour « Demandes récentes »", "common", 200),
-    ("opt_style_upcoming_flip", "calendar.upcoming:style=flip", "Flip board for « Upcoming »", "Tableau à palettes pour « À venir »", "rare", 300),
     ("opt_style_stats_countup", "media.stats:style=countup", "Counting figures for « My statistics »", "Chiffres animés pour « Mes statistiques »", "common", 200),
     ("opt_style_wall_kenburns", "media.poster_wall:style=kenburns", "Travelling camera for the poster wall", "Travelling pour le mur d'affiches", "epic", 500),
-    ("opt_style_news_ticker", "news.latest:style=ticker", "Ticker for « Latest news »", "Bandeau défilant pour « Dernières actualités »", "common", 200),
+    ("opt_style_news_ticker", "news.latest:style=carousel", "Carousel for « Latest news »", "Carrousel pour « Dernières actualités »", "common", 200),  # the key predates the carousel
     ("opt_style_clock_analog", "dashboard.clock:style=analog", "Analog face for the clock", "Cadran analogique pour l'horloge", "rare", 250),
     ("opt_style_countdown_flip", "dashboard.countdown:style=flip", "Flip digits for the countdown", "Chiffres à palettes pour le compte à rebours", "rare", 250),
     ("opt_style_activity_live", "community.activity:style=live", "Live feed for « Community activity »", "Fil en direct pour « Activité de la communauté »", "common", 200),

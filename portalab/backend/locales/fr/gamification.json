@@ -356,6 +356,9 @@
   "value.xp": "XP",
   "widget.daily.description": "Les objectifs du jour et votre progression.",
   "widget.daily.title": "Objectifs du jour",
+  "widget.progress.boosts": "Ce qui booste mes gains",
   "widget.progress.description": "Niveau, XP, Contribution et Coins",
+  "widget.progress.gained": "+{amount} {unit} en {days} jours",
+  "widget.progress.streak": "{days, plural, one {# jour} other {# jours}} d’affilée",
   "widget.progress.title": "Ma progression"
 }

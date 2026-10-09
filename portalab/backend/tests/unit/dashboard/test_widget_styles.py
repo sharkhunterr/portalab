@@ -4,7 +4,6 @@ is on sale."""
 
 from portalab.app.demo_shop import SHOP
 from portalab.capabilities.dashboard import WidgetDefinition, with_styles
-from portalab.modules.calendar.module import UPCOMING
 from portalab.modules.community.integrations import ACTIVITY_WIDGET
 from portalab.modules.dashboard.widgets.builtin import CLOCK, COUNTDOWN, SERVICES_SUMMARY
 from portalab.modules.gamification.integrations import DAILY_WIDGET, PROGRESS_WIDGET
@@ -20,7 +19,6 @@ from portalab.modules.news.integrations import LATEST
 from tests.unit.dashboard.fakes import definition
 
 STYLED: tuple[WidgetDefinition, ...] = (
-    UPCOMING,
     ACTIVITY_WIDGET,
     CLOCK,
     COUNTDOWN,

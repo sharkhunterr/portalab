@@ -23,7 +23,7 @@ from uuid import UUID
 from sqlalchemy import text
 
 from portalab.app import demo_economy
-from portalab.app.demo_shop import COLLECTIONS, SHOP, definition
+from portalab.app.demo_shop import COLLECTIONS, RETIRED, SHOP, definition
 from portalab.app.wiring import Platform
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.notifications import AllAuthenticated, CommunicationRequest
@@ -596,7 +596,13 @@ class DemoSeeder:
                     AvailabilityIn(supply=product["supply"], limit_count=limit[0], limit_days=limit[1]),
                     product["level"],
                 )
-        return f"{made} products published, {revised} revised"
+        retired = 0
+        for key in RETIRED:
+            state = await self._scalar("SELECT state FROM marketplace.products WHERE key = :k", k=key)
+            if state in ("available", "unavailable"):
+                await catalog.move(self.admin, key, "archived")
+                retired += 1
+        return f"{made} products published, {revised} revised, {retired} retired"
 
     async def purchases(self) -> str:
         purchases = self.platform.marketplace.purchases

@@ -8837,6 +8837,13 @@ export interface components {
              */
             message: string;
         };
+        /** CampaignBoostOut */
+        CampaignBoostOut: {
+            /** Factor */
+            factor: number;
+            /** Value */
+            value: string;
+        };
         /** CampaignCreateIn */
         CampaignCreateIn: {
             /** Definition */
@@ -8909,6 +8916,11 @@ export interface components {
         };
         /** CampaignSummaryOut */
         CampaignSummaryOut: {
+            /**
+             * Boosts
+             * @default []
+             */
+            boosts: components["schemas"]["CampaignBoostOut"][];
             /** Ends At */
             ends_at: string | null;
             /** Key */

@@ -48,6 +48,9 @@ async def test_theme_overlay(cm: CampHarness, client: AsyncClient) -> None:
     shown = (await client.get("/api/v1/campaigns/active/presentation")).json()
     assert {c["key"] for c in shown["campaigns"]} == {"halloween", "vip_night"}
     assert shown["theme"] == {"campaign": "vip_night", "theme_key": "ghost"}
+    # 027: the running campaigns say what they boost (shown with the member's progression)
+    boosts = {c["key"]: c["boosts"] for c in (await client.get("/api/v1/campaigns/active")).json()}
+    assert boosts["vip_night"] == [{"value": "xp", "factor": 2.0}]
     await login(client, "ulrich")
     other = (await client.get("/api/v1/campaigns/active/presentation")).json()
     assert [c["key"] for c in other["campaigns"]] == ["halloween"] and other["theme"][

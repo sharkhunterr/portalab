@@ -23,12 +23,13 @@ from portalab.capabilities.i18n import LocaleContext
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.media.common import strong_ids
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.stats import CATEGORIES, InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
 from portalab.modules.media.models import Activity, Image, MediaObject, MediaRequest, PlaybackSession
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
-from portalab.modules.media.requests.insights import GROUPS, RequestInsights, kind_of, lookup_of
+from portalab.modules.media.requests.insights import GROUPS, RequestInsights, ids_of, kind_of, lookup_of
 
 OWNER = "module:media"
 CHARTS = ("bars", "area", "donut", "top", "figures")
@@ -164,6 +165,12 @@ ON_THIS_DAY = _definition(  # 027 (#31): a year ago today — what I watched, wh
     component="media.on_this_day",
     icon="hourglass",
     size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+)
+NEXT_RELEASES = _definition(  # 027: what comes out next among what I asked for and the series I follow
+    "media.next_releases",
+    component="media.next_releases",
+    icon="rocket",
+    size=SizeLimits(default=Size(6, 3), min=Size(4, 2), max=Size(12, 6)),
 )
 MY_SOON = _definition(
     "media.my_soon",
@@ -420,6 +427,92 @@ class UpcomingWidget(_Base):
             for r in releases
             if r["at"] >= now.isoformat()
         ][:16]
+        return self.payload({"items": await self.cards(items)})
+
+
+class NextReleasesWidget(_Base):
+    """027: « next releases » — the coming releases (60 days) that concern the viewer: a title they asked for
+    (its release, or the next episode of a series they requested) or a series they watched this past year
+    (its next episode). One per title, the soonest first, each saying why it is there."""
+
+    LIMIT = 8
+    FOLLOWED = timedelta(days=365)
+
+    def __init__(
+        self,
+        database: Database,
+        upcoming: Upcoming,
+        clock: Clock | None = None,
+        enricher: MetadataEnricher | None = None,
+    ) -> None:
+        super().__init__(database, clock, enricher)
+        self.upcoming = upcoming
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        me = principal.acting_for or principal.user_id
+        if me is None:
+            return self.payload({"items": []})
+        now = utc_now(self.clock)
+        async with self.database.session() as session:
+            requests = (
+                (await session.execute(select(MediaRequest).where(MediaRequest.requester_user_id == me)))
+                .scalars()
+                .all()
+            )
+            watched = (
+                await session.execute(
+                    select(Activity.work_id, Activity.parent_title)
+                    .where(
+                        Activity.user_id == me,
+                        Activity.kind == "episode",
+                        Activity.started_at >= now - self.FOLLOWED,
+                    )
+                    .distinct()
+                )
+            ).all()
+        asked: set[tuple[str, str]] = set()
+        for request in requests:
+            asked |= ids_of(request)
+        series = {str(work) for work, _ in watched if work}
+        titles = {str(title).casefold() for _, title in watched if title}
+        items: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for release in await self.upcoming.list(60):
+            if release["at"] <= now.isoformat():
+                continue
+            name = str(release["parent_title"] or release["title"])
+            if name.casefold() in seen:
+                continue
+            if asked & set(strong_ids(release.get("ids") or {}).items()):
+                reason = "requested"
+            elif release["kind"] != "movie" and (release["object_id"] in series or name.casefold() in titles):
+                reason = "watching"
+            else:
+                continue
+            seen.add(name.casefold())
+            items.append(
+                {
+                    "id": release["object_id"],
+                    "title": name,
+                    "subtitle": release["title"] if release["parent_title"] else None,
+                    "kind": release["kind"],
+                    "type": release["type"],
+                    "season": release["season"],
+                    "episode": release["episode"],
+                    "at": release["at"],
+                    "reason": reason,
+                    "_lookup": (
+                        "movie" if release["kind"] == "movie" else "series",
+                        dict(release.get("ids") or {}),
+                        name,
+                        None,
+                    ),
+                }
+            )
+            if len(items) >= self.LIMIT:
+                break
         return self.payload({"items": await self.cards(items)})
 
 

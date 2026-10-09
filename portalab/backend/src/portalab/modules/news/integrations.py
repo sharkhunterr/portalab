@@ -151,8 +151,8 @@ def _widget(key: str, title: str) -> WidgetDefinition:
 
 
 FEATURED = _widget("news.featured", "featured")
-LATEST = with_styles(  # 027 (#31): the list, or « ticker » — the headlines running across
-    replace(_widget("news.latest", "latest"), component_id="news.latest"), "ticker"
+LATEST = with_styles(  # 027 (#31): the list, or « carousel » — one article at a time, then the next
+    replace(_widget("news.latest", "latest"), component_id="news.latest"), "carousel"
 )
 
 
@@ -177,6 +177,8 @@ class NewsWidget:
                 "title": r.title,
                 "route": f"/news/{r.slug}",
                 "meta": r.published_at.date().isoformat() if r.published_at else "",
+                "summary": r.summary,
+                "cover": str(r.category_id or r.slug),  # 027: the seed of its generated cover
             }
             for r in rows
         ]

@@ -1,14 +1,63 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
+import { api } from "../../api/client";
+import type { components } from "../../api/generated/schema";
 import { levelProgress } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { useActiveCampaigns } from "../campaigns/api";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
 import { toQuestItem, useProgression } from "./api";
 import type { QuestItem } from "./quests/QuestList";
 import "./gamification.css";
 
 const VALUE_ICON: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
+
+export function useMyStreak() {
+  return useQuery({
+    queryKey: ["gamification", "my-streak"],
+    queryFn: async () => (await api.GET("/api/v1/me/streak")).data as components["schemas"]["MyStreakOut"],
+    staleTime: 60_000,
+  });
+}
+
+const factor = (value: number) => `×${Number(value.toFixed(2))}`;
+
+/** 027: what multiplies my gains right now — my play streak (with its multiplier) and the campaigns running
+ * for me (what they boost); nothing when none is on. */
+export function ProgressBoosts() {
+  const t = useT();
+  const streak = useMyStreak().data;
+  const active = useActiveCampaigns().data;
+  const campaigns = (Array.isArray(active) ? active : []).filter((c) => (c.boosts ?? []).length);
+  const streaking = streak?.enabled && streak.days > 0;
+  if (!streaking && !campaigns.length) return null;
+  return (
+    <ul className="widget-level__boosts" aria-label={t("gamification:widget.progress.boosts")}>
+      {streaking && streak ? (
+        <li data-boost="streak" title={t("gamification:widget.progress.streak", { days: streak.days })}>
+          <Icon name="flame" size={13} />
+          {t("gamification:widget.progress.streak", { days: streak.days })}
+          {streak.multiplier > 1 ? <strong>{factor(streak.multiplier)}</strong> : null}
+        </li>
+      ) : null}
+      {campaigns.map((campaign) => (
+        <li key={campaign.key} data-boost="campaign" title={campaign.name}>
+          <Link to={`/campaigns/${campaign.key}`}>
+            <Icon name="star" size={13} />
+            <span>{campaign.name}</span>
+            {(campaign.boosts ?? []).map((boost) => (
+              <strong key={boost.value}>
+                {factor(boost.factor)} {t(`gamification:value.${boost.value}`)}
+              </strong>
+            ))}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** Dashboard widget ``gamification.progress`` (spec 013 T030; 027 #12): the level as a ring filled up to the
  * next one, the XP still to earn, and the three values as chips — all sized to the block. */
@@ -59,7 +108,17 @@ function ProgressWidget({ payload }: WidgetProps) {
   );
 }
 
-registerWidgetComponent("gamification.progress", ProgressWidget);
+/** The classic look: the level and values, then what boosts my gains now (outside the link). */
+function ProgressWithBoosts(props: WidgetProps) {
+  return (
+    <div className="widget-level-box">
+      <ProgressWidget {...props} />
+      <ProgressBoosts />
+    </div>
+  );
+}
+
+registerWidgetComponent("gamification.progress", ProgressWithBoosts);
 
 const REWARD_ICON: Record<string, string> = { coins: "coins", xp: "sparkles", contribution: "heart" };
 
