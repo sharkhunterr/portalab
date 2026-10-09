@@ -539,6 +539,7 @@ class ResumePoint:
     parent_title: str | None = None  # the series of an episode
     label: str | None = None  # « S02E05 »
     position_s: float = 0.0  # 0: up next, not started
+    series_id: str | None = None  # an episode's series on the service (its poster, its page)
     duration_s: float | None = None
     at: datetime | None = None  # when the member last watched
     ids: Mapping[str, str] = field(default_factory=dict)

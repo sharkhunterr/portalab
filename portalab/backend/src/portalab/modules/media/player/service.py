@@ -295,14 +295,24 @@ class PlayerService:
                     await session.execute(
                         select(SourceItem).where(
                             SourceItem.service_id.in_(services or {UUID(int=0)}),
-                            SourceItem.external_id.in_([p.external_id for p, _ in points] or [""]),
+                            SourceItem.external_id.in_(
+                                [p.external_id for p, _ in points]
+                                + [p.series_id for p, _ in points if p.series_id]
+                                or [""]
+                            ),
                         )
                     )
                 ).scalars()
             }
         points.sort(key=lambda p: p[0].at.timestamp() if p[0].at else 0.0, reverse=True)
+
+        def card_of(point: ResumePoint, service: UUID) -> UUID | None:
+            # an episode shows its series (its poster; its page offers the episode to resume)
+            series = objects.get((service, point.series_id)) if point.series_id else None
+            return series or objects.get((service, point.external_id))
+
         return Continuing(
-            [(point, objects.get((service, point.external_id))) for point, service in points][:limit],
+            [(point, card_of(point, service)) for point, service in points][:limit],
             services,
             families,
         )

@@ -627,6 +627,9 @@ class PlexChannel:
                     parent_title=item.get("grandparentTitle") if kind == "episode" else None,
                     label=_episode_label(item) if kind == "episode" else None,
                     position_s=_seconds(item.get("viewOffset")) or 0.0,
+                    series_id=str(item["grandparentRatingKey"])
+                    if kind == "episode" and item.get("grandparentRatingKey")
+                    else None,
                     duration_s=_seconds(item.get("duration")),
                     at=parse_time(item.get("lastViewedAt")),
                     ids=_guids(item),

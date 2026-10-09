@@ -209,6 +209,28 @@ async def test_continue_follows_the_servers_own_continue_watching(
     assert [(c["title"], c["progress"]) for c in shelf] == [("Film", 0.25), ("A book", 0.4)]
     assert shelf[0]["route"].startswith("/media/")  # tied to the catalog's object
 
+    # an episode is shown by its series (the series' poster and page)
+    await media.module.library.upsert(
+        [
+            library_record("s1", kind="series", title="Firefly"),
+            library_record("e1", kind="episode", title="Pilot", parent="s1"),
+        ],
+        plex,
+    )
+    fake.resume.insert(
+        0,
+        ResumePoint("e1", "episode", "Pilot", parent_title="Firefly", label="S01E01", series_id="s1", at=NOW),
+    )
+    shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
+    async with media.database.session() as session:
+        from sqlalchemy import text
+
+        series = (
+            await session.execute(text("SELECT id FROM media.objects WHERE title = 'Firefly'"))
+        ).scalar_one()
+    assert shelf[0]["route"] == f"/media/{series}" and shelf[0]["subtitle"] == "S01E01 · Pilot"
+    fake.resume.pop(0)
+
     fake.resume.clear()  # « Back to zero » on Plex
     shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
     assert [c["title"] for c in shelf] == ["A book"]

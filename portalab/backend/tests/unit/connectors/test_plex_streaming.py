@@ -127,6 +127,7 @@ class _Server:
                     "type": "episode",
                     "title": "Pilot",
                     "grandparentTitle": "Firefly",
+                    "grandparentRatingKey": "199",
                     "parentIndex": 1,
                     "index": 2,
                     "duration": 2_400_000,
@@ -227,6 +228,7 @@ async def test_continue_watching_is_plexs_own(server: _Server) -> None:
         ("201", "episode", 0.0, "S01E02"),  # the next episode: no position
     ]
     assert points[0].at is not None and points[1].parent_title == "Firefly"
+    assert points[0].series_id is None and points[1].series_id == "199"
 
 
 async def test_the_subtitle_feed_becomes_cues() -> None:
