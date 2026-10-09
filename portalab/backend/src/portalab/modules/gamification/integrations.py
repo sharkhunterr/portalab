@@ -10,7 +10,14 @@ from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.ai import AITool, AIToolRegistry, SourceRef, ToolResult
 from portalab.capabilities.automation_actions import ActionRegistry, ActionType
-from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
+from portalab.capabilities.dashboard import (
+    Refresh,
+    Size,
+    SizeLimits,
+    WidgetDefinition,
+    WidgetPayload,
+    with_styles,
+)
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.visibility import Level, register_datum_class
 from portalab.core.authz_port import Principal
@@ -248,3 +255,7 @@ class CatalogFacade:
 
     async def quests_of(self, user_id: UUID) -> list[dict[str, Any]]:
         return list(await self.quests.mine(user_id))
+
+
+PROGRESS_WIDGET = with_styles(PROGRESS_WIDGET, "odometer")  # 027 (#31)
+DAILY_WIDGET = with_styles(DAILY_WIDGET, "liquid")  # 027 (#31)

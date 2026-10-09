@@ -11,6 +11,7 @@ import "../widgets/layout";
 import "../widgets/builtin";
 import "../widgets/media";
 import "../widgets/calendar";
+import "../widgets/discover";
 
 /**
  * 027: a widget's miniature — the real widget with the member's own data (``preview``: before it is bought,

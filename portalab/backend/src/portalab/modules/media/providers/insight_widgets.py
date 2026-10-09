@@ -4,13 +4,21 @@ counts, never who watched or asked)."""
 
 import asyncio
 from collections.abc import Coroutine, Iterable, Mapping
+from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, select
 
-from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
+from portalab.capabilities.dashboard import (
+    Refresh,
+    Size,
+    SizeLimits,
+    WidgetDefinition,
+    WidgetPayload,
+    with_styles,
+)
 from portalab.capabilities.i18n import LocaleContext
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -18,7 +26,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.stats import CATEGORIES, InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
-from portalab.modules.media.models import Image, MediaObject, MediaRequest
+from portalab.modules.media.models import Activity, Image, MediaObject, MediaRequest, PlaybackSession
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 from portalab.modules.media.requests.insights import GROUPS, RequestInsights, kind_of, lookup_of
 
@@ -133,6 +141,29 @@ SHUFFLE = _definition(  # 027 (#12): a title drawn at random from the library, o
     size=SizeLimits(default=Size(12, 3), min=Size(4, 2), max=Size(12, 6)),
     schema=KIND_FILTER,
     defaults={"kind": "all"},
+)
+LIVING_WALL = _definition(  # 027 (#31): a wall of posters turning one by one (sold in the shop)
+    "media.living_wall",
+    component="media.living_wall",
+    icon="apps",
+    size=SizeLimits(default=Size(12, 4), min=Size(4, 2), max=Size(12, 8)),
+    product="widget_living_wall",
+)
+SERVER_PLAYING = replace(  # 027 (#31): what plays on the server now — titles and progress, never who
+    _definition(
+        "media.server_playing",
+        component="media.server_playing",
+        icon="play",
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    ),
+    refresh=Refresh(mode="interval", interval_s=30),
+    stale_after_s=120,
+)
+ON_THIS_DAY = _definition(  # 027 (#31): a year ago today — what I watched, what came into the library
+    "media.on_this_day",
+    component="media.on_this_day",
+    icon="hourglass",
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
 )
 MY_SOON = _definition(
     "media.my_soon",
@@ -457,6 +488,160 @@ class ShuffleWidget(_Base):
         return self.payload({"items": cards})
 
 
+class LivingWallWidget(ShuffleWidget):
+    """027 (#31): the « living wall » — many posters at random from the library, which the block turns one
+    by one to reveal others."""
+
+    DRAW = 48
+
+
+class ServerPlayingWidget(_Base):
+    """027 (#31): « playing on the server » — the sessions running now (playing, paused, buffering), each
+    with its title, poster and progress; the viewer's own are marked, the others name nobody."""
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        me = principal.acting_for or principal.user_id
+        since = utc_now(self.clock) - timedelta(minutes=3)
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(PlaybackSession, MediaObject)
+                    .outerjoin(MediaObject, MediaObject.id == PlaybackSession.object_id)
+                    .where(
+                        PlaybackSession.ended.is_(False),
+                        PlaybackSession.state.in_(("playing", "paused", "buffering")),
+                        PlaybackSession.updated_at >= since,
+                    )
+                    .order_by(PlaybackSession.started_at.desc())
+                    .limit(12)
+                )
+            ).all()
+            parents: dict[UUID, MediaObject] = {}
+            pending = {o.parent_id for _, o in rows if o is not None and o.parent_id}
+            for _ in range(2):  # an episode → its season → its series
+                if not pending:
+                    break
+                found = (
+                    (await session.execute(select(MediaObject).where(MediaObject.id.in_(pending))))
+                    .scalars()
+                    .all()
+                )
+                parents.update({o.id: o for o in found})
+                pending = {o.parent_id for o in found if o.parent_id and o.parent_id not in parents}
+
+        def series_of(item: MediaObject) -> MediaObject | None:
+            parent = parents.get(item.parent_id) if item.parent_id else None
+            if parent is not None and parent.kind == "season" and parent.parent_id:
+                return parents.get(parent.parent_id, parent)
+            return parent
+
+        items = []
+        for session_row, item in rows:
+            series = series_of(item) if item is not None and item.kind == "episode" else None
+            shown = series or item
+            duration = session_row.duration_s or 0
+            items.append(
+                {
+                    "id": str(shown.id) if shown is not None else None,
+                    "title": shown.title if shown is not None else session_row.kind,
+                    "subtitle": item.title if series is not None and item is not None else None,
+                    "kind": session_row.kind,
+                    "state": session_row.state,
+                    "progress": min(1.0, session_row.position_s / duration) if duration else None,
+                    "mine": session_row.user_id is not None and session_row.user_id == me,
+                }
+            )
+        cards = await self.cards(items)
+        return self.payload({"items": cards, "count": len(cards)})
+
+
+class OnThisDayWidget(_Base):
+    """027 (#31): « a year ago » — around this date (± 3 days) one, two… years back: what I watched then,
+    and what came into the library (the first year that has something)."""
+
+    YEARS = 5
+    AROUND = timedelta(days=3)
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        me = principal.acting_for or principal.user_id
+        today = utc_now(self.clock)
+        async with self.database.session() as session:
+            for years in range(1, self.YEARS + 1):
+                try:
+                    then = today.replace(year=today.year - years)
+                except ValueError:  # the 29th of February
+                    then = today.replace(year=today.year - years, day=28)
+                watched_rows = (
+                    (
+                        await session.execute(
+                            select(Activity)
+                            .where(
+                                Activity.user_id == me,
+                                Activity.counted.is_(True),
+                                Activity.kind != "live",
+                                Activity.started_at.between(then - self.AROUND, then + self.AROUND),
+                            )
+                            .order_by(Activity.started_at)
+                            .limit(40)
+                        )
+                    )
+                    .scalars()
+                    .all()
+                    if me
+                    else []
+                )
+                added_rows = (
+                    (
+                        await session.execute(
+                            select(MediaObject)
+                            .where(
+                                MediaObject.status == "active",
+                                MediaObject.kind.in_(("movie", "series", "book", "audiobook")),
+                                MediaObject.first_seen_at.between(then - self.AROUND, then + self.AROUND),
+                            )
+                            .order_by(func.random())
+                            .limit(12)
+                        )
+                    )
+                    .scalars()
+                    .all()
+                )
+                if watched_rows or added_rows:
+                    break
+            else:
+                return self.payload({"years": None, "watched": [], "added": []})
+        seen: set[Any] = set()
+        watched = []
+        for row in watched_rows:
+            key = row.work_id or row.object_id or (row.parent_title or row.title)
+            if key in seen:
+                continue
+            seen.add(key)
+            series = row.kind == "episode" and row.parent_title
+            watched.append(
+                {
+                    "id": str(row.work_id or row.object_id) if (row.work_id or row.object_id) else None,
+                    "title": row.parent_title if series else row.title,
+                    "subtitle": row.title if series else None,
+                    "kind": "series" if series else row.kind,
+                    "at": row.started_at.isoformat(),
+                }
+            )
+        added = [{"id": str(o.id), "title": o.title, "kind": o.kind, "year": o.year} for o in added_rows]
+        return self.payload(
+            {
+                "years": years,
+                "date": then.date().isoformat(),
+                "watched": await self.cards(watched[:12]),
+                "added": [c for c in await self.cards(added) if c.get("image_id")],
+            }
+        )
+
+
 class PosterWallWidget(TopWidget):
     """The server's 24 most watched titles of the month as a poster mosaic (sold in the shop)."""
 
@@ -469,3 +654,10 @@ class PosterWallWidget(TopWidget):
             for w in data["top_works"]
         ]
         return self.payload({"items": await self.cards(items)})
+
+
+STATS = with_styles(STATS, "countup")  # 027 (#31)
+RECENTLY_ADDED = with_styles(RECENTLY_ADDED, "deck")  # 027 (#31)
+RECENT_RELEASES = with_styles(RECENT_RELEASES, "deck")  # 027 (#31)
+RECENTLY_REQUESTED = with_styles(RECENTLY_REQUESTED, "deck")  # 027 (#31)
+POSTER_WALL = with_styles(POSTER_WALL, "kenburns")  # 027 (#31)

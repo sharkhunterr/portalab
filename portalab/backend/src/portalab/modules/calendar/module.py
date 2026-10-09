@@ -17,6 +17,7 @@ from portalab.capabilities.dashboard import (
     WidgetPayload,
     WidgetRegistry,
     default_widgets,
+    with_styles,
 )
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.i18n import LocaleContext
@@ -62,7 +63,9 @@ UPCOMING = WidgetDefinition(
     refresh=Refresh(),
     stale_after_s=900,
     template="list",
+    component_id="calendar.upcoming",  # 027 (#31): the list, or « flip » — the next date on flip digits
 )
+UPCOMING = with_styles(UPCOMING, "flip")
 
 
 class UpcomingWidget:

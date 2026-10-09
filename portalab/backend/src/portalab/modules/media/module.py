@@ -85,15 +85,21 @@ from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.player.service import PlayerService
 from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
+    LIVING_WALL,
     MY_SOON,
+    ON_THIS_DAY,
     POSTER_WALL,
     RECENT_RELEASES,
     RECENTLY_ADDED,
     RECENTLY_REQUESTED,
+    SERVER_PLAYING,
+    LivingWallWidget,
     MySoonWidget,
+    OnThisDayWidget,
     PosterWallWidget,
     RecentlyAddedWidget,
     RecentlyRequestedWidget,
+    ServerPlayingWidget,
     ShuffleWidget,
     StatsWidget,
     TopWidget,
@@ -352,6 +358,9 @@ class MediaModule:
             (MY_SOON, MySoonWidget(self.database, self.request_insights, self.clock, self.enricher)),
             (POSTER_WALL, PosterWallWidget(self.database, self.insights, self.clock)),
             (SHUFFLE_WIDGET, ShuffleWidget(self.database, self.clock)),
+            (LIVING_WALL, LivingWallWidget(self.database, self.clock)),
+            (SERVER_PLAYING, ServerPlayingWidget(self.database, self.clock)),
+            (ON_THIS_DAY, OnThisDayWidget(self.database, self.clock, self.enricher)),
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:

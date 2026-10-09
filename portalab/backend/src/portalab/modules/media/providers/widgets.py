@@ -5,7 +5,14 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import Any
 
-from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
+from portalab.capabilities.dashboard import (
+    Refresh,
+    Size,
+    SizeLimits,
+    WidgetDefinition,
+    WidgetPayload,
+    with_styles,
+)
 from portalab.capabilities.i18n import LocaleContext
 from portalab.core.authz_port import Principal
 from portalab.core.time import Clock, utc_now
@@ -35,10 +42,13 @@ def _definition(key: str, permission: str, events: tuple[str, ...]) -> WidgetDef
     )
 
 
-CONTINUE = replace(
-    _definition("media.continue", MEDIA_READ, ("media.playback_paused", "media.playback_finished")),
-    component_id="media.continue",  # 027: posters with a progress bar
-    refresh=Refresh(),
+CONTINUE = with_styles(  # 027 (#31): « ambient » — the title's poster as a blurred light behind
+    replace(
+        _definition("media.continue", MEDIA_READ, ("media.playback_paused", "media.playback_finished")),
+        component_id="media.continue",  # 027: posters with a progress bar
+        refresh=Refresh(),
+    ),
+    "ambient",
 )
 RECENT = _definition("media.recent", MEDIA_READ, ("media.added",))
 NOW_PLAYING = _definition(

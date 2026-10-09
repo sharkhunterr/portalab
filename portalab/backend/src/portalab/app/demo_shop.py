@@ -1101,6 +1101,34 @@ for key, option, en, fr, rarity, price in (
        "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée.",
        {"option": option}, collection="widgets", icon="settings")  # fmt: skip
 
+# 027 (#30, #31): the widgets' other looks — the original one stays free; these are picked in a widget's
+# settings (« Visual ») once bought
+for key, option, en, fr, rarity, price in (
+    ("opt_style_continue_ambient", "media.continue:style=ambient", "Ambient light for « Continue »", "Lumière d'ambiance pour « Continuer »", "rare", 350),
+    ("opt_style_services_pulse", "health.services_summary:style=pulse", "Heartbeat for « Services »", "Pouls pour « Services »", "rare", 300),
+    ("opt_style_progress_odometer", "gamification.progress:style=odometer", "Odometer for « My progression »", "Compteur animé pour « Ma progression »", "epic", 450),
+    ("opt_style_daily_liquid", "gamification.daily_objectives:style=liquid", "Liquid gauges for « Daily objectives »", "Jauges liquides pour « Objectifs du jour »", "rare", 300),
+    ("opt_style_added_deck", "media.recently_added:style=deck", "Card deck for « Recently added »", "Pile de cartes pour « Ajouts récents »", "common", 200),
+    ("opt_style_releases_deck", "media.recent_releases:style=deck", "Card deck for « Recent releases »", "Pile de cartes pour « Sorties récentes »", "common", 200),
+    ("opt_style_requested_deck", "media.recently_requested:style=deck", "Card deck for « Recently requested »", "Pile de cartes pour « Demandes récentes »", "common", 200),
+    ("opt_style_upcoming_flip", "calendar.upcoming:style=flip", "Flip board for « Upcoming »", "Tableau à palettes pour « À venir »", "rare", 300),
+    ("opt_style_stats_countup", "media.stats:style=countup", "Counting figures for « My statistics »", "Chiffres animés pour « Mes statistiques »", "common", 200),
+    ("opt_style_wall_kenburns", "media.poster_wall:style=kenburns", "Travelling camera for the poster wall", "Travelling pour le mur d'affiches", "epic", 500),
+    ("opt_style_news_ticker", "news.latest:style=ticker", "Ticker for « Latest news »", "Bandeau défilant pour « Dernières actualités »", "common", 200),
+    ("opt_style_clock_analog", "dashboard.clock:style=analog", "Analog face for the clock", "Cadran analogique pour l'horloge", "rare", 250),
+    ("opt_style_countdown_flip", "dashboard.countdown:style=flip", "Flip digits for the countdown", "Chiffres à palettes pour le compte à rebours", "rare", 250),
+    ("opt_style_activity_live", "community.activity:style=live", "Live feed for « Community activity »", "Fil en direct pour « Activité de la communauté »", "common", 200),
+):  # fmt: skip
+    _p(key, "widget_option", price, rarity, en, fr,
+       "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+       "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté.",
+       {"option": option}, collection="widgets", icon="sparkles")  # fmt: skip
+
+_p("widget_living_wall", "widget", 650, "epic", "Living wall widget", "Widget Mur vivant",
+   "A wall of posters from the library that turn one by one to reveal others.",
+   "Un mur d'affiches de la bibliothèque qui se retournent une à une pour en révéler d'autres.",
+   {"widget": "media.living_wall"}, collection="widgets", icon="dashboard")  # fmt: skip
+
 for name, en, fr, rarity, price, level in (
     ("when", "When you watch", "Vos moments de visionnage", "rare", 300, None),
     ("genres", "Your favourite genres", "Vos genres préférés", "rare", 300, None),

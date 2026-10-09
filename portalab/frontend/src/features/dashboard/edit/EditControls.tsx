@@ -94,7 +94,14 @@ function ConfigDialog({
   const base = `${ns}:widget.${rest.join(".")}.config`;
   const label = (key: string, fallback: string) => {
     const text = t(key);
-    return text === key.split(":").slice(1).join(":") ? fallback : text;
+    if (text !== key.split(":").slice(1).join(":")) return text;
+    // 027 (#31): « style » (a widget's other looks) is named once for every widget
+    const shared = key.replace(`${base}.style`, "dashboard:style");
+    if (shared !== key) {
+      const common = t(shared === "dashboard:style" ? "dashboard:style.title" : shared);
+      if (!common.startsWith("style.")) return common;
+    }
+    return fallback;
   };
   return (
     <Dialog

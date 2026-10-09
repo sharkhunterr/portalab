@@ -16,6 +16,7 @@ from portalab.capabilities.dashboard import (
     WidgetPayload,
     WidgetRegistry,
     WidgetUnavailable,
+    with_styles,
 )
 from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE
 from portalab.capabilities.i18n import LocaleContext
@@ -582,3 +583,8 @@ def register_builtin(
 def register_since_last_visit(registry: WidgetRegistry, summary: Any, clock: Clock | None = None) -> None:
     if registry.get(SINCE_LAST_VISIT.key) is None:
         registry.register(SINCE_LAST_VISIT, SinceLastVisitProvider(summary, clock), owner=OWNER)
+
+
+SERVICES_SUMMARY = with_styles(SERVICES_SUMMARY, "pulse")  # 027 (#31)
+CLOCK = with_styles(CLOCK, "analog")  # 027 (#31)
+COUNTDOWN = with_styles(COUNTDOWN, "flip")  # 027 (#31)

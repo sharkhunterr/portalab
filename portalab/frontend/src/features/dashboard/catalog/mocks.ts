@@ -65,6 +65,25 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
   "media.continue": () => ({
     items: cards(3).map((c, i) => ({ ...c, subtitle: c.meta, progress: 0.25 + i * 0.25 })),
   }),
+  "media.living_wall": () => ({
+    items: [...cards(8), ...cards(8)].map((c, i) => ({ ...c, id: `wall-${i}` })),
+  }),
+  "media.server_playing": () => ({
+    count: 3,
+    items: cards(3).map((c, i) => ({
+      ...c,
+      subtitle: c.kind === "series" ? c.meta : null,
+      state: i === 1 ? "paused" : "playing",
+      progress: 0.2 + i * 0.3,
+      mine: i === 0,
+    })),
+  }),
+  "media.on_this_day": () => ({
+    years: 1,
+    date: inDays(-365).slice(0, 10),
+    watched: cards(3),
+    added: cards(7).slice(3),
+  }),
   "media.soon": () => ({
     items: cards(3).map((c, i) => ({
       ...c,

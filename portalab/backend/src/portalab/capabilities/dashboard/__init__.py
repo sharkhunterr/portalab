@@ -11,7 +11,7 @@ contributed; stored user instances are kept (placeholder, restored on reactivati
 """
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Any, Literal, Protocol, runtime_checkable
 from uuid import UUID
@@ -88,6 +88,20 @@ class WidgetDefinition:
     component_id: str | None = None  # first-party frontend component
     schema_version: int = 1
     product: str | None = None  # marketplace widget product (entitlement-gated, 015)
+
+
+def with_styles(definition: WidgetDefinition, *styles: str) -> WidgetDefinition:
+    """027 (#31): a widget's alternative looks — a ``style`` setting, ``classic`` by default (the original
+    look, always there and free); the others are sold in the shop as ``widget_option`` products
+    (``<key>:style=<style>``), so only their owners may pick them."""
+    schema = dict(definition.config_schema)
+    properties = dict(schema.get("properties") or {})
+    properties["style"] = {"type": "string", "enum": ["classic", *styles]}
+    schema["type"] = schema.get("type", "object")
+    schema["properties"] = properties
+    return replace(
+        definition, config_schema=schema, config_defaults={**definition.config_defaults, "style": "classic"}
+    )
 
 
 @dataclass(frozen=True, slots=True)

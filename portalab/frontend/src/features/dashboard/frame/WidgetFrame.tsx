@@ -16,6 +16,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type Instance, useWidgetData } from "../api";
 import { keyOf } from "../edit/EditSession";
 import { TEMPLATES } from "../templates/Templates";
+import { useOffscreen } from "../widgets/motion";
 import { widgetComponent } from "../widgets/registry";
 import { HeaderSlot } from "./actions";
 import { useEmptyReport } from "./emptiness";
@@ -189,6 +190,7 @@ export function WidgetFrame({
   const headingId = useId();
   const body = useRef<HTMLDivElement>(null);
   const hidden = useFit(body);
+  useOffscreen(body); // 027 (#29): animations pause out of sight
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
   // 027: the member may show the content alone — without its title, without its box, or both

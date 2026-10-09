@@ -5,7 +5,14 @@ the viewer may see, under the same read-time visibility as the feed itself — a
 from collections.abc import Mapping
 from typing import Any
 
-from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
+from portalab.capabilities.dashboard import (
+    Refresh,
+    Size,
+    SizeLimits,
+    WidgetDefinition,
+    WidgetPayload,
+    with_styles,
+)
 from portalab.capabilities.i18n import LocaleContext
 from portalab.core.authz_port import Principal
 from portalab.core.time import Clock, utc_now
@@ -101,3 +108,6 @@ class ProjectsWidget:
                 ]
             },
         )
+
+
+ACTIVITY_WIDGET = with_styles(ACTIVITY_WIDGET, "live")  # 027 (#31)

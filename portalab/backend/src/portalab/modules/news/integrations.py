@@ -4,13 +4,21 @@ scheduled ones for editors only) and the 019 action ``content.publish`` (runs as
 
 import time
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.automation_actions import ActionRegistry, ActionType
 from portalab.capabilities.content import CalendarItem, CalendarSourceResult, ContentRef, ResolvedLink
-from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
+from portalab.capabilities.dashboard import (
+    Refresh,
+    Size,
+    SizeLimits,
+    WidgetDefinition,
+    WidgetPayload,
+    with_styles,
+)
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.search import FacetDef, ParsedQuery, ProviderResult, SearchItem
 from portalab.capabilities.search.fts import snippet
@@ -143,7 +151,9 @@ def _widget(key: str, title: str) -> WidgetDefinition:
 
 
 FEATURED = _widget("news.featured", "featured")
-LATEST = _widget("news.latest", "latest")
+LATEST = with_styles(  # 027 (#31): the list, or « ticker » — the headlines running across
+    replace(_widget("news.latest", "latest"), component_id="news.latest"), "ticker"
+)
 
 
 class NewsWidget:
