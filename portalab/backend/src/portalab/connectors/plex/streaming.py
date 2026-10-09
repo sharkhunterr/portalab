@@ -583,5 +583,15 @@ class PlexChannel:
             raise ProviderNotFound("no such picture")
         return response.content
 
+    async def reset(self, external_id: str) -> None:
+        """Plex keeps a resume point against any smaller progress: ``unscrobble`` clears it (and
+        « watched »), so a title seen before is marked seen again — seen, with nothing to resume."""
+        key = safe_id(external_id)
+        item = await self._metadata(key)
+        target = {"key": key, "identifier": "com.plexapp.plugins.library"}
+        await self._call("GET", "/:/unscrobble", target)
+        if item.get("viewCount"):
+            await self._call("GET", "/:/scrobble", target)
+
     async def stop(self, session: str) -> None:
         await self._call("GET", f"{TRANSCODER}/stop", {"session": session}, session=session)

@@ -22,6 +22,7 @@ import { CatalogPage } from "../../../src/features/media/catalog/CatalogPage";
 import { DetailPage } from "../../../src/features/media/detail/DetailPage";
 import { RequestsPage } from "../../../src/features/media/requests/RequestsPage";
 import { json } from "../../support/fake-api";
+import { INFO } from "./player-fixtures";
 
 const ID = "0190f0a0-0000-7000-8000-0000000000aa";
 const AS_OF = "2026-10-03T10:00:00Z";
@@ -117,6 +118,48 @@ describe("media detail", () => {
     fireEvent.click(screen.getByRole("button", { name: "Request" }));
     expect(await screen.findByText("You have used your requests for this period.")).toBeTruthy();
     expect(posts).toEqual(["/api/v1/media/requests"]);
+  });
+});
+
+describe("watching from the title's page", () => {
+  it("resumes, starts over, or goes back to zero without playing", async () => {
+    let resume = 1234;
+    const resets: unknown[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path.endsWith("/player/reset")) {
+        resets.push(await request.json());
+        resume = 0;
+        return new Response(null, { status: 204 });
+      }
+      if (path.endsWith("/player")) return json(200, { ...INFO, item: { ...INFO.item, resume_s: resume } });
+      if (path === `/api/v1/media/${ID}`)
+        return json(200, {
+          id: ID,
+          kind: "movie",
+          title: "Alien",
+          year: 1979,
+          available: true,
+          image_id: null,
+          status: "active",
+          parent_id: null,
+          position: null,
+          overview: null,
+          genres: [],
+          ids: {},
+          sections: [],
+        });
+      return section(path.split("/").pop() ?? "", "no-data");
+    };
+    renderAt(`/media/${ID}`, [{ path: "/media/:objectId", element: <DetailPage /> }]);
+    expect(await screen.findByRole("link", { name: "Resume" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Start over" }).getAttribute("href")).toBe(
+      `/media/${ID}/watch?start=0`,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Back to zero" }));
+    await waitFor(() => expect(resets).toEqual([{ item: "100" }]));
+    expect(await screen.findByRole("link", { name: "Watch" })).toBeTruthy(); // nothing left to resume
+    expect(screen.queryByRole("button", { name: "Back to zero" })).toBeNull();
   });
 });
 

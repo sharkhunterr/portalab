@@ -253,6 +253,16 @@ async def player_start(
     )
 
 
+class PlayerResetIn(BaseModel):
+    item: str | None = Field(default=None, max_length=200, pattern=r"^[A-Za-z0-9_-]+$")
+
+
+@router.post("/media/{object_id}/player/reset", status_code=status.HTTP_204_NO_CONTENT)
+async def player_reset(principal: Player, object_id: UUID, body: PlayerResetIn, module: Module) -> None:
+    """Back to zero: the member's resume point on the media server is forgotten, nothing plays."""
+    await module.player.reset(_me(principal), object_id, body.item)
+
+
 @router.get("/media/player/{ticket}/subtitles", response_model=SubtitleCuesOut)
 async def player_subtitles(
     principal: Player,

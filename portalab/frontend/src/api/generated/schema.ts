@@ -6322,6 +6322,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/{object_id}/player/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Player Reset
+         * @description Back to zero: the member's resume point on the media server is forgotten, nothing plays.
+         */
+        post: operations["player_reset_api_v1_media__object_id__player_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/{object_id}/player/start": {
         parameters: {
             query?: never;
@@ -11607,6 +11627,11 @@ export interface components {
             service_id: string;
             /** Service Name */
             service_name: string | null;
+        };
+        /** PlayerResetIn */
+        PlayerResetIn: {
+            /** Item */
+            item?: string | null;
         };
         /** PlayerTimelineIn */
         PlayerTimelineIn: {
@@ -26293,6 +26318,39 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PlayerInfoOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    player_reset_api_v1_media__object_id__player_reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlayerResetIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

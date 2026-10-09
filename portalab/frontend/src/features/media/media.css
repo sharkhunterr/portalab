@@ -929,6 +929,14 @@ a.media-card__link:focus-visible .media-card__frame {
   padding-inline: var(--space-4);
 }
 
+.media-watch-icon {
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  justify-content: center;
+  border-radius: 999px;
+}
+
 .media-watch-hint {
   flex-basis: 100%;
   display: inline-flex;

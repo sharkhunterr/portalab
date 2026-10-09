@@ -603,6 +603,10 @@ class StreamChannel(Protocol):
         """A chapter's picture, or the preview of ``previews`` at ``at_s`` (JPEG)."""
         ...
 
+    async def reset(self, external_id: str) -> None:
+        """Forget where the member stopped (no resume point), keeping « watched » as it was."""
+        ...
+
 
 @runtime_checkable
 class MediaStreaming(Protocol):

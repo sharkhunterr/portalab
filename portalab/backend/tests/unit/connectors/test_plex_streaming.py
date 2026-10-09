@@ -181,6 +181,11 @@ async def test_a_shared_member_plays_as_themself(server: _Server) -> None:
         async with channel.open("sess1", "session/sess1/../../library/sections"):
             pass
 
+    # back to zero: the resume point is cleared, « watched » kept as it was (FILM was never seen)
+    await channel.reset("100")
+    cleared = [r.url.path for r in server.requests if r.url.path in ("/:/unscrobble", "/:/scrobble")]
+    assert cleared == ["/:/unscrobble"]
+
     await channel.report("100", "sess1", "paused", 12.5, 7000.0)
     timeline = next(r for r in server.requests if r.url.path == "/:/timeline")
     assert timeline.url.params["time"] == "12500" and timeline.url.params["state"] == "paused"

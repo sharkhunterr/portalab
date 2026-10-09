@@ -507,6 +507,8 @@
   "player.chapters": "Chapters",
   "player.cta.episode": "Watch {label}",
   "player.cta.link": "Link your media server account to watch here",
+  "player.cta.reset": "Back to zero",
+  "player.cta.resetFailed": "The resume point could not be cleared. Try again.",
   "player.cta.restart": "Start over",
   "player.cta.resume": "Resume",
   "player.cta.resumeEpisode": "Resume {label}",

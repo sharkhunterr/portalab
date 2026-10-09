@@ -16,7 +16,7 @@ import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
-import { usePlayerInfo } from "../player/api";
+import { usePlayerInfo, useResetResume } from "../player/api";
 import { artworkSlides, Backdrop, Enrichment, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 
@@ -471,6 +471,7 @@ function Watch({ objectId, kind }: { objectId: string; kind: string }) {
   const code = player.error instanceof MediaError ? player.error.code : undefined;
   const item = player.data?.item;
   const resume = item && item.resume_s > 30 && (!item.duration_s || item.resume_s < item.duration_s * 0.95);
+  const reset = useResetResume(objectId);
   return (
     <div className="media-watch">
       {item ? (
@@ -482,11 +483,29 @@ function Watch({ objectId, kind }: { objectId: string; kind: string }) {
         </Link>
       ) : null}
       {item && resume ? (
-        <Link className="ds-button ds-button--secondary" to={`/media/${objectId}/watch?start=0`}>
-          <Icon name="replay" size={16} />
-          {t("media:player.cta.restart")}
-        </Link>
+        // compact: icon buttons beside « Resume » (their names in the tooltip and for screen readers)
+        <>
+          <Link
+            className="ds-button ds-button--secondary media-watch-icon"
+            to={`/media/${objectId}/watch?start=0`}
+            aria-label={t("media:player.cta.restart")}
+            title={t("media:player.cta.restart")}
+          >
+            <Icon name="replay" size={18} />
+          </Link>
+          <button
+            type="button"
+            className="ds-button ds-button--secondary media-watch-icon"
+            disabled={reset.isPending}
+            onClick={() => reset.mutate(item.external_id)}
+            aria-label={t("media:player.cta.reset")}
+            title={t("media:player.cta.reset")}
+          >
+            <Icon name="replay-10" size={18} />
+          </button>
+        </>
       ) : null}
+      {reset.isError ? <p role="alert">{t("media:player.cta.resetFailed")}</p> : null}
       <OpenIn objectId={objectId} kind={kind} secondary={Boolean(item)} />
       {code === "media.player_unlinked" ? (
         <Link className="media-watch-hint" to="/settings/media-accounts">

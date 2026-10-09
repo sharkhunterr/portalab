@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 
@@ -26,6 +26,20 @@ export function usePlayerInfo(objectId: string, item: string | null, enabled = t
       if (!data) throw new Error("empty player info");
       return data;
     },
+  });
+}
+
+/** 027: back to zero without playing — the member's resume point on the media server is forgotten. */
+export function useResetResume(objectId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (item: string) => {
+      await api.POST("/api/v1/media/{object_id}/player/reset", {
+        params: { path: { object_id: objectId } },
+        body: { item },
+      });
+    },
+    onSuccess: () => client.invalidateQueries({ queryKey: ["media"] }),
   });
 }
 

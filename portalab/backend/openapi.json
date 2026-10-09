@@ -10030,6 +10030,25 @@
         "title": "PlayerInfoOut",
         "type": "object"
       },
+      "PlayerResetIn": {
+        "properties": {
+          "item": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item"
+          }
+        },
+        "title": "PlayerResetIn",
+        "type": "object"
+      },
       "PlayerTimelineIn": {
         "properties": {
           "duration_s": {
@@ -34095,6 +34114,53 @@
           }
         },
         "summary": "Player Info",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/player/reset": {
+      "post": {
+        "description": "Back to zero: the member's resume point on the media server is forgotten, nothing plays.",
+        "operationId": "player_reset_api_v1_media__object_id__player_reset_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerResetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Player Reset",
         "tags": [
           "media"
         ]

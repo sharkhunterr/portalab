@@ -507,6 +507,8 @@
   "player.chapters": "Chapitres",
   "player.cta.episode": "Regarder {label}",
   "player.cta.link": "Liez votre compte du serveur multimédia pour regarder ici",
+  "player.cta.reset": "Remettre à zéro",
+  "player.cta.resetFailed": "Le point de reprise n’a pas pu être effacé. Réessayez.",
   "player.cta.restart": "Recommencer",
   "player.cta.resume": "Reprendre",
   "player.cta.resumeEpisode": "Reprendre {label}",

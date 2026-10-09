@@ -240,6 +240,13 @@ class PlayerService:
             remote_ticket = sign(remote_key(self.key), replace(ticket, expires=expires))
         return sign(self.key, ticket), remote_ticket, started
 
+    async def reset(self, user: UUID, object_id: UUID, item: str | None = None) -> None:
+        """« Back to zero » without playing: the member's resume point on the service is forgotten."""
+        self._enabled()
+        source = await self._source(object_id)
+        account = await self._account(user, source.service_id)
+        await _call(self._channel(source.service_id, account).reset(item or source.external_id))
+
     # --- while playing ------------------------------------------------------------------------------------
     def ticket(self, user: UUID, token: str) -> Ticket:
         return read(self.key, token, user=user, now=utc_now(self.clock))

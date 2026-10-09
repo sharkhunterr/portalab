@@ -96,6 +96,10 @@ async def test_play_as_the_members_account(
         assert (await device.get(f"/api/v1/media/player/{player_ticket}/{playlist}")).status_code == 401
     assert started.json().get("remote_playlist") is None  # only when asked for
 
+    # back to zero, without playing
+    reset = await client.post(f"/api/v1/media/{object_id}/player/reset", json={"item": "m1"})
+    assert reset.status_code == 204 and fake.calls[-1] == ("7", "reset", "m1")
+
     # someone else cannot use Zoé's ticket
     await login(client, "max")
     stolen = await client.get(f"{base}/{playlist}")
