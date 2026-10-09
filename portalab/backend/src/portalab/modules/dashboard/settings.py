@@ -19,28 +19,44 @@ POLICY_CLASSES: tuple[str, ...] = (
     "disabled",
 )
 
-# 027: what matters to everyone sits pinned on the first row — incidents and the current campaign
+# 027: what matters to everyone sits pinned on the first row — incidents and the current campaign, one line
+# each
 DEFAULT_POLICIES: dict[str, dict[str, Any]] = {
-    "support.open_incidents": {"class": "pinned", "x": 0, "y": 0, "w": 6, "h": 2},
-    "campaigns.active": {"class": "pinned", "x": 6, "y": 0, "w": 6, "h": 2},
+    "support.open_incidents": {
+        "class": "pinned",
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 1,
+        "move": True,
+        "resize": True,
+    },
+    "campaigns.active": {"class": "pinned", "x": 6, "y": 0, "w": 6, "h": 1},
 }
 
-# 027: a first visit shows the essentials, in rows of 12 columns (widgets a member cannot use yet are
-# skipped): where to start and how I progress, today's objectives, the services and their links, what is
-# new in the library and what I was watching, the news and what is coming up
+# 027: a first visit — free widgets only (nothing to buy first), in rows of 12 columns that fit together
+# (each row's widgets share a height; widgets a member cannot use yet are skipped). Under the pinned line
+# (incidents · campaign, one row each): a glance line (shortcuts, my level, today's objectives, compact),
+# what is new for me beside a title drawn at random, what I was watching, what came in, the services and
+# the news, the community and the calendar, my statistics and my tickets, the shop window and the links;
+# what a new member has nothing in yet (watching, statistics) stays out of sight until it fills up
 DEFAULT_STARTER: list[dict[str, Any]] = [
-    {"widget_key": "dashboard.since_last_visit", "w": 12, "h": 3},
-    {"widget_key": "dashboard.welcome", "w": 6, "h": 2},
-    {"widget_key": "gamification.progress", "w": 3, "h": 2},
-    {"widget_key": "gamification.daily_objectives", "w": 3, "h": 2},
+    {"widget_key": "dashboard.welcome", "w": 6, "h": 1},
+    {"widget_key": "gamification.progress", "w": 3, "h": 1},
+    {"widget_key": "gamification.daily_objectives", "w": 3, "h": 1},
+    {"widget_key": "dashboard.since_last_visit", "w": 8, "h": 3},
+    {"widget_key": "media.shuffle", "w": 4, "h": 3},
+    {"widget_key": "media.continue", "w": 12, "h": 3, "config": {"_hide_empty": True}},
+    {"widget_key": "media.recently_added", "w": 12, "h": 3},
     {"widget_key": "health.services_summary", "w": 6, "h": 3},
-    {"widget_key": "health.service_links", "w": 6, "h": 3},
-    {"widget_key": "media.continue", "w": 12, "h": 3},
-    {"widget_key": "media.recent", "w": 12, "h": 3},
     {"widget_key": "news.latest", "w": 6, "h": 3},
-    {"widget_key": "calendar.upcoming", "w": 6, "h": 3},
-    {"widget_key": "media.requests", "w": 6, "h": 3},
+    {"widget_key": "community.activity", "w": 6, "h": 3},
+    {"widget_key": "calendar.month", "w": 6, "h": 3},  # 3 rows: this week and what comes
     {"widget_key": "support.my_tickets", "w": 6, "h": 3},
+    {"widget_key": "marketplace.featured", "w": 6, "h": 3},
+    # alone on their rows: a widget waiting to fill up leaves no hole beside it
+    {"widget_key": "media.stats", "w": 12, "h": 3, "config": {"_hide_empty": True}},
+    {"widget_key": "health.service_links", "w": 12, "h": 2},
 ]
 
 

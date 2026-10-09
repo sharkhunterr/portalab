@@ -46,3 +46,26 @@ async def test_starter(app: FastAPI, client: httpx.AsyncClient, dash: DashboardH
     async with identity.ctx.database.unit_of_work() as uow:
         await identity.onboarding.start(uow.session, user, identity.ctx.now())
     assert (await client.post("/api/v1/me/onboarding/dashboard/complete")).status_code == 200
+
+
+async def test_starter_entries_carry_frame_settings(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
+) -> None:
+    """027: a starter entry may set how its frame shows (« hide while empty ») — never the widget's own
+    settings."""
+    dash.module.config = replace(
+        dash.module.config,
+        starter_layout=[
+            {"widget_key": "health.services_summary", "w": 6, "h": 2, "config": {"_hide_empty": True}},
+            {"widget_key": "dashboard.welcome", "w": 6, "h": 1},
+        ],
+    )
+    await create_user(module_of(app), "alex")
+    await login(client, "alex")
+    instances = {i["widget_key"]: i for i in (await client.get("/api/v1/dashboard")).json()["instances"]}
+    assert instances["health.services_summary"]["config"]["_hide_empty"] is True
+    assert "_hide_empty" not in instances["dashboard.welcome"]["config"]
+    errors = await dash.module.validators.starter(
+        [{"widget_key": "health.services_summary", "config": {"limit": 3}}]
+    )
+    assert errors == ["entry 0: config holds frame settings only"]

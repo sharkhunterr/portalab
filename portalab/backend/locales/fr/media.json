@@ -730,6 +730,7 @@
   "widget.server_playing.description": "Ce qui se regarde sur le serveur en ce moment — titres et progression, jamais qui.",
   "widget.server_playing.left": "encore {time}",
   "widget.server_playing.none": "Rien en lecture pour le moment.",
+  "widget.server_playing.none_mine": "Vous ne regardez rien en ce moment.",
   "widget.server_playing.paused": "En pause",
   "widget.server_playing.playing": "En lecture",
   "widget.server_playing.show": "Afficher la lecture {n} : {title}",

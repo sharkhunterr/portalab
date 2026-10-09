@@ -1,4 +1,4 @@
-"""Dashboard widgets (T033; 009 SDK): ``media.continue``, ``media.recent``, ``media.now_playing`` and
+"""Dashboard widgets (T033; 009 SDK): ``media.continue``, ``media.recent`` and
 ``media.requests`` — the viewer's own data only, as declarative lists."""
 
 from collections.abc import Mapping
@@ -19,7 +19,6 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
-from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.providers.insight_widgets import posters
 from portalab.modules.media.requests.service import Requests
 
@@ -51,9 +50,6 @@ CONTINUE = with_styles(  # 027 (#31): « ambient » — the title's poster as a 
     "ambient",
 )
 RECENT = _definition("media.recent", MEDIA_READ, ("media.added",))
-NOW_PLAYING = _definition(
-    "media.now_playing", MEDIA_READ, ("media.playback_started", "media.playback_finished")
-)
 REQUESTS = _definition("media.requests", MEDIA_REQUEST, ("media.request_updated", "media.request_available"))
 
 
@@ -152,28 +148,6 @@ class RecentWidget(_Base):
                     "image_id": images.get(o.id),
                 }
                 for o in rows[:8]
-            ]
-        )
-
-
-class NowPlayingWidget(_Base):
-    def __init__(self, poller: PlaybackPoller, clock: Clock | None = None) -> None:
-        super().__init__(clock)
-        self.poller = poller
-
-    async def load(
-        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
-    ) -> WidgetPayload:
-        user = principal.acting_for or principal.user_id
-        rows = await self.poller.now_playing(user) if user else []
-        return self.payload(
-            [
-                {
-                    "title": s.kind,
-                    "route": f"/media/{s.object_id}" if s.object_id else "/media",
-                    "meta": s.state,
-                }
-                for s in rows
             ]
         )
 

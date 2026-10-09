@@ -60,7 +60,7 @@ export const servicesHealthStrings = {
 
 type HealthState = "operational" | "degraded" | "unavailable" | "maintenance" | "unknown";
 
-interface OverviewItem {
+export interface OverviewItem {
   id: string;
   name: string;
   connector: string;
@@ -534,7 +534,7 @@ export function UptimeBars({ serviceId }: { serviceId: string }) {
   );
 }
 
-function ServiceCard({ item }: { item: OverviewItem }) {
+export function ServiceCard({ item }: { item: OverviewItem }) {
   const t = useT();
   const ratio = item.availability;
   return (

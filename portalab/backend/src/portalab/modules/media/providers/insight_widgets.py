@@ -42,7 +42,7 @@ from portalab.modules.media.requests.insights import GROUPS, RequestInsights, id
 OWNER = "module:media"
 CHARTS = ("bars", "area", "donut", "top", "figures")
 PERIODS = ("7d", "30d", "90d", "365d", "all")
-POSTERS = SizeLimits(default=Size(12, 3), min=Size(4, 2), max=Size(12, 6))
+POSTERS = SizeLimits(default=Size(12, 3), min=Size(4, 1), max=Size(12, 6))
 
 
 def _definition(
@@ -80,7 +80,7 @@ STATS = _definition(
     "media.stats",
     component="media.stats",
     icon="chart",
-    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
     schema={
         "type": "object",
         "properties": {
@@ -140,14 +140,14 @@ POSTER_WALL = _definition(  # 027: a Marketplace widget — owners only (product
     "media.poster_wall",
     component="media.wall",
     icon="image",
-    size=SizeLimits(default=Size(12, 4), min=Size(6, 3), max=Size(12, 8)),
+    size=SizeLimits(default=Size(12, 4), min=Size(6, 1), max=Size(12, 8)),
     product="widget_poster_wall",
 )
 SHUFFLE = _definition(  # 027 (#12): a title drawn at random from the library, on a frieze of posters
     "media.shuffle",
     component="media.shuffle",
     icon="shuffle",
-    size=SizeLimits(default=Size(12, 3), min=Size(4, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(12, 3), min=Size(4, 1), max=Size(12, 6)),
     schema=KIND_FILTER,
     defaults={"kind": "all"},
 )
@@ -155,7 +155,7 @@ LIVING_WALL = _definition(  # 027 (#31): a wall of posters turning one by one (s
     "media.living_wall",
     component="media.living_wall",
     icon="apps",
-    size=SizeLimits(default=Size(12, 4), min=Size(4, 2), max=Size(12, 8)),
+    size=SizeLimits(default=Size(12, 4), min=Size(4, 1), max=Size(12, 8)),
     product="widget_living_wall",
 )
 SERVER_PLAYING = replace(  # 027 (#31): what plays on the server now — titles and progress, never who
@@ -163,8 +163,14 @@ SERVER_PLAYING = replace(  # 027 (#31): what plays on the server now — titles 
         "media.server_playing",
         component="media.server_playing",
         icon="play",
-        size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
-        product="widget_server_playing",  # sold in the shop
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
+        # 027: everyone's streams (nobody named) or only mine — it replaced « now playing »
+        schema={
+            "type": "object",
+            "properties": {"scope": {"type": "string", "enum": ["all", "me"]}},
+            "additionalProperties": False,
+        },
+        defaults={"scope": "all"},
     ),
     refresh=Refresh(mode="interval", interval_s=30),
     stale_after_s=120,
@@ -173,7 +179,7 @@ ON_THIS_DAY = _definition(  # 027 (#31): a year ago today — what I watched, wh
     "media.on_this_day",
     component="media.on_this_day",
     icon="hourglass",
-    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
     product="widget_on_this_day",  # sold in the shop
 )
 NEXT_RELEASES = _definition(  # 027: what comes out next among what I asked for and the series I follow
@@ -187,7 +193,7 @@ MY_SOON = _definition(
     "media.my_soon",
     component="media.soon",
     icon="clock",
-    size=SizeLimits(default=Size(6, 3), min=Size(4, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(4, 1), max=Size(12, 6)),
     events=("media.request_updated", "media.request_available"),
     schema={
         "type": "object",
@@ -675,6 +681,7 @@ class ServerPlayingWidget(_Base):
                         PlaybackSession.ended.is_(False),
                         PlaybackSession.state.in_(("playing", "paused", "buffering")),
                         PlaybackSession.updated_at >= since,
+                        *([PlaybackSession.user_id == me] if config.get("scope") == "me" else []),
                     )
                     .order_by(PlaybackSession.started_at.desc())
                     .limit(12)
@@ -718,7 +725,10 @@ class ServerPlayingWidget(_Base):
                 }
             )
         cards = await self.cards(items, detailed=True)
-        return self.payload({"items": cards, "count": len(cards)})
+        mine = config.get("scope") == "me"
+        return WidgetPayload(
+            "available", as_of=utc_now(self.clock), data={"items": cards, "count": len(cards), "mine": mine}
+        )
 
 
 class OnThisDayWidget(_Base):

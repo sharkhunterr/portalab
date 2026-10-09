@@ -42,7 +42,33 @@ function EntryRow({ entry }: { entry: CalEntry }) {
   );
 }
 
-function MonthCalendar({ payload }: WidgetProps) {
+/** 027 (#36): this week, a day each — its number, today marked, a dot per kind of thing on it. */
+function WeekStrip({ today, entries }: { today: string; entries: CalEntry[] }) {
+  const base = new Date(`${today}T12:00:00Z`);
+  const monday = new Date(base.getTime() - ((base.getUTCDay() + 6) % 7) * 86_400_000);
+  const days = Array.from({ length: 7 }, (_, i) => new Date(monday.getTime() + i * 86_400_000));
+  return (
+    <Link to="/calendar" className="cal-week">
+      {days.map((day) => {
+        const iso = day.toISOString().slice(0, 10);
+        const kinds = [...new Set(entries.filter((e) => e.date <= iso && e.end >= iso).map(categoryOf))];
+        return (
+          <span key={iso} className="cal-week__day" data-today={iso === today || undefined}>
+            <small>{day.toLocaleDateString(undefined, { weekday: "narrow", timeZone: "UTC" })}</small>
+            <strong>{day.getUTCDate()}</strong>
+            <span className="cal-week__dots" aria-hidden="true">
+              {kinds.slice(0, 3).map((kind) => (
+                <span key={kind} data-category={kind} />
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </Link>
+  );
+}
+
+function MonthCalendar({ payload, rows }: WidgetProps) {
   const t = useT();
   const data = (payload.data ?? {}) as Partial<MonthData>;
   const [picked, setPicked] = useState<string | null>(null);
@@ -50,6 +76,20 @@ function MonthCalendar({ payload }: WidgetProps) {
   const days = useMemo(() => monthDays(month), [month]);
   const entries = data.entries ?? [];
   const shown = picked ? entries.filter((e) => e.date <= picked && e.end >= picked) : (data.upcoming ?? []);
+  // 027 (#36): too low for the month — this week (and what comes up when there is room)
+  if (rows !== undefined && rows < 5)
+    return (
+      <div className="cal-widget cal-widget--week">
+        <WeekStrip today={data.today ?? month} entries={entries} />
+        {rows > 1 && shown.length ? (
+          <ul className="cal-widget__list">
+            {shown.map((entry) => (
+              <EntryRow key={`${entry.date}-${entry.kind}-${entry.title}`} entry={entry} />
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    );
   return (
     <div className="cal-widget">
       <div className="cal-widget__head">

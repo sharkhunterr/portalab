@@ -6,6 +6,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { useMeasures } from "../../media/insights/api";
 import { WidgetHeaderAction } from "../frame/actions";
+import { PosterStrip } from "./compact";
 import { TitleFacts } from "./facts";
 import { reducedMotion, useLively } from "./motion";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
@@ -46,7 +47,7 @@ function Tile({ card }: { card: Card }) {
   );
 }
 
-function LivingWall({ payload }: WidgetProps) {
+function LivingWall({ payload, compact }: WidgetProps) {
   const ref = useRef<HTMLUListElement>(null);
   const lively = useLively(ref);
   const cards = ((payload.data ?? {}) as { items?: Card[] }).items ?? [];
@@ -70,6 +71,19 @@ function LivingWall({ payload }: WidgetProps) {
     }, 2600);
     return () => window.clearInterval(timer);
   }, [lively, total, count]);
+  if (compact)
+    // 027 (#36): on a single row, the wall becomes a running frieze
+    return (
+      <PosterStrip
+        cards={cards.map((card, index) => ({
+          key: `${card.id ?? card.title}-${index}`,
+          title: card.title,
+          src: art(card),
+          to: card.route,
+        }))}
+        running
+      />
+    );
   if (!count) return null;
   return (
     <ul
@@ -231,14 +245,14 @@ function Sessions({ items }: { items: Playing[] }) {
  */
 function ServerPlaying({ payload, compact }: WidgetProps) {
   const t = useT();
-  const data = (payload.data ?? {}) as { items?: Playing[]; count?: number };
+  const data = (payload.data ?? {}) as { items?: Playing[]; count?: number; mine?: boolean };
   const items = data.items ?? [];
   const count = data.count ?? items.length;
   if (!items.length)
     return (
       <p className="widget-server-playing__none">
         <Icon name="moon" size={16} />
-        {t("media:widget.server_playing.none")}
+        {t(data.mine ? "media:widget.server_playing.none_mine" : "media:widget.server_playing.none")}
       </p>
     );
   const first = items[0] as Playing;

@@ -116,10 +116,8 @@ from portalab.modules.media.providers.search import ACTIONS, MediaResolver, Medi
 from portalab.modules.media.providers.summary import MediaChanges
 from portalab.modules.media.providers.widgets import (
     CONTINUE,
-    NOW_PLAYING,
     RECENT,
     ContinueWidget,
-    NowPlayingWidget,
     RecentWidget,
     RequestsWidget,
 )
@@ -349,7 +347,6 @@ class MediaModule:
         widgets: tuple[tuple[Any, Any], ...] = (
             (CONTINUE, ContinueWidget(self.history, self.clock, self.enricher, self.player)),
             (RECENT, RecentWidget(self.discovery, self.clock)),
-            (NOW_PLAYING, NowPlayingWidget(self.poller, self.clock)),
             (REQUESTS_WIDGET, RequestsWidget(self.requests, self.clock)),
             (STATS_WIDGET, StatsWidget(self.database, self.insights, self.clock)),
             (RECENTLY_ADDED, RecentlyAddedWidget(self.database, self.clock)),

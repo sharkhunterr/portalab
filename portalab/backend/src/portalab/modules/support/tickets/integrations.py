@@ -165,7 +165,7 @@ def _widget(key: str, permission: str) -> WidgetDefinition:
         description_key=f"support:widget.{name}.description",
         icon="lifebuoy",
         required_permission=permission,
-        size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
         refresh=Refresh(mode="event", events=("ticket.created", "ticket.state_changed", "ticket.assigned")),
         stale_after_s=600,
         template="list",

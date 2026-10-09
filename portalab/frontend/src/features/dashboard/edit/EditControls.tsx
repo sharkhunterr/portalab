@@ -27,6 +27,8 @@ interface SchemaProperty {
   minimum?: number;
   maximum?: number;
   maxLength?: number;
+  /** 027: the options come from the portal (``services``: the services, by name). */
+  "x-options"?: string;
   format?: string;
 }
 
@@ -76,6 +78,18 @@ function ConfigDialog({
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Record<string, unknown>>(instance.config);
   const properties = (instance.widget?.config_schema.properties ?? {}) as Record<string, SchemaProperty>;
+  // 027: a setting offering the services (« which service ») lists them by name
+  const services = useQuery({
+    queryKey: ["services", "health", "names"],
+    enabled: open && Object.values(properties).some((p) => p["x-options"] === "services"),
+    staleTime: 60_000,
+    queryFn: async () =>
+      (
+        (await api.GET("/api/v1/services/health")).data as unknown as {
+          items: Array<{ id: string; name: string }>;
+        }
+      ).items,
+  });
   // 027: settings sold in the shop (another chart, a longer period…) stay visible, locked
   const lockedOptions = useQuery({
     queryKey: ["dashboard", "locked-options"],
@@ -140,6 +154,22 @@ function ConfigDialog({
       >
         {Object.entries(properties).map(([name, schema]) => {
           const value = draft[name];
+          if (schema["x-options"] === "services")
+            return (
+              <SelectField
+                key={name}
+                label={label(`${base}.${name}`, name)}
+                value={String(value ?? "")}
+                onChange={(e) => setDraft({ ...draft, [name]: e.target.value })}
+              >
+                <option value="">{t("dashboard:field.service.auto")}</option>
+                {(services.data ?? []).map((service) => (
+                  <option key={service.id} value={service.id}>
+                    {service.name}
+                  </option>
+                ))}
+              </SelectField>
+            );
           if (schema.enum)
             return (
               <SelectField

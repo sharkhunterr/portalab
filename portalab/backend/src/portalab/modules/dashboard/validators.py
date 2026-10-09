@@ -55,9 +55,14 @@ class DashboardValidators:
             if not isinstance(entry, dict) or not self._known(str(entry.get("widget_key", ""))):
                 errors.append(f"entry {index}: unknown widget")
                 continue
-            extra = set(entry) - {"widget_key", "w", "h", "roles"}
+            extra = set(entry) - {"widget_key", "w", "h", "roles", "config"}
             if extra:
                 errors.append(f"entry {index}: unknown fields {sorted(extra)}")
+            # 027: frame settings only (hide its title, its box, while empty) — a widget's own settings
+            # stay its defaults
+            config = entry.get("config", {})
+            if not isinstance(config, dict) or set(config) - {"_hide_title", "_no_box", "_hide_empty"}:
+                errors.append(f"entry {index}: config holds frame settings only")
         return errors
 
     def table(self) -> dict[str, Any]:

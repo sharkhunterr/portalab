@@ -67,7 +67,7 @@ export default function MediaStatsChart({
     const rows = byKind.map((k) => ({ name: t(`media:insights.kind.${k.kind}`), value: value(k) }));
     return (
       <div className="widget-media-stats__donut">
-        <ResponsiveContainer width="100%" height={150}>
+        <ResponsiveContainer width="100%" height="100%" minHeight={130}>
           <PieChart>
             <Pie
               data={rows}
@@ -97,7 +97,7 @@ export default function MediaStatsChart({
   }
   const rows = timeline.map((p) => ({ date: p.date, value: value(p) }));
   return (
-    <ResponsiveContainer width="100%" height={130}>
+    <ResponsiveContainer width="100%" height="100%" minHeight={110}>
       {chart === "area" ? (
         <AreaChart data={rows} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
           <defs>

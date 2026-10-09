@@ -77,7 +77,7 @@ async def test_extensibility(media: MediaHarness) -> None:
     assert media.blocks.for_kind("movie") == []
     assert media.types.unregister(owner) == 1 and media.blocks.unregister(owner) == 1
     # first-party contributions are in place
-    for key in ("media.continue", "media.recent", "media.now_playing", "media.requests"):
+    for key in ("media.continue", "media.recent", "media.server_playing", "media.requests"):
         assert media.widgets.get(key) is not None
     assert media.search.provider("media") is not None
     assert {a.id for a in media.search.actions()} >= {"media.open", "media.request"}

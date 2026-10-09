@@ -730,6 +730,7 @@
   "widget.server_playing.description": "What is being watched on the server right now — titles and progress, never who.",
   "widget.server_playing.left": "{time} left",
   "widget.server_playing.none": "Nothing is playing right now.",
+  "widget.server_playing.none_mine": "You are not watching anything right now.",
   "widget.server_playing.paused": "Paused",
   "widget.server_playing.playing": "Playing",
   "widget.server_playing.show": "Show stream {n}: {title}",

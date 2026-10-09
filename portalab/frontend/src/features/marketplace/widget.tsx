@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { CompactLine } from "../dashboard/widgets/compact";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
 import { TYPE_ICONS } from "./catalog/ProductPoster";
 import "./marketplace.css";
@@ -18,11 +19,32 @@ interface Featured {
 
 /** Dashboard widget ``marketplace.featured`` (spec 015 T033; 027 redesign): the shop window — what is
  * featured, then what is new, each opening its product sheet in the shop. */
-function FeaturedWidget({ payload }: WidgetProps) {
+function FeaturedWidget({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const data = (payload.data ?? {}) as { items?: Featured[]; total?: number };
   const items = data.items ?? [];
+  const first = items[0];
+  if (compact && first)
+    // 027 (#36): the shop window's first product, its price, and the way to the shop
+    return (
+      <CompactLine
+        to={`/marketplace?product=${encodeURIComponent(first.key)}`}
+        icon={first.icon ?? TYPE_ICONS[first.type] ?? "shop"}
+        title={first.name}
+        detail={t(`marketplace:type.${first.type}`)}
+        end={
+          first.price ? (
+            <>
+              <Icon name="coins" size={12} />
+              {format.number(first.price)}
+            </>
+          ) : (
+            t("marketplace:purchase.free")
+          )
+        }
+      />
+    );
   return (
     <div className="shop-window">
       <ul className="shop-window__list">

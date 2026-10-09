@@ -33,7 +33,7 @@ from portalab.modules.dashboard.arrangement import Size as GridSize
 from portalab.modules.dashboard.arrangement import move as grid_move
 from portalab.modules.dashboard.arrangement import resize as grid_resize
 from portalab.modules.dashboard.conditions.evaluator import ConditionEvaluator, parse_condition
-from portalab.modules.dashboard.gateway.gateway import WidgetGateway, config_errors
+from portalab.modules.dashboard.gateway.gateway import FRAME_KEYS, WidgetGateway, config_errors
 from portalab.modules.dashboard.models import UserDashboard, WidgetInstance
 from portalab.modules.dashboard.observability import log, metrics
 from portalab.modules.dashboard.overlay.overlay import (
@@ -891,7 +891,7 @@ class DashboardService:
         layout = self.config().starter_layout
         policies = self.config().widget_policies
         widgets = {w.definition.key: w for w in self.registry.widgets()}
-        chosen: list[tuple[RegisteredWidget, int, int]] = []
+        chosen: list[tuple[RegisteredWidget, int, int, dict[str, Any]]] = []
         roles_ok = await self._roles(principal)
         pinned = [
             {"widget_key": key, "w": pin[2], "h": pin[3]}
@@ -910,7 +910,8 @@ class DashboardService:
                 if not await self.gateway.allowed(widget, principal):
                     continue
                 size = widget.definition.size.clamp(int(entry.get("w", 0) or 0), int(entry.get("h", 0) or 0))
-                chosen.append((widget, size.w, size.h))
+                frame = {k: v for k, v in dict(entry.get("config") or {}).items() if k in FRAME_KEYS}
+                chosen.append((widget, size.w, size.h, frame))
             except Exception:
                 log.warning("starter entry skipped")
         for key, widget in sorted(widgets.items()):
@@ -919,7 +920,9 @@ class DashboardService:
                 and all(c[0].definition.key != key for c in chosen)
                 and await self.gateway.allowed(widget, principal)
             ):
-                chosen.append((widget, widget.definition.size.default.w, widget.definition.size.default.h))
+                chosen.append(
+                    (widget, widget.definition.size.default.w, widget.definition.size.default.h, {})
+                )
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
             session = uow.session
@@ -938,7 +941,7 @@ class DashboardService:
                 ).scalars()
             )
             position = await self._next_position(session, user)
-            for widget, w, h in chosen:
+            for widget, w, h, frame in chosen:
                 if widget.definition.key in existing:
                     continue
                 session.add(
@@ -949,7 +952,7 @@ class DashboardService:
                         position=position,
                         w=w,
                         h=h,
-                        config=dict(widget.definition.config_defaults),
+                        config={**widget.definition.config_defaults, **frame},
                         config_schema_version=widget.definition.schema_version,
                         origin="starter",
                         created_at=now,

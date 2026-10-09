@@ -12,6 +12,8 @@ export interface WidgetProps {
   icon?: string | null | undefined;
   /** 027: the widget sits on a single row — it shows its compact form (one line: the essentials). */
   compact?: boolean | undefined;
+  /** 027: the rows it takes in the current view (undefined outside the grid: catalog, « see all »). */
+  rows?: number | undefined;
 }
 
 const components = new Map<string, ComponentType<WidgetProps>>();

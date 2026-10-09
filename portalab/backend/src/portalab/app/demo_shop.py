@@ -19,7 +19,11 @@ BUILTIN_THEMES = Path(themes_package.__file__).parent / "builtin"
 
 SHOP: list[Product] = []
 # 027: products taken out of the shop — archived (no longer sold, their option no longer offered)
-RETIRED: tuple[str, ...] = ("opt_style_upcoming_flip",)
+RETIRED: tuple[str, ...] = (
+    "opt_style_upcoming_flip",
+    "widget_server_playing",  # free again: it replaced « now playing »
+    "widget_calendar",  # free: the calendar is part of every dashboard
+)
 
 
 def _p(
@@ -1049,10 +1053,6 @@ for service, en, fr, group, about_en, about_fr in (
 
 # --------------------------------------------------------------------------------- dashboard and statistics
 for key, widget, en, fr, about_en, about_fr, rarity, price, level in (
-    ("widget_calendar", "calendar.month", "Calendar widget", "Widget Calendrier",
-     "The month at a glance on your dashboard: events, maintenance, news and film and episode releases.",
-     "Le mois en un coup d'œil sur votre tableau de bord : événements, maintenances, actualités et sorties de films et d'épisodes.",
-     "epic", 600, 3),
     ("widget_media_top", "media.top", "Top of the week widget", "Widget Top de la semaine",
      "The most watched titles of the week with their posters.", "Les titres les plus vus de la semaine, avec leurs affiches.",
      "rare", 400, None),
@@ -1126,10 +1126,6 @@ for key, option, en, fr, rarity, price in (
        "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté.",
        {"option": option}, collection="widgets", icon="sparkles")  # fmt: skip
 
-_p("widget_server_playing", "widget", 400, "rare", "Playing on the server widget", "Widget En lecture sur le serveur",
-   "What is being watched on the server right now — titles and progress, never who.",
-   "Ce qui se regarde sur le serveur en ce moment — titres et progression, jamais qui.",
-   {"widget": "media.server_playing"}, collection="widgets", icon="dashboard")  # fmt: skip
 _p("widget_on_this_day", "widget", 450, "rare", "A year ago widget", "Widget Il y a un an",
    "Around this date, a year or more ago: what you watched, what came into the library.",
    "Autour de cette date, il y a un an ou plus : ce que vous regardiez, ce qui arrivait dans la bibliothèque.",
@@ -1520,10 +1516,9 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
       "stat_platforms", "opt_stats_area", "opt_stats_donut", "opt_stats_top", "opt_stats_year",
       "opt_stats_all", "opt_stats_server", "opt_style_stats_countup", "opt_style_progress_chart"], "legendary", 8),
     ("pack_dashboard", "Dashboard pack", "Pack Tableau de bord",
-     "The calendar, top of the week, upcoming releases, coming-soon, next releases and playing-on-the-server widgets.",
-     "Les widgets calendrier, top de la semaine, sorties à venir, demandes bientôt là, prochaines sorties et en lecture sur le serveur.",
-     ["widget_calendar", "widget_media_top", "widget_media_upcoming", "widget_my_soon", "widget_next_releases",
-      "widget_server_playing"], "epic", 4),
+     "The top of the week, upcoming releases, coming-soon and next releases widgets.",
+     "Les widgets top de la semaine, sorties à venir, demandes bientôt là et prochaines sorties.",
+     ["widget_media_top", "widget_media_upcoming", "widget_my_soon", "widget_next_releases"], "epic", 4),
     ("pack_animated_profile", "Living profile pack", "Pack Profil vivant",
      "An aurora background, the hologram frame, the rainbow name and the nebula banner.",
      "Un fond aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse.",
@@ -1582,10 +1577,14 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Le cinéma sur votre tableau de bord : lumière d'ambiance pour « Continuer », piles de cartes pour les ajouts, sorties et demandes, le mur d'affiches et son travelling, et le mur vivant.",
      ["opt_style_continue_ambient", "opt_style_added_deck", "opt_style_releases_deck", "opt_style_requested_deck",
       "widget_poster_wall", "opt_style_wall_kenburns", "widget_living_wall"], "epic", 6),
+    ("pack_organizer", "Organizer pack", "Pack Organisation",
+     "Everything to lay out a dashboard: separators with a label, sticky notes, progress bars and columns.",
+     "Tout pour organiser un tableau de bord : séparateurs avec titre, post-it, barres et colonnes de progression.",
+     ["widget_separator", "widget_note", "widget_progress", "widget_progress_vertical"], "rare", None),
     ("pack_explorer", "Explorer pack", "Pack Explorateur",
-     "The widgets to discover: next releases with their countdown, a year ago, playing on the server and the living wall.",
-     "Les widgets pour découvrir : prochaines sorties et leur décompte, il y a un an, en lecture sur le serveur et le mur vivant.",
-     ["widget_next_releases", "widget_on_this_day", "widget_server_playing", "widget_living_wall"], "epic", 4),
+     "The widgets to discover: next releases with their countdown, a year ago and the living wall.",
+     "Les widgets pour découvrir : prochaines sorties et leur décompte, il y a un an et le mur vivant.",
+     ["widget_next_releases", "widget_on_this_day", "widget_living_wall"], "epic", 4),
 ):  # fmt: skip
     _p(key, "bundle", None, rarity, en, fr, about_en, about_fr, {"products": contents},
        collection="packs", icon="shop", featured=key == "pack_cinephile", level=level)  # fmt: skip

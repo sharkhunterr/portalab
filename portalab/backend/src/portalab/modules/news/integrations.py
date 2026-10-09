@@ -141,7 +141,7 @@ def _widget(key: str, title: str) -> WidgetDefinition:
         description_key=f"news:widget.{title}.description",
         icon="newspaper",
         required_permission=NEWS_READ,
-        size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
         refresh=Refresh(
             mode="event", events=("news.article_published", "news.article_featured", "news.article_archived")
         ),

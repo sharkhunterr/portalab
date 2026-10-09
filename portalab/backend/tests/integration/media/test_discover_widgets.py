@@ -80,6 +80,11 @@ async def test_playing_on_the_server(app: FastAPI, media: MediaHarness) -> None:
     assert shown["Alien"]["mine"] is True and shown["Heat"]["mine"] is False
     assert shown["Alien"]["progress"] == 0.25 and shown["Heat"]["state"] == "paused"
     assert str(people["max"]) not in str(data) and "TV" not in str(data)  # nobody named, no device
+    # « mine » (what « now playing » was): the viewer's own streams only
+    mine = (
+        await widget.load(Principal(user_id=people["zoe"]), {"scope": "me"}, LocaleContext(locale="en"))
+    ).data
+    assert mine is not None and [i["title"] for i in mine["items"]] == ["Alien"] and mine["mine"] is True
 
 
 async def _watched(media: MediaHarness, user: UUID, work: UUID, title: str, days: float) -> None:

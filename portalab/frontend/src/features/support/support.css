@@ -1178,3 +1178,17 @@
 .service-picker__state[data-state="unavailable"] {
   color: var(--state-error-fg);
 }
+
+/* 027 (#36): incidents on a single row */
+.incidents-widget--compact {
+  display: block;
+  block-size: 100%;
+}
+.incidents-widget--compact[data-ok] .compact-line__icon {
+  background: color-mix(in srgb, var(--state-available-fg) 18%, transparent);
+  color: var(--state-available-fg);
+}
+.incidents-widget--compact:not([data-ok]) .compact-line__icon {
+  background: color-mix(in srgb, var(--state-error-fg) 18%, transparent);
+  color: var(--state-error-fg);
+}

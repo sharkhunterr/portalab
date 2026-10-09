@@ -24,7 +24,7 @@ OPEN_INCIDENTS = WidgetDefinition(
     description_key="support:widget.incidents.description",
     icon="alert",
     required_permission=INCIDENTS_READ,
-    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
     refresh=Refresh(mode="event", events=("incident.created", "incident.updated", "incident.resolved")),
     stale_after_s=900,
     component_id="support.incidents",  # 027: severity, state, duration and the latest update

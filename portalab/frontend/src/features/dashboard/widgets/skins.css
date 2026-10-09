@@ -1403,25 +1403,6 @@
 .widget-playing--one .widget-playing__bar {
   block-size: 0.45rem;
 }
-.widget-playing--many {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-  gap: var(--space-2);
-}
-.widget-playing--many li > :is(a, span) {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0.4rem;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-text) 4%, transparent);
-}
-.widget-playing--many li[data-mine] > :is(a, span) {
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-}
-.widget-playing--many .widget-playing__poster {
-  inline-size: 3rem;
-}
 .widget-playing__poster {
   display: grid;
   flex: none;
@@ -1625,5 +1606,38 @@
   }
   .widget-next__mini-text {
     font-size: var(--font-size-sm);
+  }
+}
+
+/* a year ago: each shelf takes its share of the block, its posters as tall as the shelf */
+.widget-on-this-day__shelves {
+  grid-auto-rows: minmax(0, 1fr);
+}
+.widget-on-this-day__shelf ul {
+  align-items: stretch;
+  min-block-size: 0;
+}
+.widget-on-this-day__shelf li {
+  inline-size: auto;
+  block-size: 100%;
+}
+.widget-on-this-day__shelf li > :is(a, span) {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  box-sizing: border-box;
+  block-size: 100%;
+}
+.widget-on-this-day__shelf .widget-on-this-day__photo {
+  block-size: 100%;
+  inline-size: auto;
+  min-block-size: 3rem;
+  aspect-ratio: 2 / 3;
+}
+.widget-on-this-day__shelf .widget-on-this-day__caption {
+  max-inline-size: 6rem;
+}
+@container (max-height: 12rem) {
+  .widget-on-this-day__shelf .widget-on-this-day__caption {
+    display: none;
   }
 }

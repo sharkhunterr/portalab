@@ -42,7 +42,7 @@ class FrameBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   }
 }
 
-function Body({ instance, compact = false }: { instance: Instance; compact?: boolean }) {
+function Body({ instance, rows }: { instance: Instance; rows?: number | undefined }) {
   const t = useT();
   const widget = instance.widget;
   const interval = widget?.refresh_mode === "interval" ? (widget.refresh_interval_s ?? null) : null;
@@ -77,16 +77,25 @@ function Body({ instance, compact = false }: { instance: Instance; compact?: boo
     (widget?.template ? TEMPLATES[widget.template as keyof typeof TEMPLATES] : undefined);
   return (
     <>
-      {payload.state === "partial" || payload.state === "stale" ? (
+      {payload.state === "partial" ? (
+        // 027: in words — a source did not answer, what shows may be incomplete (no time: it is now)
         <FunctionalState
-          state={payload.state}
-          asOf={payload.as_of ? new Date(payload.as_of) : undefined}
+          state="partial"
+          label={t("dashboard:partialHint")}
           {...(payload.partial_reasons.length ? { detail: payload.partial_reasons.join(" · ") } : {})}
         />
+      ) : payload.state === "stale" ? (
+        <FunctionalState state="stale" asOf={payload.as_of ? new Date(payload.as_of) : undefined} />
       ) : null}
       {payload.config_invalid ? <p className="widget__meta">{t("dashboard:configInvalid")}</p> : null}
       {Rendered ? (
-        <Rendered payload={payload} config={instance.config} icon={widget?.icon} compact={compact} />
+        <Rendered
+          payload={payload}
+          config={instance.config}
+          icon={widget?.icon}
+          compact={rows !== undefined && rows <= 1}
+          rows={rows}
+        />
       ) : null}
     </>
   );
@@ -160,7 +169,9 @@ function useFit(ref: RefObject<HTMLElement | null>): number {
           const room = limit - top;
           if (natural <= 0 || room <= natural + 2) continue; // already full (or cropped): leave it be
           list.style.setProperty("--fit-rows", String(tops.size));
-          list.style.setProperty("--fill-height", `${Math.floor(Math.min(room, natural * STRETCH))}px`);
+          // a lone row grows a little only: stretched, it would float in the middle of the block
+          const stretch = tops.size === 1 ? 1.3 : STRETCH;
+          list.style.setProperty("--fill-height", `${Math.floor(Math.min(room, natural * stretch))}px`);
           list.setAttribute("data-filled", "");
         }
         setHidden(count);
@@ -219,8 +230,8 @@ export function WidgetFrame({
           {title}
         </h3>
         {instance.mandatory && instance.locked ? (
-          <span className="widget__badge" title={t("dashboard:pinnedHint")}>
-            <Icon name="lock" size={11} /> {t("dashboard:pinned")}
+          <span className="widget__badge" data-pinned title={t("dashboard:pinnedHint")}>
+            <Icon name="lock" size={11} /> <span className="widget__badge-text">{t("dashboard:pinned")}</span>
           </span>
         ) : (
           <>
@@ -264,7 +275,7 @@ export function WidgetFrame({
           <HeaderSlot.Provider value={slot}>
             <FrameBoundary fallback={<FunctionalState state="error" />}>
               <Suspense fallback={<FunctionalState state="loading" />}>
-                <Body instance={instance} compact={height <= 1} />
+                <Body instance={instance} rows={height} />
               </Suspense>
             </FrameBoundary>
           </HeaderSlot.Provider>

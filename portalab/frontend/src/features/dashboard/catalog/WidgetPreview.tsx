@@ -12,6 +12,7 @@ import "../widgets/builtin";
 import "../widgets/media";
 import "../widgets/calendar";
 import "../widgets/discover";
+import "../widgets/service-status";
 import "../../gamification/widget";
 import "../../community/widget";
 import "../widgets/skins"; // 027 (#30): last — the looks wrap the widgets above, a look's product shows it

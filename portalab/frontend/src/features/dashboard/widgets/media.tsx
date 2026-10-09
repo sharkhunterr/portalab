@@ -7,6 +7,7 @@ import { metadataImage } from "../../media/detail/Enrichment";
 import { useMeasures } from "../../media/insights/api";
 import type { SoonCard } from "../../media/requests/api";
 import { SoonList } from "../../media/requests/SoonList";
+import { CompactLine, PosterStrip } from "./compact";
 import type { StatsPoint } from "./MediaStatsChart";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 
@@ -37,12 +38,23 @@ function poster(id: string | null): string | null {
   return id ? `/api/v1/media/images/${id}` : null;
 }
 
-function Posters({ payload }: WidgetProps) {
+/** Cards as a strip of posters (a widget on a single row). */
+function strip(items: Card[]) {
+  return items.map((card, index) => ({
+    key: `${card.id ?? card.title}-${index}`,
+    title: card.title,
+    src: poster(card.image_id) ?? metadataImage(card.poster_ref, "w342"),
+    to: card.route,
+  }));
+}
+
+function Posters({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
   const data = (payload.data ?? {}) as { items?: Card[]; mode?: "added" | "released" };
   const items = data.items ?? [];
+  if (compact) return <PosterStrip cards={strip(items)} />; // 027 (#36): a strip of posters
   const caption = (card: Card) => {
     if (card.state) return t(`media:requests.state.${card.state}`);
     if (data.mode && card.at) {
@@ -98,9 +110,10 @@ function Posters({ payload }: WidgetProps) {
  * « Poster wall » (027, sold in the shop): the month's most watched titles as a dense wall of posters, the
  * plays on each, the first ones larger — it fills its block, and opens each title.
  */
-function PosterWall({ payload }: WidgetProps) {
+function PosterWall({ payload, compact }: WidgetProps) {
   const t = useT();
   const items = ((payload.data ?? {}) as { items?: Card[] }).items ?? [];
+  if (compact) return <PosterStrip cards={strip(items)} running />; // 027 (#36): a running frieze
   return (
     <ul className="widget-wall">
       {items.map((card, index) => {
@@ -230,7 +243,7 @@ interface StatsData {
 const MediaStatsChart = lazy(() => import("./MediaStatsChart"));
 
 /** « My statistics » (027): configurable — whose, period, category, metric and chart. */
-function Stats({ payload }: WidgetProps) {
+function Stats({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
@@ -249,6 +262,28 @@ function Stats({ payload }: WidgetProps) {
   ]
     .filter(Boolean)
     .join(" · ");
+  if (compact)
+    // 027 (#36): the headline, the other figures, the trend
+    return (
+      <CompactLine
+        to="/media/insights"
+        icon="chart"
+        title={headline}
+        detail={`${context} · ${
+          metric === "time"
+            ? t("media:insights.plays", { count: data.totals.plays })
+            : measures.duration(data.totals.seconds)
+        }`}
+        end={
+          trend !== null ? (
+            <span className="widget-media-stats__trend" data-trend={trend >= 0 ? "up" : "down"}>
+              <Icon name={trend >= 0 ? "arrow-up" : "arrow-down"} size={14} />
+              {format.percent(Math.abs(trend))}
+            </span>
+          ) : null
+        }
+      />
+    );
   return (
     <div className="widget-media-stats">
       <p className="widget-media-stats__context">{context}</p>
@@ -278,15 +313,18 @@ function Stats({ payload }: WidgetProps) {
         ) : null}
       </div>
       {chart === "bars" || chart === "area" || chart === "donut" ? (
-        <Suspense fallback={<div className="widget-media-stats__placeholder" />}>
-          <MediaStatsChart
-            chart={chart}
-            metric={metric}
-            unit={data.unit ?? "day"}
-            timeline={data.timeline ?? []}
-            byKind={data.by_kind ?? []}
-          />
-        </Suspense>
+        // 027: the chart takes the height the block has left
+        <div className="widget-media-stats__chart">
+          <Suspense fallback={<div className="widget-media-stats__placeholder" />}>
+            <MediaStatsChart
+              chart={chart}
+              metric={metric}
+              unit={data.unit ?? "day"}
+              timeline={data.timeline ?? []}
+              byKind={data.by_kind ?? []}
+            />
+          </Suspense>
+        </div>
       ) : null}
       {chart === "top" && data.top?.length ? (
         <ol className="widget-rows">
@@ -325,9 +363,9 @@ function Stats({ payload }: WidgetProps) {
 }
 
 /** « Coming soon » (027): my requests downloading, importing or with a release date. */
-function Soon({ payload }: WidgetProps) {
+function Soon({ payload, compact }: WidgetProps) {
   const items = ((payload.data ?? {}) as { items?: SoonCard[] }).items ?? [];
-  return <SoonList items={items} compact />;
+  return <SoonList items={compact ? items.slice(0, 1) : items} compact />; // one row: the first
 }
 
 registerWidgetComponent("media.posters", Posters);
@@ -346,7 +384,7 @@ interface ShuffleCard extends Card {
  * watching » banner, its posters scrolling behind as a frieze. « Another one » draws again among the batch
  * (never the same twice in a row); the picked poster stands in front when the block is large enough.
  */
-function Shuffle({ payload }: WidgetProps) {
+function Shuffle({ payload, compact }: WidgetProps) {
   const t = useT();
   const items = ((payload.data ?? {}) as { items?: ShuffleCard[] }).items ?? [];
   const [index, setIndex] = useState(() => Math.floor(Math.random() * Math.max(1, items.length)));
@@ -398,6 +436,29 @@ function Shuffle({ payload }: WidgetProps) {
     .filter(Boolean)
     .join(" · ");
   const art = poster(pick.image_id);
+  if (compact)
+    // 027 (#36): one title drawn, and another one in a click
+    return (
+      <CompactLine
+        to={pick.route}
+        image={art}
+        icon="shuffle"
+        title={pick.title}
+        detail={meta}
+        end={
+          <button
+            type="button"
+            className="compact-line__button"
+            onClick={another}
+            disabled={items.length < 2}
+            aria-label={t("media:widget.shuffle.another")}
+            title={t("media:widget.shuffle.another")}
+          >
+            <Icon name="shuffle" size={16} />
+          </button>
+        }
+      />
+    );
   return (
     <div
       ref={box}

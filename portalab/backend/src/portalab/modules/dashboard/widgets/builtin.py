@@ -35,7 +35,7 @@ WELCOME = WidgetDefinition(
     description_key="dashboard:widget.welcome.description",
     icon="sparkles",
     required_permission="users.self.manage",
-    size=SizeLimits(default=Size(6, 2), min=Size(3, 2), max=Size(12, 4)),
+    size=SizeLimits(default=Size(6, 2), min=Size(3, 1), max=Size(12, 4)),
     component_id="dashboard.welcome",
 )
 
@@ -85,10 +85,32 @@ SERVICE_LINKS = WidgetDefinition(
     description_key="dashboard:widget.links.description",
     icon="link",
     required_permission=SERVICES_READ,
-    size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
     refresh=Refresh(mode="event", events=(STATUS_CHANGED,)),
     stale_after_s=600,
     component_id="health.service_links",
+)
+
+# 027: one service's state as on the services page — its badge, its last 48 hours as bars, its address
+SERVICE_STATUS = WidgetDefinition(
+    key="health.service_status",
+    owner=OWNER,
+    title_key="dashboard:widget.service_status.title",
+    description_key="dashboard:widget.service_status.description",
+    icon="activity",
+    required_permission=SERVICES_READ,
+    config_schema={
+        "type": "object",
+        # « x-options »: the settings offer the services by name (the value is the service's id)
+        "properties": {"service": {"type": "string", "maxLength": 64, "x-options": "services"}},
+        "additionalProperties": False,
+    },
+    config_defaults={"service": ""},
+    size=SizeLimits(default=Size(4, 2), min=Size(3, 1), max=Size(12, 4)),
+    refresh=Refresh(mode="event", events=(STATUS_CHANGED,)),
+    stale_after_s=600,
+    component_id="health.service_status",
+    multiple=True,
 )
 
 # 027: « since your last visit » as a widget a member places (and hides) like the others
@@ -99,7 +121,7 @@ SINCE_LAST_VISIT = WidgetDefinition(
     description_key="dashboard:widget.since_last_visit.description",
     icon="sparkles",
     required_permission="users.self.manage",
-    size=SizeLimits(default=Size(12, 3), min=Size(3, 2), max=Size(12, 8)),
+    size=SizeLimits(default=Size(12, 3), min=Size(3, 1), max=Size(12, 8)),
     stale_after_s=300,
     component_id="dashboard.since_last_visit",
 )
@@ -429,6 +451,7 @@ class ServicesSummaryProvider:
                     "since": view.since.isoformat() if view else None,
                     "availability": view.availability if view else None,
                     "as_of": view.as_of if view else None,
+                    "link": service.link,
                 }
             )
         # 027: trouble first, then by importance, then by name
@@ -502,6 +525,30 @@ class ServiceLinksProvider(ServicesSummaryProvider):
         return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
 
 
+class ServiceStatusProvider(ServicesSummaryProvider):
+    """027: the chosen service (by id) — by default the one that needs looking at most (trouble first,
+    then the most important)."""
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        rows = await self._rows()
+        if not rows:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        wanted = str(config.get("service") or "")
+        row = next((r for r in rows if str(r["id"]) == wanted), rows[0])
+        item = {
+            "id": str(row["id"]),
+            "name": row["name"],
+            "connector": row["connector"],
+            "state": row["state"],
+            "availability": row["availability"],
+            "link": row["link"],
+            "route": f"/services/{row['id']}",
+        }
+        return WidgetPayload("available", as_of=row["as_of"] or utc_now(self.clock), data={"item": item})
+
+
 class ServicesChanges:
     """Service state changes since the boundary, for principals holding ``services.read``."""
 
@@ -571,6 +618,8 @@ def register_builtin(
         )
     if registry.get(SERVICE_LINKS.key) is None:
         registry.register(SERVICE_LINKS, ServiceLinksProvider(capabilities, authorizer, clock), owner=OWNER)
+    if registry.get(SERVICE_STATUS.key) is None:
+        registry.register(SERVICE_STATUS, ServiceStatusProvider(capabilities, authorizer, clock), owner=OWNER)
     registry.register_summary(ServicesChanges(services), owner=OWNER)
     for definition, provider in ((SHORTCUT, ShortcutProvider(clock)), (VALUE, ValueProvider(clock))):
         if registry.get(definition.key) is None:

@@ -88,7 +88,7 @@ FEATURED_WIDGET = WidgetDefinition(
     description_key="marketplace:widget.featured.description",
     icon="sparkles",
     required_permission=READ,
-    size=SizeLimits(default=Size(4, 3), min=Size(3, 2), max=Size(8, 6)),
+    size=SizeLimits(default=Size(4, 3), min=Size(3, 1), max=Size(8, 6)),
     refresh=Refresh(mode="interval", interval_s=1800),
     stale_after_s=3600,
     component_id="marketplace.featured",

@@ -7,6 +7,11 @@ import "../../../src/features/dashboard/widgets/builtin";
 import "../../../src/features/dashboard/widgets/media";
 import "../../../src/features/dashboard/widgets/discover";
 import "../../../src/features/gamification/widget";
+import "../../../src/features/dashboard/widgets/calendar";
+import "../../../src/features/dashboard/widgets/service-status";
+import "../../../src/features/campaigns/widget";
+import "../../../src/features/marketplace/widget";
+import "../../../src/features/support/incidents/widget";
 import { widgetComponent } from "../../../src/features/dashboard/widgets/registry";
 import "../../../src/features/dashboard/widgets/skins";
 
@@ -18,7 +23,12 @@ function show(key: string, data: unknown, { compact = false, config = {} } = {})
   expect(Widget, key).toBeDefined();
   const Component = Widget as NonNullable<typeof Widget>;
   const element: ReactElement = (
-    <Component payload={{ state: "available", data } as never} config={config} compact={compact} />
+    <Component
+      payload={{ state: "available", data } as never}
+      config={config}
+      compact={compact}
+      rows={compact ? 1 : undefined}
+    />
   );
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } });
   return render(
@@ -92,5 +102,112 @@ describe("compact widgets", () => {
     );
     expect(screen.getByText("Severance")).toBeInTheDocument();
     expect(screen.getByRole("timer").textContent).toMatch(/^2d 0[01]:\d\d:\d\d$/);
+  });
+
+  it("posters, the poster wall: a strip of posters", () => {
+    const card = (n: number) => ({
+      id: `i${n}`,
+      title: `Title ${n}`,
+      image_id: `img${n}`,
+      route: `/media/i${n}`,
+    });
+    show("media.posters", { items: [card(1), card(2), card(3)] }, { compact: true });
+    expect(document.querySelectorAll(".poster-strip li")).toHaveLength(3);
+    expect(screen.getByRole("link", { name: "Title 2" }).getAttribute("href")).toBe("/media/i2");
+  });
+
+  it("statistics: the headline, the context and the trend", () => {
+    const data = {
+      scope: "me",
+      period: "30d",
+      metric: "plays",
+      totals: { plays: 10, seconds: 3600, works: 3 },
+      previous: { plays: 20, seconds: 7200 },
+      series: [],
+      top_works: [],
+    };
+    show("media.stats", data, { compact: true });
+    expect(document.querySelector(".compact-line strong")?.textContent).toBe("10");
+    expect(document.querySelector(".widget-media-stats__trend")?.getAttribute("data-trend")).toBe("down");
+  });
+
+  it("the calendar: this week, today marked", () => {
+    show(
+      "calendar.month",
+      {
+        month: "2026-10-01",
+        today: "2026-10-09",
+        entries: [{ title: "Night", kind: "event", route: "/", date: "2026-10-09", end: "2026-10-09" }],
+        upcoming: [],
+      },
+      { compact: true },
+    );
+    const days = document.querySelectorAll(".cal-week__day");
+    expect(days).toHaveLength(7);
+    const today = document.querySelector(".cal-week__day[data-today]");
+    expect(today?.textContent).toContain("9");
+    expect(today?.querySelectorAll(".cal-week__dots span")).toHaveLength(1);
+  });
+
+  it("incidents: all is well, or the incident going on", () => {
+    show("support.incidents", { open: 0, items: [] }, { compact: true });
+    expect(document.querySelector(".incidents-widget--compact[data-ok]")).not.toBeNull();
+  });
+
+  it("the campaign: what it boosts and how long is left", () => {
+    const ends = new Date(Date.now() + 3 * 86_400_000).toISOString();
+    show(
+      "campaigns.active",
+      {
+        items: [
+          {
+            key: "autumn",
+            title: "Autumn festival",
+            route: "/campaigns/autumn",
+            ends_at: ends,
+            description: "",
+            boosts: [{ value: "xp", factor: 1.5 }],
+          },
+        ],
+      },
+      { compact: true },
+    );
+    expect(screen.getByText("Autumn festival")).toBeInTheDocument();
+    expect(screen.getByText("×1.5 XP")).toBeInTheDocument();
+  });
+
+  it("the shop window: its first product and its price", () => {
+    show(
+      "marketplace.featured",
+      { items: [{ key: "theme_dune", name: "Dune", type: "theme", price: 900 }] },
+      { compact: true },
+    );
+    expect(screen.getByRole("link", { name: /Dune/ }).getAttribute("href")).toBe(
+      "/marketplace?product=theme_dune",
+    );
+  });
+});
+
+describe("service status", () => {
+  const item = {
+    id: "s1",
+    name: "Plex",
+    connector: "plex",
+    state: "operational",
+    availability: 0.996,
+    link: "https://plex.example",
+    route: "/services/s1",
+  };
+
+  it("shows one service as on the services page", () => {
+    show("health.service_status", { item });
+    expect(screen.getByText("Plex")).toBeInTheDocument();
+    expect(screen.getByText(/99.6% available/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Open/ }).getAttribute("href")).toBe("https://plex.example");
+  });
+
+  it("on a single row: its name and state", () => {
+    show("health.service_status", { item }, { compact: true });
+    expect(screen.getByRole("link", { name: /Plex/ }).getAttribute("href")).toBe("/services/s1");
   });
 });

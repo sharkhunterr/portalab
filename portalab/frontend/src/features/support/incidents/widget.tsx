@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { CompactLine } from "../../dashboard/widgets/compact";
 import { registerWidgetComponent, type WidgetProps } from "../../dashboard/widgets/registry";
 import { SeverityBadge, StateSteps, useLasting } from "./IncidentParts";
 import "../support.css";
@@ -19,11 +20,34 @@ interface Item {
 
 /** Dashboard widget ``support.open_incidents`` (027 redesign): what is going wrong now — severity, step
  * reached, how long — and what was fixed this week. */
-function IncidentsWidget({ payload }: WidgetProps) {
+function IncidentsWidget({ payload, compact }: WidgetProps) {
   const t = useT();
   const lasting = useLasting();
   const data = (payload.data ?? {}) as { items?: Item[]; open?: number };
   const items = data.items ?? [];
+  const current = items.find((item) => !item.resolved_at);
+  if (compact)
+    // 027 (#36): one line — all is well, or the incident going on and how long
+    return (
+      <div className="incidents-widget incidents-widget--compact" data-ok={!data.open || undefined}>
+        <CompactLine
+          to={current?.route ?? "/incidents"}
+          icon={data.open ? "alert" : "check"}
+          title={
+            data.open ? t("support:incident.count", { count: data.open }) : t("support:incident.allGood")
+          }
+          detail={current ? current.title : null}
+          end={
+            current ? (
+              <>
+                <SeverityBadge severity={current.severity} />
+                <small>{t("support:incident.since", { duration: lasting(current.since) })}</small>
+              </>
+            ) : null
+          }
+        />
+      </div>
+    );
   return (
     <div className="incidents-widget">
       <p className="incidents-widget__status" data-ok={!data.open || undefined}>

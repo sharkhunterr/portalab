@@ -28,6 +28,22 @@ export interface FunctionalStateProps {
   retryLabel?: string | undefined;
 }
 
+/** 027: freshness in words (« 3 minutes ago »), in the page's language — never a raw timestamp. */
+function relative(at: Date): string {
+  const seconds = (at.getTime() - Date.now()) / 1000;
+  const lang = typeof document !== "undefined" ? document.documentElement.lang || undefined : undefined;
+  const format = new Intl.RelativeTimeFormat(lang, { numeric: "auto" });
+  const steps: Array<[number, Intl.RelativeTimeFormatUnit]> = [
+    [60, "second"],
+    [3600, "minute"],
+    [86_400, "hour"],
+    [Number.POSITIVE_INFINITY, "day"],
+  ];
+  const size: Record<string, number> = { second: 1, minute: 60, hour: 3600, day: 86_400 };
+  const unit = steps.find(([limit]) => Math.abs(seconds) < limit)?.[1] ?? "day";
+  return format.format(Math.round(seconds / (size[unit] ?? 1)), unit);
+}
+
 export function FunctionalState({
   state,
   label,
@@ -64,8 +80,8 @@ export function FunctionalState({
       <span className="functional-state__label">{text}</span>
       {detail ? <span className="functional-state__detail">{detail}</span> : null}
       {asOf ? (
-        <time className="functional-state__as-of" dateTime={asOf.toISOString()}>
-          {asOf.toISOString()}
+        <time className="functional-state__as-of" dateTime={asOf.toISOString()} title={asOf.toLocaleString()}>
+          {relative(asOf)}
         </time>
       ) : null}
       {onRetry ? (
