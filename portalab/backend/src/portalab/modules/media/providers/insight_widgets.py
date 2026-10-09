@@ -27,7 +27,14 @@ from portalab.modules.media.common import strong_ids
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.stats import CATEGORIES, InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
-from portalab.modules.media.models import Activity, Image, MediaObject, MediaRequest, PlaybackSession
+from portalab.modules.media.models import (
+    Activity,
+    Image,
+    MediaObject,
+    MediaRequest,
+    ObjectMetadata,
+    PlaybackSession,
+)
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 from portalab.modules.media.requests.insights import GROUPS, RequestInsights, ids_of, kind_of, lookup_of
 
@@ -156,6 +163,7 @@ SERVER_PLAYING = replace(  # 027 (#31): what plays on the server now — titles 
         component="media.server_playing",
         icon="play",
         size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+        product="widget_server_playing",  # sold in the shop
     ),
     refresh=Refresh(mode="interval", interval_s=30),
     stale_after_s=120,
@@ -165,12 +173,14 @@ ON_THIS_DAY = _definition(  # 027 (#31): a year ago today — what I watched, wh
     component="media.on_this_day",
     icon="hourglass",
     size=SizeLimits(default=Size(6, 3), min=Size(3, 2), max=Size(12, 6)),
+    product="widget_on_this_day",  # sold in the shop
 )
 NEXT_RELEASES = _definition(  # 027: what comes out next among what I asked for and the series I follow
     "media.next_releases",
     component="media.next_releases",
     icon="rocket",
     size=SizeLimits(default=Size(6, 3), min=Size(4, 1), max=Size(12, 6)),  # one row = compact
+    product="widget_next_releases",  # sold in the shop
 )
 MY_SOON = _definition(
     "media.my_soon",
@@ -201,25 +211,79 @@ async def posters(database: Database, object_ids: Iterable[UUID | None]) -> dict
         return {object_id: str(image_id) for object_id, image_id in rows.all()}
 
 
+async def details(database: Database, object_ids: Iterable[UUID]) -> dict[UUID, dict[str, Any]]:
+    """027: what the cards of a title say of it — its year, genres, overview and rating (the metadata
+    provider's, when it was enriched)."""
+    wanted = set(object_ids)
+    if not wanted:
+        return {}
+    async with database.session() as session:
+        found = await session.execute(select(MediaObject).where(MediaObject.id.in_(wanted)))
+        objects = found.scalars().all()
+        rated = await session.execute(
+            select(ObjectMetadata.object_id, ObjectMetadata.data["vote_average"].astext).where(
+                ObjectMetadata.object_id.in_(wanted), ObjectMetadata.status == "found"
+            )
+        )
+        ratings: dict[UUID, str | None] = {row[0]: row[1] for row in rated.all()}
+    out: dict[UUID, dict[str, Any]] = {}
+    for item in objects:
+        rating = ratings.get(item.id)
+        out[item.id] = {
+            "year": item.year,
+            "genres": [str(g) for g in (item.effective.get("genres") or [])][:3],
+            "overview": str(item.effective.get("overview") or "")[:400] or None,
+            "rating": round(float(rating), 1) if rating not in (None, "", "null") else None,
+        }
+    return out
+
+
 async def with_posters(
-    database: Database, enricher: MetadataEnricher | None, rows: list[dict[str, Any]], *, lookups: int = 40
+    database: Database,
+    enricher: MetadataEnricher | None,
+    rows: list[dict[str, Any]],
+    *,
+    lookups: int = 40,
+    detailed: bool = False,
 ) -> list[dict[str, Any]]:
     """Catalog posters for rows tied to an object; the metadata provider's poster (TMDB) for the others —
-    at most ``lookups`` of them, a few at a time (cached by the enricher)."""
-    images = await posters(database, (UUID(r["id"]) if r.get("id") else None for r in rows))
+    at most ``lookups`` of them, a few at a time (cached by the enricher). ``detailed`` (027): each card
+    also says its year, genres, overview and rating."""
+    ids = [UUID(r["id"]) for r in rows if r.get("id")]
+    images = await posters(database, ids)
+    known = await details(database, ids) if detailed else {}
     gate = asyncio.Semaphore(6)
 
-    async def fill(row: dict[str, Any], lookup: tuple[Any, ...]) -> None:
+    async def fill(row: dict[str, Any], lookup: tuple[Any, ...], poster: bool) -> None:
         async with gate:
-            row["poster_ref"] = await enricher.poster(*lookup) if enricher is not None else None
+            if enricher is None:
+                return
+            brief = await enricher.brief(*lookup)
+            if poster:
+                row["poster_ref"] = brief.get("poster")
+            if detailed:
+                for field in ("overview", "genres", "rating"):
+                    if not row.get(field) and brief.get(field):
+                        row[field] = brief[field]
+                if not row.get("year") and brief.get("release_date"):
+                    row["year"] = int(str(brief["release_date"])[:4])
 
     pending: list[Coroutine[Any, Any, None]] = []
     for row in rows:
-        row["image_id"] = images.get(UUID(row["id"])) if row.get("id") else None
+        object_id = UUID(row["id"]) if row.get("id") else None
+        row["image_id"] = images.get(object_id) if object_id else None
         row["route"] = f"/media/{row['id']}" if row.get("id") else None
+        if object_id in known:
+            for field, value in known[object_id].items():
+                if value and not row.get(field):
+                    row[field] = value
         lookup = row.pop("_lookup", None)
-        if row["image_id"] is None and lookup and enricher is not None and len(pending) < lookups:
-            pending.append(fill(row, lookup))  # not in the library: TMDB's poster, served by the portal
+        poster = row["image_id"] is None
+        wanted = poster or (detailed and object_id not in known)
+        if wanted and lookup and enricher is not None and len(pending) < lookups:
+            pending.append(fill(row, lookup, poster))  # not in the library: what TMDB says of it
+        elif poster:
+            row["poster_ref"] = None
     await asyncio.gather(*pending)
     return rows
 
@@ -236,8 +300,8 @@ class _Base:
         empty = not data or (isinstance(data.get("items"), list) and not data["items"])
         return WidgetPayload("no-data" if empty else "available", as_of=utc_now(self.clock), data=data)
 
-    async def cards(self, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        return await with_posters(self.database, self.enricher, rows)
+    async def cards(self, rows: list[dict[str, Any]], *, detailed: bool = False) -> list[dict[str, Any]]:
+        return await with_posters(self.database, self.enricher, rows, detailed=detailed)
 
 
 class StatsWidget(_Base):
@@ -326,7 +390,10 @@ class RecentlyAddedWidget(_Base):
             if r.object_id in rows
         ]
         return self.payload(
-            {"items": await self.cards(items), "mode": "released" if self.released else "added"}
+            {
+                "items": await self.cards(items, detailed=True),  # 027: the deck look tells about each one
+                "mode": "released" if self.released else "added",
+            }
         )
 
 
@@ -366,7 +433,7 @@ class RecentlyRequestedWidget(_Base):
             }
             for r in rows
         ]
-        return self.payload({"items": await self.cards(items)})
+        return self.payload({"items": await self.cards(items, detailed=True)})
 
 
 class MySoonWidget(_Base):
@@ -503,6 +570,7 @@ class NextReleasesWidget(_Base):
                     "episode": release["episode"],
                     "at": release["at"],
                     "reason": reason,
+                    "overview": release.get("overview"),
                     "_lookup": (
                         "movie" if release["kind"] == "movie" else "series",
                         dict(release.get("ids") or {}),
@@ -513,7 +581,7 @@ class NextReleasesWidget(_Base):
             )
             if len(items) >= self.LIMIT:
                 break
-        return self.payload({"items": await self.cards(items)})
+        return self.payload({"items": await self.cards(items, detailed=True)})
 
 
 class TopWidget(_Base):

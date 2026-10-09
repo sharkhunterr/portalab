@@ -60,7 +60,7 @@ class MetadataEnricher:
         self.blobs = blobs
         self.clock = clock
         self._images: dict[tuple[str, str], str] = {}
-        self._posters: dict[tuple[Any, ...], dict[str, str | None]] = {}
+        self._posters: dict[tuple[Any, ...], dict[str, Any]] = {}
         self.progress = Progress(database)
 
     def provider(self) -> tuple[str, Any] | None:
@@ -251,16 +251,18 @@ class MetadataEnricher:
 
     async def brief(
         self, kind: str, ids: Mapping[str, str], title: str, year: int | None = None
-    ) -> dict[str, str | None]:
-        """027: poster and release date of a title the library may not have (a request, an upcoming
-        release) — looked up once at the provider, then remembered (misses too)."""
+    ) -> dict[str, Any]:
+        """027: what the provider says of a title the library may not have (a request, an upcoming
+        release) — its poster, release date, overview, genres and rating — looked up once, then
+        remembered (misses too)."""
         found = self.provider()
+        empty: dict[str, Any] = {"poster": None, "release_date": None}
         if found is None or kind not in KINDS or not title:
-            return {"poster": None, "release_date": None}
+            return empty
         key = (kind, tuple(sorted(ids.items())), title.casefold(), year)
         if key in self._posters:
             return self._posters[key]
-        brief: dict[str, str | None] = {"poster": None, "release_date": None}
+        brief = empty
         try:
             record = unwrap(
                 await asyncio.wait_for(
@@ -268,7 +270,13 @@ class MetadataEnricher:
                 )
             )
             if record is not None:
-                brief = {"poster": record.poster, "release_date": record.release_date}
+                brief = {
+                    "poster": record.poster,
+                    "release_date": record.release_date,
+                    "overview": record.overview,
+                    "genres": list(record.genres)[:3],
+                    "rating": record.vote_average,
+                }
         except Exception:  # noqa: S110 — nothing known is fine
             pass
         if len(self._posters) > 5000:
@@ -279,7 +287,8 @@ class MetadataEnricher:
     async def poster(
         self, kind: str, ids: Mapping[str, str], title: str, year: int | None = None
     ) -> str | None:
-        return (await self.brief(kind, ids, title, year))["poster"]
+        poster: str | None = (await self.brief(kind, ids, title, year))["poster"]
+        return poster
 
     async def image(self, ref: str, size: str) -> bytes:
         """A provider image, fetched once then served from the blob store (or memory without one)."""

@@ -76,6 +76,14 @@ describe("widget looks", () => {
     expect(screen.getByText("Holidays")).toBeInTheDocument();
   });
 
+  it("tells about the card on top of the deck: kind, year, genres, rating and overview", () => {
+    const shown = { ...card(1), year: 2024, genres: ["Sci-Fi", "Drama"], rating: 7.8, overview: "Far away." };
+    show("media.posters", { items: [shown, card(2)] }, { style: "deck" });
+    expect(screen.getByText("Movie · 2024 · Sci-Fi · Drama")).toBeInTheDocument();
+    expect(screen.getByText("7.8")).toBeInTheDocument();
+    expect(screen.getByText("Far away.")).toBeInTheDocument();
+  });
+
   it("deals the posters as a deck, the next card on a click", () => {
     show("media.posters", { items: [card(1), card(2), card(3)] }, { style: "deck" });
     expect(document.querySelectorAll(".skin-deck__pile img")).toHaveLength(3);
@@ -147,11 +155,22 @@ describe("next releases", () => {
     const at = (days: number) => new Date(Date.now() + days * 86_400_000 + 3_600_000).toISOString();
     show("media.next_releases", {
       items: [
-        { ...card(1), title: "Severance", season: 2, episode: 5, type: "air", at: at(3), reason: "watching" },
+        {
+          ...card(1),
+          title: "Severance",
+          kind: "episode",
+          season: 2,
+          episode: 5,
+          type: "air",
+          at: at(3),
+          reason: "watching",
+          overview: "A dark office.",
+        },
         { ...card(2), title: "Dune: Part Three", type: "cinema", at: at(20), reason: "requested" },
       ],
     });
     expect(document.querySelector(".widget-next__title")?.textContent).toBe("Severance");
+    expect(screen.getByText("A dark office.")).toBeInTheDocument(); // what it is, where the countdown was
     expect(screen.getByText("You follow it")).toBeInTheDocument();
     expect(screen.getByText(/S02E05/)).toBeInTheDocument();
     const units = document.querySelectorAll(".widget-next__unit strong");

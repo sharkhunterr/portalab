@@ -295,9 +295,10 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
             columns={columns}
             arranger={arranging ? session : null}
             collapsed={emptyWidgets}
-            render={(instance, handles) => (
+            render={(instance, handles, cell) => (
               <WidgetFrame
                 instance={instance}
+                rows={cell.h}
                 handles={handles}
                 controls={isEditing ? <EditControls instance={instance} apply={apply} /> : null}
               />

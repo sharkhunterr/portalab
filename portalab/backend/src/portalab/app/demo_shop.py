@@ -1126,6 +1126,18 @@ for key, option, en, fr, rarity, price in (
        "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté.",
        {"option": option}, collection="widgets", icon="sparkles")  # fmt: skip
 
+_p("widget_server_playing", "widget", 400, "rare", "Playing on the server widget", "Widget En lecture sur le serveur",
+   "What is being watched on the server right now — titles and progress, never who.",
+   "Ce qui se regarde sur le serveur en ce moment — titres et progression, jamais qui.",
+   {"widget": "media.server_playing"}, collection="widgets", icon="dashboard")  # fmt: skip
+_p("widget_on_this_day", "widget", 450, "rare", "A year ago widget", "Widget Il y a un an",
+   "Around this date, a year or more ago: what you watched, what came into the library.",
+   "Autour de cette date, il y a un an ou plus : ce que vous regardiez, ce qui arrivait dans la bibliothèque.",
+   {"widget": "media.on_this_day"}, collection="widgets", icon="dashboard")  # fmt: skip
+_p("widget_next_releases", "widget", 500, "epic", "Next releases widget", "Widget Prochaines sorties",
+   "What comes out next among what you asked for and the series you follow — with a live countdown.",
+   "Ce qui sort bientôt parmi vos demandes et les séries que vous suivez — avec un décompte en direct.",
+   {"widget": "media.next_releases"}, collection="widgets", icon="dashboard")  # fmt: skip
 _p("widget_living_wall", "widget", 650, "epic", "Living wall widget", "Widget Mur vivant",
    "A wall of posters from the library that turn one by one to reveal others.",
    "Un mur d'affiches de la bibliothèque qui se retournent une à une pour en révéler d'autres.",

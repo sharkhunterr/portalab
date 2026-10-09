@@ -12,6 +12,9 @@ import "../widgets/builtin";
 import "../widgets/media";
 import "../widgets/calendar";
 import "../widgets/discover";
+import "../../gamification/widget";
+import "../../community/widget";
+import "../widgets/skins"; // 027 (#30): last — the looks wrap the widgets above, a look's product shows it
 
 /**
  * 027: a widget's miniature — the real widget with the member's own data (``preview``: before it is bought,

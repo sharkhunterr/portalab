@@ -4,6 +4,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
+import { TitleFacts } from "./facts";
 import { reducedMotion, useLively } from "./motion";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 import "./skins.css";
@@ -250,6 +251,10 @@ function OnThisDay({ payload }: WidgetProps) {
 // --- next releases ---------------------------------------------------------------------------------------------
 interface Release extends Card {
   at: string;
+  year?: number | null;
+  genres?: string[] | null;
+  rating?: number | null;
+  overview?: string | null;
   reason?: "requested" | "watching";
   type?: string;
   season?: number | null;
@@ -352,6 +357,7 @@ function NextReleases({ payload, compact }: WidgetProps) {
           ) : null}
           <strong className="widget-next__title">{hero.title}</strong>
           <small className="widget-next__details">{details.join(" · ")}</small>
+          <TitleFacts facts={hero} />
         </span>
         {left > 0 ? (
           <span

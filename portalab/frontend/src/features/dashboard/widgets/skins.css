@@ -64,21 +64,21 @@
 
 /* --- services: heartbeat ---------------------------------------------------------------------------------- */
 .skin-pulse {
-  isolation: isolate;
-  block-size: auto;
+  display: contents;
 }
+/* the heartbeat runs in the summary line, between the summary and « All » */
 .skin-pulse__trace {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: 0;
-  z-index: -1;
-  inline-size: 100%;
-  block-size: 3.6rem;
+  flex: 1 1 4rem;
+  min-inline-size: 3rem;
+  block-size: 2.2rem;
   fill: none;
   stroke: var(--tone, var(--color-accent));
   stroke-width: 1.5;
   stroke-linejoin: round;
-  opacity: 0.6;
+  opacity: 0.85;
+}
+.widget-services__head:has(.skin-pulse__trace) .widget-services__summary {
+  flex: 0 1 auto;
 }
 .skin-pulse__trace path {
   vector-effect: non-scaling-stroke;
@@ -236,7 +236,7 @@
 .skin-deck {
   display: flex;
   align-items: center;
-  gap: clamp(var(--space-3), 5cqw, var(--space-6));
+  gap: clamp(1.5rem, 7cqw, 3rem); /* the fanned cards stick out of the pile: the text keeps clear of them */
   block-size: 100cqh;
   padding-inline: 0.6rem;
 }
@@ -963,12 +963,10 @@
 }
 .widget-next__hero {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas: "poster info" "poster count";
-  align-content: center;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "poster info count";
   align-items: center;
-  column-gap: clamp(var(--space-3), 4cqw, var(--space-5, 1.5rem));
-  row-gap: 0.3rem;
+  column-gap: clamp(var(--space-2), 3cqw, var(--space-5, 1.5rem));
   min-block-size: 0;
   color: inherit;
   text-decoration: none;
@@ -994,7 +992,9 @@
 }
 .widget-next__info {
   grid-area: info;
-  align-self: end;
+  align-self: center;
+  overflow: hidden;
+  max-block-size: 100%;
   display: grid;
   align-content: center;
   justify-items: start;
@@ -1032,32 +1032,24 @@
 .widget-next__count,
 .widget-next__out {
   grid-area: count;
-  align-self: start;
-  justify-self: start;
+  justify-self: end;
 }
+/* the countdown on the right: a 2 × 2 square on a narrow block, a row on a wide one */
 .widget-next__count {
-  display: flex;
-  gap: clamp(0.3rem, 1.5cqw, 0.6rem);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.35rem;
 }
-/* a wide block: the countdown on the right, larger */
-@container (min-width: 36rem) {
-  .widget-next__hero {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: "poster info count";
-  }
-  .widget-next__info {
-    align-self: center;
-  }
-  .widget-next__count,
-  .widget-next__out {
-    align-self: center;
-    justify-self: end;
+@container (min-width: 40rem) {
+  .widget-next__count {
+    grid-template-columns: repeat(4, auto);
+    gap: 0.6rem;
   }
   .widget-next__unit {
-    inline-size: clamp(3rem, min(9cqw, 30cqh), 5rem);
+    inline-size: clamp(3.6rem, min(9cqw, 34cqh), 6rem);
   }
   .widget-next__unit strong {
-    font-size: clamp(1rem, min(3cqw, 10cqh), 1.8rem);
+    font-size: clamp(1.2rem, min(3cqw, 12cqh), 2.2rem);
   }
 }
 /* each unit in a ring filled by its share (days of a month, hours of a day…) */
@@ -1065,7 +1057,7 @@
   display: grid;
   place-content: center;
   justify-items: center;
-  inline-size: clamp(2.3rem, min(10cqw, 24cqh), 4rem);
+  inline-size: clamp(3rem, min(15cqw, 27cqh), 4.6rem);
   aspect-ratio: 1;
   border-radius: 50%;
   background:
@@ -1077,13 +1069,13 @@
 }
 .widget-next__unit strong {
   font-family: var(--font-display);
-  font-size: clamp(0.85rem, min(3.4cqw, 8cqh), 1.4rem);
+  font-size: clamp(1.05rem, min(5cqw, 10cqh), 1.8rem);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 .widget-next__unit small {
   color: var(--color-text-muted);
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1240,116 +1232,55 @@
   font-size: var(--font-size-sm);
 }
 
-/* the next cards of the deck, a row of posters on the right of a wide block */
-.skin-deck__queue {
-  display: none;
-  flex: 0 1 auto;
+/* --- what a card says of its title (deck, next releases) ------------------------------------------------- */
+.title-facts {
+  display: grid;
+  gap: 0.25rem;
+  min-inline-size: 0;
+}
+.title-facts__line {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
-  min-inline-size: 0;
-  block-size: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  list-style: none;
-}
-@container (min-width: 34rem) {
-  .skin-deck__queue {
-    display: flex;
-  }
-}
-.skin-deck__queue li {
-  flex: none;
-  block-size: 86%;
-  animation: skin-rise 0.5s ease-out both;
-}
-.skin-deck__queue li:nth-child(2) {
-  animation-delay: 0.06s;
-}
-.skin-deck__queue li:nth-child(3) {
-  animation-delay: 0.12s;
-}
-.skin-deck__queue li:nth-child(4) {
-  animation-delay: 0.18s;
-}
-/* fewer of them when the block is narrower */
-@container (max-width: 52rem) {
-  .skin-deck__queue li:nth-child(n + 3) {
-    display: none;
-  }
-}
-.skin-deck__queue button {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 0.3rem;
-  block-size: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-.skin-deck__queue img {
-  block-size: 100%;
-  min-block-size: 0;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-  box-shadow: 0 0.3rem 0.8rem color-mix(in srgb, var(--color-text) 18%, transparent);
-  opacity: 0.75;
-  transition:
-    transform 0.3s,
-    opacity 0.3s;
-}
-.skin-deck__queue button:hover img {
-  opacity: 1;
-  transform: translateY(-0.25rem) rotate(-2deg);
-}
-.skin-deck__queue span {
-  display: grid;
-  max-inline-size: 6.5rem;
-  min-inline-size: 0;
-}
-.skin-deck__queue strong,
-.skin-deck__queue small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.skin-deck__queue strong {
+  gap: 0.2rem 0.5rem;
+  color: var(--color-text-muted);
   font-size: var(--font-size-xs);
 }
-/* a narrow but tall block (a phone): the next two, stacked on the right */
-@container (max-width: 34rem) and (min-height: 13rem) {
-  .skin-deck__queue {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--space-2);
-  }
-  .skin-deck__queue li {
-    block-size: auto;
-    inline-size: clamp(3rem, 16cqw, 5rem);
-  }
-  .skin-deck__queue li:nth-child(n + 3) {
-    display: none;
-  }
-  .skin-deck__queue button {
-    display: block;
-    inline-size: 100%;
-  }
-  .skin-deck__queue img {
-    block-size: auto;
-    inline-size: 100%;
-  }
-  .skin-deck__queue span {
-    display: none;
+.title-facts__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rarity-legendary, var(--color-accent)) 18%, transparent);
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+.title-facts__rating svg {
+  color: var(--rarity-legendary, var(--color-accent));
+}
+.title-facts__extra {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.title-facts__overview {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+@container (min-height: 13rem) {
+  .title-facts__overview {
+    -webkit-line-clamp: 4;
   }
 }
-.skin-deck__queue small {
-  display: none;
+@container (min-height: 20rem) {
+  .title-facts__overview {
+    -webkit-line-clamp: 7;
+  }
 }
 /* the analog clock fits its block (a one-row tile has no block to measure: it takes the row) */
 .skin-analog svg {
@@ -1357,4 +1288,8 @@
 }
 .widget-frame[data-tile] .skin-analog svg {
   block-size: 100%;
+}
+.skin-deck__text {
+  max-block-size: 100%;
+  overflow: hidden;
 }

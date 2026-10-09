@@ -145,3 +145,19 @@ async def test_a_year_ago(app: FastAPI, media: MediaHarness) -> None:
     lone = await users(app, media, "ana")
     nothing = (await load(Principal(user_id=lone["ana"]), {}, LocaleContext(locale="en"))).data
     assert nothing == {"years": None, "watched": [], "added": []}
+
+
+async def test_detailed_cards_tell_about_their_title(media: MediaHarness) -> None:
+    """027: a detailed card says its title's year, genres and overview (and the provider's rating)."""
+    from portalab.modules.media.providers.insight_widgets import with_posters
+
+    await media.module.library.upsert(
+        [library_record("m1", title="Alien", year=1979, genres=["Sci-Fi", "Horror"], overview="In space.")],
+        media.service(1, "plex"),
+    )
+    objects = await _objects(media)
+    rows = [{"id": str(objects["Alien"]), "title": "Alien"}]
+    [card] = await with_posters(media.database, None, rows, detailed=True)
+    assert card["year"] == 1979 and card["genres"] == ["Sci-Fi", "Horror"] and card["overview"] == "In space."
+    [plain] = await with_posters(media.database, None, [{"id": str(objects["Alien"]), "title": "Alien"}])
+    assert "overview" not in plain  # only when asked

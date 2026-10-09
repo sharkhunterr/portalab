@@ -26,7 +26,8 @@ interface DashboardGridProps {
   cells: Map<string, Cell>;
   columns: number;
   arranger?: Arranger | null;
-  render: (instance: Instance, handles: ReactNode) => ReactNode;
+  /** ``cell``: where the widget sits in this view (its rows may differ from the desktop ones). */
+  render: (instance: Instance, handles: ReactNode, cell: { w: number; h: number }) => ReactNode;
   /** 027: widgets with nothing to show that asked to be hidden (kept mounted, out of the layout). */
   collapsed?: ReadonlySet<string>;
 }
@@ -285,7 +286,7 @@ export function DashboardGrid({
                   : {}),
               }}
             >
-              {render(instance, handles)}
+              {render(instance, handles, at)}
             </li>
           );
         })}

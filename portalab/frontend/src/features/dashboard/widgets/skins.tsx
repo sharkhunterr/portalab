@@ -12,6 +12,7 @@ import { Cover } from "../../news/cover";
 import "../../news/news.css";
 import { WidgetHeaderAction } from "../frame/actions";
 import { TEMPLATES } from "../templates/Templates";
+import { TitleFacts } from "./facts";
 import { daysUntil } from "./layout";
 import { useCountUp, useLively } from "./motion";
 import { registerWidgetComponent, type WidgetProps, widgetComponent } from "./registry";
@@ -34,6 +35,10 @@ type Card = {
   poster_ref?: string | null;
   summary?: string | null;
   cover?: string | null;
+  year?: number | null;
+  genres?: string[] | null;
+  rating?: number | null;
+  overview?: string | null;
 };
 type SkinProps = WidgetProps & { Original: ComponentType<WidgetProps> };
 
@@ -46,9 +51,6 @@ const ISO = /^\d{4}-\d{2}-\d{2}(T|$)/;
 // continue: « ambient » is drawn by the widget itself (media.tsx: a glow behind each poster)
 
 // --- services: « pulse » — a heartbeat trace under the summary, the ring and the state dots beating -----------
-// two beats across the block (the line is stretched to its width)
-const BEAT = "H{x} l3 -3 l3 3 h5 l2 -13 l4 27 l3 -18 l2 4 h8 q4 -7 8 0";
-const TRACE = `M0 20 ${BEAT.replace("{x}", "22")} H122 ${BEAT.replace("{x}", "122").slice(5)} H200`;
 
 function Pulse({ Original, ...props }: SkinProps) {
   const items = ((props.payload.data ?? {}) as { items?: Array<{ state?: string }> }).items ?? [];
@@ -59,10 +61,7 @@ function Pulse({ Original, ...props }: SkinProps) {
       : "ok";
   return (
     <div className="skin skin-pulse has-tone" data-tone={tone}>
-      <svg className="skin-pulse__trace" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
-        <path d={TRACE} />
-        <path className="skin-pulse__beam" d={TRACE} pathLength={100} />
-      </svg>
+      {/* the trace itself is drawn by the widget, in its summary line (heartbeat.tsx) */}
       <Original {...props} />
     </div>
   );
@@ -203,7 +202,14 @@ function Deck({ payload }: SkinProps) {
       </button>
       <div className="skin-deck__text" key={shown.id ?? shown.title}>
         <strong>{shown.title}</strong>
-        {shown.subtitle || shown.meta ? <span>{shown.subtitle ?? shown.meta}</span> : null}
+        {/* what it is: kind, year, genres, rating and overview (and its episode, for a series) */}
+        <TitleFacts
+          facts={shown}
+          extra={
+            shown.subtitle ??
+            (shown.meta && !ISO.test(shown.meta) && shown.meta !== String(shown.year) ? shown.meta : null)
+          }
+        />
         {shown.route ? (
           <Link className="ds-button ds-button--secondary" to={shown.route}>
             {t("dashboard:deck.open")}
@@ -216,25 +222,6 @@ function Deck({ payload }: SkinProps) {
           ))}
         </span>
       </div>
-      {/* the next cards of the pile: a wide block shows them on the right, one click deals one */}
-      <ul className="skin-deck__queue" data-nofit>
-        {[1, 2, 3, 4].map((step) => {
-          if (step >= cards.length) return null;
-          const index = (front + step) % cards.length;
-          const card = cards[index] as Card;
-          return (
-            <li key={`${card.id ?? card.title}-${step}`}>
-              <button type="button" onClick={() => setFront(index)} title={card.title}>
-                <img src={art(card) ?? ""} alt="" loading="lazy" />
-                <span>
-                  <strong>{card.title}</strong>
-                  {card.subtitle || card.meta ? <small>{card.subtitle ?? card.meta}</small> : null}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useNavigationView } from "../../../shell/nav/NavigationProvider";
 import { useShellStrings } from "../../../shell/strings";
 import { CONNECTOR_ICON } from "../../services/connectorIcons";
+import { HeartbeatTrace } from "./heartbeat";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 
 /** First-party widgets (spec 009 T013): welcome / next steps and the services health summary. */
@@ -78,7 +79,7 @@ function HealthRing({ ok, total }: { ok: number; total: number }) {
  * per service — its kind's icon ringed with its state, its name, its state in words and its last 24 hours
  * as a thin bar. Trouble first, then the most important. Narrow blocks list them.
  */
-function ServicesHealth({ payload, compact }: WidgetProps) {
+function ServicesHealth({ payload, compact, config }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const data = servicesData(payload);
@@ -116,6 +117,7 @@ function ServicesHealth({ payload, compact }: WidgetProps) {
               ))}
           </span>
         </p>
+        {(config ?? {}).style === "pulse" && !compact ? <HeartbeatTrace /> : null}
         <Link to="/services" className="widget-services__all">
           {t("dashboard:services.all")}
           <Icon name="chevron-right" size={14} />

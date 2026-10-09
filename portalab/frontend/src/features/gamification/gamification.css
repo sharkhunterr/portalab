@@ -357,11 +357,10 @@
 .daily-objective {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr) auto; /* check, label and bar, rewards — all inside the card */
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  padding-inline-end: 4.5rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-text) 3%, transparent);
@@ -411,9 +410,6 @@
   background: var(--done);
 }
 .daily-objective__rewards {
-  position: absolute;
-  inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-2);
   display: flex;
   flex-direction: column;
   align-items: flex-end;

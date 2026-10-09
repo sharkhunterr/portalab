@@ -42,7 +42,7 @@ class FrameBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   }
 }
 
-function Body({ instance, full = false }: { instance: Instance; full?: boolean }) {
+function Body({ instance, compact = false }: { instance: Instance; compact?: boolean }) {
   const t = useT();
   const widget = instance.widget;
   const interval = widget?.refresh_mode === "interval" ? (widget.refresh_interval_s ?? null) : null;
@@ -86,12 +86,7 @@ function Body({ instance, full = false }: { instance: Instance; full?: boolean }
       ) : null}
       {payload.config_invalid ? <p className="widget__meta">{t("dashboard:configInvalid")}</p> : null}
       {Rendered ? (
-        <Rendered
-          payload={payload}
-          config={instance.config}
-          icon={widget?.icon}
-          compact={!full && instance.h <= 1}
-        />
+        <Rendered payload={payload} config={instance.config} icon={widget?.icon} compact={compact} />
       ) : null}
     </>
   );
@@ -186,10 +181,13 @@ function useFit(ref: RefObject<HTMLElement | null>): number {
 
 export function WidgetFrame({
   instance,
+  rows,
   controls,
   handles,
 }: {
   instance: Instance;
+  /** 027: the rows it takes in this view (a phone may give it fewer than the desktop) */
+  rows?: number | undefined;
   controls?: ReactNode;
   handles?: ReactNode;
 }) {
@@ -198,6 +196,7 @@ export function WidgetFrame({
   const body = useRef<HTMLDivElement>(null);
   const hidden = useFit(body);
   useOffscreen(body); // 027 (#29): animations pause out of sight
+  const height = rows ?? instance.h;
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
   // 027: the member may show the content alone — without its title, without its box, or both
@@ -207,10 +206,10 @@ export function WidgetFrame({
       aria-labelledby={headingId}
       className="widget-frame"
       data-widget={instance.widget_key}
-      data-tile={instance.h <= 1 || undefined}
+      data-tile={height <= 1 || undefined}
       data-no-title={frame._hide_title === true || undefined}
       data-no-box={frame._no_box === true || undefined}
-      style={{ "--widget-w": instance.w, "--widget-h": instance.h } as React.CSSProperties}
+      style={{ "--widget-w": instance.w, "--widget-h": height } as React.CSSProperties}
     >
       {handles}
       <header className="widget-frame__header">
@@ -250,7 +249,7 @@ export function WidgetFrame({
               <div className="widget-frame__full" data-widget={instance.widget_key}>
                 <FrameBoundary fallback={<FunctionalState state="error" />}>
                   <Suspense fallback={<FunctionalState state="loading" />}>
-                    <Body instance={instance} full />
+                    <Body instance={instance} />
                   </Suspense>
                 </FrameBoundary>
               </div>
@@ -264,7 +263,7 @@ export function WidgetFrame({
           <HeaderSlot.Provider value={slot}>
             <FrameBoundary fallback={<FunctionalState state="error" />}>
               <Suspense fallback={<FunctionalState state="loading" />}>
-                <Body instance={instance} />
+                <Body instance={instance} compact={height <= 1} />
               </Suspense>
             </FrameBoundary>
           </HeaderSlot.Provider>

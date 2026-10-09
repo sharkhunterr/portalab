@@ -19,10 +19,19 @@ import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
 import "../product-art.css";
 
-/** 027: a widget product shows the widget itself, in miniature, with the member's own data. */
-function WidgetArt({ product }: { product: Product }) {
+/** 027: a widget product shows the widget itself, in miniature, with the member's own data — a look for a
+ * widget (#30) shows that widget wearing it. */
+function WidgetArt({
+  product,
+  widget,
+  config,
+}: {
+  product: Product;
+  widget?: string | undefined;
+  config?: Record<string, unknown> | undefined;
+}) {
   const catalog = useCatalog(true);
-  const key = text(product.preview as Preview, "widget");
+  const key = widget ?? text(product.preview as Preview, "widget");
   const entry = (catalog.data ?? []).find((e) => e.key === key);
   return (
     <span className="product-art__widget product-art__widget--live">
@@ -32,6 +41,7 @@ function WidgetArt({ product }: { product: Product }) {
           icon: entry?.widget.icon ?? product.icon,
           template: entry?.widget.template,
           component_id: entry?.widget.component_id,
+          config_defaults: config,
         }}
       />
     </span>
@@ -336,6 +346,9 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
     case "widget_option": {
       const option = text(preview, "option") ?? "";
       const [widget, setting] = option.split(":");
+      // 027 (#30): a look for a widget — the widget itself, wearing it
+      const look = setting?.startsWith("style=") ? setting.slice("style=".length) : null;
+      if (look && widget) return <WidgetArt product={product} widget={widget} config={{ style: look }} />;
       return (
         <span className="product-art__widget product-art__option">
           <span className="product-art__widget-head">
