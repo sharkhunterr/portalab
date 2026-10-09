@@ -55,3 +55,19 @@ def test_every_look_on_sale_is_one_its_widget_offers_and_back() -> None:
             on_sale.add((key, style))
     assert on_sale == offered
     assert all(w.config_defaults["style"] == "classic" for w in STYLED)
+
+
+def test_every_look_comes_in_a_pack_with_the_widget_it_needs() -> None:
+    """027 (#30): each look is also sold in packs (a theme pack takes its universe's), and a pack never holds
+    a look for a sold widget without that widget."""
+    from portalab.app.demo_shop import LOOK_NEEDS
+
+    looks = {p["key"] for p in SHOP if p["type"] == "widget_option" and ":style=" in p["payload"]["option"]}
+    packs = [p for p in SHOP if p["type"] == "bundle"]
+    in_packs = {key for pack in packs for key in pack["payload"]["products"]}
+    assert looks <= in_packs
+    for pack in packs:
+        contents = set(pack["payload"]["products"])
+        for look, widget in LOOK_NEEDS.items():
+            if look in contents:
+                assert widget in contents, (pack["key"], look)

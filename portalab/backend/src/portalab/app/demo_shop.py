@@ -1393,6 +1393,52 @@ UNIVERSE_EXTRAS = {
 }  # fmt: skip
 
 
+# 027 (#30): each universe's dashboard looks — its theme pack includes them (and the widget a look needs)
+UNIVERSE_LOOKS: dict[str, tuple[str, ...]] = {
+    "cyberpunk": ("opt_style_services_pulse", "opt_style_activity_live", "opt_style_stats_countup"),
+    "matrix": ("opt_style_activity_live", "opt_style_stats_countup", "opt_style_news_ticker"),
+    "futuristic": ("opt_style_progress_odometer", "opt_style_progress_chart", "opt_style_stats_countup"),
+    "neowave": ("opt_style_countdown_flip", "opt_style_services_pulse", "opt_style_continue_ambient"),
+    "plex": ("opt_style_continue_ambient", "opt_style_added_deck", "opt_style_wall_kenburns"),
+    "nostromo": ("opt_style_services_pulse", "opt_style_countdown_flip", "opt_style_activity_live"),
+    "alien": ("opt_style_services_pulse", "opt_style_stats_countup"),
+    "galaxy": ("opt_style_wall_kenburns", "opt_style_progress_odometer"),
+    "wizard": ("opt_style_daily_liquid", "opt_style_added_deck", "opt_style_clock_analog"),
+    "middleearth": ("opt_style_daily_liquid", "opt_style_wall_kenburns", "opt_style_clock_analog"),
+    "cozy": ("opt_style_continue_ambient", "opt_style_clock_analog", "opt_style_daily_liquid"),
+    "christmas": ("opt_style_countdown_flip", "opt_style_continue_ambient", "opt_style_added_deck"),
+    "vhs": ("opt_style_wall_kenburns", "opt_style_countdown_flip", "opt_style_news_ticker"),
+    "disco": ("opt_style_wall_kenburns", "opt_style_progress_odometer", "opt_style_activity_live"),
+    "sincity": ("opt_style_wall_kenburns", "opt_style_continue_ambient", "opt_style_news_ticker"),
+    "comic": ("opt_style_added_deck", "opt_style_progress_odometer", "opt_style_news_ticker"),
+    "manga": ("opt_style_added_deck", "opt_style_progress_odometer", "opt_style_activity_live"),
+    "heroes": ("opt_style_progress_odometer", "opt_style_services_pulse", "opt_style_added_deck"),
+    "cartoon": ("opt_style_daily_liquid", "opt_style_added_deck", "opt_style_progress_odometer"),
+    "horror": ("opt_style_services_pulse", "opt_style_continue_ambient"),
+    "halloween": ("opt_style_countdown_flip", "opt_style_daily_liquid", "opt_style_continue_ambient"),
+    "upsidedown": ("opt_style_services_pulse", "opt_style_continue_ambient", "opt_style_activity_live"),
+    "desert": ("opt_style_wall_kenburns", "opt_style_clock_analog"),
+    "minimal": ("opt_style_clock_analog", "opt_style_stats_countup", "opt_style_progress_chart"),
+    "nova": ("opt_style_progress_odometer", "opt_style_continue_ambient", "opt_style_news_ticker"),
+}
+# a look for a widget sold in the shop comes with that widget
+LOOK_NEEDS = {
+    "opt_style_clock_analog": "widget_clock",
+    "opt_style_countdown_flip": "widget_countdown",
+    "opt_style_wall_kenburns": "widget_poster_wall",
+}
+
+
+def with_widgets(looks: tuple[str, ...] | list[str]) -> list[str]:
+    """The looks, each preceded by the widget it needs when that widget is sold."""
+    out: list[str] = []
+    for look in looks:
+        if look in LOOK_NEEDS:
+            out.append(LOOK_NEEDS[look])
+        out.append(look)
+    return out
+
+
 def theme_looks(theme: str) -> list[str]:
     """The sold products a universe theme's own looks need (its notification style and entrance, ambience,
     celebration and level-up): the interface alone shows the free defaults instead, its theme pack has them."""
@@ -1413,12 +1459,20 @@ def theme_looks(theme: str) -> list[str]:
 
 for theme, items in UNIVERSES.items():
     en, fr, _, _ = THEME_TEXT[theme]
-    extras = [item for item in (*UNIVERSE_EXTRAS.get(theme, ()), *theme_looks(theme)) if item not in items]
+    extras = [
+        item
+        for item in (
+            *UNIVERSE_EXTRAS.get(theme, ()),
+            *theme_looks(theme),
+            *with_widgets(UNIVERSE_LOOKS.get(theme, ())),  # 027 (#30): its dashboard looks
+        )
+        if item not in items
+    ]
     contents = [f"theme_{theme}", *[item for item in items if item], *dict.fromkeys(extras)]
     level = max(THEME_RARITY[theme][2] or 0, 8)
     _p(f"ultimate_{theme}", "bundle", None, "legendary", f"{en} theme pack", f"Pack de thème {fr}",
-       f"The whole {en} theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge and its badges.",
-       f"Tout le thème {fr} : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau et ses badges.",
+       f"The whole {en} theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks.",
+       f"Tout le thème {fr} : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord.",
        {"products": contents}, collection="ultimate", icon="crown", featured=theme in ("wizard", "cyberpunk"),
        level=level + 4, supply=5)  # fmt: skip
 
@@ -1432,9 +1486,10 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Notifications néon, pluie néon, cadre néon et étoiles filantes.",
      ["notif_neon", "ambient_rain", "frame_neon", "effect_aurora"], "epic", 5),
     ("pack_cinephile", "Cinephile pack", "Pack Cinéphile",
-     "The poster wall widget, the Cinephile title, the Binge-watcher badge and the film backdrop banner.",
-     "Le widget mur d'affiches, le titre Cinéphile, le badge Binge-watcher et la bannière de film.",
-     ["widget_poster_wall", "title_cinephile", "badge_binge_watcher", "backdrop_banner"], "legendary", 10),
+     "The poster wall widget and its travelling camera, the ambient light of « Continue », the Cinephile title, the Binge-watcher badge and the film backdrop banner.",
+     "Le widget mur d'affiches et son travelling, la lumière d'ambiance de « Continuer », le titre Cinéphile, le badge Binge-watcher et la bannière de film.",
+     ["widget_poster_wall", "opt_style_wall_kenburns", "opt_style_continue_ambient", "title_cinephile",
+      "badge_binge_watcher", "backdrop_banner"], "legendary", 10),
     ("pack_profile_star", "Star profile pack", "Pack Profil star",
      "The starfield banner and background, the golden frame and the royal name style.",
      "La bannière et le fond étoilés, le cadre doré et le style de nom royal.",
@@ -1459,15 +1514,16 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Confettis, cœurs, bulles, pétales et pluie de pièces pour chaque récompense.",
      ["effect_confetti", "effect_hearts", "effect_bubbles", "effect_petals", "effect_coins"], "epic", 6),
     ("pack_statistics", "Statistician pack", "Pack Statisticien",
-     "Every Media statistic and every setting of « My statistics ».",
-     "Toutes les statistiques Médias et toutes les options de « Mes statistiques ».",
+     "Every Media statistic, every setting of « My statistics », its counting figures and the curves of « My progression ».",
+     "Toutes les statistiques Médias, toutes les options de « Mes statistiques », ses chiffres animés et les courbes de « Ma progression ».",
      ["stat_when", "stat_genres", "stat_people", "stat_decades", "stat_records", "stat_box_office",
       "stat_platforms", "opt_stats_area", "opt_stats_donut", "opt_stats_top", "opt_stats_year",
-      "opt_stats_all", "opt_stats_server"], "legendary", 8),
+      "opt_stats_all", "opt_stats_server", "opt_style_stats_countup", "opt_style_progress_chart"], "legendary", 8),
     ("pack_dashboard", "Dashboard pack", "Pack Tableau de bord",
-     "The calendar, top of the week, upcoming releases and coming-soon widgets.",
-     "Les widgets calendrier, top de la semaine, prochaines sorties et demandes bientôt là.",
-     ["widget_calendar", "widget_media_top", "widget_media_upcoming", "widget_my_soon"], "epic", 4),
+     "The calendar, top of the week, upcoming releases, coming-soon, next releases and playing-on-the-server widgets.",
+     "Les widgets calendrier, top de la semaine, sorties à venir, demandes bientôt là, prochaines sorties et en lecture sur le serveur.",
+     ["widget_calendar", "widget_media_top", "widget_media_upcoming", "widget_my_soon", "widget_next_releases",
+      "widget_server_playing"], "epic", 4),
     ("pack_animated_profile", "Living profile pack", "Pack Profil vivant",
      "An aurora background, the hologram frame, the rainbow name and the nebula banner.",
      "Un fond aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse.",
@@ -1487,10 +1543,10 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      ["notif_air", "notif_water", "notif_earth", "notif_fire", "level_elements", "levelup_elements",
       "badge_waterbender", "badge_airbender", "ambient_wind", "ambient_tide"], "legendary", 15),
     ("pack_retro", "Retro pack", "Pack Rétro",
-     "VHS notifications and ambience, pixel and VHS level badges, the arcade level-up, an 8-bit sky and two retro badges.",
-     "Notifications et ambiance VHS, badges de niveau pixel et VHS, passage de niveau arcade, ciel 8 bits et deux badges rétro.",
+     "VHS notifications and ambience, pixel and VHS level badges, the arcade level-up, an 8-bit sky, two retro badges and a countdown on flip digits.",
+     "Notifications et ambiance VHS, badges de niveau pixel et VHS, passage de niveau arcade, ciel 8 bits, deux badges rétro et un compte à rebours à palettes.",
      ["notif_vhs", "ambient_vhs", "level_pixel", "level_vhs", "levelup_arcade", "ambient_pixelsky",
-      "badge_rewinder", "badge_8bit_hero", "badge_root"], "epic", 6),
+      "badge_rewinder", "badge_8bit_hero", "badge_root", "widget_countdown", "opt_style_countdown_flip"], "epic", 6),
     ("pack_comics", "Comics pack", "Pack Comics",
      "KAPOW! notifications and level badge, the comic book level-up, manga panels and the POW banner.",
      "Notifications et badge de niveau KAPOW !, passage de niveau BD, cases de manga et bannière POW.",
@@ -1501,15 +1557,35 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      ["notif_blackhole", "notif_portal", "level_blackhole", "level_portal", "levelup_cosmic", "notif_saga"],
      "legendary", 16),
     ("pack_vhs", "VHS pack", "Pack VHS",
-     "Everything for the video store: VHS and bad-tracking notifications, the VHS ambience, banner, frame and name, the VHS and cassette level badges, the VHS level-up, the rewind celebration and two badges.",
-     "Tout pour le vidéoclub : notifications VHS et mauvais tracking, ambiance, bannière, cadre et nom VHS, badges de niveau VHS et cassette, passage de niveau VHS, célébration rembobinage et deux badges.",
+     "Everything for the video store: VHS and bad-tracking notifications, the VHS ambience, banner, frame and name, the VHS and cassette level badges, the VHS level-up, the rewind celebration, two badges and the poster wall with its travelling camera.",
+     "Tout pour le vidéoclub : notifications VHS et mauvais tracking, ambiance, bannière, cadre et nom VHS, badges de niveau VHS et cassette, passage de niveau VHS, célébration rembobinage, deux badges et le mur d'affiches avec son travelling.",
      ["notif_vhs", "notif_tracking", "ambient_vhs", "banner_vhs", "frame_vhs", "name_vhs", "level_vhs",
-      "level_cassette", "levelup_vhs", "effect_rewind", "badge_rewinder", "badge_be_kind_rewind"], "epic", 6),
+      "level_cassette", "levelup_vhs", "effect_rewind", "badge_rewinder", "badge_be_kind_rewind",
+      "widget_poster_wall", "opt_style_wall_kenburns"], "epic", 6),
     ("pack_nova", "Nova pack", "Pack Nova",
-     "A phone's look: island and morph notifications, the app-icon level badge, the sheet level-up, colour mesh, activity rings, the gradient name, bloom and bokeh.",
-     "Le style d'un téléphone : notifications îlot et métamorphose, badge de niveau icône d'app, passage de niveau en volet, dégradé fluide, anneaux d'activité, nom en dégradé, éclosion et bokeh.",
+     "A phone's look: island and morph notifications, the app-icon level badge, the sheet level-up, colour mesh, activity rings (and the odometer of « My progression »), the gradient name, bloom and bokeh.",
+     "Le style d'un téléphone : notifications îlot et métamorphose, badge de niveau icône d'app, passage de niveau en volet, dégradé fluide, anneaux d'activité (et le compteur animé de « Ma progression »), nom en dégradé, éclosion et bokeh.",
      ["notif_island", "notif_morph", "level_squircle", "levelup_nova", "banner_mesh", "frame_rings", "name_nova",
-      "effect_bloom", "ambient_bokeh"], "epic", 6),
+      "effect_bloom", "ambient_bokeh", "opt_style_progress_odometer"], "epic", 6),
+    # 027 (#30): packs of dashboard looks and widgets
+    ("pack_living_dashboard", "Living dashboard pack", "Pack Tableau de bord vivant",
+     "The dashboard comes alive: heartbeat services, the progression odometer, liquid objectives, the live community feed, the news carousel and counting statistics.",
+     "Le tableau de bord prend vie : services qui battent, compteur de progression, objectifs liquides, fil communautaire en direct, carrousel d'actualités et statistiques animées.",
+     ["opt_style_services_pulse", "opt_style_progress_odometer", "opt_style_daily_liquid", "opt_style_activity_live",
+      "opt_style_news_ticker", "opt_style_stats_countup"], "epic", 4),
+    ("pack_clockmaker", "Clockmaker pack", "Pack Horloger",
+     "The clock with its analog face and the countdown with its flip digits.",
+     "L'horloge et son cadran analogique, le compte à rebours et ses chiffres à palettes.",
+     ["widget_clock", "opt_style_clock_analog", "widget_countdown", "opt_style_countdown_flip"], "rare", None),
+    ("pack_dark_room", "Dark room pack", "Pack Salle obscure",
+     "The cinema on your dashboard: ambient light behind « Continue », card decks for what is new, released and requested, the poster wall with its travelling camera and the living wall.",
+     "Le cinéma sur votre tableau de bord : lumière d'ambiance pour « Continuer », piles de cartes pour les ajouts, sorties et demandes, le mur d'affiches et son travelling, et le mur vivant.",
+     ["opt_style_continue_ambient", "opt_style_added_deck", "opt_style_releases_deck", "opt_style_requested_deck",
+      "widget_poster_wall", "opt_style_wall_kenburns", "widget_living_wall"], "epic", 6),
+    ("pack_explorer", "Explorer pack", "Pack Explorateur",
+     "The widgets to discover: next releases with their countdown, a year ago, playing on the server and the living wall.",
+     "Les widgets pour découvrir : prochaines sorties et leur décompte, il y a un an, en lecture sur le serveur et le mur vivant.",
+     ["widget_next_releases", "widget_on_this_day", "widget_server_playing", "widget_living_wall"], "epic", 4),
 ):  # fmt: skip
     _p(key, "bundle", None, rarity, en, fr, about_en, about_fr, {"products": contents},
        collection="packs", icon="shop", featured=key == "pack_cinephile", level=level)  # fmt: skip
