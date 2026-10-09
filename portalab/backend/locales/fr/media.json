@@ -285,6 +285,8 @@
   "insights.scope.all": "Tout le serveur",
   "insights.scope.me": "Moi",
   "insights.sources.backfill": "Rattrapage en cours",
+  "insights.sources.behind": "Plus de nouvelles lectures",
+  "insights.sources.behindSince": "Sa dernière lecture date du {date}, alors que le serveur continue d’en enregistrer : vérifiez qu’il les reçoit toujours (redémarrez-le, ou vérifiez sa connexion au serveur).",
   "insights.sources.catchingUp": "Rattrapage en cours",
   "insights.sources.enrichNow": "Enrichir maintenant",
   "insights.sources.enriched": "Fiches TMDB : {done} sur {total} titres",

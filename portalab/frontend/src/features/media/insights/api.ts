@@ -119,6 +119,7 @@ export interface Source {
   backfilled_at: string | null;
   last_run_at: string | null;
   last_error: string | null;
+  behind_since?: string | null; // #24: a richest source no longer receiving plays, since its latest one
   progress: TaskProgress;
 }
 

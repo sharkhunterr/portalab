@@ -1021,6 +1021,7 @@ async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
             select(func.count()).where(MediaObject.kind.in_(ENRICHED_KINDS), MediaObject.status == "active")
         )
     tasks = await module.ingestor.progress.all()
+    behind = await module.ingestor.behind()  # 027 (#24): a richest source no longer receiving plays
     now = utc_now(module.clock)
 
     def live(task: str) -> dict[str, Any]:
@@ -1046,6 +1047,7 @@ async def insight_sources(_: Manager, module: Module) -> dict[str, Any]:
                 "backfilled_at": c.backfilled_at,
                 "last_run_at": c.last_run_at,
                 "last_error": c.last_error,
+                "behind_since": behind.get(c.service_id),
                 "progress": live(history_task(c.service_id)),
             }
             for c in sorted(cursors, key=lambda c: names.get(str(c.service_id), ""))

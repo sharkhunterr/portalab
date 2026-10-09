@@ -121,6 +121,15 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
                     item="e1",
                     title="Kassa",
                 ),
+                # #24: a play Tautulli missed (it was down) — Plex alone knows it
+                play(
+                    "p4",
+                    now - timedelta(days=1, hours=12),
+                    priority=10,
+                    item="102",
+                    title="Arrival",
+                    user="777",
+                ),
             ]
         ),
     )
@@ -156,7 +165,7 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     )
     media.provide(ACCOUNTS, tautulli, _Accounts())
 
-    assert await media.module.ingestor.run() == 7
+    assert await media.module.ingestor.run() == 8
     # 027: « sync now » of a history service from the services page reads its whole history over again
     reports: list[tuple[int, int | None]] = []
 
@@ -176,12 +185,13 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
         dune = await session.scalar(select(MediaObject.id).where(MediaObject.title == "Dune"))
         andor = await session.scalar(select(MediaObject.id).where(MediaObject.title == "Andor"))
     # backfilled over pages, then incremental
-    assert [c[1] for c in plex_history.calls] == [None, "2"] and cursors[
+    assert [c[1] for c in plex_history.calls] == [None, "2", "4"] and cursors[
         plex.service_id
     ].mode == "incremental"
     assert cursors[tautulli.service_id].backfilled_at is not None
-    # from Tautulli's first play on, Plex's rows of the same plays stop counting
+    # Plex's rows of the plays Tautulli also recorded stop counting (#24: per play, not from a date on)
     assert rows["p1"].counted and not rows["p2"].counted and not rows["p3"].counted
+    assert rows["p4"].counted  # Tautulli missed it: Plex's row still counts
     assert rows["t1"].counted and rows["t1"].object_id == dune == rows["p1"].work_id
     assert rows["t2"].work_id == andor  # an episode counts for its series (resolved through the Plex library)
     # Plex plays were attributed at once; Tautulli's wait for the account to be linked
@@ -198,8 +208,10 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     while await media.module.aggregator.run():
         pass
     server = (await client.get("/api/v1/media/insights", params={"scope": "all", "period": "30d"})).json()
-    assert server["manager"] and server["totals"]["plays"] == 5 and server["totals"]["members"] == 1
-    assert server["members"][0]["name"] == "zoe" and server["unattributed"] == 0
+    assert (
+        server["manager"] and server["totals"]["plays"] == 6 and server["totals"]["members"] == 1
+    )  # with Arrival (#24)
+    assert server["members"][0]["name"] == "zoe" and server["unattributed"] == 1  # the « 777 » account
     ran = await client.post("/api/v1/admin/media/insights/run", json={"what": "metadata"})
     assert ran.status_code == 202 and ran.json() == {"state": "scheduled"}
     assert (await client.post("/api/v1/admin/media/insights/run", json={"what": "x"})).status_code == 422
@@ -209,7 +221,7 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     assert not any(s["progress"]["running"] for s in sources["sources"])
     assert sorted((s["progress"]["done"], s["progress"]["total"]) for s in sources["sources"]) == [
         (3, 3),
-        (4, 4),
+        (5, 5),
     ]
     assert sources["metadata"]["eligible"] == 2 and sources["metadata"]["progress"]["running"] is False
 
@@ -565,3 +577,40 @@ async def test_recently_added_and_recent_releases(
     films = await _widget(media, "media.recent_releases").load(zoe, {"kind": "movie"}, ctx)
     assert [i["title"] for i in films.data["items"]] == ["Old film", "New film"]
     assert films.data["mode"] == "released"
+
+
+async def test_a_richest_source_that_stopped_receiving_plays_is_flagged(
+    media: MediaHarness, clock: FixedClock
+) -> None:
+    """#24: Tautulli silent for two days while Plex goes on: flagged behind, from its latest play."""
+    from uuid import uuid4
+
+    now = clock.now()
+    plex, tautulli = media.service(1, "plex"), media.service(2, "tautulli")
+    async with media.database.unit_of_work() as uow:
+        for service, priority, at in (
+            (tautulli, 20, now - timedelta(days=2)),
+            (plex, 10, now - timedelta(days=2, minutes=5)),
+            (plex, 10, now - timedelta(hours=1)),
+        ):
+            uow.session.add(
+                Activity(
+                    service_id=service.service_id,
+                    ref=str(uuid4()),
+                    family="plex",
+                    priority=priority,
+                    counted=True,
+                    external_user_id="1",
+                    kind="movie",
+                    title="Dune",
+                    ids={},
+                    started_at=at,
+                    watched_s=10.0,
+                    received_at=now,
+                )
+            )
+    assert await media.module.ingestor.behind() == {tautulli.service_id: now - timedelta(days=2)}
+    await media.module.ingestor.dedup("plex")
+    async with media.database.session() as session:
+        counted = sorted((a.priority, a.counted) for a in (await session.execute(select(Activity))).scalars())
+    assert counted == [(10, False), (10, True), (20, True)]  # the play Tautulli has, and the one it missed

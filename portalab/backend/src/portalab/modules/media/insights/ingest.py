@@ -19,9 +19,10 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, func, or_, select, update
+from sqlalchemy import and_, func, literal, or_, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from portalab.capabilities.media import ACTIVITY_HISTORY, ACTIVITY_KINDS, ActivityPage, SourceActivity, unwrap
 from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
@@ -91,6 +92,10 @@ async def attribute(session: AsyncSession, service_id: UUID, external_user_id: s
     ).all()
     await mark_days(session, (r[0] for r in rows))
     return len(rows)
+
+
+SAME_PLAY_BEFORE = timedelta(hours=12)  # a richer row starts at most this long before the same play's row
+BEHIND_AFTER = timedelta(hours=6)  # a richest source this far behind its family no longer receives plays
 
 
 class _Resolver:
@@ -481,33 +486,77 @@ class ActivityIngestor:
             ]
 
     async def dedup(self, family: str) -> None:
-        """Within a family, from the first play of the best source on, the other sources stop counting."""
+        """Within a family, a row is set aside only when a richer source recorded **the same play** (#24):
+        the same item (its id, the catalog object, or its title within its series), the same member when
+        both rows are attributed, and a start within the richer row's session (an hour before it, up to
+        three hours after it ended — Plex dates a play when it is marked watched). A play the richer source
+        missed (Tautulli down, not running yet) keeps counting."""
+        richer = aliased(Activity)
+        same_play = (
+            select(literal(1))
+            .where(
+                richer.family == Activity.family,
+                richer.priority > Activity.priority,
+                richer.started_at.between(
+                    Activity.started_at - SAME_PLAY_BEFORE, Activity.started_at + timedelta(hours=1)
+                ),
+                or_(
+                    richer.item_external_id == Activity.item_external_id,
+                    and_(richer.object_id.is_not(None), richer.object_id == Activity.object_id),
+                    and_(
+                        richer.title == Activity.title,
+                        func.coalesce(richer.parent_title, "") == func.coalesce(Activity.parent_title, ""),
+                    ),
+                ),
+                or_(richer.user_id.is_(None), Activity.user_id.is_(None), richer.user_id == Activity.user_id),
+                Activity.started_at
+                <= func.coalesce(richer.stopped_at, richer.started_at) + timedelta(hours=3),
+            )
+            .exists()
+        )
         async with self.database.unit_of_work() as uow:
             session = uow.session
-            best = await session.scalar(select(func.max(Activity.priority)).where(Activity.family == family))
-            if best is None:
-                return
-            coverage = await session.scalar(
-                select(func.min(Activity.started_at)).where(
-                    Activity.family == family, Activity.priority == best
-                )
-            )
-            superseded = and_(Activity.priority < best, Activity.started_at >= coverage)
             changed = (
                 await session.execute(
                     update(Activity)
                     .where(
                         Activity.family == family,
                         or_(
-                            and_(superseded, Activity.counted.is_(True)),
-                            and_(~superseded, Activity.counted.is_(False)),
+                            and_(same_play, Activity.counted.is_(True)),
+                            and_(~same_play, Activity.counted.is_(False)),
                         ),
                     )
-                    .values(counted=~superseded)
+                    .values(counted=~same_play)
                     .returning(Activity.started_at)
+                    .execution_options(synchronize_session=False)
                 )
             ).all()
             await mark_days(session, (r[0] for r in changed))
+
+    async def behind(self) -> dict[UUID, datetime]:
+        """#24: the richest source of a family that stopped receiving plays while another one goes on
+        (Tautulli no longer told by Plex): the date of its latest play, by service."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(
+                        Activity.service_id, Activity.family, Activity.priority, func.max(Activity.started_at)
+                    )
+                    .where(Activity.family.is_not(None))
+                    .group_by(Activity.service_id, Activity.family, Activity.priority)
+                )
+            ).all()
+        out: dict[UUID, datetime] = {}
+        for family in {r[1] for r in rows}:
+            members = [r for r in rows if r[1] == family]
+            if len(members) < 2:
+                continue
+            newest = max(r[3] for r in members)
+            best = max(r[2] for r in members)
+            for service_id, _, priority, latest in members:
+                if priority == best and newest - latest > BEHIND_AFTER:
+                    out[service_id] = latest
+        return out
 
     async def _failed(self, service_id: UUID, source: str, exc: Exception) -> None:
         await self.progress.set(history_task(service_id), utc_now(self.clock), running=False)

@@ -285,6 +285,8 @@
   "insights.scope.all": "Whole server",
   "insights.scope.me": "Me",
   "insights.sources.backfill": "Catching up",
+  "insights.sources.behind": "No new plays",
+  "insights.sources.behindSince": "Its latest play dates from {date}, while the server keeps recording plays: check that it still receives them (restart it, or check its connection to the server).",
   "insights.sources.catchingUp": "Catching up",
   "insights.sources.enrichNow": "Enrich now",
   "insights.sources.enriched": "TMDB details: {done} of {total} titles",

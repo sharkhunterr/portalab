@@ -46,6 +46,17 @@ function SourceState({ source }: { source: Source }) {
       </span>
     );
   }
+  if (source.behind_since) {
+    // #24: another source of the same server goes on recording plays (Tautulli no longer told by Plex)
+    return (
+      <span className="services-admin__name">
+        <StatusBadge tone="warn">{t("media:insights.sources.behind")}</StatusBadge>
+        <span className="admin-muted">
+          {t("media:insights.sources.behindSince", { date: format.dateTime(source.behind_since) })}
+        </span>
+      </span>
+    );
+  }
   if (source.mode === "backfill") {
     return (
       <span className="insights-source-state">
