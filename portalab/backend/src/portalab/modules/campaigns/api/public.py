@@ -103,5 +103,33 @@ async def campaign(_: Reader, key: str, module: Module) -> dict[str, Any]:
         "state": row.state,
         "timezone": row.timezone,
         "windows": [{"start_at": w.start_at.isoformat(), "end_at": w.end_at.isoformat()} for w in windows],
-        "modifiers": [{"value": m.value, "factor": m.factor} for m in definition.modifiers],
+        "modifiers": [_modifier(m) for m in definition.modifiers],
+        # 027: what else it brings — shop reductions, its own achievements and quests
+        "discounts": [
+            {"percent": d.percent, "products": len(d.products), "categories": list(d.categories)}
+            for d in definition.discounts
+        ],
+        "achievements": [_nested(n) for n in definition.achievements],
+        "quests": [_nested(n) for n in definition.quests],
     }
+
+
+def _modifier(m: Any) -> dict[str, Any]:
+    """A boost and what it applies to (kinds, genres, activities, titles); whom it targets stays private —
+    only whether it is for every member."""
+    when = m.when
+    return {
+        "value": m.value,
+        "factor": m.factor,
+        "kinds": list(when.media_kind),
+        "genres": list(when.genre),
+        "activities": list(when.activity),
+        "titles": list(when.title_contains),
+        "everyone": when.audience.kind == "all",
+    }
+
+
+def _nested(n: Any) -> dict[str, Any]:
+    definition = n.definition if isinstance(n.definition, dict) else {}
+    label = definition.get("label") or (definition.get("names") or {}).get("en") or n.key
+    return {"key": n.key, "label": str(label)}

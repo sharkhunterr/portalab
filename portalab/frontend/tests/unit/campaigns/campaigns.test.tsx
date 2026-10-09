@@ -18,6 +18,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { ActiveCampaignBanner } from "../../../src/features/campaigns/banner/ActiveCampaignBanner";
+import CampaignsPage from "../../../src/features/campaigns/CampaignsPage";
 import CampaignConsole from "../../../src/features/campaigns/console/CampaignConsole";
 import { useCampaignOverlay } from "../../../src/features/campaigns/presentation/CampaignPresentationProvider";
 import { json } from "../../support/fake-api";
@@ -132,5 +133,48 @@ describe("campaigns", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Simulate" }));
     expect(await screen.findByText(/horror_xp · xp ×2 — applies/)).toBeTruthy();
     expect(screen.getByText(/unknown attributes \(not applied\)/)).toBeTruthy();
+  });
+});
+
+describe("a campaign's page", () => {
+  it("says in words what the campaign brings: boosts and what they apply to, shop reductions", async () => {
+    fake.handler = () =>
+      json(200, {
+        key: "halloween",
+        name: "Halloween",
+        description: "Spooky",
+        state: "active",
+        timezone: "Europe/Paris",
+        windows: [],
+        modifiers: [
+          {
+            value: "xp",
+            factor: 2,
+            kinds: ["movie"],
+            genres: ["horror"],
+            activities: ["media.playback_finished", "custom.unknown"],
+            titles: [],
+            everyone: true,
+          },
+        ],
+        discounts: [{ percent: 20, products: 14, categories: [] }],
+        achievements: [{ key: "pumpkin_hunter", label: "Pumpkin hunter" }],
+        quests: [],
+      });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <RouterProvider
+          router={createMemoryRouter([{ path: "/campaigns/:key", element: <CampaignsPage /> }], {
+            initialEntries: ["/campaigns/halloween"],
+          })}
+        />
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByText("What it brings you")).toBeTruthy();
+    expect(screen.getByText(/on Movie · genres: horror · when you finish a film or an episode/)).toBeTruthy();
+    expect(screen.queryByText(/media\.playback_finished/)).toBeNull(); // never the technical name
+    expect(screen.getByText(/off 14 items in the shop/)).toBeTruthy();
+    expect(screen.getByText(/A special achievement to unlock/).textContent).toContain("Pumpkin hunter");
   });
 });

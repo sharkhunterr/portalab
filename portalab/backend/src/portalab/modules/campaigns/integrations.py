@@ -19,7 +19,7 @@ ACTIVE_WIDGET = WidgetDefinition(
     description_key="campaigns:widget.active.description",
     icon="sparkles",
     required_permission=READ,
-    size=SizeLimits(default=Size(4, 3), min=Size(3, 2), max=Size(12, 4)),
+    size=SizeLimits(default=Size(4, 3), min=Size(3, 1), max=Size(12, 4)),
     refresh=Refresh(mode="event", events=("campaign.started", "campaign.ended")),
     stale_after_s=600,
     component_id="campaigns.active",  # 027: a card per campaign — countdown and boosts

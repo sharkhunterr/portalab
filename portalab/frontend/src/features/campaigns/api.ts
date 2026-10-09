@@ -14,7 +14,19 @@ export interface CampaignView {
   state: string;
   timezone: string;
   windows: Array<{ start_at: string; end_at: string }>;
-  modifiers: Array<{ value: string; factor: number }>;
+  modifiers: Array<{
+    value: string;
+    factor: number;
+    kinds?: string[];
+    genres?: string[];
+    activities?: string[];
+    titles?: string[];
+    everyone?: boolean;
+  }>;
+  /** 027: shop reductions while it runs, and its own achievements and quests. */
+  discounts?: Array<{ percent: number; products: number; categories: string[] }>;
+  achievements?: Array<{ key: string; label: string }>;
+  quests?: Array<{ key: string; label: string }>;
 }
 
 export interface CampaignHistory {

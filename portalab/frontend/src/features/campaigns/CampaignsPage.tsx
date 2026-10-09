@@ -4,7 +4,7 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { EmptyState, Skeleton } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
-import { useActiveCampaigns, useCampaign } from "./api";
+import { type CampaignView, useActiveCampaigns, useCampaign } from "./api";
 import { WindowProgress } from "./WindowProgress";
 import "./campaigns.css";
 
@@ -66,17 +66,7 @@ function CampaignCard({
           </div>
         </header>
         {view.description ? <p className="campaign-card__pitch">{view.description}</p> : null}
-        {view.modifiers.length ? (
-          <ul className="campaign-boosts" aria-label={t("campaigns:page.boosts")}>
-            {view.modifiers.map((m) => (
-              <li key={`${m.value}-${m.factor}`} data-value={m.value}>
-                <Icon name={VALUE_ICONS[m.value] ?? "zap"} size={16} />
-                <strong>×{m.factor}</strong>
-                <span>{t(`gamification:value.${m.value}`)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <Brings view={view} />
       </div>
       <aside className="campaign-card__side">
         {until ? <Countdown endsAt={until} /> : null}
@@ -104,6 +94,94 @@ function CampaignCard({
         ) : null}
       </aside>
     </article>
+  );
+}
+
+/** 027: what the campaign brings, in words — each boost and what it applies to, the shop reductions, its
+ * own achievements and quests. */
+function Brings({ view }: { view: CampaignView }) {
+  const t = useT();
+  const discounts = view.discounts ?? [];
+  const achievements = view.achievements ?? [];
+  const quests = view.quests ?? [];
+  if (!view.modifiers.length && !discounts.length && !achievements.length && !quests.length) return null;
+  const kinds = (list: string[] = []) => list.map((k) => t(`media:kind.${k}`)).join(", ");
+  // what the member does, in words (« finish a film or an episode »), never the event's technical name
+  const activities = (list: string[]) => {
+    const words = list
+      .map((event) => {
+        const key = `page.activity.${event}`;
+        const text = t(`campaigns:${key}`);
+        return text === key ? null : text;
+      })
+      .filter(Boolean);
+    return words.length ? words.join(", ") : t("campaigns:page.activity.other");
+  };
+  return (
+    <section className="campaign-brings" aria-label={t("campaigns:page.brings")}>
+      <h3>{t("campaigns:page.brings")}</h3>
+      <ul>
+        {view.modifiers.map((m, index) => {
+          const scope = [
+            m.kinds?.length ? t("campaigns:page.on.kinds", { kinds: kinds(m.kinds) }) : null,
+            m.genres?.length ? t("campaigns:page.on.genres", { genres: m.genres.join(", ") }) : null,
+            m.activities?.length
+              ? t("campaigns:page.on.activities", { activities: activities(m.activities) })
+              : null,
+            m.titles?.length ? t("campaigns:page.on.titles", { titles: m.titles.join(", ") }) : null,
+          ].filter(Boolean);
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: a campaign may boost the same value twice
+            <li key={`${m.value}-${index}`} data-value={m.value}>
+              <span className="campaign-brings__badge">
+                <Icon name={VALUE_ICONS[m.value] ?? "zap"} size={16} />
+                <strong>×{m.factor}</strong> {t(`gamification:value.${m.value}`)}
+              </span>
+              <span className="campaign-brings__what">
+                {scope.length ? scope.join(" · ") : t("campaigns:page.on.everything")}
+                {m.everyone === false ? ` · ${t("campaigns:page.on.some")}` : ""}
+              </span>
+            </li>
+          );
+        })}
+        {discounts.map((d, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: reductions in order
+          <li key={`discount-${index}`} data-value="discount">
+            <span className="campaign-brings__badge">
+              <Icon name="shop" size={16} />
+              <strong>−{d.percent} %</strong>
+            </span>
+            <span className="campaign-brings__what">
+              {t("campaigns:page.discount", { count: d.products })}{" "}
+              <Link to="/marketplace">{t("campaigns:page.toShop")}</Link>
+            </span>
+          </li>
+        ))}
+        {achievements.length ? (
+          <li data-value="achievements">
+            <span className="campaign-brings__badge">
+              <Icon name="trophy" size={16} />
+              <strong>{achievements.length}</strong>
+            </span>
+            <span className="campaign-brings__what">
+              {t("campaigns:page.achievements", { count: achievements.length })} :{" "}
+              {achievements.map((a) => a.label).join(", ")}
+            </span>
+          </li>
+        ) : null}
+        {quests.length ? (
+          <li data-value="quests">
+            <span className="campaign-brings__badge">
+              <Icon name="target" size={16} />
+              <strong>{quests.length}</strong>
+            </span>
+            <span className="campaign-brings__what">
+              {t("campaigns:page.quests", { count: quests.length })} : {quests.map((q) => q.label).join(", ")}
+            </span>
+          </li>
+        ) : null}
+      </ul>
+    </section>
   );
 }
 

@@ -88,7 +88,9 @@ class Definitions:
     async def plan(
         self, session: AsyncSession, campaign: Campaign, definition: CampaignDefinition, now: datetime
     ) -> None:
-        """Future occurrences follow the version just published; started and past ones are kept."""
+        """Future occurrences follow the version just published; past ones are kept. The running one
+        (027) takes the new version's window around now — a moved end applies at once (an end moved
+        before now ends it now) — keeping its start."""
         await session.execute(
             delete(Occurrence).where(Occurrence.campaign_id == campaign.id, Occurrence.status == "planned")
         )
@@ -101,7 +103,10 @@ class Definitions:
                 select(Occurrence).where(Occurrence.campaign_id == campaign.id, Occurrence.status == "active")
             )
         ).scalar_one_or_none()
+        covering = None
         for window in expand(definition, self.resolve()):
+            if window.start_at <= now < window.end_at:
+                covering = window
             if window.end_at <= now or (window.start_at <= now and current is not None):
                 continue
             session.add(
@@ -114,6 +119,9 @@ class Definitions:
                     status="planned",
                 )
             )
+        if current is not None:
+            current.end_at = covering.end_at if covering is not None else max(now, current.start_at)
+            current.version = campaign.current_version
         await session.flush()
 
     async def create(

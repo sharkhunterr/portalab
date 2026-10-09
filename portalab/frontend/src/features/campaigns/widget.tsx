@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { CompactLine } from "../dashboard/widgets/compact";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
 import { WindowProgress } from "./WindowProgress";
 import "./campaigns.css";
@@ -20,7 +21,7 @@ const VALUE_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", co
 
 /** Dashboard widget ``campaigns.active`` (027 redesign): each running campaign as a small card — its
  * boosts in big, how long is left. */
-function CampaignsWidget({ payload }: WidgetProps) {
+function CampaignsWidget({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const data = (payload.data ?? {}) as {
@@ -46,6 +47,29 @@ function CampaignsWidget({ payload }: WidgetProps) {
           <span>{t("campaigns:widget.none")}</span>
         )}
       </div>
+    );
+  }
+  const first = items[0];
+  if (compact && first) {
+    // 027 (#36): the running campaign — what it boosts and how long is left
+    const left = first.ends_at ? (Date.parse(first.ends_at) - Date.now()) / 1000 : null;
+    return (
+      <CompactLine
+        to={first.route}
+        icon="star"
+        title={first.title}
+        detail={first.boosts
+          .map((boost) => `×${boost.factor} ${t(`gamification:value.${boost.value}`)}`)
+          .join(" · ")}
+        end={
+          left !== null ? (
+            <>
+              <Icon name="hourglass" size={12} />
+              {left > 0 ? format.relative(left) : t("campaigns:page.ended")}
+            </>
+          ) : null
+        }
+      />
     );
   }
   return (
