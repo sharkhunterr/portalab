@@ -23,6 +23,7 @@ from uuid import UUID
 from sqlalchemy import text
 
 from portalab.app import demo_economy
+from portalab.app.demo_history import seed_history
 from portalab.app.demo_shop import COLLECTIONS, RETIRED, SHOP, definition
 from portalab.app.wiring import Platform
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
@@ -44,11 +45,12 @@ log = get_logger("portalab.demo")
 MEMBERS = (("alice", "Alice Martin"), ("bruno", "Bruno Lefèvre"), ("chloe", "Chloé Dubois"))
 
 # Target progression (default curve: level n from 100*(n-1)^1.5 XP) — a portal that looks played.
+# the XP comes from each member's history (demo_history): the levels follow from their weeks on the portal
 PROGRESSION: dict[str, dict[str, int]] = {
-    "admin": {"xp": 900, "coins": 1500, "contribution": 3},  # level 5
-    "alice": {"xp": 1300, "coins": 1800, "contribution": 5},  # level 6
-    "bruno": {"xp": 600, "coins": 900, "contribution": 2},  # level 4
-    "chloe": {"xp": 260, "coins": 400, "contribution": 1},  # level 2
+    "admin": {"coins": 1500, "contribution": 3},
+    "alice": {"coins": 1800, "contribution": 5},
+    "bruno": {"coins": 900, "contribution": 2},
+    "chloe": {"coins": 400, "contribution": 1},
 }
 
 ACHIEVEMENTS: dict[str, dict[str, Any]] = {
@@ -397,6 +399,7 @@ class DemoSeeder:
         await self._step("wiki", self.wiki)
         await self._step("support", self.support)
         await self._step("notifications", self.notifications)
+        await self._step("progression history", self.history)
         await self._step("leaderboards", self.leaderboards)
         return self.report
 
@@ -502,6 +505,9 @@ class DemoSeeder:
                 )
                 granted += done is not None and not done.duplicate
         return f"{granted} new grants"
+
+    async def history(self) -> str:
+        return await seed_history(self.platform.gamification, self.people)
 
     async def unlock_achievements(self) -> str:
         rewards = self.platform.gamification.rewards

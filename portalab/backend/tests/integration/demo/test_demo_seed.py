@@ -66,6 +66,16 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
 
     progression = await platform.gamification.progression.progress(admin)
     assert progression.level >= 4 and progression.coins > 0
+    # #62: the level comes from weeks of history, day after day, not from one lump
+    async with database.session() as session:
+        days = await session.scalar(
+            text(
+                "SELECT count(DISTINCT occurred_at::date) FROM gamification.transactions "
+                "WHERE user_id = :u AND value = 'xp' AND delta > 0"
+            ),
+            {"u": admin},
+        )
+    assert days >= 20
 
     lines = users_file.read_text(encoding="utf-8").splitlines()
     assert [line.split("\t")[0] for line in lines] == [login for login, _ in MEMBERS]
