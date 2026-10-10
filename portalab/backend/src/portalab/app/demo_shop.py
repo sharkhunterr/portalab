@@ -1112,15 +1112,15 @@ for key, option, en, fr, rarity, price in (
 _p("opt_chart_network", "widget_option", 600, "epic", "Network traffic for « Chart »", "Trafic réseau pour « Graphique »",
    "The server's network traffic over time in your « Chart » — for those who take part.",
    "Le trafic réseau du serveur dans le temps, dans votre « Graphique » — pour ceux qui s'investissent.",
-   {"option": "health.chart:series=network"}, collection="widgets", icon="activity", contribution=80)  # fmt: skip
+   {"option": "health.chart:series=network"}, collection="widgets", icon="activity", contribution=30)  # fmt: skip
 _p("widget_server", "widget", 1500, "legendary", "Server widget", "Widget Serveur",
    "The server at a glance: processor, memory, temperature, network, uptime and what needs attention.",
    "Le serveur d'un coup d'œil : processeur, mémoire, température, réseau, temps de fonctionnement et ce qui demande attention.",
-   {"widget": "health.host"}, collection="widgets", icon="cpu", level=10, contribution=150)  # fmt: skip
+   {"widget": "health.host"}, collection="widgets", icon="cpu", level=10, contribution=30)  # fmt: skip
 _p("widget_containers", "widget", 2500, "legendary", "Containers widget", "Widget Conteneurs",
    "The server's containers: which run, which have an update, and what the server warns about.",
    "Les conteneurs du serveur : lesquels tournent, lesquels ont une mise à jour, et ce que le serveur signale.",
-   {"widget": "health.containers"}, collection="widgets", icon="package", level=15, contribution=300)  # fmt: skip
+   {"widget": "health.containers"}, collection="widgets", icon="package", level=15, contribution=30)  # fmt: skip
 
 # 027 (#30, #31): the widgets' other looks — the original one stays free; these are picked in a widget's
 # settings (« Visual ») once bought
@@ -1608,11 +1608,20 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
     _p(key, "bundle", None, rarity, en, fr, about_en, about_fr, {"products": contents},
        collection="packs", icon="shop", featured=key == "pack_cinephile", level=level)  # fmt: skip
 
+# #53: for those who give the most — the server's whole picture in one pack; it asks what its contents ask
+# (the same contribution minimum, the highest level), never more
+_p("pack_server_room", "bundle", None, "legendary", "Server room pack", "Pack Salle des serveurs",
+   "For the community's pillars: the « Server » and « Containers » widgets and every series of « Chart » (temperatures, network, storage over time, a week of history).",
+   "Pour les piliers de la communauté : les widgets « Serveur » et « Conteneurs » et toutes les séries du « Graphique » (températures, réseau, stockage dans le temps, une semaine d'historique).",
+   {"products": ["widget_server", "widget_containers", "opt_chart_network", "opt_chart_temperature",
+                 "opt_chart_storage", "opt_chart_week"]},
+   collection="packs", icon="server", level=15, contribution=30)  # fmt: skip
+
 # rarities stay rare: legendary for a handful of flagship items, the cheaper « rare » ones are common
 # 027: a handful of legendaries (the flagships), rare from 600 Coins, epic from 1000 — most of the shop common
 LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
-    "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal",
+    "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:
