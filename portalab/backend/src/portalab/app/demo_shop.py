@@ -1025,7 +1025,7 @@ _p("request_4k", "special_request", 1500, "epic", "A film in 4K", "Un film en 4K
        _field("subtitles", "choice", "Subtitles", "Sous-titres", ("French", "English", "Forced only", "None")),
        _field("notes", "textarea", "Anything else", "Autre chose"),
    ]},
-   collection="essentials", icon="clapperboard", featured=True, level=10, contribution=50, limit=(1, 30),
+   collection="essentials", icon="clapperboard", featured=True, level=10, contribution=10, limit=(1, 30),
    repeatable=True)  # fmt: skip
 for service, en, fr, group, about_en, about_fr in (
     (
