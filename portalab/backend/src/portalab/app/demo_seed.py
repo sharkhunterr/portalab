@@ -601,6 +601,7 @@ class DemoSeeder:
                     product["key"],
                     AvailabilityIn(supply=product["supply"], limit_count=limit[0], limit_days=limit[1]),
                     product["level"],
+                    product.get("contribution"),  # #59: never drop the contribution minimum
                 )
         retired = 0
         for key in RETIRED:

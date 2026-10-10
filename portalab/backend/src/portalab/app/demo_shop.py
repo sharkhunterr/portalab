@@ -1047,6 +1047,20 @@ _p("request_4k", "special_request", 1500, "epic", "A film in 4K", "Un film en 4K
    ]},
    collection="essentials", icon="clapperboard", featured=True, level=10, contribution=10, limit=(1, 30),
    repeatable=True)  # fmt: skip
+# #59: a TV channel of one's own on the Live TV (Tunarr) — costly, for the members who take part; an
+# administrator builds it by hand until Tunarr is automated
+_p("request_tv_channel", "special_request", 5000, "legendary", "Your own TV channel", "Votre chaîne TV",
+   "A Live TV channel built for you: its name, its theme and what it shows (films, series, a saga, a genre…), on a loop for everyone. An administrator sets it up within two weeks; declined, your Coins come back.",
+   "Une chaîne de la TV en direct créée pour vous : son nom, son thème et ce qu'elle diffuse (films, séries, une saga, un genre…), en boucle pour tout le monde. Un administrateur la met en place sous deux semaines ; refusée, vos Coins vous sont rendus.",
+   {"deadline_days": 14, "form": [
+       _field("name", "text", "Channel name", "Nom de la chaîne", required=True),
+       _field("theme", "choice", "Theme", "Thème", ("Films", "Series", "A saga", "A genre", "Cartoons", "Mixed")),
+       _field("content", "textarea", "What it shows (titles, saga, genre…)", "Ce qu'elle diffuse (titres, saga, genre…)", required=True),
+       _field("order", "choice", "Order", "Ordre", ("Shuffle", "In order", "By release date")),
+       _field("notes", "textarea", "Anything else", "Autre chose"),
+   ]},
+   collection="essentials", icon="tv", featured=True, level=15, contribution=30, limit=(1, 60),
+   repeatable=True)  # fmt: skip
 for service, en, fr, group, about_en, about_fr in (
     (
         "romm",
@@ -1694,6 +1708,7 @@ _p("pack_server_room", "bundle", None, "legendary", "Server room pack", "Pack Sa
 LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
+    "request_tv_channel",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:
