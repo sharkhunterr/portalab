@@ -54,4 +54,5 @@ async def test_level_ups(gm: GamHarness, client: AsyncClient) -> None:
         "coins": 0,
         "reserved_coins": 0,
         "achievements": 0,
+        "boost": None,  # #55: none bought
     }

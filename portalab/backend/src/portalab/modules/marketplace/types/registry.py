@@ -10,6 +10,7 @@ from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.dashboard import WidgetRegistry
+from portalab.capabilities.economy import PERKS
 from portalab.capabilities.marketplace import (
     ActivationResult,
     OwnershipView,
@@ -26,7 +27,17 @@ from portalab.core.permissions import PermissionRegistry
 OWNER = "module:marketplace"
 # 027: a request (special, service) is settled by the administrators — declined, its Coins come back
 NOT_REFUNDABLE = frozenset(
-    {"plugin", "access", "quota", "bundle", "project_launch", "special_request", "service_access"}
+    {
+        "plugin",
+        "access",
+        "quota",
+        "bundle",
+        "project_launch",
+        "special_request",
+        "service_access",
+        "streak_freeze",
+        "xp_boost",
+    }
 )
 
 
@@ -259,6 +270,48 @@ class ServiceAccessHandler(Owned):
             await self.requests.close_for(ownership)
 
 
+class StreakFreezeHandler(Owned):
+    """``streak_freeze`` (#54): ``payload.count`` freezes, each covering one missed day of the owner's play
+    streak — used automatically by Gamification. Consumed, not refundable (sold ``repeatable``)."""
+
+    def __init__(self, capabilities: CapabilityRegistry) -> None:
+        self.capabilities = capabilities
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        count = int(ownership.payload.get("count", 1) or 0)
+        if count <= 0:
+            return ActivationResult("incompatible", "no freeze")
+        perks = _port(self.capabilities, PERKS)
+        if perks is None:
+            return ActivationResult("failed", "gamification unavailable")
+        await perks.grant_freezes(ownership.user_id, min(count, 30), f"marketplace:{ownership.id}")
+        return ActivationResult("active")
+
+
+class BoostHandler(Owned):
+    """``xp_boost`` (#55): multiplies the owner's gains (``payload.values``, XP by default) by
+    ``payload.factor`` for ``payload.hours`` — after the boost already running, if any. Under the
+    economy's global boost cap, like campaigns and streaks."""
+
+    def __init__(self, capabilities: CapabilityRegistry) -> None:
+        self.capabilities = capabilities
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        try:
+            factor = float(ownership.payload.get("factor", 0) or 0)
+            hours = float(ownership.payload.get("hours", 0) or 0)
+        except (TypeError, ValueError):
+            return ActivationResult("incompatible", "invalid boost")
+        values = [str(v) for v in ownership.payload.get("values") or ["xp"] if v in ("xp", "coins")]
+        if factor <= 1 or hours <= 0 or not values:
+            return ActivationResult("incompatible", "invalid boost")
+        perks = _port(self.capabilities, PERKS)
+        if perks is None:
+            return ActivationResult("failed", "gamification unavailable")
+        await perks.grant_boost(ownership.user_id, factor, hours, values, f"marketplace:{ownership.id}")
+        return ActivationResult("active")
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
@@ -299,6 +352,9 @@ def register_builtin_types(
         # 027: requests the administrators handle: a special one (a film in 4K…) and a service's access
         ("special_request", SpecialRequestHandler(requests), ("form", "deadline_days")),
         ("service_access", ServiceAccessHandler(requests), ("service", "group", "deadline_days")),
+        # #54/#55: consumable perks for the play streak and the gains
+        ("streak_freeze", StreakFreezeHandler(capabilities), ("count",)),
+        ("xp_boost", BoostHandler(capabilities), ("factor", "hours", "values")),
     ):
         if registry.get(key) is None:
             registry.register(

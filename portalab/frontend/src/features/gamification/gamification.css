@@ -317,6 +317,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
+  flex-wrap: wrap;
   margin: 0;
 }
 .daily-objectives__count {
@@ -1359,4 +1360,96 @@
   .daily-objectives--compact .daily-reward {
     display: none;
   }
+}
+
+/* #55: a boost bought in the shop, wherever the level shows */
+.boost-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 18%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 45%, transparent);
+  color: inherit;
+  font-size: var(--font-size-xs);
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  animation: boost-glow 3s ease-in-out infinite;
+}
+.boost-tag svg,
+.boost-tag strong {
+  color: var(--rarity-epic, var(--color-accent));
+}
+.boost-tag strong {
+  font-variant-numeric: tabular-nums;
+}
+.boost-tag small {
+  color: var(--color-text-muted);
+}
+.boost-tag[data-variant="mini"] {
+  padding: 0.1rem 0.4rem;
+}
+@keyframes boost-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 45%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 70%, transparent),
+      0 0 10px color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 45%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boost-tag {
+    animation: none;
+  }
+}
+.widget-level__boosts li[data-boost="boost"],
+.widget-level__boosts li[data-boost="freeze"] {
+  padding: 0;
+  background: none;
+}
+.widget-level__boosts li[data-boost="freeze"] span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent-alt, var(--color-accent)) 14%, transparent);
+}
+/* #54/#55: the streak and the boost beside what the member earns */
+.gains-now {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-inline-size: 0;
+  font-size: var(--font-size-xs);
+}
+.gains-now__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rarity-legendary, var(--color-accent)) 18%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+.gains-now__streak > svg {
+  color: var(--rarity-legendary, var(--color-accent));
+}
+.gains-now__streak strong {
+  color: var(--color-accent);
+}
+.gains-now__streak span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  color: var(--color-text-muted);
+}
+.daily-objectives--compact .gains-now {
+  flex: none;
 }

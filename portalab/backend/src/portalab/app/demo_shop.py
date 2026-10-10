@@ -999,6 +999,26 @@ _p("quota_requests", "quota", 150, "common", "+5 media requests", "+5 demandes d
    {"kind": "media_requests", "units": 5}, collection="essentials", icon="inbox", limit=(2, 30),
    repeatable=True)  # fmt: skip
 
+# #54/#55: perks for the play streak and the gains — consumed, bought again and again (within limits)
+_p("streak_freeze_1", "streak_freeze", 120, "common", "Streak freeze", "Gel de série",
+   "A missed day no longer breaks your play streak: it is covered automatically, the multiplier goes on.",
+   "Un jour manqué ne casse plus votre série de jeu : il est couvert automatiquement, le multiplicateur continue.",
+   {"count": 1}, collection="essentials", icon="snowflake", limit=(4, 30), repeatable=True)  # fmt: skip
+_p("streak_freeze_3", "streak_freeze", 300, "rare", "Three streak freezes", "Trois gels de série",
+   "Three missed days covered — for holidays or a busy week. Cheaper than one by one.",
+   "Trois jours manqués couverts — pour les vacances ou une semaine chargée. Moins cher qu'un par un.",
+   {"count": 3}, collection="essentials", icon="snowflake", level=3, limit=(2, 30), repeatable=True)  # fmt: skip
+_p("boost_xp_15", "xp_boost", 200, "rare", "XP boost x1.5 — 24 h", "Boost d'XP x1,5 — 24 h",
+   "All the XP you earn is multiplied by 1.5 for 24 hours, on top of your streak and the events.",
+   "Toute l'XP gagnée est multipliée par 1,5 pendant 24 heures, en plus de votre série et des événements.",
+   {"factor": 1.5, "hours": 24, "values": ["xp"]}, collection="essentials", icon="rocket", featured=True,
+   limit=(3, 7), repeatable=True)  # fmt: skip
+_p("boost_xp_2", "xp_boost", 600, "epic", "XP boost x2 — 48 h", "Boost d'XP x2 — 48 h",
+   "Twice the XP for two days: the fastest way to the next level.",
+   "Deux fois plus d'XP pendant deux jours : le plus court chemin vers le niveau suivant.",
+   {"factor": 2, "hours": 48, "values": ["xp"]}, collection="essentials", icon="rocket", level=5,
+   limit=(1, 7), repeatable=True)  # fmt: skip
+
 
 # 027: requests the administrators handle — a film in 4K with one's wishes, a homelab service's access — kept
 # for members who take part (a minimum Contribution) and limited in time

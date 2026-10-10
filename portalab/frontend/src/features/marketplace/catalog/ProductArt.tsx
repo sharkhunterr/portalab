@@ -384,6 +384,22 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
           <span>{t("marketplace:art.requests")}</span>
         </span>
       );
+    case "xp_boost": // #55: the factor, big
+      return (
+        <span className="product-art__quota product-art__perk">
+          <Icon name="rocket" size={size === "sheet" ? 40 : size === "mini" ? 14 : 24} />
+          <strong>×{String(preview.factor ?? "")}</strong>
+          <span>{t("marketplace:art.boost", { hours: Number(preview.hours ?? 0) })}</span>
+        </span>
+      );
+    case "streak_freeze": // #54: how many days it covers
+      return (
+        <span className="product-art__quota product-art__perk">
+          <Icon name="snowflake" size={size === "sheet" ? 40 : size === "mini" ? 14 : 24} />
+          <strong>{String(preview.count ?? 1)}</strong>
+          <span>{t("marketplace:art.freeze", { count: Number(preview.count ?? 1) })}</span>
+        </span>
+      );
     case "widget":
       return <WidgetArt product={product} />;
     default:
@@ -418,7 +434,7 @@ export function ProductArt({ product, size = "card" }: { product: Product; size?
             <Icon name={TYPE_BADGE_ICON[product.type] ?? "shop"} size={12} />
             {t(`marketplace:type.${product.type}`)}
           </span>
-          {product.owned ? (
+          {product.owned && !product.repeatable ? (
             <span className="product-art__acquired">
               <Icon name="check" size={12} />
               {t("marketplace:product.owned")}

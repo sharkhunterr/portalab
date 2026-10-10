@@ -25,6 +25,7 @@ export const SOURCES: Record<string, { color: string; icon: string }> = {
   visits: { color: "var(--color-accent-alt)", icon: "home" },
   levels: { color: "var(--rarity-rare)", icon: "gift" },
   pace: { color: "var(--color-accent)", icon: "trending" },
+  boost: { color: "var(--rarity-epic)", icon: "rocket" }, // #55: a boost bought in the shop
   activity: { color: "var(--cal-news)", icon: "zap" },
   other: { color: "var(--cal-other)", icon: "sparkles" },
 };
@@ -105,6 +106,17 @@ export function GainSources() {
           {streak.next
             ? ` ${t("gamification:sources.nextTier", { days: streak.next.days - streak.days, multiplier: streak.next.multiplier })}`
             : ""}
+        </p>
+      ) : null}
+      {streak?.enabled && (streak.freezes || streak.last_frozen) ? (
+        <p className="gain-sources__streak" data-freeze="true">
+          <Icon name="snowflake" size={18} />
+          {streak.freezes
+            ? `${t("gamification:freeze.owned", { count: streak.freezes })} — ${t("gamification:freeze.hint")}`
+            : null}
+          {streak.last_frozen
+            ? ` ${t("gamification:freeze.used", { date: format.date(streak.last_frozen) })}`
+            : null}
         </p>
       ) : null}
       {data && !sources.length ? <p className="admin-muted">{t("gamification:sources.empty")}</p> : null}

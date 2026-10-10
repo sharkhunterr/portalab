@@ -33,6 +33,7 @@ MODIFIERS = "economy.modifiers"
 DEFINITION_SOURCES = "economy.definition_sources"
 LEADERBOARDS = "economy.leaderboards"
 CATALOG = "economy.catalog"
+PERKS = "economy.perks"  # #54/#55: bought perks — streak freezes, XP boosts
 
 Value = Literal["xp", "contribution", "coins"]
 VALUES: tuple[Value, ...] = ("xp", "contribution", "coins")
@@ -189,6 +190,21 @@ class ModifierProvider(Protocol):
         ...
 
 
+@runtime_checkable
+class Perks(Protocol):
+    """#54/#55: what the shop sells to the economy — idempotent per ``source`` (the ownership)."""
+
+    async def grant_freezes(self, user: UUID, count: int, source: str) -> None:
+        """Streak freezes: each covers one missed day of a play streak, used automatically."""
+        ...
+
+    async def grant_boost(
+        self, user: UUID, factor: float, hours: float, values: Sequence[str], source: str
+    ) -> None:
+        """A gains boost for ``hours`` (queued after the member's boost in progress)."""
+        ...
+
+
 @dataclass(frozen=True, slots=True)
 class ExternalDefinition:
     """An achievement contributed by another module (e.g. a campaign), valid within its window."""
@@ -287,4 +303,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(DEFINITION_SOURCES, DefinitionSource, True, "Extra achievement definitions (Campaigns 014)"),
     _spec(LEADERBOARDS, LeaderboardReader, False, "Visibility-bound leaderboards (Gamification 013)"),
     _spec(CATALOG, GamificationCatalog, False, "Achievements and quests for presentation (Gamification 013)"),
+    _spec(PERKS, Perks, False, "Streak freezes and XP boosts bought in the shop (Gamification)"),
 )

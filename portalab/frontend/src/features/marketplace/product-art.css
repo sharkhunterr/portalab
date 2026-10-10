@@ -375,6 +375,10 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+.product-art__perk {
+  gap: 0.25rem;
+  color: var(--rarity);
+}
 .product-art__widget {
   display: grid;
   gap: 0.35rem;

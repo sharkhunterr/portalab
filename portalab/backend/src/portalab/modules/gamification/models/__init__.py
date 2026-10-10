@@ -9,8 +9,10 @@ from uuid import UUID
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     Date,
+    Float,
     ForeignKey,
     Identity,
     Index,
@@ -305,3 +307,32 @@ class StreakDay(GamificationBase):
 
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
     day: Mapped[date] = mapped_column(Date, primary_key=True)
+    # #54: a missed day covered by a streak freeze (the streak goes on)
+    frozen: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+
+
+class FreezeGrant(GamificationBase):
+    """#54: streak freezes bought (one row per purchase: ``source``); those available are the granted ones
+    less the days frozen."""
+
+    __tablename__ = "freeze_grants"
+
+    source: Mapped[str] = mapped_column(String(120), primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(nullable=False, index=True)
+    count: Mapped[int] = mapped_column(Integer, nullable=False)
+    granted_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Boost(GamificationBase):
+    """#55: a gains boost bought in the shop — ``factor`` on the listed values between its start and end
+    (a boost bought during another one starts when it ends)."""
+
+    __tablename__ = "boosts"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    source: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
+    user_id: Mapped[UUID] = mapped_column(nullable=False, index=True)
+    factor: Mapped[float] = mapped_column(Float, nullable=False)
+    gains: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    starts_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    ends_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

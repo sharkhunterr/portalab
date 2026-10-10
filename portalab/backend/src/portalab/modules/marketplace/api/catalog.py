@@ -112,6 +112,8 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "special_request": ("form", "deadline_days"),
     "service_access": ("service", "deadline_days"),
     "statistic": ("statistic",),
+    "streak_freeze": ("count",),  # #54/#55: the perk's effect, on its card
+    "xp_boost": ("factor", "hours", "values"),
 }
 
 

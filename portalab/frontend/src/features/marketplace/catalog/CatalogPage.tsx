@@ -6,6 +6,8 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { useProgression } from "../../gamification/api";
+import { BoostTag } from "../../gamification/boost";
 import { type Product, useDescribe, useProducts } from "../api";
 import { LazyArt } from "./LazyArt";
 import { Price, priceOf } from "./Price";
@@ -75,6 +77,7 @@ export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }>
       { key: "services", icon: "server", types: ["service_access"] }, // 027: a homelab service's access
       { key: "requests", icon: "clapperboard", types: ["special_request"] }, // 027: a film in 4K…
       { key: "community", icon: "lightbulb", types: ["project_launch"] },
+      { key: "perks", icon: "rocket", types: ["xp_boost", "streak_freeze"] }, // #54/#55
       { key: "bonus", icon: "inbox", types: ["quota", "feature", "plugin", "access"] },
     ],
   },
@@ -119,6 +122,12 @@ function shelfOrder(a: Product, b: Product): number {
   );
 }
 
+/** #54/#55: on the perks' shelf, the boost in progress (bought now, the next one starts after it). */
+function PerksNow() {
+  const boost = useProgression().data?.boost;
+  return boost ? <BoostTag boost={boost} /> : null;
+}
+
 function ShelfView({
   shelf,
   items,
@@ -136,6 +145,7 @@ function ShelfView({
       <h2 id={`shelf-${shelf.key}`} className="shop-shelf__title">
         <Icon name={shelf.icon} size={20} /> {t(`marketplace:shelf.${shelf.key}`)}
         <span className="shop-shelf__count">{items.length}</span>
+        {shelf.key === "perks" ? <PerksNow /> : null}
         {items.length > FIRST ? (
           <Button variant="ghost" className="shop-shelf__more" onClick={() => setAll(!all)}>
             {all ? t("marketplace:shop.less") : t("marketplace:shop.seeAll", { count: items.length })}
@@ -274,7 +284,7 @@ export default function CatalogPage() {
                   </Link>
                 </h3>
                 {describe(product) ? <p>{describe(product)}</p> : null}
-                {product.owned ? (
+                {product.owned && !product.repeatable ? (
                   <span className="product-card__owned">
                     <Icon name="check" size={16} /> {t("marketplace:product.owned")}
                   </span>

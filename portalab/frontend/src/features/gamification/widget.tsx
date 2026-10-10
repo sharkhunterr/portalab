@@ -1,7 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
-import { api } from "../../api/client";
-import type { components } from "../../api/generated/schema";
 import { levelProgress } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
@@ -9,37 +6,49 @@ import { useT } from "../../i18n/hooks/useT";
 import { useActiveCampaigns } from "../campaigns/api";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
 import { toQuestItem, useProgression } from "./api";
+import { BoostTag, GainsNow, useMyStreak } from "./boost";
+
+export { useMyStreak };
+
 import type { QuestItem } from "./quests/QuestList";
 import "./gamification.css";
 
 const VALUE_ICON: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
 
-export function useMyStreak() {
-  return useQuery({
-    queryKey: ["gamification", "my-streak"],
-    queryFn: async () => (await api.GET("/api/v1/me/streak")).data as components["schemas"]["MyStreakOut"],
-    staleTime: 60_000,
-  });
-}
-
 const factor = (value: number) => `×${Number(value.toFixed(2))}`;
 
-/** 027: what multiplies my gains right now — my play streak (with its multiplier) and the campaigns running
- * for me (what they boost); nothing when none is on. */
+/** 027: what multiplies my gains right now — my play streak (with its multiplier), the boost bought in the
+ * shop (#55), the campaigns running for me (what they boost), and the streak freezes I own (#54); nothing
+ * when none is on. */
 export function ProgressBoosts() {
   const t = useT();
   const streak = useMyStreak().data;
+  const boost = useProgression().data?.boost;
   const active = useActiveCampaigns().data;
   const campaigns = (Array.isArray(active) ? active : []).filter((c) => (c.boosts ?? []).length);
   const streaking = streak?.enabled && streak.days > 0;
-  if (!streaking && !campaigns.length) return null;
+  const freezes = streak?.enabled ? (streak.freezes ?? 0) : 0;
+  if (!streaking && !campaigns.length && !boost && !freezes) return null;
   return (
     <ul className="widget-level__boosts" aria-label={t("gamification:widget.progress.boosts")}>
+      {boost ? (
+        <li data-boost="boost">
+          <BoostTag boost={boost} />
+        </li>
+      ) : null}
       {streaking && streak ? (
         <li data-boost="streak" title={t("gamification:widget.progress.streak", { days: streak.days })}>
           <Icon name="flame" size={13} />
           {t("gamification:widget.progress.streak", { days: streak.days })}
           {streak.multiplier > 1 ? <strong>{factor(streak.multiplier)}</strong> : null}
+        </li>
+      ) : null}
+      {freezes ? (
+        <li data-boost="freeze" title={t("gamification:freeze.owned", { count: freezes })}>
+          <span>
+            <Icon name="snowflake" size={13} />
+            {t("gamification:freeze.owned", { count: freezes })}
+          </span>
         </li>
       ) : null}
       {campaigns.map((campaign) => (
@@ -153,6 +162,11 @@ function ProgressCompact({ payload }: WidgetProps) {
           {format.number(streak.days)}
         </span>
       ) : null}
+      {progression?.boost ? (
+        <span className="widget-level__streak" data-boost="boost">
+          <Icon name="rocket" size={13} />×{Number(progression.boost.factor.toFixed(2))}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -253,6 +267,7 @@ function DailyObjectivesWidget({ payload, compact }: WidgetProps) {
           <Icon name={all ? "trophy" : "target"} size={16} />
           {format.number(done)}/{format.number(quests.length)}
         </span>
+        <GainsNow mini />
         <span
           className="daily-objectives__track"
           role="progressbar"
@@ -276,6 +291,7 @@ function DailyObjectivesWidget({ payload, compact }: WidgetProps) {
           <Icon name={all ? "trophy" : "target"} size={16} />
           {t("gamification:daily.done", { done, count: quests.length })}
         </span>
+        <GainsNow />
         <span className="daily-reward" data-value="coins">
           <Icon name="coins" size={13} />
           {format.number(coins(quests.filter((q) => q.completed)))} / {format.number(coins(quests))}

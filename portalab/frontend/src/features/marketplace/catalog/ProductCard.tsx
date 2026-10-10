@@ -25,17 +25,19 @@ export function ProductCard({
   const Tag = as;
   const rarity = product.rarity ?? "common";
   const gear = useEquipment();
-  const worn = Boolean(product.owned && gear.equipped(product)); // 027: what the member wears now
+  // a consumable (boost, freeze, extra requests) is bought again and again: never shown as owned
+  const owned = Boolean(product.owned && !product.repeatable);
+  const worn = Boolean(owned && gear.equipped(product)); // 027: what the member wears now
   return (
     <Tag
       className="product-card"
       data-type={product.type}
       data-rarity={rarity}
-      data-owned={product.owned ? "true" : undefined}
+      data-owned={owned ? "true" : undefined}
       data-equipped={worn || undefined}
-      data-soldout={product.remaining === 0 && !product.owned ? "true" : undefined}
+      data-soldout={product.remaining === 0 && !owned ? "true" : undefined}
     >
-      {product.remaining === 0 && !product.owned ? (
+      {product.remaining === 0 && !owned ? (
         <span className="product-card__soldout">{t("marketplace:stock.soldOut")}</span>
       ) : null}
       {worn ? (
@@ -81,7 +83,7 @@ export function ProductCard({
           </span>
         ) : null}
         <div className="product-card__footer">
-          {product.owned && !worn && gear.wearable(product) ? (
+          {owned && !worn && gear.wearable(product) ? (
             <button
               type="button"
               className="product-card__equip"
@@ -94,7 +96,7 @@ export function ProductCard({
             >
               <Icon name="sparkles" size={14} /> {t("marketplace:equip.action")}
             </button>
-          ) : product.owned ? (
+          ) : owned ? (
             <span className="product-card__owned">
               <Icon name="check" size={16} />{" "}
               {t(worn ? "marketplace:equip.equipped" : "marketplace:product.owned")}

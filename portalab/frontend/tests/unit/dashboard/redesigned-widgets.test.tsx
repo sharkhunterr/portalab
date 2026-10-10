@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -16,7 +17,11 @@ function show(key: string, data: unknown) {
   expect(Widget).toBeDefined();
   const Component = Widget as NonNullable<typeof Widget>;
   const element: ReactElement = <Component payload={{ state: "available", data } as never} config={{}} />;
-  render(<RouterProvider router={createMemoryRouter([{ path: "/", element }])} />);
+  render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <RouterProvider router={createMemoryRouter([{ path: "/", element }])} />
+    </QueryClientProvider>,
+  );
 }
 
 describe("redesigned widgets", () => {

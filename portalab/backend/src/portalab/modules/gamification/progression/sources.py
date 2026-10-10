@@ -1,8 +1,8 @@
 """Where a member's gains come from (027, the progression page): every positive movement of a value over a
 period sorted into sources — what each action gave (by kind of action: media, shop, support, visits…),
 quests, achievements, level rewards, manual grants — and the **bonuses** on top of the actions' own amounts
-(play streaks, campaigns, the overall pace), split from each grant's recorded modifiers; per day and in all.
-Own data only."""
+(play streaks, campaigns, the overall pace, boosts bought in the shop), split from each grant's recorded
+modifiers; per day and in all. Own data only."""
 
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -40,6 +40,8 @@ def bonus_of(source_ref: str) -> str | None:
         return "campaigns"
     if source_ref == "pace":
         return "pace"
+    if source_ref.startswith("boost"):
+        return "boost"  # #55: a boost bought in the shop
     return None  # the rule's own multiplier stays with the action
 
 

@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { CoinBadge, LevelBadge, levelProgress, ProgressBar } from "../../design-system/components/Badges";
 import type { Progression } from "../../features/gamification/api";
+import { BoostTag } from "../../features/gamification/boost";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -39,6 +40,7 @@ export function ProgressChip({
           </span>
         )}
       </Link>
+      <BoostTag boost={progression.boost} variant={compact ? "mini" : "chip"} />
       {coins ? (
         <Link to="/progression" className="shell-progress__coins">
           <CoinBadge amount={progression.coins} label={strings.coins} locale={locale} />

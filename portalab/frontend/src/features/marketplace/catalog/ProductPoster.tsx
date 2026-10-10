@@ -26,6 +26,8 @@ export const TYPE_ICONS: Record<string, string> = {
   project_launch: "lightbulb",
   special_request: "clapperboard", // 027: a film in 4K, by hand
   service_access: "server", // 027: a homelab service's access
+  streak_freeze: "snowflake", // #54: a missed day of the play streak covered
+  xp_boost: "rocket", // #55: gains multiplied for a while
 };
 
 export function ProductPoster({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {

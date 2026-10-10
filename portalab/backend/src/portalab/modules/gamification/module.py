@@ -12,7 +12,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
-from portalab.capabilities.economy import CATALOG, ECONOMY, LEADERBOARDS, MODIFIERS, REWARDS
+from portalab.capabilities.economy import CATALOG, ECONOMY, LEADERBOARDS, MODIFIERS, PERKS, REWARDS
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -77,6 +77,7 @@ from portalab.modules.gamification.rules.store import RuleStore
 from portalab.modules.gamification.settings import SETTINGS, EconomyConfig
 from portalab.modules.gamification.streaks.level_rewards import CONSUMER as LEVEL_REWARDS
 from portalab.modules.gamification.streaks.level_rewards import LevelRewards
+from portalab.modules.gamification.streaks.perks import Perks
 from portalab.modules.gamification.streaks.service import Pace, Streaks
 from portalab.modules.gamification.verify.verifier import verify
 
@@ -84,7 +85,9 @@ OWNER = "module:gamification"
 INSTANCE = "gamification"
 STREAK_INSTANCE = "streak"
 PACE_INSTANCE = "pace"
+BOOST_INSTANCE = "boost"
 PURGE_JOB = "gamification.purge"
+FREEZE_JOB = "gamification.streak_freezes"  # #54: a missed day covered by a freeze
 LEADERBOARD_JOB = "gamification.leaderboards"  # snapshots older than refreshMinutes are rebuilt
 
 
@@ -161,6 +164,7 @@ class GamificationModule:
         self.progression = ProgressionService(database, self.levels, self.achievements.unlock_shares)
         self.streaks = Streaks(database, config)
         self.pace = Pace(config)
+        self.perks = Perks(database, self.streaks, clock=clock)
         self.level_rewards = LevelRewards(database, self.writer, capabilities, config)
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock
@@ -172,7 +176,11 @@ class GamificationModule:
             self.consumers.register(self.pipeline.consumer())
         if self.consumers.get(LEVEL_REWARDS) is None:
             self.consumers.register(self.level_rewards.consumer())
-        for instance, modifier in ((STREAK_INSTANCE, self.streaks), (PACE_INSTANCE, self.pace)):
+        for instance, modifier in (
+            (STREAK_INSTANCE, self.streaks),
+            (PACE_INSTANCE, self.pace),
+            (BOOST_INSTANCE, self.perks),
+        ):
             if not any(p.instance_ref == instance for p in self.capabilities.system_providers(MODIFIERS)):
                 self.capabilities.provide(MODIFIERS, modifier, instance_ref=instance, owner=OWNER)
         for name, provider in (
@@ -181,6 +189,7 @@ class GamificationModule:
             (PROGRESSION, self.progression),
             (CONTRIBUTIONS, self.rewards),
             (LEADERBOARDS, self.leaderboards),
+            (PERKS, self.perks),
             (CATALOG, CatalogFacade(self.achievements, self.progression, self.quests)),
         ):
             if not self.capabilities.system_providers(name):
@@ -240,12 +249,16 @@ class GamificationModule:
         async def leaderboards() -> None:
             await self.leaderboards.refresh()
 
+        async def freezes() -> None:
+            await self.perks.apply_freezes()
+
         return [
             self.start,
             register_periodic(jobs, self.database, PURGE_JOB, timedelta(hours=6), purge, owner=OWNER),
             register_periodic(
                 jobs, self.database, LEADERBOARD_JOB, timedelta(minutes=5), leaderboards, owner=OWNER
             ),
+            register_periodic(jobs, self.database, FREEZE_JOB, timedelta(hours=1), freezes, owner=OWNER),
         ]
 
     async def start(self) -> None:

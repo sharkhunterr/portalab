@@ -1942,6 +1942,40 @@
         "title": "AvailabilityIn",
         "type": "object"
       },
+      "BoostOut": {
+        "description": "#55: the member's gains boost in progress (``until``: the end of the boosts queued after it).",
+        "properties": {
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "factor": {
+            "title": "Factor",
+            "type": "number"
+          },
+          "gains": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Gains",
+            "type": "array"
+          },
+          "until": {
+            "format": "date-time",
+            "title": "Until",
+            "type": "string"
+          }
+        },
+        "required": [
+          "factor",
+          "gains",
+          "ends_at",
+          "until"
+        ],
+        "title": "BoostOut",
+        "type": "object"
+      },
       "BroadcastIn": {
         "additionalProperties": false,
         "properties": {
@@ -8545,6 +8579,23 @@
             "title": "Enabled",
             "type": "boolean"
           },
+          "freezes": {
+            "default": 0,
+            "title": "Freezes",
+            "type": "integer"
+          },
+          "last_frozen": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Frozen"
+          },
           "multiplier": {
             "title": "Multiplier",
             "type": "number"
@@ -10737,6 +10788,16 @@
           "achievements": {
             "title": "Achievements",
             "type": "integer"
+          },
+          "boost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BoostOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "coins": {
             "title": "Coins",

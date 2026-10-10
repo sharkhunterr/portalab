@@ -43,6 +43,15 @@ Me = Annotated[Principal, require(SELF)]
 Reader = Annotated[Principal, require(READ)]
 
 
+class BoostOut(BaseModel):
+    """#55: the member's gains boost in progress (``until``: the end of the boosts queued after it)."""
+
+    factor: float
+    gains: list[str]
+    ends_at: datetime
+    until: datetime
+
+
 class ProgressionOut(BaseModel):
     user_id: UUID
     xp: int
@@ -53,6 +62,7 @@ class ProgressionOut(BaseModel):
     coins: int
     reserved_coins: int
     achievements: int
+    boost: BoostOut | None = None  # only on the member's own progression
 
 
 class EconomyTransactionOut(BaseModel):
@@ -110,7 +120,10 @@ def _me(principal: Principal) -> UUID:
 
 @router.get("/me/progression", response_model=ProgressionOut)
 async def my_progression(principal: Me, module: Module) -> ProgressionOut:
-    return progression_out(await module.progression.progress(_me(principal)))
+    out = progression_out(await module.progression.progress(_me(principal)))
+    boost = (await module.perks.state(_me(principal)))["boost"]
+    out.boost = BoostOut.model_validate(boost) if boost else None
+    return out
 
 
 @router.get("/me/economy/transactions", response_model=EconomyTransactionPage)

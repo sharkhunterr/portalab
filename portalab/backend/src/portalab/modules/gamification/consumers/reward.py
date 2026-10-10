@@ -193,7 +193,20 @@ class RewardPipeline:
                     "reward",
                     user,
                     f"reward:{key}",
-                    {"value": value, "amount": verdict.amount, "rule": rule.key},
+                    {
+                        "value": value,
+                        "amount": verdict.amount,
+                        "rule": rule.key,
+                        # #55: a boost bought in the shop shows on each gain it multiplied
+                        "boost": next(
+                            (
+                                f"{float(m['factor']):g}"
+                                for m in combined.applied
+                                if str(m.get("source_ref", "")).startswith("boost:")
+                            ),
+                            "none",
+                        ),
+                    },
                 )
             )
             if recorded.level_up:

@@ -51,6 +51,9 @@ const TYPES = [
   // 027: requests the administrators handle (a film in 4K…) and a homelab service's access
   "special_request",
   "service_access",
+  // #54/#55: consumable perks — streak freezes and gains boosts
+  "streak_freeze",
+  "xp_boost",
 ] as const;
 /** 027: the designs each cosmetic type can sell (keys shared with the backend). */
 const DESIGNS: Partial<
@@ -508,6 +511,8 @@ export function NewProductDialog({
   const [packed, setPacked] = useState<string[]>([]);
   const [extra, setExtra] = useState("{}");
   const [deadline, setDeadline] = useState(7);
+  const [factor, setFactor] = useState(1.5);
+  const [hours, setHours] = useState(24);
   const [fields, setFields] = useState<FormFieldDraft[]>([
     { label: "", type: "text", options: "", required: true },
   ]);
@@ -539,6 +544,10 @@ export function NewProductDialog({
         return { deadline_days: deadline, form: formOf(fields) };
       case "service_access":
         return { deadline_days: deadline, service, ...(group.trim() ? { group: group.trim() } : {}) };
+      case "streak_freeze":
+        return { count: units };
+      case "xp_boost":
+        return { factor, hours, values: ["xp"] };
       default:
         {
           const designed = DESIGNS[type];
@@ -579,7 +588,10 @@ export function NewProductDialog({
             presentation,
             ...(() => {
               const body = availabilityBody(availability);
-              return { availability: body.availability, repeatable: type === "quota" };
+              return {
+                availability: body.availability,
+                repeatable: ["quota", "streak_freeze", "xp_boost"].includes(type),
+              };
             })(),
             version: {
               price_coins: price,
@@ -794,6 +806,37 @@ export function NewProductDialog({
               value={String(units)}
               onChange={(e) => setUnits(Number(e.target.value))}
             />
+          ) : null}
+          {type === "streak_freeze" ? (
+            <TextField
+              label={t("marketplace:admin.freezes")}
+              type="number"
+              min={1}
+              max={30}
+              value={String(units)}
+              onChange={(e) => setUnits(Number(e.target.value))}
+            />
+          ) : null}
+          {type === "xp_boost" ? (
+            <>
+              <TextField
+                label={t("marketplace:admin.boostFactor")}
+                type="number"
+                min={1.1}
+                max={5}
+                step={0.1}
+                value={String(factor)}
+                onChange={(e) => setFactor(Number(e.target.value))}
+              />
+              <TextField
+                label={t("marketplace:admin.boostHours")}
+                type="number"
+                min={1}
+                max={720}
+                value={String(hours)}
+                onChange={(e) => setHours(Number(e.target.value))}
+              />
+            </>
           ) : null}
           {type === "special_request" || type === "service_access" ? (
             <TextField

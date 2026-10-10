@@ -3,7 +3,7 @@ be rewarded (event types and their rewardable attributes), play streaks, level r
 progress over time (daily gains, the members who progress most, where the gains come from)."""
 
 import types
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import Annotated, Any, Literal, Union, get_args, get_origin
 from uuid import UUID
 
@@ -281,13 +281,18 @@ class MyStreakOut(BaseModel):
     days: int
     multiplier: float
     next: StreakNextOut | None
+    freezes: int = 0  # #54: freezes owned, each covering one missed day
+    last_frozen: date | None = None
 
 
 @router.get("/me/streak", response_model=MyStreakOut)
 async def my_streak(principal: Me, module: Module) -> MyStreakOut:
     """The member's play streak today (or yesterday's, still alive) and the next tier."""
     state = await module.streaks.current(_me(principal), utc_now(module.clock))
-    return MyStreakOut.model_validate(state)
+    perks = await module.perks.state(_me(principal))
+    return MyStreakOut.model_validate(
+        {**state, "freezes": perks["freezes"], "last_frozen": perks["last_frozen"]}
+    )
 
 
 class MemberPositionOut(BaseModel):

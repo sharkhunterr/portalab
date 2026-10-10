@@ -8832,6 +8832,26 @@ export interface components {
             /** Supply */
             supply?: number | null;
         };
+        /**
+         * BoostOut
+         * @description #55: the member's gains boost in progress (``until``: the end of the boosts queued after it).
+         */
+        BoostOut: {
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Factor */
+            factor: number;
+            /** Gains */
+            gains: string[];
+            /**
+             * Until
+             * Format: date-time
+             */
+            until: string;
+        };
         /** BroadcastIn */
         BroadcastIn: {
             /** Action Url */
@@ -11219,6 +11239,13 @@ export interface components {
             days: number;
             /** Enabled */
             enabled: boolean;
+            /**
+             * Freezes
+             * @default 0
+             */
+            freezes: number;
+            /** Last Frozen */
+            last_frozen?: string | null;
             /** Multiplier */
             multiplier: number;
             next: components["schemas"]["StreakNextOut"] | null;
@@ -12031,6 +12058,7 @@ export interface components {
         ProgressionOut: {
             /** Achievements */
             achievements: number;
+            boost?: components["schemas"]["BoostOut"] | null;
             /** Coins */
             coins: number;
             /** Contribution */

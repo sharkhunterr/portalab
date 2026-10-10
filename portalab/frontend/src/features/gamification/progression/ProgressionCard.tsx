@@ -3,6 +3,7 @@ import { StatFigure } from "../../../design-system/components/Collections";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Progression } from "../api";
+import { GainsNow } from "../boost";
 
 /**
  * Progression card (spec 013 T024): the Level derives from XP (progress bar toward the next level);
@@ -23,6 +24,7 @@ export function ProgressionCard({ progression }: { progression: Progression }) {
             value={levelProgress(progression.xp, progression.level_floor, next ?? null)}
             label={levelLabel}
           />
+          <GainsNow />
         </div>
       </div>
       <p id="gamification-next" className="gamification-meta">
