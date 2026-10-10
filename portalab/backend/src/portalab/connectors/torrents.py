@@ -26,6 +26,12 @@ from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.http_base import BaseConfig, HttpConnector, binding
 
 HASH_CHARS = frozenset("0123456789abcdef")
+
+
+class ClientError(ConnectionError):
+    """The client answered but refused the call (a JSON-RPC error): reachable, the message says why."""
+
+
 INFINITE_ETA = 8_640_000
 
 
@@ -202,6 +208,13 @@ class _TorrentConnector(HttpConnector):
                 compatible=False,
                 detail=f"Something answered at this address, but it is not {self.name}.",
             )
+        except ClientError as exc:
+            return TestResult(
+                ok=False,
+                reachable=True,
+                authenticated=True,
+                detail=f"{self.name} answered with an error: {exc}",
+            )
         except (ConnectionError, OSError):
             return TestResult(
                 ok=False,
@@ -344,7 +357,7 @@ class DelugeConnector(_TorrentConnector):
         if isinstance(error, Mapping):
             if int(error.get("code") or 0) == 1:  # « Not authenticated »
                 raise ProviderAuthError("the session expired")
-            raise ConnectionError(str(error.get("message") or "Deluge refused the call")[:200])
+            raise ClientError(str(error.get("message") or "Deluge refused the call")[:200])
         if method == "auth.login":
             return body["result"], response.headers
         return body["result"]
@@ -362,8 +375,17 @@ class DelugeConnector(_TorrentConnector):
                 await self.rpc(service, "web.connect", [hosts[0][0]])
 
     async def version(self, service: ServiceHandle) -> str:
-        info = await self.rpc(service, "daemon.info", [])
-        return f"Deluge {info}" if isinstance(info, str) else "Deluge"
+        # Deluge 2 replaced ``daemon.info`` by ``daemon.get_version``; neither is vital to the connection
+        for method in ("daemon.get_version", "daemon.info"):
+            try:
+                info = await self.rpc(service, method, [])
+            except ClientError:
+                continue
+            if isinstance(info, str) and info:
+                return f"Deluge {info}"
+        if not await self.rpc(service, "web.connected", []):
+            raise ClientError("the Web UI is not connected to a Deluge daemon (Connection Manager)")
+        return "Deluge"
 
     async def fetch(self, service: ServiceHandle, hashes: list[str]) -> list[TorrentState]:
         body = await self.rpc(service, "core.get_torrents_status", [{"id": hashes}, DELUGE_FIELDS])

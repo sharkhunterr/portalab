@@ -57,3 +57,53 @@ def test_hashes_and_queue() -> None:
     assert extra["download_id"] == HASH and extra["attention"] == "import_blocked"
     assert extra["messages"] == ("No files found are eligible for import",)
     assert queue_attention({"trackedDownloadState": "downloading"}) is None
+
+
+class _Answer:
+    def __init__(self, body: dict[str, object], headers: dict[str, str] | None = None) -> None:
+        self.status_code = 200
+        self.body = body
+        self.headers = headers or {}
+
+    def json(self) -> dict[str, object]:
+        return self.body
+
+
+class _Deluge2:
+    """A Deluge 2 Web UI: ``daemon.info`` is gone (``daemon.get_version`` instead)."""
+
+    def __init__(self, connected: bool = True) -> None:
+        self.connected = connected
+        self.calls: list[str] = []
+
+    async def request(self, method: str, path: str, **kwargs: object) -> _Answer:
+        call = kwargs["json"]
+        assert isinstance(call, dict)
+        name = str(call["method"])
+        self.calls.append(name)
+        if name == "auth.login":
+            return _Answer({"result": True, "error": None}, {"set-cookie": "_session_id=abc; Path=/json"})
+        if name == "web.connected":
+            return _Answer({"result": self.connected, "error": None})
+        if name == "web.get_hosts":
+            return _Answer({"result": [], "error": None})
+        if name == "daemon.get_version" and self.connected:
+            return _Answer({"result": "2.1.1", "error": None})
+        return _Answer({"result": None, "error": {"message": f"Unknown method {name}", "code": 2}})
+
+
+async def test_deluge_2_connects() -> None:
+    from uuid import uuid4
+
+    from portalab.capabilities.connector_sdk import ServiceHandle
+    from portalab.connectors.torrents import DelugeConnector
+
+    http = _Deluge2()
+    service = ServiceHandle(uuid4(), "Deluge", {}, {"password": "x"}, http)
+    result = await DelugeConnector().test_connection(service)
+    assert result.ok and result.detail == "Connected to Deluge 2.1.1."
+
+    # no daemon behind the Web UI: reachable and authenticated, the reason said
+    lonely = ServiceHandle(uuid4(), "Deluge", {}, {"password": "x"}, _Deluge2(connected=False))
+    result = await DelugeConnector().test_connection(lonely)
+    assert not result.ok and result.reachable and "daemon" in result.detail
