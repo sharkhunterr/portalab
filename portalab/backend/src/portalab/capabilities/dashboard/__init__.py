@@ -88,6 +88,9 @@ class WidgetDefinition:
     component_id: str | None = None  # first-party frontend component
     schema_version: int = 1
     product: str | None = None  # marketplace widget product (entitlement-gated, 015)
+    # #53: holders of this permission get the widget and its sold settings without buying them (the
+    # administrators for widgets about the servers — members buy them, often with a contribution minimum)
+    free_with: str | None = None
 
 
 def with_styles(definition: WidgetDefinition, *styles: str) -> WidgetDefinition:

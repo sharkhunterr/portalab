@@ -172,3 +172,48 @@ async def test_existing_widgets_and_settings_sold_in_the_shop(
     assert added.status_code == 201, added.text  # the buyer owns the setting too
     await login(client, "other")
     assert (await client.get("/api/v1/dashboard/locked-options")).json() == {"locked": ["t.sold:limit=9"]}
+
+
+class _StaffShop(_Shop):
+    async def sold(self, kind: str, field: str) -> frozenset[str]:
+        return frozenset(
+            {"t.staff"} if kind == "widget" else {"t.staff:limit=9"} if kind == "widget_option" else set()
+        )
+
+
+async def test_a_widget_sold_to_members_is_the_staffs_own(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """#53: a widget about the servers — sold to members (often with a contribution minimum), given with
+    its sold settings to the holders of a permission (the administrators)."""
+    from dataclasses import replace
+
+    from portalab.capabilities.themes import COSMETICS
+
+    dash.registry.register(replace(definition("t.staff"), free_with="staff.perm"), FakeWidget())
+    staff = await create_user(module_of(app), "staff")
+    await create_user(module_of(app), "member")
+    dash.full.identity.capabilities.provide(
+        COSMETICS, _StaffShop(set()), instance_ref="t", owner="module:marketplace"
+    )
+    authorizer = dash.module.service.gateway.authorizer
+    original = authorizer.is_allowed
+
+    async def is_allowed(principal, permission, *args, **kwargs):  # type: ignore[no-untyped-def]
+        if permission == "staff.perm":
+            return principal.user_id == staff
+        return await original(principal, permission, *args, **kwargs)
+
+    monkeypatch.setattr(authorizer, "is_allowed", is_allowed)
+    await login(client, "member")
+    gallery = {c["key"]: c["locked"] for c in (await client.get("/api/v1/dashboard/catalog")).json()}
+    assert gallery["t.staff"] is True  # in the shop for a member
+    assert (await client.get("/api/v1/dashboard/locked-options")).json() == {"locked": ["t.staff:limit=9"]}
+    await login(client, "staff")
+    gallery = {c["key"]: c["locked"] for c in (await client.get("/api/v1/dashboard/catalog")).json()}
+    assert gallery["t.staff"] is False
+    assert (await client.get("/api/v1/dashboard/locked-options")).json() == {"locked": []}
+    added = await client.post(
+        "/api/v1/dashboard/widgets", json={"widget_key": "t.staff", "config": {"limit": 9}}
+    )
+    assert added.status_code == 201, added.text

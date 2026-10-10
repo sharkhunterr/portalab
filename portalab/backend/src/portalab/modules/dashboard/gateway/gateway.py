@@ -97,6 +97,8 @@ class WidgetGateway:
             product = widget.definition.product
             if preview:
                 return True
+            if await self.free_for(widget.definition.free_with, principal):
+                return True  # #53: the staff's own (no purchase)
             if product is not None:
                 entitlements = self._provider(ENTITLEMENTS)
                 user = principal.acting_for or principal.user_id
@@ -114,6 +116,14 @@ class WidgetGateway:
             return False  # fail closed
         return True
 
+    async def free_for(self, permission: str | None, principal: Principal) -> bool:
+        if not permission:
+            return False
+        try:
+            return bool(await self.authorizer.is_allowed(principal, permission))
+        except Exception:
+            return False
+
     async def sold_widgets(self) -> frozenset[str]:
         """027: widget keys sold by available ``widget`` products (read at most every 10 s)."""
         return await self._sold("widget", "widget")
@@ -124,6 +134,12 @@ class WidgetGateway:
         sold = await self._sold("widget_option", "option")
         if not sold:
             return frozenset()
+        # #53: the settings of widgets given to a permission's holders are theirs too
+        for widget in self.registry.widgets():
+            free_with = widget.definition.free_with
+            if free_with and await self.free_for(free_with, principal):
+                prefix = f"{widget.definition.key}:"
+                sold = frozenset(option for option in sold if not option.startswith(prefix))
         shop = self._provider(COSMETICS)
         user = principal.acting_for or principal.user_id
         if shop is None or user is None:

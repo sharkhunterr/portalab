@@ -1098,15 +1098,29 @@ for key, option, en, fr, rarity, price in (
     ("opt_stats_server", "media.stats:scope=all", "Whole server for « My statistics »", "Tout le serveur pour « Mes statistiques »", "rare", 300),
     ("opt_requests_server", "media.recently_requested:scope=all", "Whole server for « Recently requested »", "Tout le serveur pour « Demandes récentes »", "rare", 250),
     # #52: « Chart » — CPU and memory are free; the other series and the week are sold
-    ("opt_chart_temperature", "health.chart:series=temperature", "Temperatures for « Chart »", "Températures pour « Graphique »", "rare", 300),
-    ("opt_chart_network", "health.chart:series=network", "Network traffic for « Chart »", "Trafic réseau pour « Graphique »", "rare", 300),
     ("opt_chart_storage", "health.chart:series=storage", "Storage over time for « Chart »", "Stockage dans le temps pour « Graphique »", "common", 200),
+    ("opt_chart_temperature", "health.chart:series=temperature", "Temperatures for « Chart »", "Températures pour « Graphique »", "rare", 300),
     ("opt_chart_week", "health.chart:range=7d", "A week of history for « Chart »", "Une semaine d'historique pour « Graphique »", "epic", 450),
 ):  # fmt: skip
     _p(key, "widget_option", price, rarity, en, fr,
        "One more setting for this dashboard widget — chosen in its settings once bought.",
        "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée.",
        {"option": option}, collection="widgets", icon="settings")  # fmt: skip
+
+# #53: what says much about the server — the administrators have it; members buy it, and only once they
+# have given to the community (a contribution minimum)
+_p("opt_chart_network", "widget_option", 600, "epic", "Network traffic for « Chart »", "Trafic réseau pour « Graphique »",
+   "The server's network traffic over time in your « Chart » — for those who take part.",
+   "Le trafic réseau du serveur dans le temps, dans votre « Graphique » — pour ceux qui s'investissent.",
+   {"option": "health.chart:series=network"}, collection="widgets", icon="activity", contribution=80)  # fmt: skip
+_p("widget_server", "widget", 1500, "legendary", "Server widget", "Widget Serveur",
+   "The server at a glance: processor, memory, temperature, network, uptime and what needs attention.",
+   "Le serveur d'un coup d'œil : processeur, mémoire, température, réseau, temps de fonctionnement et ce qui demande attention.",
+   {"widget": "health.host"}, collection="widgets", icon="cpu", level=10, contribution=150)  # fmt: skip
+_p("widget_containers", "widget", 2500, "legendary", "Containers widget", "Widget Conteneurs",
+   "The server's containers: which run, which have an update, and what the server warns about.",
+   "Les conteneurs du serveur : lesquels tournent, lesquels ont une mise à jour, et ce que le serveur signale.",
+   {"widget": "health.containers"}, collection="widgets", icon="package", level=15, contribution=300)  # fmt: skip
 
 # 027 (#30, #31): the widgets' other looks — the original one stays free; these are picked in a widget's
 # settings (« Visual ») once bought

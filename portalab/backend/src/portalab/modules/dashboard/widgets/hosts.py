@@ -1,11 +1,11 @@
 """Server widgets (#49 Glances, #50 Unraid), from the services' ``infrastructure.host`` providers:
 
 * ``health.host`` — the server at a glance: processor, memory, hottest sensor, network, uptime, what needs
-  attention (``infrastructure.read``);
+  attention (the administrators', else bought with a contribution minimum);
 * ``health.storage`` — how full the storage is: the whole, each disk and cache, the array and its parity
   check (any member: ``services.read`` — no names of containers or files);
 * ``health.containers`` — the containers: how many run, which have an update, the server's unread
-  notifications (``infrastructure.read``).
+  notifications (the administrators', else bought with a high contribution minimum).
 
 The server is the one chosen in the widget's settings, else the first that reports one (for the storage,
 the first with an array). Reports are kept a few seconds: several widgets ask at once."""
@@ -45,7 +45,12 @@ SERVICE_SETTING = {"service": {"type": "string", "maxLength": 64, "x-options": "
 
 
 def _definition(
-    key: str, icon: str, permission: str, default: Size, extra: Mapping[str, Any]
+    key: str,
+    icon: str,
+    permission: str,
+    default: Size,
+    extra: Mapping[str, Any],
+    free_with: str | None = None,
 ) -> WidgetDefinition:
     name = key.split(".")[1]
     return WidgetDefinition(
@@ -66,17 +71,22 @@ def _definition(
         stale_after_s=300,
         component_id=key,
         multiple=True,
+        free_with=free_with,
     )
 
 
-HOST = _definition("health.host", "cpu", INFRASTRUCTURE_READ, Size(6, 3), {})
+# #53: « Storage » (with the parity) and « Chart » (processor and memory) are every member's; « Server »
+# and « Containers » say much about the machine: the administrators' (``infrastructure.read``), else bought
+# in the shop with a contribution minimum — like the chart's other series
+HOST = _definition("health.host", "cpu", SERVICES_READ, Size(6, 3), {}, free_with=INFRASTRUCTURE_READ)
 STORAGE = _definition("health.storage", "database", SERVICES_READ, Size(6, 3), {})
 CONTAINERS = _definition(
     "health.containers",
     "package",
-    INFRASTRUCTURE_READ,
+    SERVICES_READ,
     Size(6, 3),
     {"show": {"enum": ["updates", "all", "stopped"]}},
+    free_with=INFRASTRUCTURE_READ,
 )
 
 
@@ -104,7 +114,8 @@ CHART = WidgetDefinition(
     title_key="dashboard:widget.chart.title",
     description_key="dashboard:widget.chart.description",
     icon="trending",
-    required_permission=INFRASTRUCTURE_READ,
+    required_permission=SERVICES_READ,
+    free_with=INFRASTRUCTURE_READ,  # the administrators get every series
     config_schema={
         "type": "object",
         "properties": {
