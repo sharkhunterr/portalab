@@ -160,6 +160,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <Community view="achievements" />,
               handle: h({ crumb: "Achievements" }),
             },
+            { path: "quests", element: <Community view="quests" />, handle: h({ crumb: "Quests" }) },
             { path: "events", element: <Community view="events" />, handle: h({ crumb: "Events" }) },
             { path: "proposals", element: <Community view="proposals" />, handle: h({ crumb: "Proposals" }) },
             {

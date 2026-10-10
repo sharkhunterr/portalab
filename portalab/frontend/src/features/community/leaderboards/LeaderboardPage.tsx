@@ -15,7 +15,7 @@ import {
 } from "../../gamification/leaderboards/Leaderboard";
 
 /** The first three on steps (027): second, first, third — avatar, name and score. */
-function Podium({ rows }: { rows: RankRow[] }) {
+export function Podium({ rows }: { rows: RankRow[] }) {
   const t = useT();
   const format = useFormat();
   const top = rows.filter((r) => r.rank <= 3).slice(0, 3);

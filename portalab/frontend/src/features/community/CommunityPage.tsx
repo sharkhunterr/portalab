@@ -3,25 +3,25 @@ import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { QuestBoard } from "./achievements/QuestBoard";
 import { Showcase } from "./achievements/Showcase";
-import { DiscoveryHome } from "./discovery/DiscoveryHome";
 import { EventList } from "./events/EventList";
 import { Feed } from "./feed/Feed";
 import { LeaderboardPage } from "./leaderboards/LeaderboardPage";
 import { Directory } from "./members/Directory";
+import { CommunityOverview } from "./overview/CommunityOverview";
 import { ProfilePage } from "./profile/ProfilePage";
 import { ProposalDetail } from "./projects/ProposalDetail";
 import { ProposalList } from "./projects/ProposalList";
 import "./community.css";
 import { PageHeader } from "../../design-system/components/PageHeader";
 
+// #63: the overview, then one tab per thing to look at; the activity, proposals and events stay reachable
+// from the overview's panels (and the calendar), without tabs of their own
 const TABS = [
   { to: "/community", key: "discover", end: true, icon: "compass" },
-  { to: "/community/members", key: "members", end: true, icon: "users" },
-  { to: "/community/feed", key: "feed", end: true, icon: "activity" },
-  { to: "/community/proposals", key: "proposals", end: false, icon: "lightbulb" },
   { to: "/community/leaderboards", key: "leaderboards", end: true, icon: "medal" },
+  { to: "/community/quests", key: "quests", end: true, icon: "target" },
   { to: "/community/achievements", key: "achievements", end: true, icon: "trophy" },
-  { to: "/community/events", key: "events", end: true, icon: "calendar" },
+  { to: "/community/members", key: "members", end: true, icon: "users" },
 ] as const;
 
 /** ``/community/*`` (spec 012, slice A): discovery, members, activity and events. */
@@ -35,6 +35,7 @@ export default function CommunityPage({
     | "feed"
     | "leaderboards"
     | "achievements"
+    | "quests"
     | "events"
     | "proposals"
     | "proposal";
@@ -54,16 +55,12 @@ export default function CommunityPage({
           </NavLink>
         ))}
       </nav>
-      {view === "discover" ? <DiscoveryHome /> : null}
+      {view === "discover" ? <CommunityOverview /> : null}
       {view === "members" ? <Directory /> : null}
       {view === "feed" ? <Feed /> : null}
       {view === "leaderboards" ? <LeaderboardPage /> : null}
-      {view === "achievements" ? (
-        <>
-          <Showcase />
-          <QuestBoard />
-        </>
-      ) : null}
+      {view === "achievements" ? <Showcase /> : null}
+      {view === "quests" ? <QuestBoard /> : null}
       {view === "events" ? <EventList /> : null}
       {view === "proposals" ? <ProposalList /> : null}
     </div>

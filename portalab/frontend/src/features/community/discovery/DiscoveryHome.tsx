@@ -113,16 +113,18 @@ function Shelf({ info }: { info: CommunityShelfInfo }) {
 
 /** ``/community`` (spec 012 T012; 027 redesign): discovery panels bound by the same visibility as their
  * sources — new faces first, then what needs support, the latest achievements and highlights. */
-export function DiscoveryHome() {
+export function DiscoveryHome({ without = [] }: { without?: string[] }) {
   const t = useT();
   const shelves = useShelves();
   return (
     <section aria-label={t("community:discovery.title")} className="ds-stack">
       {shelves.isError ? <FunctionalState state="unavailable" onRetry={() => shelves.refetch()} /> : null}
       <div className="community-shelves">
-        {(shelves.data ?? []).map((info) => (
-          <Shelf key={info.key} info={info} />
-        ))}
+        {(shelves.data ?? [])
+          .filter((info) => !without.includes(info.key))
+          .map((info) => (
+            <Shelf key={info.key} info={info} />
+          ))}
       </div>
     </section>
   );
