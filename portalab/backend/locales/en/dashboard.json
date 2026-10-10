@@ -209,6 +209,8 @@
   "title": "Dashboard",
   "toolbar": "Layout",
   "unavailableWidget": "This widget is no longer available.",
+  "unread": "{count, plural, one {# new} other {# new}}",
+  "unreadOne": "Not read yet",
   "view.desktop": "Computer",
   "view.phone": "Phone",
   "view.tablet": "Tablet",

@@ -138,3 +138,150 @@
 .content-diff [data-op="delete"] {
   text-decoration: line-through;
 }
+
+/* #48 — the Markdown editor: a mode switch, a toolbar, side by side on wide screens */
+.markdown-editor {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.markdown-editor:focus-within {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, var(--color-border));
+}
+.markdown-editor__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface-raised) 70%, var(--color-surface));
+}
+.markdown-editor__label {
+  font-weight: var(--font-weight-semibold);
+}
+.markdown-editor__modes {
+  display: inline-flex;
+  margin: 0;
+  padding: 3px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+.markdown-editor__modes button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.markdown-editor__modes button[aria-pressed="true"] {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+.markdown-editor__modes button:focus-visible,
+.markdown-editor__tool:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 1px;
+}
+/* side by side needs room: hidden on a phone */
+@media (max-width: 48rem) {
+  .markdown-editor__modes button[data-mode="split"] {
+    display: none;
+  }
+}
+.markdown-editor__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1) var(--space-2);
+  border-block-end: 1px solid var(--color-border);
+}
+.markdown-editor__tool {
+  display: grid;
+  place-items: center;
+  min-inline-size: 2.1rem;
+  block-size: 2.1rem;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.markdown-editor__tool:hover {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-text);
+}
+.markdown-editor__glyph {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+.markdown-editor__glyph[data-tool="italic"] {
+  font-style: italic;
+}
+.markdown-editor__glyph[data-tool="strike"] {
+  text-decoration: line-through;
+}
+.markdown-editor__sep {
+  inline-size: 1px;
+  block-size: 1.25rem;
+  margin-inline: var(--space-1);
+  background: var(--color-border);
+}
+.markdown-editor__panes {
+  display: grid;
+  min-block-size: 18rem;
+}
+.markdown-editor[data-mode="split"] .markdown-editor__panes {
+  grid-template-columns: 1fr 1fr;
+}
+.markdown-editor .markdown-editor__input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 18rem;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  line-height: 1.65;
+  resize: vertical;
+}
+.markdown-editor .markdown-editor__input:focus {
+  outline: none;
+}
+.markdown-editor__preview {
+  max-block-size: 36rem;
+  overflow: auto;
+  padding: var(--space-3) var(--space-4);
+}
+.markdown-editor[data-mode="split"] .markdown-editor__preview {
+  border-inline-start: 1px solid var(--color-border);
+}
+.markdown-editor__empty {
+  color: var(--color-text-muted);
+}
+.markdown-editor__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}

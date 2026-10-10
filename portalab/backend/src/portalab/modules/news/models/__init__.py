@@ -11,7 +11,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from portalab.core.db import TZDateTime, schema_metadata
 from portalab.core.ids import new_id
-from portalab.core.privacy_registry import not_personal
+from portalab.core.privacy_registry import not_personal, pii
 
 
 class NewsBase(DeclarativeBase):
@@ -106,6 +106,23 @@ class ArticleTranslation(NewsBase):
     renderer_version: Mapped[str] = mapped_column(String(8), nullable=False)
     state: Mapped[str] = mapped_column(String(14), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class ArticleRead(NewsBase):
+    """#48: a member opened a published article (the first time) — for the unread dot and the editors'
+    « who read it »."""
+
+    __tablename__ = "article_reads"
+    __table_args__ = (Index("ix_article_reads_user", "user_id"),)
+
+    article_id: Mapped[UUID] = mapped_column(
+        ForeignKey("news.articles.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[UUID] = mapped_column(primary_key=True, info=pii("activity"))
+    # the row is deleted with the member (``user_id`` is the personal part)
+    read_at: Mapped[datetime] = mapped_column(
+        TZDateTime, nullable=False, info=not_personal("when it was opened, deleted with the member")
+    )
 
 
 class NewsletterSchedule(NewsBase):

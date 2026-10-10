@@ -399,3 +399,113 @@
   block-size: 1.3rem;
   accent-color: var(--color-accent);
 }
+
+/* #48 — the editor's options, « Validate » and its choices, who read an article */
+.news-editor__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}
+.news-editor__switches {
+  display: grid;
+  gap: var(--space-1);
+}
+.news-editor__submit {
+  justify-content: flex-end;
+}
+.news-validate {
+  display: grid;
+  gap: var(--space-1);
+  inline-size: min(22rem, calc(100vw - 2rem));
+}
+.news-validate__title {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.news-validate__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.news-validate__option:hover,
+.news-validate__option[aria-expanded="true"] {
+  border-color: var(--color-border);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.news-validate__option > svg {
+  flex: none;
+  margin-block-start: 0.15rem;
+  color: var(--color-accent);
+}
+.news-validate__option > span {
+  display: grid;
+}
+.news-validate__option > span > span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.news-validate__when {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+.news-readers {
+  display: grid;
+  gap: var(--space-4);
+}
+.news-readers__summary {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+.news-readers__bar {
+  block-size: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.news-readers__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--xp-gradient);
+}
+.news-readers h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+.news-readers ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.news-readers li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.news-readers__name {
+  flex: 1;
+  min-inline-size: 0;
+}
+.news-readers li time {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.news-readers li[data-unread] {
+  opacity: 0.75;
+}
+.news-card[data-unread] .news-card__title {
+  font-weight: var(--font-weight-bold);
+}

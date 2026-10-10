@@ -177,6 +177,7 @@ class NewsWidget:
         )
         if not rows:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        read = await self.articles.read_ids(principal.user_id, [r.id for r in rows])  # #48: unread dots
         items = [
             {
                 "title": r.title,
@@ -184,10 +185,12 @@ class NewsWidget:
                 "meta": r.published_at.date().isoformat() if r.published_at else "",
                 "summary": r.summary,
                 "cover": str(r.category_id or r.slug),  # 027: the seed of its generated cover
+                "unread": principal.user_id is not None and r.id not in read,
             }
             for r in rows
         ]
-        return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
+        unread = sum(1 for item in items if item["unread"])
+        return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items, "unread": unread})
 
 
 def register_publish_action(articles: ArticleService, registry: ActionRegistry) -> None:

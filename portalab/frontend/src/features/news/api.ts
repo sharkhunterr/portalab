@@ -113,3 +113,34 @@ export function useNewsActions() {
   });
   return { save, publish, schedule, lifecycle, feature };
 }
+
+/** #48: the member opened an article — remembered once; the unread dots go away. */
+export function useMarkRead() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (slug: string) => {
+      await api.POST("/api/v1/news/{slug}/read", { params: { path: { slug } } });
+    },
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: KEY });
+      await client.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
+
+export type NewsReaders = components["schemas"]["NewsReadersOut"];
+
+/** #48: who read an article, and who has not yet (editors). */
+export function useReaders(articleId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: [...KEY, "readers", articleId],
+    enabled,
+    retry: false,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/admin/news/articles/{article_id}/readers", {
+          params: { path: { article_id: articleId } },
+        })
+      ).data as NewsReaders,
+  });
+}

@@ -1,17 +1,20 @@
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { type FormEvent, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { AdminPage, AdminTabs } from "../../design-system/admin/AdminKit";
+import { Avatar } from "../../design-system/components/Avatar";
 import { Button } from "../../design-system/components/Button";
 import { Card } from "../../design-system/components/Content";
-import { CheckboxField, SelectField, TextField } from "../../design-system/components/Field";
+import { SelectField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
-import { Popover } from "../../design-system/components/Overlays";
+import { Dialog, Popover } from "../../design-system/components/Overlays";
 import { EmptyState } from "../../design-system/components/Placeholders";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { Switch } from "../account/SettingsKit";
 import { MarkdownEditor } from "../content/MarkdownEditor";
-import { type NewsEditor, useEditorial, useNewsActions } from "./api";
+import { type NewsEditor, useEditorial, useNewsActions, useReaders } from "./api";
 import { Cover } from "./cover";
 import { ChannelsPanel, NewslettersPanel, useChannels } from "./NewsChannels";
 import "./news.css";
@@ -28,9 +31,103 @@ function documentLanguage(): string {
   return (typeof document !== "undefined" && document.documentElement.lang.split("-")[0]) || "en";
 }
 
+type Outcome = "draft" | "publish" | "schedule";
+
+/**
+ * #48: « Validate » asks what to do with it — keep it as a draft, publish it now, or publish it at a time
+ * (an already published article is simply saved).
+ */
+function ValidateMenu({
+  published,
+  busy,
+  onChoose,
+}: {
+  published: boolean;
+  busy: boolean;
+  onChoose: (outcome: Outcome, at?: string) => void;
+}) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
+  const [when, setWhen] = useState("");
+  if (published)
+    return (
+      <Button type="submit" disabled={busy}>
+        <Icon name="check" size={16} />
+        {t("news:admin.saveChanges")}
+      </Button>
+    );
+  const choose = (outcome: Outcome, at?: string) => {
+    setOpen(false);
+    setScheduling(false);
+    onChoose(outcome, at);
+  };
+  return (
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Trigger asChild>
+        <Button
+          disabled={busy}
+          onClick={(event) => {
+            const form = (event.currentTarget as HTMLButtonElement).form;
+            if (form && !form.reportValidity()) event.preventDefault();
+          }}
+        >
+          <Icon name="check" size={16} />
+          {t("news:admin.validate")}
+          <Icon name="chevron-down" size={16} />
+        </Button>
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content className="ds-popover news-validate" align="end" sideOffset={6}>
+          <p className="news-validate__title">{t("news:admin.validateTitle")}</p>
+          <button type="button" className="news-validate__option" onClick={() => choose("draft")}>
+            <Icon name="feather" size={18} />
+            <span>
+              <strong>{t("news:admin.asDraft")}</strong>
+              <span>{t("news:admin.asDraftHint")}</span>
+            </span>
+          </button>
+          <button type="button" className="news-validate__option" onClick={() => choose("publish")}>
+            <Icon name="rocket" size={18} />
+            <span>
+              <strong>{t("news:admin.publishNow")}</strong>
+              <span>{t("news:admin.publishNowHint")}</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="news-validate__option"
+            aria-expanded={scheduling}
+            onClick={() => setScheduling(!scheduling)}
+          >
+            <Icon name="calendar" size={18} />
+            <span>
+              <strong>{t("news:admin.scheduleIt")}</strong>
+              <span>{t("news:admin.scheduleItHint")}</span>
+            </span>
+          </button>
+          {scheduling ? (
+            <div className="news-validate__when">
+              <TextField
+                label={t("news:publishAt")}
+                type="datetime-local"
+                value={when}
+                onChange={(e) => setWhen(e.target.value)}
+              />
+              <Button disabled={!when} onClick={() => choose("schedule", new Date(when).toISOString())}>
+                {t("news:schedule")}
+              </Button>
+            </div>
+          ) : null}
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
+  );
+}
+
 function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () => void }) {
   const t = useT();
-  const { save } = useNewsActions();
+  const { save, publish, schedule, feature } = useNewsActions();
   const [title, setTitle] = useState(article?.title ?? "");
   const [summary, setSummary] = useState(article?.summary ?? "");
   const [body, setBody] = useState(article?.body_md ?? "");
@@ -38,11 +135,16 @@ function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () =>
   const channels = useChannels();
   const [category, setCategory] = useState(article?.category_id ?? "");
   const [email, setEmail] = useState(article?.email_on_publish ?? false);
+  const [featured, setFeatured] = useState(Boolean(article?.featured_from));
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   const chosen = (channels.data ?? []).find((c) => c.id === category);
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    save.mutate(
-      {
+  const published = article?.status === "published";
+  const run = async (outcome: Outcome, at?: string) => {
+    setBusy(true);
+    setFailed(false);
+    try {
+      const saved = await save.mutateAsync({
         ...(article ? { id: article.id } : {}),
         body: {
           title,
@@ -54,9 +156,21 @@ function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () =>
           language: documentLanguage(),
           ...(article ? { base_version: article.version } : {}),
         },
-      },
-      { onSuccess: onDone },
-    );
+      });
+      const id = saved?.id ?? article?.id;
+      if (id && featured !== Boolean(article?.featured_from)) await feature.mutateAsync({ id, on: featured });
+      if (id && outcome === "publish") await publish.mutateAsync(id);
+      if (id && outcome === "schedule" && at) await schedule.mutateAsync({ id, at });
+      onDone();
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    void run("draft");
   };
   return (
     <Card
@@ -87,46 +201,55 @@ function Editor({ article, onDone }: { article: NewsEditor | null; onDone: () =>
           onChange={setBody}
           ownerRef={article ? `portalab://news/${article.id}` : undefined}
         />
-        <SelectField
-          label={t("news:field.channel")}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">{t("news:field.noChannel")}</option>
-          {(channels.data ?? [])
-            .filter((c) => c.enabled)
-            .map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-                {c.newsletter ? ` · ${t("news:channels.byEmail")}` : ""}
-              </option>
-            ))}
-        </SelectField>
-        <CheckboxField
-          label={t("news:field.notify")}
-          checked={notify}
-          onChange={(e) => setNotify(e.target.checked)}
-        />
-        <CheckboxField
-          label={t("news:field.email")}
-          hint={
-            article?.emailed_at
-              ? t("news:field.emailed")
-              : chosen?.newsletter
-                ? t("news:field.emailHint", { channel: chosen.name })
-                : t("news:field.emailNeedsChannel")
-          }
-          checked={Boolean(chosen?.newsletter) && email}
-          disabled={!chosen?.newsletter || Boolean(article?.emailed_at)}
-          onChange={(e) => setEmail(e.target.checked)}
-        />
-        <div className="news-admin__actions">
-          <Button type="submit" disabled={save.isPending}>
-            <Icon name="check" size={16} />
-            {t("news:save")}
-          </Button>
+        <div className="news-editor__options">
+          <SelectField
+            label={t("news:field.channel")}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">{t("news:field.noChannel")}</option>
+            {(channels.data ?? [])
+              .filter((c) => c.enabled)
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                  {c.newsletter ? ` · ${t("news:channels.byEmail")}` : ""}
+                </option>
+              ))}
+          </SelectField>
+          <div className="news-editor__switches">
+            <Switch
+              label={t("news:field.featured")}
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+            />
+            <Switch
+              label={t("news:field.notify")}
+              checked={notify}
+              onChange={(e) => setNotify(e.target.checked)}
+            />
+            <Switch
+              label={t("news:field.email")}
+              checked={Boolean(chosen?.newsletter) && email}
+              disabled={!chosen?.newsletter || Boolean(article?.emailed_at)}
+              onChange={(e) => setEmail(e.target.checked)}
+            />
+            <p className="settings-muted">
+              {article?.emailed_at
+                ? t("news:field.emailed")
+                : chosen?.newsletter
+                  ? t("news:field.emailHint", { channel: chosen.name })
+                  : t("news:field.emailNeedsChannel")}
+            </p>
+          </div>
         </div>
-        {save.isError ? <p role="alert">{t("news:saveFailed")}</p> : null}
+        <div className="news-admin__actions news-editor__submit">
+          <Button variant="ghost" onClick={onDone}>
+            {t("news:admin.close")}
+          </Button>
+          <ValidateMenu published={published} busy={busy} onChoose={(outcome, at) => void run(outcome, at)} />
+        </div>
+        {failed ? <p role="alert">{t("news:saveFailed")}</p> : null}
       </form>
     </Card>
   );
@@ -162,6 +285,77 @@ function ScheduleButton({ article }: { article: NewsEditor }) {
         </Button>
       </div>
     </Popover>
+  );
+}
+
+/** #48: who read the article (and when), and who has not yet. */
+function ReadersButton({ article }: { article: NewsEditor }) {
+  const t = useT();
+  const format = useFormat();
+  const [open, setOpen] = useState(false);
+  const readers = useReaders(article.id, open);
+  const data = readers.data;
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+      title={t("news:readers.title", { title: article.title })}
+      closeLabel={t("news:readers.close")}
+      trigger={
+        <Button variant="ghost" title={t("news:readers.open")}>
+          <Icon name="eye" size={16} />
+          {t("news:readers.count", { count: article.reads ?? 0 })}
+          <span className="visually-hidden">: {article.title}</span>
+        </Button>
+      }
+    >
+      {readers.isPending ? <FunctionalState state="loading" /> : null}
+      {data ? (
+        <div className="news-readers">
+          <p className="news-readers__summary">
+            <strong>{t("news:readers.ratio", { read: data.read.length, total: data.members })}</strong>
+            <span className="news-readers__bar" aria-hidden="true">
+              <span style={{ width: `${data.members ? (100 * data.read.length) / data.members : 0}%` }} />
+            </span>
+          </p>
+          <section aria-labelledby="readers-read">
+            <h3 id="readers-read">{t("news:readers.read", { count: data.read.length })}</h3>
+            <ul>
+              {data.read.map((r) => (
+                <li key={r.user_id}>
+                  <Avatar
+                    name={r.name ?? "?"}
+                    userId={r.user_id}
+                    src={`/api/v1/users/${r.user_id}/avatar`}
+                    size="sm"
+                    decorative
+                  />
+                  <span className="news-readers__name">{r.name ?? t("news:readers.someone")}</span>
+                  {r.read_at ? <time dateTime={r.read_at}>{format.dateTime(r.read_at)}</time> : null}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section aria-labelledby="readers-unread">
+            <h3 id="readers-unread">{t("news:readers.unread", { count: data.unread.length })}</h3>
+            <ul>
+              {data.unread.map((r) => (
+                <li key={r.user_id} data-unread="true">
+                  <Avatar
+                    name={r.name ?? "?"}
+                    userId={r.user_id}
+                    src={`/api/v1/users/${r.user_id}/avatar`}
+                    size="sm"
+                    decorative
+                  />
+                  <span className="news-readers__name">{r.name ?? t("news:readers.someone")}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      ) : null}
+    </Dialog>
   );
 }
 
@@ -208,10 +402,15 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
           <>
             <Button onClick={() => publish.mutate(article.id)}>{t("news:publish")}</Button>
             <ScheduleButton article={article} />
+            <Button variant="ghost" onClick={() => feature.mutate({ id: article.id, on: !featured })}>
+              <Icon name="star" size={16} />
+              {featured ? t("news:unfeature") : t("news:feature")}
+            </Button>
           </>
         ) : null}
         {article.status === "published" ? (
           <>
+            <ReadersButton article={article} />
             <Link className="ds-button ds-button--ghost" to={`/news/${article.slug}`}>
               {t("news:admin.view")}
               <span className="visually-hidden">: {article.title}</span>

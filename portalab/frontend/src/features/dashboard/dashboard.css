@@ -2277,3 +2277,35 @@
 html[data-motion="none"] .widget-shuffle__track {
   animation: none;
 }
+
+/* #48 — what the member has not read yet: a dot on the line, a pill in the widget's header */
+.widget-unread__dot {
+  display: inline-block;
+  flex: none;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  margin-inline-end: 0.4rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  vertical-align: 0.1em;
+}
+.widget-unread {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+.widget-unread .widget-unread__dot {
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  box-shadow: none;
+}
+.widget-row[data-unread] .widget-row__title {
+  font-weight: var(--font-weight-semibold);
+}

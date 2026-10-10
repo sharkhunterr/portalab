@@ -8,6 +8,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { type NewsCard, useCategories, useFeatured, useNewsList } from "./api";
 import { Cover } from "./cover";
 import "./news.css";
+import { UnreadDot } from "../dashboard/templates/Templates";
 
 /**
  * News (spec 011 T020, 027 T095): a magazine page — the first featured article as a hero, the other
@@ -34,11 +35,12 @@ function ArticleCard({
   const category = categoryName(categories, item.category_id, t("news:uncategorized"));
   const age = item.published_at ? (Date.parse(item.published_at) - Date.now()) / 1000 : null;
   return (
-    <article className="news-card" data-hero={hero || undefined}>
+    <article className="news-card" data-hero={hero || undefined} data-unread={item.unread || undefined}>
       <Cover seed={item.category_id ?? item.slug} label={category} size={hero ? "lg" : "md"} />
       <div className="news-card__body">
         {hero ? <span className="news-card__kicker">{t("news:featured")}</span> : null}
         <h3 className="news-card__title">
+          {item.unread ? <UnreadDot /> : null}
           <Link to={`/news/${item.slug}`}>{item.title}</Link>
         </h3>
         {item.summary ? <p className="news-card__summary">{item.summary}</p> : null}

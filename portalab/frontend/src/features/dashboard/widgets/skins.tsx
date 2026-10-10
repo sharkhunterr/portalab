@@ -11,7 +11,7 @@ import { metadataImage } from "../../media/detail/Enrichment";
 import { Cover } from "../../news/cover";
 import "../../news/news.css";
 import { WidgetHeaderAction } from "../frame/actions";
-import { TEMPLATES } from "../templates/Templates";
+import { TEMPLATES, UnreadDot } from "../templates/Templates";
 import { TitleFacts } from "./facts";
 import { daysUntil } from "./layout";
 import { useCountUp, useLively } from "./motion";
@@ -376,7 +376,10 @@ function Carousel({ Original, ...props }: SkinProps) {
         <Cover seed={item.cover ?? item.title ?? ""} />
         <span className="skin-carousel__text">
           {date ? <small>{date}</small> : null}
-          <strong>{item.title}</strong>
+          <strong>
+            {(item as { unread?: boolean }).unread ? <UnreadDot /> : null}
+            {item.title}
+          </strong>
           {item.summary ? <span>{item.summary}</span> : null}
         </span>
       </Link>

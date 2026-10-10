@@ -59,6 +59,7 @@ class NewsCard(BaseModel):
     category_id: UUID | None
     published_at: datetime | None
     status: str
+    unread: bool = False  # #48: published and not opened yet by this member
 
 
 class NewsArticleOut(NewsCard):
@@ -82,6 +83,19 @@ class NewsEditorOut(NewsCard):
     emailed_at: datetime | None = None
     version: int
     publish_seq: int
+    reads: int = 0  # #48: members who opened it
+
+
+class NewsReaderOut(BaseModel):
+    user_id: UUID
+    name: str | None
+    read_at: datetime | None = None
+
+
+class NewsReadersOut(BaseModel):
+    read: list[NewsReaderOut]
+    unread: list[NewsReaderOut]
+    members: int
 
 
 class NewsListOut(BaseModel):
@@ -276,12 +290,21 @@ async def list_news(
     cursor: Annotated[str | None, Query(max_length=64)] = None,
 ) -> NewsListOut:
     rows, next_cursor = await module.articles.listing(principal, category=category, cursor=cursor)
-    return NewsListOut(items=[_card(r) for r in rows], next_cursor=next_cursor)
+    return NewsListOut(items=await _cards(module, principal, rows), next_cursor=next_cursor)
+
+
+async def _cards(module: NewsModule, principal: Principal, rows: list[Any]) -> list[NewsCard]:
+    """#48: the cards, each saying whether this member has opened it yet."""
+    read = await module.articles.read_ids(principal.user_id, [r.id for r in rows])
+    cards = [_card(r) for r in rows]
+    for card in cards:
+        card.unread = card.status == "published" and card.id not in read and principal.user_id is not None
+    return cards
 
 
 @router.get("/news/featured", response_model=list[NewsCard])
 async def featured(principal: Reader, module: Module) -> list[NewsCard]:
-    return [_card(r) for r in await module.articles.featured(principal)]
+    return await _cards(module, principal, await module.articles.featured(principal))
 
 
 @router.get("/news/categories", response_model=list[NewsCategoryOut])
@@ -312,6 +335,13 @@ async def article(
     )
 
 
+@router.post("/news/{slug}/read", status_code=status.HTTP_204_NO_CONTENT)
+async def read(principal: Reader, slug: str, module: Module) -> Response:
+    """#48: the member opened the article (remembered once)."""
+    await module.articles.mark_read(principal, slug)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 # --- editorial -------------------------------------------------------------------------------------------
 @router.get("/admin/news/articles", response_model=list[NewsEditorOut])
 async def editorial(
@@ -319,7 +349,18 @@ async def editorial(
     module: Module,
     status_filter: Annotated[str | None, Query(alias="status", max_length=12)] = None,
 ) -> list[NewsEditorOut]:
-    return [_editor(r) for r in await module.articles.editorial(principal, status_filter)]
+    rows = await module.articles.editorial(principal, status_filter)
+    counts = await module.articles.read_counts([r.id for r in rows])
+    out = [_editor(r) for r in rows]
+    for item in out:
+        item.reads = counts.get(item.id, 0)
+    return out
+
+
+@router.get("/admin/news/articles/{article_id}/readers", response_model=NewsReadersOut)
+async def readers(principal: Author, article_id: UUID, module: Module) -> NewsReadersOut:
+    """#48: who opened the article, and the members who have not yet."""
+    return NewsReadersOut.model_validate(await module.articles.readers(principal, article_id))
 
 
 @router.get("/admin/news/articles/{article_id}", response_model=NewsEditorOut)

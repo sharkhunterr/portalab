@@ -1987,6 +1987,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/news/articles/{article_id}/readers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Readers
+         * @description #48: who opened the article, and the members who have not yet.
+         */
+        get: operations["readers_api_v1_admin_news_articles__article_id__readers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/news/articles/{article_id}/schedule": {
         parameters: {
             query?: never;
@@ -6478,6 +6498,26 @@ export interface paths {
         get: operations["article_api_v1_news__slug__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/news/{slug}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read
+         * @description #48: the member opened the article (remembered once).
+         */
+        post: operations["read_api_v1_news__slug__read_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -11221,6 +11261,11 @@ export interface components {
             title: string;
             /** Translation Missing */
             translation_missing: boolean;
+            /**
+             * Unread
+             * @default false
+             */
+            unread: boolean;
         };
         /** NewsCard */
         NewsCard: {
@@ -11241,6 +11286,11 @@ export interface components {
             summary: string;
             /** Title */
             title: string;
+            /**
+             * Unread
+             * @default false
+             */
+            unread: boolean;
         };
         /** NewsCategoryIn */
         NewsCategoryIn: {
@@ -11340,6 +11390,11 @@ export interface components {
             publish_seq: number;
             /** Published At */
             published_at: string | null;
+            /**
+             * Reads
+             * @default 0
+             */
+            reads: number;
             /** Slug */
             slug: string;
             /** Status */
@@ -11348,6 +11403,11 @@ export interface components {
             summary: string;
             /** Title */
             title: string;
+            /**
+             * Unread
+             * @default false
+             */
+            unread: boolean;
             /** Version */
             version: number;
         };
@@ -11369,6 +11429,27 @@ export interface components {
             items: components["schemas"]["NewsCard"][];
             /** Next Cursor */
             next_cursor: string | null;
+        };
+        /** NewsReaderOut */
+        NewsReaderOut: {
+            /** Name */
+            name: string | null;
+            /** Read At */
+            read_at?: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** NewsReadersOut */
+        NewsReadersOut: {
+            /** Members */
+            members: number;
+            /** Read */
+            read: components["schemas"]["NewsReaderOut"][];
+            /** Unread */
+            unread: components["schemas"]["NewsReaderOut"][];
         };
         /** NewsScheduleIn */
         NewsScheduleIn: {
@@ -17999,6 +18080,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NewsEditorOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    readers_api_v1_admin_news_articles__article_id__readers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                article_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsReadersOut"];
                 };
             };
             /** @description Validation Error */
@@ -26631,6 +26743,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["NewsArticleOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_api_v1_news__slug__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

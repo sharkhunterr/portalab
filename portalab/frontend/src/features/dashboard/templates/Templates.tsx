@@ -83,6 +83,19 @@ function Thumb({ item, icon }: { item: Row; icon: string | null | undefined }) {
   ) : null;
 }
 
+/** #48: « not read yet » — a dot, said in words for screen readers. */
+export function UnreadDot() {
+  const t = useT();
+  return (
+    <span
+      className="widget-unread__dot"
+      role="img"
+      aria-label={t("dashboard:unreadOne")}
+      title={t("dashboard:unreadOne")}
+    />
+  );
+}
+
 function Row({ item, icon }: { item: Row; icon: string | null | undefined }) {
   const meta = useMeta();
   const stateLabel = useStateLabel();
@@ -94,7 +107,10 @@ function Row({ item, icon }: { item: Row; icon: string | null | undefined }) {
     <>
       <Thumb item={item} icon={icon} />
       <span className="widget-row__main">
-        <span className="widget-row__title">{text(item.title)}</span>
+        <span className="widget-row__title">
+          {item.unread === true ? <UnreadDot /> : null}
+          {text(item.title)}
+        </span>
         {details ? <span className="widget-row__meta">{details}</span> : null}
         {progress !== null ? (
           <span className="widget-row__progress" aria-hidden="true">
@@ -106,7 +122,11 @@ function Row({ item, icon }: { item: Row; icon: string | null | undefined }) {
       {to ? <Icon name="chevron-right" size={16} className="widget-row__chevron" /> : null}
     </>
   );
-  return <li className="widget-row">{to ? <Link to={to}>{body}</Link> : <span>{body}</span>}</li>;
+  return (
+    <li className="widget-row" data-unread={item.unread === true || undefined}>
+      {to ? <Link to={to}>{body}</Link> : <span>{body}</span>}
+    </li>
+  );
 }
 
 export function StatTemplate({ payload, icon }: WidgetProps) {

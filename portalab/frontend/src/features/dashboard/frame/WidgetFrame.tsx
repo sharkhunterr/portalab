@@ -18,7 +18,7 @@ import { keyOf } from "../edit/EditSession";
 import { TEMPLATES } from "../templates/Templates";
 import { useOffscreen } from "../widgets/motion";
 import { widgetComponent } from "../widgets/registry";
-import { HeaderSlot } from "./actions";
+import { HeaderSlot, WidgetHeaderAction } from "./actions";
 import { useEmptyReport } from "./emptiness";
 
 /**
@@ -88,6 +88,7 @@ function Body({ instance, rows }: { instance: Instance; rows?: number | undefine
         <FunctionalState state="stale" asOf={payload.as_of ? new Date(payload.as_of) : undefined} />
       ) : null}
       {payload.config_invalid ? <p className="widget__meta">{t("dashboard:configInvalid")}</p> : null}
+      <UnreadBadge data={payload.data} />
       {Rendered ? (
         <Rendered
           payload={payload}
@@ -284,5 +285,20 @@ export function WidgetFrame({
         )}
       </div>
     </section>
+  );
+}
+
+/** #48: a widget whose data counts what the member has not seen yet (``unread``) says it in its header. */
+function UnreadBadge({ data }: { data: unknown }) {
+  const t = useT();
+  const count = typeof data === "object" && data !== null ? (data as { unread?: unknown }).unread : undefined;
+  if (typeof count !== "number" || count <= 0) return null;
+  return (
+    <WidgetHeaderAction>
+      <span className="widget-unread" title={t("dashboard:unread", { count })}>
+        <span className="widget-unread__dot" aria-hidden="true" />
+        {t("dashboard:unread", { count })}
+      </span>
+    </WidgetHeaderAction>
   );
 }

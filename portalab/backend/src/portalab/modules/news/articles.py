@@ -17,11 +17,14 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import and_, func, or_, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.content.audience import Audience, can_read
 from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown
 from portalab.capabilities.i18n import normalize_for_search
+from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
+from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import (
     NOTIFY,
     AllAuthenticated,
@@ -38,7 +41,13 @@ from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.queue import enqueue
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
-from portalab.modules.news.models import Article, ArticleRevision, ArticleTranslation, Category
+from portalab.modules.news.models import (
+    Article,
+    ArticleRead,
+    ArticleRevision,
+    ArticleTranslation,
+    Category,
+)
 from portalab.modules.news.permissions import (
     NEWS_ARCHIVE,
     NEWS_CREATE,
@@ -444,6 +453,85 @@ class ArticleService:
                 )
             except Exception:
                 log.warning("news publication notification not sent")  # publishing is never blocked
+
+    # --- who read what (#48) ----------------------------------------------------------------------------
+    async def mark_read(self, viewer: Principal, key: str) -> bool:
+        """The member opened a published article: remembered the first time (later visits change nothing)."""
+        row = await self.get(key, viewer)
+        if row.status != "published" or viewer.user_id is None:
+            return False
+        async with self.database.unit_of_work() as uow:
+            done = await uow.session.execute(
+                insert(ArticleRead)
+                .values(article_id=row.id, user_id=viewer.user_id, read_at=utc_now(self.clock))
+                .on_conflict_do_nothing(index_elements=["article_id", "user_id"])
+            )
+        return bool(getattr(done, "rowcount", 0))
+
+    async def read_ids(self, user_id: UUID | None, article_ids: Sequence[UUID]) -> set[UUID]:
+        """Which of these articles the member has read."""
+        if user_id is None or not article_ids:
+            return set()
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(ArticleRead.article_id).where(
+                    ArticleRead.user_id == user_id, ArticleRead.article_id.in_(list(article_ids))
+                )
+            )
+            return set(rows.scalars())
+
+    async def read_counts(self, article_ids: Sequence[UUID]) -> dict[UUID, int]:
+        if not article_ids:
+            return {}
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(ArticleRead.article_id, func.count())
+                .where(ArticleRead.article_id.in_(list(article_ids)))
+                .group_by(ArticleRead.article_id)
+            )
+            return {article: int(count) for article, count in rows}
+
+    async def readers(self, actor: Principal, article_id: UUID) -> dict[str, Any]:
+        """For the editors: who opened the article (and when), and the active members who have not."""
+        if not await self.is_editor(actor):
+            raise Forbidden("You cannot manage news.")
+        async with self.database.session() as session:
+            row = await session.get(Article, article_id)
+            if row is None or row.status == "deleted":
+                raise ArticleNotFound("This article does not exist.")
+            reads = {
+                user: at
+                for user, at in await session.execute(
+                    select(ArticleRead.user_id, ArticleRead.read_at).where(
+                        ArticleRead.article_id == article_id
+                    )
+                )
+            }
+        contact = self.capabilities.system_providers(CONTACT)
+        members: list[UUID] = []
+        if contact:
+            try:
+                members = list(await contact[0].provider.active_user_ids())
+            except Exception:
+                members = []
+        directory = self.capabilities.system_providers(DIRECTORY)
+
+        async def name(user: UUID) -> str | None:
+            if not directory:
+                return None
+            try:
+                summary = await directory[0].provider.get_user_summary(user)
+            except Exception:
+                return None
+            return summary.display_name if summary is not None else None
+
+        read = [
+            {"user_id": str(user), "name": await name(user), "read_at": at.isoformat()}
+            for user, at in sorted(reads.items(), key=lambda item: item[1], reverse=True)
+        ]
+        unread = [{"user_id": str(user), "name": await name(user)} for user in members if user not in reads]
+        unread.sort(key=lambda item: (item["name"] or "").lower())
+        return {"read": read, "unread": unread, "members": len(set(members) | set(reads))}
 
     # --- reads ---------------------------------------------------------------------------------------
     async def by_key(self, key: str) -> Article | None:

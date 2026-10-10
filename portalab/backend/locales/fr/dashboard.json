@@ -209,6 +209,8 @@
   "title": "Tableau de bord",
   "toolbar": "Disposition",
   "unavailableWidget": "Ce widget n’est plus disponible.",
+  "unread": "{count, plural, one {# nouvelle} other {# nouvelles}}",
+  "unreadOne": "Pas encore lue",
   "view.desktop": "Ordinateur",
   "view.phone": "Mobile",
   "view.tablet": "Tablette",

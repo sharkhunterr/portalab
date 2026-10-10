@@ -8766,6 +8766,11 @@
           "translation_missing": {
             "title": "Translation Missing",
             "type": "boolean"
+          },
+          "unread": {
+            "default": false,
+            "title": "Unread",
+            "type": "boolean"
           }
         },
         "required": [
@@ -8832,6 +8837,11 @@
           "title": {
             "title": "Title",
             "type": "string"
+          },
+          "unread": {
+            "default": false,
+            "title": "Unread",
+            "type": "boolean"
           }
         },
         "required": [
@@ -9081,6 +9091,11 @@
             ],
             "title": "Published At"
           },
+          "reads": {
+            "default": 0,
+            "title": "Reads",
+            "type": "integer"
+          },
           "slug": {
             "title": "Slug",
             "type": "string"
@@ -9096,6 +9111,11 @@
           "title": {
             "title": "Title",
             "type": "string"
+          },
+          "unread": {
+            "default": false,
+            "title": "Unread",
+            "type": "boolean"
           },
           "version": {
             "title": "Version",
@@ -9187,6 +9207,73 @@
           "next_cursor"
         ],
         "title": "NewsListOut",
+        "type": "object"
+      },
+      "NewsReaderOut": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "name"
+        ],
+        "title": "NewsReaderOut",
+        "type": "object"
+      },
+      "NewsReadersOut": {
+        "properties": {
+          "members": {
+            "title": "Members",
+            "type": "integer"
+          },
+          "read": {
+            "items": {
+              "$ref": "#/components/schemas/NewsReaderOut"
+            },
+            "title": "Read",
+            "type": "array"
+          },
+          "unread": {
+            "items": {
+              "$ref": "#/components/schemas/NewsReaderOut"
+            },
+            "title": "Unread",
+            "type": "array"
+          }
+        },
+        "required": [
+          "read",
+          "unread",
+          "members"
+        ],
+        "title": "NewsReadersOut",
         "type": "object"
       },
       "NewsScheduleIn": {
@@ -21984,6 +22071,50 @@
         ]
       }
     },
+    "/api/v1/admin/news/articles/{article_id}/readers": {
+      "get": {
+        "description": "#48: who opened the article, and the members who have not yet.",
+        "operationId": "readers_api_v1_admin_news_articles__article_id__readers_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "article_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Article Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsReadersOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Readers",
+        "tags": [
+          "news"
+        ]
+      }
+    },
     "/api/v1/admin/news/articles/{article_id}/schedule": {
       "post": {
         "operationId": "schedule_api_v1_admin_news_articles__article_id__schedule_post",
@@ -34544,6 +34675,42 @@
           }
         },
         "summary": "Article",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/news/{slug}/read": {
+      "post": {
+        "description": "#48: the member opened the article (remembered once).",
+        "operationId": "read_api_v1_news__slug__read_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read",
         "tags": [
           "news"
         ]

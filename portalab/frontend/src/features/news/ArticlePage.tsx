@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import { Link, useParams } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
@@ -6,7 +6,7 @@ import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { SafeHtml } from "../content/SafeHtml";
-import { useArticle, useCategories } from "./api";
+import { useArticle, useCategories, useMarkRead } from "./api";
 import { Cover, readingMinutes } from "./cover";
 import "./news.css";
 
@@ -21,6 +21,15 @@ export function ArticlePage() {
   const { slug = "" } = useParams();
   const article = useArticle(slug);
   const categories = useCategories();
+  // #48: opening a published article counts as reading it (once — the server keeps the first time)
+  const markRead = useMarkRead();
+  const marked = useRef<string | null>(null);
+  const published = article.data?.status === "published";
+  useEffect(() => {
+    if (!published || marked.current === slug) return;
+    marked.current = slug;
+    markRead.mutate(slug);
+  }, [published, slug, markRead]);
   if (article.isPending) return <FunctionalState state="loading" />;
   if (article.isError || !article.data)
     return <FunctionalState state="unavailable" label={t("news:notFound")} />;
