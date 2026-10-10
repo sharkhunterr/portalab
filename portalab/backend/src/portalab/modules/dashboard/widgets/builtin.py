@@ -24,6 +24,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.service_events import STATUS_CHANGED
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.time import Clock, utc_now
+from portalab.modules.dashboard.widgets.hosts import register_host_widgets
 
 OWNER = "module:dashboard"
 SERVICES_READ = "services.read"
@@ -608,6 +609,7 @@ def register_builtin(
     clock: Clock | None = None,
 ) -> None:
     registry.register(WELCOME, WelcomeProvider(clock), owner=OWNER)
+    register_host_widgets(registry, capabilities, clock)  # #49/#50: servers (Glances, Unraid)
     services = ServicesSummaryProvider(capabilities, authorizer, clock)
     registry.register(SERVICES_SUMMARY, services, owner=OWNER)
     if registry.get(SERVICES_COMPACT.key) is None:

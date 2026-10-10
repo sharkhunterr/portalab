@@ -16,6 +16,7 @@ from portalab.capabilities.registry import CapabilitySpec
 
 HEALTH_PROBE = "service.health_probe"
 INFRA_METRICS = "infrastructure.metrics"
+INFRA_HOST = "infrastructure.host"  # #49/#50: a server's full picture (Glances, Unraid)
 SERVER_OPERATIONS = "server.operations"
 SERVICE_DIRECTORY = "connectors.directory"
 SERVICE_STATE = "health.service_state"
@@ -33,6 +34,9 @@ class ProbeResult:
     latency_ms: float | None = None
     detail: str = ""
     error_code: str | None = None  # stable code, e.g. "timeout", "http_503", "auth"
+    # #49/#50: the service answers but reports a problem (an array degraded, a disk in error, little space
+    # left): the service is « degraded », never counted as an outage
+    warning: str | None = None
 
 
 @runtime_checkable
@@ -56,6 +60,121 @@ class NotAvailable:
 @runtime_checkable
 class InfrastructureMetrics(Protocol):
     async def fetch(self, metrics: list[str]) -> Mapping[str, MetricValue | NotAvailable]: ...
+
+
+# --- a server's full picture (#49 Glances, #50 Unraid) ----------------------------------------------------
+@dataclass(frozen=True, slots=True)
+class Usage:
+    used: float  # bytes
+    total: float
+
+
+@dataclass(frozen=True, slots=True)
+class Volume:
+    """A file system, a disk of an array, a cache pool or a share."""
+
+    name: str
+    kind: str = "filesystem"  # filesystem | array | parity | disk | cache | boot | pool | share
+    used: float | None = None  # bytes
+    total: float | None = None
+    mount: str | None = None
+    state: str | None = None  # the device's state as the server says it (e.g. DISK_OK)
+    ok: bool = True
+    temperature: float | None = None  # °C
+    errors: int | None = None
+    spinning: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Sensor:
+    label: str
+    value: float
+    unit: str = "°C"
+    warning: float | None = None
+    critical: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Interface:
+    name: str
+    rx_bps: float | None = None  # bytes per second
+    tx_bps: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Container:
+    name: str
+    state: str  # running | exited | paused | …
+    image: str | None = None
+    cpu_percent: float | None = None
+    memory_bytes: float | None = None
+    update_available: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ParityCheck:
+    status: str  # running | paused | completed | …
+    progress: float | None = None  # percent
+    errors: int | None = None
+    speed: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class HostNotice:
+    """Something the server says needs attention (an unread alert, an update…)."""
+
+    title: str
+    importance: str = "info"  # info | warning | alert
+    detail: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class HostReport:
+    hostname: str | None = None
+    os: str | None = None
+    version: str | None = None
+    uptime_seconds: float | None = None
+    cpu_name: str | None = None
+    cpu_cores: int | None = None
+    cpu_percent: float | None = None
+    load: tuple[float, float, float] | None = None
+    memory: Usage | None = None
+    swap: Usage | None = None
+    storage: Usage | None = None  # the whole (array capacity, or the file systems together)
+    array_state: str | None = None  # Unraid: STARTED, STOPPED…
+    parity: ParityCheck | None = None
+    volumes: tuple[Volume, ...] = ()
+    sensors: tuple[Sensor, ...] = ()
+    interfaces: tuple[Interface, ...] = ()
+    containers: tuple[Container, ...] = ()
+    notices: tuple[HostNotice, ...] = ()
+    warnings: tuple[str, ...] = ()  # stable codes: storage_low, disk_errors, array_stopped, temperature_high…
+
+
+@runtime_checkable
+class HostReporter(Protocol):
+    async def report(self) -> HostReport: ...
+
+
+def host_warnings(report: HostReport, *, storage_low: float = 95.0) -> tuple[str, ...]:
+    """What deserves attention in a report (also what makes a probe warn): a volume almost full, a device
+    not OK or with errors, the array not started, a sensor at its critical value."""
+    codes: list[str] = []
+    for volume in report.volumes:
+        if volume.kind in ("share", "boot"):
+            continue
+        if volume.used is not None and volume.total and 100 * volume.used / volume.total >= storage_low:
+            codes.append("storage_low")
+        if not volume.ok:
+            codes.append("disk_problem")
+        if volume.errors:
+            codes.append("disk_errors")
+    if report.array_state and report.array_state.upper() not in ("STARTED", "STARTING"):
+        codes.append("array_stopped")
+    for sensor in report.sensors:
+        if sensor.critical is not None and sensor.value >= sensor.critical:
+            codes.append("temperature_high")
+    return tuple(dict.fromkeys(codes))
 
 
 @dataclass(frozen=True, slots=True)
@@ -252,6 +371,7 @@ def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> Capa
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(HEALTH_PROBE, HealthProbe, True, "Health probe of one service (provided per service)"),
     _spec(INFRA_METRICS, InfrastructureMetrics, True, "Infrastructure metrics of one service's host"),
+    _spec(INFRA_HOST, HostReporter, True, "A server's full picture: disks, array, containers, updates"),
     _spec(SERVER_OPERATIONS, ServerOperations, True, "Privileged server operations of one service"),
     _spec(SERVICE_DIRECTORY, ServiceDirectory, False, "Configured services and their sync state (005)"),
     _spec(SERVICE_STATE, ServiceStateReader, False, "Derived service health state (006)"),

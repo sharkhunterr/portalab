@@ -48,6 +48,8 @@ class ProbeRunner:
             ok = probe.reachable and probe.error_code is None
             latency = probe.latency_ms if probe.latency_ms is not None else elapsed_ms
             code = probe.error_code or (None if ok else "unreachable")
+            if ok and probe.warning:
+                code = probe.warning  # answers, but warns: degraded, not an outage
             message = probe.detail or ("The service did not answer." if not ok else "")
         else:
             state = getattr(result, "state", "unavailable")
@@ -69,7 +71,7 @@ class ProbeRunner:
                     detail={"message": message} if message else None,
                 )
             )
-            if not ok and code:
+            if code:
                 await uow.session.execute(
                     insert(RecentError)
                     .values(

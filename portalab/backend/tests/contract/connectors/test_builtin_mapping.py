@@ -165,6 +165,8 @@ def test_builtin_catalog_registers_once() -> None:
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
         "authentik",  # 027: the single sign-on, for services' access
+        "glances",  # #49: a server's processor, memory, disks, containers
+        "unraid",  # #50: an Unraid server's array, disks, containers and updates
     }
 
 

@@ -1,0 +1,383 @@
+{
+ "system": {
+  "os_name": "Linux",
+  "hostname": "Tower",
+  "platform": "64bit",
+  "os_version": "6.18.33-Unraid",
+  "linux_distro": "Alpine Linux 3.21.3",
+  "hr_name": "Alpine Linux 3.21.3 64bit / Linux 6.18.33-Unraid"
+ },
+ "uptime": "17 days, 11:56:40",
+ "core": {
+  "phys": 14,
+  "log": 20
+ },
+ "quicklook": {
+  "cpu_name": "13th Gen Intel(R) Core(TM) i5-13500",
+  "cpu_hz_current": 3905850249.9999995,
+  "cpu_hz": 4280000000.0,
+  "cpu": 20.3,
+  "mem": 76.6,
+  "swap": 0.0,
+  "cpu_log_core": 20,
+  "cpu_phys_core": 14,
+  "load": 31.2
+ },
+ "mem": {
+  "total": 67191906304,
+  "available": 15719301120,
+  "percent": 76.6,
+  "used": 51472605184,
+  "free": 15719301120,
+  "active": 23090442240,
+  "inactive": 37605175296,
+  "buffers": 823296,
+  "cached": 18944839680,
+  "shared": 4230836224
+ },
+ "memswap": {
+  "total": 0,
+  "used": 0,
+  "free": 0,
+  "percent": 0.0,
+  "sin": 0,
+  "sout": 0,
+  "time_since_update": 1535.4161396026611
+ },
+ "load": {
+  "min1": 8.4658203125,
+  "min5": 6.3408203125,
+  "min15": 6.2392578125,
+  "cpucore": 20
+ },
+ "sensors": [
+  {
+   "label": "Composite",
+   "unit": "C",
+   "value": 40,
+   "warning": 69,
+   "critical": 79,
+   "type": "temperature_core",
+   "key": "label"
+  },
+  {
+   "label": "Core 0",
+   "unit": "C",
+   "value": 42,
+   "warning": 80,
+   "critical": 100,
+   "type": "temperature_core",
+   "key": "label"
+  },
+  {
+   "label": "Core 12",
+   "unit": "C",
+   "value": 50,
+   "warning": 80,
+   "critical": 100,
+   "type": "temperature_core",
+   "key": "label"
+  },
+  {
+   "label": "Core 16",
+   "unit": "C",
+   "value": 43,
+   "warning": 80,
+   "critical": 100,
+   "type": "temperature_core",
+   "key": "label"
+  },
+  {
+   "label": "Core 20",
+   "unit": "C",
+   "value": 38,
+   "warning": 80,
+   "critical": 100,
+   "type": "temperature_core",
+   "key": "label"
+  },
+  {
+   "label": "Core 24",
+   "unit": "C",
+   "value": 38,
+   "warning": 80,
+   "critical": 100,
+   "type": "temperature_core",
+   "key": "label"
+  }
+ ],
+ "fs": [
+  {
+   "device_name": "/dev/loop2",
+   "fs_type": "btrfs",
+   "mnt_point": "/",
+   "size": 300647710720,
+   "used": 201687474176,
+   "free": 97436901376,
+   "percent": 67.4,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/md1p1",
+   "fs_type": "xfs",
+   "mnt_point": "/mnt/disk1",
+   "size": 3998833471488,
+   "used": 3577818554368,
+   "free": 421014917120,
+   "percent": 89.5,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/md2p1",
+   "fs_type": "xfs",
+   "mnt_point": "/mnt/disk2",
+   "size": 3998833471488,
+   "used": 3480949706752,
+   "free": 517883764736,
+   "percent": 87.0,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/md3p1",
+   "fs_type": "xfs",
+   "mnt_point": "/mnt/disk3",
+   "size": 3998833471488,
+   "used": 3628557565952,
+   "free": 370275905536,
+   "percent": 90.7,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/md4p1",
+   "fs_type": "xfs",
+   "mnt_point": "/mnt/disk4",
+   "size": 3998833471488,
+   "used": 3323292835840,
+   "free": 675540635648,
+   "percent": 83.1,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/md5p1",
+   "fs_type": "xfs",
+   "mnt_point": "/mnt/disk5",
+   "size": 11998001573888,
+   "used": 5130463092736,
+   "free": 6867538481152,
+   "percent": 42.8,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/md6p1",
+   "fs_type": "xfs",
+   "mnt_point": "/mnt/disk6",
+   "size": 3998833471488,
+   "used": 76601303040,
+   "free": 3922232168448,
+   "percent": 1.9,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/sdh1",
+   "fs_type": "btrfs",
+   "mnt_point": "/mnt/cache",
+   "size": 500107321344,
+   "used": 285835325440,
+   "free": 211664687104,
+   "percent": 57.5,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/loop2",
+   "fs_type": "btrfs",
+   "mnt_point": "/etc/resolv.conf",
+   "size": 300647710720,
+   "used": 201687474176,
+   "free": 97436901376,
+   "percent": 67.4,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/loop2",
+   "fs_type": "btrfs",
+   "mnt_point": "/etc/hostname",
+   "size": 300647710720,
+   "used": 201687474176,
+   "free": 97436901376,
+   "percent": 67.4,
+   "key": "mnt_point"
+  },
+  {
+   "device_name": "/dev/loop2",
+   "fs_type": "btrfs",
+   "mnt_point": "/etc/hosts",
+   "size": 300647710720,
+   "used": 201687474176,
+   "free": 97436901376,
+   "percent": 67.4,
+   "key": "mnt_point"
+  }
+ ],
+ "network": [
+  {
+   "bytes_sent": 1629,
+   "bytes_recv": 1629,
+   "speed": 0,
+   "key": "interface_name",
+   "interface_name": "lo",
+   "alias": null,
+   "bytes_all": 3258,
+   "time_since_update": 1.5895640850067139,
+   "bytes_recv_gauge": 35323088569,
+   "bytes_recv_rate_per_sec": 1024.0,
+   "bytes_sent_gauge": 35323088569,
+   "bytes_sent_rate_per_sec": 1024.0,
+   "bytes_all_gauge": 70646177138,
+   "bytes_all_rate_per_sec": 2049.0
+  },
+  {
+   "bytes_sent": 7437,
+   "bytes_recv": 4346014,
+   "speed": 10485760000,
+   "key": "interface_name",
+   "interface_name": "br0",
+   "alias": null,
+   "bytes_all": 4353451,
+   "time_since_update": 1.5895640850067139,
+   "bytes_recv_gauge": 7775783210327,
+   "bytes_recv_rate_per_sec": 2734091.0,
+   "bytes_sent_gauge": 1146694303390,
+   "bytes_sent_rate_per_sec": 4678.0,
+   "bytes_all_gauge": 8922477513717,
+   "bytes_all_rate_per_sec": 2738770.0
+  },
+  {
+   "bytes_sent": 0,
+   "bytes_recv": 0,
+   "speed": 0,
+   "key": "interface_name",
+   "interface_name": "wg0",
+   "alias": null,
+   "bytes_all": 0,
+   "time_since_update": 1.5895640850067139,
+   "bytes_recv_gauge": 235424076,
+   "bytes_recv_rate_per_sec": 0.0,
+   "bytes_sent_gauge": 2391475244,
+   "bytes_sent_rate_per_sec": 0.0,
+   "bytes_all_gauge": 2626899320,
+   "bytes_all_rate_per_sec": 0.0
+  },
+  {
+   "bytes_sent": 1305,
+   "bytes_recv": 0,
+   "speed": 10485760000,
+   "key": "interface_name",
+   "interface_name": "vethdd350d7",
+   "alias": null,
+   "bytes_all": 1305,
+   "time_since_update": 1.5895640850067139,
+   "bytes_recv_gauge": 990766,
+   "bytes_recv_rate_per_sec": 0.0,
+   "bytes_sent_gauge": 197187770,
+   "bytes_sent_rate_per_sec": 820.0,
+   "bytes_all_gauge": 198178536,
+   "bytes_all_rate_per_sec": 820.0
+  },
+  {
+   "bytes_sent": 0,
+   "bytes_recv": 0,
+   "speed": 10485760000,
+   "key": "interface_name",
+   "interface_name": "veth910cdd3",
+   "alias": null,
+   "bytes_all": 0,
+   "time_since_update": 1.5895640850067139,
+   "bytes_recv_gauge": 37357,
+   "bytes_recv_rate_per_sec": 0.0,
+   "bytes_sent_gauge": 6202686348,
+   "bytes_sent_rate_per_sec": 0.0,
+   "bytes_all_gauge": 6202723705,
+   "bytes_all_rate_per_sec": 0.0
+  }
+ ],
+ "containers": [
+  {
+   "name": "app-1",
+   "status": "running",
+   "image": [
+    "example/app-1:latest"
+   ],
+   "cpu": {
+    "total": 0.15123062898814948
+   },
+   "cpu_percent": 0.15123062898814948,
+   "memory_usage": 1834295296,
+   "engine": "docker"
+  },
+  {
+   "name": "app-2",
+   "status": "running",
+   "image": [
+    "example/app-2:latest"
+   ],
+   "cpu": {
+    "total": 0.1966780654616512
+   },
+   "cpu_percent": 0.1966780654616512,
+   "memory_usage": 1719672832,
+   "engine": "docker"
+  },
+  {
+   "name": "app-3",
+   "status": "running",
+   "image": [
+    "example/app-3:latest"
+   ],
+   "cpu": {
+    "total": 0.2300391389432485
+   },
+   "cpu_percent": 0.2300391389432485,
+   "memory_usage": 1456619520,
+   "engine": "docker"
+  },
+  {
+   "name": "app-4",
+   "status": "running",
+   "image": [
+    "example/app-4:latest"
+   ],
+   "cpu": {
+    "total": 0.662072113190324
+   },
+   "cpu_percent": 0.662072113190324,
+   "memory_usage": 1396367360,
+   "engine": "docker"
+  },
+  {
+   "name": "app-5",
+   "status": "running",
+   "image": [
+    "example/app-5:latest"
+   ],
+   "cpu": {
+    "total": 0.27022004889975554
+   },
+   "cpu_percent": 0.27022004889975554,
+   "memory_usage": 1329946624,
+   "engine": "docker"
+  },
+  {
+   "name": "app-6",
+   "status": "exited",
+   "image": [
+    "example/app-6:latest"
+   ],
+   "cpu": {
+    "total": 0.11298405466970388
+   },
+   "cpu_percent": 0.11298405466970388,
+   "memory_usage": 1204338688,
+   "engine": "docker"
+  }
+ ]
+}

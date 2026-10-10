@@ -117,6 +117,7 @@ class StateService:
                 last_latency_ms=last.latency_ms if last else None,
                 consecutive_failures=failures,
                 maintenance_active=maintenance is not None,
+                last_warning=bool(last and last.ok and last.error_code),
             ),
             maintenance,
         )

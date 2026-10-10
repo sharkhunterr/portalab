@@ -10,7 +10,8 @@ from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.time import require_aware, utc_now
 from portalab.modules.health.api.common import Module, tier_of
-from portalab.modules.health.permissions import SERVICES_READ
+from portalab.modules.health.infra.hosts import summary
+from portalab.modules.health.permissions import INFRASTRUCTURE_READ, SERVICES_READ
 
 router = APIRouter(prefix="/api/v1", tags=["health"])
 MAX_RANGE = timedelta(days=93)
@@ -79,3 +80,27 @@ async def history(
     if tier.infrastructure or tier.manage:
         result["errors"] = await module.history.recent_errors(service_id)
     return result
+
+
+# --- servers (#49 Glances, #50 Unraid) ------------------------------------------------------------------
+@router.get("/infrastructure/hosts")
+async def hosts(
+    principal: Annotated[Principal, require(SERVICES_READ)], request: Request, module: Module
+) -> dict[str, Any]:
+    """Every server the portal watches: the full report for ``infrastructure.read``, else a summary
+    (whether it is fine, how full its storage is)."""
+    tier = await tier_of(request, principal)
+    entries = await module.hosts.all()
+    if tier.infrastructure or tier.manage:
+        return {"items": entries, "full": True}
+    return {"items": [summary(e) for e in entries], "full": False}
+
+
+@router.get("/infrastructure/hosts/{service_id}")
+async def host(
+    _: Annotated[Principal, require(INFRASTRUCTURE_READ)], service_id: str, module: Module
+) -> dict[str, Any]:
+    entry = await module.hosts.report(service_id)
+    if entry is None:
+        raise NotFound("This service does not report a server.", code="service.no_host")
+    return entry

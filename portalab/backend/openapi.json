@@ -30248,6 +30248,74 @@
         ]
       }
     },
+    "/api/v1/infrastructure/hosts": {
+      "get": {
+        "description": "Every server the portal watches: the full report for ``infrastructure.read``, else a summary\n(whether it is fine, how full its storage is).",
+        "operationId": "hosts_api_v1_infrastructure_hosts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Hosts Api V1 Infrastructure Hosts Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Hosts",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/infrastructure/hosts/{service_id}": {
+      "get": {
+        "operationId": "host_api_v1_infrastructure_hosts__service_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Host Api V1 Infrastructure Hosts  Service Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Host",
+        "tags": [
+          "health"
+        ]
+      }
+    },
     "/api/v1/leaderboards": {
       "get": {
         "operationId": "leaderboard_metrics_api_v1_leaderboards_get",

@@ -7,8 +7,8 @@ A pure, deterministic function of its inputs (versioned rules, ``RULES_VERSION``
 3. the service's circuit breaker is open (Connectors ``unavailable``) ⇒ **unavailable**;
 4. no probe yet, or the last probe is older than ``stale_after`` ⇒ **unknown** (never Operational);
 5. ``unavailable_after`` consecutive failed probes ⇒ **unavailable**;
-6. a failed last probe (fewer failures), a connector-reported error or a latency above the threshold ⇒
-   **degraded**;
+6. a failed last probe (fewer failures), a connector-reported error, a latency above the threshold or a
+   probe that answered with a warning (#49/#50) ⇒ **degraded**;
 7. otherwise **operational**.
 """
 
@@ -19,7 +19,7 @@ from typing import Literal
 from portalab.capabilities.health import HealthState
 
 RULES_VERSION = 1
-Reason = Literal["probe", "breaker", "stale", "maintenance", "inactive", "latency"]
+Reason = Literal["probe", "breaker", "stale", "maintenance", "inactive", "latency", "warning"]
 MONITORED = frozenset({"enabled", "error", "unavailable", "maintenance"})
 
 
@@ -32,6 +32,7 @@ class Inputs:
     last_latency_ms: float | None
     consecutive_failures: int
     maintenance_active: bool
+    last_warning: bool = False  # #49/#50: the last probe answered but reported a problem
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,4 +67,6 @@ def derive(inputs: Inputs, thresholds: Thresholds) -> Derived:
         return Derived("degraded", "breaker")
     if inputs.last_latency_ms is not None and inputs.last_latency_ms > thresholds.degraded_latency_ms:
         return Derived("degraded", "latency")
+    if inputs.last_warning:
+        return Derived("degraded", "warning")
     return Derived("operational", "probe")

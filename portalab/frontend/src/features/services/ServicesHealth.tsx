@@ -13,6 +13,7 @@ import { useIncidents } from "../support/incidents/api";
 import { SeverityBadge } from "../support/incidents/IncidentParts";
 import { useMaintenances } from "../support/incidents/maintenance";
 import "./services.css";
+import { HostPanel } from "./HostWidgets";
 
 /**
  * Services overview and detail page (spec 006 T024). Each detail section is independent and shows its own
@@ -243,6 +244,7 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
             <h4>{t("support:status.detail.last48")}</h4>
             <UptimeBars serviceId={serviceId} />
           </section>
+          <HostPanel serviceId={serviceId} />
           {periods.length ? (
             <section className="svc-detail__block">
               <h4>{t("support:status.detail.changes")}</h4>

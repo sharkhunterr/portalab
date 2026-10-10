@@ -20,6 +20,7 @@ from portalab.modules.health.calendar_source import MaintenanceCalendarSource
 from portalab.modules.health.detail.assembler import DetailAssembler
 from portalab.modules.health.detail.history import HistoryQuery
 from portalab.modules.health.detail.incidents import IncidentLinkService
+from portalab.modules.health.infra.hosts import HostService
 from portalab.modules.health.infra.service import InfraMetricsService
 from portalab.modules.health.maintenance.service import END_JOB, START_JOB, MaintenanceService
 from portalab.modules.health.operations.service import OperationsService
@@ -56,6 +57,7 @@ class HealthModule:
         self.history = HistoryQuery(self.state)
         self.incidents = IncidentLinkService(self.state)
         self.infra = InfraMetricsService(self.state)
+        self.hosts = HostService(self.state)  # #49/#50: servers (Glances, Unraid)
         self.operations = OperationsService(self.state, audit)
         self.detail = DetailAssembler(
             self.state, self.maintenance, self.history, self.incidents, self.infra, self.operations

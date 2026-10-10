@@ -37,6 +37,7 @@ import "../support/tickets/widget";
 import "../campaigns/widget";
 import "./widgets/discover";
 import "./widgets/service-status";
+import "../services/HostWidgets";
 import "./widgets/skins"; // 027 (#31): last — the other looks wrap the widgets registered above
 
 const ONBOARDED = "portalab.onboarding.dashboard";

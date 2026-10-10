@@ -3,6 +3,7 @@
 from portalab.capabilities.connector_sdk import Connector, ConnectorRegistry
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.authentik import AuthentikConnector
+from portalab.connectors.glances import GlancesConnector
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
@@ -11,6 +12,7 @@ from portalab.connectors.seerr import SeerrConnector
 from portalab.connectors.tautulli import TautulliConnector
 from portalab.connectors.tmdb import TmdbConnector
 from portalab.connectors.torrents import DelugeConnector, QBittorrentConnector
+from portalab.connectors.unraid import UnraidConnector
 
 OWNER = "core:connectors"
 
@@ -29,6 +31,8 @@ def builtin_connectors() -> list[Connector]:
         QBittorrentConnector(),
         DelugeConnector(),
         AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service
+        GlancesConnector(),  # #49: a server's processor, memory, temperatures, disks, containers
+        UnraidConnector(),  # #50: an Unraid server's array, disks, containers and updates
     ]
 
 
