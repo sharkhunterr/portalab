@@ -1,27 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type ChangeEvent, type FormEvent, useEffect, useId, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type FormEvent, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { Button } from "../../design-system/components/Button";
-import { SelectField, TextAreaField, TextField } from "../../design-system/components/Field";
+import { TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../state/regions";
-import { SavedNote, SettingsCard, SettingsGrid, SettingsPage } from "../account/SettingsKit";
-import { useProfile } from "../community/api";
-import type { Equipped } from "../community/profile/looks";
-import { ProfileHero } from "../community/profile/ProfileHero";
+import { SettingsCard, SettingsPage } from "../account/SettingsKit";
+import { MemberProfile } from "../community/profile/ProfilePage";
 import { FormMessage } from "./FormMessage";
-import { authStrings, type VisibilityPreference } from "./strings";
+import { authStrings } from "./strings";
 import { ME_KEY, type Me } from "./useAuth";
 import "../community/profile/profile.css";
 
 type ExportOut = components["schemas"]["ExportOut"];
-type ProfileOut = components["schemas"]["ProfileOut"];
-
-const VISIBILITIES: readonly VisibilityPreference[] = ["public", "community", "leaderboard", "private"];
 
 function messageFor(error: unknown, t: ReturnType<typeof useT>): string {
   if (error instanceof ApiError) {
@@ -33,166 +28,6 @@ function messageFor(error: unknown, t: ReturnType<typeof useT>): string {
   return t("account:error");
 }
 
-/** The member's own profile fields (to edit « About me » without losing what is there). */
-function useOwnProfile(userId: string) {
-  return useQuery({
-    queryKey: ["identity", "profile", userId],
-    retry: false,
-    queryFn: async () =>
-      (await api.GET("/api/v1/users/{user_id}/profile", { params: { path: { user_id: userId } } }))
-        .data as ProfileOut,
-  });
-}
-
-/** « Change the picture », over the avatar of the hero (and « remove » once there is one). */
-function PhotoControl({ onChanged }: { onChanged: () => void }) {
-  const t = useT();
-  const fileId = useId();
-  const queryClient = useQueryClient();
-  const upload = useMutation({
-    mutationFn: async (file: File) => {
-      await api.PUT("/api/v1/me/avatar", {
-        body: file as unknown as string,
-        bodySerializer: (body) => body as unknown as BodyInit,
-        headers: { "Content-Type": file.type || "application/octet-stream" },
-      });
-    },
-    onSuccess: async () => {
-      onChanged();
-      await queryClient.invalidateQueries({ queryKey: ME_KEY });
-    },
-  });
-  return (
-    <>
-      <label
-        htmlFor={fileId}
-        className="account-hero__photo"
-        title={t("account:photo.change")}
-        data-tour="avatar"
-      >
-        <Icon name={upload.isPending ? "spinner" : "image"} size={16} />
-        <span className="visually-hidden">{t("account:photo.change")}</span>
-      </label>
-      <input
-        id={fileId}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
-        className="visually-hidden"
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          const file = event.target.files?.[0];
-          if (file) upload.mutate(file);
-          event.target.value = "";
-        }}
-      />
-      {upload.isError ? (
-        <span className="visually-hidden" role="alert">
-          {messageFor(upload.error, t)}
-        </span>
-      ) : null}
-    </>
-  );
-}
-
-function ProfileCard({ me, onPhotoRemoved }: { me: Me; onPhotoRemoved: () => void }) {
-  const t = useT();
-  const ids = { name: useId(), bio: useId() };
-  const queryClient = useQueryClient();
-  const own = useOwnProfile(me.id);
-  const bioField = own.data?.fields?.find((field) => field.key === "bio");
-  const [displayName, setDisplayName] = useState(me.display_name ?? "");
-  const [bio, setBio] = useState("");
-  const [visibility, setVisibility] = useState<VisibilityPreference>("private");
-  // what is stored, once it arrives (« About me » and who sees it)
-  useEffect(() => {
-    if (!bioField) return;
-    setBio(bioField.value ?? "");
-    setVisibility(bioField.visibility);
-  }, [bioField]);
-  const save = useMutation({
-    mutationFn: async () => {
-      await api.PATCH("/api/v1/me/profile", {
-        body: { display_name: displayName, fields: { bio: { value: bio || null, visibility } } },
-      });
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ME_KEY });
-      await queryClient.invalidateQueries({ queryKey: ["identity", "profile", me.id] });
-      await queryClient.invalidateQueries({ queryKey: ["community"] });
-    },
-  });
-  const removePhoto = useMutation({
-    mutationFn: async () => {
-      await api.DELETE("/api/v1/me/avatar");
-    },
-    onSuccess: async () => {
-      onPhotoRemoved();
-      await queryClient.invalidateQueries({ queryKey: ME_KEY });
-    },
-  });
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    save.mutate();
-  };
-  return (
-    <SettingsCard
-      id="account-profile"
-      icon="user"
-      title={t("account:profile.title")}
-      hint={t("account:profile.hint")}
-      aside={<SavedNote shown={save.isSuccess} text={t("account:saved")} />}
-    >
-      <form onSubmit={submit}>
-        {save.isError ? <FormMessage kind="error">{messageFor(save.error, t)}</FormMessage> : null}
-        <TextField
-          id={ids.name}
-          label={t("account:profile.name")}
-          autoComplete="nickname"
-          maxLength={64}
-          value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
-        />
-        <TextAreaField
-          id={ids.bio}
-          label={t("account:profile.bio")}
-          hint={t("account:profile.bioHint")}
-          maxLength={1000}
-          rows={3}
-          value={bio}
-          onChange={(event) => setBio(event.target.value)}
-        />
-        <SelectField
-          label={t("account:profile.visibility")}
-          value={visibility}
-          onChange={(event) => setVisibility(event.target.value as VisibilityPreference)}
-        >
-          {VISIBILITIES.map((key) => (
-            <option key={key} value={key}>
-              {t(`account:visibility.${key}`)}
-            </option>
-          ))}
-        </SelectField>
-        <div className="settings-actions">
-          {me.has_avatar ? (
-            <Button
-              variant="ghost"
-              className="ds-button--quiet-danger"
-              disabled={removePhoto.isPending}
-              onClick={() => removePhoto.mutate()}
-            >
-              <Icon name="trash" size={16} />
-              {t("account:photo.remove")}
-            </Button>
-          ) : null}
-          <Button type="submit" disabled={save.isPending} aria-busy={save.isPending}>
-            <Icon name="check" size={16} />
-            {t("account:save")}
-          </Button>
-        </div>
-      </form>
-    </SettingsCard>
-  );
-}
-
 const LINKS = [
   { key: "profile", icon: "users", to: (id: string) => `/community/members/${id}` },
   { key: "progression", icon: "trophy", to: () => "/progression" },
@@ -202,39 +37,21 @@ const LINKS = [
 
 function AccountView({ me }: { me: Me }) {
   const t = useT();
-  const community = useProfile(me.id);
-  const [version, setVersion] = useState(0);
-  const name = me.display_name ?? me.login ?? "";
-  const looks = (community.data?.looks ?? {}) as Equipped;
-  const avatar = me.has_avatar ? `/api/v1/users/${me.id}/avatar${version ? `?v=${version}` : ""}` : null;
   return (
     <SettingsPage icon="user" title={t("account:title")} lead={t("account:lead")}>
-      <div className="profile-page">
-        <ProfileHero
-          memberId={me.id}
-          name={name}
-          looks={looks}
-          own
-          heading={2}
-          avatarSrc={avatar}
-          avatarAction={<PhotoControl onChanged={() => setVersion(Date.now())} />}
-        />
-      </div>
-      <SettingsGrid>
-        <ProfileCard me={me} onPhotoRemoved={() => setVersion(Date.now())} />
-        <SettingsCard icon="compass" title={t("account:links.title")} hint={t("account:links.hint")}>
-          <ul className="account-links">
-            {LINKS.map((link) => (
-              <li key={link.key}>
-                <Link to={link.to(me.id)}>
-                  <Icon name={link.icon} size={18} />
-                  {t(`account:links.${link.key}`)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </SettingsCard>
-      </SettingsGrid>
+      <MemberProfile memberId={me.id} heading={2} />
+      <SettingsCard icon="compass" title={t("account:links.title")} hint={t("account:links.hint")}>
+        <ul className="account-links">
+          {LINKS.map((link) => (
+            <li key={link.key}>
+              <Link to={link.to(me.id)}>
+                <Icon name={link.icon} size={18} />
+                {t(`account:links.${link.key}`)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </SettingsCard>
     </SettingsPage>
   );
 }

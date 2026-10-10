@@ -62,11 +62,9 @@ function IdentitySection({ memberId, data }: SectionViewProps) {
   if (bio) return <p className="profile-about">{bio}</p>;
   return (
     <p className="settings-muted">
-      {me.data?.id === memberId ? (
-        <Link to="/account">{t("community:about.addYours")}</Link>
-      ) : (
-        t("community:about.empty", { name: String(data.display_name ?? "") })
-      )}
+      {me.data?.id === memberId
+        ? t("community:about.addYours")
+        : t("community:about.empty", { name: String(data.display_name ?? "") })}
     </p>
   );
 }
@@ -166,16 +164,40 @@ function AchievementBadge({ item }: { item: AchievementItem }) {
   );
 }
 
+const RARITIES = ["legendary", "epic", "rare", "common"] as const;
+
+/** Unlocked achievements (#51): the rarest first, a legend counting each rarity, a medal per rarity. */
 function AchievementsSection({ data }: SectionViewProps) {
+  const t = useT();
   const items = (Array.isArray(data.items) ? data.items : []) as AchievementItem[];
+  const rank = (item: AchievementItem) => {
+    const at = RARITIES.indexOf((item.rarity ?? "common") as (typeof RARITIES)[number]);
+    return at < 0 ? RARITIES.length : at;
+  };
+  const sorted = [...items].sort((a, b) => rank(a) - rank(b) || b.unlocked_at.localeCompare(a.unlocked_at));
+  const counts = RARITIES.map((rarity) => ({
+    rarity,
+    count: items.filter((item) => (item.rarity ?? "common") === rarity).length,
+  })).filter((entry) => entry.count);
   return (
-    <ul className="profile-medals">
-      {items.map((item) => (
-        <li key={item.key}>
-          <AchievementBadge item={item} />
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="profile-rarities" aria-label={t("community:achievements.byRarity")}>
+        {counts.map((entry) => (
+          <li key={entry.rarity} data-rarity={entry.rarity}>
+            <span className="profile-rarities__gem" aria-hidden="true" />
+            {t(`gamification:achievements.rarity.${entry.rarity}`)}
+            <strong>{entry.count}</strong>
+          </li>
+        ))}
+      </ul>
+      <ul className="profile-medals">
+        {sorted.map((item) => (
+          <li key={item.key}>
+            <AchievementBadge item={item} />
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

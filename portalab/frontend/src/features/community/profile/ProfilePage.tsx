@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 import type { Ambient } from "../../../design-system/a11y/preferences";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { useT } from "../../../i18n/hooks/useT";
 import { SettingsCard } from "../../account/SettingsKit";
+import { PhotoControl, ProfileCard } from "../../auth/ProfileEditor";
 import { useMe } from "../../auth/useAuth";
 import { type CommunitySection, useProfile } from "../api";
 import type { Equipped } from "./looks";
@@ -43,15 +45,17 @@ function SectionFrame({ memberId, section }: { memberId: string; section: Commun
 }
 
 /**
- * ``/community/members/:memberId`` (spec 012 T008): only the sections the member's visibility lets this
- * viewer see — each in its own frame, failing alone. There is no follow, friend or message control. 027: a
- * hero on top — the member's banner (a design or a film backdrop) and framed avatar, customisable by them.
+ * A member's profile (spec 012 T008): only the sections the member's visibility lets this viewer see —
+ * each in its own frame, failing alone; no follow, friend or message control. 027: a hero on top — the
+ * member's banner and framed avatar, customisable by them. #51: on one's own profile, the picture changes
+ * from the avatar and the profile card (name, « About me ») sits with the sections — the same view in
+ * My account.
  */
-export function ProfilePage() {
+export function MemberProfile({ memberId, heading = 1 }: { memberId: string; heading?: 1 | 2 }) {
   const t = useT();
-  const { memberId = "" } = useParams();
   const profile = useProfile(memberId);
   const me = useMe();
+  const [version, setVersion] = useState(0);
   if (profile.isPending) return <FunctionalState state="loading" />;
   if (profile.isError) return <FunctionalState state="unavailable" onRetry={() => profile.refetch()} />;
   if (!profile.data) {
@@ -63,6 +67,12 @@ export function ProfilePage() {
     );
   }
   const looks = (profile.data.looks ?? {}) as Equipped;
+  const own = me.data?.id === memberId ? me.data : null;
+  const avatar = own
+    ? own.has_avatar
+      ? `/api/v1/users/${memberId}/avatar${version ? `?v=${version}` : ""}`
+      : null
+    : undefined;
   return (
     <div className="ds-stack profile-page" data-background={looks.background ?? undefined}>
       {looks.background && looks.background !== "none" ? (
@@ -70,16 +80,35 @@ export function ProfilePage() {
       ) : null}
       <ProfileHero
         memberId={memberId}
-        name={profile.data.display_name ?? t("community:feed.someone")}
+        name={own?.display_name ?? profile.data.display_name ?? t("community:feed.someone")}
         looks={looks}
-        own={me.data?.id === memberId}
+        own={Boolean(own)}
+        heading={heading}
+        {...(avatar !== undefined ? { avatarSrc: avatar } : {})}
+        {...(own ? { avatarAction: <PhotoControl onChanged={() => setVersion(Date.now())} /> } : {})}
       />
       <div className="community-sections">
-        {profile.data.sections.map((section) => (
+        {own ? (
+          <div data-section="edit" className="community-sections__edit">
+            <ProfileCard me={own} onPhotoRemoved={() => setVersion(Date.now())} />
+          </div>
+        ) : null}
+        {(profile.data.sections ?? []).map((section) => (
           <SectionFrame key={section.key} memberId={memberId} section={section} />
         ))}
       </div>
-      <Link to="/community/members">{t("community:profile.back")}</Link>
     </div>
+  );
+}
+
+/** ``/community/members/:memberId``. */
+export function ProfilePage() {
+  const t = useT();
+  const { memberId = "" } = useParams();
+  return (
+    <>
+      <MemberProfile memberId={memberId} />
+      <Link to="/community/members">{t("community:profile.back")}</Link>
+    </>
   );
 }

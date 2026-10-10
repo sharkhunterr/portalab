@@ -1,6 +1,7 @@
 {
-  "about.addYours": "Ajoute quelques mots sur toi dans Mon compte",
+  "about.addYours": "Rien pour l'instant — écris quelques mots sur toi dans ta carte de profil.",
   "about.empty": "{name} n'a encore rien écrit sur soi.",
+  "achievements.byRarity": "Succès par rareté",
   "activity.achievement.unlocked": "Succès débloqué",
   "activity.generic": "A participé à la communauté",
   "activity.project.created": "Projet proposé",
