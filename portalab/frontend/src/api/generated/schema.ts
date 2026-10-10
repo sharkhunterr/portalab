@@ -5370,6 +5370,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/insights/locked": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Locked Statistics
+         * @description 061: what is still to unlock in the shop — sections, tabs, filters and request statistics.
+         */
+        get: operations["locked_statistics_api_v1_me_media_insights_locked_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/journal": {
         parameters: {
             query?: never;
@@ -5906,6 +5926,26 @@ export interface paths {
          *     (streaks, campaigns, pace) on top — per day and in all.
          */
         get: operations["my_sources_api_v1_me_progression_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/progression/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Timeline
+         * @description #62: my XP, Coins and Contribution gained day by day, and the moments I reached a level.
+         */
+        get: operations["my_timeline_api_v1_me_progression_timeline_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10418,6 +10458,15 @@ export interface components {
             /** Xp */
             xp: number;
         };
+        /** LevelUpOut */
+        LevelUpOut: {
+            /** At */
+            at: string;
+            /** Day */
+            day: string;
+            /** Level */
+            level: number;
+        };
         /** LoginRequest */
         LoginRequest: {
             /** Login */
@@ -11259,6 +11308,15 @@ export interface components {
             /** Required */
             required: boolean;
             terms: components["schemas"]["TermsOut"] | null;
+        };
+        /** MyTimelineOut */
+        MyTimelineOut: {
+            /** Days */
+            days: components["schemas"]["TimelineDayOut"][];
+            /** Level Ups */
+            level_ups: components["schemas"]["LevelUpOut"][];
+            /** Start Level */
+            start_level: number;
         };
         /** NewsArticleIn */
         NewsArticleIn: {
@@ -13462,6 +13520,17 @@ export interface components {
             days: number;
             /** Multiplier */
             multiplier: number;
+        };
+        /** TimelineDayOut */
+        TimelineDayOut: {
+            /** Coins */
+            coins: number;
+            /** Contribution */
+            contribution: number;
+            /** Day */
+            day: string;
+            /** Xp */
+            xp: number;
         };
         /** ToggleIn */
         ToggleIn: {
@@ -24832,6 +24901,28 @@ export interface operations {
             };
         };
     };
+    locked_statistics_api_v1_me_media_insights_locked_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string[];
+                    };
+                };
+            };
+        };
+    };
     my_journal_api_v1_me_media_journal_get: {
         parameters: {
             query?: never;
@@ -25765,6 +25856,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MySourcesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_timeline_api_v1_me_progression_timeline_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyTimelineOut"];
                 };
             };
             /** @description Validation Error */

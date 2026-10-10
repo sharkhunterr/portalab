@@ -63,6 +63,8 @@ export interface AdminTab {
   key: string;
   label: string;
   count?: number | undefined;
+  /** 061: still to unlock (in the shop): a lock beside the label; the tab stays reachable */
+  locked?: boolean | undefined;
 }
 
 /** Sub-navigation of a page (state lives in the page): buttons with ``aria-pressed``. */
@@ -87,6 +89,7 @@ export function AdminTabs({
           onClick={() => onChange(tab.key)}
         >
           {tab.label}
+          {tab.locked ? <Icon name="lock" size={13} className="admin-tabs__lock" /> : null}
           {tab.count !== undefined ? (
             <>
               {" "}

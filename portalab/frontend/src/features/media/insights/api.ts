@@ -250,9 +250,30 @@ export function useInsightSection<S extends Section>(
 /** When an update was last asked for: the panel refreshes quickly until it shows up as running. */
 let requestedAt = 0;
 
-export function useInsights(scope: Scope, category: Category, period: string) {
+/** 061: the statistics on sale this member has not unlocked (``media.insights.*``, ``media.requests.*``). */
+export function useLockedStatistics() {
+  const query = useQuery({
+    queryKey: ["media", "insights", "locked"],
+    staleTime: 60_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/me/media/insights/locked")).data as { locked: string[] } | undefined)
+        ?.locked ?? [],
+  });
+  const locked = new Set(query.data ?? []);
+  return {
+    tab: (section: string) => locked.has(`media.insights.tab.${section}`),
+    history: locked.has("media.insights.history"),
+    server: locked.has("media.insights.server"),
+  };
+}
+
+/** 061: a long period (the year to date, one year, all time) — sold with the « full history ». */
+export const LONG_PERIOD = /^(ytd|all|\d{4})$/;
+
+export function useInsights(scope: Scope, category: Category, period: string, enabled = true) {
   const { time_zone } = useLocaleContext();
   return useQuery({
+    enabled,
     queryKey: ["media", "insights", scope, category, period, time_zone],
     queryFn: async () =>
       (

@@ -6317,6 +6317,29 @@
         "title": "LevelStepOut",
         "type": "object"
       },
+      "LevelUpOut": {
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level",
+          "at",
+          "day"
+        ],
+        "title": "LevelUpOut",
+        "type": "object"
+      },
       "LoginRequest": {
         "additionalProperties": false,
         "properties": {
@@ -8667,6 +8690,35 @@
           "required"
         ],
         "title": "MyTermsOut",
+        "type": "object"
+      },
+      "MyTimelineOut": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineDayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "level_ups": {
+            "items": {
+              "$ref": "#/components/schemas/LevelUpOut"
+            },
+            "title": "Level Ups",
+            "type": "array"
+          },
+          "start_level": {
+            "title": "Start Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "start_level",
+          "level_ups"
+        ],
+        "title": "MyTimelineOut",
         "type": "object"
       },
       "NewsArticleIn": {
@@ -14782,6 +14834,34 @@
           "multiplier"
         ],
         "title": "Tier",
+        "type": "object"
+      },
+      "TimelineDayOut": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "contribution": {
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "xp",
+          "coins",
+          "contribution"
+        ],
+        "title": "TimelineDayOut",
         "type": "object"
       },
       "ToggleIn": {
@@ -31860,6 +31940,35 @@
         ]
       }
     },
+    "/api/v1/me/media/insights/locked": {
+      "get": {
+        "description": "061: what is still to unlock in the shop \u2014 sections, tabs, filters and request statistics.",
+        "operationId": "locked_statistics_api_v1_me_media_insights_locked_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Response Locked Statistics Api V1 Me Media Insights Locked Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Locked Statistics",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/me/media/journal": {
       "get": {
         "description": "027 \u2014 the media home's own shelves, from the services' history (Plex/Tautulli, Grimmory\u2026): what I am\nin the middle of and what I opened lately, with posters (the library's, else the metadata provider's).",
@@ -33085,6 +33194,52 @@
           }
         },
         "summary": "My Sources",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/me/progression/timeline": {
+      "get": {
+        "description": "#62: my XP, Coins and Contribution gained day by day, and the moments I reached a level.",
+        "operationId": "my_timeline_api_v1_me_progression_timeline_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyTimelineOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Timeline",
         "tags": [
           "gamification-admin"
         ]

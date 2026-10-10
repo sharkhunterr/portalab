@@ -53,6 +53,8 @@ export interface RequestInsights {
   };
   quota: { base_remaining?: number; extra_units?: number; [key: string]: unknown };
   acquisition?: Acquisition;
+  /** 061: the statistics still to unlock in the shop (their data left out) */
+  locked?: string[];
 }
 
 export function useRequestInsights(period: string) {

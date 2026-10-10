@@ -47,6 +47,7 @@ import "../../admin/admin.css";
 import "../media.css";
 import "../insights/insights.css"; // 027: the poster rows are the statistics' own
 import "./requests.css";
+import { LockedStat } from "../insights/LockedStat";
 import { AcquisitionView } from "./Acquisition";
 import { Poster, SoonList } from "./SoonList";
 
@@ -282,6 +283,7 @@ function Genres({ data }: { data: RequestInsights }) {
 
 export function Overview({ data }: { data: RequestInsights }) {
   const t = useT();
+  const locked = (name: string) => Boolean(data.locked?.includes(name)); // 061: sold in the shop
   const measures = useMeasures();
   if (!data.summary.total) {
     return (
@@ -297,17 +299,25 @@ export function Overview({ data }: { data: RequestInsights }) {
       <AdminSection title={t("media:myRequests.status")} icon="target">
         <Funnel data={data} />
       </AdminSection>
-      <AdminSection title={t("media:myRequests.whatBecame")} icon="check">
-        <Watched data={data} />
-      </AdminSection>
-      <AdminSection
-        title={t("media:myRequests.rank")}
-        description={t("media:myRequests.rankHint")}
-        icon="trophy"
-        span="full"
-      >
-        <Rank data={data} />
-      </AdminSection>
+      {locked("watched") ? (
+        <LockedStat name="req_watched" icon="check" />
+      ) : (
+        <AdminSection title={t("media:myRequests.whatBecame")} icon="check">
+          <Watched data={data} />
+        </AdminSection>
+      )}
+      {locked("ranking") ? (
+        <LockedStat name="req_ranking" icon="trophy" span="full" />
+      ) : (
+        <AdminSection
+          title={t("media:myRequests.rank")}
+          description={t("media:myRequests.rankHint")}
+          icon="trophy"
+          span="full"
+        >
+          <Rank data={data} />
+        </AdminSection>
+      )}
       <AdminSection
         title={t("media:myRequests.overTime")}
         description={t("media:myRequests.overTimeHint")}
@@ -316,6 +326,7 @@ export function Overview({ data }: { data: RequestInsights }) {
       >
         <OverTime data={data} />
       </AdminSection>
+      {locked("acquisition") ? <LockedStat name="req_acquisition" icon="clock" span="full" /> : null}
       {data.acquisition ? (
         <AdminSection
           title={t("media:myRequests.acquisition")}
@@ -326,46 +337,53 @@ export function Overview({ data }: { data: RequestInsights }) {
           <AcquisitionView data={data.acquisition} />
         </AdminSection>
       ) : null}
-      <AdminSection
-        title={t("media:myRequests.topWatched")}
-        description={t("media:myRequests.topWatchedHint")}
-        icon="star"
-        span="full"
-        flush
-      >
-        {data.top_watched.length ? (
-          <ol className="insights-posters">
-            {data.top_watched.map((work, index) => (
-              <li key={work.id} className="insights-poster">
-                <Link to={work.route ?? `/media/${work.id}`}>
-                  <span className="insights-poster__art">
-                    {work.image_id ? (
-                      <img src={`/api/v1/media/images/${work.image_id}`} alt="" loading="lazy" />
-                    ) : (
-                      <Icon name="film" size={28} />
-                    )}
-                    <span className="insights-poster__rank">{index + 1}</span>
-                  </span>
-                  <span className="insights-poster__title">{work.title}</span>
-                  <span className="insights-poster__meta">
-                    {t("media:insights.plays", { count: work.plays })} · {measures.duration(work.seconds)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <AdminEmpty icon="star" title={t("media:insights.none")} />
-        )}
-      </AdminSection>
-      <AdminSection
-        title={t("media:myRequests.genres")}
-        description={t("media:myRequests.genresHint")}
-        icon="palette"
-        span="full"
-      >
-        <Genres data={data} />
-      </AdminSection>
+      {locked("top_watched") ? <LockedStat name="req_top_watched" icon="star" span="full" /> : null}
+      {locked("top_watched") ? null : (
+        <AdminSection
+          title={t("media:myRequests.topWatched")}
+          description={t("media:myRequests.topWatchedHint")}
+          icon="star"
+          span="full"
+          flush
+        >
+          {data.top_watched.length ? (
+            <ol className="insights-posters">
+              {data.top_watched.map((work, index) => (
+                <li key={work.id} className="insights-poster">
+                  <Link to={work.route ?? `/media/${work.id}`}>
+                    <span className="insights-poster__art">
+                      {work.image_id ? (
+                        <img src={`/api/v1/media/images/${work.image_id}`} alt="" loading="lazy" />
+                      ) : (
+                        <Icon name="film" size={28} />
+                      )}
+                      <span className="insights-poster__rank">{index + 1}</span>
+                    </span>
+                    <span className="insights-poster__title">{work.title}</span>
+                    <span className="insights-poster__meta">
+                      {t("media:insights.plays", { count: work.plays })} · {measures.duration(work.seconds)}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <AdminEmpty icon="star" title={t("media:insights.none")} />
+          )}
+        </AdminSection>
+      )}
+      {locked("genres") ? (
+        <LockedStat name="req_genres" icon="palette" span="full" />
+      ) : (
+        <AdminSection
+          title={t("media:myRequests.genres")}
+          description={t("media:myRequests.genresHint")}
+          icon="palette"
+          span="full"
+        >
+          <Genres data={data} />
+        </AdminSection>
+      )}
     </AdminGrid>
   );
 }

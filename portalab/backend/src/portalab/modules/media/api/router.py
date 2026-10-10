@@ -3,6 +3,7 @@ history, continue, requests and account links; administration of identity (match
 overrides) and unlinked activity. Personal data is the caller's own; admin views carry metadata only."""
 
 import asyncio
+import re
 from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -351,26 +352,65 @@ LOCKABLE_INSIGHTS: dict[str, tuple[str, Any]] = {
 }
 
 
-async def _locked_insights(module: Any, principal: Principal) -> list[str]:
+# 061: more of the statistics sold — the tabs in depth, the long history (the year to date, one year, all
+# time), the whole server's view, and the deeper statistics of « My requests »; a minimum stays free
+LOCKABLE_TABS = ("casting", "production", "playback", "profile")
+LONG_PERIODS = re.compile(r"^(ytd|all|\d{4})$")
+HISTORY = "media.insights.history"
+SERVER = "media.insights.server"
+LOCKABLE_REQUESTS: dict[str, tuple[str, Any]] = {
+    "watched": ("watched", None),
+    "ranking": ("ranking", None),
+    "top_watched": ("top_watched", []),
+    "genres": ("genres", None),
+    "acquisition": ("acquisition", None),
+}
+
+
+class StatisticLocked(Forbidden):
+    default_code = "media.statistic_locked"
+    default_title = "This statistic is unlocked in the shop"
+
+
+async def _locked_statistics(module: Any, principal: Principal) -> set[str]:
+    """The statistics on sale this member does not own (``media.insights.*``, ``media.requests.*``) —
+    none for media managers."""
     try:
         providers = module.capabilities.system_providers(COSMETICS)
     except Exception:
-        return []
-    if not providers:
-        return []
+        return set()
+    if not providers or await module.authorizer.is_allowed(principal, MEDIA_MANAGE):
+        return set()
     shop = providers[0].provider
-    sold = {
-        value.removeprefix("media.insights.")
-        for value in await shop.sold("statistic", "statistic")
-        if value.startswith("media.insights.")
-    }
+    sold = {v for v in await shop.sold("statistic", "statistic") if v.startswith("media.")}
     if not sold:
-        return []
-    owned = {
-        value.removeprefix("media.insights.")
-        for value in await shop.owned(_me(principal), "statistic", "statistic")
-    }
-    return sorted(name for name in sold - owned if name in LOCKABLE_INSIGHTS)
+        return set()
+    return sold - set(await shop.owned(_me(principal), "statistic", "statistic"))
+
+
+async def _locked_insights(module: Any, principal: Principal) -> list[str]:
+    locked = await _locked_statistics(module, principal)
+    return sorted(
+        name
+        for key in locked
+        if (name := key.removeprefix("media.insights.")) in LOCKABLE_INSIGHTS
+        and key.startswith("media.insights.")
+    )
+
+
+async def _guard_filters(module: Any, principal: Principal, period: str, scope: str) -> set[str]:
+    locked = await _locked_statistics(module, principal)
+    if HISTORY in locked and LONG_PERIODS.match(period):
+        raise StatisticLocked("The long history is unlocked in the shop.")
+    if SERVER in locked and scope == "all":
+        raise StatisticLocked("The whole server's statistics are unlocked in the shop.")
+    return locked
+
+
+@router.get("/me/media/insights/locked")
+async def locked_statistics(principal: Reader, module: Module) -> dict[str, list[str]]:
+    """061: what is still to unlock in the shop — sections, tabs, filters and request statistics."""
+    return {"locked": sorted(await _locked_statistics(module, principal))}
 
 
 @router.get("/media/insights")
@@ -383,6 +423,7 @@ async def insights(
     tz: Annotated[str, Query(max_length=64)] = "UTC",
 ) -> dict[str, Any]:
     """What was watched, listened to and read — mine, or the server's (anonymous unless media manager)."""
+    await _guard_filters(module, principal, period, scope)
     manager = await module.authorizer.is_allowed(principal, MEDIA_MANAGE)
     data = await module.insights.overview(
         period=period,
@@ -431,6 +472,9 @@ async def insights_section(
 ) -> dict[str, Any]:
     """027: one tab of the statistics in depth (casting, production, playback, profile), compared with the
     previous period — mine, or the server's (devices only for « me » and media managers)."""
+    locked = await _guard_filters(module, principal, period, scope)
+    if f"media.insights.tab.{section}" in locked:
+        raise StatisticLocked("This tab is unlocked in the shop.")
     manager = await module.authorizer.is_allowed(principal, MEDIA_MANAGE)
     data = await module.deep_insights.section(
         section,
@@ -641,7 +685,13 @@ async def my_requests_insights(
 ) -> dict[str, Any]:
     """027: my requests over a period — funnel, kinds, over time, watched ratio, rank, top, genres."""
     user = _me(principal)
+    locked_all = await _guard_filters(module, principal, period, "me")
     data = await module.request_insights.overview(user, period)
+    locked = sorted(name for name in LOCKABLE_REQUESTS if f"media.requests.{name}" in locked_all)
+    for name in locked:  # 061: the deeper statistics are sold; their data stays on the server
+        key, empty = LOCKABLE_REQUESTS[name]
+        data[key] = empty
+    data["locked"] = locked
     data["top_watched"] = await with_posters(module.database, module.enricher, data["top_watched"])
     data["quota"] = await module.quota.summary(user)
     return data

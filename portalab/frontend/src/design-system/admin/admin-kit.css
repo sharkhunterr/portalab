@@ -601,3 +601,9 @@
 .has-tone[data-tone="info"] {
   --tone: var(--color-accent);
 }
+/* 061: a tab still to unlock in the shop */
+.admin-tabs__lock {
+  margin-inline-start: 0.3rem;
+  vertical-align: -0.1em;
+  opacity: 0.7;
+}
