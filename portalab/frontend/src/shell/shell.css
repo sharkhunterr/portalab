@@ -1780,3 +1780,18 @@
     stroke-dashoffset: 0;
   }
 }
+/* #55: the boost in progress, the same size as the Coins badge beside it */
+.shell-progress .boost-tag {
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem 0.2rem 0.4rem;
+  font-size: inherit;
+  font-weight: var(--font-weight-bold);
+  line-height: inherit;
+}
+.shell-progress .boost-tag svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+.shell-progress .boost-tag small {
+  font-weight: var(--font-weight-regular, 400);
+}
