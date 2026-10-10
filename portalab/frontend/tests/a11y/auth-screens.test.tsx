@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import type { ReactNode } from "react";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
 // 002 T049 — the sign-in, activation and account screens have no axe violations, every field has a label
@@ -25,7 +26,9 @@ function withClient(children: ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return (
     <QueryClientProvider client={client}>
-      <main>{children}</main>
+      <MemoryRouter>
+        <main>{children}</main>
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }
@@ -52,7 +55,7 @@ describe("auth screens accessibility", () => {
   it("account page", async () => {
     fake.handler = () => json(200, { ...ME, has_avatar: true });
     const { container } = render(withClient(<AccountPage />));
-    expect(await screen.findByRole("heading", { name: "My account" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Account" })).toBeInTheDocument();
     await expectAccessible(container);
     expect(screen.getByLabelText("Who can see “About me”")).toHaveValue("private");
   });

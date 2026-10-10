@@ -1,3 +1,4 @@
+import account from "../../../backend/locales/en/account.json";
 import admin from "../../../backend/locales/en/admin.json";
 import ai from "../../../backend/locales/en/ai.json";
 import automations from "../../../backend/locales/en/automations.json";
@@ -27,6 +28,7 @@ import wiki from "../../../backend/locales/en/wiki.json";
  * loaded, and the strings used before the user's catalogs arrive. Same files as the backend's base bundles.
  */
 export const BUNDLED: Record<string, Record<string, string>> = {
+  account,
   admin,
   ai,
   automations,

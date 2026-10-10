@@ -1,63 +1,90 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { SelectField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { PolicyField } from "../../../design-system/components/PolicyField";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { SavedNote, SettingsCard, SettingsGrid, SettingsPage, Switch } from "../../account/SettingsKit";
+import { NewsletterSubscriptions } from "../../news/NewsletterSubscriptions";
 import { type Preferences, usePreferences, useSavePreferences } from "../api";
 import "../notifications.css";
-import { PageHeader } from "../../../design-system/components/PageHeader";
-import { NewsletterSubscriptions } from "../../news/NewsletterSubscriptions";
 
 /**
- * Notification preferences (spec 010 T016): per category and channel; a channel required by the category
- * or by the administrator is shown checked and explained (``PolicyField``), never silently disabled; a
- * category the administrator locked is read-only; the e-mail digest mode.
+ * Notification preferences (spec 010 T016; #46 redrawn like the other « My account » tabs): one card per
+ * theme (account, media, community…), a switch per channel; a channel required by the category or by the
+ * administrator is shown on and explained (``PolicyField``), never silently disabled; a category the
+ * administrator locked is read-only; the e-mail digest in a card of its own.
  */
 const CHANNELS = ["portal", "email"] as const;
+type Category = Preferences["categories"][number];
 
-function Row({
+/** Which card a category goes in, from its key's prefix (« media.available » → media). */
+const GROUPS: ReadonlyArray<{ key: string; icon: string; prefixes: readonly string[] }> = [
+  { key: "account", icon: "shield", prefixes: ["account"] },
+  { key: "media", icon: "film", prefixes: ["media"] },
+  { key: "community", icon: "users", prefixes: ["community", "campaigns"] },
+  { key: "progression", icon: "trophy", prefixes: ["gamification", "statistics"] },
+  { key: "shop", icon: "shop", prefixes: ["marketplace"] },
+  { key: "news", icon: "newspaper", prefixes: ["news", "communications", "calendar"] },
+  { key: "support", icon: "lifebuoy", prefixes: ["support", "system"] },
+  { key: "admin", icon: "settings", prefixes: ["automations", "plugins"] },
+];
+
+function groupOf(category: Category): string {
+  const prefix = category.key.split(".")[0] ?? "";
+  return GROUPS.find((group) => group.prefixes.includes(prefix))?.key ?? "other";
+}
+
+function Line({
   category,
   onToggle,
 }: {
-  category: Preferences["categories"][number];
+  category: Category;
   onToggle: (channel: string, on: boolean) => void;
 }) {
   const t = useT();
-  const rowId = useId();
   const label = t(category.label_key);
   return (
-    <tr>
-      <th scope="row">{label}</th>
-      {CHANNELS.map((channel) => {
-        const state = category.channels[channel];
-        if (!state) return <td key={channel} />;
-        const policy = state.mandatory ? "mandatory" : state.locked ? "locked" : "free";
-        const id = `${rowId}-${channel}`;
-        return (
-          <td key={channel}>
-            <PolicyField id={id} state={policy}>
-              {({ disabled, describedBy }) => (
-                <input
-                  id={id}
-                  type="checkbox"
-                  checked={state.enabled}
-                  disabled={disabled || state.mandatory}
-                  aria-describedby={describedBy}
-                  aria-label={`${label}: ${t(`notifications:preferences.${channel}`)}`}
-                  onChange={(event) => onToggle(channel, event.currentTarget.checked)}
-                />
-              )}
-            </PolicyField>
-          </td>
-        );
-      })}
-    </tr>
+    <li>
+      <span className="settings-list__text">
+        <strong>{label}</strong>
+        {Object.values(category.channels).some((state) => state?.mandatory || state?.locked) ? (
+          <span>
+            <Icon name="lock" size={12} /> {t("account:notifications.locked")}
+          </span>
+        ) : null}
+      </span>
+      <span className="settings-list__controls">
+        {CHANNELS.map((channel) => {
+          const state = category.channels[channel];
+          if (!state) return <span key={channel} className="notif-matrix__cell" />;
+          const policy = state.mandatory ? "mandatory" : state.locked ? "locked" : "free";
+          const id = `notif-${category.key}-${channel}`;
+          return (
+            <span key={channel} className="notif-matrix__cell">
+              <PolicyField id={id} state={policy}>
+                {({ disabled, describedBy }) => (
+                  <Switch
+                    id={id}
+                    hideLabel
+                    label={`${label}: ${t(`notifications:preferences.${channel}`)}`}
+                    checked={state.enabled}
+                    disabled={disabled || state.mandatory}
+                    aria-describedby={describedBy}
+                    onChange={(event) => onToggle(channel, event.currentTarget.checked)}
+                  />
+                )}
+              </PolicyField>
+            </span>
+          );
+        })}
+      </span>
+    </li>
   );
 }
 
 export function NotificationPreferences() {
   const t = useT();
-  const headingId = useId();
   const query = usePreferences();
   const save = useSavePreferences();
   const [saved, setSaved] = useState(false);
@@ -67,45 +94,64 @@ export function NotificationPreferences() {
   const data = query.data;
   const submit = (body: Parameters<typeof save.mutate>[0]) =>
     save.mutate(body, { onSuccess: () => setSaved(true), onError: () => setSaved(false) });
+  const groups = [...GROUPS, { key: "other", icon: "bell", prefixes: [] }]
+    .map((group) => ({ ...group, items: data.categories.filter((c) => groupOf(c) === group.key) }))
+    .filter((group) => group.items.length);
+  const heads = (
+    <span className="notif-matrix__head" aria-hidden="true">
+      {CHANNELS.map((channel) => (
+        <span key={channel}>{t(`notifications:preferences.${channel}`)}</span>
+      ))}
+    </span>
+  );
   return (
-    <section aria-labelledby={headingId} className="notification-preferences">
-      <PageHeader titleId={headingId} level={2} icon="bell" title={t("notifications:preferences.title")} />
-      <table>
-        <thead>
-          <tr>
-            <td />
-            {CHANNELS.map((channel) => (
-              <th key={channel} scope="col">
-                {t(`notifications:preferences.${channel}`)}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.categories.map((category) => (
-            <Row
-              key={category.key}
-              category={category}
-              onToggle={(channel, on) => submit({ preferences: { [category.key]: { [channel]: on } } })}
-            />
-          ))}
-        </tbody>
-      </table>
-      <SelectField
-        label={t("notifications:preferences.digest")}
-        value={data.digest}
-        onChange={(event) => submit({ digest: event.currentTarget.value as Preferences["digest"] })}
-      >
-        {(["off", "daily", "weekly"] as const).map((mode) => (
-          <option key={mode} value={mode}>
-            {t(`notifications:preferences.digest.${mode}`)}
-          </option>
-        ))}
-      </SelectField>
-      <p aria-live="polite">{saved ? t("notifications:preferences.saved") : ""}</p>
+    <SettingsPage
+      icon="bell"
+      title={t("notifications:preferences.title")}
+      lead={t("account:notifications.lead")}
+      actions={<SavedNote shown={saved} text={t("notifications:preferences.saved")} />}
+      className="notification-preferences"
+    >
       {save.isError ? <FunctionalState state="error" /> : null}
+      <SettingsGrid>
+        {groups.map((group) => (
+          <SettingsCard
+            key={group.key}
+            icon={group.icon}
+            title={t(`account:notifications.group.${group.key}`)}
+            aside={heads}
+          >
+            <ul className="settings-list">
+              {group.items.map((category) => (
+                <Line
+                  key={category.key}
+                  category={category}
+                  onToggle={(channel, on) => submit({ preferences: { [category.key]: { [channel]: on } } })}
+                />
+              ))}
+            </ul>
+          </SettingsCard>
+        ))}
+        <SettingsCard
+          icon="mail"
+          title={t("notifications:preferences.digest")}
+          hint={t("account:notifications.digestHint")}
+        >
+          <SelectField
+            label={t("notifications:preferences.digest")}
+            value={data.digest}
+            onChange={(event) => submit({ digest: event.currentTarget.value as Preferences["digest"] })}
+          >
+            {(["off", "daily", "weekly"] as const).map((mode) => (
+              <option key={mode} value={mode}>
+                {t(`notifications:preferences.digest.${mode}`)}
+              </option>
+            ))}
+          </SelectField>
+        </SettingsCard>
+      </SettingsGrid>
       <NewsletterSubscriptions />
-    </section>
+    </SettingsPage>
   );
 }
 

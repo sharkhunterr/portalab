@@ -8,8 +8,6 @@ import {
   ProgressBar,
 } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
-import { openWelcome } from "../../features/onboarding/api";
-import { TermsMenuEntry } from "../../features/terms/TermsViewer";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -97,25 +95,6 @@ export function ProfileCard({
                 </Link>
               </li>
             ))}
-          <li>
-            <Link to="/guide" onClick={onNavigate}>
-              <Icon name="compass" size={16} />
-              {t("onboarding:menu.tour")}
-            </Link>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                onNavigate?.();
-                openWelcome();
-              }}
-            >
-              <Icon name="sparkles" size={16} />
-              {t("onboarding:menu.welcome")}
-            </button>
-          </li>
-          <TermsMenuEntry onOpen={onNavigate} />
           <li>
             <button type="button" onClick={onSignOut}>
               <Icon name="logout" size={16} />

@@ -3,20 +3,29 @@ import type { Ambient } from "../../../design-system/a11y/preferences";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { useT } from "../../../i18n/hooks/useT";
+import { SettingsCard } from "../../account/SettingsKit";
 import { useMe } from "../../auth/useAuth";
 import { type CommunitySection, useProfile } from "../api";
 import type { Equipped } from "./looks";
 import { ProfileHero } from "./ProfileHero";
 import { sectionView } from "./sections";
 
+/** #46: each section's icon, its card drawn like the « My account » tabs. */
+const ICONS: Record<string, string> = {
+  identity: "user",
+  progression: "trophy",
+  achievements: "medal",
+  activity: "activity",
+  projects: "lightbulb",
+  cosmetics: "sparkles",
+};
+
 function SectionFrame({ memberId, section }: { memberId: string; section: CommunitySection }) {
   const t = useT();
   const View = sectionView(section.key);
-  const headingId = `community-section-${section.key}`;
   const title = section.label_key ? t(section.label_key) : section.key;
   return (
-    <section aria-labelledby={headingId} className="ds-card ds-stack community-section">
-      <h2 id={headingId}>{title}</h2>
+    <SettingsCard icon={ICONS[section.key] ?? "star"} title={title} level={2} data-section={section.key}>
       {section.state === "available" || section.state === "stale" ? (
         <>
           {section.state === "stale" ? (
@@ -29,7 +38,7 @@ function SectionFrame({ memberId, section }: { memberId: string; section: Commun
       ) : (
         <FunctionalState state="unavailable" label={t("community:section.unavailable")} />
       )}
-    </section>
+    </SettingsCard>
   );
 }
 

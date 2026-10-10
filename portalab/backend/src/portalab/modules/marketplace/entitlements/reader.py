@@ -26,6 +26,35 @@ class Entitlements:
             )
         return found is not None
 
+    async def owned_items(self, user_id: UUID, product_type: str) -> list[dict[str, Any]]:
+        """#46: what a member owns of one type, to show on a profile — key, names (by language), icon,
+        rarity and look (the product's current version)."""
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(
+                    Product.key, Product.icon, Product.rarity, ProductVersion.names, ProductVersion.payload
+                )
+                .join(Ownership, Ownership.product_id == Product.id)
+                .join(
+                    ProductVersion,
+                    (ProductVersion.product_id == Product.id)
+                    & (ProductVersion.version == Product.current_version),
+                )
+                .where(Ownership.user_id == user_id, Product.type == product_type, Ownership.state.in_(LIVE))
+                .distinct()
+                .order_by(Product.key)
+            )
+            return [
+                {
+                    "key": key,
+                    "names": dict(names or {}),
+                    "icon": icon or (payload or {}).get("icon"),
+                    "rarity": rarity,
+                    "style": (payload or {}).get("style"),
+                }
+                for key, icon, rarity, names, payload in rows
+            ]
+
     async def owned_by_type(self, user_id: UUID, product_type: str) -> list[str]:
         async with self.database.session() as session:
             rows = await session.execute(

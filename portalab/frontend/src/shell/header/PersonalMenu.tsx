@@ -1,8 +1,6 @@
 import { Avatar } from "../../design-system/components/Avatar";
 import type { MenuItem } from "../../design-system/components/Overlays";
 import { Menu } from "../../design-system/components/Overlays";
-import { openWelcome } from "../../features/onboarding/api";
-import { useT } from "../../i18n/hooks/useT";
 import { useShellStrings } from "../strings";
 
 /**
@@ -37,7 +35,6 @@ export function PersonalMenu({
   showName = false,
 }: PersonalMenuProps) {
   const strings = useShellStrings();
-  const t = useT();
   const profile = userId ? `/community/members/${userId}` : "/account"; // 027: the profile with its banner
   const items: MenuItem[] = [
     { key: "profile", label: strings.profile, icon: "user", onSelect: () => onNavigate(profile) },
@@ -56,15 +53,6 @@ export function PersonalMenu({
         separated: index === 0,
         onSelect: () => onNavigate(entry.route as string),
       })),
-    // #7: the welcome and the guided tour, whenever wanted
-    {
-      key: "tour",
-      label: t("onboarding:menu.tour"),
-      icon: "compass",
-      separated: true,
-      onSelect: () => onNavigate("/guide"),
-    },
-    { key: "welcome", label: t("onboarding:menu.welcome"), icon: "sparkles", onSelect: openWelcome },
     { key: "signout", label: strings.signOut, icon: "logout", separated: true, onSelect: onSignOut },
   ];
   return (

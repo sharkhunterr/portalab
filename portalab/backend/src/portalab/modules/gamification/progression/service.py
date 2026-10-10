@@ -1,20 +1,28 @@
 """Progression (T010, T024, T028; FR-002): the three values shown **separately** with the derived level;
 ``ProgressionReader`` for 017/015/012."""
 
+from collections.abc import Awaitable, Callable
 from uuid import UUID
 
 from sqlalchemy import func, select
 
 from portalab.capabilities.economy import Progress
 from portalab.core.db import Database
+from portalab.modules.gamification.achievements.evaluator import rarity_of
 from portalab.modules.gamification.levels.service import LevelService
 from portalab.modules.gamification.models import Achievement, Balance, Reservation, UserAchievement
 
 
 class ProgressionService:
-    def __init__(self, database: Database, levels: LevelService) -> None:
+    def __init__(
+        self,
+        database: Database,
+        levels: LevelService,
+        shares: Callable[[], Awaitable[dict[str, float]]] | None = None,
+    ) -> None:
         self.database = database
         self.levels = levels
+        self.shares = shares  # #46: each achievement's unlock share, for its rarity on profiles
 
     async def progress(self, user: UUID) -> Progress:
         async with self.database.session() as session:
@@ -69,7 +77,8 @@ class ProgressionService:
         return found is not None
 
     async def achievement_list(self, user_id: UUID, limit: int = 50) -> list[dict[str, str]]:
-        """Unlocked achievements, newest first (key, label, date) — for profile surfaces (012)."""
+        """Unlocked achievements, newest first — for profile surfaces (012): key, label, date and (#46) the
+        description, icon and rarity a badge shows."""
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -86,10 +95,14 @@ class ProgressionService:
                     .limit(limit)
                 )
             ).all()
+        shares = await self.shares() if self.shares is not None else {}
         return [
             {
                 "key": key,
                 "label": str((definition or {}).get("label") or key),
+                "description": str((definition or {}).get("description") or ""),
+                "icon": str((definition or {}).get("icon") or "trophy"),
+                "rarity": rarity_of(shares.get(key, 100.0)),
                 "unlocked_at": unlocked_at.isoformat(),
             }
             for key, unlocked_at, definition in rows

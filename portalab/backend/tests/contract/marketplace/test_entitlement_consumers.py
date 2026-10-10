@@ -26,7 +26,11 @@ async def test_consumers_contract(mk: MkHarness) -> None:
     section = mk.module.sections.get("cosmetics")
     assert section is not None and section.datum_class == "progression"
     shown = await section.provider(user, mk.p("ulrich"))
-    assert shown.state == "available" and shown.data == {"badges": ["owl"], "titles": ["boss_title"]}
+    assert shown.state == "available" and shown.data is not None
+    # #46: what a profile shows of them — key, names, icon, rarity, look
+    assert [b["key"] for b in shown.data["badges"]] == ["owl"]
+    assert [t["key"] for t in shown.data["titles"]] == ["boss_title"]
+    assert shown.data["badges"][0]["names"]["en"] == "Owl"
 
     await mk.module.refunds.refund(mk.p("ursula"), owl.id, "Changed my mind")
     assert not await reader.owns(user, "owl")

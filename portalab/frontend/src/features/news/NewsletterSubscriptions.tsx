@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
+import { SettingsCard, Switch } from "../account/SettingsKit";
 import "./news.css";
 
 interface Subscription {
@@ -34,25 +35,26 @@ export function NewsletterSubscriptions() {
   });
   if (!channels.data?.length) return null;
   return (
-    <section id="newsletters" className="newsletter-subscriptions" aria-labelledby="newsletters-title">
-      <h3 id="newsletters-title">
-        <Icon name="mail" size={18} />
-        {t("news:subscriptions.title")}
-      </h3>
-      <p className="ds-page-header__context">{t("news:subscriptions.hint")}</p>
-      <ul>
+    <SettingsCard
+      id="newsletters"
+      icon="mail"
+      title={t("news:subscriptions.title")}
+      hint={t("news:subscriptions.hint")}
+    >
+      <ul className="settings-list">
         {channels.data.map((channel) => (
           <li key={channel.key} data-on={channel.subscribed || undefined}>
-            <span className="newsletter-subscriptions__icon" aria-hidden="true">
+            <span className="linked-service" aria-hidden="true">
               <Icon name={channel.icon ?? "newspaper"} size={18} />
             </span>
-            <label className="newsletter-subscriptions__text" htmlFor={`newsletter-${channel.key}`}>
+            <span className="settings-list__text">
               <strong>{channel.name}</strong>
               {channel.description ? <span>{channel.description}</span> : null}
-            </label>
-            <input
+            </span>
+            <Switch
               id={`newsletter-${channel.key}`}
-              type="checkbox"
+              hideLabel
+              label={channel.name}
               role="switch"
               aria-checked={channel.subscribed}
               checked={channel.subscribed}
@@ -62,6 +64,6 @@ export function NewsletterSubscriptions() {
           </li>
         ))}
       </ul>
-    </section>
+    </SettingsCard>
   );
 }

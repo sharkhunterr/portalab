@@ -59,7 +59,7 @@ def register_builtin_sections(
         listing = getattr(reader, "achievement_list", None) if reader is not None else None
         if listing is None:
             return SectionResult("unavailable")
-        items = await listing(owner, 12)
+        items = await listing(owner, 60)
         return SectionResult("available" if items else "no-data", {"items": items})
 
     async def activity(owner: UUID, viewer: Principal) -> SectionResult:

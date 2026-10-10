@@ -5,7 +5,9 @@ import type { components } from "../../api/generated/schema";
 import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { DataRegion } from "../../state/regions";
+import { SettingsCard, SettingsGrid } from "../account/SettingsKit";
 import { DeletionSection, ExportSection } from "../auth/AccountPage";
+import { TermsCard } from "../terms/TermsViewer";
 import { type LevelKey, privacyStrings as t } from "./strings";
 import "./privacy.css";
 
@@ -113,7 +115,7 @@ export function PrivacyCenter() {
           groups.set(owner, [...(groups.get(owner) ?? []), item]);
         }
         return (
-          <div className="account-page privacy-page">
+          <div className="settings-page privacy-page">
             <PageHeader level={2} icon="shield" title={t.centerTitle} context={t.centerIntro} />
             <ul className="privacy-summary" aria-label={t.summary}>
               {LEVELS.map((level) => (
@@ -124,34 +126,29 @@ export function PrivacyCenter() {
                 </li>
               ))}
             </ul>
-            <div className="privacy-groups">
+            <SettingsGrid>
               {[...groups.entries()].map(([owner, items]) => (
-                <section key={owner} className="privacy-group" aria-label={t.owners[owner] ?? owner}>
-                  <h3>
-                    <span className="privacy-group__icon" aria-hidden="true">
-                      <Icon name={OWNER_ICONS[owner] ?? "database"} size={16} />
-                    </span>
-                    {t.owners[owner] ?? owner}
-                  </h3>
+                <SettingsCard
+                  key={owner}
+                  icon={OWNER_ICONS[owner] ?? "database"}
+                  title={t.owners[owner] ?? owner}
+                >
                   <ul className="privacy-data">
                     {items.map((item) => (
                       <DatumRow key={item.datum_class} item={item} />
                     ))}
                   </ul>
-                </section>
+                </SettingsCard>
               ))}
-            </div>
+            </SettingsGrid>
             <section className="privacy-mine" aria-label={t.yourData} id="delete-account">
               <h3>{t.yourData}</h3>
               <p className="ds-page-header__context">{t.yourDataHint}</p>
-              <div className="privacy-mine__cards">
-                <div className="privacy-mine__card">
-                  <ExportSection />
-                </div>
-                <div className="privacy-mine__card" data-danger="true">
-                  <DeletionSection />
-                </div>
-              </div>
+              <SettingsGrid>
+                <TermsCard />
+                <ExportSection />
+                <DeletionSection />
+              </SettingsGrid>
             </section>
           </div>
         );

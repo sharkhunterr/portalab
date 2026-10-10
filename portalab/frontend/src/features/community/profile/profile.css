@@ -19,6 +19,11 @@
   margin-block-start: -3.5rem;
   position: relative;
 }
+.profile-hero__avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
 .profile-hero__identity .avatar-frame {
   background-color: var(--color-surface-raised);
 }
@@ -30,7 +35,8 @@
   flex: 1 1 12rem;
   min-inline-size: 0;
 }
-.profile-hero__text h1 {
+.profile-hero__text h1,
+.profile-hero__text h2 {
   margin: 0;
   font-size: clamp(1.4rem, 3vw, 2rem);
 }
@@ -268,4 +274,214 @@
 .looks-grid__level .ds-level {
   align-self: center;
   transform: scale(1.4);
+}
+
+/* #46 — the profile's sections as cards: about, figures, medals, recent activity --------------------- */
+.community-sections {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  align-items: start;
+}
+.community-sections > [data-section="achievements"],
+.community-sections > [data-section="activity"],
+.community-sections > [data-section="projects"],
+.community-sections > [data-section="cosmetics"] {
+  grid-column: 1 / -1;
+}
+.profile-about {
+  margin: 0;
+  white-space: pre-line;
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-stats li {
+  display: grid;
+  justify-items: start;
+  gap: 0.1rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+.profile-stats li > svg {
+  color: var(--color-accent);
+}
+.profile-stats strong {
+  font-size: var(--font-size-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.profile-stats span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* unlocked achievements: medals only, their story on hover / tap */
+.profile-medals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-medal {
+  --rarity: var(--rarity-common);
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  padding: 0;
+  border: 2px solid color-mix(in srgb, var(--rarity) 70%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--rarity) 80%, var(--artwork-text) 20%),
+    var(--rarity) 60%,
+    color-mix(in srgb, var(--rarity) 70%, black 30%)
+  );
+  color: var(--artwork-text);
+  box-shadow: 0 0.35rem 0.9rem color-mix(in srgb, var(--rarity) 35%, transparent);
+  cursor: pointer;
+  transition: transform var(--motion-duration-fast) var(--motion-easing-spring);
+}
+.profile-medal:hover,
+.profile-medal[data-state="open"] {
+  transform: translateY(-2px) scale(1.08);
+}
+.profile-medal:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+.profile-medal[data-rarity="rare"],
+.profile-medal__card[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+.profile-medal[data-rarity="epic"],
+.profile-medal__card[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+.profile-medal[data-rarity="legendary"],
+.profile-medal__card[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+.profile-medal[data-rarity="epic"],
+.profile-medal[data-rarity="legendary"] {
+  animation: profile-medal-glow 2.6s ease-in-out infinite;
+}
+.profile-medal__card {
+  --rarity: var(--rarity-common);
+  display: grid;
+  gap: var(--space-1);
+  max-inline-size: 16rem;
+  border-block-start: 3px solid var(--rarity);
+}
+.profile-medal__card p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.profile-medal__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--font-size-xs);
+}
+.profile-medal__rarity {
+  color: var(--rarity);
+  font-weight: var(--font-weight-semibold);
+}
+.profile-medal__arrow {
+  fill: var(--color-surface-raised);
+}
+
+/* recent activity: a badge, a title, what, when */
+.profile-activity {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-activity li {
+  --kind: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
+.profile-activity li:hover {
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+.profile-activity li[data-kind="achievement.unlocked"] {
+  --kind: var(--rarity-legendary);
+}
+.profile-activity li[data-kind="quest.completed"] {
+  --kind: var(--state-available-fg);
+}
+.profile-activity li[data-kind="project.created"] {
+  --kind: var(--color-accent-alt);
+}
+.profile-activity__badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--kind) 18%, transparent);
+  color: var(--kind);
+}
+.profile-activity__text {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+.profile-activity__text strong {
+  font-weight: var(--font-weight-semibold);
+}
+.profile-activity__text span {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-activity__when {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.profile-activity__more {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+@keyframes profile-medal-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px color-mix(in srgb, var(--rarity) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 24px color-mix(in srgb, var(--rarity) 75%, transparent);
+  }
+}
+.profile-looks {
+  display: grid;
+  gap: var(--space-3);
+}
+.profile-looks ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

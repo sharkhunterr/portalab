@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type ReactElement, useId } from "react";
+import type { ReactElement } from "react";
 import { api } from "../../api/client";
 import { SelectField } from "../../design-system/components/Field";
-import { PageHeader } from "../../design-system/components/PageHeader";
+import { Icon } from "../../design-system/components/Icon";
 import { PolicyField, type PolicyState } from "../../design-system/components/PolicyField";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
+import { SavedNote, SettingsCard, SettingsGrid, SettingsPage } from "../account/SettingsKit";
 
 /**
  * Language & region (spec 026 T028; US1, US2, US3, US11): interface language, formats locale, time zone,
@@ -41,7 +42,6 @@ function zones(): string[] {
 }
 
 export function LanguageSettings() {
-  const headingId = useId();
   const t = useT();
   const ctx = useLocaleContext();
   const format = useFormat();
@@ -88,92 +88,122 @@ export function LanguageSettings() {
       new Date(Date.UTC(2024, 0, day + 1)), // 2024-01-01 is a Monday
     );
   return (
-    <section aria-labelledby={headingId} className="account-page">
-      <PageHeader titleId={headingId} level={2} icon="globe" title={t("i18n:title")} />
+    <SettingsPage
+      icon="globe"
+      title={t("i18n:title")}
+      lead={t("account:language.lead")}
+      actions={<SavedNote shown={save.isSuccess} text={t("account:saved")} />}
+    >
       {ctx.retained_language ? (
         <p role="status">{t("i18n:retained", { language: ctx.retained_language })}</p>
       ) : null}
-      {field("i18n.language", (disabled, describedBy) => (
-        <SelectField
-          label={t("i18n:language")}
-          value={value("i18n.language")}
-          disabled={disabled}
-          aria-describedby={describedBy}
-          onChange={(event) => set("i18n.language")(event.target.value)}
+      <SettingsGrid>
+        <SettingsCard
+          icon="globe"
+          title={t("account:language.language")}
+          hint={t("account:language.languageHint")}
         >
-          <option value="">{t("i18n:auto")}</option>
-          {(languages.data?.items ?? []).map((language) => (
-            <option key={language.code} value={language.code} lang={language.code} dir={language.direction}>
-              {language.name_native}
-            </option>
+          {field("i18n.language", (disabled, describedBy) => (
+            <SelectField
+              label={t("i18n:language")}
+              value={value("i18n.language")}
+              disabled={disabled}
+              aria-describedby={describedBy}
+              onChange={(event) => set("i18n.language")(event.target.value)}
+            >
+              <option value="">{t("i18n:auto")}</option>
+              {(languages.data?.items ?? []).map((language) => (
+                <option
+                  key={language.code}
+                  value={language.code}
+                  lang={language.code}
+                  dir={language.direction}
+                >
+                  {language.name_native}
+                </option>
+              ))}
+            </SelectField>
           ))}
-        </SelectField>
-      ))}
-      {field("i18n.locale", (disabled, describedBy) => (
-        <SelectField
-          label={t("i18n:locale")}
-          value={value("i18n.locale")}
-          disabled={disabled}
-          aria-describedby={describedBy}
-          onChange={(event) => set("i18n.locale")(event.target.value)}
+        </SettingsCard>
+        <SettingsCard
+          icon="calendar"
+          title={t("account:language.formats")}
+          hint={t("account:language.formatsHint")}
         >
-          <option value="">{t("i18n:auto")}</option>
-          {LOCALES.map((code) => (
-            <option key={code} value={code}>
-              {new Intl.DisplayNames([ctx.locale], { type: "language" }).of(code) ?? code}
-            </option>
-          ))}
-        </SelectField>
-      ))}
-      {field("i18n.timeZone", (disabled, describedBy) => (
-        <SelectField
-          label={t("i18n:timeZone")}
-          value={value("i18n.timeZone")}
-          disabled={disabled}
-          aria-describedby={describedBy}
-          onChange={(event) => set("i18n.timeZone")(event.target.value)}
-        >
-          <option value="">{t("i18n:auto")}</option>
-          {zones().map((zone) => (
-            <option key={zone} value={zone}>
-              {zone}
-            </option>
-          ))}
-        </SelectField>
-      ))}
-      {field("i18n.hourCycle", (disabled, describedBy) => (
-        <SelectField
-          label={t("i18n:hourCycle")}
-          value={value("i18n.hourCycle")}
-          disabled={disabled}
-          aria-describedby={describedBy}
-          onChange={(event) => set("i18n.hourCycle")(event.target.value)}
-        >
-          <option value="">{t("i18n:auto")}</option>
-          <option value="h12">{t("i18n:h12")}</option>
-          <option value="h23">{t("i18n:h23")}</option>
-        </SelectField>
-      ))}
-      {field("i18n.firstDayOfWeek", (disabled, describedBy) => (
-        <SelectField
-          label={t("i18n:firstDayOfWeek")}
-          value={value("i18n.firstDayOfWeek")}
-          disabled={disabled}
-          aria-describedby={describedBy}
-          onChange={(event) =>
-            save.mutate({ "i18n.firstDayOfWeek": event.target.value ? Number(event.target.value) : null })
-          }
-        >
-          <option value="">{t("i18n:auto")}</option>
-          {DAYS.map((day) => (
-            <option key={day} value={day}>
-              {dayName(day)}
-            </option>
-          ))}
-        </SelectField>
-      ))}
-      <p aria-live="polite">{t("i18n:preview", { date: format.dateTime(new Date()) })}</p>
-    </section>
+          <div className="settings-fields">
+            {field("i18n.locale", (disabled, describedBy) => (
+              <SelectField
+                label={t("i18n:locale")}
+                value={value("i18n.locale")}
+                disabled={disabled}
+                aria-describedby={describedBy}
+                onChange={(event) => set("i18n.locale")(event.target.value)}
+              >
+                <option value="">{t("i18n:auto")}</option>
+                {LOCALES.map((code) => (
+                  <option key={code} value={code}>
+                    {new Intl.DisplayNames([ctx.locale], { type: "language" }).of(code) ?? code}
+                  </option>
+                ))}
+              </SelectField>
+            ))}
+            {field("i18n.timeZone", (disabled, describedBy) => (
+              <SelectField
+                label={t("i18n:timeZone")}
+                value={value("i18n.timeZone")}
+                disabled={disabled}
+                aria-describedby={describedBy}
+                onChange={(event) => set("i18n.timeZone")(event.target.value)}
+              >
+                <option value="">{t("i18n:auto")}</option>
+                {zones().map((zone) => (
+                  <option key={zone} value={zone}>
+                    {zone}
+                  </option>
+                ))}
+              </SelectField>
+            ))}
+            {field("i18n.hourCycle", (disabled, describedBy) => (
+              <SelectField
+                label={t("i18n:hourCycle")}
+                value={value("i18n.hourCycle")}
+                disabled={disabled}
+                aria-describedby={describedBy}
+                onChange={(event) => set("i18n.hourCycle")(event.target.value)}
+              >
+                <option value="">{t("i18n:auto")}</option>
+                <option value="h12">{t("i18n:h12")}</option>
+                <option value="h23">{t("i18n:h23")}</option>
+              </SelectField>
+            ))}
+            {field("i18n.firstDayOfWeek", (disabled, describedBy) => (
+              <SelectField
+                label={t("i18n:firstDayOfWeek")}
+                value={value("i18n.firstDayOfWeek")}
+                disabled={disabled}
+                aria-describedby={describedBy}
+                onChange={(event) =>
+                  save.mutate({
+                    "i18n.firstDayOfWeek": event.target.value ? Number(event.target.value) : null,
+                  })
+                }
+              >
+                <option value="">{t("i18n:auto")}</option>
+                {DAYS.map((day) => (
+                  <option key={day} value={day}>
+                    {dayName(day)}
+                  </option>
+                ))}
+              </SelectField>
+            ))}
+          </div>
+          <p className="settings-preview" aria-live="polite">
+            <Icon name="clock" size={18} />
+            {t("i18n:preview", { date: format.dateTime(new Date()) })}
+          </p>
+        </SettingsCard>
+      </SettingsGrid>
+    </SettingsPage>
   );
 }
 

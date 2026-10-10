@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import { api } from "../../../api/client";
 import { Avatar } from "../../../design-system/components/Avatar";
 import { LevelBadge } from "../../../design-system/components/Badges";
@@ -72,28 +73,41 @@ export function ProfileHero({
   name,
   looks,
   own,
+  avatarSrc,
+  avatarAction,
+  heading = 1,
 }: {
   memberId: string;
   name: string;
   looks: Equipped;
   own: boolean;
+  /** #46: the picture to show (a fresh one right after a change). */
+  avatarSrc?: string | null;
+  /** #46: a control over the avatar (« change the picture » on the account page). */
+  avatarAction?: ReactNode;
+  /** The name's heading level (2 inside a page that has its own title). */
+  heading?: 1 | 2;
 }) {
   const t = useT();
+  const Name = heading === 1 ? "h1" : "h2";
   return (
     <header className="profile-hero">
       <BannerArt banner={looks.banner ?? null} backdrop={looks.backdrop ?? null} />
       <div className="profile-hero__identity">
-        <FramedAvatar
-          frame={looks.frame}
-          name={name}
-          userId={memberId}
-          src={`/api/v1/users/${memberId}/avatar`}
-        />
+        <span className="profile-hero__avatar">
+          <FramedAvatar
+            frame={looks.frame}
+            name={name}
+            userId={memberId}
+            src={avatarSrc === undefined ? `/api/v1/users/${memberId}/avatar` : avatarSrc}
+          />
+          {avatarAction}
+        </span>
         <div className="profile-hero__text">
-          <h1 className="profile-hero__name">
+          <Name className="profile-hero__name">
             <StyledName name={name} style={looks.name} />
             <MemberLevel memberId={memberId} look={looks.level} />
-          </h1>
+          </Name>
           {looks.title ? <WornBadge item={looks.title} kind="title" /> : null}
           {looks.badges?.items?.length ? (
             <ul className="profile-hero__badges">

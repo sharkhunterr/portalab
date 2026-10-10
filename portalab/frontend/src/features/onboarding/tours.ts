@@ -73,7 +73,7 @@ export const TOURS: readonly TourDef[] = [
     route: "/account",
     mission: "discover_profile",
     steps: [
-      { key: "name", icon: "user", targets: [".account-page .auth-form"] },
+      { key: "name", icon: "user", targets: ["#account-profile"] },
       { key: "avatar", icon: "image", targets: ["[data-tour='avatar']"] },
       { key: "themes", icon: "palette", route: "/settings/appearance", targets: [".theme-gallery__list"] },
       { key: "palettes", icon: "sparkles", targets: [".palettes"] },

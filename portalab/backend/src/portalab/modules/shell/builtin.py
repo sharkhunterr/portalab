@@ -119,15 +119,15 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
+        # #46: the notification centre opens from the bell (and the palette), not as a profile tab
         "key": "notifications.center",
         "owner": "module:notifications",
-        "kind": "entry",
+        "kind": "command",
         "label_key": "nav.notifications",
         "icon": "bell",
         "route": "/notifications",
-        "group": "me",
-        "order_hint": 5,
         "required_permission": "users.self.manage",
+        "keywords": ("notifications", "inbox"),
     },
     {
         "key": "notifications.preferences",

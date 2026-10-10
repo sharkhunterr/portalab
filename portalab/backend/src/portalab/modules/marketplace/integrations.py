@@ -187,8 +187,8 @@ def catalog_tool(catalog: Catalog, clock: Clock | None = None) -> AITool:
 
 def cosmetics_section(entitlements: Entitlements) -> ProfileSection:
     async def provider(owner: UUID, viewer: Principal) -> SectionResult:
-        badges = await entitlements.owned_by_type(owner, "badge")
-        titles = await entitlements.owned_by_type(owner, "title")
+        badges = await entitlements.owned_items(owner, "badge")
+        titles = await entitlements.owned_items(owner, "title")
         if not badges and not titles:
             return SectionResult("no-data")
         return SectionResult("available", {"badges": badges, "titles": titles})
