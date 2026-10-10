@@ -347,6 +347,7 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
       <button
         type="button"
         className="ds-button ds-button--ghost ds-button--icon"
+        data-tour="search"
         aria-label={strings.search}
         aria-keyshortcuts="Control+K Meta+K /"
         onClick={() => {

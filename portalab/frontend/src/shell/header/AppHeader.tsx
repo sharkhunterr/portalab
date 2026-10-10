@@ -69,7 +69,13 @@ export function AppHeader({
             </RegionBoundary>
           ) : null}
           <NotificationButton unread={data.unread} />
-          <Button variant="ghost" size="icon" aria-label={strings.openNavigation} onClick={onOpenNavigation}>
+          <Button
+            variant="ghost"
+            size="icon"
+            data-tour="nav"
+            aria-label={strings.openNavigation}
+            onClick={onOpenNavigation}
+          >
             <Icon name="menu" />
           </Button>
         </div>
@@ -80,7 +86,13 @@ export function AppHeader({
     <header className="shell-header" data-device={device}>
       <div className="shell-header__start">
         {onOpenNavigation ? (
-          <Button variant="ghost" size="icon" aria-label={strings.openNavigation} onClick={onOpenNavigation}>
+          <Button
+            variant="ghost"
+            size="icon"
+            data-tour="nav"
+            aria-label={strings.openNavigation}
+            onClick={onOpenNavigation}
+          >
             <Icon name="menu" />
           </Button>
         ) : null}
@@ -128,6 +140,7 @@ function SearchField({ compact }: { compact: boolean }) {
       <Button
         variant="ghost"
         size="icon"
+        data-tour="search"
         aria-label={strings.search}
         aria-keyshortcuts="Control+K Meta+K /"
         onClick={open}

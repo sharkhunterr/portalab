@@ -43,6 +43,7 @@ ONBOARDING_STEPS: tuple[str, ...] = (
     "privacy",
     "dashboard",
     "discovery",
+    "tour",  # 027: the guided tour of the portal
 )
 REVOKE_REASONS: tuple[str, ...] = ("logout", "suspended", "deleted", "admin", "password_change", "rotated")
 EXPORT_STATUSES: tuple[str, ...] = ("queued", "ready", "failed", "expired")

@@ -31,7 +31,8 @@ function writeMirror(key: string, value: unknown): void {
   }
 }
 
-export function useShellPreference<T>(key: string, fallback: T): [T, (value: T) => void] {
+/** The value, its setter, and whether the server's copy has arrived (to decide before showing anything). */
+export function useShellPreference<T>(key: string, fallback: T): [T, (value: T) => void, boolean] {
   const client = useQueryClient();
   const query = useQuery({
     queryKey: KEY,
@@ -62,5 +63,5 @@ export function useShellPreference<T>(key: string, fallback: T): [T, (value: T) 
     },
     [client, key, save],
   );
-  return [value, set];
+  return [value, set, query.isSuccess];
 }

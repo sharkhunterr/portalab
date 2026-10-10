@@ -272,7 +272,7 @@ class Quest(GamificationBase):
     __tablename__ = "quests"
     __table_args__ = (
         CheckConstraint("status IN ('active', 'retired')", name="status"),
-        CheckConstraint("kind IN ('quest', 'daily', 'challenge')", name="kind"),
+        CheckConstraint("kind IN ('quest', 'daily', 'challenge', 'discovery')", name="kind"),
     )
 
     key: Mapped[str] = mapped_column(String(96), primary_key=True)

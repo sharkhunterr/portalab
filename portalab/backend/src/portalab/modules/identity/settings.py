@@ -138,6 +138,25 @@ _OIDC: tuple[tuple[str, Any, Any, str, bool], ...] = (
 )
 
 
+# 027: the members' welcome (a few steps on first sign-in, the guided tour, the discovery missions)
+ONBOARDING_ENABLED = "identity.onboarding.enabled"
+ONBOARDING_MESSAGE = "identity.onboarding.welcomeMessage"
+_ONBOARDING: tuple[tuple[str, Any, Any, str], ...] = (
+    (
+        ONBOARDING_ENABLED,
+        bool,
+        True,
+        "Welcome new members with a few steps and a guided tour on first sign-in.",
+    ),
+    (
+        ONBOARDING_MESSAGE,
+        str,
+        "",
+        "The administrator's word shown on the first step of the welcome (empty: the portal's own).",
+    ),
+)
+
+
 def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None:
     """Declare the identity keys through the kernel ``declare_setting`` (idempotent per catalog)."""
     declare = declare_setting if catalog is default_catalog else catalog.declare
@@ -153,6 +172,11 @@ def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None
             owner=OWNER,
             description=description,
         )
+    for key, schema, default, description in _ONBOARDING:
+        if key not in known:
+            declare(
+                scope="global", key=key, schema=schema, default=default, owner=OWNER, description=description
+            )
     for key, schema, default, description, sensitive in _OIDC:
         if key in known:
             continue

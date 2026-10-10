@@ -251,6 +251,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "calendar.read",
     },
     {
+        "key": "shell.guide",  # #7: every guided tour of the portal, relaunched from one page
+        "owner": "module:shell",
+        "kind": "entry",
+        "label_key": "nav.guide",
+        "icon": "compass",
+        "route": "/guide",
+        "group": "support",
+        "order_hint": 29,
+        "required_permission": "users.self.manage",
+        "keywords": ("tour", "help", "onboarding", "visite", "aide"),
+    },
+    {
         "key": "support.tickets",
         "owner": "module:support",
         "kind": "entry",

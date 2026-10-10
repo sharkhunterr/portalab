@@ -14,6 +14,7 @@ import media from "../../../backend/locales/en/media.json";
 import nav from "../../../backend/locales/en/nav.json";
 import news from "../../../backend/locales/en/news.json";
 import notifications from "../../../backend/locales/en/notifications.json";
+import onboarding from "../../../backend/locales/en/onboarding.json";
 import plugins from "../../../backend/locales/en/plugins.json";
 import search from "../../../backend/locales/en/search.json";
 import shell from "../../../backend/locales/en/shell.json";
@@ -42,6 +43,7 @@ export const BUNDLED: Record<string, Record<string, string>> = {
   nav,
   news,
   notifications,
+  onboarding,
   plugins,
   search,
   shell,

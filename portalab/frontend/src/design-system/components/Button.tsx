@@ -1,6 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode, Ref } from "react";
 
 /** Button (WCAG 2.2: target ≥ 24×24, visible focus from tokens, real ``<button>`` semantics). */
 const button = cva("ds-button", {
@@ -21,6 +21,7 @@ const button = cva("ds-button", {
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof button> {
   asChild?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 export function Button({ asChild = false, variant, size, className, type, ...props }: ButtonProps) {

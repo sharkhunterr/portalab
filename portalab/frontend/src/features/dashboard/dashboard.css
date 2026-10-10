@@ -658,55 +658,6 @@
   }
 }
 
-/* 027 FR-029: first-visit welcome */
-.welcome-card {
-  display: flex;
-  gap: var(--space-5);
-  align-items: flex-start;
-  background:
-    radial-gradient(
-      30rem 12rem at 100% 0%,
-      color-mix(in srgb, var(--color-accent-alt) 18%, transparent),
-      transparent 70%
-    ),
-    var(--color-surface-raised);
-}
-
-.welcome-card__art {
-  display: grid;
-  flex: none;
-  place-items: center;
-  inline-size: 3.5rem;
-  block-size: 3.5rem;
-  border-radius: var(--radius-lg);
-  background: var(--xp-gradient);
-  color: var(--color-accent-contrast);
-}
-
-.welcome-card__body h2 {
-  margin: 0 0 var(--space-2);
-}
-
-.welcome-card__body ul {
-  display: grid;
-  gap: var(--space-2);
-  margin: 0 0 var(--space-4);
-  padding: 0;
-  list-style: none;
-}
-
-.welcome-card__body li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.welcome-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
 /* 027 media widgets: poster rows and my statistics */
 .widget-posters {
   display: grid;

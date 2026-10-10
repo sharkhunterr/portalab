@@ -286,7 +286,9 @@ class DashboardService:
             )
         return board
 
-    async def _bump(self, session: AsyncSession, board: UserDashboard, principal: Principal) -> int:
+    async def _bump(
+        self, session: AsyncSession, board: UserDashboard, principal: Principal, *, starter: bool = False
+    ) -> int:
         board.layout_version += 1
         board.updated_at = utc_now(self.clock)
         counts = (
@@ -306,6 +308,7 @@ class DashboardService:
                 "layout_version": board.layout_version,
                 "widgets": len(counts),
                 "active": sum(1 for status in counts if status == "active"),
+                "starter": starter,
             },
             occurred_at=board.updated_at,
             actor=principal,
@@ -962,7 +965,7 @@ class DashboardService:
                 position += 1
             board.starter_applied_at = now
             await self._rearrange(session, user, by_position=True)
-            await self._bump(session, board, principal)
+            await self._bump(session, board, principal, starter=True)
             await self.events.publish(
                 session,
                 "dashboard.starter_applied",

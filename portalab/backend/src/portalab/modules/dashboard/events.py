@@ -12,6 +12,7 @@ class LayoutChanged(BaseModel):
     layout_version: int
     widgets: int
     active: int
+    starter: bool = False  # 027: the starter layout being applied (not the member's own doing)
 
 
 class StarterApplied(BaseModel):

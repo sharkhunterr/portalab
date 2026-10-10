@@ -95,7 +95,7 @@ function AvatarSection({ me }: { me: Me }) {
   const error = upload.error ?? remove.error;
 
   return (
-    <section aria-labelledby={ids.title}>
+    <section aria-labelledby={ids.title} data-tour="avatar">
       <h2 id={ids.title}>{t.avatarTitle}</h2>
       {error ? <FormMessage kind="error">{messageFor(error)}</FormMessage> : null}
       {me.has_avatar ? (

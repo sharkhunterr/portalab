@@ -70,7 +70,7 @@ export function MyTickets() {
           </Link>
         }
         primary={
-          <Link className="ds-button ds-button--primary" to="/support/new">
+          <Link className="ds-button ds-button--primary" to="/support/new" data-tour="new-ticket">
             <Icon name="plus" size={18} />
             {t("support:mine.new")}
           </Link>
@@ -82,7 +82,7 @@ export function MyTickets() {
           icon="lifebuoy"
           title={t("support:mine.empty")}
           action={
-            <Link className="ds-button ds-button--primary" to="/support/new">
+            <Link className="ds-button ds-button--primary" to="/support/new" data-tour="new-ticket">
               {t("support:mine.new")}
             </Link>
           }

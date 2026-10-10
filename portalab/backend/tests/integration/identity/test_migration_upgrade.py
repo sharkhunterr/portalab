@@ -29,7 +29,7 @@ async def test_upgrade_from_the_001_baseline(empty_db_url: str, heads: set[str])
             assert (await conn.execute(text("SELECT to_regnamespace('identity')"))).scalar() is None
         await asyncio.to_thread(upgrade, empty_db_url)
         assert await current_heads(db) == heads
-        assert {"core_0005", "identity_0002"} <= heads
+        assert {"core_0005", "identity_0003"} <= heads
         async with db.engine.connect() as conn:
             assert (await conn.execute(text("SELECT count(*) FROM core.job"))).scalar() == 1
             assert (await conn.execute(text("SELECT count(*) FROM core.live_event"))).scalar() == 1

@@ -30,12 +30,18 @@ export function BottomBar({
       <button
         type="button"
         className="shell-bottom-bar__item"
+        data-tour="search"
         onClick={() => (search ? search.open() : palette.open())}
       >
         <Icon name="search" />
         <span>{strings.search}</span>
       </button>
-      <button type="button" className="shell-bottom-bar__item" onClick={() => notifications?.open()}>
+      <button
+        type="button"
+        className="shell-bottom-bar__item"
+        data-tour="notifications"
+        onClick={() => notifications?.open()}
+      >
         <span className="shell-bottom-bar__icon">
           <Icon name="bell" />
           {count > 0 ? (
@@ -49,7 +55,13 @@ export function BottomBar({
           {count > 0 ? <span className="visually-hidden"> ({count})</span> : null}
         </span>
       </button>
-      <button type="button" className="shell-bottom-bar__item" aria-expanded={menuOpen} onClick={onOpenMenu}>
+      <button
+        type="button"
+        className="shell-bottom-bar__item"
+        data-tour="nav"
+        aria-expanded={menuOpen}
+        onClick={onOpenMenu}
+      >
         <Icon name="menu" />
         <span>{strings.menu}</span>
       </button>

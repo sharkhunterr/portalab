@@ -2,7 +2,8 @@
 
 * ``quest`` — steps over event counts, once (``period: none``) or each week (``period: week``);
 * ``daily`` — a daily objective (``period: day``; ``week`` for weekly objectives), reset each period;
-* ``challenge`` — a **time-boxed quest**: a ``window`` is required and only events inside it count.
+* ``challenge`` — a **time-boxed quest**: a ``window`` is required and only events inside it count;
+* ``discovery`` (027) — a new member's first steps (fill the profile, take the tour…): once, no window.
 Steps reuse the achievements' ``event_count`` criterion; rewards go through the ledger."""
 
 from collections.abc import Mapping
@@ -14,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError,
 from portalab.core.errors import ValidationFailed
 from portalab.modules.gamification.achievements.definition import EventCount, Reward
 
-QuestKind = Literal["quest", "daily", "challenge"]
+QuestKind = Literal["quest", "daily", "challenge", "discovery"]
 Period = Literal["none", "day", "week", "month"]
 
 
@@ -49,6 +50,8 @@ class QuestDefinition(BaseModel):
             raise ValueError("a daily objective resets each day, week or month")
         if self.kind == "challenge" and (self.window is None or self.period != "none"):
             raise ValueError("a challenge is a time-boxed quest: a window and no period")
+        if self.kind == "discovery" and (self.period != "none" or self.window is not None):
+            raise ValueError("a discovery mission is done once: no period and no window")
         if self.kind == "quest" and self.period == "day":
             raise ValueError("a quest repeating each day is a daily objective")
         return self

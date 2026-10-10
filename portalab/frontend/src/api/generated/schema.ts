@@ -5654,6 +5654,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/onboarding/tours/{tour}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete Tour
+         * @description #7: a guided tour seen to its end (once per tour; unknown tours are 404).
+         */
+        post: operations["complete_tour_api_v1_me_onboarding_tours__tour__complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/onboarding/welcome": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Onboarding Welcome
+         * @description 027: whether the welcome is on, and the administrator's message for it.
+         */
+        get: operations["onboarding_welcome_api_v1_me_onboarding_welcome_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/onboarding/{step}/complete": {
         parameters: {
             query?: never;
@@ -13357,6 +13397,13 @@ export interface components {
             id?: string | null;
             /** Layout Version */
             layout_version: number;
+        };
+        /** WelcomeOut */
+        WelcomeOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Message */
+            message: string;
         };
         /** WidgetMeta */
         WidgetMeta: {
@@ -25124,6 +25171,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OnboardingStep"][];
+                };
+            };
+        };
+    };
+    complete_tour_api_v1_me_onboarding_tours__tour__complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tour: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    onboarding_welcome_api_v1_me_onboarding_welcome_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WelcomeOut"];
                 };
             };
         };

@@ -86,7 +86,7 @@ export function CatalogDrawer({ apply }: { apply: (change: Change) => void }) {
       title={t("dashboard:catalog")}
       closeLabel={t("dashboard:done")}
       trigger={
-        <Button variant="secondary">
+        <Button variant="secondary" data-tour="add-widget">
           <Icon name="plus" size={18} />
           {t("dashboard:addWidget")}
         </Button>

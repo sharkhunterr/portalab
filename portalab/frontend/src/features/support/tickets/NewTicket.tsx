@@ -169,7 +169,7 @@ export function NewTicketForm({
           />
         ) : null}
         {formId ? null : (
-          <Button type="submit" disabled={!typeKey || !title || create.isPending}>
+          <Button type="submit" data-tour="ticket-submit" disabled={!typeKey || !title || create.isPending}>
             {t("support:new.submit")}
           </Button>
         )}

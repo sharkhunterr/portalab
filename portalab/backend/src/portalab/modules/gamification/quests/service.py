@@ -84,6 +84,19 @@ class Quests:
         self._own: tuple[float, list[QuestVersion]] | None = None
 
     # --- definitions -------------------------------------------------------------------------------------
+    async def ensure_discovery(self) -> int:
+        """027: the discovery missions exist on a fresh portal (a key once used is never created again)."""
+        from portalab.modules.gamification.quests.discovery import DISCOVERY
+
+        made = 0
+        for key, raw in DISCOVERY.items():
+            async with self.database.session() as session:
+                if await session.scalar(select(Quest.key).where(Quest.key == key).limit(1)) is not None:
+                    continue
+            await self.save(Principal(channel="system"), key, raw)
+            made += 1
+        return made
+
     async def save(self, actor: Principal, key: str, raw: Mapping[str, Any]) -> Quest:
         definition = parse_quest(raw)
         async with self.database.unit_of_work() as uow:

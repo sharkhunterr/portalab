@@ -14,6 +14,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useMe } from "../auth/useAuth";
 import { useHasPermission } from "../authz/useMyPermissions";
+import { FirstSteps } from "../onboarding/FirstSteps";
 import { type Change, DASHBOARD_KEY, type Instance, useDashboard, useDashboardWrite } from "./api";
 import { CatalogDrawer } from "./catalog/CatalogDrawer";
 import { EditControls } from "./edit/EditControls";
@@ -25,7 +26,6 @@ import { VIEW_COLUMNS, type View } from "./grid/engine";
 import "./summary/SinceLastLoginCard";
 import "./widgets/tiles";
 import "./widgets/layout";
-import { WelcomeCard } from "./WelcomeCard";
 import "./widgets/builtin";
 import "./widgets/media";
 import "./widgets/calendar";
@@ -196,14 +196,14 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
               <Button variant="secondary" disabled={session.saving} onClick={() => void session.cancel()}>
                 {t("dashboard:cancel")}
               </Button>
-              <Button disabled={session.saving} onClick={() => void save()}>
+              <Button data-tour="dashboard-save" disabled={session.saving} onClick={() => void save()}>
                 <Icon name="check" size={18} />
                 {t("dashboard:save")}
               </Button>
             </>
           ) : (
             <>
-              <Button variant="secondary" onClick={() => session.start(deviceView)}>
+              <Button variant="secondary" data-tour="customize" onClick={() => session.start(deviceView)}>
                 <Icon name="dashboard" size={18} />
                 {t("dashboard:edit")}
               </Button>
@@ -211,7 +211,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
           )
         }
       />
-      <WelcomeCard />
+      <FirstSteps />
       {dashboard.isPending ? <FunctionalState state="loading" /> : null}
       {dashboard.isError ? <FunctionalState state="error" onRetry={() => dashboard.refetch()} /> : null}
       {dashboard.data && visible.length === 0 ? (

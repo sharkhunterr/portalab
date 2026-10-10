@@ -1,0 +1,221 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
+import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, expect, it, vi } from "vitest";
+
+// #7 — the member onboarding: the welcome opens once (and never again once seen, on any device, or when the
+// administrator turned it off); the first steps list the discovery missions with what they bring and go
+// away when put away; the guided tour shows what is on screen and its end completes the « tour » step.
+
+const fake = vi.hoisted(() => ({
+  handler: (_: Request): Response | Promise<Response> => new Response(null),
+}));
+vi.mock("../../src/api/client", async (importOriginal) => {
+  const { installFakeApi } = await import("../support/fake-api");
+  const installed = installFakeApi();
+  Object.defineProperty(installed, "handler", { get: () => fake.handler });
+  return importOriginal();
+});
+
+import { startTour } from "../../src/features/onboarding/api";
+import { FirstSteps } from "../../src/features/onboarding/FirstSteps";
+import GuidePage from "../../src/features/onboarding/GuidePage";
+import { TOUR_TIMING, Tour } from "../../src/features/onboarding/Tour";
+import { TOURS } from "../../src/features/onboarding/tours";
+import { WelcomeFlow } from "../../src/features/onboarding/WelcomeFlow";
+import { BUNDLED } from "../../src/i18n/bundled";
+import { json, ME } from "../support/fake-api";
+
+function show(element: ReactNode) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const router = createMemoryRouter([{ path: "*", element }]); // the tours open their pages
+  return render(
+    <QueryClientProvider client={client}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+}
+
+interface Backend {
+  preferences?: Array<{ key: string; value: unknown }>;
+  welcome?: { enabled: boolean; message: string };
+  quests?: unknown[];
+}
+
+function backend({ preferences = [], welcome = { enabled: true, message: "" }, quests = [] }: Backend) {
+  const puts: Array<Record<string, unknown>> = [];
+  const posts: string[] = [];
+  fake.handler = async (request) => {
+    const path = new URL(request.url).pathname;
+    if (request.method === "PUT" && path === "/api/v1/me/preferences") {
+      puts.push(await request.json());
+      return json(200, { preferences: [] });
+    }
+    if (request.method === "POST") {
+      posts.push(path);
+      return json(200, []);
+    }
+    if (path === "/api/v1/me") return json(200, ME);
+    if (path === "/api/v1/me/preferences") return json(200, { preferences });
+    if (path === "/api/v1/me/onboarding/welcome") return json(200, welcome);
+    if (path === "/api/v1/me/quests") return json(200, quests);
+    return json(404, {});
+  };
+  return { puts, posts };
+}
+
+const mission = (key: string, done = false) => ({
+  key,
+  kind: "discovery",
+  label: key,
+  icon: "user",
+  completed_at: done ? "2026-10-10T10:00:00Z" : null,
+  rewards: [
+    { value: "xp", amount: 25 },
+    { value: "coins", amount: 10 },
+  ],
+  steps: [{ current: done ? 1 : 0, target: 1 }],
+});
+
+describe("welcome", () => {
+  it("opens on a first visit, with the portal's words, and skipping it is remembered", async () => {
+    window.localStorage.clear();
+    const { puts } = backend({ welcome: { enabled: true, message: "Have fun, folks" } });
+    show(<WelcomeFlow />);
+    expect(await screen.findByRole("heading", { name: "Welcome, Alice!" })).toBeInTheDocument();
+    expect(screen.getByText("Have fun, folks")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Let's go" }));
+    expect(await screen.findByRole("heading", { name: "A face and a name" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Skip" }));
+    await waitFor(() => expect(puts.flatMap(Object.keys)).toContain("shell.onboarding.welcomedAt"));
+    expect(screen.queryByRole("heading", { name: "A face and a name" })).toBeNull();
+  });
+
+  it("stays closed once seen elsewhere, or when the administrator turned it off", async () => {
+    window.localStorage.clear();
+    backend({ preferences: [{ key: "shell.onboarding.welcomedAt", value: "2026-10-09T10:00:00Z" }] });
+    const first = show(<WelcomeFlow />);
+    await waitFor(() => expect(fake.handler).toBeDefined());
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByRole("heading", { name: "Welcome, Alice!" })).toBeNull();
+    first.unmount();
+
+    backend({ welcome: { enabled: false, message: "" } });
+    show(<WelcomeFlow />);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByRole("heading", { name: "Welcome, Alice!" })).toBeNull();
+  });
+
+  it("keeps what the member came for", async () => {
+    window.localStorage.clear();
+    const { puts, posts } = backend({});
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" })); // profile unchanged
+    await screen.findByRole("heading", { name: "Your look" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: "Films" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Games" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "All set, Alice!" })).toBeInTheDocument();
+    await waitFor(() => expect(puts).toContainEqual({ "shell.onboarding.interests": ["movies", "games"] }));
+    expect(posts).toContain("/api/v1/me/onboarding/interests/complete");
+  });
+});
+
+describe("first steps", () => {
+  it("lists the missions with their rewards and can be put away", async () => {
+    window.localStorage.clear();
+    const { puts } = backend({
+      quests: [mission("discover_profile", true), mission("discover_tour"), mission("daily", false)].map(
+        (m, i) => (i === 2 ? { ...m, kind: "daily" } : m),
+      ),
+    });
+    show(<FirstSteps />);
+    expect(await screen.findByRole("heading", { name: "First steps" })).toBeInTheDocument();
+    expect(screen.getByText("Make your profile yours")).toBeInTheDocument();
+    expect(screen.getByText("Take the tour")).toBeInTheDocument();
+    expect(screen.getByText("+25 XP · +10 Coins")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "1 of 2 done" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Put away the first steps" }));
+    await waitFor(() => expect(puts.flatMap(Object.keys)).toContain("shell.onboarding.stepsHiddenAt"));
+    expect(screen.queryByRole("heading", { name: "First steps" })).toBeNull();
+  });
+
+  it("goes away once every mission is done", async () => {
+    window.localStorage.clear();
+    backend({ quests: [mission("discover_profile", true), mission("discover_tour", true)] });
+    const { container } = show(<FirstSteps />);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(container.querySelector(".first-steps")).toBeNull();
+  });
+});
+
+describe("guided tour", () => {
+  it("has its words for every step of every tour", () => {
+    const messages = BUNDLED.onboarding as Record<string, string>;
+    for (const tour of TOURS) {
+      expect(messages[`tours.${tour.key}.title`], tour.key).toBeTruthy();
+      expect(messages[`tours.${tour.key}.description`], tour.key).toBeTruthy();
+      expect(tour.steps.at(-1)?.targets, tour.key).toEqual([]); // each ends on a bubble of its own
+      for (const step of tour.steps) {
+        expect(messages[`tours.${tour.key}.${step.key}.title`], `${tour.key}.${step.key}`).toBeTruthy();
+        expect(messages[`tours.${tour.key}.${step.key}.text`], `${tour.key}.${step.key}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("leaves out what is not on screen and its end is said once", async () => {
+    TOUR_TIMING.patience = 30;
+    window.localStorage.clear();
+    const { posts, puts } = backend({});
+    show(<Tour />);
+    act(() => startTour("services"));
+    // nothing of the page is drawn here: only the closing bubble remains
+    expect(await screen.findByRole("dialog", { name: "Something wrong?" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => expect(posts).toContain("/api/v1/me/onboarding/tours/services/complete"));
+    expect(posts).not.toContain("/api/v1/me/onboarding/tour/complete");
+    expect(puts).toContainEqual({ "shell.onboarding.toursSeen": ["services"] });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("the portal's tour also completes the welcome's tour step", async () => {
+    TOUR_TIMING.patience = 30;
+    const { posts } = backend({});
+    show(<Tour />);
+    act(() => startTour());
+    fireEvent.click(await screen.findByRole("button", { name: "Finish" }));
+    await waitFor(() => expect(posts).toContain("/api/v1/me/onboarding/tours/portal/complete"));
+    expect(posts).toContain("/api/v1/me/onboarding/tour/complete");
+  });
+
+  it("leaves with Escape without completing anything", async () => {
+    TOUR_TIMING.patience = 30;
+    const { posts } = backend({});
+    show(<Tour />);
+    act(() => startTour("calendar"));
+    await screen.findByRole("dialog", { name: "Never miss a thing" });
+    fireEvent.keyDown(window, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(posts).toEqual([]);
+  });
+});
+
+describe("guide", () => {
+  it("offers every tour, with what its mission still brings", async () => {
+    window.localStorage.clear();
+    backend({
+      preferences: [{ key: "shell.onboarding.toursSeen", value: ["services"] }],
+      quests: [mission("discover_ticket")],
+    });
+    show(<GuidePage />);
+    expect(await screen.findByRole("heading", { name: "Guided tours" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Ask the support" })).toBeInTheDocument();
+    expect(await screen.findByText("+25 XP · +10 Coins")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See again : Service status" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(TOURS.length - 1);
+  });
+});

@@ -5,6 +5,8 @@ import { useLogout, useMe } from "../features/auth/useAuth";
 import { NotificationPanel } from "../features/notifications/bell/NotificationPanel";
 import { useNotificationSummary } from "../features/notifications/bell/NotificationSlot";
 import { ToastRegion } from "../features/notifications/toasts/ToastRegion";
+import { Tour } from "../features/onboarding/Tour";
+import { WelcomeFlow } from "../features/onboarding/WelcomeFlow";
 import { TermsViewer } from "../features/terms/TermsViewer";
 import { useHelpSlot } from "../features/wiki/useHelpSlot";
 import { AppShell } from "./AppShell";
@@ -29,6 +31,8 @@ export function ShellLayout() {
       <NotificationPanel open={bell.open} onOpenChange={bell.setOpen} />
       <AiPanel {...assistant.panel} />
       <TermsViewer />
+      <WelcomeFlow />
+      <Tour />
     </ShellSlotsProvider>
   );
 }

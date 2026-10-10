@@ -75,6 +75,7 @@ async def test_open_registration_then_verify(
         "privacy",
         "dashboard",
         "discovery",
+        "tour",
     }
     events = await _events(app)
     assert events[:2] == ["user.created", "user.verified"]

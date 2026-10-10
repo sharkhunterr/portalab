@@ -14875,6 +14875,24 @@
         "title": "VersionOut",
         "type": "object"
       },
+      "WelcomeOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "message"
+        ],
+        "title": "WelcomeOut",
+        "type": "object"
+      },
       "WidgetMeta": {
         "properties": {
           "component_id": {
@@ -32349,6 +32367,64 @@
           }
         },
         "summary": "Onboarding",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/me/onboarding/tours/{tour}/complete": {
+      "post": {
+        "description": "#7: a guided tour seen to its end (once per tour; unknown tours are 404).",
+        "operationId": "complete_tour_api_v1_me_onboarding_tours__tour__complete_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tour",
+            "required": true,
+            "schema": {
+              "title": "Tour",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Complete Tour",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/me/onboarding/welcome": {
+      "get": {
+        "description": "027: whether the welcome is on, and the administrator's message for it.",
+        "operationId": "onboarding_welcome_api_v1_me_onboarding_welcome_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WelcomeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Onboarding Welcome",
         "tags": [
           "identity"
         ]

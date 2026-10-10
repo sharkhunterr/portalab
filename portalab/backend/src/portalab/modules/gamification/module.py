@@ -251,6 +251,7 @@ class GamificationModule:
     async def start(self) -> None:
         await self.refresh_config()
         await self.levels.ensure_default()
+        await self.quests.ensure_discovery()  # 027: a new member's first steps
 
     async def refresh_config(self) -> None:
         try:

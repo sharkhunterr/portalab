@@ -10,6 +10,7 @@ import { RouteErrorElement } from "./RouteBoundary";
  */
 const Home = lazy(() => import("../../features/dashboard/DashboardPage"));
 const Account = lazy(() => import("../../pages/AccountRoute"));
+const Guide = lazy(() => import("../../features/onboarding/GuidePage"));
 const Appearance = lazy(() => import("../../pages/AppearanceRoute"));
 const Privacy = lazy(() => import("../../pages/PrivacyRoute"));
 const Services = lazy(() => import("../../pages/ServicesRoute"));
@@ -289,6 +290,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         },
         { path: "notifications", element: <Notifications />, handle: h({ crumb: "Notifications" }) },
         { path: "account", element: <Account />, handle: h({ crumb: "Account" }) },
+        { path: "guide", element: <Guide />, handle: h({ crumb: "Guided tours" }) },
         { path: "settings/appearance", element: <Appearance />, handle: h({ crumb: "Appearance" }) },
         { path: "settings/language", element: <Language />, handle: h({ crumb: "Language & region" }) },
         {

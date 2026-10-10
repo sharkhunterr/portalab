@@ -19,6 +19,8 @@ register_event_types(
     "user.deleted",
     "user.admin_transferred",
     "user.onboarding_completed",
+    "user.onboarding_step_completed",  # 027: one step of the welcome (its ``step``) — discovery missions
+    "user.tour_completed",  # #7: a guided tour seen to its end (its ``tour``), once — discovery missions
     retention_class="business",
     visibility_class="private",
 )

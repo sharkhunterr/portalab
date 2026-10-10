@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
@@ -105,6 +106,29 @@ async def onboarding(
     async with module.ctx.database.session() as session:
         progress = await module.onboarding.progress(session, principal.user_id)
     return [OnboardingStep(step=item.step, completed_at=item.completed_at) for item in progress]
+
+
+class WelcomeOut(BaseModel):
+    enabled: bool
+    message: str
+
+
+@router.get("/me/onboarding/welcome", response_model=WelcomeOut)
+async def onboarding_welcome(
+    module: Module, principal: Principal = require("users.self.manage")
+) -> WelcomeOut:
+    """027: whether the welcome is on, and the administrator's message for it."""
+    welcome = await module.onboarding.welcome()
+    return WelcomeOut(enabled=welcome.enabled, message=welcome.message)
+
+
+@router.post("/me/onboarding/tours/{tour}/complete", status_code=204)
+async def complete_tour(
+    tour: str, module: Module, principal: Principal = require("users.self.manage")
+) -> Response:
+    """#7: a guided tour seen to its end (once per tour; unknown tours are 404)."""
+    await module.onboarding.tour_completed(principal, tour)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/me/onboarding/{step}/complete", response_model=list[OnboardingStep])

@@ -36,6 +36,8 @@ EXPECTED_PERMISSIONS = {
     ("PUT", "/api/v1/me/avatar"): "users.self.manage",
     ("DELETE", "/api/v1/me/avatar"): "users.self.manage",
     ("GET", "/api/v1/me/onboarding"): "users.self.manage",
+    ("GET", "/api/v1/me/onboarding/welcome"): "users.self.manage",
+    ("POST", "/api/v1/me/onboarding/tours/{tour}/complete"): "users.self.manage",
     ("POST", "/api/v1/me/onboarding/{step}/complete"): "users.self.manage",
     ("POST", "/api/v1/me/deletion"): "users.self.manage",
     ("DELETE", "/api/v1/me/deletion"): "users.self.manage",
