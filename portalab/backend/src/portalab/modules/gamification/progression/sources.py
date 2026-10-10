@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Date, cast, func, select
+from sqlalchemy import Date, cast, func, or_, select
 
 from portalab.core.db import Database
 from portalab.modules.gamification.models import LedgerTransaction, RewardRule
@@ -87,7 +87,8 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
                 ).where(
                     LedgerTransaction.user_id == user,
                     LedgerTransaction.value == value,
-                    LedgerTransaction.delta > 0,
+                    # a correction takes back part of a gain: counted against the day it is dated
+                    or_(LedgerTransaction.delta > 0, LedgerTransaction.kind == "correction"),
                     LedgerTransaction.kind.in_(GAINS),
                     LedgerTransaction.occurred_at >= since,
                 )
@@ -112,7 +113,7 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
     ordered = sorted(totals.items(), key=lambda item: -item[1])
     return {
         "value": value,
-        "total": round(sum(totals.values())),
+        "total": round(sum(a for a in totals.values() if a > 0)),
         "sources": [{"source": s, "amount": round(a)} for s, a in ordered if round(a) > 0],
         "days": [
             {"day": d, "amounts": {s: round(a) for s, a in amounts.items() if round(a) > 0}}

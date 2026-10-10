@@ -1453,3 +1453,59 @@
 .daily-objectives--compact .gains-now {
   flex: none;
 }
+
+/* #62: my progression over time — the level-ups as small cards */
+.gain-timeline {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.gain-levelups h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.gain-levelups ol {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+.gain-levelup {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 45%, transparent);
+  border-radius: var(--radius-md, 0.75rem);
+  background: color-mix(in srgb, var(--rarity-epic, var(--color-accent)) 10%, var(--color-surface));
+  scroll-snap-align: start;
+}
+.gain-levelup__level {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: var(--rarity-epic, var(--color-accent));
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.gain-levelup__text {
+  display: grid;
+  line-height: 1.2;
+}
+.gain-levelup__text small {
+  color: var(--color-text-muted);
+}
+.gain-levelup--more {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

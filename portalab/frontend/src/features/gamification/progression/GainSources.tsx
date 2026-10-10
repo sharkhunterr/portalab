@@ -9,6 +9,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Value } from "../api";
+import { GainTimeline } from "./GainTimeline";
 
 type Sources = components["schemas"]["MySourcesOut"];
 type Streak = components["schemas"]["MyStreakOut"];
@@ -66,6 +67,7 @@ export function GainSources() {
   const [value, setValue] = useState<Value>("xp");
   const [days, setDays] = useState(30);
   const [table, setTable] = useState(false);
+  const [mode, setMode] = useState<"sources" | "timeline">("sources"); // #62: by source, or over time
   const data = useSources(value, days).data;
   const streak = useStreak().data;
   const unit = t(`gamification:value.${value}`);
@@ -81,11 +83,22 @@ export function GainSources() {
         </h2>
         <div className="gain-sources__filters">
           <AdminTabs
-            label={t("gamification:sources.value")}
-            current={value}
-            onChange={(next) => setValue(next as Value)}
-            tabs={VALUES.map((v) => ({ key: v, label: t(`gamification:value.${v}`) }))}
+            label={t("gamification:sources.mode")}
+            current={mode}
+            onChange={(next) => setMode(next as "sources" | "timeline")}
+            tabs={[
+              { key: "sources", label: t("gamification:sources.bySource") },
+              { key: "timeline", label: t("gamification:sources.overTime") },
+            ]}
           />
+          {mode === "sources" ? (
+            <AdminTabs
+              label={t("gamification:sources.value")}
+              current={value}
+              onChange={(next) => setValue(next as Value)}
+              tabs={VALUES.map((v) => ({ key: v, label: t(`gamification:value.${v}`) }))}
+            />
+          ) : null}
           <AdminTabs
             label={t("gamification:sources.period")}
             current={String(days)}
@@ -119,8 +132,11 @@ export function GainSources() {
             : null}
         </p>
       ) : null}
-      {data && !sources.length ? <p className="admin-muted">{t("gamification:sources.empty")}</p> : null}
-      {sources.length ? (
+      {mode === "timeline" ? <GainTimeline days={days} /> : null}
+      {mode === "sources" && data && !sources.length ? (
+        <p className="admin-muted">{t("gamification:sources.empty")}</p>
+      ) : null}
+      {mode === "sources" && sources.length ? (
         <div className="gain-sources__charts">
           <figure className="gain-stack">
             <p className="gain-stack__total">
@@ -191,7 +207,7 @@ export function GainSources() {
           </figure>
         </div>
       ) : null}
-      {sources.length ? (
+      {mode === "sources" && sources.length ? (
         <Button
           variant="ghost"
           onClick={() => setTable(!table)}
@@ -202,7 +218,7 @@ export function GainSources() {
           {table ? t("gamification:admin.overview.hideTable") : t("gamification:admin.overview.showTable")}
         </Button>
       ) : null}
-      {table && data ? (
+      {mode === "sources" && table && data ? (
         <table id={tableId} className="admin-table" aria-label={t("gamification:sources.title")}>
           <thead>
             <tr>

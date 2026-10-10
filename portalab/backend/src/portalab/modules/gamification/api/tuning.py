@@ -23,6 +23,7 @@ from portalab.modules.gamification.models import LedgerTransaction
 from portalab.modules.gamification.permissions import MANAGE
 from portalab.modules.gamification.progression.sources import since_days
 from portalab.modules.gamification.progression.sources import sources as gain_sources
+from portalab.modules.gamification.progression.timeline import timeline as gain_timeline
 from portalab.modules.gamification.settings import SETTINGS
 from portalab.modules.gamification.streaks.level_rewards import LevelReward, parse_rewards
 from portalab.modules.gamification.streaks.service import PaceConfig, StreakConfig, parse_pace, parse_streak
@@ -406,3 +407,39 @@ async def my_sources(
         module.config.timezone or "UTC",
     )
     return MySourcesOut.model_validate(result)
+
+
+class TimelineDayOut(BaseModel):
+    day: str
+    xp: int
+    coins: int
+    contribution: int
+
+
+class LevelUpOut(BaseModel):
+    level: int
+    at: str
+    day: str
+
+
+class MyTimelineOut(BaseModel):
+    days: list[TimelineDayOut]
+    start_level: int
+    level_ups: list[LevelUpOut]
+
+
+@router.get("/me/progression/timeline", response_model=MyTimelineOut)
+async def my_timeline(
+    principal: Me,
+    module: Module,
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+) -> MyTimelineOut:
+    """#62: my XP, Coins and Contribution gained day by day, and the moments I reached a level."""
+    result = await gain_timeline(
+        module.database,
+        _me(principal),
+        since_days(utc_now(module.clock), days),
+        module.config.timezone or "UTC",
+        await module.levels.curve(),
+    )
+    return MyTimelineOut.model_validate(result)
