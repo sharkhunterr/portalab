@@ -55,7 +55,7 @@ def test_unraid_report() -> None:
             "os": {"hostname": "Tower", "uptime": 3600},
             "versions": {"core": {"unraid": "7.2.0"}},
             "cpu": {
-                "brand": "i5-13500",
+                "brand": "Gen Intel® Core™ i5-13500",
                 "cores": 14,
                 "threads": 20,
                 "packages": {"temp": [45], "totalPower": 30},
@@ -63,7 +63,7 @@ def test_unraid_report() -> None:
         },
         "metrics": {
             "cpu": {"percentTotal": 12.5},
-            "memory": {"total": 1000, "used": 600, "percentTotal": 60},
+            "memory": {"total": 1000, "used": 980, "available": 400, "percentTotal": 98},
         },
         "array": {
             "state": "STARTED",
@@ -81,7 +81,14 @@ def test_unraid_report() -> None:
                 {"name": "disk2", "status": "DISK_NP"},
             ],
             "caches": [{"name": "cache", "status": "DISK_OK", "fsSize": 100, "fsUsed": 10, "numErrors": 2}],
-            "parityCheckStatus": {"status": "RUNNING", "progress": 42.5, "errors": 0, "running": True},
+            "parityCheckStatus": {
+                "status": "RUNNING",
+                "progress": 25,
+                "errors": 0,
+                "running": True,
+                "duration": 3600,
+                "speed": "180 MB/s",
+            },
         },
         "docker": {
             "containers": [
@@ -95,10 +102,13 @@ def test_unraid_report() -> None:
     }
     report = unraid_report(data)
     assert report.os == "Unraid 7.2.0" and report.cpu_cores == 20 and report.cpu_percent == 12.5
+    assert report.cpu_name == "Intel Core i5-13500"
+    assert report.memory is not None and report.memory.used == 600  # total - available, not the cache
     assert report.storage is not None and report.storage.total == 1000 * 1024
     assert [v.name for v in report.volumes] == ["parity", "disk1", "cache"]  # the empty slot is left out
     assert report.volumes[0].used is None  # a parity disk holds no files
-    assert report.parity is not None and report.parity.progress == 42.5
+    assert report.parity is not None and report.parity.progress == 25 and report.parity.running
+    assert report.parity.elapsed_seconds == 3600 and report.parity.remaining_seconds == 3 * 3600
     assert report.containers[0].name == "sonarr" and report.containers[0].update_available  # updates first
     assert report.notices[0].importance == "warning"
     assert report.warnings == ("storage_low", "disk_errors")  # disk1 98 % full; the cache has errors

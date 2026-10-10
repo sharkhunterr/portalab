@@ -49,14 +49,14 @@ SECTIONS: dict[str, str] = {
       versions { core { unraid } }
       cpu { brand cores threads packages { temp totalPower } }
     }""",
-    "metrics": "metrics { cpu { percentTotal } memory { total used free percentTotal } }",
+    "metrics": "metrics { cpu { percentTotal } memory { total used free available percentTotal } }",
     "array": """array {
       state
       capacity { kilobytes { free used total } }
       parities { name status temp size numErrors }
       disks { name status temp size numErrors fsSize fsFree fsUsed isSpinning }
       caches { name status temp size numErrors fsSize fsFree fsUsed }
-      parityCheckStatus { status progress running errors speed }
+      parityCheckStatus { status progress running errors speed date duration paused correcting }
     }""",
     "docker": "docker { containers { names state status image isUpdateAvailable autoStart } }",
     "notifications": """notifications {
@@ -190,6 +190,52 @@ def _list(value: Any) -> list[Mapping[str, Any]]:
     return [v for v in value if isinstance(v, Mapping)] if isinstance(value, list) else []
 
 
+def _memory_used(memory: Mapping[str, Any], total: float) -> float:
+    """What programs use: total - available (Unraid's « used » counts the disk cache too)."""
+    available = _number(memory.get("available"))
+    if available is not None and 0 <= available <= total:
+        return total - available
+    return _number(memory.get("used")) or 0.0
+
+
+def _cpu_name(value: Any) -> str | None:
+    """« Gen Intel® Core™ i5-13500 » (Unraid drops the generation) → « Intel Core i5-13500 »."""
+    if not value:
+        return None
+    text = str(value).replace("®", "").replace("™", "").replace("(R)", "").replace("(TM)", "")
+    text = " ".join(text.split())
+    return text[4:] if text.startswith("Gen ") else text
+
+
+def _parity(raw: Mapping[str, Any]) -> ParityCheck | None:
+    """The parity check: its state, progress, time so far and (when running) the time left at its pace."""
+    if not raw:
+        return None
+    running = raw.get("running") is True
+    paused = raw.get("paused") is True
+    status = str(raw.get("status") or ("running" if running else "idle")).lower()
+    progress = _number(raw.get("progress"))
+    elapsed = _number(raw.get("duration"))
+    started = parse_time(raw.get("date"))
+    if elapsed is None and started is not None and (running or paused):
+        elapsed = max(0.0, (datetime.now(UTC) - started).total_seconds())
+    remaining = None
+    if (running or paused) and progress and 0 < progress < 100 and elapsed:
+        remaining = elapsed * (100 - progress) / progress
+    return ParityCheck(
+        status=status,
+        progress=progress,
+        errors=int(_number(raw.get("errors")) or 0),
+        speed=str(raw.get("speed")) if raw.get("speed") not in (None, "", "0", 0) else None,
+        running=running,
+        paused=paused,
+        correcting=raw.get("correcting") if isinstance(raw.get("correcting"), bool) else None,
+        started_at=started.isoformat() if started else None,
+        elapsed_seconds=elapsed,
+        remaining_seconds=remaining,
+    )
+
+
 def _uptime(value: Any) -> float | None:
     """Seconds — Unraid gives the boot time (ISO) or a number of seconds."""
     number = _number(value)
@@ -241,16 +287,7 @@ def build_report(data: Mapping[str, Any]) -> HostReport:
     memory = _map(metrics.get("memory"))
     mem_total = _number(memory.get("total"))
     cap_total = _number(capacity.get("total"))
-    parity_raw = _map(array.get("parityCheckStatus"))
-    parity = None
-    if parity_raw:
-        status = str(parity_raw.get("status") or ("running" if parity_raw.get("running") else "idle")).lower()
-        parity = ParityCheck(
-            status=status,
-            progress=_number(parity_raw.get("progress")),
-            errors=int(_number(parity_raw.get("errors")) or 0),
-            speed=str(parity_raw.get("speed")) if parity_raw.get("speed") else None,
-        )
+    parity = _parity(_map(array.get("parityCheckStatus")))
     packages = (
         _list(cpu.get("packages")) if isinstance(cpu.get("packages"), list) else [_map(cpu.get("packages"))]
     )
@@ -297,10 +334,10 @@ def build_report(data: Mapping[str, Any]) -> HostReport:
         os=f"Unraid {version}" if version else (str(os_.get("distro")) if os_.get("distro") else "Unraid"),
         version=str(version) if version else (str(os_.get("release")) if os_.get("release") else None),
         uptime_seconds=_uptime(os_.get("uptime")),
-        cpu_name=str(cpu.get("brand")) if cpu.get("brand") else None,
+        cpu_name=_cpu_name(cpu.get("brand")),
         cpu_cores=int(_number(cpu.get("threads")) or _number(cpu.get("cores")) or 0) or None,
         cpu_percent=_number(_map(metrics.get("cpu")).get("percentTotal")),
-        memory=Usage(used=_number(memory.get("used")) or 0, total=mem_total) if mem_total else None,
+        memory=Usage(used=_memory_used(memory, mem_total), total=mem_total) if mem_total else None,
         storage=Usage(used=(_number(capacity.get("used")) or 0) * KB, total=cap_total * KB)
         if cap_total
         else None,

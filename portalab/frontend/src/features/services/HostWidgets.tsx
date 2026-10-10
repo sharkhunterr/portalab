@@ -254,11 +254,93 @@ function HostWidget({ payload, compact }: WidgetProps) {
   );
 }
 
+interface Parity {
+  status: string;
+  progress?: number | null;
+  errors?: number | null;
+  speed?: string | null;
+  running?: boolean;
+  paused?: boolean;
+  correcting?: boolean | null;
+  started_at?: string | null;
+  elapsed_seconds?: number | null;
+  remaining_seconds?: number | null;
+}
+
+/** « 2 h 15 min », « 3 d 4 h » — a duration in words, short. */
+function useDuration() {
+  const t = useT();
+  return (seconds: number | null | undefined) => {
+    if (seconds === null || seconds === undefined) return null;
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) return t("dashboard:duration.minutes", { minutes: Math.max(1, minutes) });
+    const hours = Math.floor(minutes / 60);
+    if (hours < 48) return t("dashboard:duration.hours", { hours, minutes: minutes % 60 });
+    return t("dashboard:duration.days", { days: Math.floor(hours / 24), hours: hours % 24 });
+  };
+}
+
+/** #50: the parity check — running (or paused): its progress, time so far, time left; else the last one. */
+function ParityBlock({ parity }: { parity: Parity }) {
+  const t = useT();
+  const duration = useDuration();
+  const format = useFormat();
+  const active = parity.running || parity.paused;
+  if (!active) {
+    if (!parity.started_at && !parity.elapsed_seconds) return null;
+    return (
+      <p className="parity-block parity-block--done">
+        <Icon name="shield" size={14} />
+        {t("dashboard:parity.last", {
+          when: parity.started_at ? format.date(parity.started_at) : "—",
+          errors: parity.errors ?? 0,
+        })}
+        {parity.elapsed_seconds ? ` · ${duration(parity.elapsed_seconds)}` : ""}
+      </p>
+    );
+  }
+  const progress = Math.max(0, Math.min(100, parity.progress ?? 0));
+  return (
+    <div className="parity-block" data-paused={parity.paused || undefined}>
+      <p className="parity-block__head">
+        {parity.paused ? (
+          <Icon name="pause" size={14} />
+        ) : (
+          <Icon name="sync" size={14} className="parity-block__spin" />
+        )}
+        <strong>
+          {parity.paused
+            ? t("dashboard:parity.paused")
+            : parity.correcting === false
+              ? t("dashboard:parity.checking")
+              : t("dashboard:parity.running")}
+        </strong>
+        <span className="parity-block__percent">{format.number(Math.round(progress * 10) / 10)} %</span>
+      </p>
+      <span className="host-bar parity-block__bar" aria-hidden="true">
+        <span style={{ inlineSize: `${progress}%` }} />
+      </span>
+      <p className="parity-block__facts">
+        {parity.elapsed_seconds ? (
+          <span>{t("dashboard:parity.elapsed", { time: duration(parity.elapsed_seconds) ?? "" })}</span>
+        ) : null}
+        {parity.remaining_seconds ? (
+          <span>{t("dashboard:parity.remaining", { time: duration(parity.remaining_seconds) ?? "" })}</span>
+        ) : null}
+        {parity.speed ? <span>{parity.speed}</span> : null}
+        <span data-errors={(parity.errors ?? 0) > 0 || undefined}>
+          {t("dashboard:parity.errors", { count: parity.errors ?? 0 })}
+        </span>
+      </p>
+    </div>
+  );
+}
+
 interface StorageData {
   name: string;
   storage?: UsageData | null;
   array_state?: string | null;
-  parity?: { status: string; progress?: number | null; errors?: number | null } | null;
+  parity?: Parity | null;
   volumes: Array<{
     name: string;
     kind: string;
@@ -296,7 +378,6 @@ function StorageWidget({ payload, compact }: WidgetProps) {
         end={whole ? <Bar used={whole.used} total={whole.total} tone={level(share, 85, 95)} /> : null}
       />
     );
-  const running = data.parity && data.parity.status.toLowerCase() === "running";
   return (
     <div className="storage-widget">
       {whole ? (
@@ -327,12 +408,6 @@ function StorageWidget({ payload, compact }: WidgetProps) {
             {known(t, `dashboard:storage.array.${data.array_state}`, data.array_state)}
           </span>
         ) : null}
-        {running ? (
-          <span className="host-chip" data-level="warm">
-            <Icon name="sync" size={14} />
-            {t("dashboard:storage.parity", { progress: Math.round(data.parity?.progress ?? 0) })}
-          </span>
-        ) : null}
         {data.warnings
           .filter((w) => w !== "array_stopped")
           .map((w) => (
@@ -342,6 +417,7 @@ function StorageWidget({ payload, compact }: WidgetProps) {
             </span>
           ))}
       </p>
+      {data.parity ? <ParityBlock parity={data.parity} /> : null}
       <ul className="storage-widget__volumes">
         {data.volumes.map((volume) => {
           const share =
@@ -390,6 +466,7 @@ interface ContainersData {
   total: number;
   updates: number;
   updates_known: boolean;
+  running_updates?: number;
   items: Array<{ name: string; state: string; image?: string | null; update?: boolean | null }>;
   notices: Array<{ title: string; importance: string; detail: string }>;
 }
@@ -420,6 +497,8 @@ function ContainersWidget({ payload, compact, config }: WidgetProps) {
   // without update information (Glances), « up to date » would be a guess: say what runs instead
   const asked = String(config.show ?? "updates");
   const show = asked === "updates" && !data.updates_known ? "stopped" : asked;
+  // what the server warns about — not its « a new version is out » notes, which the list already says
+  const notices = data.notices.filter((n) => n.importance !== "info").slice(0, 3);
   return (
     <div className="containers-widget">
       <p className="containers-widget__counts">
@@ -431,12 +510,15 @@ function ContainersWidget({ payload, compact, config }: WidgetProps) {
           <span className="host-chip" data-level={data.updates ? "warm" : "ok"}>
             <Icon name="arrow-up" size={14} />
             {t("dashboard:host.updates", { count: data.updates })}
+            {data.updates && data.running_updates !== undefined
+              ? ` · ${t("dashboard:host.updatesRunning", { count: data.running_updates })}`
+              : ""}
           </span>
         ) : null}
       </p>
-      {data.notices.length ? (
+      {notices.length ? (
         <ul className="containers-widget__notices">
-          {data.notices.map((notice, index) => (
+          {notices.map((notice, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: notifications have no stable id here
             <li key={index} data-importance={notice.importance}>
               <Icon

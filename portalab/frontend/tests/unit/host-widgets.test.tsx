@@ -78,6 +78,28 @@ describe("server widgets", () => {
     expect(screen.getByText("76.6 %")).toBeInTheDocument();
   });
 
+  it("follows a parity check: progress, time so far, time left", () => {
+    show("health.storage", {
+      name: "Unraid",
+      storage: { used: 600, total: 1000 },
+      array_state: "STARTED",
+      parity: {
+        status: "running",
+        running: true,
+        progress: 25,
+        elapsed_seconds: 3600,
+        remaining_seconds: 10800,
+        errors: 0,
+      },
+      volumes: [],
+      warnings: [],
+    });
+    expect(screen.getByText("Parity check running")).toBeInTheDocument();
+    expect(screen.getByText("25 %")).toBeInTheDocument();
+    expect(screen.getByText("1 h 0 min so far")).toBeInTheDocument();
+    expect(screen.getByText("about 3 h 0 min left")).toBeInTheDocument();
+  });
+
   it("says the containers on one row", () => {
     show(
       "health.containers",

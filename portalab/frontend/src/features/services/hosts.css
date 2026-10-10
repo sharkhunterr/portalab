@@ -447,3 +447,57 @@
     gap: var(--space-1);
   }
 }
+
+/* #50 — the parity check */
+.parity-block {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 9%, transparent);
+  font-size: var(--font-size-sm);
+}
+.parity-block p {
+  margin: 0;
+}
+.parity-block__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.parity-block__percent {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+}
+.parity-block__spin {
+  animation: parity-spin 2.4s linear infinite;
+}
+@keyframes parity-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.parity-block__bar {
+  block-size: 0.45rem;
+}
+.parity-block__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.parity-block__facts [data-errors] {
+  color: var(--state-error-fg);
+  font-weight: var(--font-weight-semibold);
+}
+.parity-block--done {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}

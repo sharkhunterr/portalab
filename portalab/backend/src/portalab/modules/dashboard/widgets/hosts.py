@@ -328,6 +328,7 @@ class ContainersProvider(_Base):
             "total": len(containers),
             "updates": sum(1 for c in containers if c.update_available),
             "updates_known": any(c.update_available is not None for c in containers),
+            "running_updates": sum(1 for c in containers if c.update_available and c.state == "running"),
             "items": [
                 {
                     "name": c.name,

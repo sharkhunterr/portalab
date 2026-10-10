@@ -118,6 +118,12 @@ class ParityCheck:
     progress: float | None = None  # percent
     errors: int | None = None
     speed: str | None = None
+    running: bool = False
+    paused: bool = False
+    correcting: bool | None = None
+    started_at: str | None = None  # ISO
+    elapsed_seconds: float | None = None
+    remaining_seconds: float | None = None  # estimated from the pace so far
 
 
 @dataclass(frozen=True, slots=True)
