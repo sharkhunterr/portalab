@@ -6,13 +6,14 @@ and filtered **at read time** by each member's 021 ``progression`` visibility on
   ``level`` is all-time only;
 * only active accounts are ranked (tombstoned and suspended accounts never appear);
 * ties: earliest attainment first (the ledger sequence or unlock time that reached the score), then id;
-* ranks count only the members this viewer may see, so no gap reveals a hidden member; the viewer always
-  gets their own position, even when they chose not to appear to others."""
+* #66: a member this viewer may not see keeps their place as an anonymous entry — no name, no avatar, no
+  profile, an id tied to the place and never to them; the viewer always gets their own position;
+* #66: each entry tells the places gained or lost against the board of 24 hours before."""
 
 from collections.abc import Sequence
 from datetime import datetime, timedelta
 from typing import Any
-from uuid import UUID
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
@@ -43,6 +44,13 @@ from portalab.modules.gamification.observability import metrics
 DATUM = "progression"
 EARNED = ("grant", "manual", "correction")
 MAX_ENTRIES = 5000
+MOVES_SINCE = timedelta(hours=24)  # #66: places gained or lost since a day
+
+
+def anonymous_id(metric: str, period: str, rank: int) -> UUID:
+    """#66: what stands for a member who keeps their progression private — tied to the place, never to
+    the member (no name, no avatar, no profile behind it)."""
+    return uuid5(NAMESPACE_URL, f"portalab:leaderboard:{metric}:{period}:{rank}")
 
 
 class LeaderboardService:
@@ -123,6 +131,38 @@ class LeaderboardService:
             ).all()
             return [(u, int(total), int(seq)) for u, total, seq in rows if int(total or 0) > 0]
 
+    async def _rows_before(
+        self, metric: str, start: datetime | None, until: datetime
+    ) -> list[tuple[UUID, int]]:
+        """#66: ``(user, score)`` as the board stood at ``until`` (nothing when the period had not begun)."""
+        if start is not None and until <= start:
+            return []
+        async with self.database.session() as session:
+            if metric == "achievements":
+                statement = (
+                    select(UserAchievement.user_id, func.count())
+                    .where(UserAchievement.unlocked_at < until)
+                    .group_by(UserAchievement.user_id)
+                )
+                if start is not None:
+                    statement = statement.where(UserAchievement.unlocked_at >= start)
+                return [(u, int(n)) for u, n in (await session.execute(statement)).all()]
+            value = "xp" if metric == "level" else metric
+            statement = (
+                select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta))
+                .where(LedgerTransaction.value == value, LedgerTransaction.occurred_at < until)
+                .group_by(LedgerTransaction.user_id)
+            )
+            if start is not None:
+                statement = statement.where(
+                    LedgerTransaction.kind.in_(EARNED), LedgerTransaction.occurred_at >= start
+                )
+            rows = [(u, int(total or 0)) for u, total in (await session.execute(statement)).all()]
+            if metric == "level":
+                curve = await self.levels.curve(session)
+                rows = [(u, curve.level_for(max(0, a))) for u, a in rows]
+            return [(u, score) for u, score in rows if score > 0]
+
     async def compute(self, metric: str, period: LeaderboardPeriod) -> LeaderboardSnapshot:
         self._check(metric, period)
         now = utc_now(self.clock)
@@ -133,19 +173,41 @@ class LeaderboardService:
             (r for r in rows if r[0] in active and r[1] > 0), key=lambda r: (-r[1], r[2], str(r[0]))
         )[:MAX_ENTRIES]
         entries = [[str(u), score] for u, score, _ in ranked]
+        before = await self._rows_before(metric, start, now - MOVES_SINCE)
+        previous = [
+            [str(u), score]
+            for u, score in sorted((r for r in before if r[0] in active), key=lambda r: (-r[1], str(r[0])))[
+                :MAX_ENTRIES
+            ]
+        ]
         statement = insert(LeaderboardSnapshot).values(
-            metric=metric, period=period, period_start=start, computed_at=now, entries=entries
+            metric=metric,
+            period=period,
+            period_start=start,
+            computed_at=now,
+            entries=entries,
+            previous=previous,
         )
         async with self.database.unit_of_work() as uow:
             await uow.session.execute(
                 statement.on_conflict_do_update(
                     index_elements=[LeaderboardSnapshot.metric, LeaderboardSnapshot.period],
-                    set_={"period_start": start, "computed_at": now, "entries": entries},
+                    set_={
+                        "period_start": start,
+                        "computed_at": now,
+                        "entries": entries,
+                        "previous": previous,
+                    },
                 )
             )
         metrics.increment("gamification.leaderboards.computed")
         return LeaderboardSnapshot(
-            metric=metric, period=period, period_start=start, computed_at=now, entries=entries
+            metric=metric,
+            period=period,
+            period_start=start,
+            computed_at=now,
+            entries=entries,
+            previous=previous,
         )
 
     async def refresh(self, *, force: bool = False) -> int:
@@ -188,15 +250,30 @@ class LeaderboardService:
         limit = max(1, min(limit, 100))
         snapshot = await self._snapshot(metric, period)
         me = viewer.acting_for or viewer.user_id
+        shown: dict[UUID, bool] = {}
+
+        async def visible(user: UUID) -> bool:
+            if user not in shown:
+                shown[user] = user == me or await self._shown(viewer, user)
+            return shown[user]
+
+        # #66: the ranks of a day before
+        before = {UUID(raw_user): index for index, (raw_user, _s) in enumerate(snapshot.previous or [], 1)}
         entries: list[LeaderboardEntry] = []
         mine: LeaderboardEntry | None = None
-        rank = 0
-        for raw_user, score in snapshot.entries:
+        for rank, (raw_user, score) in enumerate(snapshot.entries, 1):
             user = UUID(raw_user)
-            if user != me and not await self._shown(viewer, user):
-                continue
-            rank += 1
-            entry = LeaderboardEntry(rank, user, int(score), user == me)
+            hidden = not await visible(user)  # #66: kept in the ranking, as an anonymous member
+            was = before.get(user)
+            entry = LeaderboardEntry(
+                rank,
+                anonymous_id(metric, period, rank) if hidden else user,
+                int(score),
+                user == me,
+                change=(was - rank) if was is not None else None,
+                new=bool(before) and was is None,
+                anonymous=hidden,
+            )
             if len(entries) < limit:
                 entries.append(entry)
             if user == me:
@@ -216,3 +293,6 @@ class LeaderboardService:
                 kept = [e for e in snapshot.entries if e[0] != str(user)]
                 if len(kept) != len(snapshot.entries):
                     snapshot.entries = kept
+                earlier = [e for e in snapshot.previous or [] if e[0] != str(user)]
+                if len(earlier) != len(snapshot.previous or []):
+                    snapshot.previous = earlier

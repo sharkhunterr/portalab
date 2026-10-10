@@ -14,14 +14,15 @@ import { ProposalList } from "./projects/ProposalList";
 import "./community.css";
 import { PageHeader } from "../../design-system/components/PageHeader";
 
-// #63: the overview, then one tab per thing to look at; the activity, proposals and events stay reachable
-// from the overview's panels (and the calendar), without tabs of their own
+// #63: the overview, then one tab per thing to look at (proposals included); the activity and events stay
+// reachable from the overview's panels (and the calendar), without tabs of their own
 const TABS = [
   { to: "/community", key: "discover", end: true, icon: "compass" },
   { to: "/community/leaderboards", key: "leaderboards", end: true, icon: "medal" },
   { to: "/community/quests", key: "quests", end: true, icon: "target" },
   { to: "/community/achievements", key: "achievements", end: true, icon: "trophy" },
   { to: "/community/members", key: "members", end: true, icon: "users" },
+  { to: "/community/proposals", key: "proposals", end: false, icon: "lightbulb" },
 ] as const;
 
 /** ``/community/*`` (spec 012, slice A): discovery, members, activity and events. */

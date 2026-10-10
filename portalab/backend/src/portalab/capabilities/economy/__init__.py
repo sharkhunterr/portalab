@@ -245,10 +245,15 @@ PERIODS: tuple[LeaderboardPeriod, ...] = ("all", "month", "week")
 
 @dataclass(frozen=True, slots=True)
 class LeaderboardEntry:
-    rank: int  # among the members this viewer may see on leaderboards (no gap reveals a hidden member)
+    rank: int  # #66: every ranked member counts; those this viewer may not see are anonymous
     user_id: UUID
     score: int
     me: bool = False
+    change: int | None = None  # #66: places gained (> 0) or lost (< 0) since a day; None: no reference
+    new: bool = False  # #66: not on the board a day before
+    anonymous: bool = (
+        False  # #66: a member keeping their progression private (``user_id`` stands for the place)
+    )
 
 
 @dataclass(frozen=True, slots=True)

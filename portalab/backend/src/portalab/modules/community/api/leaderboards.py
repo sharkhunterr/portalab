@@ -25,6 +25,9 @@ class CommunityRankOut(BaseModel):
     display_name: str | None
     score: int
     me: bool
+    change: int | None = None  # #66: places gained (> 0) or lost (< 0) since a day
+    new: bool = False
+    anonymous: bool = False  # #66: a private member — no name, no avatar, no profile
 
 
 class CommunityLeaderboardOut(BaseModel):
@@ -51,6 +54,9 @@ def rank_out(member: RankedMember) -> CommunityRankOut:
         display_name=member.display_name,
         score=member.score,
         me=member.me,
+        change=member.change,
+        new=member.new,
+        anonymous=member.anonymous,
     )
 
 

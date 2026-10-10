@@ -8,6 +8,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useActiveCampaigns } from "../../campaigns/api";
+import { Leaderboard } from "../../gamification/leaderboards/Leaderboard";
 import type { QuestItem } from "../../gamification/quests/QuestList";
 import { useFeed } from "../api";
 import { DiscoveryHome } from "../discovery/DiscoveryHome";
@@ -72,7 +73,15 @@ function TopPanel() {
         data.entries.length ? (
           <>
             <Podium rows={data.entries} />
-            {data.me && data.me.rank > 3 ? (
+            {data.entries.some((row) => row.rank > 3) ? (
+              // #66: the others under the podium, with their moves since a day
+              <Leaderboard
+                caption={t("community:overview.leaderboard")}
+                rows={data.entries.filter((row) => row.rank > 3 && row.rank <= 10)}
+                me={data.me}
+                profileLinks
+              />
+            ) : data.me && data.me.rank > 3 ? (
               <p className="community-overview__me">
                 {t("community:overview.myRank", { rank: data.me.rank, score: format.number(data.me.score) })}
               </p>

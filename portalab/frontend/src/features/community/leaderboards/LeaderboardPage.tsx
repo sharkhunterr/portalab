@@ -11,6 +11,7 @@ import {
   LEADERBOARD_PERIODS,
   Leaderboard,
   type LeaderboardPeriod,
+  RankMove,
   type RankRow,
 } from "../../gamification/leaderboards/Leaderboard";
 
@@ -25,20 +26,40 @@ export function Podium({ rows }: { rows: RankRow[] }) {
     <ol className="community-podium" aria-label={t("community:leaderboards.podium")}>
       {order.map((row) => (
         <li key={row.user_id} data-rank={row.rank} data-me={row.me || undefined}>
-          <Link to={`/community/members/${row.user_id}`} className="community-podium__who">
-            <span className="community-podium__medal" aria-hidden="true">
-              <Icon name={row.rank === 1 ? "crown" : "medal"} size={16} />
+          {row.anonymous ? (
+            // #66: a member keeping their progression private: their place, without a face nor a name
+            <span className="community-podium__who" data-anonymous="true">
+              <span className="community-podium__medal" aria-hidden="true">
+                <Icon name={row.rank === 1 ? "crown" : "medal"} size={16} />
+              </span>
+              <span
+                className="community-podium__ghost"
+                data-size={row.rank === 1 ? "xl" : "lg"}
+                aria-hidden="true"
+              >
+                <Icon name="user" size={row.rank === 1 ? 36 : 28} />
+              </span>
+              <em>{t("gamification:leaderboard.anonymous")}</em>
+              <span className="community-meta">{format.number(row.score)}</span>
+              <RankMove row={row} />
             </span>
-            <Avatar
-              name={row.display_name ?? ""}
-              userId={row.user_id}
-              src={`/api/v1/users/${row.user_id}/avatar`}
-              size={row.rank === 1 ? "xl" : "lg"}
-              decorative
-            />
-            <strong>{row.display_name ?? t("gamification:leaderboard.member")}</strong>
-            <span className="community-meta">{format.number(row.score)}</span>
-          </Link>
+          ) : (
+            <Link to={`/community/members/${row.user_id}`} className="community-podium__who">
+              <span className="community-podium__medal" aria-hidden="true">
+                <Icon name={row.rank === 1 ? "crown" : "medal"} size={16} />
+              </span>
+              <Avatar
+                name={row.display_name ?? ""}
+                userId={row.user_id}
+                src={`/api/v1/users/${row.user_id}/avatar`}
+                size={row.rank === 1 ? "xl" : "lg"}
+                decorative
+              />
+              <strong>{row.display_name ?? t("gamification:leaderboard.member")}</strong>
+              <span className="community-meta">{format.number(row.score)}</span>
+              <RankMove row={row} />
+            </Link>
+          )}
           <span className="community-podium__step">#{row.rank}</span>
         </li>
       ))}
@@ -116,7 +137,7 @@ export function LeaderboardPage() {
           <Podium rows={board.data.entries} />
           <Leaderboard
             caption={`${heading} — ${t(`community:leaderboards.metric.${current}`)}`}
-            rows={board.data.entries}
+            rows={board.data.entries.filter((row) => row.rank > 3)} // #66: the others, under the podium
             me={board.data.me}
             profileLinks
           />

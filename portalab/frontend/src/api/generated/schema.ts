@@ -9500,10 +9500,22 @@ export interface components {
         };
         /** CommunityRankOut */
         CommunityRankOut: {
+            /**
+             * Anonymous
+             * @default false
+             */
+            anonymous: boolean;
+            /** Change */
+            change?: number | null;
             /** Display Name */
             display_name: string | null;
             /** Me */
             me: boolean;
+            /**
+             * New
+             * @default false
+             */
+            new: boolean;
             /** Rank */
             rank: number;
             /** Score */
@@ -10373,10 +10385,22 @@ export interface components {
         };
         /** LeaderboardEntryOut */
         LeaderboardEntryOut: {
+            /**
+             * Anonymous
+             * @default false
+             */
+            anonymous: boolean;
+            /** Change */
+            change?: number | null;
             /** Display Name */
             display_name: string | null;
             /** Me */
             me: boolean;
+            /**
+             * New
+             * @default false
+             */
+            new: boolean;
             /** Rank */
             rank: number;
             /** Score */

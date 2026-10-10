@@ -266,6 +266,14 @@ class LeaderboardSnapshot(GamificationBase):
     entries: Mapped[list[list[Any]]] = mapped_column(
         JSONB, nullable=False, default=list, info=not_personal("user ids and scores, rebuilt by the job")
     )
+    # #66: the same board 24 hours earlier — who gained or lost places
+    previous: Mapped[list[list[Any]]] = mapped_column(
+        JSONB,
+        nullable=False,
+        default=list,
+        server_default="[]",
+        info=not_personal("user ids and scores of the day before, rebuilt by the job"),
+    )
 
 
 class Quest(GamificationBase):

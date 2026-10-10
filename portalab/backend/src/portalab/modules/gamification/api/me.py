@@ -201,6 +201,9 @@ class LeaderboardEntryOut(BaseModel):
     display_name: str | None
     score: int
     me: bool
+    change: int | None = None  # #66: places gained (> 0) or lost (< 0) since a day
+    new: bool = False
+    anonymous: bool = False  # #66: a private member — no name, no avatar, no profile
 
 
 class LeaderboardOut(BaseModel):
@@ -223,9 +226,18 @@ async def leaderboard_out(module: GamificationModule, view: LeaderboardView) -> 
     directory = providers[0].provider if providers else None
 
     async def entry(e: LeaderboardEntry) -> LeaderboardEntryOut:
-        summary = await directory.get_user_summary(e.user_id) if directory else None
+        summary = await directory.get_user_summary(e.user_id) if directory and not e.anonymous else None
         name = summary.display_name if summary and not summary.anonymized else None
-        return LeaderboardEntryOut(rank=e.rank, user_id=e.user_id, display_name=name, score=e.score, me=e.me)
+        return LeaderboardEntryOut(
+            rank=e.rank,
+            user_id=e.user_id,
+            display_name=name,
+            score=e.score,
+            me=e.me,
+            change=e.change,
+            new=e.new,
+            anonymous=e.anonymous,
+        )
 
     return LeaderboardOut(
         metric=view.metric,

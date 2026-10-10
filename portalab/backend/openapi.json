@@ -3613,6 +3613,22 @@
       },
       "CommunityRankOut": {
         "properties": {
+          "anonymous": {
+            "default": false,
+            "title": "Anonymous",
+            "type": "boolean"
+          },
+          "change": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change"
+          },
           "display_name": {
             "anyOf": [
               {
@@ -3626,6 +3642,11 @@
           },
           "me": {
             "title": "Me",
+            "type": "boolean"
+          },
+          "new": {
+            "default": false,
+            "title": "New",
             "type": "boolean"
           },
           "rank": {
@@ -6063,6 +6084,22 @@
       },
       "LeaderboardEntryOut": {
         "properties": {
+          "anonymous": {
+            "default": false,
+            "title": "Anonymous",
+            "type": "boolean"
+          },
+          "change": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change"
+          },
           "display_name": {
             "anyOf": [
               {
@@ -6076,6 +6113,11 @@
           },
           "me": {
             "title": "Me",
+            "type": "boolean"
+          },
+          "new": {
+            "default": false,
+            "title": "New",
             "type": "boolean"
           },
           "rank": {

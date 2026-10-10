@@ -24,6 +24,9 @@ class RankedMember:
     display_name: str | None
     score: int
     me: bool
+    change: int | None = None  # #66: places gained (> 0) or lost (< 0) since a day
+    new: bool = False
+    anonymous: bool = False  # #66: a private member — no name, no avatar, no profile
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,7 +56,17 @@ class LeaderboardsView:
             return []
 
     async def _ranked(self, entry: LeaderboardEntry) -> RankedMember:
-        return RankedMember(entry.rank, entry.user_id, await self.names(entry.user_id), entry.score, entry.me)
+        anonymous = bool(getattr(entry, "anonymous", False))
+        return RankedMember(
+            entry.rank,
+            entry.user_id,
+            None if anonymous else await self.names(entry.user_id),
+            entry.score,
+            entry.me,
+            getattr(entry, "change", None),
+            getattr(entry, "new", False),
+            anonymous,
+        )
 
     async def board(
         self, viewer: Principal, metric: str, period: LeaderboardPeriod = "all", *, limit: int = 50
