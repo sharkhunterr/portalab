@@ -5,7 +5,7 @@ probe slot) and re-derives services that have no probe (they turn Unknown once s
 from datetime import timedelta
 from typing import Any
 
-from portalab.capabilities.health import HEALTH_PROBE
+from portalab.capabilities.health import HEALTH_PROBE, INFRA_METRICS
 from portalab.core.jobs.periodic import register_periodic, slot_of
 from portalab.core.jobs.queue import HEALTH_QUEUE, enqueue
 from portalab.core.jobs.registry import JobRegistry
@@ -18,6 +18,7 @@ from portalab.modules.health.probes.runner import ProbeRunner
 OWNER = "module:health"
 PROBE_JOB = "health.probe_service"
 SWEEP_JOB = "health.probe_sweep"
+INFRA_JOB = "health.infra_sample"  # #52: a service's metrics, sampled with each sweep (charts)
 
 
 class ProbeScheduler:
@@ -25,6 +26,7 @@ class ProbeScheduler:
         self.runner = runner
         self.state = runner.state
         self.maintenance = maintenance
+        self.infra: Any = None  # #52: set by the module — samples the metrics for the charts
 
     async def ensure_partitions(self) -> None:
         now = utc_now(self.state.clock)
@@ -54,6 +56,23 @@ class ProbeScheduler:
                     max_attempts=1,
                     clock=self.state.clock,
                 )
+        if self.infra is not None:  # #52: the metrics, once per sweep, for the charts
+            measured = {
+                str(r.instance_ref)
+                for r in self.state.capabilities.system_providers(INFRA_METRICS)
+                if r.instance_ref is not None
+            }
+            async with self.state.database.unit_of_work() as uow:
+                for service_id in sorted(measured):
+                    await enqueue(
+                        uow.session,
+                        kind=INFRA_JOB,
+                        queue=HEALTH_QUEUE,
+                        payload={"service_id": service_id},
+                        dedup_key=f"{INFRA_JOB}:{service_id}:{slot}",
+                        max_attempts=1,
+                        clock=self.state.clock,
+                    )
         for info in await self.state.services():
             if info.id not in probed:
                 await self.state.evaluate(info.id)
@@ -62,7 +81,18 @@ class ProbeScheduler:
     async def handle(self, payload: dict[str, Any]) -> None:
         await self.runner.probe(str(payload["service_id"]))
 
+    async def sample(self, payload: dict[str, Any]) -> None:
+        if self.infra is not None:
+            await self.infra.fetch(str(payload["service_id"]))
+
     def register(self, jobs: JobRegistry) -> Any:
+        jobs.register(
+            INFRA_JOB,
+            self.sample,
+            idempotency="a duplicate sample adds one more point to the charts",
+            timeout_seconds=60,
+            owner=OWNER,
+        )
         jobs.register(
             PROBE_JOB,
             self.handle,

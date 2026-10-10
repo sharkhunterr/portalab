@@ -17,6 +17,7 @@ from portalab.capabilities.registry import CapabilitySpec
 HEALTH_PROBE = "service.health_probe"
 INFRA_METRICS = "infrastructure.metrics"
 INFRA_HOST = "infrastructure.host"  # #49/#50: a server's full picture (Glances, Unraid)
+INFRA_HISTORY = "health.infra_history"  # #52: the metrics over time (charts), provided by health
 SERVER_OPERATIONS = "server.operations"
 SERVICE_DIRECTORY = "connectors.directory"
 SERVICE_STATE = "health.service_state"
@@ -154,6 +155,43 @@ class HostReport:
 @runtime_checkable
 class HostReporter(Protocol):
     async def report(self) -> HostReport: ...
+
+
+class ReportCache:
+    """#52: servers answer slowly or one request at a time — a report a few seconds old is served at
+    once (and refreshed in the background, once), callers asking together share one request, and a first
+    ask waits at most ``wait`` seconds (the report keeps coming for the next ask)."""
+
+    def __init__(self, fresh: float = 20.0, keep: float = 600.0, wait: float = 4.0) -> None:
+        self.fresh, self.keep, self.wait = fresh, keep, wait
+        self._values: dict[str, tuple[float, Any]] = {}
+        self._running: dict[str, Any] = {}
+
+    async def get(self, key: str, load: Any) -> Any:
+        import asyncio
+        import contextlib
+        import time
+
+        now = time.monotonic()
+        cached = self._values.get(key)
+        task = self._running.get(key)
+        if task is None and (cached is None or now - cached[0] > self.fresh):
+
+            async def run() -> None:
+                try:
+                    self._values[key] = (time.monotonic(), await load())
+                finally:
+                    self._running.pop(key, None)
+
+            task = asyncio.ensure_future(run())
+            self._running[key] = task
+        if cached is not None and now - cached[0] <= self.keep:
+            return cached[1]
+        if task is not None:
+            with contextlib.suppress(Exception):  # too slow or failed: said as « not there yet »
+                await asyncio.wait_for(asyncio.shield(task), timeout=self.wait)
+        found = self._values.get(key)
+        return found[1] if found else None
 
 
 def host_warnings(report: HostReport, *, storage_low: float = 95.0) -> tuple[str, ...]:
@@ -362,6 +400,24 @@ class ServiceTickets(Protocol):
     async def open_for_service(self, service_id: str) -> list[TicketRef]: ...
 
 
+# --- the metrics over time (#52, provided by health) ------------------------------------------------------
+@runtime_checkable
+class InfraHistory(Protocol):
+    def services(self) -> list[str]:
+        """The services that report metrics."""
+        ...
+
+    async def series(
+        self, service_id: str, metrics: Sequence[str], since: datetime, *, points: int = 240
+    ) -> Mapping[str, list[tuple[datetime, float]]]:
+        """Each metric's samples since ``since``, averaged down to about ``points`` points."""
+        ...
+
+    async def current(self, service_id: str, metrics: Sequence[str]) -> Mapping[str, MetricValue | None]:
+        """The values right now (asked to the service, not stored)."""
+        ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -372,6 +428,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(HEALTH_PROBE, HealthProbe, True, "Health probe of one service (provided per service)"),
     _spec(INFRA_METRICS, InfrastructureMetrics, True, "Infrastructure metrics of one service's host"),
     _spec(INFRA_HOST, HostReporter, True, "A server's full picture: disks, array, containers, updates"),
+    _spec(INFRA_HISTORY, InfraHistory, False, "Infrastructure metrics over time (charts)"),
     _spec(SERVER_OPERATIONS, ServerOperations, True, "Privileged server operations of one service"),
     _spec(SERVICE_DIRECTORY, ServiceDirectory, False, "Configured services and their sync state (005)"),
     _spec(SERVICE_STATE, ServiceStateReader, False, "Derived service health state (006)"),

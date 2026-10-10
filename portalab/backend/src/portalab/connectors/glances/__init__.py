@@ -16,7 +16,7 @@ import base64
 import re
 import time
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -40,7 +40,8 @@ from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.http_base import BaseConfig, HttpConnector, binding
 
 API = "/api/4"
-PARALLEL = 2  # more requests at once and Glances times out
+REUSE_SECONDS = 3.0
+PARALLEL = 1  # Glances' web server answers one request at a time: more at once and it times out
 # file systems that say nothing about the storage: images, overlays, virtual ones
 IGNORED_FS = frozenset(
     {"squashfs", "tmpfs", "devtmpfs", "overlay", "proc", "sysfs", "cgroup", "nsfs", "ramfs"}
@@ -97,6 +98,29 @@ class GlancesConnector(HttpConnector):
         binding(INFRA_HOST),
     )
     status_path = f"{API}/status"
+    # one gate per server, shared by the probe, the samples and the reports (every caller of that Glances)
+    _gates: ClassVar[dict[str, asyncio.Semaphore]] = {}
+    # a plugin's answer is reused for a few seconds: Glances' rates (cpu, network) read 0 or 100 when asked
+    # twice in a row, and every caller asks the same things
+    _answers: ClassVar[dict[tuple[str, str], tuple[float, Any]]] = {}
+
+    def gate(self, service: ServiceHandle) -> asyncio.Semaphore:
+        address = str(service.config.get("base_url") or service.service_id)
+        if address not in self._gates:
+            self._gates[address] = asyncio.Semaphore(PARALLEL)
+        return self._gates[address]
+
+    async def get_json(self, service: ServiceHandle, path: str, **params: Any) -> Any:
+        address = str(service.config.get("base_url") or service.service_id)
+        key = (address, path)
+        async with self.gate(service):
+            cached = self._answers.get(key)
+            if cached and not params and time.monotonic() - cached[0] < REUSE_SECONDS:
+                return cached[1]
+            answer = await super().get_json(service, path, **params)
+            if not params:
+                self._answers[key] = (time.monotonic(), answer)
+            return answer
 
     def auth_headers(self, service: ServiceHandle) -> dict[str, str]:
         username = str(service.config.get("username") or "")
@@ -142,13 +166,7 @@ class GlancesConnector(HttpConnector):
             "network",
             "containers",
         )
-        gate = asyncio.Semaphore(PARALLEL)  # Glances' web server answers one request at a time
-
-        async def one(plugin: str) -> Any:
-            async with gate:
-                return await self._get(service, plugin)
-
-        results = await asyncio.gather(*(one(p) for p in wanted))
+        results = await asyncio.gather(*(self._get(service, p) for p in wanted))  # gated in get_json
         answers = dict(zip(wanted, results, strict=True))
         if all(answer is None for answer in answers.values()):
             raise ConnectionError("Glances did not answer")

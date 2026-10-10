@@ -277,3 +277,173 @@
 .host-panel > h4:not(:first-child) {
   margin-block-start: var(--space-3);
 }
+
+/* #52 — « Chart »: the values on top, the plot filling the block; a sparkline on one row */
+.chart-widget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  block-size: 100%;
+  min-block-size: 0;
+}
+.chart-widget__values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+.chart-widget__values li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.chart-widget__values strong {
+  font-variant-numeric: tabular-nums;
+}
+.chart-widget__swatch {
+  inline-size: 0.7rem;
+  block-size: 0.25rem;
+  border-radius: var(--radius-pill);
+  background: var(--series);
+}
+.chart-widget__live {
+  margin-inline-start: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.chart-widget__pulse {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  animation: chart-pulse 1.6s ease-in-out infinite;
+}
+@keyframes chart-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+.chart-widget__plot {
+  flex: 1;
+  min-block-size: 4rem;
+}
+.chart-widget--compact {
+  flex-direction: row;
+  align-items: center;
+}
+.chart-widget--compact .chart-widget__values {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.chart-widget__spark {
+  flex: 1;
+  min-inline-size: 4rem;
+  block-size: 2rem;
+}
+@container (max-width: 18rem) {
+  .chart-widget--compact .chart-widget__live,
+  .chart-widget--compact .chart-widget__values li span:not(.chart-widget__swatch) {
+    display: none;
+  }
+}
+@container (max-height: 7rem) {
+  .chart-widget__live {
+    display: none;
+  }
+}
+
+/* #52 — each server widget fits its block: narrow (one column), short, tall */
+.storage-donut {
+  display: none;
+}
+@container (max-width: 20rem) and (min-height: 10rem) {
+  /* a narrow, tall block: the whole as a donut */
+  .storage-widget__whole .host-bar,
+  .storage-widget__figure {
+    display: none;
+  }
+  .storage-donut {
+    --tone: var(--color-accent);
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    justify-self: center;
+    inline-size: min(60cqw, 9rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(closest-side, var(--color-surface-raised) 74%, transparent 76%),
+      conic-gradient(
+        var(--tone) calc(var(--value) * 1%),
+        color-mix(in srgb, var(--color-text) 10%, transparent) 0
+      );
+  }
+  .storage-donut[data-level="warm"] {
+    --tone: var(--state-partial-fg);
+  }
+  .storage-donut[data-level="hot"] {
+    --tone: var(--state-error-fg);
+  }
+  .storage-donut strong {
+    font-size: var(--font-size-xl);
+  }
+  .storage-donut small {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+}
+@container (max-height: 9rem) {
+  /* short: the whole, not each disk */
+  .storage-widget__volumes,
+  .host-widget__facts {
+    display: none;
+  }
+}
+@container (max-width: 22rem) {
+  .host-gauges {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .host-gauge__ring {
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+  }
+  .storage-widget__volumes li {
+    grid-template-columns: minmax(4rem, 6rem) 1fr 2.6rem;
+  }
+  .storage-widget__temp {
+    display: none;
+  }
+  .host-widget__facts span:first-child {
+    display: none;
+  }
+}
+@container (max-height: 13rem) and (min-width: 30rem) {
+  /* wide but short: the gauges in one line */
+  .host-gauges {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .host-gauge__ring {
+    inline-size: 3.4rem;
+    block-size: 3.4rem;
+  }
+}
+@container (max-height: 8.5rem) {
+  /* very short: the os line goes, the gauges shrink */
+  .host-widget__name small {
+    display: none;
+  }
+  .host-gauge__ring {
+    inline-size: 2.8rem;
+    block-size: 2.8rem;
+  }
+  .host-gauge__ring strong {
+    font-size: var(--font-size-xs);
+  }
+  .host-widget {
+    gap: var(--space-1);
+  }
+}

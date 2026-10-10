@@ -5,11 +5,10 @@ and kept a few seconds (several widgets and pages ask at once; Glances answers o
 ``summary`` is what any member may see (how full the storage is, whether the server is fine); the full
 report is for holders of ``infrastructure.read``."""
 
-import time
 from dataclasses import asdict
 from typing import Any
 
-from portalab.capabilities.health import INFRA_HOST, HostReport
+from portalab.capabilities.health import INFRA_HOST, HostReport, ReportCache
 from portalab.capabilities.results import Available
 from portalab.core.time import utc_now
 from portalab.modules.health.state.service import StateService
@@ -20,7 +19,7 @@ CACHE_SECONDS = 20.0
 class HostService:
     def __init__(self, state: StateService) -> None:
         self.state = state
-        self._cache: dict[str, tuple[float, dict[str, Any]]] = {}
+        self._cache = ReportCache(fresh=CACHE_SECONDS, wait=8.0)
 
     def service_ids(self) -> list[str]:
         return [
@@ -37,9 +36,22 @@ class HostService:
 
     async def report(self, service_id: str) -> dict[str, Any] | None:
         """The service's report as JSON-ready data; ``None`` when it has no host provider."""
-        cached = self._cache.get(service_id)
-        if cached and time.monotonic() - cached[0] < CACHE_SECONDS:
-            return cached[1]
+        if self.provider(service_id) is None:
+            return None
+        found = await self._cache.get(service_id, lambda: self._load(service_id))
+        if found is None:
+            info = await self.state.service_info(service_id)
+            return {
+                "service_id": service_id,
+                "name": info.name if info else service_id,
+                "connector": info.connector if info else None,
+                "as_of": utc_now(self.state.clock).isoformat(),
+                "state": "unavailable",
+                "report": None,
+            }
+        return found  # type: ignore[no-any-return]
+
+    async def _load(self, service_id: str) -> dict[str, Any] | None:
         provider = self.provider(service_id)
         if provider is None:
             return None
@@ -52,11 +64,8 @@ class HostService:
         }
         result = await provider.report()
         if isinstance(result, Available) and isinstance(result.value, HostReport):
-            value = {**base, "state": "available", "report": serialize(result.value)}
-        else:
-            value = {**base, "state": "unavailable", "report": None}
-        self._cache[service_id] = (time.monotonic(), value)
-        return value
+            return {**base, "state": "available", "report": serialize(result.value)}
+        return None
 
     async def all(self) -> list[dict[str, Any]]:
         out = []

@@ -52,6 +52,32 @@ describe("server widgets", () => {
     expect(screen.getByText("parity", { selector: ".storage-widget__parity" })).toBeInTheDocument();
   });
 
+  it("draws the chart's live values, and a sparkline on one row", () => {
+    const data = {
+      service_id: "s",
+      name: "Tower",
+      metrics: ["cpu", "ram"],
+      units: { cpu: "%", ram: "%" },
+      points: [{ t: "2026-10-10T10:00:00Z", cpu: 20, ram: 70 }],
+      current: { cpu: 23.4, ram: 76.6 },
+      now: "2026-10-10T10:30:00Z",
+      range: "1h",
+    };
+    const Widget = widgetComponent("health.chart");
+    if (!Widget) throw new Error("no chart");
+    const { unmount } = render(
+      <MemoryRouter>
+        <Widget payload={{ state: "available", data } as never} config={{ live: true, live_seconds: 5 }} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("23.4 %")).toBeInTheDocument();
+    expect(screen.getByText("Live")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "CPU 23.4 %, RAM 76.6 %" })).toBeInTheDocument();
+    unmount();
+    show("health.chart", data, true);
+    expect(screen.getByText("76.6 %")).toBeInTheDocument();
+  });
+
   it("says the containers on one row", () => {
     show(
       "health.containers",

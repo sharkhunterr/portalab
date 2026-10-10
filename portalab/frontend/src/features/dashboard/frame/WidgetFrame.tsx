@@ -45,7 +45,11 @@ class FrameBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 function Body({ instance, rows }: { instance: Instance; rows?: number | undefined }) {
   const t = useT();
   const widget = instance.widget;
-  const interval = widget?.refresh_mode === "interval" ? (widget.refresh_interval_s ?? null) : null;
+  // #52: a widget set « live » refreshes every ``live_seconds`` (a chart that moves), else at its pace
+  const config = (instance.config ?? {}) as { live?: unknown; live_seconds?: unknown };
+  const live =
+    config.live === true && typeof config.live_seconds === "number" ? Math.max(2, config.live_seconds) : null;
+  const interval = live ?? (widget?.refresh_mode === "interval" ? (widget.refresh_interval_s ?? null) : null);
   const query = useWidgetData(instance.widget_key, instance.id ?? null, interval);
   const report = useEmptyReport();
   const hideWhenEmpty = Boolean((instance.config as Record<string, unknown> | undefined)?._hide_empty);

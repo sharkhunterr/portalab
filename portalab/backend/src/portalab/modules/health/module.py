@@ -6,7 +6,7 @@ from typing import Any
 
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.content import default_calendar_sources
-from portalab.capabilities.health import SERVICE_STATE
+from portalab.capabilities.health import INFRA_HISTORY, SERVICE_STATE
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditSink
 from portalab.core.db import Database
@@ -21,7 +21,7 @@ from portalab.modules.health.detail.assembler import DetailAssembler
 from portalab.modules.health.detail.history import HistoryQuery
 from portalab.modules.health.detail.incidents import IncidentLinkService
 from portalab.modules.health.infra.hosts import HostService
-from portalab.modules.health.infra.service import InfraMetricsService
+from portalab.modules.health.infra.service import InfraHistoryService, InfraMetricsService
 from portalab.modules.health.maintenance.service import END_JOB, START_JOB, MaintenanceService
 from portalab.modules.health.operations.service import OperationsService
 from portalab.modules.health.permissions import SERVICES_READ
@@ -57,6 +57,8 @@ class HealthModule:
         self.history = HistoryQuery(self.state)
         self.incidents = IncidentLinkService(self.state)
         self.infra = InfraMetricsService(self.state)
+        self.scheduler.infra = self.infra  # #52: the metrics sampled with each sweep, for the charts
+        self.infra_history = InfraHistoryService(self.infra)
         self.hosts = HostService(self.state)  # #49/#50: servers (Glances, Unraid)
         self.operations = OperationsService(self.state, audit)
         self.detail = DetailAssembler(
@@ -74,6 +76,7 @@ class HealthModule:
 
     def register_capabilities(self) -> None:
         self.capabilities.provide(SERVICE_STATE, self.reader, instance_ref="health", owner=OWNER)
+        self.capabilities.provide(INFRA_HISTORY, self.infra_history, instance_ref="health", owner=OWNER)
         default_admin_surfaces.register(
             AdminSurface("health", "admin.surface.health", "/services", SERVICES_READ, OWNER)
         )

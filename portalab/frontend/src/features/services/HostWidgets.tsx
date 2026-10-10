@@ -1,5 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
+import {
+  Area,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { api } from "../../api/client";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
@@ -299,6 +309,15 @@ function StorageWidget({ payload, compact }: WidgetProps) {
             </small>
           </span>
           <Bar used={whole.used} total={whole.total} tone={level(share, 85, 95)} />
+          <span
+            className="storage-donut"
+            data-level={level(share, 85, 95)}
+            style={{ "--value": share ?? 0 } as CSSProperties}
+            aria-hidden="true"
+          >
+            <strong>{share} %</strong>
+            <small>{bytes(whole.total - whole.used)}</small>
+          </span>
         </div>
       ) : null}
       <p className="storage-widget__state">
@@ -466,6 +485,183 @@ function ContainersWidget({ payload, compact, config }: WidgetProps) {
   );
 }
 
+// --- « Chart » (#52): a server's metrics over time, moving when live ------------------------------------
+interface ChartPoint {
+  t: string;
+  [metric: string]: number | string | undefined;
+}
+
+interface ChartData {
+  service_id: string;
+  name: string;
+  metrics: string[];
+  units: Record<string, string>;
+  points: ChartPoint[];
+  current: Record<string, number | null>;
+  now: string;
+  range: string;
+}
+
+const COLORS: Record<string, string> = {
+  cpu: "var(--color-accent)",
+  ram: "var(--color-accent-alt)",
+  temperature: "var(--rarity-legendary)",
+  network: "var(--color-accent)",
+  storage: "var(--color-accent-alt)",
+};
+const RANGE_MS: Record<string, number> = {
+  "15m": 15 * 60_000,
+  "1h": 3_600_000,
+  "6h": 6 * 3_600_000,
+  "24h": 24 * 3_600_000,
+  "7d": 7 * 24 * 3_600_000,
+};
+
+function ChartWidget({ payload, compact, config }: WidgetProps) {
+  const t = useT();
+  const format = useFormat();
+  const data = payload.data as unknown as ChartData | undefined;
+  const key = data ? `${data.service_id}:${data.metrics.join(",")}:${data.range}` : "";
+  // the live values gathered while the widget is on screen (the stored history is per minute)
+  const [live, setLive] = useState<{ key: string; points: ChartPoint[] }>({ key: "", points: [] });
+  useEffect(() => {
+    if (!data?.current || !Object.values(data.current).some((v) => v !== null)) return;
+    const point: ChartPoint = { t: data.now };
+    for (const [metric, value] of Object.entries(data.current)) if (value !== null) point[metric] = value;
+    setLive((previous) => ({
+      key,
+      points: [...(previous.key === key ? previous.points : []), point].slice(-900),
+    }));
+  }, [data?.now, data?.current, key]);
+  if (!data) return null;
+  const since = Date.parse(data.now) - (RANGE_MS[data.range] ?? RANGE_MS["1h"] ?? 3_600_000);
+  const stored = data.points;
+  const lastStored = stored.length ? Date.parse(stored[stored.length - 1]?.t ?? "") : 0;
+  const rows = [
+    ...stored,
+    ...(live.key === key ? live.points : []).filter((p) => Date.parse(p.t) > lastStored),
+  ]
+    .map((p): ChartPoint & { x: number } => ({ ...p, x: Date.parse(p.t) }))
+    .filter((p) => p.x >= since);
+  const latest = Object.fromEntries(
+    data.metrics.map((m) => {
+      const value = data.current[m] ?? [...rows].reverse().find((r) => typeof r[m] === "number")?.[m];
+      return [m, typeof value === "number" ? value : null];
+    }),
+  );
+  const percentOnly = data.metrics.every((m) => data.units[m] === "%");
+  const label = (m: string) => t(`dashboard:chart.metric.${m}`);
+  const valueText = (m: string, v: number | null) =>
+    v === null ? "—" : `${format.number(Math.round(v * 10) / 10)} ${data.units[m] ?? ""}`.trim();
+  const area = String(config.kind ?? "area") === "area";
+  const values = (
+    <ul className="chart-widget__values">
+      {data.metrics.map((m) => (
+        <li key={m} style={{ "--series": COLORS[m] ?? "var(--color-accent)" } as CSSProperties}>
+          <span className="chart-widget__swatch" aria-hidden="true" />
+          <span>{label(m)}</span>
+          <strong>{valueText(m, latest[m] ?? null)}</strong>
+        </li>
+      ))}
+      {config.live === true ? (
+        <li className="chart-widget__live">
+          <span className="chart-widget__pulse" aria-hidden="true" />
+          {t("dashboard:chart.live")}
+        </li>
+      ) : null}
+    </ul>
+  );
+  const plot = (axes: boolean) => (
+    <ResponsiveContainer width="100%" height="100%">
+      <ComposedChart data={rows} margin={{ top: 8, right: 6, bottom: 0, left: 0 }}>
+        {axes ? (
+          <>
+            <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="x"
+              type="number"
+              scale="time"
+              domain={[since, "dataMax"]}
+              stroke="var(--color-text-muted)"
+              fontSize={11}
+              tickFormatter={(x: number) =>
+                data.range === "7d" ? format.date(new Date(x), "short") : format.time(new Date(x))
+              }
+              minTickGap={28}
+            />
+            <YAxis
+              stroke="var(--color-text-muted)"
+              fontSize={11}
+              width={42}
+              domain={percentOnly ? [0, 100] : ["auto", "auto"]}
+              tickFormatter={(v: number) => (percentOnly ? `${v}%` : format.number(v))}
+            />
+            <Tooltip
+              contentStyle={{
+                background: "var(--color-surface-raised)",
+                border: "1px solid var(--color-border)",
+                borderRadius: 8,
+                color: "var(--color-text)",
+              }}
+              labelFormatter={(x) => format.dateTime(new Date(Number(x)))}
+              formatter={(v, name) => [valueText(String(name), Number(v)), label(String(name))]}
+            />
+          </>
+        ) : null}
+        {data.metrics.map((m) =>
+          area ? (
+            <Area
+              key={m}
+              type="monotone"
+              dataKey={m}
+              stroke={COLORS[m] ?? "var(--color-accent)"}
+              fill={COLORS[m] ?? "var(--color-accent)"}
+              fillOpacity={0.15}
+              strokeWidth={2}
+              dot={false}
+              isAnimationActive={false}
+              connectNulls
+            />
+          ) : (
+            <Line
+              key={m}
+              type="monotone"
+              dataKey={m}
+              stroke={COLORS[m] ?? "var(--color-accent)"}
+              strokeWidth={2}
+              dot={false}
+              isAnimationActive={false}
+              connectNulls
+            />
+          ),
+        )}
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+  if (compact)
+    return (
+      <div className="chart-widget chart-widget--compact">
+        {values}
+        <div className="chart-widget__spark" aria-hidden="true">
+          {plot(false)}
+        </div>
+      </div>
+    );
+  return (
+    <div className="chart-widget">
+      {values}
+      <div
+        className="chart-widget__plot"
+        role="img"
+        aria-label={data.metrics.map((m) => `${label(m)} ${valueText(m, latest[m] ?? null)}`).join(", ")}
+      >
+        {plot(true)}
+      </div>
+    </div>
+  );
+}
+
+registerWidgetComponent("health.chart", ChartWidget);
 registerWidgetComponent("health.host", HostWidget);
 registerWidgetComponent("health.storage", StorageWidget);
 registerWidgetComponent("health.containers", ContainersWidget);

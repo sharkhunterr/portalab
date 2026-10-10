@@ -1097,6 +1097,11 @@ for key, option, en, fr, rarity, price in (
     ("opt_stats_all", "media.stats:period=all", "All-time period for « My statistics »", "Depuis toujours pour « Mes statistiques »", "epic", 500),
     ("opt_stats_server", "media.stats:scope=all", "Whole server for « My statistics »", "Tout le serveur pour « Mes statistiques »", "rare", 300),
     ("opt_requests_server", "media.recently_requested:scope=all", "Whole server for « Recently requested »", "Tout le serveur pour « Demandes récentes »", "rare", 250),
+    # #52: « Chart » — CPU and memory are free; the other series and the week are sold
+    ("opt_chart_temperature", "health.chart:series=temperature", "Temperatures for « Chart »", "Températures pour « Graphique »", "rare", 300),
+    ("opt_chart_network", "health.chart:series=network", "Network traffic for « Chart »", "Trafic réseau pour « Graphique »", "rare", 300),
+    ("opt_chart_storage", "health.chart:series=storage", "Storage over time for « Chart »", "Stockage dans le temps pour « Graphique »", "common", 200),
+    ("opt_chart_week", "health.chart:range=7d", "A week of history for « Chart »", "Une semaine d'historique pour « Graphique »", "epic", 450),
 ):  # fmt: skip
     _p(key, "widget_option", price, rarity, en, fr,
        "One more setting for this dashboard widget — chosen in its settings once bought.",
