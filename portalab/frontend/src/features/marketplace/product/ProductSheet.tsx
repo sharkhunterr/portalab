@@ -9,6 +9,7 @@ import { useNotify } from "../../../design-system/components/Notification";
 import { useCelebrate } from "../../../design-system/feedback/Celebration";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { showLevelUp } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useAcquire, useDescribe, useProducts } from "../api";
@@ -34,6 +35,12 @@ function PackItem({ item }: { item: Product }) {
         </Link>
         <span className="pack-item__meta">
           <span className="product-card__rarity">{t(`marketplace:rarity.${item.rarity ?? "common"}`)}</span>
+          {isHdProduct(item) ? (
+            <>
+              {" "}
+              <HdTag />
+            </>
+          ) : null}
           {" · "}
           {t(`marketplace:type.${item.type}`)}
         </span>
@@ -156,6 +163,7 @@ export function ProductSheet({ product }: { product: Product }) {
           <Icon name={TYPE_BADGE_ICON[product.type] ?? "shop"} size={14} />
           {t(`marketplace:type.${product.type}`)}
         </span>
+        {isHdProduct(product) ? <HdTag large /> : null}
         {product.owned ? (
           <span className="product-chip" data-tone="ok">
             <Icon name="check" size={14} />

@@ -1872,3 +1872,32 @@
 .shell-progress .boost-tag small {
   font-weight: var(--font-weight-regular, 400);
 }
+
+/* #75: the card wears the member's profile banner (or film backdrop), fading into the card */
+.shell-profile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.shell-profile > :not(.shell-profile__banner) {
+  position: relative;
+  z-index: 1;
+}
+.shell-profile__banner.profile-banner {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  display: block;
+  block-size: 6.5rem;
+  border-radius: 0;
+  mask-image: linear-gradient(180deg, var(--color-text) 45%, transparent); /* only its opacity counts */
+  pointer-events: none;
+}
+.shell-profile__banner img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.shell-profile__banner ~ .shell-profile__who .shell-profile__name {
+  text-shadow: 0 1px 3px color-mix(in srgb, var(--color-surface) 85%, transparent);
+}

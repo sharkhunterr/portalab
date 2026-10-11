@@ -5,8 +5,8 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
 import { AmbientLayer } from "../../design-system/themes/AmbientLayer";
-import { isPremiumAmbient } from "../../design-system/themes/premium/PremiumAmbient";
 import { useT } from "../../i18n/hooks/useT";
+import { HdTag, isHdAmbient } from "./Rarity";
 import { WeatherPlace } from "./WeatherPlace";
 
 /**
@@ -23,23 +23,6 @@ export interface AmbientChoice {
 
 const RARITY_ORDER = ["legendary", "epic", "rare", "common"] as const;
 type Filter = "all" | (typeof RARITY_ORDER)[number] | "free";
-
-// « live weather » switches between premium ambiences (storm, downpour, blizzard…)
-function premium(kind: string): boolean {
-  return kind === "weather" || isPremiumAmbient(kind);
-}
-
-/** #71: drawn by the graphics chip — high quality, not a CSS animation. */
-function HdTag({ large = false }: { large?: boolean }) {
-  const t = useT();
-  return (
-    <span className="hd-tag" data-large={large || undefined} title={t("notifications:universe.hdHint")}>
-      <Icon name="cpu" size={large ? 14 : 11} />
-      {t("notifications:universe.hd")}
-      <span className="visually-hidden"> — {t("notifications:universe.hdHint")}</span>
-    </span>
-  );
-}
 
 function rarityOf(choice: AmbientChoice | undefined): string {
   return choice?.rarity ?? "free";
@@ -123,7 +106,7 @@ export function AmbientChooser({
           return (
             <li key={key} className="ambient-row" data-rarity={rarity} data-current={active || undefined}>
               <span className="ambient-row__gem" aria-hidden="true">
-                <Icon name={key === "theme" ? "palette" : premium(key) ? "gem" : "sparkle"} size={16} />
+                <Icon name={key === "theme" ? "palette" : isHdAmbient(key) ? "gem" : "sparkle"} size={16} />
               </span>
               {/* the name opens the preview window: a large target, the ambience playing there only */}
               <button type="button" className="ambient-row__open" onClick={() => setOpen(key)}>
@@ -134,7 +117,7 @@ export function AmbientChooser({
                       ? t(`notifications:universe.ambients.${themeAmbient || "none"}`)
                       : t(`notifications:universe.rarity.${rarity}`)}
                   </span>
-                  {premium(key) ? <HdTag /> : null}
+                  {isHdAmbient(key) ? <HdTag /> : null}
                   <span className="ambient-row__preview">
                     <Icon name="eye" size={14} />
                     {t("notifications:universe.preview")}
@@ -202,10 +185,10 @@ export function AmbientChooser({
                     ? t("notifications:universe.followTheme")
                     : t(`notifications:universe.rarity.${rarityOf(opened)}`)}
                 </span>
-                {premium(openedKind) ? <HdTag large /> : null}
+                {isHdAmbient(openedKind) ? <HdTag large /> : null}
               </span>
               <p>
-                {premium(openedKind)
+                {isHdAmbient(openedKind)
                   ? t("notifications:universe.kind.premium")
                   : t("notifications:universe.kind.light")}
               </p>

@@ -8,6 +8,7 @@ import {
   ProgressBar,
 } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
+import { backdropUrl, useProfileLooks } from "../../features/community/profile/looks";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -16,7 +17,8 @@ import type { useHeaderData } from "./useHeaderData";
 
 /**
  * The member at the top of the navigation (027): avatar and name (to the profile), level with its progress
- * bar, Coins and contribution. In the phone menu — where the header keeps only what matters most — it also
+ * bar, Coins and contribution — dressed in the banner (or film backdrop) and avatar frame they wear on their
+ * profile (#75). In the phone menu — where the header keeps only what matters most — it also
  * carries the personal destinations and sign out that the avatar menu offers elsewhere.
  */
 export function ProfileCard({
@@ -35,7 +37,9 @@ export function ProfileCard({
   const strings = useShellStrings();
   const { locale } = useLocaleContext();
   const me = data.me;
+  const worn = useProfileLooks(Boolean(me)).data?.equipped;
   if (!me) return null;
+  const frame = worn?.frame && worn.frame !== "none" ? worn.frame : undefined;
   const name = me.display_name ?? me.login ?? "";
   const progression = data.progression;
   const profile = `/community/members/${me.id}`;
@@ -52,8 +56,17 @@ export function ProfileCard({
     : "";
   return (
     <section className="shell-profile" aria-label={strings.profile}>
+      {worn?.backdrop?.ref ? (
+        <span className="shell-profile__banner profile-banner" data-banner="backdrop" aria-hidden="true">
+          <img src={backdropUrl(worn.backdrop.ref)} alt="" loading="lazy" />
+        </span>
+      ) : worn?.banner ? (
+        <span className="shell-profile__banner profile-banner" data-banner={worn.banner} aria-hidden="true" />
+      ) : null}
       <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
-        <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
+        <span className="avatar-frame" data-frame={frame}>
+          <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
+        </span>
         <span className="shell-profile__name">
           <strong>{name}</strong>
           <span>{strings.profile}</span>

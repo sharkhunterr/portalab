@@ -1,4 +1,5 @@
 import { Icon } from "../../design-system/components/Icon";
+import { isPremiumAmbient } from "../../design-system/themes/premium/PremiumAmbient";
 import { useT } from "../../i18n/hooks/useT";
 
 /**
@@ -23,4 +24,36 @@ export function rarityIn(
   key: string,
 ): string | undefined {
   return list?.find((c) => c.key === key)?.rarity ?? undefined;
+}
+
+/** #71: drawn by the graphics chip (shaders, particles) — high quality, not a CSS animation. */
+export function HdTag({ large = false }: { large?: boolean }) {
+  const t = useT();
+  return (
+    <span className="hd-tag" data-large={large || undefined} title={t("notifications:universe.hdHint")}>
+      <Icon name="cpu" size={large ? 14 : 11} />
+      {t("notifications:universe.hd")}
+      <span className="visually-hidden"> — {t("notifications:universe.hdHint")}</span>
+    </span>
+  );
+}
+
+/** Whether this ambience is drawn in high quality (« live weather » switches between premium ones). */
+export function isHdAmbient(kind: string | null | undefined): boolean {
+  return Boolean(kind) && (kind === "weather" || isPremiumAmbient(kind as string));
+}
+
+/** #71: whether a shop product is (or, for a pack, holds) an ambience drawn in high quality. */
+export function isHdProduct(product: { type: string; preview?: Record<string, unknown> | null }): boolean {
+  const preview = product.preview ?? {};
+  if (product.type === "ambient" || product.type === "profile_background") {
+    const kind = preview.ambient ?? preview.background;
+    return typeof kind === "string" && isHdAmbient(kind);
+  }
+  if (product.type === "bundle" && Array.isArray(preview.products)) {
+    return (preview.products as unknown[]).some(
+      (key) => typeof key === "string" && key.startsWith("ambient_") && isHdAmbient(key.slice(8)),
+    );
+  }
+  return false;
 }

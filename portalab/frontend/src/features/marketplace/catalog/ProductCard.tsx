@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import type { Product } from "../api";
 import { useEquipment } from "../equip";
 import { LazyArt } from "./LazyArt";
@@ -47,7 +48,10 @@ export function ProductCard({
       ) : null}
       <LazyArt product={product} />
       <div className="product-card__body">
-        <span className="product-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
+        <span className="product-card__rarity">
+          {t(`marketplace:rarity.${rarity}`)}
+          {isHdProduct(product) ? <HdTag /> : null}
+        </span>
         <h3 className="product-card__name">
           <Link
             to={`/marketplace/products/${product.key}`}
