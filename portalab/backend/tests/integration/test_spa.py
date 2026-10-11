@@ -21,6 +21,11 @@ async def test_spa_is_served_with_client_side_fallback(tmp_path: Path, heads: se
         assert api.status_code == 404
         assert api.headers["content-type"].startswith("application/problem+json")
         assert (await client.get("/healthz")).json() == {"status": "ok"}
+        # a file of a previous build is a 404, never the page taken for code; the page is never cached
+        stale = await client.get("/assets/shaderRunner-OLDHASH.js")
+        assert stale.status_code == 404 and "Portalab" not in stale.text
+        assert "no-store" in (await client.get("/")).headers.get("cache-control", "")
+        assert "no-store" in deep.headers.get("cache-control", "")
 
 
 async def test_without_build_no_static_route_is_mounted(tmp_path: Path, heads: set[str]) -> None:

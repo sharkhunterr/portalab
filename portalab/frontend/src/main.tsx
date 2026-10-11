@@ -12,6 +12,7 @@ import { DirectionBridge, I18nProvider } from "./i18n";
 import { NavigationProvider } from "./shell/nav/NavigationProvider";
 import { createRouter } from "./shell/router/routes";
 import { ShellLayout } from "./shell/ShellLayout";
+import { watchStaleBuild } from "./shell/staleBuild";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/plus-jakarta-sans";
 import "./design-system/fonts/universe-fonts";
@@ -34,6 +35,7 @@ if (!container) {
 }
 
 applyFirstPaint();
+watchStaleBuild(); // #68: a deployment while the page is open: reload to the new build
 
 async function renderGallery(): Promise<boolean> {
   if (!import.meta.env.DEV || window.location.pathname !== "/dev/gallery") return false;

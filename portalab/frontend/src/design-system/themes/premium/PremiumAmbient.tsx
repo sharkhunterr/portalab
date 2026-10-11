@@ -80,7 +80,13 @@ export function isPremiumAmbient(kind: string): boolean {
 }
 
 /** #68: whether this device draws the premium ambiences with its GPU, and which chip (when it says). */
+let known: { webgl: boolean; gpu: string | null } | null = null;
 export function webglInfo(): { webgl: boolean; gpu: string | null } {
+  if (known) return known; // asked once: each test opens a GPU context of its own
+  known = askWebgl();
+  return known;
+}
+function askWebgl(): { webgl: boolean; gpu: string | null } {
   try {
     const gl = document.createElement("canvas").getContext("webgl");
     if (!gl) return { webgl: false, gpu: null };
@@ -93,8 +99,12 @@ export function webglInfo(): { webgl: boolean; gpu: string | null } {
   }
 }
 
-// a page full of previews (the shop, the pickers) must not open more canvases than browsers allow
-const MAX_RUNNING = 6;
+// a page full of previews (the shop, the pickers) must not open more canvases than browsers allow — phones
+// give far fewer GPU contexts and less memory: two there
+const PHONE =
+  typeof window !== "undefined" &&
+  (window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 700);
+const MAX_RUNNING = PHONE ? 2 : 6;
 let running = 0;
 const freed = new EventTarget();
 function take(): boolean {
@@ -196,6 +206,19 @@ export function PremiumAmbient({
       setSlot(false);
     };
   }, [visible]);
+
+  // the GPU took the context back (memory, too many contexts): the CSS ambience instead, never a frozen
+  // or black layer
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    const lost = (event: Event) => {
+      event.preventDefault();
+      setFailed(true);
+    };
+    element.addEventListener("webglcontextlost", lost, true);
+    return () => element.removeEventListener("webglcontextlost", lost, true);
+  }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: the layers follow the kind
   useEffect(() => {

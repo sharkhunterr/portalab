@@ -2,6 +2,7 @@ import { Component, type ErrorInfo, type ReactNode, Suspense } from "react";
 import { isRouteErrorResponse, Link, useMatches, useRouteError } from "react-router";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { ApiError } from "../../state/regions";
+import { isStaleBuildError, reloadForNewBuild } from "../staleBuild";
 import { useShellStrings } from "../strings";
 import type { RouteHandle } from "./handle";
 
@@ -80,8 +81,10 @@ export class RegionBoundary extends Component<
     if (this.state.error && previous.resetKey !== this.props.resetKey) this.setState({ error: null });
   }
 
-  override componentDidCatch(_error: Error, _info: ErrorInfo): void {
-    // reported through the observability hooks of the API calls; never rethrown
+  override componentDidCatch(error: Error, _info: ErrorInfo): void {
+    // reported through the observability hooks of the API calls; never rethrown. #68: code of a previous
+    // build (the page left open across a deployment): reload once to the current one
+    if (isStaleBuildError(error)) reloadForNewBuild();
   }
 
   override render(): ReactNode {
