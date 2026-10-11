@@ -7681,9 +7681,30 @@ export interface paths {
         };
         /**
          * Weather
-         * @description #68: the sky over the homelab, for the « live weather » ambience (none until a place is set).
+         * @description #68, #70: the sky over the member's place (or everyone's default), for the « live weather »
+         *     ambience — none until a place is set.
          */
         get: operations["weather_api_v1_ui_weather_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ui/weather/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Weather Places
+         * @description #70: places matching a name, for a member to choose where their weather comes from.
+         */
+        get: operations["weather_places_api_v1_ui_weather_places_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -11878,6 +11899,15 @@ export interface components {
             /** User Grantable */
             user_grantable: boolean;
         };
+        /** PlaceOut */
+        PlaceOut: {
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Name */
+            name?: string | null;
+        };
         /** PlayableItemOut */
         PlayableItemOut: {
             /** Chapters */
@@ -13667,6 +13697,7 @@ export interface components {
              * @default true
              */
             is_day: boolean;
+            place?: components["schemas"]["PlaceOut"] | null;
             /** Temperature */
             temperature?: number | null;
         };
@@ -29312,6 +29343,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WeatherOut"];
+                };
+            };
+        };
+    };
+    weather_places_api_v1_ui_weather_places_get: {
+        parameters: {
+            query: {
+                q: string;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

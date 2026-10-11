@@ -10093,6 +10093,35 @@
         "title": "PermissionOut",
         "type": "object"
       },
+      "PlaceOut": {
+        "properties": {
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "title": "PlaceOut",
+        "type": "object"
+      },
       "PlayableItemOut": {
         "properties": {
           "chapters": {
@@ -15162,6 +15191,16 @@
             "default": true,
             "title": "Is Day",
             "type": "boolean"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlaceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "temperature": {
             "anyOf": [
@@ -38546,7 +38585,7 @@
     },
     "/api/v1/ui/weather": {
       "get": {
-        "description": "#68: the sky over the homelab, for the \u00ab live weather \u00bb ambience (none until a place is set).",
+        "description": "#68, #70: the sky over the member's place (or everyone's default), for the \u00ab live weather \u00bb\nambience \u2014 none until a place is set.",
         "operationId": "weather_api_v1_ui_weather_get",
         "responses": {
           "200": {
@@ -38561,6 +38600,66 @@
           }
         },
         "summary": "Weather",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/ui/weather/places": {
+      "get": {
+        "description": "#70: places matching a name, for a member to choose where their weather comes from.",
+        "operationId": "weather_places_api_v1_ui_weather_places_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 80,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "pattern": "^[a-z]{2}$",
+              "title": "Language",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlaceOut"
+                  },
+                  "title": "Response Weather Places Api V1 Ui Weather Places Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Weather Places",
         "tags": [
           "ui"
         ]

@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from pydantic import BaseModel, ConfigDict
 
 from portalab.core.authorization import require
@@ -52,21 +52,47 @@ async def notification_looks(
     return await module.looks.catalog(principal.user_id)
 
 
+class PlaceOut(BaseModel):
+    name: str | None = None
+    latitude: float
+    longitude: float
+
+
 class WeatherOut(BaseModel):
     condition: str | None
     is_day: bool = True
     temperature: float | None = None
+    place: PlaceOut | None = None
 
 
 @router.get("/ui/weather", response_model=WeatherOut)
 async def weather(
     principal: Annotated[Principal, require("users.self.manage")], module: Module
 ) -> WeatherOut:
-    """#68: the sky over the homelab, for the « live weather » ambience (none until a place is set)."""
-    now = await module.weather.now()
+    """#68, #70: the sky over the member's place (or everyone's default), for the « live weather »
+    ambience — none until a place is set."""
+    now = await module.weather.now(principal.user_id)
     if now is None:
         return WeatherOut(condition=None)
-    return WeatherOut(condition=now.condition, is_day=now.is_day, temperature=now.temperature)
+    place, sky = now
+    where = PlaceOut(name=place.name, latitude=place.latitude, longitude=place.longitude)
+    if sky is None:
+        return WeatherOut(condition=None, place=where)
+    return WeatherOut(condition=sky.condition, is_day=sky.is_day, temperature=sky.temperature, place=where)
+
+
+@router.get("/ui/weather/places", response_model=list[PlaceOut])
+async def weather_places(
+    _: Annotated[Principal, require("users.self.manage")],
+    module: Module,
+    q: Annotated[str, Query(min_length=2, max_length=80)],
+    language: Annotated[str, Query(pattern="^[a-z]{2}$")] = "en",
+) -> list[PlaceOut]:
+    """#70: places matching a name, for a member to choose where their weather comes from."""
+    return [
+        PlaceOut(name=p.name, latitude=p.latitude, longitude=p.longitude)
+        for p in await module.weather.places(q, language)
+    ]
 
 
 @router.get("/admin/ui/themes")

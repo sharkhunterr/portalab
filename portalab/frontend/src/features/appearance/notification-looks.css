@@ -359,3 +359,266 @@
 .looks__renderer[data-webgl] .ds-icon {
   color: var(--color-accent);
 }
+
+/* #71: the ambiences as a plain list (no animation in it), the rarest first, each previewed in a window */
+.ambient-chooser {
+  display: grid;
+  gap: var(--space-3);
+}
+.ambient-chooser__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.ambient-chooser__head h4,
+.ambient-chooser__weather h4 {
+  margin: 0;
+}
+.ambient-chooser__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.ambient-chooser [data-rarity="free"],
+.ambient-detail[data-rarity="free"] {
+  --rarity: var(--color-text-muted);
+}
+.ambient-chooser [data-rarity="theme"],
+.ambient-detail[data-rarity="theme"] {
+  --rarity: var(--color-accent);
+}
+.ambient-chooser [data-rarity="common"],
+.ambient-detail[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+.ambient-chooser [data-rarity="rare"],
+.ambient-detail[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+.ambient-chooser [data-rarity="epic"],
+.ambient-detail[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+.ambient-chooser [data-rarity="legendary"],
+.ambient-detail[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+.ambient-chooser__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--rarity, var(--color-border)) 60%, var(--color-border));
+  border-radius: var(--radius-full, 999px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.ambient-chooser__filter[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--rarity, var(--color-accent)) 25%, var(--color-surface));
+  border-color: var(--rarity, var(--color-accent));
+}
+.ambient-chooser__count {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ambient-chooser__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ambient-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: 3.5rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--rarity) 35%, var(--color-border));
+  border-inline-start: 4px solid var(--rarity);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--rarity) 8%, var(--color-surface));
+}
+.ambient-row[data-current] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+}
+.ambient-row__gem {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rarity) 22%, var(--color-surface));
+  color: var(--rarity);
+}
+.ambient-row__open {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.ambient-row__open:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.ambient-row__name {
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ambient-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.ambient-row__rarity {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full, 999px);
+  background: color-mix(in srgb, var(--rarity) 20%, transparent);
+  color: var(--rarity);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+.ambient-row__preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.ambient-row__open:hover .ambient-row__preview {
+  color: var(--color-accent);
+}
+.ambient-row__active {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+.ambient-row__apply {
+  flex: none;
+}
+.ambient-detail {
+  display: grid;
+  gap: var(--space-3);
+}
+.ambient-detail__stage {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  max-block-size: 55vh;
+  border: 2px solid var(--rarity);
+  border-radius: var(--radius-md);
+  background: var(--color-background, var(--color-surface));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--rarity) 30%, transparent);
+}
+.ambient-detail__stage .ambient {
+  position: absolute;
+  inset: 0;
+}
+.ambient-detail__facts {
+  display: grid;
+  gap: var(--space-1);
+}
+.ambient-detail__facts p {
+  margin: 0;
+}
+.ambient-detail__rarity {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full, 999px);
+  background: color-mix(in srgb, var(--rarity) 25%, var(--color-surface));
+  color: var(--rarity);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--rarity) 35%, transparent);
+}
+.ambient-detail__note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.weather-place {
+  display: grid;
+  gap: var(--space-2);
+}
+.weather-place__current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+.weather-place__temp {
+  color: var(--color-text-muted);
+}
+.weather-place__search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.weather-place__search input {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.weather-place__found {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.weather-place__found button,
+.weather-place__reset {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.weather-place__found button:hover {
+  background: var(--color-surface-raised);
+}
+.weather-place__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.ambient-chooser__filters {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

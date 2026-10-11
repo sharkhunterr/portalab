@@ -128,6 +128,29 @@ class CosmeticsReader:
             )
             return frozenset(key for key in rows if key)
 
+    async def details(self, kind: str, field: str) -> dict[str, dict[str, Any]]:
+        """#71: for each choice sold, the product selling it: its key, rarity and price."""
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(
+                    ProductVersion.payload[field].astext,
+                    Product.key,
+                    Product.rarity,
+                    ProductVersion.price_coins,
+                )
+                .join(Product, Product.id == ProductVersion.product_id)
+                .where(
+                    Product.type == kind,
+                    ProductVersion.version == Product.current_version,
+                    Product.state.in_(("available", "unavailable")),
+                )
+            )
+            return {
+                choice: {"product": key, "rarity": rarity, "price": price}
+                for choice, key, rarity, price in rows
+                if choice
+            }
+
     async def equipped(self, user_id: UUID) -> dict[str, Any]:
         """027: the profile cosmetics a member wears (banner and frame keys, film backdrop)."""
         from portalab.modules.marketplace.looks.service import equipped_of

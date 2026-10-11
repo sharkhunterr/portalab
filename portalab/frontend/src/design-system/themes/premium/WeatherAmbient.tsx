@@ -1,10 +1,14 @@
 import { type ReactNode, useEffect, useState } from "react";
 
 /**
- * #68: « live weather » — the ambience follows the sky over the homelab: a storm, a downpour, a blizzard,
- * fog, a clear day in the forest or a clear night of stars. The weather comes from the server (refreshed
- * every 15 minutes); until a place is set, a starry sky.
+ * #68, #70: « live weather » — the ambience follows the sky over the member's place (their own, or the
+ * portal's default): a storm, a downpour, a blizzard, fog, a clear day in the forest or a clear night of
+ * stars. The weather comes from the server (refreshed every 15 minutes, and at once when the member picks
+ * another place); until a place is set, a starry sky.
  */
+
+/** Sent when the member picks another place: the ambience asks for its sky again. */
+export const WEATHER_PLACE_CHANGED = "portalab:weather-place";
 interface Sky {
   condition: string | null;
   is_day: boolean;
@@ -42,9 +46,12 @@ export function WeatherAmbient({ render }: { render: (kind: string) => ReactNode
     };
     void ask();
     const timer = window.setInterval(ask, 15 * 60 * 1000);
+    const again = () => void ask();
+    window.addEventListener(WEATHER_PLACE_CHANGED, again);
     return () => {
       alive = false;
       window.clearInterval(timer);
+      window.removeEventListener(WEATHER_PLACE_CHANGED, again);
     };
   }, []);
   return <>{render(weatherAmbient(sky))}</>;
