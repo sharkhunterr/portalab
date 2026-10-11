@@ -664,6 +664,56 @@ a.media-card__link:focus-visible .media-card__frame {
 }
 
 /* --- the request journey (027) ---------------------------------------------------------------------- */
+/* #57: the library's cleanup will delete this title — when, and « Save this title » */
+.media-leaving {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-4) 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--state-error-fg) 45%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--state-error-fg) 8%, var(--color-surface-raised));
+}
+.media-leaving > .lucide,
+.media-leaving > svg {
+  flex: none;
+  color: var(--state-error-fg);
+}
+.media-leaving[data-state="saved"] {
+  border-color: var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.media-leaving[data-state="saved"] > svg {
+  color: var(--color-accent);
+}
+.media-leaving__text {
+  display: grid;
+  gap: 0.15rem;
+  flex: 1 1 16rem;
+  min-inline-size: 0;
+}
+.media-leaving__text p {
+  margin: 0;
+}
+.media-leaving__text small,
+.media-leaving__actions small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.media-leaving__actions {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+}
+.media-leaving__actions :is(.ds-button, button) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 .media-journey {
   display: grid;
   gap: var(--space-3);
@@ -852,6 +902,27 @@ a.media-card__link:focus-visible .media-card__frame {
   gap: var(--space-1) var(--space-3);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+}
+/* #58: the torrent's facts as a small grid — label over value, as many columns as fit */
+.journey-transfer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+.journey-transfer__grid div {
+  display: grid;
+  min-inline-size: 0;
+}
+.journey-transfer__grid dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.journey-transfer__grid dd {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 .journey-transfer__release {
   color: var(--color-text-muted);

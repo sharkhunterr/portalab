@@ -46,6 +46,7 @@ ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one t
 DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
 ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
 STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder
+CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -137,6 +138,10 @@ class SourcePlayback:
     position_s: float = 0.0
     duration_s: float | None = None
     device: str | None = None
+    # #47: what the source calls it beyond the title — the episode under a series, and the channel of a
+    # live TV programme (``kind`` is then ``live``), for sessions the library cannot resolve
+    subtitle: str | None = None
+    channel: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -373,11 +378,41 @@ class TorrentState:
     seeds: int | None = None
     peers: int | None = None
     client: str = ""
+    # #58: the whole picture on a title's page — its size and how much came in, what went out (and the
+    # share ratio), and the swarm the tracker knows (seeders and leechers beyond the connected ones)
+    size: int | None = None
+    downloaded: int | None = None
+    uploaded: int | None = None
+    ratio: float | None = None
+    swarm_seeds: int | None = None
+    swarm_peers: int | None = None
 
 
 @runtime_checkable
 class DownloadClient(Protocol):
     async def torrents(self, hashes: Sequence[str]) -> Sequence[TorrentState]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class LeavingItem:
+    """#57: a title a cleanup tool (Maintainerr) has scheduled for deletion."""
+
+    external_id: str  # the media server's id of the item (a Plex rating key, a Jellyfin id)
+    kind: str  # movie | series | season | episode
+    collection: str  # the rule's collection that holds it
+    added_at: datetime
+    delete_at: datetime | None = None  # ``None``: the collection deletes nothing by itself
+    ids: Mapping[str, str] = field(default_factory=dict)  # tmdb, tvdb
+    size: int | None = None
+
+
+@runtime_checkable
+class MediaCleanup(Protocol):
+    async def leaving(self) -> Sequence[LeavingItem]: ...
+
+    async def keep(self, external_id: str) -> None:
+        """Exclude the item from every rule: it is no longer deleted."""
+        ...
 
 
 @runtime_checkable
@@ -681,6 +716,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(DOWNLOAD_CLIENTS, DownloadClient, "Transfers of a torrent client, by hash (027)"),
     _spec(ITEM_LINKS, ItemLinks, "Where a title opens in its service (027)"),
     _spec(STREAMING, MediaStreaming, "Play a title in the portal, transcoded by its service (027)"),
+    _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

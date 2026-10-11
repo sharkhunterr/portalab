@@ -31,6 +31,25 @@ def test_qbit_mapping() -> None:
         3,
     )
     assert map_qbit({"hash": HASH, "state": "metaDL"}, "q").state == "metadata"  # type: ignore[union-attr]
+    # #58: size, what came in and went out, the share ratio, the tracker's swarm
+    full = map_qbit(
+        {
+            "hash": HASH,
+            "state": "downloading",
+            "size": 4_000,
+            "downloaded": 1_000,
+            "uploaded": 500,
+            "ratio": 0.5,
+            "num_complete": 42,
+            "num_incomplete": 7,
+        },
+        "q",
+    )
+    assert full is not None
+    assert (full.size, full.downloaded, full.uploaded, full.ratio) == (4_000, 1_000, 500, 0.5)
+    assert (full.swarm_seeds, full.swarm_peers) == (42, 7)
+    unknown = map_qbit({"hash": HASH, "ratio": 9999.5, "num_complete": -1}, "q")
+    assert unknown is not None and unknown.ratio is None and unknown.swarm_seeds is None
 
 
 def test_deluge_mapping() -> None:
@@ -40,6 +59,23 @@ def test_deluge_mapping() -> None:
     stuck = map_deluge(HASH, {"state": "Downloading", "progress": 10.0, "download_payload_rate": 0}, "d")
     assert (moving.state, moving.progress, moving.eta_s) == ("downloading", 0.55, 60)
     assert stuck.state == "stalled"
+    full = map_deluge(
+        HASH,
+        {
+            "state": "Downloading",
+            "progress": 25.0,
+            "download_payload_rate": 10,
+            "total_size": 8_000,
+            "total_done": 2_000,
+            "total_uploaded": 1_000,
+            "ratio": 0.5,
+            "total_seeds": 12,
+            "total_peers": 3,
+        },
+        "d",
+    )
+    assert (full.size, full.downloaded, full.uploaded, full.ratio) == (8_000, 2_000, 1_000, 0.5)
+    assert (full.swarm_seeds, full.swarm_peers) == (12, 3)
 
 
 def test_hashes_and_queue() -> None:

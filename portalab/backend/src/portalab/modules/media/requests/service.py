@@ -362,16 +362,11 @@ class RequestSink:
 SERIES_KINDS = ("tv", "series", "season", "episode")
 
 
-async def catalog_title(
-    session: AsyncSession, ids: Mapping[str, str], kind: str, title: str | None, now: datetime
-) -> UUID | None:
-    """The catalog title a request is about (027): same strong id **and** same kind of title — a film
-    and a series may share a TMDB number. A film or series no library holds yet gets its own title, not
-    available, so every request opens a page (the enriched details and the journey live there); the
-    library's copy joins it later through the same id."""
-    strong = strong_ids(ids)
+async def known_title(session: AsyncSession, ids: Mapping[str, str], kind: str) -> UUID | None:
+    """The catalog title with one of these strong ids and the same kind (a film and a series may share a
+    TMDB number) — ``None`` when the catalog has none; nothing is created."""
     wanted = ("series", "season") if kind in SERIES_KINDS else ("movie",)
-    for scheme, value in strong.items():
+    for scheme, value in strong_ids(ids).items():
         found = await session.scalar(
             select(ExternalId.object_id)
             .join(MediaObject, MediaObject.id == ExternalId.object_id)
@@ -385,6 +380,20 @@ async def catalog_title(
         )
         if found is not None:
             return found
+    return None
+
+
+async def catalog_title(
+    session: AsyncSession, ids: Mapping[str, str], kind: str, title: str | None, now: datetime
+) -> UUID | None:
+    """The catalog title a request is about (027): same strong id **and** same kind of title — a film
+    and a series may share a TMDB number. A film or series no library holds yet gets its own title, not
+    available, so every request opens a page (the enriched details and the journey live there); the
+    library's copy joins it later through the same id."""
+    strong = strong_ids(ids)
+    found = await known_title(session, strong, kind)
+    if found is not None:
+        return found
     name = (title or "").strip()[:500]
     if not strong or not name or kind not in ("movie", *SERIES_KINDS[:2]):
         return None

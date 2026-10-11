@@ -1458,6 +1458,30 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
 }
+/* #47: live TV — a « live » badge and the channel where a film shows its progress */
+.widget-playing__live {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+.widget-playing__live-badge {
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-alt);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.widget-playing__live small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
 .widget-playing__bar {
   display: block;
   block-size: 0.3rem;

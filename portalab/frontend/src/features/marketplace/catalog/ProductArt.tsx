@@ -400,6 +400,14 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
           <span>{t("marketplace:art.freeze", { count: Number(preview.count ?? 1) })}</span>
         </span>
       );
+    case "media_rescue": // #57: how many titles it saves
+      return (
+        <span className="product-art__quota product-art__perk">
+          <Icon name="shield" size={size === "sheet" ? 40 : size === "mini" ? 14 : 24} />
+          <strong>{String(preview.count ?? 1)}</strong>
+          <span>{t("marketplace:art.rescue", { count: Number(preview.count ?? 1) })}</span>
+        </span>
+      );
     case "widget":
       return <WidgetArt product={product} />;
     default:

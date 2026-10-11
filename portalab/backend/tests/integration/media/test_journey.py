@@ -8,6 +8,7 @@ import httpx
 from fastapi import FastAPI
 from sqlalchemy import select
 
+from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.media import (
     ACQUISITION,
     DOWNLOAD_CLIENTS,
@@ -20,8 +21,10 @@ from portalab.capabilities.media import (
 )
 from portalab.capabilities.media.testkit import library_record
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
+from portalab.core.authz_port import Principal
 from portalab.core.time import FixedClock
 from portalab.modules.media.models import MediaObject, UserLink
+from portalab.modules.media.providers.insight_widgets import DownloadsWidget
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 from tests.integration.media.test_request_insights import _request
@@ -165,3 +168,55 @@ async def test_journey(
     final = (await client.get(path)).json()
     assert final["available"] and final["steps"][-1]["status"] == "done" and final["can_search"] is False
     assert all(s["status"] == "done" for s in final["steps"])
+
+
+async def test_downloads_widget(media: MediaHarness, app: FastAPI, clock: FixedClock) -> None:
+    """#58: one card per title (a season pack counted once), the torrents' speed, peers and time left,
+    downloading first; nobody named; « my requests » keeps only what I asked for."""
+    people = await users(app, media, "zoe")
+    pack = "c" * 40
+
+    class _Torrents:
+        async def torrents(self, hashes: list[str]) -> list[TorrentState]:
+            heat = TorrentState(HASH, "Heat", "downloading", 0.5, 2_000, 300, 120, 5, 2, "qBit", size=8_000)
+            show = TorrentState(pack, "Show.S01", "stalled", 0.2, 0, 0, None, 0, 1, "qBit", size=4_000)
+            known = {HASH: heat, pack: show}
+            return [known[h] for h in hashes if h in known]
+
+    queue = _Queue()
+    queue.items = [
+        SourceDownload("q1", "movie", "Heat", "downloading", 0.4, ids={"tmdb": "949"}, download_id=HASH),
+        *(
+            SourceDownload(
+                f"e{n}",
+                "episode",
+                f"Episode {n}",
+                "downloading",
+                0.2,
+                ids={"tvdb": "77"},
+                parent_title="Show",
+                season=1,
+                episode=n,
+                download_id=pack,
+            )
+            for n in (1, 2)
+        ),
+    ]
+    media.provide(DOWNLOADS, media.service(4, "radarr"), queue)
+    media.provide(DOWNLOAD_CLIENTS, media.service(6, "qbittorrent"), _Torrents())
+    widget = DownloadsWidget(media.database, media.module.request_insights, clock)
+    data = (await widget.load(Principal(user_id=people["zoe"]), {}, LocaleContext(locale="en"))).data or {}
+    assert [c["title"] for c in data["items"]] == ["Heat", "Show"] and data["count"] == 2
+    heat, show = data["items"]
+    assert (heat["state"], heat["progress"], heat["speed"], heat["eta_s"], heat["seeds"]) == (
+        "downloading",
+        0.5,
+        2_000,
+        120,
+        5,
+    )
+    assert (show["state"], show["count"], show["size"], show["kind"]) == ("stalled", 2, 4_000, "series")
+    assert data["speed"] == 2_000 and str(people["zoe"]) not in str(data)
+    media.module.request_insights._queue = None
+    mine = await widget.load(Principal(user_id=people["zoe"]), {"scope": "me"}, LocaleContext(locale="en"))
+    assert mine.data is not None and mine.data["items"] == [] and mine.data["mine"] is True

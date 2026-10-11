@@ -6,6 +6,7 @@ from portalab.connectors.authentik import AuthentikConnector
 from portalab.connectors.glances import GlancesConnector
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.jellyfin import JellyfinConnector
+from portalab.connectors.maintainerr import MaintainerrConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector
 from portalab.connectors.seerr import SeerrConnector
@@ -33,6 +34,7 @@ def builtin_connectors() -> list[Connector]:
         AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service
         GlancesConnector(),  # #49: a server's processor, memory, temperatures, disks, containers
         UnraidConnector(),  # #50: an Unraid server's array, disks, containers and updates
+        MaintainerrConnector(),  # #57: the library's cleanup — what will be deleted, saving a title
     ]
 
 

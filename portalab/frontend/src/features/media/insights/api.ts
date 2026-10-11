@@ -334,6 +334,22 @@ export function useMeasures() {
       return unit(Math.round(hours), "hour");
     },
     hours: (seconds: number) => unit(Math.round(seconds / 3600), "hour"),
+    /** #58: a size in the locale's own units (« 977 Mo », « 977 MB »). */
+    bytes: (value: number) => {
+      const units = ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte"] as const;
+      let amount = value;
+      let index = 0;
+      while (amount >= 1024 && index < units.length - 1) {
+        amount /= 1024;
+        index += 1;
+      }
+      return new Intl.NumberFormat(locale, {
+        style: "unit",
+        unit: units[index],
+        unitDisplay: "short",
+        maximumFractionDigits: amount >= 10 || index === 0 ? 0 : 1,
+      }).format(amount);
+    },
     money: (amount: number) =>
       new Intl.NumberFormat(locale, {
         style: "currency",

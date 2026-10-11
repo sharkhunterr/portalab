@@ -201,14 +201,19 @@ class _Playback:
             if not item:
                 continue
             state = session.get("PlayState") or {}
+            # #47: live TV plays a channel; its current programme is what is on
+            live = item.get("Type") == "TvChannel"
+            programme = (item.get("CurrentProgram") or {}) if live else {}
             playing.append(
                 SourcePlayback(
                     session_key=str(session.get("Id")),
                     state="paused" if state.get("IsPaused") else "playing",
-                    kind=KINDS.get(str(item.get("Type")), "movie"),
-                    title=str(item.get("Name") or "?"),
+                    kind="live" if live else KINDS.get(str(item.get("Type")), "movie"),
+                    title=str(programme.get("Name") or item.get("Name") or "?"),
+                    subtitle=programme.get("EpisodeTitle") or None,
+                    channel=item.get("Name") if live else None,
                     external_user_id=session.get("UserId"),
-                    item_external_id=item.get("Id"),
+                    item_external_id=None if live else item.get("Id"),
                     ids=_ids(item),
                     position_s=_seconds(state.get("PositionTicks")) or 0.0,
                     duration_s=_seconds(item.get("RunTimeTicks")),

@@ -36,6 +36,8 @@ import "../support/incidents/widget";
 import "../support/tickets/widget";
 import "../campaigns/widget";
 import "./widgets/discover";
+import "./widgets/downloads";
+import "./widgets/leaving";
 import "./widgets/service-status";
 import "../services/HostWidgets";
 import "./widgets/skins"; // 027 (#31): last — the other looks wrap the widgets registered above

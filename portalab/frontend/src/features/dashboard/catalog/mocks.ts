@@ -79,6 +79,27 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
       mine: i === 0,
     })),
   }),
+  "media.downloads": () => ({
+    count: 3,
+    speed: 14_500_000,
+    items: cards(3).map((c, i) => ({
+      ...c,
+      kind: i === 1 ? "series" : "movie",
+      state: i === 2 ? "stalled" : "downloading",
+      progress: 0.75 - i * 0.25,
+      speed: i === 2 ? 0 : 7_250_000,
+      upload_speed: 0,
+      eta_s: i === 2 ? null : 900 + i * 1200,
+      seeds: 12 - i * 5,
+      peers: 3,
+      size: 4_200_000_000,
+      count: i === 1 ? 4 : 1,
+      client: "qBittorrent",
+    })),
+  }),
+  "media.leaving": () => ({
+    items: cards(6).map((c, i) => ({ ...c, delete_at: inDays(i * 3 + 2), collection: "" })),
+  }),
   "media.next_releases": () => ({
     items: cards(4).map((c, i) => ({
       ...c,

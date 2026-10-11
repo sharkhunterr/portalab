@@ -77,7 +77,7 @@ export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }>
       { key: "services", icon: "server", types: ["service_access"] }, // 027: a homelab service's access
       { key: "requests", icon: "clapperboard", types: ["special_request"] }, // 027: a film in 4K…
       { key: "community", icon: "lightbulb", types: ["project_launch"] },
-      { key: "perks", icon: "rocket", types: ["xp_boost", "streak_freeze"] }, // #54/#55
+      { key: "perks", icon: "rocket", types: ["xp_boost", "streak_freeze", "media_rescue"] }, // #54/#55/#57
       { key: "bonus", icon: "inbox", types: ["quota", "feature", "plugin", "access"] },
     ],
   },

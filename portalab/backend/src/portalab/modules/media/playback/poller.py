@@ -194,6 +194,9 @@ class PlaybackPoller:
                     max_position_s=position,
                     duration_s=report.duration_s,
                     device=(report.device or None) and report.device[:120],
+                    title=(report.title or None) and report.title[:500],
+                    subtitle=(report.subtitle or None) and report.subtitle[:500],
+                    channel=(report.channel or None) and report.channel[:200],
                     started_at=now,
                     updated_at=now,
                     as_of=now,
@@ -210,6 +213,10 @@ class PlaybackPoller:
             )
             row.position_s, row.max_position_s = position, max(row.max_position_s, position)
             row.duration_s = report.duration_s or row.duration_s
+            if report.kind == "live":  # #47: the channel moves on to its next programme
+                row.title = (report.title or None) and report.title[:500]
+                row.subtitle = (report.subtitle or None) and report.subtitle[:500]
+                row.channel = ((report.channel or None) and report.channel[:200]) or row.channel
             row.updated_at = row.as_of = now
             if decision.state == "stopped":
                 await self._finish(session, row, now)

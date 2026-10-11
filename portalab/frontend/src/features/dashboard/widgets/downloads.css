@@ -1,0 +1,168 @@
+/* « Downloads in progress » (#58): one row per title — poster, name and state, the bar, the facts */
+.widget-downloads {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+  overflow-y: auto;
+  block-size: 100%;
+  align-content: start;
+}
+.widget-downloads :is(a, li > span) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+  min-inline-size: 0;
+}
+.widget-downloads a:hover strong {
+  color: var(--color-accent);
+}
+.widget-downloads__poster {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text-muted);
+}
+.widget-downloads__poster img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.widget-downloads__info {
+  display: grid;
+  gap: 0.2rem;
+  flex: 1;
+  min-inline-size: 0;
+}
+.widget-downloads__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.widget-downloads__head strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.widget-downloads__state {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-accent);
+}
+.widget-downloads__state:is([data-phase="stalled"], [data-phase="paused"], [data-phase="queued"]) {
+  color: var(--color-text-muted);
+}
+.widget-downloads__state[data-phase="warning"] {
+  color: var(--color-accent-alt);
+}
+.widget-downloads__subtitle,
+.widget-downloads__facts {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+.widget-downloads__bar {
+  display: block;
+  block-size: 0.3rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+.widget-downloads__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--color-accent);
+  transition: inline-size var(--motion-duration-slow) var(--motion-easing-out);
+}
+.widget-downloads__bar:is([data-phase="stalled"], [data-phase="paused"]) span {
+  background: color-mix(in srgb, var(--color-text) 35%, transparent);
+}
+.widget-downloads__bar[data-phase="warning"] span {
+  background: var(--color-accent-alt);
+}
+.widget-downloads__total {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+.widget-downloads__none {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.widget-downloads[data-compact] .widget-downloads__subtitle {
+  display: none;
+}
+
+/* « Leaving soon » (#57): a row of posters, each with the day it goes */
+.widget-leaving {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(6.5rem, 1fr);
+  gap: var(--space-2);
+  block-size: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.widget-leaving a {
+  color: inherit;
+  text-decoration: none;
+}
+.widget-leaving__poster {
+  position: relative;
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  min-block-size: 6rem;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+.widget-leaving__poster img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.widget-leaving__title {
+  padding: var(--space-2);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+.widget-leaving__when {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.3rem;
+  background: color-mix(in srgb, var(--color-accent-alt) 88%, transparent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}

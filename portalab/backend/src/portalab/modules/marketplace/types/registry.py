@@ -17,7 +17,7 @@ from portalab.capabilities.marketplace import (
     ProductType,
     ProductTypeRegistry,
 )
-from portalab.capabilities.media_core import QUOTA
+from portalab.capabilities.media_core import QUOTA, RESCUES
 from portalab.capabilities.plugins import EXTENSION_ACTIVATION
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import CAPABILITY as THEMES
@@ -37,6 +37,7 @@ NOT_REFUNDABLE = frozenset(
         "service_access",
         "streak_freeze",
         "xp_boost",
+        "media_rescue",
     }
 )
 
@@ -288,6 +289,24 @@ class StreakFreezeHandler(Owned):
         return ActivationResult("active")
 
 
+class RescueHandler(Owned):
+    """``media_rescue`` (#57): ``payload.count`` rescues, each saving one title from the cleanup tool's
+    deletion — spent by the member on the title's page (Media keeps them). Consumed, not refundable."""
+
+    def __init__(self, capabilities: CapabilityRegistry) -> None:
+        self.capabilities = capabilities
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        count = int(ownership.payload.get("count", 1) or 0)
+        if count <= 0:
+            return ActivationResult("incompatible", "no rescue")
+        rescues = _port(self.capabilities, RESCUES)
+        if rescues is None:
+            return ActivationResult("failed", "media unavailable")
+        await rescues.grant(ownership.user_id, min(count, 30), f"marketplace:{ownership.id}")
+        return ActivationResult("active")
+
+
 class BoostHandler(Owned):
     """``xp_boost`` (#55): multiplies the owner's gains (``payload.values``, XP by default) by
     ``payload.factor`` for ``payload.hours`` — after the boost already running, if any. Under the
@@ -355,6 +374,8 @@ def register_builtin_types(
         # #54/#55: consumable perks for the play streak and the gains
         ("streak_freeze", StreakFreezeHandler(capabilities), ("count",)),
         ("xp_boost", BoostHandler(capabilities), ("factor", "hours", "values")),
+        # #57: saving a title from the library's cleanup (Maintainerr)
+        ("media_rescue", RescueHandler(capabilities), ("count",)),
     ):
         if registry.get(key) is None:
             registry.register(

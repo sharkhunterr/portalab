@@ -19,6 +19,7 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { usePlayerInfo, useResetResume } from "../player/api";
 import { artworkSlides, Backdrop, Enrichment, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
+import { LeavingNotice } from "./Leaving";
 
 /**
  * Media detail (spec 024 T017/T020): a header and independent section frames — each section loads, fails
@@ -721,6 +722,7 @@ export function DetailPage() {
           )
         }
       />
+      <LeavingNotice objectId={media.id} />
       <RequestJourney objectId={media.id} />
       <Enrichment objectId={media.id} />
       <div className="media-sections">

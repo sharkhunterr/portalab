@@ -47,6 +47,7 @@ def _session(key: str, user: UUID | None, work: UUID | None, **kw: Any) -> Playb
         last_event_at=updated,
         state_seq=1,
         ended=kw.pop("ended", False),
+        **kw,
     )
 
 
@@ -85,6 +86,30 @@ async def test_playing_on_the_server(app: FastAPI, media: MediaHarness) -> None:
         await widget.load(Principal(user_id=people["zoe"]), {"scope": "me"}, LocaleContext(locale="en"))
     ).data
     assert mine is not None and [i["title"] for i in mine["items"]] == ["Alien"] and mine["mine"] is True
+
+
+async def test_live_tv_on_the_server(app: FastAPI, media: MediaHarness) -> None:
+    """#47: a live TV programme is not in the library — it shows by its own title, episode and channel,
+    live (no progress bar), never as its bare kind."""
+    people = await users(app, media, "zoe")
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(
+            _session(
+                "live",
+                people["zoe"],
+                None,
+                kind="live",
+                title="Caméra café (Espagne)",
+                subtitle="Episode 3",
+                channel="5 Coffee TV",
+            )
+        )
+    widget = ServerPlayingWidget(media.database, media.module.clock)
+    data = (await widget.load(Principal(user_id=people["zoe"]), {}, LocaleContext(locale="en"))).data or {}
+    [card] = data["items"]
+    assert card["title"] == "Caméra café (Espagne)" and card["subtitle"] == "Episode 3"
+    assert card["live"] is True and card["channel"] == "5 Coffee TV" and card["kind"] == "live"
+    assert card["progress"] is None and card["remaining_s"] is None
 
 
 async def _watched(media: MediaHarness, user: UUID, work: UUID, title: str, days: float) -> None:

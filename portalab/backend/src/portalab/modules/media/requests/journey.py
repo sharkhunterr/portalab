@@ -22,7 +22,6 @@ from sqlalchemy import select
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.media import (
     ACQUISITION,
-    DOWNLOAD_CLIENTS,
     FoundRelease,
     SourceAcquisition,
     SourceDownload,
@@ -149,21 +148,8 @@ class RequestJourney:
         return [d for d in queue if d.kind in same and wanted & set(strong_ids(d.ids).items())]
 
     async def _torrents(self, downloads: Sequence[SourceDownload]) -> dict[str, TorrentState]:
-        hashes = [d.download_id for d in downloads if d.download_id]
-        if not hashes:
-            return {}
-        results = await asyncio.gather(
-            *(asyncio.wait_for(p.torrents(hashes), timeout=10) for p in self._providers(DOWNLOAD_CLIENTS)),
-            return_exceptions=True,
-        )
-        out: dict[str, TorrentState] = {}
-        for result in results:
-            if isinstance(result, BaseException):
-                continue
-            with suppress(Exception):
-                for torrent in unwrap(result):
-                    out[torrent.download_id] = torrent
-        return out
+        found: dict[str, TorrentState] = await self.insights.torrents(downloads)
+        return found
 
     async def _release_date(self, object_id: UUID) -> date | None:
         async with self.database.session() as session:
@@ -302,6 +288,13 @@ class RequestJourney:
                             "eta_s": torrent.eta_s,
                             "seeds": torrent.seeds,
                             "peers": torrent.peers,
+                            # #58: what goes out, the size, what came in, the ratio and the swarm
+                            "upload_speed": torrent.upload_speed,
+                            "size": torrent.size,
+                            "downloaded": torrent.downloaded,
+                            "ratio": torrent.ratio,
+                            "swarm_seeds": torrent.swarm_seeds,
+                            "swarm_peers": torrent.swarm_peers,
                         }
                         if torrent
                         else None,

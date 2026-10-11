@@ -5,6 +5,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMeasures } from "../insights/api";
 
 interface Torrent {
   state: string;
@@ -13,6 +14,13 @@ interface Torrent {
   eta_s: number | null;
   seeds: number | null;
   peers: number | null;
+  /** #58: what goes out, the size, what came in, the ratio and the tracker's swarm */
+  upload_speed?: number;
+  size?: number | null;
+  downloaded?: number | null;
+  ratio?: number | null;
+  swarm_seeds?: number | null;
+  swarm_peers?: number | null;
 }
 interface DownloadItem {
   title: string;
@@ -77,16 +85,10 @@ const ICONS: Record<string, string> = {
   available: "play",
 };
 
-function size(bytes: number | null | undefined): string {
-  if (!bytes) return "";
-  const units = ["o", "Ko", "Mo", "Go", "To"];
-  let value = bytes;
-  let unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit += 1;
-  }
-  return `${value.toFixed(value >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
+/** A size in the locale's own units — empty when unknown. */
+function useSize(): (bytes: number | null | undefined) => string {
+  const measures = useMeasures();
+  return (bytes) => (bytes ? measures.bytes(bytes) : "");
 }
 
 export function useJourney(objectId: string) {
@@ -104,8 +106,61 @@ export function useJourney(objectId: string) {
   });
 }
 
+/** #58: the torrent client's whole picture of a transfer — speeds both ways, seeders and leechers (and
+ * the swarm), ratio, time left, size and client. */
+function TorrentFacts({ torrent, item }: { torrent: Torrent; item: DownloadItem }) {
+  const t = useT();
+  const format = useFormat();
+  const measures = useMeasures();
+  const swarm = (connected: number | null, total: number | null | undefined) =>
+    connected === null
+      ? "—"
+      : total !== null && total !== undefined && total > connected
+        ? t("media:journey.facts.swarm", { connected, swarm: total })
+        : String(connected);
+  const total = torrent.size ?? item.size;
+  const size = useSize();
+  // an estimate already behind us says nothing
+  const ahead = item.eta ? (Date.parse(item.eta) - Date.now()) / 1000 : 0;
+  const left =
+    torrent.eta_s !== null ? measures.duration(torrent.eta_s) : ahead > 0 ? format.relative(ahead) : null;
+  const facts: [string, string][] = [
+    [t("media:journey.facts.speed"), `${measures.bytes(torrent.speed)}/s`],
+    [t("media:journey.facts.upload"), `${measures.bytes(torrent.upload_speed ?? 0)}/s`],
+    [t("media:journey.facts.seeds"), swarm(torrent.seeds, torrent.swarm_seeds)],
+    [t("media:journey.facts.peers"), swarm(torrent.peers, torrent.swarm_peers)],
+  ];
+  if (torrent.ratio !== null && torrent.ratio !== undefined)
+    facts.push([t("media:journey.facts.ratio"), format.number(Math.round(torrent.ratio * 100) / 100)]);
+  if (left) facts.push([t("media:journey.facts.left"), left]);
+  if (total)
+    facts.push([
+      t("media:journey.facts.size"),
+      torrent.downloaded
+        ? t("media:journey.facts.done", { done: size(torrent.downloaded), size: size(total) })
+        : size(total),
+    ]);
+  if (item.client) facts.push([t("media:journey.facts.client"), item.client]);
+  return (
+    <>
+      <span className="journey-transfer__facts">
+        <span data-torrent-state={torrent.state}>{t(`media:journey.torrent.${torrent.state}`)}</span>
+      </span>
+      <dl className="journey-transfer__grid">
+        {facts.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </>
+  );
+}
+
 /** One transfer: the manager's view (progress, release, client) and the torrent's (state, speed, peers). */
 function Transfer({ item }: { item: DownloadItem }) {
+  const size = useSize();
   const t = useT();
   const format = useFormat();
   const percent = Math.round((item.torrent?.progress ?? item.progress) * 100);
@@ -129,22 +184,19 @@ function Transfer({ item }: { item: DownloadItem }) {
       >
         <span style={{ inlineSize: `${percent}%` }} />
       </span>
-      <span className="journey-transfer__facts">
-        {item.torrent ? <span>{t(`media:journey.torrent.${item.torrent.state}`)}</span> : null}
-        {item.torrent && item.torrent.speed ? <span>{size(item.torrent.speed)}/s</span> : null}
-        {item.torrent && item.torrent.peers !== null ? (
-          <span>
-            {t("media:journey.peers", { seeds: item.torrent.seeds ?? 0, peers: item.torrent.peers })}
-          </span>
-        ) : null}
-        {item.eta ? (
-          <span>
-            {t("media:journey.eta", { when: format.relative((Date.parse(item.eta) - Date.now()) / 1000) })}
-          </span>
-        ) : null}
-        {item.client ? <span>{item.client}</span> : null}
-        {item.size ? <span>{size(item.size)}</span> : null}
-      </span>
+      {item.torrent ? (
+        <TorrentFacts torrent={item.torrent} item={item} />
+      ) : (
+        <span className="journey-transfer__facts">
+          {item.eta ? (
+            <span>
+              {t("media:journey.eta", { when: format.relative((Date.parse(item.eta) - Date.now()) / 1000) })}
+            </span>
+          ) : null}
+          {item.client ? <span>{item.client}</span> : null}
+          {item.size ? <span>{size(item.size)}</span> : null}
+        </span>
+      )}
       {item.release ? <span className="journey-transfer__release">{item.release}</span> : null}
       {item.messages.length ? (
         <ul className="journey-messages">
@@ -158,6 +210,7 @@ function Transfer({ item }: { item: DownloadItem }) {
 }
 
 function StepText({ step }: { step: Step }) {
+  const size = useSize();
   const t = useT();
   const format = useFormat();
   const date = (iso?: string) => (iso ? format.date(iso, "medium") : "");
@@ -246,6 +299,7 @@ function StepText({ step }: { step: Step }) {
  * to confirm, errors; and, on demand, what the indexers offer.
  */
 export function RequestJourney({ objectId }: { objectId: string }) {
+  const size = useSize();
   const t = useT();
   const format = useFormat();
   const headingId = useId();

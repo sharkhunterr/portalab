@@ -1,4 +1,4 @@
-"""#54/#55 — the shop's perk types hand their payload to Gamification's ``economy.perks``, keyed by the
+"""#54/#55/#57 — the shop's perk types hand their payload to Gamification's ``economy.perks``, keyed by the
 ownership (idempotent), and refuse an invalid boost."""
 
 from collections.abc import Sequence
@@ -6,8 +6,15 @@ from uuid import UUID, uuid4
 
 from portalab.capabilities.economy import PERKS, SPECS
 from portalab.capabilities.marketplace import OwnershipView
+from portalab.capabilities.media_core import RESCUES
+from portalab.capabilities.media_core import SPECS as MEDIA_SPECS
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.modules.marketplace.types.registry import NOT_REFUNDABLE, BoostHandler, StreakFreezeHandler
+from portalab.modules.marketplace.types.registry import (
+    NOT_REFUNDABLE,
+    BoostHandler,
+    RescueHandler,
+    StreakFreezeHandler,
+)
 
 
 class _Perks:
@@ -61,3 +68,24 @@ async def test_invalid_perks_are_refused() -> None:
         await BoostHandler(_registry(None)).activate(_owned("xp_boost", {"factor": 2, "hours": 1}))
     ).state == ("failed")
     assert perks.calls == []
+
+
+async def test_rescues_are_credited_to_media() -> None:
+    """#57: a rescue bought in the shop is credited to Media (keyed by the ownership); not refundable."""
+    granted: list[tuple[int, str]] = []
+
+    class _Rescues:
+        async def grant(self, user: UUID, count: int, source_ref: str) -> int:
+            granted.append((count, source_ref))
+            return count
+
+    registry = CapabilityRegistry()
+    registry.declare(next(spec for spec in MEDIA_SPECS if spec.name == RESCUES))
+    assert (await RescueHandler(registry).activate(_owned("media_rescue", {"count": 1}))).state == "failed"
+    registry.provide(RESCUES, _Rescues(), instance_ref="media", owner="test")
+    rescue = _owned("media_rescue", {"count": 3})
+    assert (await RescueHandler(registry).activate(rescue)).state == "active"
+    assert (await RescueHandler(registry).activate(_owned("media_rescue", {"count": 0}))).state == (
+        "incompatible"
+    )
+    assert granted == [(3, f"marketplace:{rescue.id}")] and "media_rescue" in NOT_REFUNDABLE

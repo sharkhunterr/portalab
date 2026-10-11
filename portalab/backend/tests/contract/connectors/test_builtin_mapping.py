@@ -10,6 +10,7 @@ import pytest
 
 from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
+    CLEANUP,
     ITEM_LINKS,
     LIBRARY,
     PLAYBACK,
@@ -23,6 +24,7 @@ from portalab.connectors.builtin import builtin_connectors, register_builtin
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.http_base import parse_time, safe_id
 from portalab.connectors.jellyfin import JellyfinConnector
+from portalab.connectors.maintainerr import MaintainerrConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector, cover_path, game_payload
 from portalab.connectors.seerr import SeerrConnector
@@ -64,6 +66,15 @@ async def test_plex_pages_and_ids() -> None:
     assert "image" not in found[1].payload
     sessions = await PlexConnector().provider(PLAYBACK, handle_for("plex")).now_playing()
     assert sessions[0].state == "paused" and sessions[0].external_user_id == "1"
+    assert sessions[0].kind == "movie" and sessions[0].channel is None
+    live = sessions[1]  # #47: live TV — its programme, episode and channel; no library item
+    assert (live.kind, live.title, live.subtitle, live.channel) == (
+        "live",
+        "Caméra café (Espagne)",
+        "Episode 3",
+        "5 Coffee TV",
+    )
+    assert live.item_external_id is None
 
 
 async def test_arr_availability_and_seasons() -> None:
@@ -167,6 +178,7 @@ def test_builtin_catalog_registers_once() -> None:
         "authentik",  # 027: the single sign-on, for services' access
         "glances",  # #49: a server's processor, memory, disks, containers
         "unraid",  # #50: an Unraid server's array, disks, containers and updates
+        "maintainerr",  # #57: the library's cleanup
     }
 
 
@@ -256,3 +268,24 @@ async def test_authentik_provisions_an_account_in_a_group() -> None:
     added = next(r for r in seen if r.url.path.endswith("/add_user/"))
     assert added.method == "POST" and b'"pk":42' in added.content.replace(b" ", b"")
     assert seen[0].headers["authorization"] == "Bearer authentik-secret-token"
+
+
+async def test_maintainerr_leaving_and_keep() -> None:
+    """#57: the titles of the active collections, each with the day it goes (entered + « delete after »
+    days; none when the collection has no delay); 1.x ids still read; keeping one is a global exclusion."""
+    seen: list[httpx.Request] = []
+    service = handle_for("maintainerr", seen=seen)
+    connector = MaintainerrConnector()
+    assert (await connector.test_connection(service)).detail == "Connected to Maintainerr 2.19.0."
+    cleanup = connector.provider(CLEANUP, service)
+    items = {i.external_id: i for i in await cleanup.leaving()}
+    assert set(items) == {"101", "102", "201"}  # no date, inactive collection: skipped
+    film = items["101"]
+    assert (film.kind, film.collection, film.ids, film.size) == ("movie", "Old films", {"tmdb": "949"}, 4000)
+    assert film.delete_at == datetime(2026, 10, 31, 10, tzinfo=UTC)
+    show = items["201"]
+    assert (show.kind, show.delete_at, show.ids) == ("series", None, {"tvdb": "77"})
+    await cleanup.keep("101")
+    posted = seen[-1]
+    assert posted.method == "POST" and posted.url.path == "/api/rules/exclusion"
+    assert json.loads(posted.content) == {"mediaId": "101", "action": 0, "plexId": 101}

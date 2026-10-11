@@ -230,18 +230,24 @@ class _Playback:
             player = item.get("Player") or {}
             user = item.get("User") or {}
             state = player.get("state")
+            live = item.get("live") in (1, "1", True)
+            parent = item.get("grandparentTitle") or None
             sessions.append(
                 SourcePlayback(
                     session_key=str(item.get("sessionKey")),
                     state=state if state in ("playing", "paused", "buffering") else "playing",
-                    kind=KINDS.get(str(item.get("type")), "movie"),
-                    title=str(item.get("grandparentTitle") or item.get("title") or "?"),
+                    # #47: a live TV programme is a « live » session, whatever its guide entry's type
+                    kind="live" if live else KINDS.get(str(item.get("type")), "movie"),
+                    title=str(parent or item.get("title") or "?"),
                     external_user_id=str(user["id"]) if user.get("id") else None,
-                    item_external_id=item.get("ratingKey"),
+                    # a guide entry is not in any library
+                    item_external_id=None if live else item.get("ratingKey"),
                     ids=_ids(item),
                     position_s=_seconds(item.get("viewOffset")) or 0.0,
                     duration_s=_seconds(item.get("duration")),
                     device=player.get("title") or player.get("device"),
+                    subtitle=str(item["title"]) if parent and item.get("title") else None,
+                    channel=_channel(item) if live else None,
                 )
             )
         return sessions
@@ -273,6 +279,15 @@ class _Playback:
                 )
             )
         return sorted(history, key=lambda h: h.occurred_at)
+
+
+def _channel(item: Mapping[str, Any]) -> str | None:
+    """#47: the channel a live TV session shows (its name, else its call sign)."""
+    for media in item.get("Media") or []:
+        name = media.get("channelTitle") or media.get("channelCallSign")
+        if name:
+            return str(name)
+    return str(item.get("sourceTitle") or "") or None
 
 
 def _day(value: Any) -> str | None:

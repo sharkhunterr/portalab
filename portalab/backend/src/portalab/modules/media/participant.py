@@ -19,6 +19,7 @@ from portalab.modules.media.models import (
     PlaybackSession,
     QuotaLedger,
     QuotaUnits,
+    RescueLedger,
     UserLink,
     UserProgress,
 )
@@ -94,6 +95,20 @@ class MediaParticipant:
                         },
                     )
                 )
+            for rescue in (
+                await session.execute(select(RescueLedger).where(RescueLedger.user_id == user_id))
+            ).scalars():
+                records.append(  # #57: rescues bought and titles saved
+                    ExportRecord(
+                        "media.rescue",
+                        {
+                            "reason": rescue.reason,
+                            "delta": rescue.delta,
+                            "title": rescue.title,
+                            "at": rescue.created_at.isoformat(),
+                        },
+                    )
+                )
         return records
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
@@ -105,7 +120,15 @@ class MediaParticipant:
                 )
             ).scalars()
             await mark_days(session, erased)
-            for model in (HistoryEntry, UserProgress, PlaybackSession, UserLink, QuotaUnits, QuotaLedger):
+            for model in (
+                HistoryEntry,
+                UserProgress,
+                PlaybackSession,
+                UserLink,
+                QuotaUnits,
+                QuotaLedger,
+                RescueLedger,
+            ):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(
                 update(MediaRequest)

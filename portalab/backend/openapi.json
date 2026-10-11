@@ -34646,6 +34646,98 @@
         ]
       }
     },
+    "/api/v1/media/{object_id}/leaving": {
+      "get": {
+        "description": "#57: whether the cleanup tool (Maintainerr) will delete this title (or some of its seasons), when,\nwhether someone saved it \u2014 and how many rescues I have to save it.",
+        "operationId": "leaving_api_v1_media__object_id__leaving_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leaving Api V1 Media  Object Id  Leaving Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Leaving",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/leaving/keep": {
+      "post": {
+        "description": "#57: spend one of my rescues: the cleanup tool excludes the title for good (for everyone).",
+        "operationId": "leaving_keep_api_v1_media__object_id__leaving_keep_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leaving Keep Api V1 Media  Object Id  Leaving Keep Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Leaving Keep",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/{object_id}/metadata": {
       "get": {
         "description": "Enriched details of a film or a series (backdrop, cast, saga, budget, revenue\u2026), when known.",

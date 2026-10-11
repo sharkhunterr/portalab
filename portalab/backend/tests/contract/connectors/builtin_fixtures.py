@@ -97,7 +97,20 @@ PLEX: Routes = {
                     "duration": 9_360_000,
                     "User": {"id": "1", "title": "jo"},
                     "Player": {"state": "paused"},
-                }
+                },
+                {  # #47: a live TV programme — a guide entry, not a library item
+                    "sessionKey": "8",
+                    "ratingKey": "9001",
+                    "live": 1,
+                    "type": "episode",
+                    "grandparentTitle": "Caméra café (Espagne)",
+                    "title": "Episode 3",
+                    "viewOffset": 0,
+                    "duration": 1_800_000,
+                    "Media": [{"channelCallSign": "5COF", "channelTitle": "5 Coffee TV"}],
+                    "User": {"id": "2", "title": "thibaut"},
+                    "Player": {"state": "playing"},
+                },
             ]
         }
     },
@@ -429,6 +442,27 @@ AUTHENTIK = {
     "/api/v3/core/users/42/recovery/": {"link": "https://sso.example.org/recovery/abc"},
 }
 
+# #57: Maintainerr — a film collection deleting after 30 days, a show collection without a delay, an
+# inactive collection (skipped); the status is a JSON document encoded as a string
+MAINTAINERR: Routes = {
+    "/api/app/status": '{"status": 1, "version": "2.19.0", "commitTag": "v2.19.0", "updateAvailable": false}',
+    "/api/collections": [
+        {"id": 1, "title": "Old films", "isActive": True, "deleteAfterDays": 30, "type": "movie"},
+        {"id": 2, "title": "Abandoned shows", "isActive": True, "deleteAfterDays": None, "type": "show"},
+        {"id": 3, "title": "Paused", "isActive": False, "deleteAfterDays": 7, "type": "movie"},
+    ],
+    "/api/collections/media/": lambda request: {
+        "1": [
+            {"mediaServerId": "101", "tmdbId": 949, "addDate": "2026-10-01T10:00:00.000Z", "sizeBytes": 4000},
+            {"plexId": 102, "addDate": "2026-10-02T10:00:00.000Z"},  # Maintainerr 1.x
+            {"mediaServerId": "103"},  # no date: skipped
+        ],
+        "2": [{"mediaServerId": "201", "tvdbId": 77, "addDate": "2026-09-01T00:00:00.000Z"}],
+        "3": [{"mediaServerId": "301", "addDate": "2026-09-01T00:00:00.000Z"}],
+    }.get(request.url.params.get("collectionId", ""), []),
+    "/api/rules/exclusion": {"code": 1, "result": "Success", "message": "Success"},
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -440,6 +474,7 @@ SECRETS = {
     "grimmory": {"password": "grimmory-secret-pass"},
     "tmdb": {"api_key": "tmdb-secret-key"},
     "authentik": {"api_token": "authentik-secret-token"},
+    "maintainerr": {},
 }
 ROUTES = {
     "jellyfin": JELLYFIN,
@@ -452,6 +487,7 @@ ROUTES = {
     "grimmory": GRIMMORY,
     "tmdb": TMDB,
     "authentik": AUTHENTIK,
+    "maintainerr": MAINTAINERR,
 }
 
 

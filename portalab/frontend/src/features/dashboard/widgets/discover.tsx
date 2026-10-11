@@ -33,7 +33,13 @@ interface Card {
 
 const art = (card: Card): string | null =>
   card.image_id ? `/api/v1/media/images/${card.image_id}` : metadataImage(card.poster_ref, "w342");
-const KIND_ICON: Record<string, string> = { movie: "film", episode: "tv", series: "tv", track: "music" };
+const KIND_ICON: Record<string, string> = {
+  movie: "film",
+  episode: "tv",
+  series: "tv",
+  track: "music",
+  live: "tv",
+};
 
 // --- living wall ---------------------------------------------------------------------------------------------
 const TILES = 24;
@@ -119,6 +125,9 @@ function LivingWall({ payload, compact }: WidgetProps) {
 // --- playing on the server -----------------------------------------------------------------------------------
 interface Playing extends Card {
   remaining_s?: number | null;
+  /** #47: live TV — no end to reach, a channel instead */
+  live?: boolean;
+  channel?: string | null;
   year?: number | null;
   genres?: string[] | null;
   rating?: number | null;
@@ -188,7 +197,20 @@ function PlayingCard({ card, hero = false }: { card: Playing; hero?: boolean }) 
         <strong className="widget-playing__title">{card.title}</strong>
         {card.subtitle ? <small className="widget-playing__subtitle">{card.subtitle}</small> : null}
         {hero ? <TitleFacts facts={{ ...card, kind: card.kind }} /> : null}
-        <Progress card={card} />
+        {card.live ? (
+          // #47: live TV — the channel and « live », where a film shows how far it got
+          <span className="widget-playing__live">
+            <span className="widget-playing__live-badge">{t("media:widget.server_playing.live")}</span>
+            {card.channel ? (
+              <small>
+                <Icon name="tv" size={12} />
+                {card.channel}
+              </small>
+            ) : null}
+          </span>
+        ) : (
+          <Progress card={card} />
+        )}
       </span>
     </>
   );

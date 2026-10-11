@@ -16,7 +16,7 @@ from uuid import UUID
 
 from sqlalchemy import String, and_, func, select
 
-from portalab.capabilities.media import DOWNLOADS, SourceDownload, unwrap
+from portalab.capabilities.media import DOWNLOAD_CLIENTS, DOWNLOADS, SourceDownload, TorrentState, unwrap
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
@@ -29,7 +29,7 @@ from portalab.modules.media.models import (
     ObjectMetadata,
     ObjectTag,
 )
-from portalab.modules.media.requests.service import catalog_title
+from portalab.modules.media.requests.service import catalog_title, known_title
 
 GROUPS = {
     "pending": ("pending",),
@@ -457,6 +457,125 @@ class RequestInsights:
                     continue
         self._queue = (time.monotonic(), items)
         return items
+
+    async def torrents(self, downloads: Sequence[SourceDownload]) -> dict[str, TorrentState]:
+        """The torrent clients' view of these downloads (by info hash): state, speeds, peers, ratio."""
+        hashes = sorted({d.download_id for d in downloads if d.download_id})
+        if not hashes:
+            return {}
+        try:
+            providers = [r.provider for r in self.capabilities.system_providers(DOWNLOAD_CLIENTS)]
+        except Exception:
+            providers = []
+        results = await asyncio.gather(
+            *(asyncio.wait_for(p.torrents(hashes), timeout=10) for p in providers), return_exceptions=True
+        )
+        out: dict[str, TorrentState] = {}
+        for result in results:
+            if isinstance(result, BaseException):
+                continue
+            with suppress(Exception):
+                for torrent in unwrap(result):
+                    out[torrent.download_id] = torrent
+        return out
+
+    async def downloads(self, user: UUID | None, limit: int = 12) -> dict[str, Any]:
+        """#58: what the download managers fetch or import now — one card per title (a series' episodes
+        together), with the torrent clients' speed, time left and peers. Titles only, never who asked;
+        ``user``: only the titles that member asked for."""
+        queue = await self.queue()
+        if user is not None and queue:
+            mine: set[tuple[str, str]] = set()
+            async with self.database.session() as session:
+                rows = (
+                    await session.execute(
+                        select(MediaRequest)
+                        .where(MediaRequest.requester_user_id == user, MediaRequest.state.in_(OPEN))
+                        .limit(300)
+                    )
+                ).scalars()
+                for row in rows:
+                    mine |= ids_of(row)
+            queue = [d for d in queue if mine & set(strong_ids(d.ids).items())]
+        torrents = await self.torrents(queue)
+        now = utc_now(self.clock)
+        groups: dict[tuple[str, ...], list[SourceDownload]] = {}
+        for download in queue:
+            kind = "movie" if download.kind == "movie" else "series"
+            name = (download.parent_title if kind == "series" else None) or download.title
+            strong = tuple(f"{k}:{v}" for k, v in sorted(strong_ids(download.ids).items()))
+            groups.setdefault((kind, *(strong or (name.casefold(),))), []).append(download)
+        cards: list[dict[str, Any]] = []
+        async with self.database.session() as session:
+            for (kind, *_), items in groups.items():
+                cards.append(await self._download_card(session, kind, items, torrents, now))
+        order = {"downloading": 0, "importing": 1, "stalled": 2, "queued": 3, "paused": 4, "warning": 5}
+        cards.sort(key=lambda c: (order.get(c["state"], 6), -c["progress"]))
+        return {
+            "items": cards[:limit],
+            "count": len(cards),
+            "speed": sum(c["speed"] for c in cards),
+            "mine": user is not None,
+        }
+
+    async def _download_card(
+        self,
+        session: Any,
+        kind: str,
+        items: list[SourceDownload],
+        torrents: dict[str, TorrentState],
+        now: datetime,
+    ) -> dict[str, Any]:
+        first = items[0]
+        title = (first.parent_title if kind == "series" else None) or first.title
+        # a season pack is one torrent behind several episodes: each torrent counts once
+        seen: dict[str, TorrentState] = {}
+        for item in items:
+            torrent = torrents.get(item.download_id or "")
+            if torrent is not None:
+                seen[torrent.download_id] = torrent
+        transfers = list(seen.values())
+        progress = [t.progress for t in transfers] or [d.progress for d in items]
+        # an estimate already behind us says nothing: no time left rather than « 0 »
+        etas = [t.eta_s for t in transfers if t.eta_s] or [
+            left for d in items if d.eta and (left := round((d.eta - now).total_seconds())) > 0
+        ]
+        states = {t.state for t in transfers}
+        if any(d.attention in ("failed", "warning", "import_blocked") for d in items):
+            state = "warning"
+        elif all(d.status == "importing" for d in items):
+            state = "importing"
+        elif "downloading" in states or (not transfers and any(d.status == "downloading" for d in items)):
+            state = "downloading"
+        elif states & {"stalled", "metadata", "error"}:
+            state = "stalled"
+        elif "paused" in states or any(d.status == "paused" for d in items):
+            state = "paused"
+        else:
+            state = "queued" if any(d.status == "queued" for d in items) else "downloading"
+        sizes = [t.size for t in transfers if t.size] or [d.size for d in items if d.size]
+        card: dict[str, Any] = {
+            "id": None,
+            "title": title,
+            "kind": kind,
+            "state": state,
+            "progress": round(sum(progress) / len(progress), 3),
+            "speed": sum(t.download_speed for t in transfers),
+            "upload_speed": sum(t.upload_speed for t in transfers),
+            "eta_s": max(etas) if etas else None,
+            "seeds": sum(t.seeds or 0 for t in transfers) if transfers else None,
+            "peers": sum(t.peers or 0 for t in transfers) if transfers else None,
+            "size": sum(sizes) if sizes else None,
+            "count": len(items),
+            "client": next((d.client for d in items if d.client), None)
+            or next((t.client for t in transfers if t.client), None),
+            "_lookup": (kind, dict(first.ids), title, None),
+        }
+        if kind == "series" and len(items) == 1 and first.season is not None:
+            card["episode"] = {"season": first.season, "episode": first.episode, "title": first.title}
+        found = await known_title(session, first.ids, kind)
+        card["id"] = str(found) if found else None
+        return card
 
     async def soon(self, user: UUID | None, limit: int = 20) -> list[dict[str, Any]]:
         """Open requests (mine, or everyone's) being downloaded or imported, or with a release date."""

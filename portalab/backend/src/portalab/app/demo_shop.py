@@ -1331,6 +1331,16 @@ _p("quota_requests", "quota", 150, "common", "+5 media requests", "+5 demandes d
    {"kind": "media_requests", "units": 5}, collection="essentials", icon="inbox", limit=(2, 30),
    repeatable=True)  # fmt: skip
 
+# #57: saving a title from the library's cleanup (Maintainerr) — spent on the title's page, for everyone
+_p("rescue_1", "media_rescue", 600, "rare", "Rescue a title", "Sauvetage d'un titre",
+   "A title the library's cleanup was about to delete stays: « Save this title » on its page takes it off the list, for everyone.",
+   "Un titre que le nettoyage de la médiathèque allait supprimer reste : « Sauver ce titre » sur sa fiche le retire de la liste, pour tout le monde.",
+   {"count": 1}, collection="essentials", icon="shield", level=3, limit=(3, 30), repeatable=True)  # fmt: skip
+_p("rescue_3", "media_rescue", 1500, "epic", "Three rescues", "Trois sauvetages",
+   "Three titles saved from the cleanup, whenever you need them — cheaper than one by one.",
+   "Trois titres sauvés du nettoyage, quand vous en avez besoin — moins cher qu'un par un.",
+   {"count": 3}, collection="essentials", icon="shield", level=8, limit=(1, 30), repeatable=True)  # fmt: skip
+
 # #54/#55: perks for the play streak and the gains — consumed, bought again and again (within limits)
 _p("streak_freeze_1", "streak_freeze", 120, "common", "Streak freeze", "Gel de série",
    "A missed day no longer breaks your play streak: it is covered automatically, the multiplier goes on.",
@@ -1487,6 +1497,10 @@ _p("widget_containers", "widget", 2500, "legendary", "Containers widget", "Widge
    "The server's containers: which run, which have an update, and what the server warns about.",
    "Les conteneurs du serveur : lesquels tournent, lesquels ont une mise à jour, et ce que le serveur signale.",
    {"widget": "health.containers"}, collection="widgets", icon="package", level=15, contribution=30)  # fmt: skip
+_p("widget_downloads", "widget", 1500, "legendary", "Downloads widget", "Widget Téléchargements",
+   "What is coming to the server: each title being downloaded, its progress, speed, peers and time left.",
+   "Ce qui arrive sur le serveur : chaque titre en téléchargement, sa progression, sa vitesse, ses pairs et le temps restant.",
+   {"widget": "media.downloads"}, collection="widgets", icon="download", level=10, contribution=30)  # fmt: skip
 
 # 027 (#30, #31): the widgets' other looks — the original one stays free; these are picked in a widget's
 # settings (« Visual ») once bought
@@ -2176,10 +2190,10 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
 # #53: for those who give the most — the server's whole picture in one pack; it asks what its contents ask
 # (the same contribution minimum, the highest level), never more
 _p("pack_server_room", "bundle", None, "legendary", "Server room pack", "Pack Salle des serveurs",
-   "For the community's pillars: the « Server » and « Containers » widgets and every series of « Chart » (temperatures, network, storage over time, a week of history).",
-   "Pour les piliers de la communauté : les widgets « Serveur » et « Conteneurs » et toutes les séries du « Graphique » (températures, réseau, stockage dans le temps, une semaine d'historique).",
-   {"products": ["widget_server", "widget_containers", "opt_chart_network", "opt_chart_temperature",
-                 "opt_chart_storage", "opt_chart_week"]},
+   "For the community's pillars: the « Server », « Containers » and « Downloads » widgets and every series of « Chart » (temperatures, network, storage over time, a week of history).",
+   "Pour les piliers de la communauté : les widgets « Serveur », « Conteneurs » et « Téléchargements » et toutes les séries du « Graphique » (températures, réseau, stockage dans le temps, une semaine d'historique).",
+   {"products": ["widget_server", "widget_containers", "widget_downloads", "opt_chart_network",
+                 "opt_chart_temperature", "opt_chart_storage", "opt_chart_week"]},
    collection="packs", icon="server", level=15, contribution=30)  # fmt: skip
 
 # #79: no animated background behind a profile (the portal's ambience is each member's own choice): the

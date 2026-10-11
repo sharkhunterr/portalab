@@ -17,6 +17,7 @@ CATALOG = "media.catalog"
 HISTORY = "media.history"
 QUOTA = "media.request_quota"
 RECOMMENDATIONS = "media.recommendations"
+RESCUES = "media.rescues"  # #57: rescues bought in the shop, spent saving a title from deletion
 
 
 _KIND = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?")
@@ -214,6 +215,15 @@ class RequestQuotaService(Protocol):
 
 
 @runtime_checkable
+class RescueCredits(Protocol):
+    """#57: Media keeps the rescues; Marketplace only credits those it sold (idempotent per purchase)."""
+
+    async def grant(self, user: UUID, count: int, source_ref: str) -> int:
+        """Credit ``count`` rescues; the new balance."""
+        ...
+
+
+@runtime_checkable
 class RecommendationProvider(Protocol):
     async def recommend(self, viewer: Principal, *, limit: int) -> Sequence[UUID]: ...
 
@@ -229,6 +239,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(HISTORY, MediaHistoryReader, False, "Privacy-bounded media history and progress (024)"),
     _spec(QUOTA, RequestQuotaService, False, "Media request quota and extra units (024)"),
     _spec(RECOMMENDATIONS, RecommendationProvider, True, "Media recommendations (024 baseline, 018 later)"),
+    _spec(RESCUES, RescueCredits, False, "Rescues saving a title from the cleanup's deletion (#57)"),
 )
 
 QuotaSummary = Mapping[str, int]
@@ -238,6 +249,7 @@ __all__ = [
     "HISTORY",
     "QUOTA",
     "RECOMMENDATIONS",
+    "RESCUES",
     "SPECS",
     "DetailBlock",
     "DetailBlockRegistry",
@@ -252,6 +264,7 @@ __all__ = [
     "QuotaSummary",
     "RecommendationProvider",
     "RequestQuotaService",
+    "RescueCredits",
     "default_detail_blocks",
     "default_media_types",
     "register_baseline",

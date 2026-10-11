@@ -54,6 +54,8 @@ const TYPES = [
   // #54/#55: consumable perks — streak freezes and gains boosts
   "streak_freeze",
   "xp_boost",
+  // #57: saving a title from the library's cleanup (Maintainerr)
+  "media_rescue",
 ] as const;
 /** 027: the designs each cosmetic type can sell (keys shared with the backend). */
 const DESIGNS: Partial<
@@ -562,6 +564,7 @@ export function NewProductDialog({
       case "service_access":
         return { deadline_days: deadline, service, ...(group.trim() ? { group: group.trim() } : {}) };
       case "streak_freeze":
+      case "media_rescue":
         return { count: units };
       case "xp_boost":
         return { factor, hours, values: ["xp"] };
@@ -607,7 +610,7 @@ export function NewProductDialog({
               const body = availabilityBody(availability);
               return {
                 availability: body.availability,
-                repeatable: ["quota", "streak_freeze", "xp_boost"].includes(type),
+                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue"].includes(type),
               };
             })(),
             version: {
@@ -827,6 +830,16 @@ export function NewProductDialog({
           {type === "streak_freeze" ? (
             <TextField
               label={t("marketplace:admin.freezes")}
+              type="number"
+              min={1}
+              max={30}
+              value={String(units)}
+              onChange={(e) => setUnits(Number(e.target.value))}
+            />
+          ) : null}
+          {type === "media_rescue" ? (
+            <TextField
+              label={t("marketplace:admin.rescues")}
               type="number"
               min={1}
               max={30}

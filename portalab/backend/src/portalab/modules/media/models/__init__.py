@@ -196,6 +196,10 @@ class PlaybackSession(MediaBase):
     max_position_s: Mapped[float] = mapped_column(Float, nullable=False)
     duration_s: Mapped[float | None] = mapped_column(Float)
     device: Mapped[str | None] = mapped_column(String(120), info=pii("activity"))
+    # #47: what the source calls it, for a session the library cannot resolve (live TV)
+    title: Mapped[str | None] = mapped_column(String(500))
+    subtitle: Mapped[str | None] = mapped_column(String(500))
+    channel: Mapped[str | None] = mapped_column(String(200))
     started_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     as_of: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
@@ -267,6 +271,28 @@ class QuotaLedger(MediaBase):
     reason: Mapped[str] = mapped_column(String(12), nullable=False)
     source_ref: Mapped[str] = mapped_column(String(200), nullable=False)
     idempotency_key: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class RescueLedger(MediaBase):
+    """#57: a member's rescues — credited by the shop (``purchase``), spent saving a title from the cleanup
+    tool's deletion (``rescue``, with the title). The balance is the sum of ``delta``."""
+
+    __tablename__ = "rescues"
+    __table_args__ = (
+        UniqueConstraint("source_ref", name="uq_rescues_source_ref"),
+        CheckConstraint("reason IN ('purchase', 'rescue', 'admin')", name="reason"),
+        Index("ix_rescues_user", "user_id"),
+        Index("ix_rescues_object", "object_id"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    delta: Mapped[int] = mapped_column(Integer, nullable=False)
+    reason: Mapped[str] = mapped_column(String(12), nullable=False)
+    source_ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    object_id: Mapped[UUID | None] = mapped_column()
+    title: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 

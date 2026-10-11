@@ -203,6 +203,36 @@ MY_SOON = _definition(
     defaults={"scope": "me"},
     permission=MEDIA_REQUEST,
 )
+# #58: what is coming in — progress, speed, time left; titles only, never who. Like the server widgets
+# (#53): the administrators' (``infrastructure.read``), else bought in the shop with a contribution minimum
+DOWNLOADS_WIDGET = replace(
+    _definition(
+        "media.downloads",
+        component="media.downloads",
+        icon="download",
+        size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
+        schema={
+            "type": "object",
+            "properties": {"scope": {"type": "string", "enum": ["all", "me"]}},
+            "additionalProperties": False,
+        },
+        defaults={"scope": "all"},
+    ),
+    refresh=Refresh(mode="interval", interval_s=30),
+    stale_after_s=120,
+    free_with="infrastructure.read",
+)
+# #57: what the cleanup (Maintainerr) will delete soon — each title and its day; every member's
+LEAVING_WIDGET = replace(
+    _definition(
+        "media.leaving",
+        component="media.leaving",
+        icon="trash",
+        size=SizeLimits(default=Size(12, 3), min=Size(4, 1), max=Size(12, 6)),
+    ),
+    refresh=Refresh(mode="interval", interval_s=600),
+    stale_after_s=1800,
+)
 UPCOMING = _definition("media.upcoming", component="media.posters", icon="calendar")
 TOP = _definition("media.top", component="media.posters", icon="trophy")
 
@@ -464,6 +494,46 @@ class MySoonWidget(_Base):
         return self.payload({"items": await self.cards(items)})
 
 
+class DownloadsWidget(_Base):
+    """#58: « downloads in progress » — one card per title the download managers fetch or import, with the
+    torrent clients' progress, speed and time left; everyone's (nobody named) or only my requests'."""
+
+    def __init__(
+        self,
+        database: Database,
+        requests: RequestInsights,
+        clock: Clock | None = None,
+        enricher: MetadataEnricher | None = None,
+    ) -> None:
+        super().__init__(database, clock, enricher)
+        self.requests = requests
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        user = principal.acting_for or principal.user_id
+        data = await self.requests.downloads(user if config.get("scope") == "me" else None)
+        data["items"] = await self.cards(data["items"])
+        return WidgetPayload("available", as_of=utc_now(self.clock), data=data)
+
+
+class LeavingWidget(_Base):
+    """#57: « leaving soon » — the titles the cleanup tool will delete, the first to go first, with the
+    day; a title page saves one (with a rescue bought in the shop)."""
+
+    def __init__(self, database: Database, cleanup: Any, clock: Clock | None = None) -> None:
+        super().__init__(database, clock)
+        self.cleanup = cleanup
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        if not self.cleanup.configured():
+            return self.payload(None)
+        items = await self.cleanup.soonest()
+        return self.payload({"items": await self.cards(items)})
+
+
 class UpcomingWidget(_Base):
     def __init__(
         self,
@@ -710,20 +780,26 @@ class ServerPlayingWidget(_Base):
         for session_row, item in rows:
             series = series_of(item) if item is not None and item.kind == "episode" else None
             shown = series or item
-            duration = session_row.duration_s or 0
-            items.append(
-                {
-                    "id": str(shown.id) if shown is not None else None,
-                    "title": shown.title if shown is not None else session_row.kind,
-                    "subtitle": item.title if series is not None and item is not None else None,
-                    "kind": session_row.kind,
-                    "state": session_row.state,
-                    "progress": min(1.0, session_row.position_s / duration) if duration else None,
-                    # 027: how long is left (whole minutes), never who
-                    "remaining_s": max(0, round(duration - session_row.position_s)) if duration else None,
-                    "mine": session_row.user_id is not None and session_row.user_id == me,
-                }
-            )
+            live = session_row.kind == "live"
+            duration = 0 if live else session_row.duration_s or 0  # #47: live TV has no end to reach
+            card: dict[str, Any] = {
+                "id": str(shown.id) if shown is not None else None,
+                "title": shown.title if shown is not None else session_row.title or session_row.kind,
+                "subtitle": item.title if series is not None and item is not None else session_row.subtitle,
+                "kind": session_row.kind,
+                "state": session_row.state,
+                "progress": min(1.0, session_row.position_s / duration) if duration else None,
+                # 027: how long is left (whole minutes), never who
+                "remaining_s": max(0, round(duration - session_row.position_s)) if duration else None,
+                "mine": session_row.user_id is not None and session_row.user_id == me,
+                "live": live,
+                "channel": session_row.channel if live else None,
+            }
+            if shown is None and session_row.title:
+                # #47: not in the library (a live TV programme): what the metadata provider says of it
+                kind = "movie" if session_row.kind == "movie" else "series"
+                card["_lookup"] = (kind, {}, session_row.title, None)
+            items.append(card)
         cards = await self.cards(items, detailed=True)
         mine = config.get("scope") == "me"
         return WidgetPayload(

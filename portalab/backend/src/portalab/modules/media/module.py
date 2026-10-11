@@ -24,6 +24,7 @@ from portalab.capabilities.media_core import (
     HISTORY,
     QUOTA,
     RECOMMENDATIONS,
+    RESCUES,
     DetailBlockRegistry,
     MediaTypeRegistry,
     default_detail_blocks,
@@ -57,6 +58,7 @@ from portalab.modules.media import permissions as _permissions  # noqa: F401 —
 from portalab.modules.media import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.media.availability.service import AvailabilityService
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
+from portalab.modules.media.cleanup import CleanupService
 from portalab.modules.media.discovery.shelves import BaselineRecommender, Discovery
 from portalab.modules.media.events import register_event_types
 from portalab.modules.media.fields.resolver import FieldResolver
@@ -85,6 +87,8 @@ from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.player.service import PlayerService
 from portalab.modules.media.providers.ai_tools import MediaAiTools
 from portalab.modules.media.providers.insight_widgets import (
+    DOWNLOADS_WIDGET,
+    LEAVING_WIDGET,
     LIVING_WALL,
     MY_SOON,
     NEXT_RELEASES,
@@ -94,6 +98,8 @@ from portalab.modules.media.providers.insight_widgets import (
     RECENTLY_ADDED,
     RECENTLY_REQUESTED,
     SERVER_PLAYING,
+    DownloadsWidget,
+    LeavingWidget,
     LivingWallWidget,
     MySoonWidget,
     NextReleasesWidget,
@@ -232,6 +238,7 @@ class MediaModule:
         self.journey = RequestJourney(  # 027: a title's request journey (media page)
             database, capabilities, self.catalog, self.request_insights, clock=clock
         )
+        self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(
@@ -320,6 +327,7 @@ class MediaModule:
             (CATALOG, self.catalog_port),
             (HISTORY, self.history_reader),
             (QUOTA, self.quota),
+            (RESCUES, self.cleanup),
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )
@@ -355,11 +363,16 @@ class MediaModule:
             (UPCOMING_WIDGET, UpcomingWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (TOP_WIDGET, TopWidget(self.database, self.insights, self.clock)),
             (MY_SOON, MySoonWidget(self.database, self.request_insights, self.clock, self.enricher)),
+            (
+                DOWNLOADS_WIDGET,
+                DownloadsWidget(self.database, self.request_insights, self.clock, self.enricher),
+            ),
+            (LEAVING_WIDGET, LeavingWidget(self.database, self.cleanup, self.clock)),
             (NEXT_RELEASES, NextReleasesWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (POSTER_WALL, PosterWallWidget(self.database, self.insights, self.clock)),
             (SHUFFLE_WIDGET, ShuffleWidget(self.database, self.clock)),
             (LIVING_WALL, LivingWallWidget(self.database, self.clock)),
-            (SERVER_PLAYING, ServerPlayingWidget(self.database, self.clock)),
+            (SERVER_PLAYING, ServerPlayingWidget(self.database, self.clock, self.enricher)),
             (ON_THIS_DAY, OnThisDayWidget(self.database, self.clock, self.enricher)),
         )
         for definition, widget in widgets:

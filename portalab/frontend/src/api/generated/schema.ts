@@ -6423,6 +6423,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/{object_id}/leaving": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Leaving
+         * @description #57: whether the cleanup tool (Maintainerr) will delete this title (or some of its seasons), when,
+         *     whether someone saved it — and how many rescues I have to save it.
+         */
+        get: operations["leaving_api_v1_media__object_id__leaving_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/leaving/keep": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Leaving Keep
+         * @description #57: spend one of my rescues: the cleanup tool excludes the title for good (for everyone).
+         */
+        post: operations["leaving_keep_api_v1_media__object_id__leaving_keep_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/{object_id}/metadata": {
         parameters: {
             query?: never;
@@ -26782,6 +26823,72 @@ export interface operations {
         };
     };
     journey_search_api_v1_media__object_id__journey_search_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    leaving_api_v1_media__object_id__leaving_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    leaving_keep_api_v1_media__object_id__leaving_keep_post: {
         parameters: {
             query?: never;
             header?: never;

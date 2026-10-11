@@ -12,6 +12,8 @@ import "../widgets/builtin";
 import "../widgets/media";
 import "../widgets/calendar";
 import "../widgets/discover";
+import "../widgets/downloads";
+import "../widgets/leaving";
 import "../widgets/service-status";
 import "../../gamification/widget";
 import "../../community/widget";

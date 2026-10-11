@@ -2,7 +2,8 @@
 
 * ``media.download_clients``: the transfers behind the download managers' queues, by info hash — state
   (downloading, stalled, waiting for metadata, queued, paused, checking, seeding, error), progress, speeds,
-  time left, seeds and peers — so a title's request journey says *why* a download does not move.
+  time left, seeds and peers, size, share ratio and the swarm — so a title's request journey says *why* a
+  download does not move, and the downloads widget what is coming in (#58).
 * ``service.health_probe``: an authenticated round trip.
 
 Authentication: qBittorrent's Web UI user (configuration) and password (secret) exchanged for the ``SID``
@@ -57,6 +58,18 @@ def _number(value: Any) -> int | None:
     return int(value) if isinstance(value, int | float) and not isinstance(value, bool) else None
 
 
+def _count(value: Any) -> int | None:
+    """A size or a swarm count — clients say -1 (or nothing) when they do not know."""
+    number = _number(value)
+    return number if number is not None and number >= 0 else None
+
+
+def _ratio(value: Any) -> float | None:
+    if not isinstance(value, int | float) or isinstance(value, bool) or value < 0:
+        return None
+    return round(float(value), 3) if value < 9999 else None  # qBittorrent says 9999 for « infinite »
+
+
 QBIT_STATES = {
     "downloading": "downloading",
     "forceddl": "downloading",
@@ -98,6 +111,12 @@ def map_qbit(item: Mapping[str, Any], client: str) -> TorrentState | None:
         seeds=_number(item.get("num_seeds")),
         peers=_number(item.get("num_leechs")),
         client=client,
+        size=_count(item.get("size")) or _count(item.get("total_size")),
+        downloaded=_count(item.get("downloaded")),
+        uploaded=_count(item.get("uploaded")),
+        ratio=_ratio(item.get("ratio")),
+        swarm_seeds=_count(item.get("num_complete")),
+        swarm_peers=_count(item.get("num_incomplete")),
     )
 
 
@@ -120,6 +139,12 @@ DELUGE_FIELDS = [
     "eta",
     "num_seeds",
     "num_peers",
+    "total_size",
+    "total_done",
+    "total_uploaded",
+    "ratio",
+    "total_seeds",
+    "total_peers",
 ]
 
 
@@ -140,6 +165,12 @@ def map_deluge(digest: str, item: Mapping[str, Any], client: str) -> TorrentStat
         seeds=_number(item.get("num_seeds")),
         peers=_number(item.get("num_peers")),
         client=client,
+        size=_count(item.get("total_size")),
+        downloaded=_count(item.get("total_done")),
+        uploaded=_count(item.get("total_uploaded")),
+        ratio=_ratio(item.get("ratio")),
+        swarm_seeds=_count(item.get("total_seeds")),
+        swarm_peers=_count(item.get("total_peers")),
     )
 
 

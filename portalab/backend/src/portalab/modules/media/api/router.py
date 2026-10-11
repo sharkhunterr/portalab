@@ -590,6 +590,23 @@ async def journey_search(principal: Searcher, object_id: UUID, module: Module) -
     return await module.journey.search(principal, object_id)
 
 
+@router.get("/media/{object_id}/leaving")
+async def leaving(principal: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
+    """#57: whether the cleanup tool (Maintainerr) will delete this title (or some of its seasons), when,
+    whether someone saved it — and how many rescues I have to save it."""
+    await module.catalog.get(principal, object_id)  # a title I may see
+    return await module.cleanup.status(object_id, _me(principal))
+
+
+@router.post("/media/{object_id}/leaving/keep")
+async def leaving_keep(principal: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
+    """#57: spend one of my rescues: the cleanup tool excludes the title for good (for everyone)."""
+    await module.catalog.get(principal, object_id)
+    body = await module.cleanup.keep(object_id, _me(principal))
+    await _audit(module, principal, "media.title_rescued", str(object_id), {"object_id": str(object_id)})
+    return body
+
+
 @router.get("/media/{object_id}/sections/{name}", response_model=MediaSectionOut)
 async def section(principal: Reader, object_id: UUID, name: str, module: Module) -> MediaSectionOut:
     if name not in SECTIONS:
