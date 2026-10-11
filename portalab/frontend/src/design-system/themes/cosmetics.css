@@ -2548,3 +2548,42 @@
 :root[data-reduced-motion="true"] [data-fx-cycle] > :not(canvas) {
   animation: none;
 }
+/* #78: a notification through the time portal — its content materialises once the portal is open, and
+   dematerialises before the portal closes (the canvas draws the portal) */
+.ds-notification[data-teleport] {
+  animation: none;
+}
+.ds-notification[data-teleport] > :not(canvas) {
+  animation: fx-teleport-in 1.4s linear both;
+}
+.ds-notification[data-teleport][data-leaving] {
+  animation: none;
+}
+.ds-notification[data-teleport][data-leaving] > :not(canvas) {
+  animation: fx-teleport-out 0.6s linear both;
+}
+@keyframes fx-teleport-in {
+  0%,
+  57% {
+    opacity: 0;
+    filter: blur(4px) brightness(2.5);
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+@keyframes fx-teleport-out {
+  to {
+    opacity: 0;
+    filter: blur(4px) brightness(2.5);
+    transform: scale(0.8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-notification[data-teleport] > :not(canvas) {
+    animation: none;
+  }
+}

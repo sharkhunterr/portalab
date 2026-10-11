@@ -143,6 +143,7 @@ export function Notification({
       data-leaving={leaving || undefined}
       data-fx={fx}
       data-burst={burst ? "true" : undefined}
+      data-teleport={fx === "chrono" || burst === "chrono" || undefined}
       data-fx-shape={fx ? (fxShape ?? 0) : undefined}
       role={item.severity === "critical" ? "alert" : "status"}
     >
@@ -186,6 +187,7 @@ export function Notification({
 /** 027: how long a notification takes to leave (its exit animation). */
 const EXIT_MS = 520;
 const FX_EXIT_MS = 800;
+const TELEPORT_EXIT_MS = 1400;
 
 interface NotifyContextValue {
   notify: (item: Omit<NotificationItem, "id">) => void;
@@ -219,12 +221,18 @@ export function NotificationArea({ children }: { children: ReactNode }) {
       }
       setLeaving((current) => new Set(current).add(id));
       // #78: an animation drawn by the GPU bursts again as it leaves — a little longer to see it
-      window.setTimeout(
-        remove,
-        FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation] ? FX_EXIT_MS : EXIT_MS,
-      );
+      // the time portal: it dematerialises, then its portal closes — longer still
+      const teleport =
+        FX_STYLES[looks.notificationStyle] === "chrono" ||
+        FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation] === "chrono";
+      const exit = teleport
+        ? TELEPORT_EXIT_MS
+        : FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation]
+          ? FX_EXIT_MS
+          : EXIT_MS;
+      window.setTimeout(remove, exit);
     },
-    [reduced, looks.notificationAnimation],
+    [reduced, looks.notificationAnimation, looks.notificationStyle],
   );
   const notify = useCallback((item: Omit<NotificationItem, "id">) => {
     counter.current += 1;

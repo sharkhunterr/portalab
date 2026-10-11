@@ -723,11 +723,12 @@ const EFFECTS: Record<FxBadge, string> = {
   // a time portal: a triangle tearing open behind it (spinning in as it appears, closing as it leaves),
   // its edge crackling with energy, the vortex of time seen through it and inside the shape
   chrono: `
-  float open = smoothstep(0.0, 0.9, u_age);
-  float closing = u_close < 0.0 ? 1.0 : 1.0 - smoothstep(0.0, 0.45, u_close);
-  float k = open * closing;
-  float shown = max(k, 0.25);
-  float flash = exp(-u_age * 4.0) + (u_close < 0.0 ? 0.0 : exp(-u_close * 6.0));
+  // once (a notification): the portal opens, then what it brings materialises; as it leaves, it
+  // dematerialises first, then the portal closes (its letters follow in CSS: fx-teleport-in / -out)
+  float leaving = u_close < 0.0 ? 0.0 : u_close;
+  float k = smoothstep(0.0, 0.8, u_age) * (1.0 - smoothstep(0.6, 1.3, leaving));
+  float shown = smoothstep(0.8, 1.4, u_age) * (1.0 - smoothstep(0.0, 0.6, leaving));
+  float flash = exp(-abs(u_age - 1.0) * 7.0) + (u_close < 0.0 ? 0.0 : exp(-abs(u_close - 0.4) * 7.0));
   if (u_cycle > 0.5) {
     // a teleporter, over and over: the portal opens, the badge materialises, stays, dematerialises, the
     // portal closes — a pause — and again (its letters follow the same cycle in CSS: fx-teleport, 9 s)
@@ -808,7 +809,7 @@ const CLOSE = `
   }
   if (u_burst > 0.5) {
     float flare = 1.0 - smoothstep(0.4, 1.9, u_age);
-    float leave = u_close < 0.0 ? 0.0 : smoothstep(0.0, 0.12, u_close) * (1.0 - smoothstep(0.35, 0.9, u_close));
+    float leave = u_close < 0.0 ? 0.0 : smoothstep(0.0, 0.12, u_close) * (1.0 - smoothstep(1.0, 1.4, u_close));
     o *= clamp(max(flare, leave), 0.0, 1.0);
   }
   float edge = min(min(gl_FragCoord.x, u_res.x - gl_FragCoord.x), min(gl_FragCoord.y, u_res.y - gl_FragCoord.y));
@@ -1004,7 +1005,9 @@ function draw(context: WebGLRenderingContext, instance: Instance, time: number):
   const corner = Number.parseFloat(getComputedStyle(instance.host).borderTopLeftRadius) || 0;
   context.uniform1f(program.round, Math.min(1, (corner * scale) / Math.max(halfHeight, 1)));
   context.uniform1f(program.calm, instance.options.aura ? 2 : instance.options.calm ? 1 : 0);
-  context.uniform1f(program.burst, instance.effect.startsWith("burst:") ? 1 : 0);
+  // the time portal keeps its own timeline (open, bring in, take out, close) rather than a mere burst
+  const burst = instance.effect.startsWith("burst:") && baseOf(instance.effect) !== "chrono";
+  context.uniform1f(program.burst, burst ? 1 : 0);
   context.uniform1f(program.cycle, instance.options.cycle ? 1 : 0);
   context.uniform1f(program.shape, instance.options.shape ?? 0);
   context.uniform1f(program.hue, instance.options.hue ?? 0);
