@@ -91,14 +91,27 @@ class ProfileLooks:
                 )
         return sorted(items, key=lambda item: item["label"])
 
+    async def _sold(self, slot: str) -> dict[str, dict[str, Any]]:
+        """#72: the product selling each design of ``slot`` (its key, rarity and price)."""
+        details = getattr(self.cosmetics, "details", None)
+        if details is None:
+            return {}
+        result: dict[str, dict[str, Any]] = await details(*PROFILE_SLOTS[slot])
+        return result
+
     async def catalog(self, user: UUID) -> dict[str, Any]:
         locked = {slot: await self.locked(user, slot) for slot in CHOICES}
+        sold = {slot: await self._sold(slot) for slot in CHOICES}
+
+        def listed(slot: str, keys: tuple[str, ...]) -> list[dict[str, Any]]:
+            return [{"key": k, "locked": k in locked[slot], **sold[slot].get(k, {})} for k in keys]
+
         return {
-            "banners": [{"key": k, "locked": k in locked["banner"]} for k in PROFILE_BANNERS],
-            "frames": [{"key": k, "locked": k in locked["frame"]} for k in AVATAR_FRAMES],
-            "backgrounds": [{"key": k, "locked": k in locked["background"]} for k in AMBIENTS],
-            "names": [{"key": k, "locked": k in locked["name"]} for k in NAME_STYLES],
-            "levels": [{"key": k, "locked": k in locked["level"]} for k in LEVEL_BADGES],
+            "banners": listed("banner", PROFILE_BANNERS),
+            "frames": listed("frame", AVATAR_FRAMES),
+            "backgrounds": listed("background", AMBIENTS),
+            "names": listed("name", NAME_STYLES),
+            "levels": listed("level", LEVEL_BADGES),
             "titles": await self.owned_items(user, "title"),
             "badges": await self.owned_items(user, "badge"),
             "backdrop": {"unlocked": await self.backdrop_unlocked(user)},

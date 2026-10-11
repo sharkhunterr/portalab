@@ -15,6 +15,7 @@ import { LevelBadgePicker } from "./LevelBadgePicker";
 import { LevelUpPicker } from "./LevelUpPicker";
 import { NotificationLooks } from "./NotificationLooks";
 import { PalettePicker } from "./PalettePicker";
+import { RarityTag } from "./Rarity";
 import { UniverseLooks } from "./UniverseLooks";
 
 /**
@@ -105,6 +106,27 @@ function useShopThemeCount(): number {
   return locked.data?.length ?? 0;
 }
 
+/** #72: the rarity of each theme the shop sells (by its key and by its family). */
+function useThemeRarities(): Map<string, string> {
+  const catalog = useQuery({
+    queryKey: ["ui", "themes", "rarities"],
+    retry: false,
+    queryFn: async () =>
+      (
+        (await api.GET("/api/v1/ui/themes")).data as unknown as {
+          themes?: Array<{ key: string; family?: string | null; rarity?: string | null }>;
+        }
+      ).themes ?? [],
+  });
+  const rarities = new Map<string, string>();
+  for (const theme of catalog.data ?? []) {
+    if (!theme.rarity) continue;
+    rarities.set(theme.key, theme.rarity);
+    if (theme.family) rarities.set(theme.family, theme.rarity);
+  }
+  return rarities;
+}
+
 /** One card per theme family/theme with a miniature of its arrangement (027 T061): never data, only looks. */
 function ThemeGallery({
   themes,
@@ -119,6 +141,7 @@ function ThemeGallery({
     (theme, index) => !theme.family || themes.findIndex((t) => t.family === theme.family) === index,
   );
   const currentTheme = themes.find((t) => t.key === current);
+  const rarities = useThemeRarities();
   return (
     <>
       <ul className="theme-gallery__list">
@@ -136,8 +159,14 @@ function ThemeGallery({
                 type="button"
                 className="theme-card"
                 aria-pressed={Boolean(active)}
+                data-rarity={
+                  rarities.get(theme.key) ?? (theme.family ? rarities.get(theme.family) : undefined)
+                }
                 onClick={() => onChoose(theme)}
               >
+                <RarityTag
+                  rarity={rarities.get(theme.key) ?? (theme.family ? rarities.get(theme.family) : undefined)}
+                />
                 <ThemeMiniature theme={theme} />
                 <span className="theme-card__name">
                   {name}

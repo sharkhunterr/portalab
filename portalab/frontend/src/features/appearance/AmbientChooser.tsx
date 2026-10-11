@@ -29,6 +29,18 @@ function premium(kind: string): boolean {
   return kind === "weather" || isPremiumAmbient(kind);
 }
 
+/** #71: drawn by the graphics chip — high quality, not a CSS animation. */
+function HdTag({ large = false }: { large?: boolean }) {
+  const t = useT();
+  return (
+    <span className="hd-tag" data-large={large || undefined} title={t("notifications:universe.hdHint")}>
+      <Icon name="cpu" size={large ? 14 : 11} />
+      {t("notifications:universe.hd")}
+      <span className="visually-hidden"> — {t("notifications:universe.hdHint")}</span>
+    </span>
+  );
+}
+
 function rarityOf(choice: AmbientChoice | undefined): string {
   return choice?.rarity ?? "free";
 }
@@ -122,6 +134,7 @@ export function AmbientChooser({
                       ? t(`notifications:universe.ambients.${themeAmbient || "none"}`)
                       : t(`notifications:universe.rarity.${rarity}`)}
                   </span>
+                  {premium(key) ? <HdTag /> : null}
                   <span className="ambient-row__preview">
                     <Icon name="eye" size={14} />
                     {t("notifications:universe.preview")}
@@ -182,11 +195,14 @@ export function AmbientChooser({
               <AmbientLayer kind={openedKind as Ambient} contained />
             </div>
             <div className="ambient-detail__facts">
-              <span className="ambient-detail__rarity">
-                <Icon name={open === "theme" ? "palette" : "gem"} size={16} />
-                {open === "theme"
-                  ? t("notifications:universe.followTheme")
-                  : t(`notifications:universe.rarity.${rarityOf(opened)}`)}
+              <span className="ambient-detail__tags">
+                <span className="ambient-detail__rarity">
+                  <Icon name={open === "theme" ? "palette" : "gem"} size={16} />
+                  {open === "theme"
+                    ? t("notifications:universe.followTheme")
+                    : t(`notifications:universe.rarity.${rarityOf(opened)}`)}
+                </span>
+                {premium(openedKind) ? <HdTag large /> : null}
               </span>
               <p>
                 {premium(openedKind)

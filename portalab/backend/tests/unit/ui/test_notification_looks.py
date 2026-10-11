@@ -91,7 +91,7 @@ async def test_level_up_looks_follow_ownership() -> None:
 
 
 async def test_ambiences_carry_their_rarity() -> None:
-    """#71: the ambiences come with the product selling them (rarity, price), shown in Appearance; free ones
+    """#71, #72: the looks come with the product selling them (rarity, price), shown in Appearance; free ones
     have none, and a shop without that detail changes nothing."""
 
     class _Rarities(_Shop):
@@ -99,13 +99,18 @@ async def test_ambiences_carry_their_rarity() -> None:
             return frozenset({"lavalamp"}) if kind == "ambient" else frozenset()
 
         async def details(self, kind: str, field: str) -> dict[str, dict[str, object]]:
-            assert (kind, field) == ("ambient", "ambient")
+            if (kind, field) == ("notification_style", "style"):
+                return {"neon": {"product": "notif_neon", "rarity": "rare", "price": 400}}
+            if (kind, field) != ("ambient", "ambient"):
+                return {}
             return {"lavalamp": {"product": "ambient_lavalamp", "rarity": "legendary", "price": 1500}}
 
     registry = CapabilityRegistry()
     registry.declare(COSMETICS_SPEC)
     registry.provide(COSMETICS, _Rarities(), instance_ref="shop", owner="test")
-    ambients = {a["key"]: a for a in (await NotificationLooks(registry).catalog(OWNER))["ambients"]}
+    catalog = await NotificationLooks(registry).catalog(OWNER)
+    ambients = {a["key"]: a for a in catalog["ambients"]}
+    assert {s["key"]: s for s in catalog["styles"]}["neon"]["rarity"] == "rare"  # #72: every kind of look
     assert ambients["lavalamp"]["rarity"] == "legendary" and ambients["lavalamp"]["locked"] is True
     assert ambients["lavalamp"]["price"] == 1500
     assert "rarity" not in ambients["snow"]

@@ -6,6 +6,7 @@ import { paletteFor } from "../../design-system/themes/palettes";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
+import { RarityTag, rarityIn } from "./Rarity";
 
 /**
  * Colour palettes (027): accent colours over any theme, chosen with swatches — only the member's own; how
@@ -21,7 +22,7 @@ export function PalettePicker() {
     retry: false,
     queryFn: async () =>
       (await api.GET("/api/v1/ui/notification-looks")).data as unknown as {
-        palettes?: Array<{ key: string; locked: boolean }>;
+        palettes?: Array<{ key: string; locked: boolean; rarity?: string | null }>;
       },
   });
   const locked = (key: string) => Boolean(looks.data?.palettes?.find((p) => p.key === key)?.locked);
@@ -36,7 +37,13 @@ export function PalettePicker() {
           const colors = paletteFor(key, scheme);
           const current = preferences.palette === key;
           return (
-            <label key={key} className="palettes__item" data-current={current || undefined}>
+            <label
+              key={key}
+              className="palettes__item"
+              data-current={current || undefined}
+              data-rarity={rarityIn(looks.data?.palettes, key)}
+            >
+              <RarityTag rarity={rarityIn(looks.data?.palettes, key)} />
               <input
                 type="radio"
                 name="palette"

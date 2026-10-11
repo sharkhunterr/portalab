@@ -9,6 +9,8 @@ import { api } from "../../../api/client";
 export interface LookChoice {
   key: string;
   locked: boolean;
+  /** #72: the rarity of the product selling it (none: free) */
+  rarity?: string | null;
 }
 
 export interface Backdrop {

@@ -5,6 +5,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { useEquipLook, useProfileLooks } from "../community/profile/looks";
 import { useProgression } from "../gamification/api";
 import { InShop } from "./InShop";
+import { RarityTag, rarityIn } from "./Rarity";
 
 /**
  * The level (XP) badge's look (027): worn on the profile — everyone sees it, in the header, the navigation
@@ -32,7 +33,13 @@ export function LevelBadgePicker() {
           const current = worn === key;
           const name = t(`notifications:levelBadge.names.${key}`);
           return (
-            <label key={key} className="level-badges__item" data-current={current || undefined}>
+            <label
+              key={key}
+              className="level-badges__item"
+              data-current={current || undefined}
+              data-rarity={rarityIn(looks.data?.levels, key)}
+            >
+              <RarityTag rarity={rarityIn(looks.data?.levels, key)} />
               <input
                 type="radio"
                 name="level-badge"

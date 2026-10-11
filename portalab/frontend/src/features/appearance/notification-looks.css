@@ -622,3 +622,108 @@
   padding: 0;
   border: 0;
 }
+
+/* #72: the rarity of a look sold in the shop — an outline and a small tag in its colour */
+:is(
+  .looks__style,
+  .looks__chip,
+  .palettes__item,
+  .level-badges__item,
+  .theme-card,
+  .rarity-tag
+)[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+:is(
+  .looks__style,
+  .looks__chip,
+  .palettes__item,
+  .level-badges__item,
+  .theme-card,
+  .rarity-tag
+)[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+:is(
+  .looks__style,
+  .looks__chip,
+  .palettes__item,
+  .level-badges__item,
+  .theme-card,
+  .rarity-tag
+)[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+:is(
+  .looks__style,
+  .looks__chip,
+  .palettes__item,
+  .level-badges__item,
+  .theme-card,
+  .rarity-tag
+)[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+:is(.looks__style, .looks__chip, .palettes__item, .level-badges__item, .theme-card)[data-rarity]:not(
+  [data-current],
+  [aria-pressed="true"]
+) {
+  border-color: color-mix(in srgb, var(--rarity) 75%, var(--color-border));
+}
+:is(.looks__style, .palettes__item, .level-badges__item, .theme-card)[data-rarity] {
+  position: relative;
+}
+:is(.looks__style, .looks__chip, .palettes__item, .level-badges__item, .theme-card)[data-rarity="legendary"] {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rarity) 30%, transparent);
+}
+.rarity-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rarity) 85%, var(--color-surface));
+  color: var(--color-surface);
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+:is(.looks__style, .palettes__item, .level-badges__item, .theme-card) > .rarity-tag {
+  position: absolute;
+  inset-block-start: -0.55rem;
+  inset-inline-end: var(--space-2);
+  z-index: 1;
+}
+.looks__chip > .rarity-tag {
+  margin-inline-start: 2px;
+}
+
+/* #71: an ambience drawn by the graphics chip (shaders, particles) — high quality, not CSS */
+.hd-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 6px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--color-accent) 30%, transparent), transparent);
+  color: var(--color-text);
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.hd-tag[data-large] {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+}
+.ambient-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}

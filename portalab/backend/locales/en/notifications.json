@@ -400,5 +400,7 @@
   "universe.weather.noResult": "No place found by that name.",
   "universe.weather.denied": "The browser did not give your position: search your town instead.",
   "universe.weather.saved": "Place saved: the ambience follows its sky.",
-  "universe.weather.reset": "Back to the portal's default place"
+  "universe.weather.reset": "Back to the portal's default place",
+  "universe.hd": "HD",
+  "universe.hdHint": "High quality: drawn by your device's graphics chip"
 }

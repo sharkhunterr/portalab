@@ -14,6 +14,7 @@ import { useNotify } from "../../design-system/components/Notification";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
+import { RarityTag, rarityIn } from "./Rarity";
 import "./notification-looks.css";
 
 /**
@@ -24,6 +25,7 @@ import "./notification-looks.css";
 interface Choice {
   key: string;
   locked: boolean;
+  rarity?: string | null;
 }
 
 function useLooks() {
@@ -85,7 +87,13 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
         {styles.map((style) => {
           const current = preferences.notificationStyle === style;
           return (
-            <label key={style} className="looks__style" data-current={current || undefined}>
+            <label
+              key={style}
+              className="looks__style"
+              data-current={current || undefined}
+              data-rarity={rarityIn(looks.data?.styles, style)}
+            >
+              <RarityTag rarity={rarityIn(looks.data?.styles, style)} />
               <input
                 type="radio"
                 name="notification-style"
@@ -123,7 +131,12 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
         {animations.map((animation) => {
           const current = preferences.notificationAnimation === animation;
           return (
-            <label key={animation} className="looks__chip" data-current={current || undefined}>
+            <label
+              key={animation}
+              className="looks__chip"
+              data-current={current || undefined}
+              data-rarity={rarityIn(looks.data?.animations, animation)}
+            >
               <input
                 type="radio"
                 name="notification-animation"
@@ -138,6 +151,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
               {animation === "theme"
                 ? t("notifications:universe.followTheme")
                 : t(`notifications:looks.animations.${animation}`)}
+              <RarityTag rarity={rarityIn(looks.data?.animations, animation)} />
             </label>
           );
         })}

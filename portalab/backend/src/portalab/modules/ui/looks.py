@@ -60,17 +60,22 @@ class NotificationLooks:
         animations = await self.locked("ui.notificationAnimation", user_id)
         palettes = await self.locked("ui.palette", user_id)
         ambients = await self.locked("ui.ambient", user_id)
-        sold = await self.details("ambient", "ambient")
         celebrations = await self.locked("ui.celebration", user_id)
         level_ups = await self.locked("ui.levelUp", user_id)
+
+        # #71, #72: each choice comes with the product selling it (its rarity, its price), shown with it
+        async def listed(setting: str, keys: tuple[str, ...], locked: frozenset[str]) -> list[dict[str, Any]]:
+            kind, field, _ = KINDS[setting]
+            sold = await self.details(kind, field)
+            return [{"key": k, "locked": k in locked, **sold.get(k, {})} for k in keys]
+
         return {
-            "styles": [{"key": k, "locked": k in styles} for k in STYLES],
-            "animations": [{"key": k, "locked": k in animations} for k in ANIMATIONS],
-            "palettes": [{"key": k, "locked": k in palettes} for k in PALETTES],
-            # #71: the ambiences come with the product selling them (its rarity, its price), shown in the list
-            "ambients": [{"key": k, "locked": k in ambients, **sold.get(k, {})} for k in AMBIENTS],
-            "celebrations": [{"key": k, "locked": k in celebrations} for k in CELEBRATIONS],
-            "level_ups": [{"key": k, "locked": k in level_ups} for k in LEVEL_UPS],
+            "styles": await listed("ui.notificationStyle", STYLES, styles),
+            "animations": await listed("ui.notificationAnimation", ANIMATIONS, animations),
+            "palettes": await listed("ui.palette", PALETTES, palettes),
+            "ambients": await listed("ui.ambient", AMBIENTS, ambients),
+            "celebrations": await listed("ui.celebration", CELEBRATIONS, celebrations),
+            "level_ups": await listed("ui.levelUp", LEVEL_UPS, level_ups),
         }
 
     async def details(self, kind: str, field: str) -> dict[str, dict[str, Any]]:

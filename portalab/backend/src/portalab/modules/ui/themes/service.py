@@ -15,6 +15,7 @@ from sqlalchemy import select
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.themes import COSMETICS
 from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Principal, ResourceRef
@@ -258,11 +259,31 @@ class ThemeService:
         if user_id is None:
             return {"themes": themes, "policy": policy}
         locked = await self._locked_for(user_id, policy["defaultTheme"])
+        sold = await self._sold()
+        for theme in themes:  # #72: a theme sold in the shop shows its rarity (by its key or its family)
+            detail = sold.get(theme["key"]) or sold.get(theme.get("family") or "")
+            if detail:
+                theme.update(rarity=detail.get("rarity"), price=detail.get("price"))
         return {
             "themes": [theme for theme in themes if theme["key"] not in locked],
             "locked": [theme for theme in themes if theme["key"] in locked],  # shown as "in the shop"
             "policy": policy,
         }
+
+    async def _sold(self) -> dict[str, dict[str, Any]]:
+        """The product selling each theme (rarity, price), when the Marketplace says (#72)."""
+        try:
+            providers = self.capabilities.system_providers(COSMETICS)
+        except Exception:
+            return {}
+        details = getattr(providers[0].provider, "details", None) if providers else None
+        if details is None:
+            return {}
+        try:
+            result: dict[str, dict[str, Any]] = await details("theme", "theme")
+        except Exception:
+            return {}
+        return result
 
     async def _locked_for(self, user_id: UUID, default: str) -> frozenset[str]:
         providers = self.capabilities.system_providers(THEME_ENTITLEMENTS)

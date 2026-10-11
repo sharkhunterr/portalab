@@ -11,6 +11,7 @@ import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { type AmbientChoice, AmbientChooser } from "./AmbientChooser";
 import { InShop } from "./InShop";
+import { RarityTag, rarityIn } from "./Rarity";
 
 /**
  * Ambient animation and celebration (027): the animated layer behind the portal (snow, code rain, bats,
@@ -21,6 +22,7 @@ import { InShop } from "./InShop";
 interface Choice {
   key: string;
   locked: boolean;
+  rarity?: string | null;
 }
 
 export function UniverseLooks() {
@@ -73,7 +75,12 @@ export function UniverseLooks() {
         {celebrations.map((key) => {
           const current = preferences.celebration === key;
           return (
-            <label key={key} className="looks__chip" data-current={current || undefined}>
+            <label
+              key={key}
+              className="looks__chip"
+              data-current={current || undefined}
+              data-rarity={rarityIn(catalog.data?.celebrations, key)}
+            >
               <input
                 type="radio"
                 name="celebration"
@@ -88,6 +95,7 @@ export function UniverseLooks() {
               {key === "theme"
                 ? t("notifications:universe.followTheme")
                 : t(`notifications:universe.celebrations.${key}`)}
+              <RarityTag rarity={rarityIn(catalog.data?.celebrations, key)} />
             </label>
           );
         })}

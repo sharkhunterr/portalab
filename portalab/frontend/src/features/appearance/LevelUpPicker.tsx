@@ -9,6 +9,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { useProgression } from "../gamification/api";
 import { showLevelUp } from "../gamification/levelup/LevelUpMoment";
 import { InShop } from "./InShop";
+import { RarityTag, rarityIn } from "./Rarity";
 
 /**
  * How a level-up is shown (027): the classic moment and those the member owns — each can be tried; how
@@ -24,7 +25,7 @@ export function LevelUpPicker() {
     retry: false,
     queryFn: async () =>
       (await api.GET("/api/v1/ui/notification-looks")).data as unknown as {
-        level_ups?: Array<{ key: string; locked: boolean }>;
+        level_ups?: Array<{ key: string; locked: boolean; rarity?: string | null }>;
       },
   });
   const locked = (key: string) => Boolean(catalog.data?.level_ups?.find((p) => p.key === key)?.locked);
@@ -36,7 +37,12 @@ export function LevelUpPicker() {
       <fieldset className="looks__animations">
         <legend className="visually-hidden">{t("notifications:levelUp.title")}</legend>
         {(["theme", ...owned] as const).map((key) => (
-          <label key={key} className="looks__chip" data-current={preferences.levelUp === key || undefined}>
+          <label
+            key={key}
+            className="looks__chip"
+            data-current={preferences.levelUp === key || undefined}
+            data-rarity={rarityIn(catalog.data?.level_ups, key)}
+          >
             <input
               type="radio"
               name="level-up"
@@ -48,6 +54,7 @@ export function LevelUpPicker() {
             {key === "theme"
               ? t("notifications:universe.followTheme")
               : t(`notifications:levelUp.names.${key}`)}
+            <RarityTag rarity={rarityIn(catalog.data?.level_ups, key)} />
           </label>
         ))}
       </fieldset>

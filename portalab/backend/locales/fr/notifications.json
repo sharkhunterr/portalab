@@ -400,5 +400,7 @@
   "universe.weather.noResult": "Aucun lieu trouvé sous ce nom.",
   "universe.weather.denied": "Le navigateur n'a pas donné votre position : recherchez plutôt votre ville.",
   "universe.weather.saved": "Lieu enregistré : l'ambiance suit son ciel.",
-  "universe.weather.reset": "Revenir au lieu par défaut du portail"
+  "universe.weather.reset": "Revenir au lieu par défaut du portail",
+  "universe.hd": "HD",
+  "universe.hdHint": "Haute qualité : dessinée par la puce graphique de votre appareil"
 }
