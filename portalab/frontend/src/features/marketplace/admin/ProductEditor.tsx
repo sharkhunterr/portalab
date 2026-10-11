@@ -93,6 +93,23 @@ const BADGE_STYLES = [
   "elven",
   "glass",
   "hazard",
+  "blaze",
+  "voltage",
+  "aqua",
+  "magma",
+  "glacier",
+  "galaxy",
+  "aurum",
+  "toxic",
+  "holo",
+  "runes",
+  "matrix",
+  "sakura",
+  "shadow",
+  "candy",
+  "aurora",
+  "plasma",
+  "chrono",
 ];
 const ICON_NAMES = Object.keys(ICONS).sort();
 

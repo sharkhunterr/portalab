@@ -801,7 +801,16 @@
             "onering",
             "vhs",
             "nova",
-            "nostromo"
+            "nostromo",
+            "phoenix",
+            "thunderstrike",
+            "tidalwave",
+            "supernova",
+            "goldrush",
+            "arcanum",
+            "sakurastorm",
+            "aurorasky",
+            "timeportal"
           ]
         }
       },
@@ -1183,7 +1192,24 @@
             "elven",
             "onering",
             "island",
-            "nostromo"
+            "nostromo",
+            "blaze",
+            "voltage",
+            "aqua",
+            "magma",
+            "glacier",
+            "galaxy",
+            "aurum",
+            "toxic",
+            "holo",
+            "runes",
+            "matrix",
+            "sakura",
+            "shadow",
+            "candy",
+            "aurora",
+            "plasma",
+            "chrono"
           ]
         },
         "animation": {

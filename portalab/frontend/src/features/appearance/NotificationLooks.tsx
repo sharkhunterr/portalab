@@ -9,8 +9,10 @@ import {
   type NotificationStyle,
 } from "../../design-system/a11y/preferences";
 import { Button } from "../../design-system/components/Button";
+import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
+import { FX_NOTIFICATION_SHAPES, FX_STYLES } from "../../design-system/themes/premium/fxLooks";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
@@ -106,7 +108,18 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
                 data-style={style === "theme" ? themeStyle : style}
                 aria-hidden="true"
               >
-                <span className="ds-notification" data-tone="info">
+                <span
+                  className="ds-notification"
+                  data-tone="info"
+                  data-fx={FX_STYLES[style === "theme" ? themeStyle : style]}
+                >
+                  {FX_STYLES[style === "theme" ? themeStyle : style] ? (
+                    <FxLayer
+                      effect={FX_STYLES[style === "theme" ? themeStyle : style] as string}
+                      calm
+                      shape={FX_NOTIFICATION_SHAPES[style === "theme" ? themeStyle : style] ?? 0}
+                    />
+                  ) : null}
                   <span className="ds-notification__icon">
                     <Icon name="bell" size={14} />
                   </span>

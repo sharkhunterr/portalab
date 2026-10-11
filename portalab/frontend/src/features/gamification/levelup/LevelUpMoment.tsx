@@ -4,8 +4,10 @@ import { type CSSProperties, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { LevelBadge } from "../../../design-system/components/Badges";
+import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { sound } from "../../../design-system/sound/SoundService";
+import { FX_LEVEL_UPS } from "../../../design-system/themes/premium/fxLooks";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -333,6 +335,10 @@ export function LevelUpPreview({ look, label, size }: { look: string; label: str
 
 /** The decoration of each look — layers and particles placed once, animated by CSS. */
 function LevelUpFx({ look, max }: { look: string; max?: number }) {
+  if (FX_LEVEL_UPS.has(look)) {
+    // #78: a full-stage moment drawn by the GPU (smaller in the shop's miniature)
+    return <FxLayer effect={look} maxSide={max ? 360 : 1100} className="levelup__gpu" />;
+  }
   const count = Math.min(PARTICLES[look] ?? 18, max ?? Number.POSITIVE_INFINITY);
   const word = WORDS[look];
   return (

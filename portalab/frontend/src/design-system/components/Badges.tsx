@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { FX_LEVEL_BADGES } from "../themes/premium/fxLooks";
+import { FxLayer } from "./Fx";
 import { Icon } from "./Icon";
-
-/** #73: the level badges drawn by the GPU (flames, electricity, water, magma). */
-const FX_LOOKS = new Set(["blaze", "voltage", "aqua", "magma"]);
 
 /** The look worn on the profile, as set on ``<html data-level-badge>`` (followed when it changes). */
 function useWornLevelLook(): string | undefined {
@@ -17,28 +16,6 @@ function useWornLevelLook(): string | undefined {
     return () => observer.disconnect();
   }, []);
   return worn;
-}
-
-/** #73: the badge's effect, drawn on a canvas around it by the shared GPU renderer (loaded when needed). */
-function BadgeFx({ effect }: { effect: string }) {
-  const canvas = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const element = canvas.current;
-    const host = element?.parentElement;
-    if (!element || !host) return;
-    let stop: (() => void) | null = null;
-    let cancelled = false;
-    void import("../themes/premium/badgeFx").then(({ attachBadgeFx }) => {
-      if (cancelled) return;
-      stop = attachBadgeFx(element, host, effect as "blaze");
-      if (!stop) host.dataset.fxFailed = "true";
-    });
-    return () => {
-      cancelled = true;
-      stop?.();
-    };
-  }, [effect]);
-  return <canvas ref={canvas} className="ds-level__fx" />;
 }
 
 /**
@@ -81,7 +58,7 @@ export function LevelBadge({
 }) {
   const worn = useWornLevelLook();
   const shown = look ?? worn;
-  const fx = shown && FX_LOOKS.has(shown) ? shown : undefined;
+  const fx = shown ? FX_LEVEL_BADGES[shown] : undefined;
   return (
     <span
       className="ds-level"
@@ -91,7 +68,7 @@ export function LevelBadge({
       data-fx={fx}
       data-tier={levelTier(level)}
     >
-      {fx ? <BadgeFx effect={fx} /> : null}
+      {fx ? <FxLayer effect={fx} className="ds-level__fx" /> : null}
       <Icon name={levelTier(level) >= 8 ? "crown" : "star"} size={11} />
       <span aria-hidden="true">{level}</span>
     </span>

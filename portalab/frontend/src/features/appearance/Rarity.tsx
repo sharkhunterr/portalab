@@ -1,4 +1,5 @@
 import { Icon } from "../../design-system/components/Icon";
+import { FX_LEVEL_BADGES, FX_PRODUCTS } from "../../design-system/themes/premium/fxLooks";
 import { isPremiumAmbient } from "../../design-system/themes/premium/PremiumAmbient";
 import { useT } from "../../i18n/hooks/useT";
 
@@ -43,25 +44,28 @@ export function isHdAmbient(kind: string | null | undefined): boolean {
   return Boolean(kind) && (kind === "weather" || isPremiumAmbient(kind as string));
 }
 
-/** #73: the level badges drawn by the graphics chip. */
+/** #73, #77: the level badges drawn by the graphics chip. */
 export function isHdLevelBadge(look: string | null | undefined): boolean {
-  return look === "blaze" || look === "voltage" || look === "aqua" || look === "magma";
+  return Boolean(look && FX_LEVEL_BADGES[look]);
 }
 
 /** #71: whether a shop product is (or, for a pack, holds) an ambience drawn in high quality. */
-export function isHdProduct(product: { type: string; preview?: Record<string, unknown> | null }): boolean {
+export function isHdProduct(product: {
+  key?: string;
+  type: string;
+  preview?: Record<string, unknown> | null;
+}): boolean {
+  if (product.key && FX_PRODUCTS.has(product.key)) return true;
   const preview = product.preview ?? {};
   if (product.type === "ambient" || product.type === "profile_background") {
     const kind = preview.ambient ?? preview.background;
     return typeof kind === "string" && isHdAmbient(kind);
   }
-  if (product.type === "level_badge") return isHdLevelBadge(preview.style as string | undefined);
   if (product.type === "bundle" && Array.isArray(preview.products)) {
     return (preview.products as unknown[]).some(
       (key) =>
         typeof key === "string" &&
-        ((key.startsWith("ambient_") && isHdAmbient(key.slice(8))) ||
-          (key.startsWith("level_") && isHdLevelBadge(key.slice(6)))),
+        (FX_PRODUCTS.has(key) || (key.startsWith("ambient_") && isHdAmbient(key.slice(8)))),
     );
   }
   return false;

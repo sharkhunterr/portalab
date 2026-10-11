@@ -104,6 +104,24 @@ export const NOTIFICATION_STYLES = [
   "onering",
   "island",
   "nostromo",
+  // #78: drawn by the GPU
+  "blaze",
+  "voltage",
+  "aqua",
+  "magma",
+  "glacier",
+  "galaxy",
+  "aurum",
+  "toxic",
+  "holo",
+  "runes",
+  "matrix",
+  "sakura",
+  "shadow",
+  "candy",
+  "aurora",
+  "plasma",
+  "chrono",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -272,6 +290,20 @@ export const LEVEL_BADGES = [
   "voltage",
   "aqua",
   "magma",
+  // #77: drawn by the GPU
+  "glacier",
+  "galaxy",
+  "aurum",
+  "toxic",
+  "holo",
+  "runes",
+  "matrix",
+  "sakura",
+  "shadow",
+  "candy",
+  "aurora",
+  "plasma",
+  "chrono",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -306,6 +338,16 @@ export const LEVEL_UPS = [
   "vhs",
   "nova",
   "nostromo",
+  // #78: full-stage, drawn by the GPU
+  "phoenix",
+  "thunderstrike",
+  "tidalwave",
+  "supernova",
+  "goldrush",
+  "arcanum",
+  "sakurastorm",
+  "aurorasky",
+  "timeportal",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [

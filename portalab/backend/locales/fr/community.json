@@ -308,5 +308,22 @@
   "widget.activity.open": "Ouvrir le fil d'activité",
   "widget.activity.title": "Activité de la communauté",
   "widget.projects.description": "Propositions ouvertes aux votes, au financement ou à l'aide.",
-  "widget.projects.title": "Projets de la communauté"
+  "widget.projects.title": "Projets de la communauté",
+  "looks.frame.pyre": "bûcher",
+  "looks.frame.tesla": "bobine Tesla",
+  "looks.frame.abyssal": "abyssal",
+  "looks.frame.obsidian": "obsidienne",
+  "looks.frame.frostcrown": "couronne de givre",
+  "looks.frame.starlit": "constellé",
+  "looks.frame.regalia": "régalia",
+  "looks.frame.biohazard": "danger biologique",
+  "looks.frame.prism": "prisme",
+  "looks.frame.sigil": "sceau",
+  "looks.frame.mainframe": "ordinateur central",
+  "looks.frame.hanami": "hanami",
+  "looks.frame.wraith": "spectre",
+  "looks.frame.sweetie": "friandise",
+  "looks.frame.borealis": "boréal",
+  "looks.frame.corona": "couronne solaire",
+  "looks.frame.chronogate": "Porte du temps"
 }

@@ -308,5 +308,22 @@
   "widget.activity.open": "Open the activity feed",
   "widget.activity.title": "Community activity",
   "widget.projects.description": "Proposals open for votes, funding or help.",
-  "widget.projects.title": "Community projects"
+  "widget.projects.title": "Community projects",
+  "looks.frame.pyre": "Pyre",
+  "looks.frame.tesla": "Tesla coil",
+  "looks.frame.abyssal": "Abyssal",
+  "looks.frame.obsidian": "Obsidian",
+  "looks.frame.frostcrown": "Frost crown",
+  "looks.frame.starlit": "Starlit",
+  "looks.frame.regalia": "Regalia",
+  "looks.frame.biohazard": "Biohazard",
+  "looks.frame.prism": "Prism",
+  "looks.frame.sigil": "Sigil",
+  "looks.frame.mainframe": "Mainframe",
+  "looks.frame.hanami": "Hanami",
+  "looks.frame.wraith": "Wraith",
+  "looks.frame.sweetie": "Sweetie",
+  "looks.frame.borealis": "Borealis",
+  "looks.frame.corona": "Corona",
+  "looks.frame.chronogate": "Time gate"
 }

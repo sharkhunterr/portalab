@@ -201,6 +201,23 @@ NOTIFICATION_STYLES = Literal[
     "onering",
     "island",
     "nostromo",
+    "blaze",
+    "voltage",
+    "aqua",
+    "magma",
+    "glacier",
+    "galaxy",
+    "aurum",
+    "toxic",
+    "holo",
+    "runes",
+    "matrix",
+    "sakura",
+    "shadow",
+    "candy",
+    "aurora",
+    "plasma",
+    "chrono",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -396,6 +413,8 @@ LEVEL_UPS = Literal[
     "vhs",
     "nova",
     "nostromo",
+    "phoenix", "thunderstrike", "tidalwave", "supernova", "goldrush", "arcanum", "sakurastorm", "aurorasky",
+    "timeportal",
 ]  # fmt: skip
 
 

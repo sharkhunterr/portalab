@@ -716,3 +716,32 @@
   overflow-wrap: normal;
   word-break: normal;
 }
+
+/* #76: the choice worn now stands out whatever its rarity — an accent ring, a tinted card, a check */
+:is(.looks__style, .palettes__item, .level-badges__item)[data-current] {
+  border-color: var(--color-accent);
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+}
+:is(.looks__style, .palettes__item, .level-badges__item)[data-current]::after {
+  content: "✓";
+  position: absolute;
+  inset-block-start: -0.6rem;
+  inset-inline-start: -0.6rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+.theme-card[aria-pressed="true"] {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}

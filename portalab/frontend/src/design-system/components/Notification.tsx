@@ -11,7 +11,9 @@ import {
 import { Link, useInRouterContext } from "react-router";
 import { usePreferences } from "../a11y/PreferencesProvider";
 import { sound } from "../sound/SoundService";
+import { FX_NOTIFICATION_SHAPES, FX_STYLES } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
+import { FxLayer } from "./Fx";
 import { Icon } from "./Icon";
 
 /**
@@ -115,12 +117,18 @@ export function Notification({
   onDismiss,
   durationMs,
   leaving = false,
+  fx,
+  fxShape,
 }: {
   item: NotificationItem;
   onDismiss?: () => void;
   durationMs?: number | undefined;
   /** 027: playing its exit animation. */
   leaving?: boolean;
+  /** #78: the GPU effect of the chosen style, drawn behind it */
+  fx?: string | undefined;
+  /** #78: the shape it draws itself in (not always a rectangle) */
+  fxShape?: number | undefined;
 }) {
   const tone = item.tone ?? item.severity;
   const internal = item.href?.startsWith("/") && !item.href.startsWith("//");
@@ -130,8 +138,11 @@ export function Notification({
       data-severity={item.severity}
       data-tone={tone}
       data-leaving={leaving || undefined}
+      data-fx={fx}
+      data-fx-shape={fx ? (fxShape ?? 0) : undefined}
       role={item.severity === "critical" ? "alert" : "status"}
     >
+      {fx ? <FxLayer effect={fx} calm shape={fxShape ?? 0} /> : null}
       <span className="ds-notification__icon" aria-hidden="true">
         <Icon name={item.icon ?? TONE_ICON[tone]} size={20} />
       </span>
@@ -242,6 +253,8 @@ export function NotificationArea({ children }: { children: ReactNode }) {
             onDismiss={() => dismiss(item.id)}
             durationMs={durationMs}
             leaving={leaving.has(item.id)}
+            fx={FX_STYLES[looks.notificationStyle]}
+            fxShape={FX_NOTIFICATION_SHAPES[looks.notificationStyle]}
           />
         ))}
       </section>

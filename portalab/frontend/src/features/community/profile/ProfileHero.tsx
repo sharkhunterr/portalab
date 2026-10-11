@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { api } from "../../../api/client";
 import { Avatar } from "../../../design-system/components/Avatar";
 import { LevelBadge } from "../../../design-system/components/Badges";
+import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
+import { FRAME_CLIPS, FX_FRAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
 import { useT } from "../../../i18n/hooks/useT";
 import { backdropUrl, type Equipped, type WornItem } from "./looks";
 import { ProfileCustomizer } from "./ProfileCustomizer";
@@ -35,6 +37,20 @@ export function FramedAvatar({
   src?: string | null | undefined;
   size?: "md" | "lg" | "xl";
 }) {
+  const fx = frame ? FX_FRAMES[frame] : undefined;
+  if (fx) {
+    // #78: a frame drawn by the GPU, in a shape of its own — the avatar cut to the same shape
+    const style = {
+      "--frame-clip": FRAME_CLIPS[fx.shape ?? 0] ?? "none",
+      "--frame-radius": fx.radius ?? "50%",
+    } as CSSProperties;
+    return (
+      <span className="avatar-frame" data-frame={frame} data-fx-frame={fx.shape ?? 0} style={style}>
+        <FxLayer effect={fx.effect} shape={fx.shape ?? 0} className="avatar-frame__fx" />
+        <Avatar name={name} userId={userId} src={src} size={size} decorative />
+      </span>
+    );
+  }
   return (
     <span className="avatar-frame" data-frame={frame && frame !== "none" ? frame : undefined}>
       <Avatar name={name} userId={userId} src={src} size={size} decorative />
@@ -53,11 +69,14 @@ export function StyledName({ name, style }: { name: string; style?: string | nul
 
 /** A title or badge as worn, with its animated style. */
 export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "title" }) {
+  const fx = item.style ? FX_STYLES[item.style] : undefined;
   return (
     <span
       className={kind === "badge" ? "cosmetic-badge" : "cosmetic-title"}
       data-style={item.style && item.style !== "none" ? item.style : undefined}
+      data-fx={fx}
     >
+      {fx ? <FxLayer effect={fx} calm /> : null}
       {kind === "badge" ? <Icon name={item.icon ?? "star"} size={14} /> : null}
       {item.label}
     </span>

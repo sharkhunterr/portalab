@@ -66,6 +66,10 @@ AVATAR_FRAMES: tuple[str, ...] = (
     "veins", "lights", "onering", "elven",
     "vhs", "rings",
     "vhs", "tracker",
+    # #78: drawn by the GPU, in shapes of their own
+    "pyre", "tesla", "abyssal", "obsidian", "frostcrown", "starlit", "regalia", "biohazard", "prism",
+    "sigil", "mainframe", "hanami", "wraith", "sweetie", "borealis", "corona",
+    "chronogate",  # #78: the time portal
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -112,6 +116,10 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     "upsidedown", "elven", "onering",
     "island",
     "nostromo",
+    # #78: drawn by the GPU
+    "blaze", "voltage", "aqua", "magma", "glacier", "galaxy", "aurum", "toxic", "holo", "runes", "matrix",
+    "sakura", "shadow", "candy", "aurora", "plasma",
+    "chrono",  # #78: the time portal
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -140,6 +148,10 @@ BADGE_STYLES: tuple[str, ...] = (
     "veins", "mirror", "ring", "elven",
     "glass",
     "hazard",
+    # #78: drawn by the GPU
+    "blaze", "voltage", "aqua", "magma", "glacier", "galaxy", "aurum", "toxic", "holo", "runes", "matrix",
+    "sakura", "shadow", "candy", "aurora", "plasma",
+    "chrono",  # #78: the time portal
 )  # fmt: skip
 # 027: the look of the level badge (the « XP badge » in the header, the navigation and on the profile, seen
 # by everyone): ``classic`` is free and changes with the level (a new rank every ten levels)
@@ -150,6 +162,10 @@ LEVEL_BADGES: tuple[str, ...] = (
     "cassette", "squircle",
     "cassette", "tracker",
     "blaze", "voltage", "aqua", "magma",  # #73: drawn by the GPU
+    # #77
+    "glacier", "galaxy", "aurum", "toxic", "holo", "runes", "matrix", "sakura", "shadow", "candy", "aurora",
+    "plasma",
+    "chrono",  # #78: the time portal
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -160,6 +176,9 @@ LEVEL_UPS: tuple[str, ...] = (
     "onering",
     "vhs", "nova",
     "vhs", "nostromo",
+    # #78: full-stage, drawn by the GPU
+    "phoenix", "thunderstrike", "tidalwave", "supernova", "goldrush", "arcanum", "sakurastorm", "aurorasky",
+    "timeportal",  # #78: the time portal
 )  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",

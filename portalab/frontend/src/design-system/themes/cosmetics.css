@@ -2337,3 +2337,88 @@
 .ds-level[data-fx="magma"][data-fx-failed] {
   background: linear-gradient(0deg, #1c0a05, #b91c1c 60%, #f59e0b);
 }
+
+/* #78: looks drawn by the GPU — notifications, titles, badges, avatar frames and level-up stages carry a
+   canvas behind them (spread around for what reaches out: flames, arcs, smoke); the element itself is
+   drawn by the effect, its text written over it. Without WebGL the canvas hides and a CSS look remains. */
+.fx-layer {
+  position: absolute;
+  inset: -1.1rem -0.9rem -0.7rem;
+  z-index: -1;
+  inline-size: calc(100% + 1.8rem);
+  block-size: calc(100% + 1.8rem);
+  pointer-events: none;
+}
+:is(.ds-notification, .cosmetic-badge, .cosmetic-title)[data-fx] {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-text-on-media, #fff);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 70%);
+}
+.ds-notification[data-fx] {
+  border-radius: var(--radius-lg, 14px);
+  backdrop-filter: none;
+}
+.ds-notification[data-fx] :is(.ds-notification__title, .ds-notification__body, .ds-notification__icon) {
+  color: inherit;
+}
+.cosmetic-title[data-fx] {
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--radius-pill);
+  color: #fff;
+}
+.cosmetic-badge[data-fx] {
+  border-radius: var(--radius-pill);
+}
+:is(.ds-notification, .cosmetic-badge, .cosmetic-title)[data-fx][data-fx-failed] > .fx-layer {
+  display: none;
+}
+:is(.ds-notification, .cosmetic-badge, .cosmetic-title)[data-fx][data-fx-failed] {
+  background: linear-gradient(135deg, #1e1b4b, #4c1d95 60%, #0f172a);
+}
+.avatar-frame[data-fx-frame] {
+  padding: 0.55rem;
+  border-radius: var(--frame-radius, 50%);
+  background: none;
+  box-shadow: none;
+}
+.avatar-frame[data-fx-frame] > .avatar-frame__fx {
+  position: absolute;
+  inset: -22%;
+  z-index: -1;
+  inline-size: 144%;
+  block-size: 144%;
+  pointer-events: none;
+}
+.avatar-frame[data-fx-frame] > :not(.avatar-frame__fx) {
+  clip-path: var(--frame-clip, none);
+  border-radius: var(--frame-radius, 50%);
+}
+.avatar-frame[data-fx-frame][data-fx-failed] {
+  background: conic-gradient(from 0deg, #f97316, #a855f7, #22d3ee, #f97316);
+}
+.levelup__gpu {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+/* #78: a notification drawn in a shape of its own keeps its text inside it */
+.ds-notification[data-fx-shape="6"] {
+  padding-inline: 1.8rem;
+}
+.ds-notification[data-fx-shape="7"] {
+  padding-inline: 1.4rem;
+}
+.ds-notification[data-fx-shape="8"] {
+  padding-block: 0.9rem;
+}
+.ds-notification[data-fx]::before,
+.ds-notification[data-fx]::after {
+  display: none;
+}

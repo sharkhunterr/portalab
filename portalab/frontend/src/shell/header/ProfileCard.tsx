@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Link } from "react-router";
 import { Avatar } from "../../design-system/components/Avatar";
 import {
@@ -7,7 +8,9 @@ import {
   levelProgress,
   ProgressBar,
 } from "../../design-system/components/Badges";
+import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
+import { FRAME_CLIPS, FX_FRAMES } from "../../design-system/themes/premium/fxLooks";
 import { backdropUrl, useProfileLooks } from "../../features/community/profile/looks";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
@@ -64,9 +67,30 @@ export function ProfileCard({
         <span className="shell-profile__banner profile-banner" data-banner={worn.banner} aria-hidden="true" />
       ) : null}
       <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
-        <span className="avatar-frame" data-frame={frame}>
-          <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
-        </span>
+        {frame && FX_FRAMES[frame] ? (
+          <span
+            className="avatar-frame"
+            data-frame={frame}
+            data-fx-frame={FX_FRAMES[frame]?.shape ?? 0}
+            style={
+              {
+                "--frame-clip": FRAME_CLIPS[FX_FRAMES[frame]?.shape ?? 0] ?? "none",
+                "--frame-radius": FX_FRAMES[frame]?.radius ?? "50%",
+              } as CSSProperties
+            }
+          >
+            <FxLayer
+              effect={FX_FRAMES[frame]?.effect ?? "blaze"}
+              shape={FX_FRAMES[frame]?.shape ?? 0}
+              className="avatar-frame__fx"
+            />
+            <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
+          </span>
+        ) : (
+          <span className="avatar-frame" data-frame={frame}>
+            <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
+          </span>
+        )}
         <span className="shell-profile__name">
           <strong>{name}</strong>
           <span>{strings.profile}</span>
