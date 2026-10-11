@@ -297,6 +297,15 @@ AMBIENTS = Literal[
     "garland",
     "christmasnight",
     "hearth",
+    "goldenhour",
+    "windowrain",
+    "summerfield",
+    "soapbubbles",
+    "skylanterns",
+    "autumnlane",
+    "pixelcamp",
+    "pixelbeach",
+    "pixelballoons",
 ]
 CELEBRATIONS = Literal[
     "none",

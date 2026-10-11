@@ -465,6 +465,16 @@ AMBIENT_NAMES = {
     "garland": ("String lights", "Guirlandes", "legendary", 1300),
     "christmasnight": ("Christmas night", "Nuit de Noël", "legendary", 1500),
     "hearth": ("By the fire", "Coin du feu", "legendary", 1400),
+    # #68: warm, cheerful and pixel-art ambiences
+    "goldenhour": ("Golden hour", "Heure dorée", "legendary", 1300),
+    "windowrain": ("Rain on the window", "Pluie à la fenêtre", "legendary", 1300),
+    "summerfield": ("Summer field", "Champ d'été", "legendary", 1300),
+    "soapbubbles": ("Soap bubbles", "Bulles de savon", "legendary", 1200),
+    "skylanterns": ("Lanterns over the lake", "Lanternes sur le lac", "legendary", 1400),
+    "autumnlane": ("Autumn lane", "Allée d'automne", "legendary", 1300),
+    "pixelcamp": ("Pixel campfire", "Feu de camp pixel", "legendary", 1400),
+    "pixelbeach": ("Pixel sunset beach", "Plage pixel au couchant", "legendary", 1400),
+    "pixelballoons": ("Pixel balloons", "Montgolfières pixel", "legendary", 1400),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -1738,7 +1748,7 @@ LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
     "request_tv_channel",
-    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave", "ambient_volcano", "ambient_blackhole", "ambient_reef", "ambient_firestorm", "ambient_whiteout", "ambient_liquidmetal", "ambient_plasma", "ambient_forest", "ambient_neoncity", "ambient_weather", "ambient_haunted", "ambient_darkness", "ambient_lostsignal", "ambient_garland", "ambient_christmasnight", "ambient_hearth",
+    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave", "ambient_volcano", "ambient_blackhole", "ambient_reef", "ambient_firestorm", "ambient_whiteout", "ambient_liquidmetal", "ambient_plasma", "ambient_forest", "ambient_neoncity", "ambient_weather", "ambient_haunted", "ambient_darkness", "ambient_lostsignal", "ambient_garland", "ambient_christmasnight", "ambient_hearth", "ambient_goldenhour", "ambient_windowrain", "ambient_summerfield", "ambient_soapbubbles", "ambient_skylanterns", "ambient_autumnlane", "ambient_pixelcamp", "ambient_pixelbeach", "ambient_pixelballoons",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:

@@ -206,6 +206,15 @@ export const AMBIENTS = [
   "garland",
   "christmasnight",
   "hearth",
+  "goldenhour",
+  "windowrain",
+  "summerfield",
+  "soapbubbles",
+  "skylanterns",
+  "autumnlane",
+  "pixelcamp",
+  "pixelbeach",
+  "pixelballoons",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and

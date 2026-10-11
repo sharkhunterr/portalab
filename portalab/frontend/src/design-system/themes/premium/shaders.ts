@@ -4,7 +4,7 @@
  * transparent page: what is not lit stays see-through. Kept to GLSL ES 1.0 so every phone runs them.
  */
 
-const COMMON = `
+export const COMMON = `
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else

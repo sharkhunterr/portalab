@@ -36,6 +36,47 @@ export interface FlowPreset {
 }
 
 export const FLOWS: Record<string, FlowPreset> = {
+  // golden dust floating in a sunbeam: tiny, slow, glinting
+  motes: {
+    density: 220,
+    colors: [
+      [1, 0.88, 0.55],
+      [1, 0.95, 0.75],
+      [1, 0.75, 0.4],
+    ],
+    size: [1, 3.2],
+    alpha: [0.25, 0.8],
+    speed: 10,
+    scale: 0.003,
+    evolve: 0.06,
+    wind: [4, -3],
+    gusts: 0.3,
+    spawn: "anywhere",
+    life: [4, 10],
+    flicker: true,
+    dots: true,
+  },
+  // butterflies: bright specks fluttering in loops, wings beating (the flicker)
+  butterflies: {
+    density: 22,
+    colors: [
+      [1, 0.85, 0.2],
+      [1, 0.45, 0.6],
+      [0.5, 0.75, 1],
+      [1, 1, 1],
+    ],
+    size: [4, 7],
+    alpha: [0.75, 1],
+    speed: 55,
+    scale: 0.006,
+    evolve: 0.5,
+    wind: [10, -2],
+    gusts: 0.4,
+    spawn: "anywhere",
+    life: [6, 14],
+    flicker: true,
+    dots: true,
+  },
   // pale wisps drifting slowly, appearing and fading
   wisps: {
     density: 45,

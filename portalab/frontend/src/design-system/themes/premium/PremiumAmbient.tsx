@@ -42,6 +42,15 @@ const LAYERS: Record<string, Layers> = {
   garland: { shader: "garland", flow: "gentlesnow" },
   christmasnight: { shader: "christmasnight", flow: "gentlesnow" },
   hearth: { shader: "hearth", flow: "crackle" },
+  goldenhour: { shader: "goldenhour", flow: "motes" },
+  windowrain: { shader: "windowrain" },
+  summerfield: { shader: "summerfield", flow: "butterflies" },
+  soapbubbles: { shader: "soapbubbles" },
+  skylanterns: { shader: "skylanterns" },
+  autumnlane: { shader: "autumnlane", flow: "motes" },
+  pixelcamp: { shader: "pixelcamp" },
+  pixelbeach: { shader: "pixelbeach" },
+  pixelballoons: { shader: "pixelballoons" },
 };
 
 /** The CSS ambience standing in for each premium one. */
@@ -73,6 +82,15 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   garland: "lights",
   christmasnight: "snow",
   hearth: "embers",
+  goldenhour: "bokeh",
+  windowrain: "rain",
+  summerfield: "meadow",
+  soapbubbles: "bubbles",
+  skylanterns: "lanterns",
+  autumnlane: "leaves",
+  pixelcamp: "pixelsky",
+  pixelbeach: "pixelsky",
+  pixelballoons: "pixelsky",
 };
 
 export function isPremiumAmbient(kind: string): boolean {
@@ -129,8 +147,12 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
   let index = 0;
   const next = () => canvases[index++] as HTMLCanvasElement;
   if (layers.shader) {
-    const [{ runShader }, { SHADERS }] = await Promise.all([import("./shaderRunner"), import("./shaders")]);
-    const stop = runShader(next(), SHADERS[layers.shader] as string);
+    const [{ runShader }, { SHADERS }, { COZY_SHADERS }] = await Promise.all([
+      import("./shaderRunner"),
+      import("./shaders"),
+      import("./cozyShaders"),
+    ]);
+    const stop = runShader(next(), (SHADERS[layers.shader] ?? COZY_SHADERS[layers.shader]) as string);
     if (!stop) return null;
     stops.push(stop);
   }
