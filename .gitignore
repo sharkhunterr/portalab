@@ -14,6 +14,8 @@ htmlcov/
 # Node / frontend
 node_modules/
 dist/
+dist-next/
+dist-old/
 build/
 coverage/
 playwright-report/
