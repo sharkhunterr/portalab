@@ -55,8 +55,19 @@ export function FramedAvatar({
       "--frame-radius": fx.radius ?? "50%",
     } as CSSProperties;
     return (
-      <span className="avatar-frame" data-frame={frame} data-fx-frame={fx.shape ?? 0} style={style}>
-        <FxLayer effect={fx.effect} shape={fx.shape ?? 0} className="avatar-frame__fx" />
+      <span
+        className="avatar-frame"
+        data-frame={frame}
+        data-fx-frame={fx.shape ?? 0}
+        data-fx-cycle={fx.effect === "chrono" || undefined}
+        style={style}
+      >
+        <FxLayer
+          effect={fx.effect}
+          shape={fx.shape ?? 0}
+          cycle={fx.effect === "chrono"}
+          className="avatar-frame__fx"
+        />
         <Avatar name={name} userId={userId} src={src} size={size} decorative />
       </span>
     );
@@ -76,9 +87,10 @@ export function StyledName({ name, style }: { name: string; style?: string | nul
       className="name-style"
       data-name={style && style !== "none" ? style : undefined}
       data-fx-name={fx ? "true" : undefined}
+      data-fx-cycle={fx === "chrono" || undefined}
     >
-      {fx ? <FxLayer effect={fx} aura className="fx-layer fx-layer--name" /> : null}
-      {name}
+      {fx ? <FxLayer effect={fx} aura cycle={fx === "chrono"} className="fx-layer fx-layer--name" /> : null}
+      {fx ? <span>{name}</span> : name}
     </span>
   );
 }

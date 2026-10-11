@@ -72,6 +72,7 @@ export function ProfileCard({
             className="avatar-frame"
             data-frame={frame}
             data-fx-frame={FX_FRAMES[frame]?.shape ?? 0}
+            data-fx-cycle={FX_FRAMES[frame]?.effect === "chrono" || undefined}
             style={
               {
                 "--frame-clip": FRAME_CLIPS[FX_FRAMES[frame]?.shape ?? 0] ?? "none",
@@ -82,6 +83,7 @@ export function ProfileCard({
             <FxLayer
               effect={FX_FRAMES[frame]?.effect ?? "blaze"}
               shape={FX_FRAMES[frame]?.shape ?? 0}
+              cycle={FX_FRAMES[frame]?.effect === "chrono"}
               className="avatar-frame__fx"
             />
             <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
