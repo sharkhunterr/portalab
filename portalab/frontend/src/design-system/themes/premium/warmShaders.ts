@@ -347,14 +347,15 @@ float bands(vec2 p, float t, float aspect) {
   return r * 1.1 + fbm4(q * 1.6) * 1.7 + q.x * 0.3;
 }
 float relief(float u) {
-  return sin(fract(u * 6.0) * 3.1416) * 0.6 + 0.008 * sin(u * 260.0) + 0.003 * sin(u * 700.0);
+  // smooth from one colour to the next: no crease where two colours meet (it lit as a crack)
+  return (0.5 - 0.5 * cos(u * 6.0 * 6.2831)) * 0.6 + 0.008 * sin(u * 260.0);
 }
 void main() {
   vec2 uv;
   vec2 p = coords(uv);
   float t = u_time;
   float aspect = u_res.x / u_res.y;
-  float e = 1.5 / u_res.y;
+  float e = 2.5 / u_res.y;
   float u = bands(p, t, aspect);
   float ux = bands(p + vec2(e, 0.0), t, aspect);
   float uy = bands(p + vec2(0.0, e), t, aspect);
@@ -377,7 +378,7 @@ void main() {
     float fk = float(k);
     float base = fk == 0.0 ? 0.22 : 0.84;
     float amp = fk == 0.0 ? 0.11 : 0.05;
-    float e = 1.5 / u_res.y;
+    float e = 2.5 / u_res.y;
     // the stroke's centre line and width, at the point and a little right and up (for the light)
     vec3 h3 = vec3(0.0);
     float u = 0.0;
@@ -390,7 +391,7 @@ void main() {
       float torn = 0.12 * (fbm4(vec2(q.x * 9.0, fk * 5.0 + t * 0.03)) - 0.5) * 2.0;
       float uu = across * 0.42 + fbm4(vec2(q.x * 2.5 - t * 0.05, across * 0.8 + fk * 7.0)) * 0.6 + fk * 0.37;
       float dome = sqrt(max(1.0 - across * across, 0.0));
-      float hh = (dome * 0.8 + sin(fract(uu * 6.0) * 3.1416) * 0.35 + 0.01 * sin(uu * 260.0)) * 0.02;
+      float hh = (dome * 0.8 + (0.5 - 0.5 * cos(uu * 6.0 * 6.2831)) * 0.35 + 0.01 * sin(uu * 260.0)) * 0.02;
       if (j == 0) {
         u = uu;
         inside = smoothstep(1.0 + torn, 0.92 + torn, abs(across));
