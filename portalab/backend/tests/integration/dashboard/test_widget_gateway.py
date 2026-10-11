@@ -46,7 +46,7 @@ async def test_states(app: FastAPI, client: httpx.AsyncClient, dash: DashboardHa
     await login(client, "alex")
     widgets = {
         "t.ok": FakeWidget(),
-        "t.slow": FakeWidget(delay=2.0),
+        "t.slow": FakeWidget(delay=30.0),  # far beyond the budget: only the timeout can end it
         "t.down": FakeWidget("unavailable"),
         "t.crash": FakeWidget("crash"),
         "t.partial": FakeWidget("partial"),
@@ -65,10 +65,13 @@ async def test_states(app: FastAPI, client: httpx.AsyncClient, dash: DashboardHa
         assert response.status_code == 200, (key, response.text)
         return response.json()
 
+    # #32: the budget ends the slow widget (not the wall clock of a loaded machine): the page answers
+    # long before the widget would have
     started = time.perf_counter()
     slow, ok = await asyncio.gather(state("t.slow"), state("t.ok"))
-    assert slow["state"] == "unavailable" and ok["state"] == "available"
-    assert time.perf_counter() - started < 1.5
+    assert slow["state"] == "unavailable" and slow["partial_reasons"] == ["timeout"]
+    assert ok["state"] == "available"
+    assert time.perf_counter() - started < 15
     assert (await state("t.down"))["state"] == "unavailable"
     assert (await state("t.crash"))["state"] == "error"
     partial = await state("t.partial")

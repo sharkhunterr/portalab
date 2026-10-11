@@ -2,6 +2,7 @@
 others render; Service State, Incident, Maintenance, Ticket and Sync State stay distinct elements."""
 
 import asyncio
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -48,7 +49,10 @@ async def test_sections_are_independent_and_distinct(hl: HealthHarness, clock: F
     hl.cn.full.identity.capabilities.provide(INCIDENTS, incidents, instance_ref="support", owner="test")
 
     async def slow(service_id: str, tier: Tier) -> Any:
-        await asyncio.sleep(5)
+        await asyncio.sleep(60)  # only the section's timeout ends it
+
+    # #32: a budget the real sections meet even on a loaded machine (they read the database)
+    hl.module.config = replace(hl.module.config, section_timeout_seconds=3.0)
 
     async def broken(service_id: str, tier: Tier) -> Any:
         raise RuntimeError("boom")
