@@ -51,6 +51,24 @@ const LAYERS: Record<string, Layers> = {
   pixelcamp: { shader: "pixelcamp" },
   pixelbeach: { shader: "pixelbeach" },
   pixelballoons: { shader: "pixelballoons" },
+  amberglow: { shader: "amberglow" },
+  candlelight: { shader: "candlelight", flow: "motes" },
+  steam: { shader: "steam" },
+  fairybokeh: { shader: "fairybokeh" },
+  warmsilk: { shader: "warmsilk" },
+  honey: { shader: "honey" },
+  knit: { shader: "knit" },
+  paintmix: { shader: "paintmix" },
+  acrylicpour: { shader: "acrylicpour" },
+  watercolor: { shader: "watercolor" },
+  marbling: { shader: "marbling" },
+  poppaint: { shader: "poppaint" },
+  poppour: { shader: "poppour" },
+  popwatercolor: { shader: "popwatercolor" },
+  popmarbling: { shader: "popmarbling" },
+  lavalamp: { shader: "lavalamp" },
+  impasto: { shader: "impasto" },
+  paintribbon: { shader: "paintribbon" },
 };
 
 /** The CSS ambience standing in for each premium one. */
@@ -91,6 +109,24 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   pixelcamp: "pixelsky",
   pixelbeach: "pixelsky",
   pixelballoons: "pixelsky",
+  amberglow: "bokeh",
+  candlelight: "embers",
+  steam: "fog",
+  fairybokeh: "bokeh",
+  warmsilk: "aurora",
+  honey: "aurora",
+  knit: "bokeh",
+  paintmix: "aurora",
+  acrylicpour: "aurora",
+  watercolor: "bokeh",
+  marbling: "aurora",
+  poppaint: "aurora",
+  poppour: "aurora",
+  popwatercolor: "bokeh",
+  popmarbling: "aurora",
+  lavalamp: "bubbles",
+  impasto: "aurora",
+  paintribbon: "aurora",
 };
 
 export function isPremiumAmbient(kind: string): boolean {
@@ -147,12 +183,14 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
   let index = 0;
   const next = () => canvases[index++] as HTMLCanvasElement;
   if (layers.shader) {
-    const [{ runShader }, { SHADERS }, { COZY_SHADERS }] = await Promise.all([
+    const [{ runShader }, { SHADERS }, { COZY_SHADERS }, { WARM_SHADERS }] = await Promise.all([
       import("./shaderRunner"),
       import("./shaders"),
       import("./cozyShaders"),
+      import("./warmShaders"),
     ]);
-    const stop = runShader(next(), (SHADERS[layers.shader] ?? COZY_SHADERS[layers.shader]) as string);
+    const source = SHADERS[layers.shader] ?? COZY_SHADERS[layers.shader] ?? WARM_SHADERS[layers.shader];
+    const stop = runShader(next(), source as string);
     if (!stop) return null;
     stops.push(stop);
   }

@@ -92,6 +92,10 @@ AMBIENTS: tuple[str, ...] = (
     "haunted", "darkness", "lostsignal", "garland", "christmasnight", "hearth",
     "goldenhour", "windowrain", "summerfield", "soapbubbles", "skylanterns", "autumnlane",
     "pixelcamp", "pixelbeach", "pixelballoons",
+    "amberglow", "candlelight", "steam", "fairybokeh", "warmsilk", "honey", "knit",
+    "paintmix", "acrylicpour", "watercolor", "marbling",
+    "poppaint", "poppour", "popwatercolor", "popmarbling", "lavalamp",
+    "impasto", "paintribbon",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",

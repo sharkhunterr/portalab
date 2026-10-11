@@ -475,6 +475,25 @@ AMBIENT_NAMES = {
     "pixelcamp": ("Pixel campfire", "Feu de camp pixel", "legendary", 1400),
     "pixelbeach": ("Pixel sunset beach", "Plage pixel au couchant", "legendary", 1400),
     "pixelballoons": ("Pixel balloons", "Montgolfières pixel", "legendary", 1400),
+    # #68: cosy ambiences — only warmth, no scenery
+    "amberglow": ("Amber glow", "Lueur ambrée", "legendary", 1200),
+    "candlelight": ("Candlelight", "Lueur de bougies", "legendary", 1300),
+    "steam": ("Warm steam", "Vapeur chaude", "legendary", 1100),
+    "fairybokeh": ("Soft fairy lights", "Lumières douces", "legendary", 1200),
+    "warmsilk": ("Warm silk", "Soie chaude", "legendary", 1300),
+    "honey": ("Honey", "Miel", "legendary", 1200),
+    "knit": ("Cosy knit", "Tricot douillet", "legendary", 1300),
+    "paintmix": ("Stirred paint", "Peinture mêlée", "legendary", 1300),
+    "acrylicpour": ("Acrylic pour", "Coulée acrylique", "legendary", 1400),
+    "watercolor": ("Warm watercolour", "Aquarelle chaude", "legendary", 1300),
+    "marbling": ("Marbled paper", "Papier marbré", "legendary", 1300),
+    "poppaint": ("Pop paint", "Peinture pop", "legendary", 1300),
+    "poppour": ("Pop pour", "Coulée pop", "legendary", 1400),
+    "popwatercolor": ("Pop watercolour", "Aquarelle pop", "legendary", 1300),
+    "popmarbling": ("Pop marbling", "Marbré pop", "legendary", 1300),
+    "lavalamp": ("Lava lamp", "Lampe à lave", "legendary", 1500),
+    "impasto": ("Thick paint", "Peinture épaisse", "legendary", 1500),
+    "paintribbon": ("Paint ribbons", "Rubans de peinture", "legendary", 1400),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -1748,7 +1767,7 @@ LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
     "request_tv_channel",
-    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave", "ambient_volcano", "ambient_blackhole", "ambient_reef", "ambient_firestorm", "ambient_whiteout", "ambient_liquidmetal", "ambient_plasma", "ambient_forest", "ambient_neoncity", "ambient_weather", "ambient_haunted", "ambient_darkness", "ambient_lostsignal", "ambient_garland", "ambient_christmasnight", "ambient_hearth", "ambient_goldenhour", "ambient_windowrain", "ambient_summerfield", "ambient_soapbubbles", "ambient_skylanterns", "ambient_autumnlane", "ambient_pixelcamp", "ambient_pixelbeach", "ambient_pixelballoons",
+    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave", "ambient_volcano", "ambient_blackhole", "ambient_reef", "ambient_firestorm", "ambient_whiteout", "ambient_liquidmetal", "ambient_plasma", "ambient_forest", "ambient_neoncity", "ambient_weather", "ambient_haunted", "ambient_darkness", "ambient_lostsignal", "ambient_garland", "ambient_christmasnight", "ambient_hearth", "ambient_goldenhour", "ambient_windowrain", "ambient_summerfield", "ambient_soapbubbles", "ambient_skylanterns", "ambient_autumnlane", "ambient_pixelcamp", "ambient_pixelbeach", "ambient_pixelballoons", "ambient_amberglow", "ambient_candlelight", "ambient_steam", "ambient_fairybokeh", "ambient_warmsilk", "ambient_honey", "ambient_knit", "ambient_paintmix", "ambient_acrylicpour", "ambient_watercolor", "ambient_marbling", "ambient_poppaint", "ambient_poppour", "ambient_popwatercolor", "ambient_popmarbling", "ambient_lavalamp", "ambient_impasto", "ambient_paintribbon",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:
