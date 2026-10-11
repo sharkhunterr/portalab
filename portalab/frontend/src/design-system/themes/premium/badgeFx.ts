@@ -10,8 +10,14 @@
 export const FX_BADGES = ["blaze", "voltage", "aqua", "magma"] as const;
 export type FxBadge = (typeof FX_BADGES)[number];
 
+// high precision where the device has it: in medium precision (many phones by default) fast-moving noise
+// stops moving once the time grows — the flames and the arcs looked frozen
 const HEAD = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 uniform vec2 u_res;
 uniform float u_time;
 uniform vec4 u_box; // the badge in the canvas: centre x, y and half width, height (pixels)
@@ -306,7 +312,8 @@ function loop(now: number) {
   const context = setup();
   if (!context) return;
   const still = reducedMotion();
-  const time = still ? 3.0 : (now - started) / 1000;
+  // kept small (a ten-minute loop): even in medium precision the noise keeps moving
+  const time = still ? 3.0 : ((now - started) / 1000) % 600;
   for (const instance of instances) {
     if (!instance.visible || (still && instance.drawn)) continue;
     if (!draw(context, instance, time)) instance.host.dataset.fxFailed = "true";
@@ -329,7 +336,7 @@ export function attachBadgeFx(
     context,
     visible: true,
     drawn: false,
-    seed: Math.random() * 100,
+    seed: Math.random() * 10,
   };
   instances.add(instance);
   if (typeof IntersectionObserver !== "undefined") {
