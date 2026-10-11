@@ -5,9 +5,13 @@
  * read from the element), and full-stage level-up moments (supernova, phoenix, lightning strike, tidal
  * wave). One WebGL context for the whole page (browsers allow few): each visible look is drawn in turn
  * into it and copied onto its element's own small 2D canvas. 30 frames a second at most, nothing while the
- * tab is hidden or the element off screen, a still frame when motion is reduced. ``attachFx`` returns
+ * tab is hidden or the element off screen, a still frame when motion is reduced. #29: a budget of looks
+ * moving at once (the others hold a still frame until pointed at), halved with the frame rate when the
+ * member chose discreet animations or the device saves energy; their positions measured twice a second. ``attachFx`` returns
  * ``null`` when the device cannot draw it (the element then keeps its CSS look).
  */
+
+import { frameInterval, liveLooks, motionBudget } from "../../motion/budget";
 
 export const FX_EFFECTS = [
   "blaze",
@@ -866,9 +870,25 @@ interface Instance {
   options: FxOptions;
   /** when its element started to leave (``data-leaving``): portals close */
   closing?: number;
+  /** #29: pointed at or focused — it moves even beyond the budget */
+  hovered: boolean;
+  /** #29: where it sits, measured at most every half second (not every frame) */
+  geometry?: Geometry | undefined;
 }
 
-const FRAME_MS = 1000 / 30;
+interface Geometry {
+  at: number;
+  w: number;
+  h: number;
+  scale: number;
+  cx: number;
+  cy: number;
+  halfWidth: number;
+  halfHeight: number;
+  round: number;
+}
+
+const GEOMETRY_MS = 500;
 const MAX_SIDE = 512; // pixels of a badge's canvas, at most
 let gl: WebGLRenderingContext | null = null;
 let shared: HTMLCanvasElement | null = null;
@@ -969,16 +989,37 @@ function reducedMotion(): boolean {
   );
 }
 
-function draw(context: WebGLRenderingContext, instance: Instance, time: number): boolean {
-  const program = compile(context, instance.effect);
-  if (!program || !shared) return false;
+function measure(instance: Instance, now: number): Geometry | null {
+  const known = instance.geometry;
+  if (known && now - known.at < GEOMETRY_MS) return known;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const area = instance.canvas.getBoundingClientRect();
   const pill = instance.host.getBoundingClientRect();
-  if (!area.width || !area.height) return true;
+  if (!area.width || !area.height) return null;
   const scale = Math.min(dpr, (instance.options.maxSide ?? MAX_SIDE) / Math.max(area.width, area.height));
-  const w = Math.max(1, Math.round(area.width * scale));
-  const h = Math.max(1, Math.round(area.height * scale));
+  const halfHeight = (pill.height / 2) * scale;
+  const corner = Number.parseFloat(getComputedStyle(instance.host).borderTopLeftRadius) || 0;
+  instance.geometry = {
+    at: now,
+    w: Math.max(1, Math.round(area.width * scale)),
+    h: Math.max(1, Math.round(area.height * scale)),
+    scale,
+    // the badge's rectangle in the canvas, y from the bottom (GL)
+    cx: (pill.left + pill.width / 2 - area.left) * scale,
+    cy: (area.bottom - (pill.top + pill.height / 2)) * scale,
+    halfWidth: (pill.width / 2) * scale,
+    halfHeight,
+    round: Math.min(1, (corner * scale) / Math.max(halfHeight, 1)),
+  };
+  return instance.geometry;
+}
+
+function draw(context: WebGLRenderingContext, instance: Instance, time: number): boolean {
+  const program = compile(context, instance.effect);
+  if (!program || !shared) return false;
+  const geometry = measure(instance, performance.now());
+  if (!geometry) return true;
+  const { w, h } = geometry;
   if (shared.width < w || shared.height < h) {
     shared.width = Math.max(shared.width, w);
     shared.height = Math.max(shared.height, h);
@@ -997,13 +1038,8 @@ function draw(context: WebGLRenderingContext, instance: Instance, time: number):
   context.vertexAttribPointer(position, 2, context.FLOAT, false, 0, 0);
   context.uniform2f(program.res, w, h);
   context.uniform1f(program.time, time + instance.seed);
-  // the badge's rectangle in the canvas, y from the bottom (GL)
-  const cx = (pill.left + pill.width / 2 - area.left) * scale;
-  const cy = (area.bottom - (pill.top + pill.height / 2)) * scale;
-  const halfHeight = (pill.height / 2) * scale;
-  context.uniform4f(program.box, cx, cy, (pill.width / 2) * scale, halfHeight);
-  const corner = Number.parseFloat(getComputedStyle(instance.host).borderTopLeftRadius) || 0;
-  context.uniform1f(program.round, Math.min(1, (corner * scale) / Math.max(halfHeight, 1)));
+  context.uniform4f(program.box, geometry.cx, geometry.cy, geometry.halfWidth, geometry.halfHeight);
+  context.uniform1f(program.round, geometry.round);
   context.uniform1f(program.calm, instance.options.aura ? 2 : instance.options.calm ? 1 : 0);
   // the time portal keeps its own timeline (open, bring in, take out, close) rather than a mere burst
   const burst = instance.effect.startsWith("burst:") && baseOf(instance.effect) !== "chrono";
@@ -1017,24 +1053,48 @@ function draw(context: WebGLRenderingContext, instance: Instance, time: number):
     program.close,
     instance.closing === undefined ? -1 : (performance.now() - instance.closing) / 1000,
   );
-  context.uniform1f(program.age, reducedMotion() ? 2.5 : (performance.now() - instance.born) / 1000);
+  context.uniform1f(program.age, still() ? 2.5 : (performance.now() - instance.born) / 1000);
   context.drawArrays(context.TRIANGLES, 0, 3);
   instance.context.clearRect(0, 0, w, h);
   instance.context.drawImage(shared, 0, shared.height - h, w, h, 0, 0, w, h);
   return true;
 }
 
+/** #29: a moment that plays once (a notification's burst, a level-up, a celebration) always plays. */
+function timed(instance: Instance): boolean {
+  return instance.effect.startsWith("burst:") || FULL_STAGE.has(instance.effect);
+}
+
+/** #29: the looks that move this frame — the timed ones, those pointed at, then the largest, up to the
+ * budget; the others hold the still frame they were last drawn with until they are pointed at. */
+function moving(visible: Instance[], limit: number): Set<Instance> {
+  if (visible.length <= limit) return new Set(visible);
+  const rank = (instance: Instance) =>
+    timed(instance) ? 3 : instance.hovered ? 2 : instance.options.cycle ? 1 : 0;
+  const area = (instance: Instance) => (instance.geometry ? instance.geometry.w * instance.geometry.h : 0);
+  const ordered = [...visible].sort((a, b) => rank(b) - rank(a) || area(b) - area(a));
+  const live = new Set(ordered.slice(0, limit));
+  for (const instance of ordered) if (rank(instance) >= 2) live.add(instance);
+  return live;
+}
+
+function still(): boolean {
+  return reducedMotion() || motionBudget() === "still";
+}
+
 function loop(now: number) {
   frame = instances.size ? requestAnimationFrame(loop) : 0;
-  if (!frame || document.hidden || now - last < FRAME_MS - 2) return;
+  if (!frame || document.hidden || now - last < frameInterval() - 2) return;
   last = now;
   const context = setup();
   if (!context) return;
-  const still = reducedMotion();
+  const frozen = still();
   // kept small (a ten-minute loop): even in medium precision the noise keeps moving
-  const time = still ? 3.0 : ((now - started) / 1000) % 600;
-  for (const instance of instances) {
-    if (!instance.visible || (still && instance.drawn)) continue;
+  const time = frozen ? 3.0 : ((now - started) / 1000) % 600;
+  const visible = [...instances].filter((instance) => instance.visible);
+  const live = frozen ? new Set<Instance>() : moving(visible, liveLooks());
+  for (const instance of visible) {
+    if (instance.drawn && !live.has(instance)) continue;
     if (!draw(context, instance, time)) instance.host.dataset.fxFailed = "true";
     instance.drawn = true;
   }
@@ -1060,8 +1120,19 @@ export function attachFx(
     seed: Math.random() * 10,
     born: performance.now() - (options.from ?? 0) * 1000,
     options,
+    hovered: false,
   };
   instances.add(instance);
+  // #29: pointed at or focused, it moves even when the budget holds it still
+  const point = (hovered: boolean) => () => {
+    instance.hovered = hovered;
+  };
+  const enter = point(true);
+  const leave = point(false);
+  host.addEventListener("pointerenter", enter);
+  host.addEventListener("pointerleave", leave);
+  host.addEventListener("focusin", enter);
+  host.addEventListener("focusout", leave);
   if (typeof IntersectionObserver !== "undefined") {
     observer ??= new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -1069,6 +1140,7 @@ export function attachFx(
           if (known.canvas === entry.target) {
             known.visible = entry.isIntersecting;
             known.drawn = false;
+            known.geometry = undefined;
           }
         }
       }
@@ -1079,5 +1151,9 @@ export function attachFx(
   return () => {
     instances.delete(instance);
     observer?.unobserve(canvas);
+    host.removeEventListener("pointerenter", enter);
+    host.removeEventListener("pointerleave", leave);
+    host.removeEventListener("focusin", enter);
+    host.removeEventListener("focusout", leave);
   };
 }

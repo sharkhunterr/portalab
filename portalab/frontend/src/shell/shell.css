@@ -1883,7 +1883,8 @@
   position: relative;
   z-index: 1;
 }
-.shell-profile__banner.profile-banner {
+/* above the animated banner's own « position: relative » (#79) */
+.shell-profile > .shell-profile__banner.profile-banner {
   position: absolute;
   inset: 0 0 auto;
   z-index: 0;

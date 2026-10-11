@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
+import { liveAmbiences } from "../../motion/budget";
 
 /**
  * #68: the premium ambiences — drawn by the GPU in layers: a shader (flames, clouds and rain, dust
@@ -154,15 +155,12 @@ function askWebgl(): { webgl: boolean; gpu: string | null } {
 }
 
 // a page full of previews (the shop, the pickers) must not open more canvases than browsers allow — phones
-// give far fewer GPU contexts and less memory: two there
-const PHONE =
-  typeof window !== "undefined" &&
-  (window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 700);
-const MAX_RUNNING = PHONE ? 2 : 6;
+// give far fewer GPU contexts and less memory (the budget counts them: ``liveAmbiences``)
 let running = 0;
 const freed = new EventTarget();
+/** #29: as many previews at once as the motion budget allows (none when still: the CSS one, paused). */
 function take(): boolean {
-  if (running >= MAX_RUNNING) return false;
+  if (running >= liveAmbiences()) return false;
   running += 1;
   return true;
 }

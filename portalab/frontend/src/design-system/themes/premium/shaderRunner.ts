@@ -5,10 +5,11 @@
  * there (the caller falls back to the CSS ambience) and a ``stop`` function otherwise.
  */
 
+import { frameInterval, motionBudget } from "../../motion/budget";
+
 const VERTEX = `attribute vec2 a_pos;
 void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 
-const FRAME_MS = 1000 / 30;
 // of the device pixels (density capped at 1.5): sharp by default, lowered while frames come late
 const SCALES = [1, 0.8, 0.62, 0.48, 0.36];
 const DENSITY = Math.min(typeof window === "undefined" ? 1 : window.devicePixelRatio || 1, 1.5);
@@ -72,15 +73,20 @@ export function runShader(canvas: HTMLCanvasElement, fragment: string): (() => v
       gl.viewport(0, 0, width, height);
     }
   };
+  let held = false;
   const draw = (now: number) => {
     frame = requestAnimationFrame(draw);
     if (document.hidden) return;
+    // #29: half the frames when saving, one still frame when motion is « none »
+    if (held && motionBudget() === "still") return;
+    const interval = frameInterval();
     const gap = now - last;
-    if (gap < FRAME_MS - 2) return; // 30 frames a second at most
+    if (gap < interval - 2) return; // 30 frames a second at most
     last = now;
+    held = motionBudget() === "still";
     // a frame much later than asked, often: the device is struggling — fewer pixels
     frames += 1;
-    if (gap > FRAME_MS * 1.6 && gap < 1000) late += 1;
+    if (gap > interval * 1.6 && gap < 1000) late += 1;
     if (frames >= 60) {
       if (late > 20 && level < SCALES.length - 1) level += 1;
       frames = 0;

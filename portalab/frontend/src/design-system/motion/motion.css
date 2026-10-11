@@ -1,0 +1,50 @@
+/* #29: the motion budget in CSS (``data-motion-budget`` on the root, see ``budget.ts``). */
+
+/* « none »: every decorative animation holds still — the ambiences, the looks of names, badges, titles,
+   frames, banners and levels, and the shop's and pickers' previews; what tells a state (a spinner, a
+   progress bar) keeps moving */
+:root[data-motion-budget="still"]
+:is(
+  .ambient,
+  .ambient *,
+  .cosmetic-badge,
+  .cosmetic-badge *,
+  .cosmetic-title,
+  .cosmetic-title *,
+  .name-style,
+  .name-style *,
+  .avatar-frame,
+  .avatar-frame *,
+  .profile-banner *,
+  .ds-level,
+  .ds-level *,
+  .product-art *,
+  .product-poster *
+),
+:root[data-motion-budget="still"]
+  :is(.cosmetic-badge, .cosmetic-title, .name-style, .avatar-frame, .ds-level)::before,
+:root[data-motion-budget="still"]
+  :is(.cosmetic-badge, .cosmetic-title, .name-style, .avatar-frame, .ds-level)::after {
+  animation-play-state: paused !important;
+}
+
+/* « discreet » or the device saving energy: half the particles of the CSS ambiences */
+:root[data-motion-budget="eco"] .ambient > span:nth-child(2n) {
+  display: none;
+}
+
+/* long lists of animated previews (the shop, the pickers): what is far off screen is not rendered at all
+   — neither laid out, painted nor animated — until it comes near */
+.product-card,
+.theme-card,
+.ambient-row,
+.looks-grid__item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 16rem;
+}
+.ambient-row {
+  contain-intrinsic-size: auto 5rem;
+}
+.looks-grid__item {
+  contain-intrinsic-size: auto 8rem;
+}

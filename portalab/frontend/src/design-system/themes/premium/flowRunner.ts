@@ -1,3 +1,4 @@
+import { frameInterval, motionBudget } from "../../motion/budget";
 import { makeNoise } from "./noise";
 
 /**
@@ -351,8 +352,6 @@ void main() {
   gl_FragColor = vec4(v_color * a, a);
 }`;
 
-const FRAME_MS = 1000 / 30;
-
 function program(gl: WebGLRenderingContext): WebGLProgram | null {
   const make = (type: number, source: string) => {
     const shader = gl.createShader(type);
@@ -457,17 +456,21 @@ export function runFlow(canvas: HTMLCanvasElement, preset: FlowPreset): (() => v
   let late = 0;
   let frames = 0;
   const started = last;
+  let held = false;
   const step = (now: number) => {
     frame = requestAnimationFrame(step);
     if (document.hidden) {
       last = now;
       return;
     }
+    if (held && motionBudget() === "still") return; // #29: one still frame
+    const interval = frameInterval();
     const gap = now - last;
-    if (gap < FRAME_MS - 2) return;
+    if (gap < interval - 2) return;
     last = now;
+    held = motionBudget() === "still";
     frames += 1;
-    if (gap > FRAME_MS * 1.6 && gap < 1000) late += 1;
+    if (gap > interval * 1.6 && gap < 1000) late += 1;
     if (frames >= 60) {
       if (late > 20) budget = Math.max(0.3, budget * 0.75);
       frames = 0;
@@ -484,7 +487,8 @@ export function runFlow(canvas: HTMLCanvasElement, preset: FlowPreset): (() => v
       : 0;
     const wx = preset.wind[0] + swing;
     const wy = preset.wind[1];
-    const drawn = Math.floor(count * budget);
+    // #29: half the particles when saving
+    const drawn = Math.floor(count * budget * (motionBudget() === "eco" ? 0.5 : 1));
     for (let i = 0; i < drawn; i++) {
       const x = pos[i * 2] as number;
       const y = pos[i * 2 + 1] as number;

@@ -53,6 +53,12 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.textScale", Annotated[float, Field(ge=0.85, le=2.0)], 1.0, "Text size multiplier."),
     ("ui.contrast", Literal["default", "high"], "default", "High contrast overrides the theme."),
     ("ui.reducedMotion", Literal["system", "on", "off"], "system", "Reduce animations."),
+    (
+        "ui.animations",
+        Literal["all", "discreet", "none"],
+        "all",
+        "Decorative animations (#29): all, discreet (fewer at once, slower — saves battery) or none.",
+    ),
     ("ui.soundEnabled", bool, True, "Play notification sounds."),
     (
         "ui.notificationPosition",

@@ -2374,6 +2374,11 @@
 .cosmetic-badge[data-fx] {
   border-radius: var(--radius-pill);
 }
+/* a title drawn as a ribbon (pointed ends): its words stay clear of the points */
+.cosmetic-title[data-fx][data-fx-shape="6"] {
+  padding: 0.3rem 1.5rem;
+  border-radius: 0;
+}
 :is(.ds-notification, .cosmetic-badge, .cosmetic-title)[data-fx][data-fx-failed] > .fx-layer {
   display: none;
 }

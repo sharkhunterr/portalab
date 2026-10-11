@@ -407,6 +407,8 @@ export interface UiPreferences {
   textScale: number;
   contrast: "default" | "high";
   reducedMotion: ReducedMotion;
+  /** #29: decorative animations — all, discreet (fewer at once, slower: saves battery) or none. */
+  animations: "all" | "discreet" | "none";
   soundEnabled: boolean;
   notificationPosition: "top-end" | "top-start" | "bottom-end" | "bottom-start";
   notificationDurationSeconds: number;
@@ -440,6 +442,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   textScale: 1,
   contrast: "default",
   reducedMotion: "system",
+  animations: "all",
   soundEnabled: true,
   notificationPosition: "top-end",
   notificationDurationSeconds: 6,
@@ -477,6 +480,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   textScale: "ui.textScale",
   contrast: "ui.contrast",
   reducedMotion: "ui.reducedMotion",
+  animations: "ui.animations",
   soundEnabled: "ui.soundEnabled",
   notificationPosition: "ui.notificationPosition",
   notificationDurationSeconds: "ui.notificationDurationSeconds",
@@ -503,6 +507,7 @@ export function sanitize(input: object): UiPreferences {
   pick("density", ["compact", "comfortable", "spacious"]);
   pick("contrast", ["default", "high"]);
   pick("reducedMotion", ["system", "on", "off"]);
+  pick("animations", ["all", "discreet", "none"]);
   pick("notificationPosition", ["top-end", "top-start", "bottom-end", "bottom-start"]);
   pick("notificationStyle", ["theme", ...NOTIFICATION_STYLES]);
   pick("notificationAnimation", ["theme", ...NOTIFICATION_ANIMATIONS]);

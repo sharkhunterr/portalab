@@ -10,6 +10,7 @@ import { PolicyField, type PolicyState } from "../../design-system/components/Po
 import { DEFAULT_FAMILY } from "../../design-system/themes/builtin";
 import { presentationOf, type ThemeDefinition } from "../../design-system/themes/schema";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
+import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
 import { LevelBadgePicker } from "./LevelBadgePicker";
 import { LevelUpPicker } from "./LevelUpPicker";
@@ -251,6 +252,7 @@ export function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
 }
 
 export function AppearanceSettings() {
+  const t = useT();
   const headingId = useId();
   const { preferences, policy, setPreference } = usePreferences();
   const { themes, effective } = useTheme();
@@ -362,6 +364,22 @@ export function AppearanceSettings() {
             </SelectField>
           ))}
         </div>
+        {field("ui.animations", (disabled) => (
+          // #29: how much decorative motion — fewer looks at once and slower, or none
+          <SelectField
+            label={t("notifications:motionBudget.label")}
+            value={preferences.animations}
+            disabled={disabled}
+            hint={t("notifications:motionBudget.hint")}
+            onChange={(event) => set("animations")(event.target.value as UiPreferences["animations"])}
+          >
+            {(["all", "discreet", "none"] as const).map((value) => (
+              <option key={value} value={value}>
+                {t(`notifications:motionBudget.${value}`)}
+              </option>
+            ))}
+          </SelectField>
+        ))}
         {field("ui.textScale", (disabled) => (
           <div className="ds-field appearance-scale">
             <label htmlFor="ui-text-scale">{appearanceStrings.textScale}</label>

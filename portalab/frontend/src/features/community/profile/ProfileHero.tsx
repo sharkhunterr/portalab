@@ -14,10 +14,15 @@ import { ProfileCustomizer } from "./ProfileCustomizer";
 import "./profile.css";
 
 /** A banner design (or a film backdrop) as a decorative block — shared by the hero, the picker and the shop. */
-export function BannerArt({ banner, backdrop }: Pick<Equipped, "banner" | "backdrop">) {
+export function BannerArt({
+  banner,
+  backdrop,
+  className,
+}: Pick<Equipped, "banner" | "backdrop"> & { className?: string }) {
+  const classes = className ? `${className} profile-banner` : "profile-banner";
   if (backdrop?.ref) {
     return (
-      <span className="profile-banner" data-banner="backdrop" aria-hidden="true">
+      <span className={classes} data-banner="backdrop" aria-hidden="true">
         <img src={backdropUrl(backdrop.ref)} alt="" loading="lazy" />
       </span>
     );
@@ -25,12 +30,12 @@ export function BannerArt({ banner, backdrop }: Pick<Equipped, "banner" | "backd
   if (banner?.startsWith("live-")) {
     // #79: an animated banner — the ambience plays inside it, for every visitor to see
     return (
-      <span className="profile-banner" data-banner="live" aria-hidden="true">
+      <span className={classes} data-banner="live" aria-hidden="true">
         <AmbientLayer kind={banner.slice(5) as Ambient} contained />
       </span>
     );
   }
-  return <span className="profile-banner" data-banner={banner ?? "default"} aria-hidden="true" />;
+  return <span className={classes} data-banner={banner ?? "default"} aria-hidden="true" />;
 }
 
 /** An avatar inside its frame (``none`` draws no frame). */
@@ -95,17 +100,23 @@ export function StyledName({ name, style }: { name: string; style?: string | nul
   );
 }
 
+/** The GPU's « pointed ends » outline: a title's ribbon. */
+const TITLE_SHAPE = 6;
+
 /** A title or badge as worn, with its animated style. */
 export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "title" }) {
   const fx = item.style ? FX_STYLES[item.style] : undefined;
+  // a title is a ribbon (pointed ends), never a pill like the badges beside it
+  const shape = kind === "title" ? TITLE_SHAPE : 0;
   return (
     <span
       className={kind === "badge" ? "cosmetic-badge" : "cosmetic-title"}
       data-style={item.style && item.style !== "none" ? item.style : undefined}
       data-fx={fx}
+      data-fx-shape={fx && shape ? shape : undefined}
       data-fx-cycle={fx === "chrono" || undefined}
     >
-      {fx ? <FxLayer effect={fx} calm cycle={fx === "chrono"} /> : null}
+      {fx ? <FxLayer effect={fx} calm shape={shape} cycle={fx === "chrono"} /> : null}
       {kind === "badge" ? <Icon name={item.icon ?? "star"} size={14} /> : null}
       {item.label}
     </span>
@@ -152,13 +163,21 @@ export function ProfileHero({
           {avatarAction}
         </span>
         <div className="profile-hero__text">
-          <Name className="profile-hero__name">
-            <StyledName name={name} style={looks.name} />
-            <MemberLevel memberId={memberId} look={looks.level} />
-          </Name>
-          {looks.title ? <WornBadge item={looks.title} kind="title" /> : null}
+          {/* the name, its level, then the title on the same line (wrapping below on a narrow screen) */}
+          <div className="profile-hero__headline">
+            <Name className="profile-hero__name">
+              <StyledName name={name} style={looks.name} />
+              <MemberLevel memberId={memberId} look={looks.level} />
+            </Name>
+            {looks.title ? (
+              <p className="profile-hero__title">
+                <span className="visually-hidden">{t("community:looks.wornTitle")} </span>
+                <WornBadge item={looks.title} kind="title" />
+              </p>
+            ) : null}
+          </div>
           {looks.badges?.items?.length ? (
-            <ul className="profile-hero__badges">
+            <ul className="profile-hero__badges" aria-label={t("community:looks.wornBadges")}>
               {looks.badges.items.map((badge) => (
                 <li key={badge.key}>
                   <WornBadge item={badge} kind="badge" />

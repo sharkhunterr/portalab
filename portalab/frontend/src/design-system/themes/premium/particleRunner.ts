@@ -1,4 +1,5 @@
 import type { Container, ISourceOptions } from "@tsparticles/engine";
+import { motionBudget } from "../../motion/budget";
 
 /**
  * #68: the particle ambiences, by tsParticles (MIT) — loaded only when one is chosen. Transparent, at 30
@@ -84,10 +85,13 @@ export async function runParticles(element: HTMLElement, kind: string): Promise<
   const options = OPTIONS[kind];
   if (!options) return null;
   const particles = await engine(kind);
+  // #29: half the frames when saving; frozen when motion is « none »
+  const budget = motionBudget();
   const container: Container | undefined = await particles.load({
     id: `ambient-${kind}-${Math.random().toString(36).slice(2)}`,
     element,
-    options,
+    options: budget === "eco" ? { ...options, fpsLimit: 15 } : options,
   });
+  if (budget === "still") window.setTimeout(() => container?.pause(), 400);
   return () => container?.destroy();
 }

@@ -11,7 +11,8 @@ import {
 import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
 import { FRAME_CLIPS, FX_FRAMES } from "../../design-system/themes/premium/fxLooks";
-import { backdropUrl, useProfileLooks } from "../../features/community/profile/looks";
+import { useProfileLooks } from "../../features/community/profile/looks";
+import { BannerArt } from "../../features/community/profile/ProfileHero";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -59,12 +60,13 @@ export function ProfileCard({
     : "";
   return (
     <section className="shell-profile" aria-label={strings.profile}>
-      {worn?.backdrop?.ref ? (
-        <span className="shell-profile__banner profile-banner" data-banner="backdrop" aria-hidden="true">
-          <img src={backdropUrl(worn.backdrop.ref)} alt="" loading="lazy" />
-        </span>
-      ) : worn?.banner ? (
-        <span className="shell-profile__banner profile-banner" data-banner={worn.banner} aria-hidden="true" />
+      {worn?.backdrop?.ref || worn?.banner ? (
+        // the same art as the profile's — a film backdrop, a design, or an animated banner (#79)
+        <BannerArt
+          className="shell-profile__banner"
+          banner={worn.banner ?? null}
+          backdrop={worn.backdrop ?? null}
+        />
       ) : null}
       <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
         {frame && FX_FRAMES[frame] ? (

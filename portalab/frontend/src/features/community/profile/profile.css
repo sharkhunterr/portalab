@@ -207,13 +207,51 @@
   display: grid;
   gap: var(--space-1);
 }
+/* the title and the badges never look alike: the title is the member's epithet — its own line under
+   the name, larger, a ribbon with pointed ends; the badges are small round tokens in a row of their own,
+   behind a « Badges » label */
+.profile-hero__headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+.profile-hero__title {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+.profile-hero__title .cosmetic-title:not([data-fx]) {
+  font-size: var(--font-size-lg);
+  font-style: italic;
+}
+.profile-hero__title .cosmetic-title:not([data-fx])::before,
+.profile-hero__title .cosmetic-title:not([data-fx])::after {
+  content: "";
+  inline-size: 1.1rem;
+  block-size: 1px;
+  background: currentcolor;
+  opacity: 0.55;
+}
 .profile-hero__badges {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
   margin: var(--space-1) 0 0;
   padding: 0;
   list-style: none;
+}
+.profile-hero__badges::before {
+  content: attr(aria-label);
+  margin-inline-end: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant: all-small-caps;
+  letter-spacing: 0.08em;
+}
+.profile-hero__badges .cosmetic-badge {
+  padding: 0.12rem 0.5rem;
+  font-size: var(--font-size-xs);
 }
 .looks-grid[data-slot="name"] {
   grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));

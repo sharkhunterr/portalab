@@ -26,6 +26,7 @@ ACCESSIBILITY_KEYS = {
     "ui.textScale",
     "ui.contrast",
     "ui.reducedMotion",
+    "ui.animations",
     "ui.soundEnabled",
     "ui.density",
     "ui.notificationPosition",

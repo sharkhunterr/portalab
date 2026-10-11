@@ -10,6 +10,7 @@ import type {
   UiPreferences,
 } from "../a11y/preferences";
 import { effectiveTextScale } from "../a11y/textScale";
+import { setMotionChoice } from "../motion/budget";
 import { BUILTIN_THEMES, builtinTheme, DEFAULT_THEME_KEY } from "./builtin";
 import { floorReport } from "./floor";
 import { paletteFor } from "./palettes";
@@ -263,5 +264,6 @@ export function applyToDocument(
   root.dataset.contrast = preferences.contrast;
   root.dataset.density = preferences.density;
   root.dataset.reducedMotion = String(effective.reducedMotion);
+  setMotionChoice(preferences.animations, effective.reducedMotion); // #29: the motion budget
   root.style.colorScheme = theme.colorScheme;
 }
