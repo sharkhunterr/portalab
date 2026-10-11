@@ -189,6 +189,7 @@ export const AMBIENTS = [
   "downpour",
   "matrix",
   "mesh",
+  "meshwave",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and

@@ -448,6 +448,7 @@ AMBIENT_NAMES = {
     "blizzard": ("Blizzard", "Blizzard", "epic", 1000),
     "fireworks": ("Fireworks", "Feu d'artifice", "epic", 1100),
     "mesh": ("Constellation mesh", "Maillage constellation", "epic", 1000),
+    "meshwave": ("Moving mesh network", "Réseau maillé en mouvement", "legendary", 1500),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -1721,7 +1722,7 @@ LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
     "request_tv_channel",
-    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix",
+    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:

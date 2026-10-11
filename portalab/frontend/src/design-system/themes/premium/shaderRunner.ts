@@ -1,6 +1,6 @@
 /**
- * #68: a full-screen fragment shader drawn on a canvas, made to stay light — drawn at a reduced
- * resolution then scaled up by the browser, at 30 frames a second at most, the resolution lowered on its
+ * #68: a full-screen fragment shader drawn on a canvas, made to stay light — drawn at the screen's
+ * resolution (lowered on its own when the device struggles), at 30 frames a second at most, the resolution lowered on its
  * own when frames come late, and nothing at all while the tab is hidden. Returns ``null`` when WebGL is not
  * there (the caller falls back to the CSS ambience) and a ``stop`` function otherwise.
  */
@@ -9,7 +9,9 @@ const VERTEX = `attribute vec2 a_pos;
 void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 
 const FRAME_MS = 1000 / 30;
-const SCALES = [0.5, 0.38, 0.28, 0.2]; // of the CSS pixel size; lowered while frames come late
+// of the device pixels (density capped at 1.5): sharp by default, lowered while frames come late
+const SCALES = [1, 0.8, 0.62, 0.48, 0.36];
+const DENSITY = Math.min(typeof window === "undefined" ? 1 : window.devicePixelRatio || 1, 1.5);
 
 function compile(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
   const shader = gl.createShader(type);
@@ -61,7 +63,7 @@ export function runShader(canvas: HTMLCanvasElement, fragment: string): (() => v
   let last = 0;
   const started = performance.now();
   const size = () => {
-    const scale = SCALES[level] ?? 0.2;
+    const scale = (SCALES[level] ?? 0.36) * DENSITY;
     const width = Math.max(1, Math.round(canvas.clientWidth * scale));
     const height = Math.max(1, Math.round(canvas.clientHeight * scale));
     if (canvas.width !== width || canvas.height !== height) {

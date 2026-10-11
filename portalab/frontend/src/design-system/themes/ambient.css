@@ -1233,3 +1233,8 @@
 .ambient--premium[data-ambient="mesh"] {
   opacity: 0.75;
 }
+/* layers of one premium ambience (a shader under its particles), stacked */
+.ambient--premium .ambient__canvas {
+  position: absolute;
+  inset: 0;
+}

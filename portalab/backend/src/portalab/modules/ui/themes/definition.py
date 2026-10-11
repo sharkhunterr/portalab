@@ -280,6 +280,7 @@ AMBIENTS = Literal[
     "downpour",
     "matrix",
     "mesh",
+    "meshwave",
 ]
 CELEBRATIONS = Literal[
     "none",

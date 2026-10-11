@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import {
@@ -11,6 +12,7 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useCelebrate } from "../../design-system/feedback/Celebration";
 import { AmbientLayer } from "../../design-system/themes/AmbientLayer";
+import { webglInfo } from "../../design-system/themes/premium/PremiumAmbient";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
@@ -55,10 +57,19 @@ export function UniverseLooks() {
     (key) => key === "theme" || !locked(catalog.data?.celebrations, key),
   );
   const lockedCount = (list: Choice[] | undefined) => (list ?? []).filter((c) => c.locked).length;
+  const renderer = useMemo(() => webglInfo(), []); // #68: how the premium ambiences are drawn here
   return (
     <section className="looks appearance-card" aria-labelledby="universe-looks">
       <h3 id="universe-looks">{t("notifications:universe.title")}</h3>
       <p className="ds-page-header__context">{t("notifications:universe.hint")}</p>
+      <p className="looks__renderer" data-webgl={renderer.webgl || undefined}>
+        <Icon name={renderer.webgl ? "zap" : "info"} size={14} />
+        {renderer.webgl
+          ? t("notifications:universe.renderer.gpu", {
+              gpu: renderer.gpu ?? t("notifications:universe.renderer.unknown"),
+            })
+          : t("notifications:universe.renderer.css")}
+      </p>
       <fieldset className="ambient-picker">
         <legend>{t("notifications:universe.ambient")}</legend>
         {ambients.map((key) => {

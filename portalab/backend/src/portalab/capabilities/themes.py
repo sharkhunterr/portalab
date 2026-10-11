@@ -86,7 +86,7 @@ AMBIENTS: tuple[str, ...] = (
     "nostromo",
     # #68: premium ambiences, drawn on a canvas (WebGL shaders, particles)
     "inferno", "thunderstorm", "sandstorm", "polar", "cosmos", "abyss", "blizzard", "fireworks", "downpour",
-    "matrix", "mesh",
+    "matrix", "mesh", "meshwave",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
