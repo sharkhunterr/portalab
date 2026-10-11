@@ -267,6 +267,11 @@ export const LEVEL_BADGES = [
   "cassette",
   "squircle",
   "tracker",
+  // #73: drawn by the GPU
+  "blaze",
+  "voltage",
+  "aqua",
+  "magma",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */

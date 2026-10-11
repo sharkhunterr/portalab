@@ -149,6 +149,7 @@ LEVEL_BADGES: tuple[str, ...] = (
     "upsidedown", "veins", "lights", "onering", "eye", "mithril", "balrog", "frost", "nebula", "circuit",
     "cassette", "squircle",
     "cassette", "tracker",
+    "blaze", "voltage", "aqua", "magma",  # #73: drawn by the GPU
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (

@@ -402,5 +402,9 @@
   "universe.weather.saved": "Lieu enregistré : l'ambiance suit son ciel.",
   "universe.weather.reset": "Revenir au lieu par défaut du portail",
   "universe.hd": "HD",
-  "universe.hdHint": "Haute qualité : dessinée par la puce graphique de votre appareil"
+  "universe.hdHint": "Haute qualité : dessinée par la puce graphique de votre appareil",
+  "levelBadge.names.blaze": "Flammes vives",
+  "levelBadge.names.voltage": "Haute tension",
+  "levelBadge.names.aqua": "Verre d'eau",
+  "levelBadge.names.magma": "Magma"
 }

@@ -759,6 +759,15 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
     ("frost", "Frost", "Givre", "rare", 400, None, "Cold blue ice.", "Une glace d'un bleu froid."),
     ("nebula", "Nebula", "Nébuleuse", "epic", 650, 5, "A drifting nebula with a few stars.", "Une nébuleuse qui dérive, quelques étoiles."),
     ("circuit", "Circuit", "Circuit", "rare", 400, None, "Green traces on a circuit board.", "Des pistes vertes sur un circuit imprimé."),
+    # #73: drawn by the graphics chip (HD)
+    ("blaze", "Living flames", "Flammes vives", "legendary", 1600, 12, "Real flames wrapped around your level, rising above it, sparks flying.",
+     "De vraies flammes qui enveloppent votre niveau et montent au-dessus, des étincelles qui s'envolent."),
+    ("voltage", "High voltage", "Haute tension", "epic", 1200, 8, "A charged badge: arcs crawl round its edge and leap out, sparks crackle inside.",
+     "Un badge chargé : des arcs courent sur son bord et s'en échappent, des étincelles crépitent dedans."),
+    ("aqua", "Water glass", "Verre d'eau", "epic", 1100, 8, "A glass badge half full of water sloshing from side to side, caustics and rising bubbles.",
+     "Un badge de verre à moitié rempli d'eau qui tangue, des reflets et des bulles qui montent."),
+    ("magma", "Magma", "Magma", "epic", 1200, 8, "Molten rock flowing under a cracked crust, its heat glowing around it.",
+     "De la roche en fusion qui coule sous une croûte fissurée, sa chaleur rougeoie autour."),
 ):  # fmt: skip
     _p(f"level_{value}", "level_badge", price, rarity, f"{en} level badge", f"Badge de niveau {fr.lower()}",
        about_en, about_fr, {"style": value}, collection="levels", icon="star", level=level)  # fmt: skip
@@ -1793,6 +1802,10 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Au-delà du ciel : espace profond, trou noir, lumières polaires, tempête de plasma et réseaux maillés.",
      ["ambient_cosmos", "ambient_blackhole", "ambient_polar", "ambient_plasma", "ambient_meshwave", "ambient_mesh"],
      "epic", 12),
+    ("pack_living_badges", "Living level badges pack", "Pack Badges vivants",
+     "Four level badges drawn by the graphics chip: living flames, high voltage, a water glass and magma.",
+     "Quatre badges de niveau dessinés par la puce graphique : flammes vives, haute tension, verre d'eau et magma.",
+     ["level_blaze", "level_voltage", "level_aqua", "level_magma"], "epic", 10),
     ("pack_city_lights", "City lights pack", "Pack Lumières de la ville",
      "The city at night: the neon city, digital rain, liquid metal and fireworks.",
      "La ville la nuit : cité néon, pluie numérique, métal liquide et feu d'artifice.",
@@ -1816,7 +1829,7 @@ LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
     "request_tv_channel",
-    "ambient_blackhole", "ambient_volcano", "ambient_thunderstorm", "ambient_neoncity", "ambient_weather", "ambient_lavalamp", "ambient_impasto", "ambient_reef",
+    "ambient_blackhole", "ambient_volcano", "ambient_thunderstorm", "ambient_neoncity", "ambient_weather", "ambient_lavalamp", "ambient_impasto", "ambient_reef", "level_blaze",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:

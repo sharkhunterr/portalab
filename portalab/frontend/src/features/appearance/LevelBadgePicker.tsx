@@ -5,7 +5,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { useEquipLook, useProfileLooks } from "../community/profile/looks";
 import { useProgression } from "../gamification/api";
 import { InShop } from "./InShop";
-import { RarityTag, rarityIn } from "./Rarity";
+import { HdTag, isHdLevelBadge, RarityTag, rarityIn } from "./Rarity";
 
 /**
  * The level (XP) badge's look (027): worn on the profile — everyone sees it, in the header, the navigation
@@ -54,7 +54,10 @@ export function LevelBadgePicker() {
                 }
               />
               <Badge level={level} label={name} look={key} />
-              <span className="looks__name">{name}</span>
+              <span className="looks__name">
+                {name}
+                {isHdLevelBadge(key) ? <HdTag /> : null}
+              </span>
             </label>
           );
         })}

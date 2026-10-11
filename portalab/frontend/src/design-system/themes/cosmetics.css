@@ -2302,3 +2302,38 @@
     animation: none;
   }
 }
+
+/* #73: level badges drawn by the GPU — the canvas spreads around the badge (flames rise above it); the
+   badge itself is drawn by the effect, its level written over it. Without WebGL: a CSS look of the same. */
+.ds-level[data-fx] {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-text-on-media, #fff);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
+}
+.ds-level[data-fx] > .ds-level__fx {
+  position: absolute;
+  inset: -1.6em -1.1em -0.7em;
+  z-index: -1;
+  inline-size: calc(100% + 2.2em);
+  block-size: calc(100% + 2.3em);
+  pointer-events: none;
+}
+.ds-level[data-fx][data-fx-failed] > .ds-level__fx {
+  display: none;
+}
+.ds-level[data-fx="blaze"][data-fx-failed] {
+  background: linear-gradient(0deg, #7f1d1d, #f97316 70%, #facc15);
+}
+.ds-level[data-fx="voltage"][data-fx-failed] {
+  background: linear-gradient(135deg, #0b1d4d, #2563eb 60%, #a5f3fc);
+}
+.ds-level[data-fx="aqua"][data-fx-failed] {
+  background: linear-gradient(0deg, #075985, #22d3ee 55%, #0f172a 56%);
+}
+.ds-level[data-fx="magma"][data-fx-failed] {
+  background: linear-gradient(0deg, #1c0a05, #b91c1c 60%, #f59e0b);
+}

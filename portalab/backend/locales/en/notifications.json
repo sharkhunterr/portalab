@@ -402,5 +402,9 @@
   "universe.weather.saved": "Place saved: the ambience follows its sky.",
   "universe.weather.reset": "Back to the portal's default place",
   "universe.hd": "HD",
-  "universe.hdHint": "High quality: drawn by your device's graphics chip"
+  "universe.hdHint": "High quality: drawn by your device's graphics chip",
+  "levelBadge.names.blaze": "Living flames",
+  "levelBadge.names.voltage": "High voltage",
+  "levelBadge.names.aqua": "Water glass",
+  "levelBadge.names.magma": "Magma"
 }
