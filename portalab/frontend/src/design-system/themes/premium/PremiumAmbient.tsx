@@ -9,7 +9,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
  */
 interface Layers {
   shader?: string;
-  flow?: string;
+  flow?: string | string[];
   particles?: string;
   mesh?: boolean;
 }
@@ -27,6 +27,21 @@ const LAYERS: Record<string, Layers> = {
   fireworks: { particles: "fireworks" },
   mesh: { particles: "mesh" },
   meshwave: { mesh: true },
+  volcano: { shader: "volcano", flow: ["ash", "embers"] },
+  blackhole: { shader: "blackhole" },
+  reef: { shader: "reef", flow: ["plankton", "school"] },
+  firestorm: { shader: "firestorm", flow: "windash" },
+  whiteout: { shader: "whiteout", flow: "nightsnow" },
+  liquidmetal: { shader: "liquidmetal" },
+  plasma: { shader: "plasma" },
+  forest: { shader: "forest", flow: "fireflies" },
+  neoncity: { shader: "neoncity" },
+  haunted: { shader: "haunted", flow: "wisps" },
+  darkness: { shader: "darkness" },
+  lostsignal: { shader: "lostsignal" },
+  garland: { shader: "garland", flow: "gentlesnow" },
+  christmasnight: { shader: "christmasnight", flow: "gentlesnow" },
+  hearth: { shader: "hearth", flow: "crackle" },
 };
 
 /** The CSS ambience standing in for each premium one. */
@@ -43,6 +58,21 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   fireworks: "sparkles",
   mesh: "fireflies",
   meshwave: "starfield",
+  volcano: "ash",
+  blackhole: "starfield",
+  reef: "bubbles",
+  firestorm: "embers",
+  whiteout: "snow",
+  liquidmetal: "aurora",
+  plasma: "aurora",
+  forest: "fireflies",
+  neoncity: "lights",
+  haunted: "fog",
+  darkness: "veins",
+  lostsignal: "vhs",
+  garland: "lights",
+  christmasnight: "snow",
+  hearth: "embers",
 };
 
 export function isPremiumAmbient(kind: string): boolean {
@@ -77,6 +107,10 @@ function release() {
   freed.dispatchEvent(new Event("freed"));
 }
 
+function flows(layers: Layers): string[] {
+  return layers.flow === undefined ? [] : Array.isArray(layers.flow) ? layers.flow : [layers.flow];
+}
+
 async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLElement) {
   const stops: Array<() => void> = [];
   const stopAll = () => {
@@ -96,9 +130,9 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
     if (!stop) return stopAll(), null;
     stops.push(stop);
   }
-  if (layers.flow) {
+  for (const name of flows(layers)) {
     const { FLOWS, runFlow } = await import("./flowRunner");
-    const preset = FLOWS[layers.flow];
+    const preset = FLOWS[name];
     const stop = preset ? runFlow(next(), preset) : null;
     if (!stop) return stopAll(), null;
     stops.push(stop);
@@ -122,7 +156,7 @@ export function PremiumAmbient({
   fallback: ReactNode;
 }) {
   const layers = LAYERS[kind] ?? {};
-  const canvasCount = [layers.shader, layers.mesh, layers.flow].filter(Boolean).length;
+  const canvasCount = [layers.shader, layers.mesh].filter(Boolean).length + flows(layers).length;
   const host = useRef<HTMLDivElement>(null);
   const canvases = useRef<HTMLCanvasElement[]>([]);
   const [failed, setFailed] = useState(false);

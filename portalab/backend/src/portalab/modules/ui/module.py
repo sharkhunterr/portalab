@@ -18,6 +18,7 @@ from portalab.modules.ui import settings as _settings  # noqa: F401 — declares
 from portalab.modules.ui.events import CONSUMER, preference_consumer, register_event_types
 from portalab.modules.ui.looks import NotificationLooks
 from portalab.modules.ui.themes.service import ThemeService
+from portalab.modules.ui.weather import WeatherService
 
 OWNER = "module:ui"
 
@@ -38,6 +39,7 @@ class UiModule:
         self.events = events
         self.capabilities = capabilities
         self.themes = ThemeService(database, audit, capabilities, clock=clock)
+        self.weather = WeatherService(capabilities)  # #68: the « live weather » ambience
         self.looks = NotificationLooks(capabilities)
         self.event_types = event_types
         self.consumers = consumers

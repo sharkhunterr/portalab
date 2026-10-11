@@ -52,6 +52,23 @@ async def notification_looks(
     return await module.looks.catalog(principal.user_id)
 
 
+class WeatherOut(BaseModel):
+    condition: str | None
+    is_day: bool = True
+    temperature: float | None = None
+
+
+@router.get("/ui/weather", response_model=WeatherOut)
+async def weather(
+    principal: Annotated[Principal, require("users.self.manage")], module: Module
+) -> WeatherOut:
+    """#68: the sky over the homelab, for the « live weather » ambience (none until a place is set)."""
+    now = await module.weather.now()
+    if now is None:
+        return WeatherOut(condition=None)
+    return WeatherOut(condition=now.condition, is_day=now.is_day, temperature=now.temperature)
+
+
 @router.get("/admin/ui/themes")
 async def all_themes(_: Manager, module: Module) -> dict[str, Any]:
     return {"items": [theme_out(row, admin=True) for row in await module.themes.all()]}

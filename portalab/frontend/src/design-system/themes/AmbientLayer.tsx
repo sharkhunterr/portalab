@@ -2,6 +2,7 @@ import { type CSSProperties, memo } from "react";
 import type { Ambient } from "../a11y/preferences";
 import "./ambient.css";
 import { isPremiumAmbient, PREMIUM_FALLBACK, PremiumAmbient } from "./premium/PremiumAmbient";
+import { WeatherAmbient } from "./premium/WeatherAmbient";
 
 /**
  * Ambient layer (027): an animated decoration behind the content — snow, embers, code rain, fireflies,
@@ -84,6 +85,10 @@ export const AmbientLayer = memo(function AmbientLayer({
   /** Inside a box (a profile background) instead of behind the whole page. */
   contained?: boolean;
 }) {
+  if (kind === "weather") {
+    // #68: the ambience of the sky outside
+    return <WeatherAmbient render={(sky) => <AmbientLayer kind={sky as Ambient} contained={contained} />} />;
+  }
   if (isPremiumAmbient(kind)) {
     // #68: drawn on a canvas (shader or particles); the CSS ambience stands in when it cannot be
     const fallback = PREMIUM_FALLBACK[kind] as Ambient;

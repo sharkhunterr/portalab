@@ -1046,7 +1046,23 @@
             "downpour",
             "matrix",
             "mesh",
-            "meshwave"
+            "meshwave",
+            "volcano",
+            "blackhole",
+            "reef",
+            "firestorm",
+            "whiteout",
+            "liquidmetal",
+            "plasma",
+            "forest",
+            "neoncity",
+            "weather",
+            "haunted",
+            "darkness",
+            "lostsignal",
+            "garland",
+            "christmasnight",
+            "hearth"
           ]
         }
       },

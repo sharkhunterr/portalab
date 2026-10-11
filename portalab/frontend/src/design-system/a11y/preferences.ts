@@ -190,6 +190,22 @@ export const AMBIENTS = [
   "matrix",
   "mesh",
   "meshwave",
+  "volcano",
+  "blackhole",
+  "reef",
+  "firestorm",
+  "whiteout",
+  "liquidmetal",
+  "plasma",
+  "forest",
+  "neoncity",
+  "weather",
+  "haunted",
+  "darkness",
+  "lostsignal",
+  "garland",
+  "christmasnight",
+  "hearth",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and

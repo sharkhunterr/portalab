@@ -21,3 +21,16 @@ describe("premium ambiences", () => {
     expect(document.querySelector('[data-ambient="inferno"]')).toBeNull();
   });
 });
+
+describe("live weather ambience", () => {
+  it("shows the sky outside: a storm, rain, snow, fog, a clear day or night", async () => {
+    const { weatherAmbient } = await import("../../src/design-system/themes/premium/WeatherAmbient");
+    expect(weatherAmbient({ condition: "storm", is_day: true })).toBe("thunderstorm");
+    expect(weatherAmbient({ condition: "rain", is_day: true })).toBe("downpour");
+    expect(weatherAmbient({ condition: "snow", is_day: false })).toBe("blizzard");
+    expect(weatherAmbient({ condition: "cloudy", is_day: true })).toBe("fog");
+    expect(weatherAmbient({ condition: "clear", is_day: true })).toBe("forest");
+    expect(weatherAmbient({ condition: "clear", is_day: false })).toBe("cosmos");
+    expect(weatherAmbient(null)).toBe("starfield"); // no place set yet
+  });
+});

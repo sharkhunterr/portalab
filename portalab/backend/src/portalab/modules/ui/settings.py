@@ -45,6 +45,19 @@ GLOBAL_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.textScale.min", Annotated[float, Field(ge=0.5, le=1.0)], 0.85, "Smallest text scale allowed."),
     ("ui.textScale.max", Annotated[float, Field(ge=1.0, le=3.0)], 2.0, "Largest text scale allowed."),
     ("ui.forceReducedMotion", bool, False, "Force reduced motion for everyone."),
+    # #68: where the « live weather » ambience looks at the sky (empty: no weather asked to anyone)
+    (
+        "ui.weather.latitude",
+        Annotated[float, Field(ge=-90, le=90)] | None,
+        None,
+        "Latitude of the place whose weather the « live weather » ambience shows (Open-Meteo).",
+    ),
+    (
+        "ui.weather.longitude",
+        Annotated[float, Field(ge=-180, le=180)] | None,
+        None,
+        "Longitude of the place whose weather the « live weather » ambience shows (Open-Meteo).",
+    ),
 )
 
 USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (

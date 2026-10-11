@@ -7672,6 +7672,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ui/weather": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Weather
+         * @description #68: the sky over the homelab, for the « live weather » ambience (none until a place is set).
+         */
+        get: operations["weather_api_v1_ui_weather_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users": {
         parameters: {
             query?: never;
@@ -13637,6 +13657,18 @@ export interface components {
             id?: string | null;
             /** Layout Version */
             layout_version: number;
+        };
+        /** WeatherOut */
+        WeatherOut: {
+            /** Condition */
+            condition: string | null;
+            /**
+             * Is Day
+             * @default true
+             */
+            is_day: boolean;
+            /** Temperature */
+            temperature?: number | null;
         };
         /** WelcomeOut */
         WelcomeOut: {
@@ -29260,6 +29292,26 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    weather_api_v1_ui_weather_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeatherOut"];
                 };
             };
         };

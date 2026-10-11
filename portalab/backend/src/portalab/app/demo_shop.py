@@ -449,6 +449,22 @@ AMBIENT_NAMES = {
     "fireworks": ("Fireworks", "Feu d'artifice", "epic", 1100),
     "mesh": ("Constellation mesh", "Maillage constellation", "epic", 1000),
     "meshwave": ("Moving mesh network", "Réseau maillé en mouvement", "legendary", 1500),
+    "volcano": ("Volcano", "Volcan", "legendary", 1600),
+    "blackhole": ("Black hole", "Trou noir", "legendary", 1700),
+    "reef": ("Under the surface", "Sous la surface", "legendary", 1500),
+    "firestorm": ("Firestorm", "Tempête de feu", "legendary", 1600),
+    "whiteout": ("Night blizzard", "Blizzard nocturne", "legendary", 1400),
+    "liquidmetal": ("Liquid metal", "Métal liquide", "legendary", 1500),
+    "plasma": ("Plasma storm", "Tempête de plasma", "legendary", 1600),
+    "forest": ("Living forest", "Forêt vivante", "legendary", 1400),
+    "neoncity": ("Neon city", "Cité néon", "legendary", 1500),
+    "weather": ("Live weather", "Météo en direct", "legendary", 1800),
+    "haunted": ("Haunting", "Hantise", "legendary", 1500),
+    "darkness": ("Darkness", "Ténèbres", "legendary", 1600),
+    "lostsignal": ("Lost signal", "Signal perdu", "legendary", 1400),
+    "garland": ("String lights", "Guirlandes", "legendary", 1300),
+    "christmasnight": ("Christmas night", "Nuit de Noël", "legendary", 1500),
+    "hearth": ("By the fire", "Coin du feu", "legendary", 1400),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -1722,7 +1738,7 @@ LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
     "request_tv_channel",
-    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave",
+    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix", "ambient_meshwave", "ambient_volcano", "ambient_blackhole", "ambient_reef", "ambient_firestorm", "ambient_whiteout", "ambient_liquidmetal", "ambient_plasma", "ambient_forest", "ambient_neoncity", "ambient_weather", "ambient_haunted", "ambient_darkness", "ambient_lostsignal", "ambient_garland", "ambient_christmasnight", "ambient_hearth",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:

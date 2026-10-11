@@ -15145,6 +15145,42 @@
         "title": "VersionOut",
         "type": "object"
       },
+      "WeatherOut": {
+        "properties": {
+          "condition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition"
+          },
+          "is_day": {
+            "default": true,
+            "title": "Is Day",
+            "type": "boolean"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          }
+        },
+        "required": [
+          "condition"
+        ],
+        "title": "WeatherOut",
+        "type": "object"
+      },
       "WelcomeOut": {
         "properties": {
           "enabled": {
@@ -38503,6 +38539,28 @@
           }
         },
         "summary": "Themes",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/ui/weather": {
+      "get": {
+        "description": "#68: the sky over the homelab, for the \u00ab live weather \u00bb ambience (none until a place is set).",
+        "operationId": "weather_api_v1_ui_weather_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Weather",
         "tags": [
           "ui"
         ]

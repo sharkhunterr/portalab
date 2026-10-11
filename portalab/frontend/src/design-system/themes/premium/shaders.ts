@@ -35,6 +35,14 @@ float fbm(vec2 p) {
   }
   return v;
 }
+// lays a layer of colour c with coverage al over what is already drawn (premultiplied)
+vec4 over(vec4 under, vec3 c, float al) {
+  al = clamp(al, 0.0, 1.0);
+  return vec4(c * al + under.rgb * (1.0 - al), al + under.a * (1.0 - al));
+}
+float fwidthApprox(float z) {
+  return clamp(z * 0.004, 0.0, 0.2);
+}
 vec2 coords(out vec2 uv) {
   uv = gl_FragCoord.xy / u_res;
   return vec2(uv.x * u_res.x / u_res.y, uv.y);
@@ -290,7 +298,540 @@ void main() {
   gl_FragColor = vec4(col * a + vec3(0.0, 0.5, 0.2) * glow, max(a, glow));
 }`;
 
+/** A volcano: a field of lava at the bottom — glowing veins cracking a dark crust, flowing slowly and
+ * pulsing — a plume of ash rising above it, lit red from below. (Ash and sparks are particles.) */
+const VOLCANO = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  // lava: ridged veins through a crust, flowing to the side and pulsing
+  vec2 q = vec2(p.x * 3.0 + t * 0.04, uv.y * 7.0 - t * 0.05);
+  vec2 w = vec2(fbm(q * 0.7 + t * 0.03), fbm(q * 0.7 + vec2(3.7, -t * 0.02)));
+  float n = fbm(q + w * 1.6);
+  float vein = smoothstep(0.07, 0.0, abs(n - 0.5)) + 0.5 * smoothstep(0.16, 0.0, abs(n - 0.5));
+  float pulse = 0.75 + 0.25 * sin(t * 1.3 + n * 9.0);
+  float field = smoothstep(0.36, 0.08, uv.y);
+  vec3 lava = mix(vec3(0.9, 0.18, 0.02), vec3(1.0, 0.75, 0.25), clamp(vein - 0.4, 0.0, 1.0)) * pulse;
+  vec3 crust = vec3(0.08, 0.03, 0.02) + vec3(0.25, 0.05, 0.0) * fbm(q * 3.0);
+  vec3 col = mix(crust, lava, clamp(vein, 0.0, 1.0)) * field;
+  float a = field * (0.55 + 0.45 * clamp(vein, 0.0, 1.0));
+  // the plume: ash billowing up, lit red where it is low
+  vec2 r = vec2(p.x * 1.6, uv.y * 2.0 - t * 0.12);
+  vec2 wr = vec2(fbm(r + t * 0.05), fbm(r + vec2(6.1, 2.3)));
+  float ash = fbm(r * 1.3 + wr * 2.2);
+  float plume = smoothstep(0.42, 0.85, ash) * smoothstep(0.15, 0.55, uv.y) * smoothstep(1.1, 0.5, uv.y);
+  vec3 smoke = mix(vec3(0.12, 0.1, 0.1), vec3(0.35, 0.3, 0.3), ash);
+  smoke += vec3(0.6, 0.12, 0.02) * smoothstep(0.65, 0.2, uv.y) * (0.6 + 0.4 * sin(t * 1.3));
+  col = mix(col, smoke, plume * (1.0 - field));
+  a = max(a, plume * 0.85);
+  float glow = smoothstep(0.6, 0.1, uv.y) * 0.25 * pulse;
+  col += vec3(0.7, 0.12, 0.0) * glow;
+  a = max(a, glow);
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** A black hole: a swirling accretion disc, brighter on the side turning toward us, its far side lensed
+ * over the hole into a ring of light; the stars behind bent around it; the horizon pure black. */
+const BLACKHOLE = `${COMMON}
+float stars(vec2 p) {
+  vec2 g = p * 90.0;
+  float h = hash(floor(g));
+  return step(0.992, h) * smoothstep(0.5, 0.0, length(fract(g) - 0.5)) * (0.5 + 0.5 * h);
+}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float aspect = u_res.x / u_res.y;
+  vec2 c = vec2(aspect * 0.68, 0.56);
+  vec2 q = p - c;
+  float r = length(q);
+  float R = 0.085;
+  // the stars behind, bent around the hole
+  float bend = R * R * 1.8 / max(r, 0.001);
+  vec2 lensed = c + normalize(q) * max(r - bend, 0.0) + vec2(t * 0.003, 0.0);
+  vec3 col = vec3(0.9, 0.93, 1.0) * stars(lensed) * smoothstep(R, R * 2.5, r);
+  float a = stars(lensed) * 0.85 * smoothstep(R, R * 2.5, r);
+  // the disc, tilted: bright, turbulent, spinning faster near the hole
+  vec2 d = vec2(q.x, q.y * 3.4);
+  float rd = length(d);
+  float ang = atan(d.y, d.x);
+  float spin = t * (0.9 / max(rd, 0.05));
+  float swirl = fbm(vec2(ang * 2.0 + spin, rd * 14.0 - t * 0.3));
+  float band = smoothstep(R * 1.4, R * 1.9, rd) * smoothstep(R * 5.0, R * 2.4, rd);
+  float doppler = 0.55 + 0.45 * cos(ang + 0.4);
+  vec3 hot = mix(vec3(1.0, 0.45, 0.12), vec3(1.0, 0.92, 0.75), swirl * doppler);
+  float disc = band * (0.35 + 0.9 * swirl) * doppler;
+  float front = step(0.0, -q.y) + step(0.0, q.y) * step(R * 1.05, r); // the near half crosses the hole
+  col += hot * disc * front * 1.4;
+  a = max(a, clamp(disc * front * 1.2, 0.0, 1.0));
+  // the far side of the disc, lensed above the hole into a ring
+  float ring = exp(-abs(r - R * 1.32) * 70.0) * (0.6 + 0.4 * fbm(vec2(atan(q.y, q.x) * 3.0 - t, t * 0.2)));
+  col += vec3(1.0, 0.75, 0.45) * ring * 1.3;
+  a = max(a, clamp(ring, 0.0, 1.0));
+  // the horizon: black, with a thin glow
+  float horizon = smoothstep(R * 1.02, R * 0.97, r);
+  col *= 1.0 - horizon;
+  a = max(a, horizon);
+  float halo = exp(-max(r - R, 0.0) * 9.0) * 0.25;
+  col += vec3(0.8, 0.4, 0.15) * halo * (1.0 - horizon);
+  a = max(a, halo * (1.0 - horizon));
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** Underwater, looking up: the surface rippling at the top with the light breaking through it, rays
+ * swaying down into the blue, depth darkening below. (Plankton and a school of fish are particles.) */
+const REEF = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  // the surface, seen from below: bright cells of light, rippling
+  vec2 s = vec2(p.x * 4.0, p.y * 9.0);
+  float n = fbm(s + fbm(s * 0.8 + t * 0.35) * 1.5 + vec2(t * 0.1, 0.0));
+  float cells = smoothstep(0.35, 0.8, n) * (0.7 + 0.3 * sin(p.x * 30.0 + n * 8.0 + t * 1.5));
+  float surface = smoothstep(0.72, 0.96, uv.y);
+  vec3 col = mix(vec3(0.05, 0.35, 0.55), vec3(0.75, 0.95, 1.0), cells) * surface;
+  float a = surface * (0.45 + 0.5 * cells);
+  // rays swaying down from the surface
+  float sway = sin(t * 0.35) * 0.15;
+  float rx = p.x + (1.0 - uv.y) * (0.25 + sway);
+  float rays = pow(0.5 + 0.5 * sin(rx * 11.0 + sin(rx * 3.0 + t * 0.4) * 1.5), 4.0)
+    * (0.5 + 0.5 * fbm(vec2(rx * 6.0, t * 0.2))) * smoothstep(0.1, 0.95, uv.y);
+  col += vec3(0.5, 0.85, 1.0) * rays * 0.6 * (1.0 - surface);
+  a = max(a, rays * 0.4 * (1.0 - surface));
+  // depth: the blue thickening below
+  float deep = smoothstep(0.7, 0.0, uv.y) * 0.35;
+  col += vec3(0.0, 0.08, 0.18) * deep;
+  a = max(a, deep);
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** A firestorm: flames bent by a strong wind, smoke rolling across the page lit orange from beneath.
+ * (Embers and ash torn sideways are particles.) */
+const FIRESTORM = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float gust = 0.6 + 0.3 * sin(t * 0.4) + 0.15 * sin(t * 1.3);
+  // flames leaning with the wind
+  vec2 q = vec2(p.x * 2.4 - uv.y * 1.6 * gust - t * 0.5, p.y * 1.7 - t * 1.3);
+  vec2 warp = vec2(fbm(q * 1.3 + vec2(0.0, -t * 0.6)), fbm(q * 1.6 + vec2(5.2, -t * 0.9)));
+  float n = fbm(q + warp * 1.8);
+  float f = clamp((n * 1.5 + (0.25 - uv.y * 1.7) - 0.4) * 2.6, 0.0, 1.0);
+  vec3 col = mix(vec3(0.45, 0.03, 0.0), vec3(1.0, 0.42, 0.04), smoothstep(0.05, 0.5, f));
+  col = mix(col, vec3(1.0, 0.75, 0.3), smoothstep(0.55, 1.0, f));
+  float a = smoothstep(0.02, 0.4, f) * 0.85;
+  // smoke rolling to the side, thick and slow, lit from below
+  vec2 r = vec2(p.x * 1.4 - t * 0.18 * gust, uv.y * 2.4);
+  vec2 wr = vec2(fbm(r * 1.2 + t * 0.06), fbm(r * 1.2 + vec2(3.1, -t * 0.04)));
+  float sm = fbm(r + wr * 2.0);
+  float smoke = smoothstep(0.42, 0.85, sm) * smoothstep(0.2, 0.55, uv.y);
+  vec3 grey = mix(vec3(0.1, 0.09, 0.09), vec3(0.32, 0.28, 0.27), sm);
+  grey += vec3(0.55, 0.18, 0.03) * smoothstep(0.75, 0.25, uv.y) * smoothstep(0.42, 0.85, sm);
+  col = mix(col, grey, smoke * (1.0 - smoothstep(0.1, 0.6, f)));
+  a = max(a, smoke * 0.7);
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** A blizzard at night: veils of blown snow sweeping across in waves, gusts whitening the air for a
+ * moment, a cold glow over the ground. (The flakes are particles in several depths.) */
+const WHITEOUT = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float gust = smoothstep(0.55, 1.0, 0.5 + 0.35 * sin(t * 0.33) + 0.25 * sin(t * 0.91 + 1.0));
+  vec2 q = vec2(p.x * 1.5 - t * 0.55, p.y * 2.0 + t * 0.12);
+  vec2 w = vec2(fbm(q + t * 0.07), fbm(q + vec2(4.4, -t * 0.05)));
+  float veil = fbm(q * 1.4 + w * 2.0);
+  float drift = smoothstep(0.45, 0.9, veil) * (0.35 + 0.55 * gust);
+  vec3 col = vec3(0.82, 0.88, 1.0);
+  float a = drift * 0.55 + gust * 0.12;
+  // the ground: a cold glow and snow streaming low
+  float ground = smoothstep(0.25, 0.0, uv.y);
+  float stream = fbm(vec2(p.x * 3.0 - t * 1.4, uv.y * 30.0));
+  col = mix(col, vec3(0.6, 0.72, 0.95), ground * 0.5);
+  a = max(a, ground * (0.25 + 0.35 * smoothstep(0.4, 0.8, stream)));
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** Liquid metal: a chrome surface flowing slowly, its relief catching a sky and sharp highlights, a
+ * thin film of colour shimmering where it bends. */
+const LIQUIDMETAL = `${COMMON}
+float height(vec2 p, float t) {
+  vec2 w = vec2(noise(p * 0.9 + t * 0.06), noise(p * 0.9 + vec2(5.2, -t * 0.05)));
+  return noise(p * 1.4 + w * 2.0 + t * 0.04) * 0.75 + noise(p * 3.1 + w + t * 0.05) * 0.25;
+}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  vec2 q = p * 0.85;
+  float e = 0.035;
+  float h = height(q, t);
+  vec3 n = normalize(vec3(height(q - vec2(e, 0.0), t) - height(q + vec2(e, 0.0), t),
+                          height(q - vec2(0.0, e), t) - height(q + vec2(0.0, e), t), e * 1.4));
+  vec3 view = vec3(0.0, 0.0, 1.0);
+  vec3 rf = reflect(-view, n);
+  // an environment: a cool sky above, a warm floor below, a bright strip of light
+  vec3 env = mix(vec3(0.12, 0.13, 0.16), vec3(0.75, 0.8, 0.9), smoothstep(-0.4, 0.8, rf.y));
+  env += vec3(1.0) * smoothstep(0.93, 1.0, dot(rf, normalize(vec3(0.4, 0.7, 0.6)))) * 1.2;
+  vec3 film = 0.5 + 0.5 * cos(6.2831 * (h * 2.0 + vec3(0.0, 0.33, 0.67)) + t * 0.2);
+  float edge = pow(1.0 - n.z, 1.5);
+  vec3 col = env + film * edge * 0.45;
+  float a = 0.3 + edge * 0.35;
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** A plasma storm: violet and cyan clouds of charged gas, crossed by branching electric filaments that
+ * flicker and crawl. */
+const PLASMA = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  vec2 q = p * 1.5;
+  vec2 w = vec2(fbm(q + t * 0.04), fbm(q + vec2(3.3, -t * 0.035)));
+  float n = fbm(q + w * 2.0);
+  vec3 col = mix(vec3(0.25, 0.05, 0.45), vec3(0.1, 0.6, 0.9), smoothstep(0.3, 0.8, w.y));
+  col = mix(col, vec3(0.9, 0.4, 1.0), smoothstep(0.6, 0.9, n));
+  float a = smoothstep(0.3, 0.85, n) * 0.55;
+  // filaments: where an evolving noise crosses its middle, branching, flickering
+  float arcs = 0.0;
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    float m = fbm(p * (2.0 + fi * 1.3) + w * 1.5 + vec2(t * (0.3 + fi * 0.15), fi * 7.0));
+    float line = smoothstep(0.012, 0.0, abs(m - 0.5)) + 0.35 * exp(-abs(m - 0.5) * 60.0);
+    float flick = step(0.35, noise(vec2(t * 7.0 + fi * 13.0, fi)));
+    arcs += line * flick * (1.0 - fi * 0.25);
+  }
+  arcs *= smoothstep(0.35, 0.75, n);
+  col += vec3(0.8, 0.85, 1.0) * arcs * 1.6;
+  a = max(a, clamp(arcs, 0.0, 1.0));
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** A living forest: sunbeams slanting through the canopy, the shade of leaves stirring in the wind,
+ * a mist breathing low. (Fireflies are particles.) */
+const FOREST = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  // the canopy's shade: patches of foliage stirring in the wind
+  vec2 l = p * 13.0 + vec2(sin(t * 0.3) * 0.4, cos(t * 0.23) * 0.3);
+  vec2 sway = vec2(noise(l * 0.3 + t * 0.2), noise(l * 0.3 + vec2(4.0, t * 0.17))) * 1.2;
+  float leaves = noise(l * 1.7 + sway) * 0.7 + noise(l * 3.4 + sway * 2.0) * 0.3;
+  float canopy = smoothstep(0.35, 0.7, fbm(p * 1.6 + vec2(t * 0.02, 0.0)));
+  float dapple = smoothstep(0.58, 0.72, leaves) * canopy * smoothstep(0.2, 1.0, uv.y);
+  vec4 o = vec4(0.0);
+  o = over(o, vec3(0.06, 0.16, 0.05), canopy * 0.3);
+  o = over(o, vec3(0.75, 0.92, 0.45), dapple * 0.45);
+  // sunbeams slanting from the top left: a few wide and soft, a few thin, slowly breathing
+  float bx = p.x + uv.y * 0.6;
+  float shafts = smoothstep(0.55, 1.0, sin(bx * 4.0 + sin(bx * 1.7) * 1.5))
+    + 0.6 * smoothstep(0.85, 1.0, sin(bx * 11.0 + 1.3));
+  float beams = shafts * (0.6 + 0.4 * sin(t * 0.4 + bx * 3.0)) * (0.7 + 0.3 * noise(vec2(bx * 3.0, t * 0.3)));
+  beams *= smoothstep(0.0, 0.9, uv.y);
+  // dust motes glittering in the beams
+  vec2 mg = p * 90.0 + vec2(sin(t * 0.5) * 2.0, t * 1.5);
+  float motes = step(0.988, hash(floor(mg))) * smoothstep(0.35, 0.0, length(fract(mg) - 0.5)) * beams;
+  o = over(o, vec3(1.0, 0.93, 0.65), beams * 0.32);
+  o = over(o, vec3(1.0, 1.0, 0.85), motes);
+  // mist low over the ground
+  float mist = fbm(vec2(p.x * 1.5 + t * 0.04, uv.y * 4.0 - t * 0.02)) * smoothstep(0.4, 0.0, uv.y);
+  o = over(o, vec3(0.7, 0.8, 0.75), mist * 0.45);
+  gl_FragColor = o;
+}`;
+
+/** A neon city in perspective: a ground of glowing roads between blocks of lit windows stretching to
+ * the horizon, streams of data racing along the roads toward the viewer, a glitch tearing the image now
+ * and then. */
+const NEONCITY = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float aspect = u_res.x / u_res.y;
+  float g = step(0.94, hash(vec2(floor(t * 3.0), 1.0)));
+  float band = step(abs(uv.y - hash(vec2(floor(t * 3.0), 2.0)) * 0.6), 0.03);
+  float x = p.x + g * band * (hash(vec2(floor(t * 3.0), 3.0)) - 0.5) * 0.15;
+  // the ground plane, from the bottom of the page to a horizon two thirds up
+  float horizon = 0.64;
+  float depth = horizon - uv.y;
+  if (depth <= 0.0) {
+    float sky = smoothstep(horizon + 0.25, horizon, uv.y) * 0.25;
+    gl_FragColor = vec4(vec3(0.6, 0.2, 0.8) * sky, sky);
+    return;
+  }
+  float z = 0.35 / depth;
+  vec2 c = vec2((x - aspect * 0.5) * z * 2.2, z + t * 0.9);
+  vec2 cell = floor(c);
+  vec2 f = fract(c);
+  float wRoad = 0.06 + 0.04 * hash(cell);
+  float lineW = fwidthApprox(z);
+  float road = max(smoothstep(wRoad + lineW, wRoad, f.x), smoothstep(wRoad + lineW, wRoad, f.y));
+  float px = fract(t * (0.3 + hash(vec2(cell.y, 5.0)) * 0.7) + hash(vec2(cell.y, 9.0)));
+  float py = fract(-t * (0.6 + hash(vec2(cell.x, 6.0)) * 0.9) + hash(vec2(cell.x, 8.0)));
+  float pulse = smoothstep(wRoad * 1.4, 0.0, f.y) * exp(-abs(f.x - px) * 12.0)
+    + smoothstep(wRoad * 1.4, 0.0, f.x) * exp(-max(f.y - py, 0.0) * 6.0) * step(py - 0.02, f.y);
+  vec2 win = floor(f * 6.0);
+  float lit = step(0.7, hash(cell * 13.0 + win)) * step(0.14, f.x) * step(0.14, f.y);
+  lit *= 0.6 + 0.4 * sin(t * 0.6 + hash(cell + win) * 30.0);
+  vec3 tint = mix(vec3(0.0, 0.85, 1.0), vec3(1.0, 0.2, 0.75), step(0.5, hash(cell)));
+  float fade = smoothstep(0.0, 0.18, depth);
+  vec3 col = (tint * road * 0.6 + vec3(1.0, 0.95, 0.85) * pulse * 1.5 + tint * lit * 0.4) * fade;
+  float a = clamp(road * 0.45 + pulse + lit * 0.35, 0.0, 1.0) * fade;
+  col += vec3(0.4, 0.9, 1.0) * g * band * 0.4;
+  a = max(a, g * band * 0.25);
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+/** Haunting: a light failing like a dying bulb, fog creeping along the floor, the dark closing in from
+ * the edges to the rhythm of a heartbeat. (Pale wisps are particles.) */
+const HAUNTED = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  vec4 o = vec4(0.0);
+  // the heartbeat: two beats, a pause
+  float beat = mod(t, 1.6);
+  float pulse = exp(-beat * 9.0) + 0.7 * exp(-abs(beat - 0.28) * 12.0);
+  // the dark closing in from the edges, tightening on each beat
+  vec2 c = uv - 0.5;
+  float vignette = smoothstep(0.12 - pulse * 0.06, 0.72, length(c * vec2(1.25, 1.0)));
+  o = over(o, vec3(0.02, 0.0, 0.01), vignette * 0.95);
+  // a shadow passing slowly across, now and then, like someone walking by a lamp
+  float pass = mod(t, 13.0) / 4.0;
+  float shadow = step(pass, 1.0) * smoothstep(0.35, 0.0, abs(uv.x - (pass * 1.6 - 0.3))) * 0.45;
+  o = over(o, vec3(0.0), shadow);
+  // a failing light: long dim stretches, sudden flickers
+  float k = floor(t * 12.0);
+  float failing = step(0.86, hash(vec2(k, 1.0))) * step(0.5, hash(vec2(floor(t * 0.7), 2.0)));
+  o = over(o, vec3(0.75, 0.8, 0.7), failing * 0.14);
+  o = over(o, vec3(0.0), (1.0 - failing) * step(0.97, hash(vec2(k, 3.0))) * 0.35);
+  // fog creeping low, slow
+  float fog = fbm(vec2(p.x * 1.4 + t * 0.03, uv.y * 3.5 - t * 0.015) + fbm(p * 2.0 + t * 0.02));
+  fog *= smoothstep(0.55, 0.0, uv.y);
+  o = over(o, vec3(0.55, 0.6, 0.62), smoothstep(0.3, 0.8, fog) * 0.7);
+  // a red glow breathing with the heart, very faint
+  o = over(o, vec3(0.35, 0.0, 0.02), pulse * vignette * 0.18);
+  gl_FragColor = o;
+}`;
+
+/** Darkness: black tendrils creeping in from the edges, red veins pulsing inside them, and eyes opening
+ * in the dark — pairs of red embers that blink, then close. */
+const DARKNESS = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float aspect = u_res.x / u_res.y;
+  vec4 o = vec4(0.0);
+  // how far in from the nearest edge, wavering
+  float edge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
+  float creep = fbm(p * 3.0 + vec2(t * 0.05, -t * 0.04));
+  float reach = 0.08 + 0.06 * sin(t * 0.2) + creep * 0.16;
+  float dark = smoothstep(reach, reach - 0.12, edge);
+  // tendrils: ridged noise reaching inward
+  float ridge = 1.0 - abs(fbm(p * 5.0 + vec2(-t * 0.08, t * 0.06)) * 2.0 - 1.0);
+  float tendril = smoothstep(0.75, 0.95, ridge) * smoothstep(reach + 0.2, reach - 0.05, edge);
+  o = over(o, vec3(0.0), max(dark, tendril) * 0.92);
+  // red veins pulsing inside the dark
+  float vein = smoothstep(0.012, 0.0, abs(fbm(p * 7.0 + t * 0.03) - 0.5))
+    * smoothstep(reach + 0.05, reach - 0.1, edge);
+  float throb = 0.5 + 0.5 * sin(t * 2.4);
+  o = over(o, vec3(0.6, 0.02, 0.03), vein * (0.4 + 0.5 * throb));
+  // eyes: a pair now and then, somewhere in the dark, opening, blinking, closing
+  float slot = floor(t / 4.0);
+  float ph = mod(t, 4.0);
+  vec2 at = vec2(hash(vec2(slot, 1.0)), hash(vec2(slot, 2.0)));
+  at = vec2(at.x < 0.5 ? 0.06 + at.x * 0.2 : 0.74 + at.x * 0.2, 0.15 + at.y * 0.7);
+  vec2 e = vec2((uv.x - at.x) * aspect, uv.y - at.y);
+  float open = smoothstep(0.0, 0.6, ph) * smoothstep(3.6, 3.0, ph) * step(0.08, abs(ph - 1.9));
+  float gap = 0.022;
+  float eyes = 0.0;
+  for (int i = 0; i < 2; i++) {
+    vec2 d = e - vec2(i == 0 ? -gap : gap, 0.0);
+    eyes += smoothstep(0.009, 0.0, length(d * vec2(1.0, 1.0 / max(open, 0.05)))) ;
+  }
+  float glow = exp(-length(e) * 40.0) * 0.5;
+  o = over(o, vec3(1.0, 0.12, 0.05), (eyes + glow) * open * step(0.35, hash(vec2(slot, 4.0))));
+  gl_FragColor = o;
+}`;
+
+/** Lost signal: a found-footage tape — grain crawling over everything, a bright tear rolling down, the
+ * colours split, and now and then the picture cutting to black. */
+const LOSTSIGNAL = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  vec4 o = vec4(0.0);
+  // grain: fine, changing every frame
+  float grain = hash(floor(gl_FragCoord.xy * 0.6) + floor(t * 24.0) * 17.0);
+  o = over(o, vec3(grain), 0.2);
+  // jitter: thin lines torn sideways, now and then
+  float jitter = step(0.96, hash(vec2(floor(gl_FragCoord.y / 3.0), floor(t * 15.0))));
+  o = over(o, vec3(0.85), jitter * 0.35);
+  // a tear rolling down the picture, the lines around it shifting
+  float roll = fract(t * 0.11);
+  float near = exp(-abs(uv.y - (1.0 - roll)) * 60.0);
+  float lines = step(0.5, fract(gl_FragCoord.y * 0.5)) * 0.06;
+  o = over(o, vec3(0.9), near * 0.5 + lines * 0.5);
+  // split colours along the tear
+  float shift = near * (hash(vec2(floor(t * 20.0), uv.y)) - 0.5);
+  o = over(o, vec3(1.0, 0.1, 0.2), smoothstep(0.0, 0.3, abs(shift)) * 0.25);
+  o = over(o, vec3(0.1, 0.9, 1.0), smoothstep(0.0, 0.3, abs(shift * 1.3)) * 0.18);
+  // the edges of an old screen, darker
+  vec2 c = uv - 0.5;
+  o = over(o, vec3(0.0), smoothstep(0.3, 0.72, length(c)) * 0.75);
+  // now and then the picture cuts to black, a timecode blinking
+  float cut = step(0.93, hash(vec2(floor(t * 1.5), 7.0)));
+  o = over(o, vec3(0.0), cut * 0.75);
+  gl_FragColor = o;
+}`;
+
+/** String lights: strings of warm bulbs sagging across the top of the page, each bulb glowing in its
+ * own colour and twinkling at its own pace. (Snow falls as particles.) */
+const GARLAND = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float aspect = u_res.x / u_res.y;
+  vec4 o = vec4(0.0);
+  for (int s = 0; s < 3; s++) {
+    float fs = float(s);
+    float span = 0.55 + fs * 0.1;
+    float x = p.x / span + fs * 0.37;
+    float sag = 0.07 + 0.02 * fs;
+    float y0 = 0.94 - fs * 0.11 - sag * 4.0 * fract(x) * (1.0 - fract(x));
+    float wire = smoothstep(0.0025, 0.0, abs(uv.y - y0));
+    o = over(o, vec3(0.08, 0.12, 0.08), wire * 0.8);
+    // bulbs along the wire
+    float n = 9.0;
+    float bi = floor(fract(x) * n);
+    float bx = (bi + 0.5) / n;
+    float id = floor(x) * 10.0 + bi + fs * 100.0;
+    float by = 0.94 - fs * 0.11 - sag * 4.0 * bx * (1.0 - bx) - 0.012;
+    vec2 d = vec2((fract(x) - bx) * span, uv.y - by);
+    float r = length(d);
+    float tw = 0.55 + 0.45 * sin(t * (1.0 + hash(vec2(id, 1.0)) * 2.5) + id);
+    vec3 hue = 0.55 + 0.45 * cos(6.2831 * (hash(vec2(id, 2.0)) + vec3(0.0, 0.33, 0.67)));
+    hue = mix(hue, vec3(1.0, 0.8, 0.45), 0.35);
+    o = over(o, hue, smoothstep(0.009, 0.004, r) * (0.6 + 0.4 * tw));
+    o = over(o, hue, exp(-r * 60.0) * 0.6 * tw);
+  }
+  gl_FragColor = o;
+}`;
+
+/** Christmas night: a winter sky of stars over snowy fir trees, the moon glowing, and now and then a
+ * sleigh with its reindeer crossing in front of it. (Snow falls as particles.) */
+const CHRISTMASNIGHT = `${COMMON}
+float fir(vec2 p, float x0, float h, float w) {
+  // a fir tree: stacked triangles, its snowy edges
+  float y = p.y;
+  float half_ = w * (1.0 - y / h) * (0.75 + 0.25 * fract(y / h * 4.0));
+  return step(y, h) * step(abs(p.x - x0), half_);
+}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  float aspect = u_res.x / u_res.y;
+  vec4 o = vec4(0.0);
+  o = over(o, vec3(0.04, 0.08, 0.2), smoothstep(0.2, 1.0, uv.y) * 0.45);
+  vec2 sg = p * 120.0;
+  float sh = hash(floor(sg));
+  float star = step(0.994, sh) * smoothstep(0.45, 0.0, length(fract(sg) - 0.5)) * (0.5 + 0.5 * sin(t * 2.0 + sh * 70.0));
+  o = over(o, vec3(1.0, 0.97, 0.88), star * smoothstep(0.3, 0.6, uv.y));
+  // the moon and its glow
+  vec2 moon = vec2(aspect * 0.78, 0.76);
+  float dm = length(p - moon);
+  o = over(o, vec3(0.95, 0.95, 0.85), exp(-dm * 9.0) * 0.35);
+  o = over(o, vec3(1.0, 0.98, 0.9), smoothstep(0.072, 0.066, dm));
+  // a sleigh crossing the moon, now and then: a silhouette with its reindeer
+  float pass = mod(t, 22.0) / 6.0;
+  float sx = moon.x - 0.45 + pass * 0.9;
+  vec2 q = p - vec2(sx, moon.y - 0.01 + sin(pass * 3.0) * 0.01);
+  float sleigh = smoothstep(1.0, 0.8, length(q / vec2(0.03, 0.009)));
+  sleigh += smoothstep(0.0025, 0.0, abs(q.y + 0.011)) * step(abs(q.x), 0.032); // the runner
+  for (int i = 1; i < 5; i++) {
+    float fi = float(i);
+    vec2 r = q - vec2(0.04 + fi * 0.028, 0.012 + sin(t * 8.0 + fi) * 0.003);
+    sleigh += smoothstep(1.0, 0.75, length(r / vec2(0.011, 0.0055)));             // body
+    sleigh += smoothstep(1.0, 0.7, length((r - vec2(0.011, 0.006)) / vec2(0.004, 0.0035))); // head
+    sleigh += smoothstep(0.0012, 0.0, abs(r.x - 0.012)) * step(abs(r.y - 0.012), 0.004); // antlers
+    sleigh += smoothstep(0.001, 0.0, abs(abs(r.x) - 0.006)) * step(abs(r.y + 0.008), 0.004); // legs
+  }
+  o = over(o, vec3(0.02, 0.03, 0.06), clamp(sleigh, 0.0, 1.0) * step(pass, 1.0));
+  // snowy hills and firs
+  float hill = 0.12 + 0.04 * sin(p.x * 2.0) + 0.02 * sin(p.x * 5.3 + 1.0);
+  float ground = step(p.y, hill);
+  float trees = 0.0;
+  for (int i = 0; i < 9; i++) {
+    float fi = float(i);
+    float x0 = (fi + 0.3 * hash(vec2(fi, 1.0))) / 9.0 * aspect;
+    float h = 0.16 + 0.12 * hash(vec2(fi, 2.0));
+    trees += fir(vec2(p.x, p.y - hill + 0.01), x0, h, 0.045 + 0.02 * hash(vec2(fi, 3.0)));
+  }
+  trees = clamp(trees, 0.0, 1.0);
+  o = over(o, vec3(0.02, 0.06, 0.05), trees);
+  o = over(o, vec3(0.75, 0.82, 0.95), ground * 0.9);
+  // snow on the hills sparkling
+  float sparkle = step(0.997, hash(floor(p * 200.0) + floor(t * 3.0))) * ground;
+  o = over(o, vec3(1.0), sparkle);
+  gl_FragColor = o;
+}`;
+
+/** By the fire: the warm glow of a hearth breathing at the bottom of the page, and frost creeping from
+ * the corners of the window, branching like ice crystals. (Embers crackle as particles.) */
+const HEARTH = `${COMMON}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = u_time;
+  vec4 o = vec4(0.0);
+  float breathe = 0.75 + 0.15 * sin(t * 1.7) + 0.1 * noise(vec2(t * 3.0, 0.0));
+  float glow = smoothstep(0.65, 0.0, uv.y) * breathe;
+  o = over(o, vec3(0.9, 0.38, 0.08), glow * 0.3);
+  // low flames licking at the very bottom
+  vec2 q = vec2(p.x * 4.0, p.y * 3.0 - t * 1.6);
+  float f = clamp((fbm(q + fbm(q * 1.4 - t * 0.6)) * 1.5 + (0.1 - uv.y * 3.5) - 0.35) * 2.5, 0.0, 1.0);
+  o = over(o, mix(vec3(0.9, 0.25, 0.02), vec3(1.0, 0.75, 0.3), f), smoothstep(0.05, 0.5, f) * 0.85);
+  // frost from the corners: branching crystals growing and melting slowly
+  vec2 c = min(uv, 1.0 - uv) * vec2(u_res.x / u_res.y, 1.0);
+  float corner = length(c);
+  float grow = 0.3 + 0.04 * sin(t * 0.15);
+  float crystal = 1.0 - abs(fbm(p * 26.0) * 2.0 - 1.0);
+  float reach = smoothstep(grow, grow * 0.35, corner);
+  o = over(o, vec3(0.75, 0.85, 0.95), reach * 0.18); // a misted pane
+  float lines = smoothstep(0.9, 0.985, crystal) + 0.6 * smoothstep(0.93, 0.99, 1.0 - abs(fbm(p * 55.0) * 2.0 - 1.0));
+  o = over(o, vec3(0.92, 0.97, 1.0), lines * reach * 0.75);
+  gl_FragColor = o;
+}`;
+
 export const SHADERS: Record<string, string> = {
+  haunted: HAUNTED,
+  darkness: DARKNESS,
+  lostsignal: LOSTSIGNAL,
+  garland: GARLAND,
+  christmasnight: CHRISTMASNIGHT,
+  hearth: HEARTH,
+  volcano: VOLCANO,
+  blackhole: BLACKHOLE,
+  reef: REEF,
+  firestorm: FIRESTORM,
+  whiteout: WHITEOUT,
+  liquidmetal: LIQUIDMETAL,
+  plasma: PLASMA,
+  forest: FOREST,
+  neoncity: NEONCITY,
   matrix: MATRIX,
   inferno: INFERNO,
   thunderstorm: THUNDERSTORM,
