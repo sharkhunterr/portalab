@@ -10,7 +10,10 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
+import { FX_FRAMES, FX_NAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
 import { useT } from "../../../i18n/hooks/useT";
+import { InShop } from "../../appearance/InShop";
+import { HdTag, isHdAmbient, isHdLevelBadge, RarityTag } from "../../appearance/Rarity";
 import { useProgression } from "../../gamification/api";
 import { imageUrl } from "../../media/api";
 import { backdropUrl, type LookChoice, useEquipLook, useProfileLooks, type WornItem } from "./looks";
@@ -20,7 +23,8 @@ import { BannerArt, FramedAvatar, StyledName, WornBadge } from "./ProfileHero";
  * Profile customisation (027), Steam-like: the banner (free designs, those bought in the shop or in a
  * theme pack), the avatar frame, the backdrop of a film or a series as the banner (unlocked once in the
  * shop), an animated background, the name's font and effect, a title and a showcase of three badges.
- * Locked designs show a padlock and lead to the shop.
+ * Only what the member owns is offered, each with its rarity (and HD when drawn by the graphics chip); how
+ * many more the shop sells is said in one line (#79).
  */
 type Tab = "banner" | "frame" | "backdrop" | "background" | "name" | "title" | "badges" | "level";
 type DesignSlot = "banner" | "frame" | "background" | "name" | "level";
@@ -38,6 +42,15 @@ const NONE: Partial<Record<DesignSlot, string>> = {
   level: "classic",
 };
 
+/** #79: whether a design of this slot is drawn by the graphics chip */
+function isHdLook(slot: DesignSlot, key: string): boolean {
+  if (slot === "frame") return Boolean(FX_FRAMES[key]);
+  if (slot === "background") return isHdAmbient(key);
+  if (slot === "level") return isHdLevelBadge(key);
+  if (slot === "name") return Boolean(FX_NAMES[key]);
+  return false;
+}
+
 function Choices({
   slot,
   choices,
@@ -52,46 +65,54 @@ function Choices({
   const t = useT();
   const equip = useEquipLook();
   const notify = useNotify();
+  // #79: only what the member owns is offered; the rest is counted in one line, toward the shop
+  const owned = choices.filter((choice) => !choice.locked);
+  const locked = choices.length - owned.length;
   return (
-    <div className="looks-grid" data-slot={slot}>
-      {choices.map((choice) => {
-        const selected = (current ?? NONE[slot] ?? null) === choice.key;
-        return (
-          <div key={choice.key} className="looks-grid__item" data-locked={choice.locked || undefined}>
-            <button
-              type="button"
-              aria-pressed={selected}
-              disabled={choice.locked || equip.isPending}
-              onClick={() =>
-                equip.mutate(
-                  { slot, value: slot === "level" && choice.key === "classic" ? null : choice.key },
-                  { onError: () => notify({ severity: "warning", title: t("community:looks.failed") }) },
-                )
-              }
+    <>
+      <div className="looks-grid" data-slot={slot}>
+        {owned.map((choice) => {
+          const selected = (current ?? NONE[slot] ?? null) === choice.key;
+          return (
+            <div
+              key={choice.key}
+              className="looks-grid__item"
+              data-rarity={choice.rarity ?? undefined}
+              data-current={selected || undefined}
             >
-              {render(choice.key)}
-              <span className="looks-grid__name">
-                {choice.locked ? (
-                  <Icon name="lock" size={14} />
-                ) : selected ? (
-                  <Icon name="check" size={14} />
-                ) : null}
-                {slot === "background"
-                  ? t(`notifications:universe.ambients.${choice.key}`)
-                  : slot === "level"
-                    ? t(`notifications:levelBadge.names.${choice.key}`)
-                    : t(`community:looks.${slot}.${choice.key}`)}
-              </span>
-            </button>
-            {choice.locked ? (
-              <Link className="looks-grid__shop" to={`/marketplace?type=${SHOP_TYPE[slot]}`}>
-                {t("community:looks.inShop")}
-              </Link>
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
+              <RarityTag rarity={choice.rarity} />
+              <button
+                type="button"
+                aria-pressed={selected}
+                disabled={choice.locked || equip.isPending}
+                onClick={() =>
+                  equip.mutate(
+                    { slot, value: slot === "level" && choice.key === "classic" ? null : choice.key },
+                    { onError: () => notify({ severity: "warning", title: t("community:looks.failed") }) },
+                  )
+                }
+              >
+                {render(choice.key)}
+                <span className="looks-grid__name">
+                  {choice.locked ? (
+                    <Icon name="lock" size={14} />
+                  ) : selected ? (
+                    <Icon name="check" size={14} />
+                  ) : null}
+                  {slot === "background"
+                    ? t(`notifications:universe.ambients.${choice.key}`)
+                    : slot === "level"
+                      ? t(`notifications:levelBadge.names.${choice.key}`)
+                      : t(`community:looks.${slot}.${choice.key}`)}
+                </span>
+                {isHdLook(slot, choice.key) ? <HdTag /> : null}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <InShop count={locked} type={SHOP_TYPE[slot]} />
+    </>
   );
 }
 
@@ -216,29 +237,41 @@ function BackdropPicker({ unlocked, current }: { unlocked: boolean; current: str
 }
 
 /** One of my titles under my name (or none). */
-function TitlePicker({ titles, current }: { titles: WornItem[]; current: string | null | undefined }) {
+function TitlePicker({
+  titles,
+  current,
+  inShop,
+}: {
+  titles: WornItem[];
+  current: string | null | undefined;
+  inShop: number;
+}) {
   const t = useT();
   const equip = useEquipLook();
   if (!titles.length) return <OwnedEmpty type="title" />;
   return (
-    <div className="looks-list">
-      {[null, ...titles].map((item) => (
-        <button
-          key={item?.key ?? "none"}
-          type="button"
-          aria-pressed={(current ?? null) === (item?.key ?? null)}
-          disabled={equip.isPending}
-          onClick={() => equip.mutate({ slot: "title", value: item?.key ?? null })}
-        >
-          {item ? <WornBadge item={item} kind="title" /> : t("community:looks.noTitle")}
-        </button>
-      ))}
-    </div>
+    <>
+      <div className="looks-list">
+        {[null, ...titles].map((item) => (
+          <button
+            key={item?.key ?? "none"}
+            type="button"
+            aria-pressed={(current ?? null) === (item?.key ?? null)}
+            disabled={equip.isPending}
+            onClick={() => equip.mutate({ slot: "title", value: item?.key ?? null })}
+          >
+            {item ? <WornBadge item={item} kind="title" /> : t("community:looks.noTitle")}
+            {item ? <ItemTags item={item} /> : null}
+          </button>
+        ))}
+      </div>
+      <InShop count={inShop} type="title" />
+    </>
   );
 }
 
 /** Up to three of my badges next to my name. */
-function BadgePicker({ badges, current }: { badges: WornItem[]; current: string[] }) {
+function BadgePicker({ badges, current, inShop }: { badges: WornItem[]; current: string[]; inShop: number }) {
   const t = useT();
   const equip = useEquipLook();
   if (!badges.length) return <OwnedEmpty type="badge" />;
@@ -259,10 +292,22 @@ function BadgePicker({ badges, current }: { badges: WornItem[]; current: string[
             onClick={() => toggle(item.key)}
           >
             <WornBadge item={item} kind="badge" />
+            <ItemTags item={item} />
           </button>
         ))}
       </div>
+      <InShop count={inShop} type="badge" />
     </>
+  );
+}
+
+/** #79: a title's or badge's rarity, and HD when drawn by the graphics chip */
+function ItemTags({ item }: { item: WornItem }) {
+  return (
+    <span className="looks-list__tags">
+      <RarityTag rarity={item.rarity} />
+      {item.style && FX_STYLES[item.style] ? <HdTag /> : null}
+    </span>
   );
 }
 
@@ -382,11 +427,16 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           )}
         />
       ) : tab === "title" ? (
-        <TitlePicker titles={looks.data.titles} current={equipped.title?.key} />
+        <TitlePicker
+          titles={looks.data.titles}
+          current={equipped.title?.key}
+          inShop={looks.data.in_shop?.title ?? 0}
+        />
       ) : tab === "badges" ? (
         <BadgePicker
           badges={looks.data.badges}
           current={(equipped.badges?.items ?? []).map((item) => item.key)}
+          inShop={looks.data.in_shop?.badge ?? 0}
         />
       ) : (
         <BackdropPicker unlocked={looks.data.backdrop.unlocked} current={equipped.backdrop?.ref} />

@@ -89,7 +89,13 @@ async def test_profile_background_name_title_and_badges(mk: MkHarness) -> None:
     assert (await looks.equip(user, "background", "snow"))["background"] == "snow"
     assert (await looks.equip(user, "name", "fire"))["name"] == "fire"
     worn = await looks.equip(user, "title", "title_legend")
-    assert worn["title"] == {"key": "title_legend", "label": "Legend", "icon": None, "style": "gold"}
+    assert {k: v for k, v in worn["title"].items() if k != "rarity"} == {
+        "key": "title_legend",
+        "label": "Legend",
+        "icon": None,
+        "style": "gold",
+    }
+    assert "rarity" in worn["title"]  # #79: shown with it
     shown = await looks.equip(user, "badges", ["b1", "b2", "b3", "b4"])
     assert [badge["label"] for badge in shown["badges"]["items"]] == ["One", "Two", "Three"]  # three at most
     assert shown["badges"]["items"][0]["style"] == "pulse"
@@ -98,6 +104,8 @@ async def test_profile_background_name_title_and_badges(mk: MkHarness) -> None:
     catalog = await looks.catalog(user)
     assert {t["key"] for t in catalog["titles"]} == {"title_legend"}
     assert len(catalog["badges"]) == 4
+    assert catalog["in_shop"]["title"] == 0 and catalog["in_shop"]["badge"] >= 0  # #79: the rest, counted
+    assert (await looks.catalog(mk.people["ulrich"]))["in_shop"]["title"] >= 1
     assert {b["key"]: b["locked"] for b in catalog["backgrounds"]}["snow"] is False
     assert (await looks.equip(user, "badges", None)).get("badges") is None
 
@@ -169,3 +177,19 @@ async def test_level_badge_slot_and_reward_only_designs(mk: MkHarness) -> None:
     catalog = await looks.catalog(user)
     shown = {c["key"]: c["locked"] for c in catalog["levels"]}
     assert shown["crown"] is False and shown["neon"] is True and shown["classic"] is False
+
+
+async def test_an_ambience_sold_only_as_ambience_is_no_free_profile_background(mk: MkHarness) -> None:
+    """#79: a premium ambience is worn behind a profile by its owners only — owning the ambience unlocks it
+    (before, an ambience sold only as an ambience was free as a profile background)."""
+    from portalab.modules.marketplace.looks.service import LookLocked
+
+    await published(mk, "ambient_lavalamp", "ambient", payload={"ambient": "lavalamp"})
+    looks = mk.module.looks
+    ursula = mk.p("ursula")
+    user = ursula.user_id
+    assert user is not None
+    with pytest.raises(LookLocked):
+        await looks.equip(user, "background", "lavalamp")
+    await mk.module.purchases.acquire(ursula, "ambient_lavalamp", "k-lava")
+    assert (await looks.equip(user, "background", "lavalamp"))["background"] == "lavalamp"

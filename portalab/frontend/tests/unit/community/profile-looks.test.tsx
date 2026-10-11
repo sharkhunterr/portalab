@@ -4,8 +4,8 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
 // 027 — a profile opens on the member's banner and framed avatar; on one's own profile « Customise » lists
-// the banners and frames, those sold and not owned locked with a way to the shop, and the film backdrop
-// locked until bought.
+// the banners and frames the member owns — those sold and not owned counted in one line toward the shop
+// (#79) — and the film backdrop locked until bought.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -75,10 +75,9 @@ describe("profile looks", () => {
     expect(container.querySelector(".profile-hero .avatar-frame")?.getAttribute("data-frame")).toBe("neon");
     fireEvent.click(await screen.findByRole("button", { name: "Customise" }));
     const dialog = await screen.findByRole("dialog");
-    const synthwave = await within(dialog).findByRole("button", { name: /Synthwave/ });
-    expect((synthwave as HTMLButtonElement).disabled).toBe(true);
-    expect(within(dialog).getAllByRole("link", { name: "In the shop" }).length).toBe(1);
-    fireEvent.click(within(dialog).getByRole("button", { name: /Aurora/ }));
+    fireEvent.click(await within(dialog).findByRole("button", { name: /Aurora/ }));
+    expect(within(dialog).queryByRole("button", { name: /Synthwave/ })).toBeNull(); // not owned: not listed
+    expect(dialog.querySelector(".in-shop")).not.toBeNull(); // counted toward the shop
     await vi.waitFor(() => expect(fake.puts).toEqual([{ slot: "banner", value: "aurora" }]));
     fireEvent.click(within(dialog).getByRole("button", { name: "Film backdrop" }));
     expect(await within(dialog).findByText("Film backdrop locked")).toBeTruthy();

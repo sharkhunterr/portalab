@@ -51,7 +51,16 @@ function SectionFrame({ memberId, section }: { memberId: string; section: Commun
  * from the avatar and the profile card (name, « About me ») sits with the sections — the same view in
  * My account.
  */
-export function MemberProfile({ memberId, heading = 1 }: { memberId: string; heading?: 1 | 2 }) {
+export function MemberProfile({
+  memberId,
+  heading = 1,
+  withBackground = true,
+}: {
+  memberId: string;
+  heading?: 1 | 2;
+  /** #79: the animated background is for the profile page; on « My account » the portal's ambience stays alone */
+  withBackground?: boolean;
+}) {
   const t = useT();
   const profile = useProfile(memberId);
   const me = useMe();
@@ -74,8 +83,11 @@ export function MemberProfile({ memberId, heading = 1 }: { memberId: string; hea
       : null
     : undefined;
   return (
-    <div className="ds-stack profile-page" data-background={looks.background ?? undefined}>
-      {looks.background && looks.background !== "none" ? (
+    <div
+      className="ds-stack profile-page"
+      data-background={withBackground ? (looks.background ?? undefined) : undefined}
+    >
+      {withBackground && looks.background && looks.background !== "none" ? (
         <AmbientLayer kind={looks.background as Ambient} contained />
       ) : null}
       <ProfileHero

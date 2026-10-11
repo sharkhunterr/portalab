@@ -593,3 +593,49 @@
     background-position: -50% 0;
   }
 }
+
+/* #79: each owned design shows its rarity (a tag and an outline of its colour) and HD when drawn by the
+   graphics chip; the one worn stands out */
+.looks-grid__item {
+  position: relative;
+}
+.looks-grid__item[data-rarity="common"],
+.looks-list .rarity-tag[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+.looks-grid__item[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+.looks-grid__item[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+.looks-grid__item[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+.looks-grid__item[data-rarity] > button {
+  border-color: color-mix(in srgb, var(--rarity) 75%, var(--color-border));
+}
+.looks-grid__item[data-rarity="legendary"] > button {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rarity) 30%, transparent);
+}
+.looks-grid__item[data-current] > button {
+  border-color: var(--color-accent);
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+}
+.looks-grid__item > .rarity-tag {
+  position: absolute;
+  inset-block-start: -0.55rem;
+  inset-inline-end: var(--space-2);
+  z-index: 1;
+}
+.looks-grid__item .hd-tag {
+  justify-self: center;
+}
+.looks-list__tags {
+  display: inline-flex;
+  gap: 4px;
+  margin-inline-start: var(--space-2);
+  vertical-align: middle;
+}

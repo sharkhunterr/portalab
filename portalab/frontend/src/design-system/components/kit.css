@@ -1064,3 +1064,32 @@ input[type="file"] {
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
 }
+
+/* #72, #79: the rarity of a look sold in the shop, as a small tag in its colour (anywhere) */
+.rarity-tag[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+.rarity-tag[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+.rarity-tag[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+.rarity-tag[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+.rarity-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rarity) 85%, var(--color-surface));
+  color: var(--color-surface);
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

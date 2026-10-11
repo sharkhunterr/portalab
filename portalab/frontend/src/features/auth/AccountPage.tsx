@@ -39,7 +39,7 @@ function AccountView({ me }: { me: Me }) {
   const t = useT();
   return (
     <SettingsPage icon="user" title={t("account:title")} lead={t("account:lead")}>
-      <MemberProfile memberId={me.id} heading={2} />
+      <MemberProfile memberId={me.id} heading={2} withBackground={false} />
       <SettingsCard icon="compass" title={t("account:links.title")} hint={t("account:links.hint")}>
         <ul className="account-links">
           {LINKS.map((link) => (

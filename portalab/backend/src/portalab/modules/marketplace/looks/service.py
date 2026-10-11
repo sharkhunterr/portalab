@@ -53,9 +53,14 @@ class ProfileLooks:
 
     async def locked(self, user: UUID, slot: str) -> frozenset[str]:
         kind, field = PROFILE_SLOTS[slot]
-        return frozenset(
-            await self.cosmetics.sold(kind, field) - await self.cosmetics.owned(user, kind, field)
-        )
+        sold = await self.cosmetics.sold(kind, field)
+        owned = await self.cosmetics.owned(user, kind, field)
+        if slot == "background":
+            # #79: an ambience sold in the shop is also a profile background — worn by its owners only (owning
+            # the ambience unlocks its background); before, those sold only as ambiences were free here
+            sold |= await self.cosmetics.sold("ambient", "ambient")
+            owned |= await self.cosmetics.owned(user, "ambient", "ambient")
+        return frozenset(sold - owned)
 
     async def backdrop_unlocked(self, user: UUID) -> bool:
         sold = await self.cosmetics.sold("profile_backdrop", "feature")
@@ -67,7 +72,7 @@ class ProfileLooks:
         """The titles or badges a member owns, as worn: key, label, icon, animated style."""
         async with self.database.session() as session:
             rows = await session.execute(
-                select(Product.key, ProductVersion.payload)
+                select(Product.key, ProductVersion.payload, Product.rarity)
                 .join(ProductVersion, ProductVersion.product_id == Product.id)
                 .join(Ownership, Ownership.product_id == Product.id)
                 .where(
@@ -79,7 +84,7 @@ class ProfileLooks:
                 .distinct()
             )
             items = []
-            for key, payload in rows.all():
+            for key, payload, rarity in rows.all():
                 style = str((payload or {}).get("style") or "none")
                 items.append(
                     {
@@ -87,6 +92,7 @@ class ProfileLooks:
                         "label": str((payload or {}).get("label") or key)[:60],
                         "icon": (payload or {}).get("icon"),
                         "style": style if style in BADGE_STYLES else "none",
+                        "rarity": rarity,  # #79
                     }
                 )
         return sorted(items, key=lambda item: item["label"])
@@ -97,7 +103,24 @@ class ProfileLooks:
         if details is None:
             return {}
         result: dict[str, dict[str, Any]] = await details(*PROFILE_SLOTS[slot])
+        if slot == "background":  # #79: the ambience's own rarity when it is not sold as a background
+            result = {**await details("ambient", "ambient"), **result}
         return result
+
+    async def unowned(self, user: UUID, product_type: str) -> int:
+        """#79: products of this type on sale that the member does not own."""
+        async with self.database.session() as session:
+            owned = (
+                select(Ownership.product_id)
+                .where(Ownership.user_id == user, Ownership.state.in_(LIVE))
+                .scalar_subquery()
+            )
+            rows = await session.scalars(
+                select(Product.key).where(
+                    Product.type == product_type, Product.state == "available", Product.id.not_in(owned)
+                )
+            )
+            return len(list(rows))
 
     async def catalog(self, user: UUID) -> dict[str, Any]:
         locked = {slot: await self.locked(user, slot) for slot in CHOICES}
@@ -114,6 +137,11 @@ class ProfileLooks:
             "levels": listed("level", LEVEL_BADGES),
             "titles": await self.owned_items(user, "title"),
             "badges": await self.owned_items(user, "badge"),
+            # #79: how many more the shop sells (shown in one line, never listed)
+            "in_shop": {
+                "title": await self.unowned(user, "title"),
+                "badge": await self.unowned(user, "badge"),
+            },
             "backdrop": {"unlocked": await self.backdrop_unlocked(user)},
             "equipped": await self.cosmetics.equipped(user),
         }

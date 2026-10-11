@@ -218,3 +218,17 @@ COSMETICS_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Cosmetic choices sold in the Marketplace and the ones a user owns (027)",
 )
+
+# some keys were listed twice over the specs' merges: each list keeps one of each, in order
+PROFILE_BANNERS = tuple(dict.fromkeys(PROFILE_BANNERS))
+AVATAR_FRAMES = tuple(dict.fromkeys(AVATAR_FRAMES))
+PALETTES = tuple(dict.fromkeys(PALETTES))
+AMBIENTS = tuple(dict.fromkeys(AMBIENTS))
+CELEBRATIONS = tuple(dict.fromkeys(CELEBRATIONS))
+NOTIFICATION_STYLES = tuple(dict.fromkeys(NOTIFICATION_STYLES))
+NOTIFICATION_ANIMATIONS = tuple(dict.fromkeys(NOTIFICATION_ANIMATIONS))
+NAME_STYLES = tuple(dict.fromkeys(NAME_STYLES))
+BADGE_STYLES = tuple(dict.fromkeys(BADGE_STYLES))
+LEVEL_BADGES = tuple(dict.fromkeys(LEVEL_BADGES))
+LEVEL_UPS = tuple(dict.fromkeys(LEVEL_UPS))
+UNIVERSE_THEMES = tuple(dict.fromkeys(UNIVERSE_THEMES))

@@ -25,6 +25,8 @@ export interface WornItem {
   label: string;
   icon?: string | null;
   style?: string | null;
+  /** #79: the rarity of the product it comes from */
+  rarity?: string | null;
 }
 
 export interface Equipped {
@@ -51,6 +53,8 @@ export interface LooksCatalog {
   titles: WornItem[];
   badges: WornItem[];
   backdrop: { unlocked: boolean };
+  /** #79: titles and badges the shop sells that the member does not own */
+  in_shop?: { title?: number; badge?: number };
   equipped: Equipped;
 }
 

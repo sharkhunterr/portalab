@@ -71,6 +71,9 @@ export const FX_NOTIFICATION_SHAPES: Record<string, number> = {
   plasma: 0,
   chrono: 6,
 };
+/** name styles drawn by the GPU (#78) */
+export const FX_NAMES: Record<string, string> = {};
+
 /** avatar frames, each in a shape of its own */
 export const FX_FRAMES: Record<string, FxSpec> = {
   pyre: { effect: "blaze", shape: 1 },

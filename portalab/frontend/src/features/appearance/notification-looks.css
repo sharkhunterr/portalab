@@ -676,21 +676,7 @@
 :is(.looks__style, .looks__chip, .palettes__item, .level-badges__item, .theme-card)[data-rarity="legendary"] {
   box-shadow: 0 0 12px color-mix(in srgb, var(--rarity) 30%, transparent);
 }
-.rarity-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--rarity) 85%, var(--color-surface));
-  color: var(--color-surface);
-  font-size: 0.68rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.03em;
-  line-height: 1.4;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+
 :is(.looks__style, .palettes__item, .level-badges__item, .theme-card) > .rarity-tag {
   position: absolute;
   inset-block-start: -0.55rem;
