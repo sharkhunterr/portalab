@@ -177,6 +177,18 @@ export const AMBIENTS = [
   "ash",
   "bokeh",
   "nostromo",
+  // #68: premium ambiences, drawn on a canvas (WebGL shaders, particles)
+  "inferno",
+  "thunderstorm",
+  "sandstorm",
+  "polar",
+  "cosmos",
+  "abyss",
+  "blizzard",
+  "fireworks",
+  "downpour",
+  "matrix",
+  "mesh",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and

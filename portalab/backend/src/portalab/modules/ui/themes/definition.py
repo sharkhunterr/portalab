@@ -269,6 +269,17 @@ AMBIENTS = Literal[
     "ash",
     "bokeh",
     "nostromo",
+    "inferno",
+    "thunderstorm",
+    "sandstorm",
+    "polar",
+    "cosmos",
+    "abyss",
+    "blizzard",
+    "fireworks",
+    "downpour",
+    "matrix",
+    "mesh",
 ]
 CELEBRATIONS = Literal[
     "none",

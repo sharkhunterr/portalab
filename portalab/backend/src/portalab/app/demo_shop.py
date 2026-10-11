@@ -436,6 +436,18 @@ AMBIENT_NAMES = {
     "ash": ("Ash of Mordor", "Cendres du Mordor", "rare", 450),
     "bokeh": ("Bokeh", "Bokeh", "rare", 450),
     "nostromo": ("Onboard computer", "Ordinateur de bord", "epic", 700),
+    # #68: premium ambiences drawn by the GPU (shaders) or as particles
+    "inferno": ("Inferno", "Brasier", "legendary", 1500),
+    "thunderstorm": ("Thunderstorm", "Orage", "legendary", 1600),
+    "sandstorm": ("Desert storm", "Tempête du désert", "legendary", 1500),
+    "polar": ("Polar lights", "Lumières polaires", "legendary", 1400),
+    "cosmos": ("Deep space", "Espace profond", "legendary", 1400),
+    "abyss": ("Abyss", "Abysses", "legendary", 1400),
+    "matrix": ("Digital rain", "Pluie numérique", "legendary", 1500),
+    "downpour": ("Downpour", "Averse", "epic", 1000),
+    "blizzard": ("Blizzard", "Blizzard", "epic", 1000),
+    "fireworks": ("Fireworks", "Feu d'artifice", "epic", 1100),
+    "mesh": ("Constellation mesh", "Maillage constellation", "epic", 1000),
 }
 for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
     _p(f"ambient_{value.replace('-', '_')}", "ambient", price, rarity, f"{en} ambience", f"Ambiance {fr.lower()}",
@@ -1709,6 +1721,7 @@ LEGENDARY = {
     "badge_the_one", "badge_dragon_tamer", "frame_hologram", "theme_wizard", "theme_cyberpunk",
     "ultimate_wizard", "ultimate_cyberpunk", "effect_portal", "name_royal", "pack_server_room",
     "request_tv_channel",
+    "ambient_inferno", "ambient_thunderstorm", "ambient_sandstorm", "ambient_polar", "ambient_cosmos", "ambient_abyss", "ambient_matrix",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:

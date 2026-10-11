@@ -1219,3 +1219,17 @@
     opacity: 1;
   }
 }
+
+/* #68: premium ambiences drawn on a canvas — drawn at a reduced size then stretched (soft, light) */
+.ambient--premium canvas {
+  display: block;
+  inline-size: 100% !important;
+  block-size: 100% !important;
+}
+.ambient--premium {
+  opacity: 0.9;
+}
+.ambient--premium[data-ambient="matrix"],
+.ambient--premium[data-ambient="mesh"] {
+  opacity: 0.75;
+}
