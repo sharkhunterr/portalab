@@ -31,9 +31,30 @@ export interface FlowPreset {
   streak?: number;
   /** also draw the particle itself as a soft dot (snowflakes, embers) */
   dots?: boolean;
+  /** pixels per second the wind swings sideways in gusts (the rain's slant changing) */
+  sway?: number;
 }
 
 export const FLOWS: Record<string, FlowPreset> = {
+  // storm rain: fast thin streaks, their slant swinging with the gusts, ruffled by turbulence
+  storm: {
+    density: 1500,
+    colors: [
+      [0.72, 0.8, 0.95],
+      [0.62, 0.7, 0.88],
+      [0.85, 0.9, 1],
+    ],
+    size: [1, 2],
+    alpha: [0.18, 0.6],
+    speed: 70,
+    scale: 0.0012,
+    evolve: 0.25,
+    wind: [120, 950],
+    gusts: 0.25,
+    sway: 260,
+    spawn: "upwind",
+    streak: 0.045,
+  },
   // sand: dense fine grains moving in masses with the gusts, eddies of all sizes
   sand: {
     density: 2600,
@@ -247,7 +268,12 @@ export function runFlow(canvas: HTMLCanvasElement, preset: FlowPreset): (() => v
     const t = (now - started) / 1000;
     // gusts: the wind swells and eases on its own rhythm, never quite periodic
     const gust = 1 + preset.gusts * (0.6 * Math.sin(t * 0.37) + 0.4 * Math.sin(t * 1.13 + 1.7));
-    const [wx, wy] = preset.wind;
+    const swing = preset.sway
+      ? preset.sway *
+        (0.7 * Math.sin(t * 0.23 + 0.5) + 0.3 * Math.sin(t * 0.71 + 2.1) + 0.15 * Math.sin(t * 1.9))
+      : 0;
+    const wx = preset.wind[0] + swing;
+    const wy = preset.wind[1];
     const drawn = Math.floor(count * budget);
     for (let i = 0; i < drawn; i++) {
       const x = pos[i * 2] as number;

@@ -16,7 +16,7 @@ interface Layers {
 
 const LAYERS: Record<string, Layers> = {
   inferno: { shader: "inferno", flow: "embers" },
-  thunderstorm: { shader: "thunderstorm" },
+  thunderstorm: { shader: "thunderstorm", flow: "storm" },
   sandstorm: { shader: "sandstorm", flow: "sand" },
   polar: { shader: "polar" },
   cosmos: { shader: "cosmos" },
