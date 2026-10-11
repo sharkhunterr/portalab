@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
-import type { Ambient } from "../../../design-system/a11y/preferences";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
-import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { useT } from "../../../i18n/hooks/useT";
 import { SettingsCard } from "../../account/SettingsKit";
 import { PhotoControl, ProfileCard } from "../../auth/ProfileEditor";
@@ -51,16 +49,7 @@ function SectionFrame({ memberId, section }: { memberId: string; section: Commun
  * from the avatar and the profile card (name, « About me ») sits with the sections — the same view in
  * My account.
  */
-export function MemberProfile({
-  memberId,
-  heading = 1,
-  withBackground = true,
-}: {
-  memberId: string;
-  heading?: 1 | 2;
-  /** #79: the animated background is for the profile page; on « My account » the portal's ambience stays alone */
-  withBackground?: boolean;
-}) {
+export function MemberProfile({ memberId, heading = 1 }: { memberId: string; heading?: 1 | 2 }) {
   const t = useT();
   const profile = useProfile(memberId);
   const me = useMe();
@@ -83,13 +72,8 @@ export function MemberProfile({
       : null
     : undefined;
   return (
-    <div
-      className="ds-stack profile-page"
-      data-background={withBackground ? (looks.background ?? undefined) : undefined}
-    >
-      {withBackground && looks.background && looks.background !== "none" ? (
-        <AmbientLayer kind={looks.background as Ambient} contained />
-      ) : null}
+    // #79: no animated background on a profile — the ambience is each member's own choice, in Appearance
+    <div className="ds-stack profile-page">
       <ProfileHero
         memberId={memberId}
         name={own?.display_name ?? profile.data.display_name ?? t("community:feed.someone")}

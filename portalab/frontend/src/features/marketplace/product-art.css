@@ -598,3 +598,8 @@
 .product-art__level[data-size="mini"] .ds-level:not(:first-child) {
   display: none;
 }
+
+/* #79: a preview of a notification look, not the live notifications — never over a menu or a dialog */
+.ds-notifications.product-art__notify {
+  z-index: auto;
+}

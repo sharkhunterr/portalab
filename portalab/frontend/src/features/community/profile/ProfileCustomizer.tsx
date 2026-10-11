@@ -2,14 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
-import type { Ambient } from "../../../design-system/a11y/preferences";
 import { AdminEmpty, AdminTabs } from "../../../design-system/admin/AdminKit";
 import { LevelBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { Dialog } from "../../../design-system/components/Overlays";
-import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { FX_FRAMES, FX_NAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
 import { useT } from "../../../i18n/hooks/useT";
 import { InShop } from "../../appearance/InShop";
@@ -22,7 +20,7 @@ import { BannerArt, FramedAvatar, StyledName, WornBadge } from "./ProfileHero";
 /**
  * Profile customisation (027), Steam-like: the banner (free designs, those bought in the shop or in a
  * theme pack), the avatar frame, the backdrop of a film or a series as the banner (unlocked once in the
- * shop), an animated background, the name's font and effect, a title and a showcase of three badges.
+ * shop), the name's font and effect, a title and a showcase of three badges.
  * Only what the member owns is offered, each with its rarity (and HD when drawn by the graphics chip); how
  * many more the shop sells is said in one line (#79).
  */
@@ -45,6 +43,7 @@ const NONE: Partial<Record<DesignSlot, string>> = {
 /** #79: whether a design of this slot is drawn by the graphics chip */
 function isHdLook(slot: DesignSlot, key: string): boolean {
   if (slot === "frame") return Boolean(FX_FRAMES[key]);
+  if (slot === "banner") return key.startsWith("live-") && isHdAmbient(key.slice(5));
   if (slot === "background") return isHdAmbient(key);
   if (slot === "level") return isHdLevelBadge(key);
   if (slot === "name") return Boolean(FX_NAMES[key]);
@@ -367,7 +366,6 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           { key: "banner", label: t("community:looks.tab.banner") },
           { key: "frame", label: t("community:looks.tab.frame") },
           { key: "backdrop", label: t("community:looks.tab.backdrop") },
-          { key: "background", label: t("community:looks.tab.background") },
           { key: "name", label: t("community:looks.tab.name") },
           { key: "title", label: t("community:looks.tab.title") },
           { key: "badges", label: t("community:looks.tab.badges") },
@@ -392,17 +390,6 @@ export function ProfileCustomizer({ name, memberId }: { name: string; memberId: 
           choices={looks.data.frames}
           current={equipped.frame}
           render={(key) => <FramedAvatar frame={key} name={name} userId={memberId} size="md" />}
-        />
-      ) : tab === "background" ? (
-        <Choices
-          slot="background"
-          choices={looks.data.backgrounds}
-          current={equipped.background}
-          render={(key) => (
-            <span className="looks-grid__ambient">
-              <AmbientLayer kind={key as Ambient} contained />
-            </span>
-          )}
         />
       ) : tab === "name" ? (
         <Choices

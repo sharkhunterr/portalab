@@ -766,7 +766,15 @@
             "fireworks",
             "rewind",
             "bloom",
-            "tracker"
+            "tracker",
+            "nova",
+            "goldshower",
+            "petalstorm",
+            "rebirth",
+            "stormstrike",
+            "skyveil",
+            "arcana",
+            "timerift"
           ]
         },
         "levelUp": {
@@ -1246,7 +1254,17 @@
             "eye",
             "tracking",
             "morph",
-            "uplink"
+            "uplink",
+            "ignite",
+            "surge",
+            "splash",
+            "frostbite",
+            "stardust",
+            "hex",
+            "decrypt",
+            "petalfall",
+            "eclipse",
+            "warp"
           ]
         }
       },

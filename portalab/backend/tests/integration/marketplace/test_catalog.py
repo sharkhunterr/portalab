@@ -84,3 +84,13 @@ class TestProductProvider(SearchProviderContractKit):
             await self.mk.module.catalog.move(self.mk.p("boss"), key, "unavailable")
 
         return ProviderWorld(provider, allowed, self.mk.p("ulrich"), "star", hide)
+
+
+async def test_the_whole_catalogue_is_listed_past_five_hundred_products(mk: MkHarness) -> None:
+    """#80: the shop lists every product — past 500, the last ones (the themes) were silently cut off."""
+    import inspect
+
+    from portalab.modules.marketplace.products.service import Catalog
+
+    default = inspect.signature(Catalog.listing).parameters["limit"].default
+    assert default >= 1500

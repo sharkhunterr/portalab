@@ -63,6 +63,7 @@
 }
 .looks__preview.ds-notifications {
   position: static;
+  z-index: auto; /* #79: a preview, not the live notifications — never over a menu or a dialog */
   inline-size: 100%;
   padding: var(--space-2);
   border-radius: var(--radius-sm, 0.3rem);

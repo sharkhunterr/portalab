@@ -493,6 +493,36 @@ for key, kind, field, value, en, fr, rarity, price, en_about, fr_about in (
      "Notifications portail temporel", "legendary", 1500,
      "Each notification steps out of a triangular time portal that opens, then closes behind it as it leaves.",
      "Chaque notification sort d'un portail temporel triangulaire qui s'ouvre, puis se referme derrière elle quand elle part."),
+    ("notif_ignite", "notification_animation", "animation", "ignite", "Ignite notifications",
+     "Notifications embrasement", "epic", 1100, "They burst out of flames — and go up in flames. Drawn by the graphics chip.",
+     "Elles jaillissent des flammes — et partent en fumée. Dessinées par la puce graphique."),
+    ("notif_surge", "notification_animation", "animation", "surge", "Power surge notifications",
+     "Notifications surtension", "epic", 1100, "Electricity crackles round them as they arrive and leave. Drawn by the graphics chip.",
+     "L'électricité crépite autour d'elles à l'arrivée et au départ. Dessinées par la puce graphique."),
+    ("notif_splash", "notification_animation", "animation", "splash", "Splash notifications",
+     "Notifications éclaboussure", "epic", 1000, "They surface from a splash of water — and sink back. Drawn by the graphics chip.",
+     "Elles surgissent d'une éclaboussure — et y replongent. Dessinées par la puce graphique."),
+    ("notif_frostbite", "notification_animation", "animation", "frostbite", "Frostbite notifications",
+     "Notifications morsure du givre", "epic", 1000, "Frost grows round them, then shatters as they go. Drawn by the graphics chip.",
+     "Le givre les entoure, puis se brise quand elles partent. Dessinées par la puce graphique."),
+    ("notif_stardust", "notification_animation", "animation", "stardust", "Stardust notifications",
+     "Notifications poussière d'étoiles", "epic", 1100, "A galaxy swirls them in and out. Drawn by the graphics chip.",
+     "Une galaxie les fait apparaître et disparaître en tourbillonnant. Dessinées par la puce graphique."),
+    ("notif_hex", "notification_animation", "animation", "hex", "Hex notifications",
+     "Notifications sortilège", "epic", 1100, "Runes flare round them as they are summoned and dismissed. Drawn by the graphics chip.",
+     "Des runes s'embrasent quand elles sont invoquées puis renvoyées. Dessinées par la puce graphique."),
+    ("notif_decrypt", "notification_animation", "animation", "decrypt", "Decrypt notifications",
+     "Notifications décryptage", "epic", 1000, "Digital rain decrypts them — and encrypts them away. Drawn by the graphics chip.",
+     "La pluie numérique les décrypte — puis les chiffre en partant. Dessinées par la puce graphique."),
+    ("notif_petalfall", "notification_animation", "animation", "petalfall", "Petal fall notifications",
+     "Notifications chute de pétales", "rare", 900, "A gust of petals brings them and takes them away. Drawn by the graphics chip.",
+     "Une bourrasque de pétales les apporte et les emporte. Dessinées par la puce graphique."),
+    ("notif_eclipse", "notification_animation", "animation", "eclipse", "Eclipse notifications",
+     "Notifications éclipse", "epic", 1100, "Black smoke parts to let them out — and swallows them. Drawn by the graphics chip.",
+     "Une fumée noire s'écarte pour les laisser sortir — et les avale. Dessinées par la puce graphique."),
+    ("notif_warp", "notification_animation", "animation", "warp", "Time warp notifications",
+     "Notifications distorsion temporelle", "legendary", 1500, "They step out of a triangular time portal that closes behind them. Drawn by the graphics chip.",
+     "Elles sortent d'un portail temporel triangulaire qui se referme derrière elles. Dessinées par la puce graphique."),
 ):  # fmt: skip
     _p(key, kind, price, rarity, en, fr, en_about, fr_about, {field: value}, collection="looks",
        icon="bell" if kind == "notification_style" else "sparkles")  # fmt: skip
@@ -520,6 +550,14 @@ for key, value, en, fr, rarity, price, level in (
     ("effect_rewind", "rewind", "Rewind", "Rembobinage", "rare", 400, None),
     ("effect_bloom", "bloom", "Bloom", "Éclosion", "rare", 450, None),
     ("effect_tracker", "tracker", "Motion tracker", "Détecteur de mouvement", "epic", 650, 6),
+    ("effect_nova", "nova", "Supernova", "Supernova", "legendary", 1600, 12),
+    ("effect_goldshower", "goldshower", "Gold shower", "Pluie d'or", "epic", 1200, 8),
+    ("effect_petalstorm", "petalstorm", "Petal storm", "Tempête de pétales", "epic", 1100, 8),
+    ("effect_rebirth", "rebirth", "Phoenix rebirth", "Renaissance du phénix", "legendary", 1600, 12),
+    ("effect_stormstrike", "stormstrike", "Storm strike", "Coup de tonnerre", "epic", 1200, 8),
+    ("effect_skyveil", "skyveil", "Aurora veil", "Voile d'aurore", "epic", 1200, 8),
+    ("effect_arcana", "arcana", "Arcana", "Arcanes", "epic", 1200, 8),
+    ("effect_timerift", "timerift", "Time rift", "Faille temporelle", "legendary", 1800, 12),
 ):  # fmt: skip
     _p(key, "effect", price, rarity, f"{en} celebration", f"Célébration {fr.lower()}",
        f"{en} burst out when you earn a reward or level up.",
@@ -625,24 +663,27 @@ for value, (en, fr, rarity, price) in AMBIENT_NAMES.items():
        {"ambient": value}, collection="ambients", icon="snowflake",
        level=10 if rarity == "legendary" else 5 if rarity == "epic" else None)  # fmt: skip
 
-# --------------------------------------------------------------------------------- animated profile backgrounds
-for value in ("starfield", "code-rain", "snow", "embers", "petals", "aurora", "disco", "bats", "fireflies",
-              "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash", "vhs", "bokeh", "nostromo"):  # fmt: skip
+# --------------------------------------------------------------------------------- animated banners (#79)
+# the profile's banner can be animated — an ambience playing inside it, for every visitor to see (the
+# animated background behind the portal stays each member's own choice, in Appearance)
+LIVE_BANNERS = ("starfield", "code-rain", "snow", "embers", "petals", "aurora", "disco", "bats", "fireflies",
+                "rain", "spores", "hearts", "upsidedown", "veins", "meadow", "ash", "vhs", "bokeh", "nostromo")  # fmt: skip
+HD_LIVE_BANNERS = ("inferno", "thunderstorm", "reef", "volcano", "whiteout", "blackhole", "liquidmetal", "neoncity",
+                   "matrix", "goldenhour", "darkness", "lavalamp", "polar", "plasma")  # fmt: skip
+for value in LIVE_BANNERS:
     en, fr, rarity, price = AMBIENT_NAMES[value]
     rarity = "legendary" if value == "aurora" else "epic" if rarity in ("epic", "legendary") else "rare"
-    _p(f"bg_{value.replace('-', '_')}", "profile_background", {"rare": 450, "epic": 800, "legendary": 1300}[rarity],
-       rarity, f"{en} profile background", f"Fond de profil {fr.lower()}",
-       f"{en} animated behind your profile, for every visitor to see.",
-       f"{fr} animés derrière votre profil, pour tous vos visiteurs.", {"background": value},
-       collection="backgrounds", icon="sparkles", level=12 if rarity == "legendary" else 6 if rarity == "epic" else None)  # fmt: skip
-
-# #78: profile backgrounds drawn by the GPU (the premium ambiences behind a profile)
-for value in ("inferno", "thunderstorm", "reef", "volcano", "whiteout", "blackhole", "liquidmetal", "neoncity", "matrix", "goldenhour", "darkness", "lavalamp", "polar", "plasma"):  # fmt: skip
+    _p(f"banner_live_{value.replace('-', '_')}", "profile_banner", {"rare": 450, "epic": 800, "legendary": 1300}[rarity],
+       rarity, f"{en} animated banner", f"Bannière animée {fr.lower()}",
+       f"{en} playing in your profile's banner, for every visitor to see.",
+       f"{fr} dans la bannière de votre profil, pour tous vos visiteurs.", {"banner": f"live-{value}"},
+       collection="profile", icon="image", level=12 if rarity == "legendary" else 6 if rarity == "epic" else None)  # fmt: skip
+for value in HD_LIVE_BANNERS:  # #78: drawn by the graphics chip
     en, fr, rarity, price = AMBIENT_NAMES[value]
-    _p(f"bg_{value}", "profile_background", 1100, "epic", f"{en} profile background", f"Fond de profil {fr.lower()}",
-       f"{en} behind your profile, drawn by the graphics chip, for every visitor to see.",
-       f"{fr} derrière votre profil, dessiné par la puce graphique, pour tous vos visiteurs.",
-       {"background": value}, collection="backgrounds", icon="sparkles", level=8)  # fmt: skip
+    _p(f"banner_live_{value}", "profile_banner", 1100, "epic", f"{en} animated banner", f"Bannière animée {fr.lower()}",
+       f"{en} in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+       f"{fr} dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs.",
+       {"banner": f"live-{value}"}, collection="profile", icon="image", level=8)  # fmt: skip
 
 # --------------------------------------------------------------------------------- banners and frames
 for key, value, en, fr, rarity, price, level, en_about, fr_about in (
@@ -842,6 +883,16 @@ for value, en, fr, rarity, price, level in (
     ("ice", "Ice", "Glace", "rare", 400, None),
     ("rainbow", "Rainbow", "Arc-en-ciel", "epic", 700, 5),
     ("royal", "Royal", "Royal", "legendary", 1300, 12),
+    ("nameblaze", "Inferno", "Ardent", "epic", 1100, 8),
+    ("namevolt", "Live wire", "Sous tension", "epic", 1100, 8),
+    ("namefrost", "Frozen", "Givré", "epic", 1000, 8),
+    ("namegalaxy", "Starborn", "Né des étoiles", "epic", 1100, 8),
+    ("namegold", "Gilded", "Doré", "legendary", 1500, 12),
+    ("nameshadow", "Shadowed", "Ombreux", "epic", 1100, 8),
+    ("namesakura", "Blossom", "En fleurs", "rare", 900, 6),
+    ("nameplasma", "Plasma", "Plasma", "epic", 1100, 8),
+    ("nameaurora", "Aurora", "Aurore", "epic", 1100, 8),
+    ("namechrono", "Out of time", "Hors du temps", "legendary", 1600, 12),
 ):  # fmt: skip
     _p(f"name_{value}", "name_style", price, rarity, f"{en} name style", f"Style de nom {fr.lower()}",
        "A font and an effect for your name on your profile.", "Une police et un effet pour votre nom sur votre profil.",
@@ -1873,8 +1924,8 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      ["widget_poster_wall", "opt_style_wall_kenburns", "opt_style_continue_ambient", "title_cinephile",
       "badge_binge_watcher", "backdrop_banner"], "legendary", 10),
     ("pack_profile_star", "Star profile pack", "Pack Profil star",
-     "The starfield banner and background, the golden frame and the royal name style.",
-     "La bannière et le fond étoilés, le cadre doré et le style de nom royal.",
+     "The starfield banner and its animated version, the golden frame and the royal name style.",
+     "La bannière étoilée et sa version animée, le cadre doré et le style de nom royal.",
      ["banner_starfield", "bg_starfield", "frame_gold", "name_royal"], "legendary", 12),
     ("pack_notifications", "Notification designer pack", "Pack Designer de notifications",
      "Nine notification styles and six animations.",
@@ -1906,8 +1957,8 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      "Les widgets top de la semaine, sorties à venir, demandes bientôt là et prochaines sorties.",
      ["widget_media_top", "widget_media_upcoming", "widget_my_soon", "widget_next_releases"], "epic", 4),
     ("pack_animated_profile", "Living profile pack", "Pack Profil vivant",
-     "An aurora background, the hologram frame, the rainbow name and the nebula banner.",
-     "Un fond aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse.",
+     "An animated aurora banner, the hologram frame, the rainbow name and the nebula banner.",
+     "Une bannière animée aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse.",
      ["bg_aurora", "frame_hologram", "name_rainbow", "banner_nebula"], "legendary", 15),
     # 027: level badges, level-up moments, elements, retro, comics, cosmos
     ("pack_level_badges", "Level badge pack", "Pack Badges de niveau",
@@ -2024,70 +2075,83 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      ["level_blaze", "level_voltage", "level_aqua", "level_magma", "level_glacier", "level_galaxy", "level_aurum", "level_toxic", "level_holo", "level_runes", "level_matrix", "level_sakura", "level_shadow", "level_candy", "level_aurora", "level_plasma", "level_chrono"], "epic", 10),
     # #78: one pack per world drawn by the GPU, and one per kind
     ("pack_hd_blaze", "Blaze HD pack", "Pack Brasier HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_blaze", "notif_blaze", "frame_pyre", "title_firebrand", "badge_phoenix_feather", "levelup_phoenix", "bg_inferno"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_blaze", "notif_blaze", "frame_pyre", "title_firebrand", "badge_phoenix_feather", "levelup_phoenix", "bg_inferno", "notif_ignite", "name_nameblaze", "effect_rebirth"], "epic", 10),
     ("pack_hd_voltage", "High voltage HD pack", "Pack Haute tension HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_voltage", "notif_voltage", "frame_tesla", "title_stormcaller", "badge_thunderbolt", "levelup_thunderstrike", "bg_thunderstorm"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_voltage", "notif_voltage", "frame_tesla", "title_stormcaller", "badge_thunderbolt", "levelup_thunderstrike", "bg_thunderstorm", "notif_surge", "name_namevolt", "effect_stormstrike"], "epic", 10),
     ("pack_hd_ocean", "Ocean HD pack", "Pack Océan HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_aqua", "notif_aqua", "frame_abyssal", "title_deep_diver", "badge_trident", "levelup_tidalwave", "bg_reef"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_aqua", "notif_aqua", "frame_abyssal", "title_deep_diver", "badge_trident", "levelup_tidalwave", "bg_reef", "notif_splash"], "epic", 10),
     ("pack_hd_volcano", "Volcano HD pack", "Pack Volcan HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et fond de profil.",
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée.",
      ["level_magma", "notif_magma", "frame_obsidian", "title_volcano_heart", "badge_lava_stone", "bg_volcano"], "epic", 10),
     ("pack_hd_ice", "Ice HD pack", "Pack Glace HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et fond de profil.",
-     ["level_glacier", "notif_glacier", "frame_frostcrown", "title_frostborn", "badge_snowflake", "bg_whiteout"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée.",
+     ["level_glacier", "notif_glacier", "frame_frostcrown", "title_frostborn", "badge_snowflake", "bg_whiteout", "notif_frostbite", "name_namefrost"], "epic", 10),
     ("pack_hd_cosmos", "Cosmos HD pack", "Pack Cosmos HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_galaxy", "notif_galaxy", "frame_starlit", "title_stargazer", "badge_comet", "levelup_supernova", "bg_blackhole"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_galaxy", "notif_galaxy", "frame_starlit", "title_stargazer", "badge_comet", "levelup_supernova", "bg_blackhole", "notif_stardust", "name_namegalaxy", "effect_nova"], "epic", 10),
     ("pack_hd_treasure", "Treasure HD pack", "Pack Trésor HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_aurum", "notif_aurum", "frame_regalia", "title_golden_one", "badge_golden_crown", "levelup_goldrush", "bg_liquidmetal"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_aurum", "notif_aurum", "frame_regalia", "title_golden_one", "badge_golden_crown", "levelup_goldrush", "bg_liquidmetal", "name_namegold", "effect_goldshower"], "epic", 10),
     ("pack_hd_toxic", "Toxic HD pack", "Pack Toxique HD",
      "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge.",
      "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge.",
      ["level_toxic", "notif_toxic", "frame_biohazard", "title_mad_scientist", "badge_radioactive"], "epic", 10),
     ("pack_hd_cyber", "Cyber HD pack", "Pack Cyber HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et fond de profil.",
-     ["level_holo", "notif_holo", "frame_prism", "title_netrunner", "badge_chrome_chip", "bg_neoncity", "level_matrix", "notif_matrix", "frame_mainframe", "title_root_access", "badge_backdoor", "bg_matrix"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée.",
+     ["level_holo", "notif_holo", "frame_prism", "title_netrunner", "badge_chrome_chip", "bg_neoncity", "level_matrix", "notif_matrix", "frame_mainframe", "title_root_access", "badge_backdoor", "bg_matrix", "notif_decrypt"], "epic", 10),
     ("pack_hd_arcane", "Arcana HD pack", "Pack Arcanes HD",
      "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up.",
      "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau.",
-     ["level_runes", "notif_runes", "frame_sigil", "title_runemaster", "badge_grimoire", "levelup_arcanum"], "epic", 10),
+     ["level_runes", "notif_runes", "frame_sigil", "title_runemaster", "badge_grimoire", "levelup_arcanum", "notif_hex", "effect_arcana"], "epic", 10),
     ("pack_hd_sakura", "Sakura HD pack", "Pack Sakura HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_sakura", "notif_sakura", "frame_hanami", "title_spring_spirit", "badge_blossom", "levelup_sakurastorm", "bg_goldenhour"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_sakura", "notif_sakura", "frame_hanami", "title_spring_spirit", "badge_blossom", "levelup_sakurastorm", "bg_goldenhour", "notif_petalfall", "name_namesakura", "effect_petalstorm"], "epic", 10),
     ("pack_hd_shadow", "Shadows HD pack", "Pack Ombres HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et fond de profil.",
-     ["level_shadow", "notif_shadow", "frame_wraith", "title_shadow_walker", "badge_watcher", "bg_darkness"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée.",
+     ["level_shadow", "notif_shadow", "frame_wraith", "title_shadow_walker", "badge_watcher", "bg_darkness", "notif_eclipse", "name_nameshadow"], "epic", 10),
     ("pack_hd_candy", "Candy HD pack", "Pack Bonbons HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et fond de profil.",
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée.",
      ["level_candy", "notif_candy", "frame_sweetie", "title_sugar_rush", "badge_lollipop", "bg_lavalamp"], "epic", 10),
     ("pack_hd_aurora", "Aurora HD pack", "Pack Aurore HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et fond de profil.",
-     ["level_aurora", "notif_aurora", "frame_borealis", "title_northern_light", "badge_north_star", "levelup_aurorasky", "bg_polar"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée.",
+     ["level_aurora", "notif_aurora", "frame_borealis", "title_northern_light", "badge_north_star", "levelup_aurorasky", "bg_polar", "name_nameaurora", "effect_skyveil"], "epic", 10),
     ("pack_hd_plasma", "Plasma HD pack", "Pack Plasma HD",
-     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and profile background.",
-     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et fond de profil.",
-     ["level_plasma", "notif_plasma", "frame_corona", "title_plasma_core", "badge_atom", "bg_plasma"], "epic", 10),
+     "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner.",
+     "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée.",
+     ["level_plasma", "notif_plasma", "frame_corona", "title_plasma_core", "badge_atom", "bg_plasma", "name_nameplasma"], "epic", 10),
     ("pack_hd_time_portal", "Time portal HD pack", "Pack Portail temporel HD",
-     "Step through time: the time rift level badge, time portal notifications, the time gate frame, the time traveller title, the hourglass badge and the time portal level-up.",
-     "Traversez le temps : badge de niveau faille temporelle, notifications portail temporel, cadre porte du temps, titre voyageur temporel, badge sablier et passage de niveau portail temporel.",
-     ["level_chrono", "notif_chrono", "frame_chronogate", "title_time_traveller", "badge_hourglass", "levelup_timeportal"],
+     "Step through time: the time rift level badge, time portal notifications and their time warp, the time gate frame, the time traveller title, the hourglass badge, the « out of time » name, the time portal level-up and the time rift celebration.",
+     "Traversez le temps : badge de niveau faille temporelle, notifications portail temporel et leur distorsion, cadre porte du temps, titre voyageur temporel, badge sablier, nom « hors du temps », passage de niveau portail temporel et célébration faille temporelle.",
+     ["level_chrono", "notif_chrono", "frame_chronogate", "title_time_traveller", "badge_hourglass", "levelup_timeportal",
+      "notif_warp", "name_namechrono", "effect_timerift"],
      "legendary", 12),
+    ("pack_hd_animations", "HD notification animations pack", "Pack Animations de notification HD",
+     "Every notification animation drawn by the graphics chip: each bursts as they arrive and leave.",
+     "Toutes les animations de notification dessinées par la puce graphique : chacune éclate à leur arrivée et à leur départ.",
+     ["notif_ignite", "notif_surge", "notif_splash", "notif_frostbite", "notif_stardust", "notif_hex", "notif_decrypt", "notif_petalfall", "notif_eclipse", "notif_warp"], "epic", 10),
+    ("pack_hd_celebrations", "HD celebrations pack", "Pack Célébrations HD",
+     "Every reward celebration drawn by the graphics chip, over the whole screen.",
+     "Toutes les célébrations de récompense dessinées par la puce graphique, sur tout l'écran.",
+     ["effect_nova", "effect_goldshower", "effect_petalstorm", "effect_rebirth", "effect_stormstrike", "effect_skyveil", "effect_arcana", "effect_timerift"], "epic", 10),
+    ("pack_hd_names", "HD name styles pack", "Pack Styles de nom HD",
+     "Every name style drawn by the graphics chip: an aura around your name.",
+     "Tous les styles de nom dessinés par la puce graphique : une aura autour de votre nom.",
+     ["name_nameblaze", "name_namevolt", "name_namefrost", "name_namegalaxy", "name_namegold", "name_nameshadow", "name_namesakura", "name_nameplasma", "name_nameaurora", "name_namechrono"], "epic", 10),
     ("pack_hd_notifications", "HD notifications pack", "Pack Notifications HD",
      "Every notification style drawn by the graphics chip.", "Tous les styles de notification dessinés par la puce graphique.",
      ["notif_blaze", "notif_voltage", "notif_aqua", "notif_magma", "notif_glacier", "notif_galaxy", "notif_aurum", "notif_toxic", "notif_holo", "notif_runes", "notif_matrix", "notif_sakura", "notif_shadow", "notif_candy", "notif_aurora", "notif_plasma", "notif_chrono"], "epic", 10),
@@ -2118,6 +2182,28 @@ _p("pack_server_room", "bundle", None, "legendary", "Server room pack", "Pack Sa
                  "opt_chart_storage", "opt_chart_week"]},
    collection="packs", icon="server", level=15, contribution=30)  # fmt: skip
 
+# #79: no animated background behind a profile (the portal's ambience is each member's own choice): the
+# profile backgrounds are retired — their animated banners take their place, in every pack that held one
+_BACKGROUNDS = [product["key"] for product in SHOP if product["type"] == "profile_background"]
+_KEYS = {product["key"] for product in SHOP}
+for product in SHOP:
+    if product["type"] == "bundle":
+        held: list[str] = []
+        for item in product["payload"]["products"]:
+            if item.startswith("bg_"):
+                item = "banner_live_" + item[3:]
+                if item not in _KEYS:
+                    continue
+            if item not in held:
+                held.append(item)
+        product["payload"]["products"] = held
+SHOP[:] = [product for product in SHOP if product["type"] != "profile_background"]
+RETIRED = (
+    *RETIRED,
+    *(f"bg_{v.replace('-', '_')}" for v in (*LIVE_BANNERS, *HD_LIVE_BANNERS)),
+    "bg_night_owl",
+)
+
 # rarities stay rare: legendary for a handful of flagship items, the cheaper « rare » ones are common
 # 027: a handful of legendaries (the flagships), rare from 600 Coins, epic from 1000 — most of the shop common
 LEGENDARY = {
@@ -2127,6 +2213,7 @@ LEGENDARY = {
     "ambient_blackhole", "ambient_volcano", "ambient_thunderstorm", "ambient_neoncity", "ambient_weather", "ambient_lavalamp", "ambient_impasto", "ambient_reef", "level_blaze",
     "frame_starlit", "levelup_supernova", "levelup_phoenix", "frame_regalia",
     "level_chrono", "notif_chrono", "frame_chronogate", "levelup_timeportal", "pack_hd_time_portal",
+    "notif_warp", "effect_timerift", "effect_nova", "effect_rebirth", "name_namegold", "name_namechrono",
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:

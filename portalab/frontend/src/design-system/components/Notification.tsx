@@ -11,7 +11,7 @@ import {
 import { Link, useInRouterContext } from "react-router";
 import { usePreferences } from "../a11y/PreferencesProvider";
 import { sound } from "../sound/SoundService";
-import { FX_NOTIFICATION_SHAPES, FX_STYLES } from "../themes/premium/fxLooks";
+import { FX_NOTIFICATION_ANIMATIONS, FX_NOTIFICATION_SHAPES, FX_STYLES } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
 import { FxLayer } from "./Fx";
 import { Icon } from "./Icon";
@@ -119,6 +119,7 @@ export function Notification({
   leaving = false,
   fx,
   fxShape,
+  burst,
 }: {
   item: NotificationItem;
   onDismiss?: () => void;
@@ -129,6 +130,8 @@ export function Notification({
   fx?: string | undefined;
   /** #78: the shape it draws itself in (not always a rectangle) */
   fxShape?: number | undefined;
+  /** #78: the GPU effect bursting as it appears and as it leaves (its animation) */
+  burst?: string | undefined;
 }) {
   const tone = item.tone ?? item.severity;
   const internal = item.href?.startsWith("/") && !item.href.startsWith("//");
@@ -139,10 +142,15 @@ export function Notification({
       data-tone={tone}
       data-leaving={leaving || undefined}
       data-fx={fx}
+      data-burst={burst ? "true" : undefined}
       data-fx-shape={fx ? (fxShape ?? 0) : undefined}
       role={item.severity === "critical" ? "alert" : "status"}
     >
       {fx ? <FxLayer effect={fx} calm shape={fxShape ?? 0} /> : null}
+      {burst ? (
+        // only around it: the notification keeps the look chosen for it — the animation is only its arrival
+        <FxLayer effect={`burst:${burst}`} shape={fxShape ?? 0} aura className="fx-layer fx-layer--burst" />
+      ) : null}
       <span className="ds-notification__icon" aria-hidden="true">
         <Icon name={item.icon ?? TONE_ICON[tone]} size={20} />
       </span>
@@ -177,6 +185,7 @@ export function Notification({
 
 /** 027: how long a notification takes to leave (its exit animation). */
 const EXIT_MS = 520;
+const FX_EXIT_MS = 800;
 
 interface NotifyContextValue {
   notify: (item: Omit<NotificationItem, "id">) => void;
@@ -209,9 +218,13 @@ export function NotificationArea({ children }: { children: ReactNode }) {
         return;
       }
       setLeaving((current) => new Set(current).add(id));
-      window.setTimeout(remove, EXIT_MS);
+      // #78: an animation drawn by the GPU bursts again as it leaves — a little longer to see it
+      window.setTimeout(
+        remove,
+        FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation] ? FX_EXIT_MS : EXIT_MS,
+      );
     },
-    [reduced],
+    [reduced, looks.notificationAnimation],
   );
   const notify = useCallback((item: Omit<NotificationItem, "id">) => {
     counter.current += 1;
@@ -255,6 +268,7 @@ export function NotificationArea({ children }: { children: ReactNode }) {
             leaving={leaving.has(item.id)}
             fx={FX_STYLES[looks.notificationStyle]}
             fxShape={FX_NOTIFICATION_SHAPES[looks.notificationStyle]}
+            burst={FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation]}
           />
         ))}
       </section>

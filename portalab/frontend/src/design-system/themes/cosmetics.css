@@ -2422,3 +2422,129 @@
 .ds-notification[data-fx]::after {
   display: none;
 }
+
+/* #78: a notification animation drawn by the GPU — the effect bursts around it, wider than itself, while
+   the notification itself materialises out of it (and dissolves into it as it leaves) */
+.fx-layer--burst {
+  inset: -2.2rem -1.6rem -1.6rem;
+  z-index: 2;
+  inline-size: calc(100% + 3.2rem);
+  block-size: calc(100% + 3.8rem);
+}
+.ds-notification[data-burst] {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  animation: fx-materialise 0.7s ease-out both;
+}
+.ds-notification[data-burst][data-leaving] {
+  animation: fx-dissolve 0.75s ease-in both;
+}
+@keyframes fx-materialise {
+  from {
+    opacity: 0;
+    filter: blur(6px) brightness(2);
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+@keyframes fx-dissolve {
+  to {
+    opacity: 0;
+    filter: blur(6px) brightness(2);
+    transform: scale(0.96);
+  }
+}
+/* #78: a name style drawn by the GPU — an aura around the name, its letters bright over it */
+.name-style[data-fx-name] {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  padding-inline: 0.15em;
+  border-radius: 0.4em;
+  color: #fff;
+  text-shadow:
+    0 0 6px rgb(255 255 255 / 55%),
+    0 1px 2px rgb(0 0 0 / 80%);
+}
+.fx-layer--name {
+  inset: -0.9em -0.7em -0.5em;
+  inline-size: calc(100% + 1.4em);
+  block-size: calc(100% + 1.4em);
+}
+/* #78: a celebration drawn by the GPU over the whole screen, fading out at its end */
+.celebration-gpu {
+  position: fixed;
+  inset: 0;
+  inline-size: 100vw;
+  block-size: 100vh;
+  pointer-events: none;
+  animation: fx-celebration-out 3.2s linear both;
+}
+.ds-celebration[data-contained] .celebration-gpu {
+  position: absolute;
+  inline-size: 100%;
+  block-size: 100%;
+}
+@keyframes fx-celebration-out {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-notification[data-burst],
+  .ds-notification[data-burst][data-leaving] {
+    animation: none;
+  }
+}
+/* #79: an animated banner — the ambience plays inside the banner's box */
+.profile-banner[data-banner="live"] {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0b1020, #141b33);
+}
+.profile-banner[data-banner="live"] > .ambient {
+  position: absolute;
+  inset: 0;
+}
+/* #78: the time portal as a teleporter — the badge's letters come and go with its portal (9 s, in step
+   with the GPU's cycle: the portal opens, the badge materialises, stays, dematerialises, the portal closes) */
+[data-fx-cycle] > :not(canvas) {
+  animation: fx-teleport 9s linear infinite;
+}
+@keyframes fx-teleport {
+  0%,
+  8.9% {
+    opacity: 0;
+    filter: blur(4px) brightness(2.5);
+    transform: scale(0.6);
+  }
+  15.6%,
+  72.2% {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+  78.9%,
+  100% {
+    opacity: 0;
+    filter: blur(4px) brightness(2.5);
+    transform: scale(0.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-fx-cycle] > :not(canvas) {
+    animation: none;
+  }
+}
+:root[data-reduced-motion="true"] [data-fx-cycle] > :not(canvas) {
+  animation: none;
+}

@@ -354,7 +354,9 @@ class Catalog:
         q: str | None = None,
         states: tuple[str, ...] = ("available",),
         owned_ids: set[UUID] | None = None,
-        limit: int = 500,
+        # the shop's whole catalogue in one answer: past 500 products, the last ones (themes, titles…) were
+        # silently cut off (#80)
+        limit: int = 2000,
     ) -> list[tuple[Product, ProductVersion]]:
         statement = (
             select(Product, ProductVersion)

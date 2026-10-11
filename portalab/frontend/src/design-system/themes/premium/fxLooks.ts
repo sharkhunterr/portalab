@@ -71,8 +71,45 @@ export const FX_NOTIFICATION_SHAPES: Record<string, number> = {
   plasma: 0,
   chrono: 6,
 };
-/** name styles drawn by the GPU (#78) */
-export const FX_NAMES: Record<string, string> = {};
+/** #78: name styles drawn by the GPU — an aura around the name (its letters stay its own) */
+export const FX_NAMES: Record<string, string> = {
+  nameblaze: "blaze",
+  namevolt: "voltage",
+  namefrost: "glacier",
+  namegalaxy: "galaxy",
+  namegold: "aurum",
+  nameshadow: "shadow",
+  namesakura: "sakura",
+  nameplasma: "plasma",
+  nameaurora: "aurora",
+  namechrono: "chrono",
+};
+
+/** #78: notification animations drawn by the GPU — an effect bursting as it appears and as it leaves */
+export const FX_NOTIFICATION_ANIMATIONS: Record<string, string> = {
+  ignite: "blaze",
+  surge: "voltage",
+  splash: "aqua",
+  frostbite: "glacier",
+  stardust: "galaxy",
+  hex: "runes",
+  decrypt: "matrix",
+  petalfall: "sakura",
+  eclipse: "shadow",
+  warp: "chrono",
+};
+
+/** #78: reward celebrations drawn by the GPU over the whole screen (and from when in their timeline) */
+export const FX_CELEBRATIONS: Record<string, { effect: string; from: number }> = {
+  nova: { effect: "supernova", from: 0.3 },
+  goldshower: { effect: "goldrush", from: 0 },
+  petalstorm: { effect: "sakurastorm", from: 0.3 },
+  rebirth: { effect: "phoenix", from: 0.9 },
+  stormstrike: { effect: "thunderstrike", from: 0 },
+  skyveil: { effect: "aurorasky", from: 0.9 },
+  arcana: { effect: "arcanum", from: 0.5 },
+  timerift: { effect: "timeportal", from: 0.8 },
+};
 
 /** avatar frames, each in a shape of its own */
 export const FX_FRAMES: Record<string, FxSpec> = {
@@ -126,20 +163,20 @@ export const FX_PRODUCTS: ReadonlySet<string> = new Set([
   "badge_thunderbolt",
   "badge_trident",
   "badge_watcher",
-  "bg_blackhole",
-  "bg_darkness",
-  "bg_goldenhour",
-  "bg_inferno",
-  "bg_lavalamp",
-  "bg_liquidmetal",
-  "bg_matrix",
-  "bg_neoncity",
-  "bg_plasma",
-  "bg_polar",
-  "bg_reef",
-  "bg_thunderstorm",
-  "bg_volcano",
-  "bg_whiteout",
+  "banner_live_blackhole",
+  "banner_live_darkness",
+  "banner_live_goldenhour",
+  "banner_live_inferno",
+  "banner_live_lavalamp",
+  "banner_live_liquidmetal",
+  "banner_live_matrix",
+  "banner_live_neoncity",
+  "banner_live_plasma",
+  "banner_live_polar",
+  "banner_live_reef",
+  "banner_live_thunderstorm",
+  "banner_live_volcano",
+  "banner_live_whiteout",
   "frame_abyssal",
   "frame_biohazard",
   "frame_borealis",
@@ -218,6 +255,34 @@ export const FX_PRODUCTS: ReadonlySet<string> = new Set([
   "title_time_traveller",
   "badge_hourglass",
   "levelup_timeportal",
+  "notif_ignite",
+  "notif_surge",
+  "notif_splash",
+  "notif_frostbite",
+  "notif_stardust",
+  "notif_hex",
+  "notif_decrypt",
+  "notif_petalfall",
+  "notif_eclipse",
+  "notif_warp",
+  "effect_nova",
+  "effect_goldshower",
+  "effect_petalstorm",
+  "effect_rebirth",
+  "effect_stormstrike",
+  "effect_skyveil",
+  "effect_arcana",
+  "effect_timerift",
+  "name_nameblaze",
+  "name_namevolt",
+  "name_namefrost",
+  "name_namegalaxy",
+  "name_namegold",
+  "name_nameshadow",
+  "name_namesakura",
+  "name_nameplasma",
+  "name_nameaurora",
+  "name_namechrono",
 ]);
 
 /** CSS clip of an avatar inside a shaped frame. */

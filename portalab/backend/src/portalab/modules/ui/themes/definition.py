@@ -252,6 +252,16 @@ NOTIFICATION_ANIMATIONS = Literal[
     "tracking",
     "morph",
     "uplink",
+    "ignite",
+    "surge",
+    "splash",
+    "frostbite",
+    "stardust",
+    "hex",
+    "decrypt",
+    "petalfall",
+    "eclipse",
+    "warp",
 ]
 AMBIENTS = Literal[
     "none",
@@ -367,6 +377,14 @@ CELEBRATIONS = Literal[
     "rewind",
     "bloom",
     "tracker",
+    "nova",
+    "goldshower",
+    "petalstorm",
+    "rebirth",
+    "stormstrike",
+    "skyveil",
+    "arcana",
+    "timerift",
 ]
 PATTERNS = Literal[
     "none",

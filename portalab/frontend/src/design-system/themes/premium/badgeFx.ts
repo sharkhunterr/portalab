@@ -63,7 +63,10 @@ uniform vec2 u_res;
 uniform float u_time;
 uniform vec4 u_box; // the shape in the canvas: centre x, y and half width, height (pixels)
 uniform float u_round; // its corner radius, in half heights (1: a pill, or a circle when square)
-uniform float u_calm; // 1: text is written over it — its inside is kept dark enough to read
+uniform float u_calm; // 1: text is written over it — its inside is kept dark enough to read;
+// 2: an aura — nothing is drawn inside the shape (a name keeps its own letters)
+uniform float u_cycle; // 1: a looks that comes and goes over and over (the time portal as a teleporter)
+uniform float u_burst; // 1: a burst — it flares as the element appears and again as it leaves, then fades
 uniform float u_age; // seconds since it appeared (the level-up moments' timeline)
 uniform float u_hue; // a colour variant: the hue turned by this angle (a blue flame, a green bolt…)
 uniform float u_shape; // 0 rounded box, 1 hexagon, 2 diamond, 3 shield, 4 star, 5 triangle (frames);
@@ -723,6 +726,16 @@ const EFFECTS: Record<FxBadge, string> = {
   float open = smoothstep(0.0, 0.9, u_age);
   float closing = u_close < 0.0 ? 1.0 : 1.0 - smoothstep(0.0, 0.45, u_close);
   float k = open * closing;
+  float shown = max(k, 0.25);
+  float flash = exp(-u_age * 4.0) + (u_close < 0.0 ? 0.0 : exp(-u_close * 6.0));
+  if (u_cycle > 0.5) {
+    // a teleporter, over and over: the portal opens, the badge materialises, stays, dematerialises, the
+    // portal closes — a pause — and again (its letters follow the same cycle in CSS: fx-teleport, 9 s)
+    float tc = mod(u_age, 9.0);
+    k = smoothstep(0.0, 0.8, tc) * (1.0 - smoothstep(7.1, 7.9, tc));
+    shown = smoothstep(0.8, 1.4, tc) * (1.0 - smoothstep(6.5, 7.1, tc));
+    flash = exp(-abs(tc - 1.1) * 7.0) + exp(-abs(tc - 6.8) * 7.0);
+  }
   float rot = (1.0 - k) * 2.6 + sin(t * 0.6) * 0.05;
   vec2 tp = mat2(cos(rot), -sin(rot), sin(rot), cos(rot)) * (p - vec2(0.0, -0.1));
   float size = (max(ax, 1.0) * 0.9 + 0.75) * max(k, 0.001);
@@ -732,7 +745,6 @@ const EFFECTS: Record<FxBadge, string> = {
   o = over(o, seen, smoothstep(0.02, -0.04, tri) * 0.92 * k);
   o = over(o, vec3(0.4, 0.75, 1.0), exp(-abs(tri - crackle) * 14.0) * k);
   o = over(o, vec3(1.0, 0.95, 0.8), exp(-abs(tri) * 45.0) * k);
-  float flash = exp(-u_age * 4.0) + (u_close < 0.0 ? 0.0 : exp(-u_close * 6.0));
   o = over(o, vec3(0.8, 0.9, 1.0), flash * exp(-length(p) * 1.5) * 0.7);
   for (int i = 0; i < 8; i++) {
     float fi = float(i);
@@ -743,7 +755,7 @@ const EFFECTS: Record<FxBadge, string> = {
   }
   vec3 body = vortex(p * 0.8, t) * 0.75;
   body += vec3(0.5, 0.8, 1.0) * smoothstep(-0.15, 0.0, d) * 0.6;
-  o = over(o, body, smoothstep(0.03, -0.03, d) * max(k, 0.25));
+  o = over(o, body, smoothstep(0.03, -0.03, d) * shown);
 `,
   // the time portal, full stage: its three sides draw one after another, it tears open, pulls everything
   // in, flashes — and closes again
@@ -788,7 +800,17 @@ const CLOSE = `
     vec3 k3 = vec3(0.57735);
     o.rgb = o.rgb * cos(u_hue) + cross(k3, o.rgb) * sin(u_hue) + k3 * dot(k3, o.rgb) * (1.0 - cos(u_hue));
   }
-  o.rgb *= 1.0 - 0.5 * u_calm * smoothstep(0.05, -0.1, d);
+  o.rgb *= 1.0 - 0.5 * min(u_calm, 1.0) * smoothstep(0.05, -0.1, d);
+  if (u_calm > 1.5) {
+    // an aura: nothing inside, and only its light — its dark parts would draw a black plate round a name
+    o *= smoothstep(-0.02, 0.12, d);
+    o.a = min(o.a, max(o.r, max(o.g, o.b)) * 1.4);
+  }
+  if (u_burst > 0.5) {
+    float flare = 1.0 - smoothstep(0.4, 1.9, u_age);
+    float leave = u_close < 0.0 ? 0.0 : smoothstep(0.0, 0.12, u_close) * (1.0 - smoothstep(0.35, 0.9, u_close));
+    o *= clamp(max(flare, leave), 0.0, 1.0);
+  }
   float edge = min(min(gl_FragCoord.x, u_res.x - gl_FragCoord.x), min(gl_FragCoord.y, u_res.y - gl_FragCoord.y));
   gl_FragColor = o * smoothstep(0.0, u_box.w * 0.7, edge);
 }`;
@@ -806,6 +828,8 @@ interface Program {
   box: WebGLUniformLocation | null;
   round: WebGLUniformLocation | null;
   calm: WebGLUniformLocation | null;
+  burst: WebGLUniformLocation | null;
+  cycle: WebGLUniformLocation | null;
   age: WebGLUniformLocation | null;
   shape: WebGLUniformLocation | null;
   hue: WebGLUniformLocation | null;
@@ -815,6 +839,12 @@ interface Program {
 export interface FxOptions {
   /** text is written over it: its inside is kept dark enough to read */
   calm?: boolean;
+  /** an aura: nothing drawn inside the shape (names keep their letters) */
+  aura?: boolean;
+  /** comes and goes over and over (the time portal as a teleporter) */
+  cycle?: boolean;
+  /** seconds into its timeline it starts at (a short celebration skips the slow build-up) */
+  from?: number;
   /** largest side of its canvas in pixels (a full stage needs more than a badge) */
   maxSide?: number;
   /** its outline: 0 rounded box (the element's corners), 1 hexagon, 2 diamond, 3 shield, 4 star */
@@ -881,6 +911,11 @@ function setup(): WebGLRenderingContext | null {
   return gl;
 }
 
+/** « burst:blaze » plays the flames of « blaze » as a burst (a notification's entrance and exit) */
+function baseOf(effect: string): FxBadge {
+  return (effect.startsWith("burst:") ? effect.slice(6) : effect) as FxBadge;
+}
+
 function compile(context: WebGLRenderingContext, effect: FxBadge): Program | null {
   if (programs.has(effect)) return programs.get(effect) ?? null;
   const make = (type: number, source: string) => {
@@ -897,7 +932,7 @@ function compile(context: WebGLRenderingContext, effect: FxBadge): Program | nul
   const vertex = make(context.VERTEX_SHADER, VERTEX);
   const fragment = make(
     context.FRAGMENT_SHADER,
-    `${HEAD}${MAIN_OPEN}${EFFECTS[effect]}${FULL_STAGE.has(effect) ? CLOSE_FULL : CLOSE}`,
+    `${HEAD}${MAIN_OPEN}${EFFECTS[baseOf(effect)]}${FULL_STAGE.has(effect) ? CLOSE_FULL : CLOSE}`,
   );
   const program = context.createProgram();
   let made: Program | null = null;
@@ -913,6 +948,8 @@ function compile(context: WebGLRenderingContext, effect: FxBadge): Program | nul
         box: context.getUniformLocation(program, "u_box"),
         round: context.getUniformLocation(program, "u_round"),
         calm: context.getUniformLocation(program, "u_calm"),
+        burst: context.getUniformLocation(program, "u_burst"),
+        cycle: context.getUniformLocation(program, "u_cycle"),
         age: context.getUniformLocation(program, "u_age"),
         shape: context.getUniformLocation(program, "u_shape"),
         hue: context.getUniformLocation(program, "u_hue"),
@@ -966,7 +1003,9 @@ function draw(context: WebGLRenderingContext, instance: Instance, time: number):
   context.uniform4f(program.box, cx, cy, (pill.width / 2) * scale, halfHeight);
   const corner = Number.parseFloat(getComputedStyle(instance.host).borderTopLeftRadius) || 0;
   context.uniform1f(program.round, Math.min(1, (corner * scale) / Math.max(halfHeight, 1)));
-  context.uniform1f(program.calm, instance.options.calm ? 1 : 0);
+  context.uniform1f(program.calm, instance.options.aura ? 2 : instance.options.calm ? 1 : 0);
+  context.uniform1f(program.burst, instance.effect.startsWith("burst:") ? 1 : 0);
+  context.uniform1f(program.cycle, instance.options.cycle ? 1 : 0);
   context.uniform1f(program.shape, instance.options.shape ?? 0);
   context.uniform1f(program.hue, instance.options.hue ?? 0);
   if (instance.host.dataset.leaving !== undefined && instance.closing === undefined)
@@ -1004,7 +1043,7 @@ export function attachFx(
   effect: FxBadge,
   options: FxOptions = {},
 ): (() => void) | null {
-  if (!(FX_EFFECTS as readonly string[]).includes(effect)) return null;
+  if (!(FX_EFFECTS as readonly string[]).includes(baseOf(effect))) return null;
   if (!setup()) return null;
   const context = canvas.getContext("2d");
   if (!context) return null;
@@ -1016,7 +1055,7 @@ export function attachFx(
     visible: true,
     drawn: false,
     seed: Math.random() * 10,
-    born: performance.now(),
+    born: performance.now() - (options.from ?? 0) * 1000,
     options,
   };
   instances.add(instance);

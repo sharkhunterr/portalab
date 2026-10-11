@@ -206,7 +206,7 @@ UNLOCKS: dict[str, list[dict[str, str]]] = {
     "big_spender": [_unlock("title_big_spender", "title", "Big spender")],
     "achievement_hunter": [_unlock("badge_achievement_hunter", "badge", "Achievement hunter")],
     "loyal": [_unlock("frame_loyal", "avatar_frame", "Loyal golden frame")],
-    "night_owl": [_unlock("bg_night_owl", "profile_background", "Night owl starry sky")],
+    "night_owl": [_unlock("banner_live_starfield", "profile_banner", "Animated starry banner")],  # #79
     "level_20": [
         _unlock("level_crown", "level_badge", "Crowned level badge"),
         _unlock("title_living_legend", "title", "Living legend"),

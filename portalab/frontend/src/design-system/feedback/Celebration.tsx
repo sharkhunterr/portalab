@@ -8,9 +8,12 @@ import {
   useRef,
   useState,
 } from "react";
+
 import { useAnnounce } from "../a11y/Announce";
+import { FxLayer } from "../components/Fx";
 import { Icon } from "../components/Icon";
 import { sound } from "../sound/SoundService";
+import { FX_CELEBRATIONS } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
 import "../themes/celebration.css";
 
@@ -103,7 +106,7 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
   const queue = useRef(new CelebrationQueue());
   const [shown, setShown] = useState<CelebrationEvent | null>(null);
   const announce = useAnnounce();
-  const { effective } = useTheme();
+  const { effective, looks } = useTheme();
   const reduced = effective.reducedMotion;
 
   const celebrate = useCallback<Celebrate>((event) => {
@@ -116,9 +119,11 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
     if (!shown) return;
     announce(shown.text);
     void sound.play(shown.kind === "level" ? "levelUp" : "reward");
-    const timer = window.setTimeout(() => setShown(queue.current.next()), DURATION_MS[shown.kind]);
+    // #78: a celebration drawn by the GPU plays a little longer (its scene needs the time)
+    const ms = DURATION_MS[shown.kind] + (FX_CELEBRATIONS[looks.celebration] ? 1200 : 0);
+    const timer = window.setTimeout(() => setShown(queue.current.next()), ms);
     return () => window.clearTimeout(timer);
-  }, [shown, announce]);
+  }, [shown, announce, looks.celebration]);
 
   const value = useMemo(() => celebrate, [celebrate]);
   return (
@@ -149,7 +154,10 @@ export function CelebrationScene({
   reduced?: boolean;
   contained?: boolean;
 }) {
-  const spec = EFFECTS[effect] ?? { count: 0, layer: "badge" as const };
+  const gpu = FX_CELEBRATIONS[effect];
+  const spec = gpu
+    ? { count: 0, layer: "badge" as const }
+    : (EFFECTS[effect] ?? { count: 0, layer: "badge" as const });
   const count = Math.round((event.kind === "level" ? spec.count * 1.5 : spec.count) * (contained ? 0.6 : 1));
   const particles = Array.from({ length: count }, (_, i) => ({
     key: `${effect}-${i}`,
@@ -184,6 +192,14 @@ export function CelebrationScene({
       ) : (
         <div className="ds-celebration__particles">{fx}</div>
       )}
+      {gpu && !reduced ? (
+        <FxLayer
+          effect={gpu.effect}
+          from={gpu.from}
+          maxSide={contained ? 420 : 1100}
+          className="celebration-gpu"
+        />
+      ) : null}
       {effect === "lightning" && !reduced ? <span className="celebration-flash" /> : null}
       {effect === "portal" && !reduced ? <span className="celebration-portal" /> : null}
       <span className="ds-celebration__badge" data-text={event.text}>

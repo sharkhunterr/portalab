@@ -159,6 +159,17 @@ export const NOTIFICATION_ANIMATIONS = [
   "tracking",
   "morph",
   "uplink",
+  // #78: drawn by the GPU
+  "ignite",
+  "surge",
+  "splash",
+  "frostbite",
+  "stardust",
+  "hex",
+  "decrypt",
+  "petalfall",
+  "eclipse",
+  "warp",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -375,6 +386,15 @@ export const CELEBRATION_KEYS = [
   "rewind",
   "bloom",
   "tracker",
+  // #78: drawn by the GPU
+  "nova",
+  "goldshower",
+  "petalstorm",
+  "rebirth",
+  "stormstrike",
+  "skyveil",
+  "arcana",
+  "timerift",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

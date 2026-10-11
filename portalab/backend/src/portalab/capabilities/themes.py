@@ -58,6 +58,13 @@ PROFILE_BANNERS: tuple[str, ...] = (
     "upsidedown", "hawkins", "shire", "mordor", "pixelshire",
     "vhs", "mesh",
     "vhs", "nostromo",
+    # #79: animated banners — an ambience playing inside the banner
+    "live-starfield", "live-code-rain", "live-snow", "live-embers", "live-petals", "live-aurora",
+    "live-disco", "live-bats", "live-fireflies", "live-rain", "live-spores", "live-hearts",
+    "live-upsidedown", "live-veins", "live-meadow", "live-ash", "live-vhs", "live-bokeh", "live-nostromo",
+    "live-inferno", "live-thunderstorm", "live-reef", "live-volcano", "live-whiteout", "live-blackhole",
+    "live-liquidmetal", "live-neoncity", "live-matrix", "live-goldenhour", "live-darkness", "live-lavalamp",
+    "live-polar", "live-plasma",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -107,6 +114,8 @@ CELEBRATIONS: tuple[str, ...] = (
     "flicker", "fireworks",
     "rewind", "bloom",
     "rewind", "tracker",
+    # #78: drawn by the GPU
+    "nova", "goldshower", "petalstorm", "rebirth", "stormstrike", "skyveil", "arcana", "timerift",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -131,6 +140,8 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "flipup", "balrog", "eye",
     "tracking", "morph",
     "tracking", "uplink",
+    # #78: drawn by the GPU
+    "ignite", "surge", "splash", "frostbite", "stardust", "hex", "decrypt", "petalfall", "eclipse", "warp",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -140,6 +151,9 @@ NAME_STYLES: tuple[str, ...] = (
     "upsidedown", "elvish", "mordor",
     "vhs", "nova",
     "vhs", "nostromo",
+    # #78: drawn by the GPU
+    "nameblaze", "namevolt", "namefrost", "namegalaxy", "namegold", "nameshadow", "namesakura",
+    "nameplasma", "nameaurora", "namechrono",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (

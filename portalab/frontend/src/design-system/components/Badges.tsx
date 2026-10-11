@@ -66,9 +66,10 @@ export function LevelBadge({
       aria-label={label}
       data-look={look ?? undefined}
       data-fx={fx}
+      data-fx-cycle={fx === "chrono" || undefined}
       data-tier={levelTier(level)}
     >
-      {fx ? <FxLayer effect={fx} className="ds-level__fx" /> : null}
+      {fx ? <FxLayer effect={fx} cycle={fx === "chrono"} className="ds-level__fx" /> : null}
       <Icon name={levelTier(level) >= 8 ? "crown" : "star"} size={11} />
       <span aria-hidden="true">{level}</span>
     </span>

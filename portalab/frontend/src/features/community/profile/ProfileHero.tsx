@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import type { CSSProperties, ReactNode } from "react";
 import { api } from "../../../api/client";
+import type { Ambient } from "../../../design-system/a11y/preferences";
 import { Avatar } from "../../../design-system/components/Avatar";
 import { LevelBadge } from "../../../design-system/components/Badges";
 import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
-import { FRAME_CLIPS, FX_FRAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
+import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
+import { FRAME_CLIPS, FX_FRAMES, FX_NAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
 import { useT } from "../../../i18n/hooks/useT";
 import { backdropUrl, type Equipped, type WornItem } from "./looks";
 import { ProfileCustomizer } from "./ProfileCustomizer";
@@ -17,6 +19,14 @@ export function BannerArt({ banner, backdrop }: Pick<Equipped, "banner" | "backd
     return (
       <span className="profile-banner" data-banner="backdrop" aria-hidden="true">
         <img src={backdropUrl(backdrop.ref)} alt="" loading="lazy" />
+      </span>
+    );
+  }
+  if (banner?.startsWith("live-")) {
+    // #79: an animated banner — the ambience plays inside it, for every visitor to see
+    return (
+      <span className="profile-banner" data-banner="live" aria-hidden="true">
+        <AmbientLayer kind={banner.slice(5) as Ambient} contained />
       </span>
     );
   }
@@ -60,8 +70,14 @@ export function FramedAvatar({
 
 /** A name in the member's chosen style (font and effect). */
 export function StyledName({ name, style }: { name: string; style?: string | null | undefined }) {
+  const fx = style ? FX_NAMES[style] : undefined;
   return (
-    <span className="name-style" data-name={style && style !== "none" ? style : undefined}>
+    <span
+      className="name-style"
+      data-name={style && style !== "none" ? style : undefined}
+      data-fx-name={fx ? "true" : undefined}
+    >
+      {fx ? <FxLayer effect={fx} aura className="fx-layer fx-layer--name" /> : null}
       {name}
     </span>
   );
@@ -75,8 +91,9 @@ export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "tit
       className={kind === "badge" ? "cosmetic-badge" : "cosmetic-title"}
       data-style={item.style && item.style !== "none" ? item.style : undefined}
       data-fx={fx}
+      data-fx-cycle={fx === "chrono" || undefined}
     >
-      {fx ? <FxLayer effect={fx} calm /> : null}
+      {fx ? <FxLayer effect={fx} calm cycle={fx === "chrono"} /> : null}
       {kind === "badge" ? <Icon name={item.icon ?? "star"} size={14} /> : null}
       {item.label}
     </span>

@@ -10,6 +10,9 @@ export function FxLayer({
   calm = false,
   shape = 0,
   maxSide,
+  aura = false,
+  cycle = false,
+  from,
   className = "fx-layer",
 }: {
   effect: string;
@@ -17,6 +20,12 @@ export function FxLayer({
   calm?: boolean;
   shape?: number;
   maxSide?: number;
+  /** nothing drawn inside the element (a name keeps its letters) */
+  aura?: boolean;
+  /** comes and goes over and over (the time portal as a teleporter) */
+  cycle?: boolean;
+  /** seconds into its timeline it starts at */
+  from?: number;
   className?: string;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -31,7 +40,10 @@ export function FxLayer({
       stop = attachFx(element, host, effect as "blaze", {
         calm,
         shape,
+        aura,
+        cycle,
         ...(maxSide ? { maxSide } : {}),
+        ...(from ? { from } : {}),
       });
       if (!stop) host.dataset.fxFailed = "true";
     });
@@ -39,6 +51,6 @@ export function FxLayer({
       cancelled = true;
       stop?.();
     };
-  }, [effect, calm, shape, maxSide]);
+  }, [effect, calm, shape, maxSide, aura, cycle, from]);
   return <canvas ref={canvas} className={className} />;
 }
