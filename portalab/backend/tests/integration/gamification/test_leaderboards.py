@@ -51,7 +51,16 @@ async def test_rankings_periods_and_visibility(gm: GamHarness, client: AsyncClie
     ]
     xp = (await client.get("/api/v1/leaderboards/xp")).json()
     assert board(xp) == [(1, "boss", 60, False), (2, "ursula", 60, False), (3, "ulrich", 20, True)]
-    assert set(xp["entries"][0]) == {"rank", "user_id", "display_name", "score", "me", "change", "new", "anonymous"}
+    assert set(xp["entries"][0]) == {
+        "rank",
+        "user_id",
+        "display_name",
+        "score",
+        "me",
+        "change",
+        "new",
+        "anonymous",
+    }
     week = (await client.get("/api/v1/leaderboards/xp", params={"period": "week"})).json()
     assert board(week) == [(1, "ursula", 60, False), (2, "boss", 20, False), (3, "ulrich", 20, True)]
     month = (await client.get("/api/v1/leaderboards/xp", params={"period": "month"})).json()

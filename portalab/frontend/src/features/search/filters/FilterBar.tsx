@@ -1,7 +1,9 @@
 import { useId } from "react";
 import { Button } from "../../../design-system/components/Button";
+import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { type GroupOut, kindKey, type SearchParams } from "../api";
+import { KIND_ICONS, valueLabel } from "../presentation";
 
 /**
  * Filters (spec 008 T017; FR-010/011): restrict to a result type and to facet values declared by the
@@ -19,7 +21,11 @@ export function FilterBar({
 }) {
   const t = useT();
   const legendId = useId();
-  const kinds = groups.map((group) => ({ kind: group.kind, label: t(kindKey(group.label_key)) }));
+  const kinds = groups.map((group) => ({
+    kind: group.kind,
+    label: t(kindKey(group.label_key)),
+    count: group.items.length,
+  }));
   const facets = new Map<string, { label: string; values: Map<string, number> }>();
   for (const group of groups) {
     for (const facet of group.facets) {
@@ -46,34 +52,43 @@ export function FilterBar({
   return (
     <fieldset className="search-filters" aria-labelledby={legendId}>
       <legend id={legendId}>{t("search:filters")}</legend>
-      <fieldset className="ds-stack ds-stack--row search-filters__group">
-        <legend className="visually-hidden">{t("search:allTypes")}</legend>
-        {kinds.map(({ kind, label }) => (
-          <Button
+      <fieldset className="search-filters__group" data-sources="true">
+        <legend className="search-filters__title">{t("search:allTypes")}</legend>
+        {kinds.map(({ kind, label, count }) => (
+          <button
             key={kind}
-            variant={params.kinds.includes(kind) ? "primary" : "secondary"}
+            type="button"
+            className="search-chip"
             aria-pressed={params.kinds.includes(kind)}
             onClick={() => toggleKind(kind)}
           >
-            {label}
-          </Button>
+            <Icon name={KIND_ICONS[kind] ?? "search"} size={15} />
+            <span className="search-chip__label">{label}</span>
+            {count ? (
+              <span className="search-chip__count" aria-hidden="true">
+                {count}
+              </span>
+            ) : null}
+          </button>
         ))}
       </fieldset>
       {[...facets.entries()].map(([key, facet]) =>
         facet.values.size ? (
-          <fieldset key={key} className="ds-stack ds-stack--row search-filters__group">
-            <legend className="visually-hidden">{facet.label}</legend>
+          <fieldset key={key} className="search-filters__group">
+            <legend className="search-filters__title">{facet.label}</legend>
             {[...facet.values.entries()].map(([value, count]) => {
               const pressed = (params.filters[key] ?? []).includes(value);
               return (
-                <Button
+                <button
                   key={value}
-                  variant={pressed ? "primary" : "secondary"}
+                  type="button"
+                  className="search-chip"
                   aria-pressed={pressed}
                   onClick={() => toggleValue(key, value)}
                 >
-                  {value} ({count})
-                </Button>
+                  <span className="search-chip__label">{valueLabel(t, key, value)}</span>{" "}
+                  <span className="search-chip__count">{count}</span>
+                </button>
               );
             })}
           </fieldset>

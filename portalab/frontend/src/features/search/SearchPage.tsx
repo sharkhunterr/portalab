@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useId, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Button } from "../../design-system/components/Button";
-import { SelectField, TextField } from "../../design-system/components/Field";
+import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
@@ -69,30 +69,36 @@ export function SearchPage() {
   return (
     <section aria-labelledby={headingId} className="search-page">
       <PageHeader titleId={headingId} level={2} icon="search" title={t("search:title")} />
-      <search>
-        <form onSubmit={submit} className="ds-stack ds-stack--row search-form">
-          <TextField
-            label={t("search:label")}
-            type="search"
-            name="q"
-            value={draft}
-            placeholder={t("search:placeholder")}
-            onChange={(event) => setDraft(event.target.value)}
-            maxLength={256}
-          />
-          <SelectField
-            label={t("search:mode")}
-            value={params.mode}
-            onChange={(event) => update({ ...params, mode: event.target.value as Mode })}
-          >
-            {MODES.map((mode) => (
-              <option key={mode} value={mode}>
-                {t(`search:mode.${mode}`)}
-              </option>
-            ))}
-          </SelectField>
+      <search className="search-hero">
+        {/* #67: one large field, the matching as a button group */}
+        <form onSubmit={submit} className="search-form">
+          <label className="search-form__field">
+            <span className="visually-hidden">{t("search:label")}</span>
+            <Icon name="search" size={20} />
+            <input
+              type="search"
+              name="q"
+              value={draft}
+              placeholder={t("search:placeholder")}
+              onChange={(event) => setDraft(event.target.value)}
+              maxLength={256}
+            />
+          </label>
           <Button type="submit">{t("search:submit")}</Button>
         </form>
+        <fieldset className="ds-subnav search-modes">
+          <legend className="visually-hidden">{t("search:mode")}</legend>
+          {MODES.map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              aria-pressed={params.mode === mode}
+              onClick={() => update({ ...params, mode })}
+            >
+              {t(`search:mode.${mode}`)}
+            </button>
+          ))}
+        </fieldset>
       </search>
       {!started ? (
         <>
@@ -104,12 +110,17 @@ export function SearchPage() {
       {search.isPending && started ? <FunctionalState state="loading" /> : null}
       {search.data ? (
         <div className="search-layout">
-          <div className="search-results" aria-busy={search.isFetching || undefined}>
-            <p role="status">{t("search:results", { count: search.data.total })}</p>
-            {search.data.semantic === "unavailable" && params.mode !== "exact" ? (
-              <p className="search-notice">{t("search:semanticUnavailable")}</p>
-            ) : null}
+          <aside className="search-side">
             <FilterBar groups={groups} params={params} onChange={update} />
+            <AssistPanel key={params.q} query={params.q} items={items} />
+          </aside>
+          <div className="search-results" aria-busy={search.isFetching || undefined}>
+            <p role="status" className="search-total">
+              <strong>{t("search:results", { count: search.data.total })}</strong>
+              {search.data.semantic === "unavailable" && params.mode !== "exact" ? (
+                <span className="search-notice">{t("search:semanticUnavailable")}</span>
+              ) : null}
+            </p>
             {search.data.total === 0 ? (
               <section className="ds-panel">
                 <p>{t("search:empty", { query: params.q })}</p>
@@ -125,7 +136,6 @@ export function SearchPage() {
                 <ResultGroup key={`${group.kind}:${search.data.request_id}`} group={group} params={params} />
               ))}
           </div>
-          <AssistPanel key={params.q} query={params.q} items={items} />
         </div>
       ) : null}
     </section>

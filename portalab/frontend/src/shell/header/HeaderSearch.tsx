@@ -6,6 +6,13 @@ import { api } from "../../api/client";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Icon } from "../../design-system/components/Icon";
 import { kindKey, resolvePalette, useHistory } from "../../features/search/api";
+import {
+  type Badge,
+  badgesOf,
+  KIND_ICONS,
+  mediaGroup,
+  ResultBadges,
+} from "../../features/search/presentation";
 import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { fromNavigation, rank } from "../palette/CommandRegistry";
@@ -34,24 +41,23 @@ interface Option {
   title: string;
   detail?: string | undefined;
   route: string;
+  /** #67: the poster of a title */
+  image?: string | undefined;
+  /** #67: its type and state, as words (never colour alone) */
+  badges?: Badge[] | undefined;
+  /** #67: the icon of its group's separator */
+  groupIcon?: string | undefined;
 }
 
-const KIND_ICONS: Record<string, string> = {
-  media: "film",
-  wiki: "book",
-  news: "newspaper",
-  users: "user",
-  services: "server",
-  incidents: "alert",
-  tickets: "ticket",
-  feedback: "message",
-  navigation: "compass",
-  calendar: "calendar",
-  community: "users",
-  marketplace: "shop",
-};
-
 let focusHandler: ((query: string) => void) | null = null;
+let floatingHandler: ((query: string) => void) | null = null;
+
+/** #67: open the search over the page — for the layouts whose header has no search field. */
+export function openFloatingSearch(query = ""): boolean {
+  if (!floatingHandler) return false;
+  floatingHandler(query);
+  return true;
+}
 
 /** Focus the header's search (Ctrl/⌘ K, « / »); ``false`` when the header has none (another layout). */
 export function focusHeaderSearch(query = ""): boolean {
@@ -69,7 +75,7 @@ function useDebounced(value: string, delay = 180): string {
   return debounced;
 }
 
-export function HeaderSearch({ phone = false }: { phone?: boolean }) {
+export function HeaderSearch({ phone = false, floating = false }: { phone?: boolean; floating?: boolean }) {
   const t = useT();
   const strings = useShellStrings();
   const navigate = useNavigate();
@@ -110,16 +116,23 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
   );
 
   useEffect(() => {
-    focusHandler = (q: string) => {
+    const handler = (q: string) => {
       setQuery(q);
       setOpen(true);
-      if (phone) setExpanded(true);
+      if (phone || floating) setExpanded(true);
       window.setTimeout(() => input.current?.focus(), 0);
     };
+    if (floating) {
+      floatingHandler = handler;
+      return () => {
+        floatingHandler = null;
+      };
+    }
+    focusHandler = handler;
     return () => {
       focusHandler = null;
     };
-  }, [phone]);
+  }, [phone, floating]);
 
   const options: Option[] = useMemo(() => {
     const out: Option[] = [];
@@ -160,18 +173,28 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
       });
     }
     const seen = new Set(out.map((o) => o.route));
+    const found: Option[] = [];
     for (const item of Array.isArray(results.data) ? results.data : []) {
       if (!item.url_ref.startsWith("/") || seen.has(item.url_ref)) continue;
       seen.add(item.url_ref);
-      out.push({
+      const byType = item.kind === "media" ? mediaGroup(item.facets?.type) : null; // films, series, books…
+      found.push({
         id: `result:${item.kind}:${item.id}`,
-        group: t(item.group?.includes(":") ? item.group : kindKey(item.group ?? `search.kind.${item.kind}`)),
-        icon: KIND_ICONS[item.kind] ?? "search",
+        group: byType
+          ? t(byType.label)
+          : t(item.group?.includes(":") ? item.group : kindKey(item.group ?? `search.kind.${item.kind}`)),
+        groupIcon: byType?.icon ?? KIND_ICONS[item.kind] ?? "search",
+        icon: byType?.icon ?? KIND_ICONS[item.kind] ?? "search",
         title: item.title,
-        detail: detailOf(t, item),
+        detail: detailOf(item),
         route: item.url_ref,
+        image: item.kind === "media" && item.facets?.image ? item.facets.image : undefined,
+        badges: badgesOf(t, item),
       });
     }
+    // each group together, in the order the groups first appear
+    const order = [...new Set(found.map((o) => o.group))];
+    out.push(...[...found].sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group)));
     out.push({
       id: "all",
       group: "",
@@ -301,7 +324,11 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
             const heading =
               option.group && option.group !== lastGroup ? (
                 <div className="header-search__group" aria-hidden="true">
-                  {option.group}
+                  <Icon name={option.groupIcon ?? "compass"} size={13} />
+                  <span>{option.group}</span>
+                  <span className="header-search__count">
+                    {options.filter((o) => o.group === option.group).length}
+                  </span>
                 </div>
               ) : null;
             lastGroup = option.group || lastGroup;
@@ -320,13 +347,23 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
                   onClick={() => choose(option)}
                   onKeyDown={() => undefined}
                 >
-                  <span className="header-search__icon" aria-hidden="true">
-                    <Icon name={option.icon} size={16} />
-                  </span>
+                  {option.image ? (
+                    <img
+                      className="header-search__poster"
+                      src={`/api/v1/media/images/${option.image}`}
+                      alt=""
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="header-search__icon" aria-hidden="true">
+                      <Icon name={option.icon} size={16} />
+                    </span>
+                  )}
                   <span className="header-search__text">
                     <span className="header-search__title">
                       <Highlight text={option.title} query={option.id === "all" ? "" : query.trim()} />
                     </span>
+                    {option.badges?.length ? <ResultBadges badges={option.badges} /> : null}
                     {option.detail ? <span className="header-search__detail">{option.detail}</span> : null}
                   </span>
                   <Icon name="chevron-right" size={14} className="header-search__go" />
@@ -341,6 +378,26 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
       ) : null}
     </div>
   );
+  if (floating) {
+    // #67: the same search over the page, for the layouts whose header has none
+    return expanded
+      ? createPortal(
+          <div className="header-search__sheet" data-floating="true">
+            <button
+              type="button"
+              className="header-search__backdrop"
+              aria-label={t("shell:searchClose")}
+              onClick={() => {
+                close();
+                setQuery("");
+              }}
+            />
+            {field}
+          </div>,
+          document.body,
+        )
+      : null;
+  }
   if (!phone) return field;
   return (
     <>
@@ -363,14 +420,10 @@ export function HeaderSearch({ phone = false }: { phone?: boolean }) {
   );
 }
 
-function detailOf(t: ReturnType<typeof useT>, item: Suggestion): string | undefined {
+function detailOf(item: Suggestion): string | undefined {
   const facets = item.facets ?? {};
   if (item.kind === "media") {
-    const parts = [
-      facets.type ? t(`media:kind.${facets.type}`) : null,
-      facets.year ?? null,
-      facets.availability === "available" ? t("media:detail.available") : null,
-    ].filter(Boolean);
+    const parts = [facets.year ?? null, facets.genres ?? null].filter(Boolean);
     if (parts.length) return parts.join(" · ");
   }
   return item.snippet?.trim() || undefined;

@@ -5,7 +5,7 @@ import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
-import { focusHeaderSearch } from "./header/HeaderSearch";
+import { focusHeaderSearch, HeaderSearch, openFloatingSearch } from "./header/HeaderSearch";
 import { ProfileCard } from "./header/ProfileCard";
 import { useHeaderData } from "./header/useHeaderData";
 import { BottomBar } from "./nav/BottomBar";
@@ -76,7 +76,7 @@ export function AppShell({
     () => ({
       // 027: the header's search answers first; the palette remains where the header has none
       open: (query = "") => {
-        if (!focusHeaderSearch(query)) setPalette({ open: true, query });
+        if (!focusHeaderSearch(query) && !openFloatingSearch(query)) setPalette({ open: true, query });
       },
       openShortcuts: () => setHelpOpen(true),
     }),
@@ -200,6 +200,8 @@ export function AppShell({
           </Drawer>
         ) : null}
       </div>
+      {/* #67: the header's search over the page, for the layouts whose header has none */}
+      <HeaderSearch floating />
       <CommandPalette
         open={palette.open}
         initialQuery={palette.query}

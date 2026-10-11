@@ -128,7 +128,7 @@ describe("search page", () => {
 
   it("applies filters through the URL without losing the query", async () => {
     const { router, bodies } = renderPage("/search?q=books");
-    fireEvent.click(await screen.findByRole("button", { name: "error (1)" }));
+    fireEvent.click(await screen.findByRole("button", { name: "error 1" }));
     await waitFor(() => expect(router.state.location.search).toBe("?q=books&f.state=error"));
     await waitFor(() => expect(bodies.at(-1)).toMatchObject({ q: "books", filters: { state: ["error"] } }));
     expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("books");

@@ -115,5 +115,6 @@ export async function suggest(
 
 /** Label of a result group: ``search.kind.users`` → catalog ``search:kind.users``. */
 export function kindKey(labelKey: string): string {
+  if (labelKey.includes(":")) return labelKey; // already namespaced (``marketplace:search.product``…)
   return `search:${labelKey.replace(/^search\./, "")}`;
 }

@@ -91,6 +91,22 @@ class SearchRequest:
     cursor: str | None = None
 
 
+def _varied(items: Sequence[Any], each: int = 4, media: int = 6) -> list[Any]:
+    """#67: a source's first suggestions — for media, taken in turn from each type (films, series, books,
+    games…) in their relevance order, so one type never fills every place."""
+    if not items or items[0].kind != "media":
+        return list(items[:each])
+    by_type: dict[str, list[Any]] = {}
+    for item in items:
+        by_type.setdefault(str(item.facets.get("type", "")), []).append(item)
+    out: list[Any] = []
+    while len(out) < media and any(by_type.values()):
+        for queue in by_type.values():
+            if queue and len(out) < media:
+                out.append(queue.pop(0))
+    return out
+
+
 class SearchModule:
     def __init__(
         self,
@@ -237,8 +253,8 @@ class SearchModule:
                 "group": group.label_key,  # the provider's own label for its kind
             }
             for group in outcome.groups
-            for item in group.items[:4]
-        ][:16]
+            for item in _varied(group.items)
+        ][:20]
 
     async def search_without_side_effects(self, principal: Principal, q: str) -> tuple[SearchOutcome, str]:
         self.limit(principal)
