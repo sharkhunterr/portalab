@@ -99,3 +99,25 @@ async def test_the_most_relevant_titles_come_first(app: FastAPI, media: MediaHar
         "Rogue One: A Star Wars Story (2016)",  # a word starts with it: the film before the book
         "095 [An +001] Star Wars 01 - Dans l'ombre de Yavin",
     ]
+
+
+async def test_suggestions_take_each_types_best(app: FastAPI, media: MediaHarness) -> None:
+    """#67: the header's suggestions draw each type's best — a book still comes when four games and six
+    films fill the first page of results."""
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    records = [library_record(f"g{n}", kind="game", title="Star Wars", year=1990 + n) for n in range(4)]
+    records += [library_record(f"m{n}", title=f"Star Wars, episode {n}", year=2000 + n) for n in range(6)]
+    records.append(library_record("b1", kind="book", title="095 [An +001] Star Wars 01"))
+    await media.module.library.upsert(records, one)
+    provider = MediaSearchProvider(
+        CatalogQuery(media.database, media.module.authorizer), media.module.authorizer
+    )
+    query = ParsedQuery(text="star wars", normalized="star wars", terms=("star", "wars"))
+    page = await provider.search(
+        query, Principal(user_id=people["zoe"]), LocaleContext(), limit=10, cursor=None
+    )
+    assert "book" not in {item.facets["type"] for item in page.items}  # the page alone missed it
+    suggested = await provider.suggestions(query, Principal(user_id=people["zoe"]))
+    assert [item.facets["type"] for item in suggested] == ["game", "movie", "book", "game", "movie"]

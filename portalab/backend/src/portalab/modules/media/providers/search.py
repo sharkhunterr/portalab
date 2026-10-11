@@ -169,6 +169,45 @@ class MediaSearchProvider:
             took_ms=int((time.perf_counter() - started) * 1000),
         )
 
+    async def suggestions(
+        self, query: ParsedQuery, principal: Principal, *, per_type: int = 2
+    ) -> Sequence[SearchItem]:
+        """#67: the header's suggestions — the most relevant titles of *each* type (films, games, books…),
+        not the first page alone (four games and six films filled it before any book)."""
+        if not query.terms or not await self.authorizer.is_allowed(principal, MEDIA_READ):
+            return []
+        order = self._relevance(query)
+        ranked = (
+            select(
+                MediaObject.id.label("id"),
+                func.row_number().over(partition_by=MediaObject.kind, order_by=order).label("place"),
+                order[0].label("tier"),
+            )
+            .where(MediaObject.status == "active")
+            .where(and_(*(MediaObject.sort_title.ilike(f"%{t}%") for t in query.terms[:8])))
+            .subquery()
+        )
+        async with self.query.database.session() as session:
+            picked = (
+                await session.execute(
+                    select(ranked.c.id, ranked.c.tier, ranked.c.place).where(ranked.c.place <= per_type)
+                )
+            ).all()
+            if not picked:
+                return []
+            rows = {
+                row.id: row
+                for row in (
+                    await session.execute(
+                        select(MediaObject).where(MediaObject.id.in_([p.id for p in picked]))
+                    )
+                ).scalars()
+            }
+        best = sorted(picked, key=lambda p: (p.place, p.tier))  # each type's best first, by relevance
+        objects = [rows[p.id] for p in best if p.id in rows]
+        extras = await self._extras(objects)
+        return [self._item(row, query, 1.0, extras.get(row.id)) for row in objects]
+
     @staticmethod
     def _relevance(query: ParsedQuery) -> list[Any]:
         """#67: the most relevant first — the exact title, a title starting with the words, a word of the

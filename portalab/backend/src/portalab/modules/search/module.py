@@ -2,6 +2,7 @@
 index and administration."""
 
 import asyncio
+import contextlib
 import threading
 import time
 from collections import deque
@@ -242,6 +243,17 @@ class SearchModule:
         """Typeahead: the first matches of each permitted kind (same scoping as ``search``) — 027: with a
         line of context and the item's facets, for the header's live results."""
         outcome, _ = await self.search_without_side_effects(principal, q)
+        ctx = await self.locale(principal)
+        query = QueryParser(max_length=self.config.max_query_length).parse(
+            q, ctx, now=utc_now(self.clock), mode="exact"
+        )
+        chosen: dict[str, list[Any]] = {}
+        for group in outcome.groups:  # #67: a source may suggest across its types (media: each type's best)
+            provider = next(iter(self.registry.providers([group.kind])), None)
+            suggestions = getattr(provider, "suggestions", None)
+            if suggestions is not None and group.state == "ok":
+                with contextlib.suppress(Exception):  # the first page stays
+                    chosen[group.kind] = list(await suggestions(query, principal))
         return [
             {
                 "kind": item.kind,
@@ -253,7 +265,7 @@ class SearchModule:
                 "group": group.label_key,  # the provider's own label for its kind
             }
             for group in outcome.groups
-            for item in _varied(group.items)
+            for item in _varied(chosen.get(group.kind) or group.items)
         ][:20]
 
     async def search_without_side_effects(self, principal: Principal, q: str) -> tuple[SearchOutcome, str]:
