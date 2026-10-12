@@ -96,6 +96,13 @@ export const BANNER_KEYS = [
   "live-skyclouds",
   "live-silkwaves",
   "live-reactions",
+  // #89: music streaming, series streaming, the newspaper
+  "soundwave",
+  "postergrid",
+  "frontpage",
+  "live-equalizer",
+  "live-cinemaglow",
+  "live-pages",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -165,6 +172,10 @@ export const FRAME_KEYS = [
   "window",
   "appicon",
   "storyring",
+  // #89: music streaming, series streaming, the newspaper
+  "vinyl",
+  "profiletile",
+  "postage",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -227,4 +238,8 @@ export const NAME_KEYS = [
   "titlebar",
   "aluminium",
   "verified",
+  // #89: music streaming, series streaming, the newspaper
+  "recap",
+  "marathon",
+  "typewriter",
 ] as const;

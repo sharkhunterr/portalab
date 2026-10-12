@@ -109,6 +109,10 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   cardcascade: { count: 14, layer: "screen" },
   balloons: { count: 14, layer: "screen" },
   likes: { count: 20, icon: "thumbs-up", layer: "badge" },
+  // #89: music notes, red ribbons streaking, ink stamps
+  musicnotes: { count: 18, icon: "music", layer: "badge" },
+  ribbons: { count: 12, layer: "screen" },
+  inkstamp: { count: 6, layer: "screen" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

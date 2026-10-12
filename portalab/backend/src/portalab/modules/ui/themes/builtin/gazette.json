@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 2,
+  "key": "gazette",
+  "name": "La Gazette",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f4efe4",
+    "surfaceRaised": "#fbf8f1",
+    "text": "#1a1a1a",
+    "textMuted": "#4a4540",
+    "border": "#cfc6b4",
+    "accent": "#1a1a1a",
+    "accentContrast": "#fbf8f1",
+    "focus": "#a3171d",
+    "accentAlt": "#a3171d",
+    "rarity": {
+      "common": "#5b5650",
+      "rare": "#1f4f8a",
+      "epic": "#6b2f8a",
+      "legendary": "#8a5a00"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b4252",
+      "bg": "#eceff4",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#15603a",
+      "bg": "#e3f4ea",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#fdf1dc",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6b4a00",
+      "bg": "#faf1d7",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#a1121d",
+      "bg": "#fde7e8",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#57303a",
+      "bg": "#f3e6ea",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b2b8f",
+      "bg": "#ede6fb",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a1f52",
+      "bg": "#f9e4ef",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#3f4652",
+      "bg": "#eef0f3",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#0f4c75",
+      "bg": "#e1eff8",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"EB Garamond\", Georgia, \"Times New Roman\", serif",
+    "headingFamily": "\"Playfair Display\", \"EB Garamond\", Georgia, serif",
+    "headingCase": "none",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0,
+    "md": 0.1
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "inkstamp",
+    "fastMs": 140,
+    "normalMs": 260,
+    "levelUp": "extraedition"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "masthead",
+      "tablet": "masthead",
+      "phone": "masthead"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "paper",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "newspaper",
+      "film": "film",
+      "media": "film",
+      "compass": "compass",
+      "users": "users",
+      "shop": "store",
+      "trophy": "trophy",
+      "search": "search",
+      "newspaper": "newspaper",
+      "book": "book",
+      "calendar": "calendar",
+      "chart": "chart"
+    }
+  },
+  "background": {
+    "fallback": "#f4efe4",
+    "pattern": "none",
+    "ambient": "pages"
+  },
+  "sounds": {
+    "notification": "asset:soft/notification.wav",
+    "alert": "asset:soft/alert.wav",
+    "success": "asset:soft/success.wav",
+    "reward": "asset:soft/reward.wav",
+    "levelUp": "asset:soft/level-up.wav",
+    "ui": "asset:soft/ui.wav"
+  },
+  "notification": {
+    "style": "telegram",
+    "animation": "spinpaper"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "À la une",
+      "nav:nav.section.home": "À la une",
+      "dashboard:title": "À la une",
+      "nav:nav.media": "Critiques",
+      "nav:nav.section.media": "Critiques",
+      "media:home.title": "Critiques",
+      "nav:nav.media_requests": "Courrier des lecteurs",
+      "nav:nav.media_insights": "Le box-office",
+      "media:insights.title": "Le box-office",
+      "nav:nav.section.content": "Rubriques",
+      "nav:nav.news": "Dernière édition",
+      "news:title": "Dernière édition",
+      "nav:nav.wiki": "Archives",
+      "wiki:title": "Archives",
+      "nav:nav.search": "Index",
+      "search:title": "Index",
+      "nav:nav.calendar": "Agenda",
+      "calendar:title": "Agenda",
+      "nav:nav.services": "Petites annonces",
+      "nav:nav.section.services": "Petites annonces",
+      "nav:nav.statistics": "Chiffres du jour",
+      "statistics:title": "Chiffres du jour",
+      "nav:nav.community": "Tribune",
+      "nav:nav.section.community": "Tribune",
+      "community:title": "Tribune",
+      "nav:nav.progression": "Mon ancienneté",
+      "gamification:progression.title": "Mon ancienneté",
+      "nav:nav.campaigns": "Grands concours",
+      "campaigns:page.title": "Grands concours",
+      "nav:nav.marketplace": "Kiosque",
+      "nav:nav.section.marketplace": "Kiosque",
+      "marketplace:catalog.title": "Kiosque",
+      "nav:nav.projects": "Souscriptions",
+      "marketplace:projects.title": "Souscriptions",
+      "marketplace:owned.title": "Mes abonnements",
+      "nav:nav.support": "Service lecteurs",
+      "nav:nav.section.support": "Service lecteurs",
+      "nav:nav.incidents": "Erratum",
+      "support:incident.title": "Erratum",
+      "nav:nav.feedback": "Écrire à la rédaction",
+      "support:feedback.title": "Écrire à la rédaction",
+      "gamification:value.coins": "Sous",
+      "gamification:value.xp": "Colonnes",
+      "shell:masthead.title": "La Gazette du Portail",
+      "shell:masthead.edition": "Édition du soir"
+    },
+    "en": {
+      "nav:nav.home": "Front page",
+      "nav:nav.section.home": "Front page",
+      "dashboard:title": "Front page",
+      "nav:nav.media": "Reviews",
+      "nav:nav.section.media": "Reviews",
+      "media:home.title": "Reviews",
+      "nav:nav.media_requests": "Letters to the editor",
+      "nav:nav.media_insights": "The box office",
+      "media:insights.title": "The box office",
+      "nav:nav.section.content": "Sections",
+      "nav:nav.news": "Latest edition",
+      "news:title": "Latest edition",
+      "nav:nav.wiki": "Archives",
+      "wiki:title": "Archives",
+      "nav:nav.search": "Index",
+      "search:title": "Index",
+      "nav:nav.calendar": "Diary",
+      "calendar:title": "Diary",
+      "nav:nav.services": "Classifieds",
+      "nav:nav.section.services": "Classifieds",
+      "nav:nav.statistics": "Figures of the day",
+      "statistics:title": "Figures of the day",
+      "nav:nav.community": "Op-eds",
+      "nav:nav.section.community": "Op-eds",
+      "community:title": "Op-eds",
+      "nav:nav.progression": "My seniority",
+      "gamification:progression.title": "My seniority",
+      "nav:nav.campaigns": "Great contests",
+      "campaigns:page.title": "Great contests",
+      "nav:nav.marketplace": "Newsstand",
+      "nav:nav.section.marketplace": "Newsstand",
+      "marketplace:catalog.title": "Newsstand",
+      "nav:nav.projects": "Subscriptions",
+      "marketplace:projects.title": "Subscriptions",
+      "marketplace:owned.title": "My subscriptions",
+      "nav:nav.support": "Reader services",
+      "nav:nav.section.support": "Reader services",
+      "nav:nav.incidents": "Corrections",
+      "support:incident.title": "Corrections",
+      "nav:nav.feedback": "Write to the editor",
+      "support:feedback.title": "Write to the editor",
+      "gamification:value.coins": "Pennies",
+      "gamification:value.xp": "Columns",
+      "shell:masthead.title": "The Portal Gazette",
+      "shell:masthead.edition": "Evening edition"
+    }
+  }
+}

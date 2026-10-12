@@ -230,6 +230,9 @@ NOTIFICATION_STYLES = Literal[
     "balloon",
     "trafficlights",
     "chathead",
+    "nowplaying",
+    "nextepisode",
+    "telegram",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -281,6 +284,9 @@ NOTIFICATION_ANIMATIONS = Literal[
     "trayrise",
     "genie",
     "chatpop",
+    "beatdrop",
+    "curtainwipe",
+    "spinpaper",
 ]
 AMBIENTS = Literal[
     "none",
@@ -382,6 +388,9 @@ AMBIENTS = Literal[
     "skyclouds",
     "silkwaves",
     "reactions",
+    "equalizer",
+    "cinemaglow",
+    "pages",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -428,6 +437,9 @@ CELEBRATIONS = Literal[
     "cardcascade",
     "balloons",
     "likes",
+    "musicnotes",
+    "ribbons",
+    "inkstamp",
 ]
 PATTERNS = Literal[
     "none",
@@ -479,6 +491,7 @@ LEVEL_UPS = Literal[
     # #81, #89: the seasons and the universes
     "owlpost", "plunder", "rollout",
     "setupwizard", "unboxing", "viral",
+    "encore", "finale", "extraedition",
 ]  # fmt: skip
 
 

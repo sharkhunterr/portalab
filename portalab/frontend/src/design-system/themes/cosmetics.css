@@ -3290,3 +3290,180 @@
   background: #1877f2;
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }
+
+/* ---------------------------------------------------------------- #89: music streaming, series streaming, the newspaper */
+/* banners */
+.profile-banner[data-banner="soundwave"] {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 3px, #121212 3px 6px),
+    radial-gradient(ellipse 48% 34% at 50% 50%, #1ed760 0 40%, #1ed76066 60%, transparent 72%),
+    radial-gradient(ellipse 22% 22% at 22% 50%, #f573a0aa 0 40%, transparent 70%),
+    radial-gradient(ellipse 18% 26% at 80% 50%, #1ed760aa 0 40%, transparent 70%),
+    linear-gradient(180deg, #000000, #121212);
+}
+.profile-banner[data-banner="postergrid"] {
+  background:
+    linear-gradient(0deg, #141414 0 8%, transparent 45%),
+    linear-gradient(90deg, #141414, transparent 20% 80%, #141414),
+    repeating-linear-gradient(90deg, transparent 0 1.2%, #141414 1.2% 2%),
+    linear-gradient(
+      90deg,
+      #4a1c1c 0 12%,
+      #1c2f4a 12% 24%,
+      #3d3a1a 24% 36%,
+      #2a1c4a 36% 48%,
+      #1c4a3a 48% 60%,
+      #4a2f1c 60% 72%,
+      #1a3d3d 72% 84%,
+      #4a1c35 84% 100%
+    )
+    0 22% / 100% 56% no-repeat,
+    radial-gradient(ellipse at 50% 120%, #e5091466, transparent 60%),
+    #141414;
+}
+.profile-banner[data-banner="frontpage"] {
+  background:
+    linear-gradient(#1a1a1a, #1a1a1a) 50% 10% / 46% 14% no-repeat,
+    linear-gradient(#1a1a1a, #1a1a1a) 50% 30% / 92% 2px no-repeat,
+    linear-gradient(#1a1a1a, #1a1a1a) 50% 33% / 92% 1px no-repeat,
+    linear-gradient(#bdb3a0, #bdb3a0) 6% 48% / 40% 34% no-repeat,
+    repeating-linear-gradient(180deg, #6b645a 0 2px, transparent 2px 7px) 70% 48% / 20% 40% no-repeat,
+    repeating-linear-gradient(180deg, #6b645a 0 2px, transparent 2px 7px) 95% 48% / 20% 40% no-repeat,
+    repeating-linear-gradient(180deg, #6b645a 0 2px, transparent 2px 7px) 6% 98% / 40% 10% no-repeat,
+    #f3ecdc;
+}
+
+/* frames — a record, a viewing profile, a postage stamp */
+.avatar-frame[data-frame="vinyl"] {
+  padding: 13px;
+  background:
+    repeating-radial-gradient(circle, #111111 0 1px, #1c1c1c 1px 3px),
+    conic-gradient(from 30deg, #ffffff22, transparent 15%, #ffffff22 50%, transparent 65%);
+  background-blend-mode: screen;
+  box-shadow: 0 0.3rem 0.8rem #00000088;
+  animation: frame-turn 6s linear infinite;
+}
+.avatar-frame[data-frame="vinyl"] > :not(.avatar-frame__fx) {
+  box-shadow: 0 0 0 3px #1ed760;
+  animation: frame-turn 6s linear infinite reverse;
+}
+.avatar-frame[data-frame="profiletile"] {
+  padding: 4px;
+  border-radius: 0.45rem;
+  background: #e50914;
+  box-shadow:
+    0 0 0 2px #141414,
+    0 0.4rem 1rem #e5091455;
+}
+.avatar-frame[data-frame="profiletile"] > :not(.avatar-frame__fx) {
+  border-radius: 0.3rem;
+}
+.avatar-frame[data-frame="postage"] {
+  padding: 9px;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      circle at 78% 22%,
+      transparent 0 22%,
+      #3a353099 23% 25%,
+      transparent 26% 30%,
+      #3a353066 31% 33%,
+      transparent 34%
+    ),
+    #fbf8f1;
+  mask:
+    radial-gradient(circle 4px at 4px 4px, transparent 98%, #000) -4px -4px / 10px 10px,
+    linear-gradient(#000, #000) 6px 6px / calc(100% - 12px) calc(100% - 12px) no-repeat;
+  filter: drop-shadow(0 2px 3px #00000055);
+}
+.avatar-frame[data-frame="postage"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+  box-shadow: 0 0 0 2px #a3171d;
+}
+
+/* name styles */
+.name-style[data-name="recap"] {
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #f573a0, #ff9f43, #1ed760, #f573a0);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px #00000066);
+  animation: name-shimmer 6s linear infinite;
+}
+.name-style[data-name="marathon"] {
+  font-family: Anton, "Bebas Neue", Impact, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #e50914;
+  text-shadow:
+    0 2px 0 #5c0004,
+    0 0 12px #e5091455;
+}
+.name-style[data-name="typewriter"] {
+  font-family: "Special Elite", "Courier New", monospace;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--color-text) 88%, #8a5a2a);
+  text-shadow:
+    0.5px 0 0 color-mix(in srgb, currentColor 80%, transparent),
+    0 0 1px color-mix(in srgb, currentColor 45%, transparent);
+}
+
+/* level badges — dancing bars, a big outlined number, a press pass */
+:is(:root[data-level-badge="eqbars"] .ds-level:not([data-look]), .ds-level[data-look="eqbars"]) {
+  gap: 0.3rem;
+  padding-inline: 0.45rem 0.6rem;
+  background: #1ed760;
+  color: #000000;
+}
+:is(:root[data-level-badge="eqbars"] .ds-level:not([data-look]), .ds-level[data-look="eqbars"])::before {
+  content: "";
+  inline-size: 0.7rem;
+  block-size: 0.75rem;
+  background:
+    linear-gradient(#000, #000) 0 100% / 0.16rem 60% no-repeat,
+    linear-gradient(#000, #000) 50% 100% / 0.16rem 100% no-repeat,
+    linear-gradient(#000, #000) 100% 100% / 0.16rem 40% no-repeat;
+  animation: level-eq 0.9s ease-in-out infinite alternate;
+}
+@keyframes level-eq {
+  to {
+    background-size:
+      0.16rem 100%,
+      0.16rem 35%,
+      0.16rem 85%;
+  }
+}
+:is(:root[data-level-badge="toprank"] .ds-level:not([data-look]), .ds-level[data-look="toprank"]) {
+  padding-inline: 0.2rem;
+  border-radius: 0;
+  background: none;
+  color: #141414;
+  font-family: Anton, Impact, sans-serif;
+  font-size: 1.35em;
+  -webkit-text-stroke: 1.5px #e5e5e5;
+  text-shadow: 2px 2px 0 #e50914;
+  box-shadow: none;
+}
+:is(:root[data-level-badge="toprank"] .ds-level:not([data-look]), .ds-level[data-look="toprank"]) .ds-icon {
+  -webkit-text-stroke: 0;
+  color: #e50914;
+}
+:is(:root[data-level-badge="presscard"] .ds-level:not([data-look]), .ds-level[data-look="presscard"]) {
+  position: relative;
+  padding-inline: 0.5rem;
+  border-radius: 0.1rem;
+  background:
+    linear-gradient(#a3171d, #a3171d) 0 0 / 100% 22% no-repeat,
+    #fbf8f1;
+  color: #1a1a1a;
+  font-family: "Special Elite", "Courier New", monospace;
+  rotate: -4deg;
+  box-shadow:
+    0 0 0 1px #1a1a1a,
+    0.15rem 0.2rem 0 #1a1a1a55;
+}

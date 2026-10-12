@@ -1279,3 +1279,102 @@
   color: #ffffff;
   box-shadow: 0 0 22px #1877f2aa;
 }
+
+/* ---------------------------------------------------------------- #89: music streaming, series streaming, the newspaper */
+/* music notes (Groove): notes flying out of the reward, green and pink */
+[data-effect="musicnotes"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  color: #1ed760;
+  filter: drop-shadow(0 0 6px #1ed76088);
+  animation-name: fx-burst;
+}
+[data-effect="musicnotes"] .celebration-fx:nth-child(2n) {
+  color: #f573a0;
+  filter: drop-shadow(0 0 6px #f573a088);
+}
+[data-effect="musicnotes"] .ds-celebration__badge {
+  background: #1ed760;
+  color: #000000;
+  box-shadow: 0 0 22px #1ed76088;
+}
+/* red ribbons (Binge): ribbons of red light streaking across the screen */
+[data-effect="ribbons"] .celebration-fx {
+  left: -30%;
+  top: calc(var(--x) * 0.9);
+  inline-size: 60%;
+  block-size: calc(0.5rem + var(--s) * 1.4rem);
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #e50914 40%, #ff5a5f 60%, transparent);
+  filter: blur(1px) drop-shadow(0 0 8px #e50914);
+  rotate: calc(-12deg + var(--s) * 8deg);
+  animation-name: fx-ribbon;
+  animation-duration: 1.4s;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1);
+}
+@keyframes fx-ribbon {
+  0% {
+    opacity: 0;
+    transform: translateX(0) scaleX(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--fx-vw, 1vw) * 190)) scaleX(1.2);
+  }
+}
+[data-effect="ribbons"] .ds-celebration__badge {
+  background: #e50914;
+  color: #ffffff;
+  box-shadow: 0 0 26px #e50914;
+}
+/* ink stamps (Gazette): red stamps thumping onto the page, EXTRA! */
+[data-effect="inkstamp"] .celebration-fx {
+  left: calc(10% + var(--x) * 0.75);
+  top: calc(15% + var(--s) * 50%);
+  padding: 0.2rem 0.7rem;
+  border: 3px solid #a3171d;
+  border-radius: 0.3rem;
+  color: #a3171d;
+  font:
+    700 1.6rem / 1 "Special Elite",
+    "Courier New",
+    monospace;
+  letter-spacing: 0.08em;
+  mix-blend-mode: multiply;
+  rotate: calc(-14deg + var(--s) * 20deg);
+  animation-name: fx-stamp;
+  animation-duration: 2s;
+  animation-timing-function: cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+[data-effect="inkstamp"] .celebration-fx::after {
+  content: "EXTRA!";
+}
+[data-effect="inkstamp"] .celebration-fx:nth-child(2n)::after {
+  content: "SCOOP";
+}
+@keyframes fx-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+  18% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+[data-effect="inkstamp"] .ds-celebration__badge {
+  background: #fbf8f1;
+  color: #1a1a1a;
+  box-shadow:
+    0 0 0 2px #1a1a1a,
+    0.3rem 0.3rem 0 #a3171d;
+}

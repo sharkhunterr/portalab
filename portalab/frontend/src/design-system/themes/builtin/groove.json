@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 2,
+  "key": "groove",
+  "name": "Groove",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#121212",
+    "surfaceRaised": "#1f1f1f",
+    "text": "#ffffff",
+    "textMuted": "#b3b3b3",
+    "border": "#333333",
+    "accent": "#1ed760",
+    "accentContrast": "#000000",
+    "focus": "#1ed760",
+    "accentAlt": "#f573a0",
+    "rarity": {
+      "common": "#b3b3b3",
+      "rare": "#4cb3ff",
+      "epic": "#c58bf2",
+      "legendary": "#ffc864"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Plus Jakarta Sans Variable\", \"Inter Variable\", sans-serif",
+    "headingFamily": "\"Plus Jakarta Sans Variable\", \"Inter Variable\", sans-serif",
+    "headingCase": "none",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.4,
+    "md": 0.6
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "musicnotes",
+    "fastMs": 140,
+    "normalMs": 260,
+    "levelUp": "encore"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "player",
+      "tablet": "player",
+      "phone": "player"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "flat",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "home",
+      "film": "film",
+      "media": "music",
+      "compass": "compass",
+      "users": "users",
+      "shop": "shop",
+      "trophy": "trophy",
+      "search": "search",
+      "newspaper": "radio",
+      "book": "library",
+      "calendar": "calendar",
+      "chart": "chart"
+    }
+  },
+  "background": {
+    "fallback": "#121212",
+    "pattern": "none",
+    "ambient": "equalizer"
+  },
+  "sounds": {
+    "notification": "asset:disco/notification.wav",
+    "alert": "asset:disco/alert.wav",
+    "success": "asset:disco/success.wav",
+    "reward": "asset:disco/reward.wav",
+    "levelUp": "asset:disco/level-up.wav",
+    "ui": "asset:disco/ui.wav"
+  },
+  "notification": {
+    "style": "nowplaying",
+    "animation": "beatdrop"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Accueil",
+      "nav:nav.section.home": "Accueil",
+      "dashboard:title": "Accueil",
+      "nav:nav.media": "Écoutes",
+      "nav:nav.section.media": "Écoutes",
+      "media:home.title": "Écoutes",
+      "nav:nav.media_requests": "Mes titres demandés",
+      "nav:nav.media_insights": "Mon bilan d'écoute",
+      "media:insights.title": "Mon bilan d'écoute",
+      "nav:nav.section.content": "Bibliothèque",
+      "nav:nav.news": "Nouveautés",
+      "news:title": "Nouveautés",
+      "nav:nav.wiki": "Paroles et crédits",
+      "wiki:title": "Paroles et crédits",
+      "nav:nav.search": "Rechercher",
+      "search:title": "Rechercher",
+      "nav:nav.calendar": "Concerts",
+      "calendar:title": "Concerts",
+      "nav:nav.services": "Appareils connectés",
+      "nav:nav.section.services": "Appareils connectés",
+      "nav:nav.statistics": "Classements",
+      "statistics:title": "Classements",
+      "nav:nav.community": "Fans",
+      "nav:nav.section.community": "Fans",
+      "community:title": "Fans",
+      "nav:nav.progression": "Mon niveau d'écoute",
+      "gamification:progression.title": "Mon niveau d'écoute",
+      "nav:nav.campaigns": "Défis musicaux",
+      "campaigns:page.title": "Défis musicaux",
+      "nav:nav.marketplace": "Disquaire",
+      "nav:nav.section.marketplace": "Disquaire",
+      "marketplace:catalog.title": "Disquaire",
+      "nav:nav.projects": "Albums à financer",
+      "marketplace:projects.title": "Albums à financer",
+      "marketplace:owned.title": "Ma collection",
+      "nav:nav.support": "Aide",
+      "nav:nav.section.support": "Aide",
+      "nav:nav.incidents": "Coupures",
+      "support:incident.title": "Coupures",
+      "nav:nav.feedback": "Proposer un titre",
+      "support:feedback.title": "Proposer un titre",
+      "gamification:value.coins": "Jetons",
+      "gamification:value.xp": "Écoutes",
+      "shell:player.library": "Votre bibliothèque",
+      "shell:player.nowPlaying": "En cours de lecture"
+    },
+    "en": {
+      "nav:nav.home": "Home",
+      "nav:nav.section.home": "Home",
+      "dashboard:title": "Home",
+      "nav:nav.media": "Listening",
+      "nav:nav.section.media": "Listening",
+      "media:home.title": "Listening",
+      "nav:nav.media_requests": "My requested tracks",
+      "nav:nav.media_insights": "My listening recap",
+      "media:insights.title": "My listening recap",
+      "nav:nav.section.content": "Library",
+      "nav:nav.news": "New releases",
+      "news:title": "New releases",
+      "nav:nav.wiki": "Lyrics and credits",
+      "wiki:title": "Lyrics and credits",
+      "nav:nav.search": "Search",
+      "search:title": "Search",
+      "nav:nav.calendar": "Concerts",
+      "calendar:title": "Concerts",
+      "nav:nav.services": "Connected devices",
+      "nav:nav.section.services": "Connected devices",
+      "nav:nav.statistics": "Charts",
+      "statistics:title": "Charts",
+      "nav:nav.community": "Fans",
+      "nav:nav.section.community": "Fans",
+      "community:title": "Fans",
+      "nav:nav.progression": "My listening level",
+      "gamification:progression.title": "My listening level",
+      "nav:nav.campaigns": "Music challenges",
+      "campaigns:page.title": "Music challenges",
+      "nav:nav.marketplace": "Record shop",
+      "nav:nav.section.marketplace": "Record shop",
+      "marketplace:catalog.title": "Record shop",
+      "nav:nav.projects": "Albums to fund",
+      "marketplace:projects.title": "Albums to fund",
+      "marketplace:owned.title": "My collection",
+      "nav:nav.support": "Help",
+      "nav:nav.section.support": "Help",
+      "nav:nav.incidents": "Dropouts",
+      "support:incident.title": "Dropouts",
+      "nav:nav.feedback": "Suggest a track",
+      "support:feedback.title": "Suggest a track",
+      "gamification:value.coins": "Tokens",
+      "gamification:value.xp": "Plays",
+      "shell:player.library": "Your library",
+      "shell:player.nowPlaying": "Now playing"
+    }
+  }
+}

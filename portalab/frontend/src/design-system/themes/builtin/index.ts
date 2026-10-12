@@ -2,6 +2,7 @@ import type { ThemeDefinition } from "../schema";
 // #89: the universes
 import academy from "./academy.json";
 import alien from "./alien.json";
+import binge from "./binge.json";
 import caribbean from "./caribbean.json";
 import cartoon from "./cartoon.json";
 import christmas from "./christmas.json";
@@ -15,6 +16,8 @@ import desert from "./desert.json";
 import disco from "./disco.json";
 import futuristic from "./futuristic.json";
 import galaxy from "./galaxy.json";
+import gazette from "./gazette.json";
+import groove from "./groove.json";
 import halloween from "./halloween.json";
 import heroes from "./heroes.json";
 import highContrast from "./high-contrast.json";
@@ -81,6 +84,9 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   classicdesk,
   cupertino,
   social,
+  groove,
+  binge,
+  gazette,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

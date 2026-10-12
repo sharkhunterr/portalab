@@ -84,6 +84,10 @@ export const PALETTE_KEYS = [
   "luna",
   "graphite",
   "chatgradient",
+  // #89: music streaming, series streaming, the newspaper
+  "groove",
+  "redcarpet",
+  "newsprint",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -150,6 +154,10 @@ export const NOTIFICATION_STYLES = [
   "balloon",
   "trafficlights",
   "chathead",
+  // #89: music streaming, series streaming, the newspaper
+  "nowplaying",
+  "nextepisode",
+  "telegram",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -206,6 +214,10 @@ export const NOTIFICATION_ANIMATIONS = [
   "trayrise",
   "genie",
   "chatpop",
+  // #89: music streaming, series streaming, the newspaper
+  "beatdrop",
+  "curtainwipe",
+  "spinpaper",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -312,6 +324,10 @@ export const AMBIENTS = [
   "skyclouds",
   "silkwaves",
   "reactions",
+  // #89: music streaming, series streaming, the newspaper
+  "equalizer",
+  "cinemaglow",
+  "pages",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -382,6 +398,10 @@ export const LEVEL_BADGES = [
   "startbutton",
   "aquagel",
   "speechbubble",
+  // #89: music streaming, series streaming, the newspaper
+  "eqbars",
+  "toprank",
+  "presscard",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -434,6 +454,10 @@ export const LEVEL_UPS = [
   "setupwizard",
   "unboxing",
   "viral",
+  // #89: music streaming, series streaming, the newspaper
+  "encore",
+  "finale",
+  "extraedition",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -484,6 +508,10 @@ export const CELEBRATION_KEYS = [
   "cardcascade",
   "balloons",
   "likes",
+  // #89: music streaming, series streaming, the newspaper
+  "musicnotes",
+  "ribbons",
+  "inkstamp",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

@@ -785,7 +785,10 @@
             "bolts",
             "cardcascade",
             "balloons",
-            "likes"
+            "likes",
+            "musicnotes",
+            "ribbons",
+            "inkstamp"
           ]
         },
         "levelUp": {
@@ -835,7 +838,10 @@
             "rollout",
             "setupwizard",
             "unboxing",
-            "viral"
+            "viral",
+            "encore",
+            "finale",
+            "extraedition"
           ]
         }
       },
@@ -1147,7 +1153,10 @@
             "gears",
             "skyclouds",
             "silkwaves",
-            "reactions"
+            "reactions",
+            "equalizer",
+            "cinemaglow",
+            "pages"
           ]
         }
       },
@@ -1269,7 +1278,10 @@
             "chamfer",
             "balloon",
             "trafficlights",
-            "chathead"
+            "chathead",
+            "nowplaying",
+            "nextepisode",
+            "telegram"
           ]
         },
         "animation": {
@@ -1322,7 +1334,10 @@
             "transform",
             "trayrise",
             "genie",
-            "chatpop"
+            "chatpop",
+            "beatdrop",
+            "curtainwipe",
+            "spinpaper"
           ]
         }
       },
