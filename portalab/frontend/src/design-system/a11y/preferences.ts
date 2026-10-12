@@ -88,6 +88,10 @@ export const PALETTE_KEYS = [
   "groove",
   "redcarpet",
   "newsprint",
+  // #89: the retro games
+  "dotmatrix",
+  "blockcolors",
+  "arcadegreen",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -158,6 +162,10 @@ export const NOTIFICATION_STYLES = [
   "nowplaying",
   "nextepisode",
   "telegram",
+  // #89: the retro games
+  "rpgbox",
+  "blockrow",
+  "invasion",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -218,6 +226,10 @@ export const NOTIFICATION_ANIMATIONS = [
   "beatdrop",
   "curtainwipe",
   "spinpaper",
+  // #89: the retro games
+  "pixelreveal",
+  "harddrop",
+  "march",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -328,6 +340,10 @@ export const AMBIENTS = [
   "equalizer",
   "cinemaglow",
   "pages",
+  // #89: the retro games
+  "lcdstars",
+  "fallingblocks",
+  "fleet",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -402,6 +418,10 @@ export const LEVEL_BADGES = [
   "eqbars",
   "toprank",
   "presscard",
+  // #89: the retro games
+  "batteryled",
+  "tpiece",
+  "saucer",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -458,6 +478,10 @@ export const LEVEL_UPS = [
   "encore",
   "finale",
   "extraedition",
+  // #89: the retro games
+  "statsup",
+  "fourlines",
+  "wavecleared",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -512,6 +536,10 @@ export const CELEBRATION_KEYS = [
   "musicnotes",
   "ribbons",
   "inkstamp",
+  // #89: the retro games
+  "pixelhearts",
+  "lineclear",
+  "lasers",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

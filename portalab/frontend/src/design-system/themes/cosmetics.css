@@ -3467,3 +3467,275 @@
     0 0 0 1px #1a1a1a,
     0.15rem 0.2rem 0 #1a1a1a55;
 }
+
+/* ---------------------------------------------------------------- #89: the retro games */
+/* banners */
+.profile-banner[data-banner="lcdscreen"] {
+  background:
+    repeating-linear-gradient(90deg, #0f380f14 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, #0f380f14 0 1px, transparent 1px 4px),
+    linear-gradient(#e3f1bc, #e3f1bc) 18% 22% / 12% 10% no-repeat,
+    linear-gradient(#e3f1bc, #e3f1bc) 21% 17% / 6% 6% no-repeat,
+    radial-gradient(circle 1.2rem at 80% 28%, #e3f1bc 96%, transparent),
+    radial-gradient(ellipse 34% 40% at 25% 100%, #306230 98%, transparent),
+    radial-gradient(ellipse 42% 32% at 75% 100%, #0f380f 98%, transparent),
+    #9bbc0f;
+  image-rendering: pixelated;
+}
+.profile-banner[data-banner="linestack"] {
+  background:
+    repeating-linear-gradient(90deg, #0b0b2a 0 2px, transparent 2px 1.6rem) 0 100% / 100% 50% no-repeat,
+    repeating-linear-gradient(0deg, #0b0b2a 0 2px, transparent 2px 1.6rem) 0 100% / 100% 50% no-repeat,
+    linear-gradient(#ffffffdd, #ffffffdd) 0 52% / 100% 1.6rem no-repeat,
+    linear-gradient(
+      90deg,
+      #00e5ff 0 20%,
+      #ffd23f 20% 35%,
+      #c77dff 35% 55%,
+      #3ddc84 55% 70%,
+      #ff5c5c 70% 85%,
+      #5c8cff 85%
+    )
+    0 100% / 100% 50% no-repeat,
+    linear-gradient(90deg, #ff9f40 0 30%, transparent 30% 45%, #c77dff 45% 60%, #00e5ff 60%) 0 70% / 100%
+    1.6rem no-repeat,
+    repeating-linear-gradient(90deg, #ffffff08 0 1px, transparent 1px 1.6rem),
+    #0b0b2a;
+}
+.profile-banner[data-banner="bunkers"] {
+  background:
+    linear-gradient(#39ff14, #39ff14) 0 100% / 100% 4px no-repeat,
+    radial-gradient(ellipse 7% 30% at 20% 100%, #39ff14 95%, transparent),
+    radial-gradient(ellipse 7% 30% at 50% 100%, #39ff14 95%, transparent),
+    radial-gradient(ellipse 7% 30% at 80% 100%, #39ff14 95%, transparent),
+    radial-gradient(circle 3px, #39ff14cc 96%, transparent) 0 8% / 2.4rem 1.4rem repeat-x,
+    radial-gradient(circle 3px, #ff4d6dcc 96%, transparent) 1.2rem 24% / 2.4rem 1.4rem repeat-x,
+    radial-gradient(circle 1px, #ffffff99 96%, transparent) 0 0 / 3rem 2.2rem,
+    #050805;
+}
+
+/* frames — a cartridge, a wall of blocks, a pixel invader */
+.avatar-frame[data-frame="cartridge"] {
+  padding: 8px 8px 18px;
+  border-radius: 4px 0 4px 4px;
+  background:
+    repeating-linear-gradient(180deg, #8d8a84 0 2px, transparent 2px 5px) 50% calc(100% - 3px) / 70% 9px
+    no-repeat,
+    linear-gradient(180deg, #c8c5bf, #a9a59e);
+  clip-path: polygon(0 0, 84% 0, 100% 12%, 100% 100%, 0 100%);
+  filter: drop-shadow(0 2px 2px #00000055);
+}
+.avatar-frame[data-frame="cartridge"] > :not(.avatar-frame__fx) {
+  border-radius: 2px;
+  box-shadow: 0 0 0 3px #e8e6e1;
+}
+.avatar-frame[data-frame="blockframe"] {
+  padding: 10px;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 8px, #00000055 8px 10px),
+    repeating-linear-gradient(180deg, #ffffff55 0 2px, transparent 2px 8px, #00000055 8px 10px),
+    repeating-linear-gradient(
+      90deg,
+      #00e5ff 0 10px,
+      #ffd23f 10px 20px,
+      #c77dff 20px 30px,
+      #3ddc84 30px 40px,
+      #ff5c5c 40px 50px
+    ),
+    #ff9f40;
+}
+.avatar-frame[data-frame="blockframe"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+}
+.avatar-frame[data-frame="crab"] {
+  padding: 5px;
+  border-radius: 0;
+  background:
+    linear-gradient(#39ff14, #39ff14) 8px 0 / calc(100% - 16px) 100% no-repeat,
+    linear-gradient(#39ff14, #39ff14) 0 8px / 100% calc(100% - 16px) no-repeat;
+}
+.avatar-frame[data-frame="crab"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+}
+.avatar-frame[data-frame="crab"]::before {
+  --p: 3px;
+  content: "";
+  position: absolute;
+  inset-block-end: calc(100% + 3px);
+  inset-inline-start: calc(50% - 16px);
+  z-index: 2;
+  inline-size: var(--p);
+  block-size: var(--p);
+  color: #39ff14;
+  box-shadow:
+    calc(2 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(7 * var(--p)) 0 currentColor;
+  animation: invader-bob 0.8s steps(2, jump-none) infinite;
+}
+
+/* name styles */
+.name-style[data-name="lcdtext"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  color: #8bc34a;
+  text-shadow:
+    1px 1px 0 #0f380f,
+    -1px -1px 0 #0f380f,
+    1px -1px 0 #0f380f,
+    -1px 1px 0 #0f380f,
+    0.15em 0.15em 0 #0f380f66;
+}
+.name-style[data-name="bevelblocks"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  background: repeating-linear-gradient(
+    90deg,
+    #00e5ff 0 0.5em,
+    #ffd23f 0.5em 1em,
+    #c77dff 1em 1.5em,
+    #3ddc84 1.5em 2em,
+    #ff5c5c 2em 2.5em
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0.1em 0.1em 0 #0b0b2a);
+}
+.name-style[data-name="hiscore"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #0a3d0a,
+    -1px -1px 0 #0a3d0a,
+    0 0 0.4em #39ff14;
+}
+
+/* level badges — a battery light, a T piece, a mystery saucer */
+:is(:root[data-level-badge="batteryled"] .ds-level:not([data-look]), .ds-level[data-look="batteryled"]) {
+  gap: 0.35rem;
+  padding-inline: 0.45rem 0.6rem;
+  border-radius: 0.3rem;
+  background: #5f5d6b;
+  color: #9bbc0f;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+}
+:is(
+  :root[data-level-badge="batteryled"] .ds-level:not([data-look]),
+  .ds-level[data-look="batteryled"]
+)::before {
+  content: "";
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-radius: 50%;
+  background: #ff3b3b;
+  box-shadow: 0 0 6px #ff3b3b;
+  animation: level-led 2.4s ease-in-out infinite;
+}
+@keyframes level-led {
+  50% {
+    opacity: 0.55;
+  }
+}
+:is(:root[data-level-badge="tpiece"] .ds-level:not([data-look]), .ds-level[data-look="tpiece"]) {
+  position: relative;
+  overflow: visible;
+  margin-block-end: 0.6rem;
+  border-radius: 0;
+  background: #a259f7;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055;
+}
+:is(:root[data-level-badge="tpiece"] .ds-level:not([data-look]), .ds-level[data-look="tpiece"])::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: calc(50% - 0.35rem);
+  inline-size: 0.7rem;
+  block-size: 0.6rem;
+  background: #a259f7;
+  box-shadow:
+    inset 3px 0 0 #ffffff66,
+    inset -3px -3px 0 #00000055;
+}
+:is(:root[data-level-badge="saucer"] .ds-level:not([data-look]), .ds-level[data-look="saucer"]) {
+  position: relative;
+  overflow: visible;
+  margin-block-start: 0.4rem;
+  padding-inline: 0.7rem;
+  border-radius: 50% / 45%;
+  background:
+    radial-gradient(circle 2px, #ffe14d 96%, transparent) 0 75% / 0.6rem 0.6rem repeat-x,
+    linear-gradient(180deg, #ff6b81, #c81d3a);
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  animation: level-saucer-lights 0.5s steps(2, jump-none) infinite;
+}
+:is(:root[data-level-badge="saucer"] .ds-level:not([data-look]), .ds-level[data-look="saucer"])::before {
+  content: "";
+  position: absolute;
+  inset-block-end: 82%;
+  inset-inline-start: 30%;
+  inline-size: 40%;
+  block-size: 0.55rem;
+  border-radius: 999px 999px 0 0;
+  background: #ffb3c0;
+}
+@keyframes level-saucer-lights {
+  50% {
+    background-position:
+      0.3rem 75%,
+      0 0;
+  }
+}

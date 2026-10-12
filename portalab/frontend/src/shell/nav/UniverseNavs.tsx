@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
@@ -422,6 +422,123 @@ export function MastheadNav({ sections }: { sections: readonly NavSection[] }) {
         ))}
       </ul>
       <SectionPanel section={section} currentKey={current?.key} className="shell-masthead__panel" />
+    </nav>
+  );
+}
+
+/** D-pad (a pocket console): left and right change section, up and down change page in the section, A opens
+ * the menu of every section, B goes back; a little screen says where one is. Arrow keys work on the pad. */
+export function DpadNav({ sections }: { sections: readonly NavSection[] }) {
+  const strings = useShellStrings();
+  const t = useT();
+  const navigate = useNavigate();
+  const { current, isActive } = useCurrent(sections);
+  const { open, setOpen, root } = useOpenSection();
+  const at = Math.max(
+    0,
+    sections.findIndex((s) => isActive(s)),
+  );
+  const here = sections[at];
+  const pages = here ? destinationsOf(here, current?.key) : [];
+  const page = Math.max(
+    0,
+    pages.findIndex((p) => p.active),
+  );
+  const toSection = (step: number) => {
+    if (!sections.length) return;
+    const next = sections[(at + step + sections.length) % sections.length];
+    const first = next ? destinationsOf(next, undefined)[0] : undefined;
+    if (first) navigate(first.route);
+  };
+  const toPage = (step: number) => {
+    if (pages.length < 2) return;
+    const next = pages[(page + step + pages.length) % pages.length];
+    if (next) navigate(next.route);
+  };
+  const onKey = (event: KeyboardEvent<HTMLElement>) => {
+    const moves: Record<string, () => void> = {
+      ArrowLeft: () => toSection(-1),
+      ArrowRight: () => toSection(1),
+      ArrowUp: () => toPage(-1),
+      ArrowDown: () => toPage(1),
+    };
+    const move = moves[event.key];
+    if (!move) return;
+    event.preventDefault();
+    move();
+  };
+  return (
+    <nav ref={root} className="shell-dpad" aria-label={strings.mainNav}>
+      {open === "menu" ? (
+        <div className="shell-dpad__menu">
+          <p className="shell-dock__title">{t("shell:dpad.menu")}</p>
+          {sections.map((s) => (
+            <div key={s.key} className="shell-player__sheet-group">
+              <p className="shell-player__sheet-title">{strings.label(s.label_key)}</p>
+              <DestinationList section={s} currentKey={current?.key} onPick={() => setOpen(null)} />
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <p className="shell-dpad__screen" aria-live="polite">
+        <span>{here ? strings.label(here.label_key) : "—"}</span>
+        {pages.length > 1 && pages[page] ? <small>{strings.label(pages[page].label_key)}</small> : null}
+      </p>
+      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: arrow keys steer the pad */}
+      <fieldset className="shell-dpad__pad" aria-label={t("shell:dpad.pad")} onKeyDown={onKey}>
+        <button
+          type="button"
+          className="shell-dpad__up"
+          aria-label={t("shell:dpad.previousPage")}
+          onClick={() => toPage(-1)}
+        >
+          <Icon name="chevron-up" size={16} />
+        </button>
+        <button
+          type="button"
+          className="shell-dpad__left"
+          aria-label={t("shell:dpad.previousSection")}
+          onClick={() => toSection(-1)}
+        >
+          <Icon name="chevron-left" size={16} />
+        </button>
+        <span className="shell-dpad__hub" aria-hidden="true" />
+        <button
+          type="button"
+          className="shell-dpad__right"
+          aria-label={t("shell:dpad.nextSection")}
+          onClick={() => toSection(1)}
+        >
+          <Icon name="chevron-right" size={16} />
+        </button>
+        <button
+          type="button"
+          className="shell-dpad__down"
+          aria-label={t("shell:dpad.nextPage")}
+          onClick={() => toPage(1)}
+        >
+          <Icon name="chevron-down" size={16} />
+        </button>
+      </fieldset>
+      <div className="shell-dpad__buttons">
+        <button
+          type="button"
+          className="shell-dpad__b"
+          aria-label={t("shell:dpad.back")}
+          onClick={() => window.history.back()}
+        >
+          B
+        </button>
+        <button
+          type="button"
+          className="shell-dpad__a"
+          aria-expanded={open === "menu"}
+          aria-label={t("shell:dpad.menu")}
+          onClick={() => setOpen(open === "menu" ? null : "menu")}
+        >
+          A
+        </button>
+      </div>
     </nav>
   );
 }

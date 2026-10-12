@@ -107,6 +107,9 @@ const LAYOUTS: Record<string, string> = {
   encore: "card",
   finale: "banner",
   extraedition: "card",
+  statsup: "card",
+  fourlines: "card",
+  wavecleared: "card",
 };
 /** The big word some looks shout (an onomatopoeia, a code). */
 const WORDS: Record<string, string> = {
@@ -124,6 +127,8 @@ const WORDS: Record<string, string> = {
   rollout: "LEVEL UP — ENGAGED",
   viral: "♥ 99+",
   extraedition: "EXTRA! EXTRA!",
+  fourlines: "4 LINES!",
+  wavecleared: "WAVE CLEARED",
 };
 /** How many particles each look scatters. */
 const PARTICLES: Record<string, number> = {
@@ -157,6 +162,9 @@ const PARTICLES: Record<string, number> = {
   encore: 20,
   finale: 10,
   extraedition: 8,
+  statsup: 8,
+  fourlines: 40,
+  wavecleared: 24,
 };
 
 function sample(level: number): Summary {

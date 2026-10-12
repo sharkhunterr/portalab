@@ -788,7 +788,10 @@
             "likes",
             "musicnotes",
             "ribbons",
-            "inkstamp"
+            "inkstamp",
+            "pixelhearts",
+            "lineclear",
+            "lasers"
           ]
         },
         "levelUp": {
@@ -841,7 +844,10 @@
             "viral",
             "encore",
             "finale",
-            "extraedition"
+            "extraedition",
+            "statsup",
+            "fourlines",
+            "wavecleared"
           ]
         }
       },
@@ -872,7 +878,8 @@
                 "taskbar",
                 "feed",
                 "player",
-                "masthead"
+                "masthead",
+                "dpad"
               ]
             },
             "tablet": {
@@ -894,7 +901,8 @@
                 "taskbar",
                 "feed",
                 "player",
-                "masthead"
+                "masthead",
+                "dpad"
               ]
             },
             "phone": {
@@ -915,7 +923,8 @@
                 "taskbar",
                 "feed",
                 "player",
-                "masthead"
+                "masthead",
+                "dpad"
               ]
             }
           },
@@ -1156,7 +1165,10 @@
             "reactions",
             "equalizer",
             "cinemaglow",
-            "pages"
+            "pages",
+            "lcdstars",
+            "fallingblocks",
+            "fleet"
           ]
         }
       },
@@ -1281,7 +1293,10 @@
             "chathead",
             "nowplaying",
             "nextepisode",
-            "telegram"
+            "telegram",
+            "rpgbox",
+            "blockrow",
+            "invasion"
           ]
         },
         "animation": {
@@ -1337,7 +1352,10 @@
             "chatpop",
             "beatdrop",
             "curtainwipe",
-            "spinpaper"
+            "spinpaper",
+            "pixelreveal",
+            "harddrop",
+            "march"
           ]
         }
       },

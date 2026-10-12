@@ -26,7 +26,8 @@ export type NavVariant =
   | "taskbar"
   | "feed"
   | "player"
-  | "masthead";
+  | "masthead"
+  | "dpad";
 
 export interface Arrangement {
   device: DeviceClass;

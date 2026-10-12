@@ -26,7 +26,15 @@ import {
   VcrNav,
 } from "./nav/PrincipleNavs";
 import { NavContent } from "./nav/SectionNav";
-import { FeedSide, FeedTabs, MastheadNav, PlayerBar, PlayerLibrary, TaskbarNav } from "./nav/UniverseNavs";
+import {
+  DpadNav,
+  FeedSide,
+  FeedTabs,
+  MastheadNav,
+  PlayerBar,
+  PlayerLibrary,
+  TaskbarNav,
+} from "./nav/UniverseNavs";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
 import { RegionBoundary } from "./router/RouteBoundary";
@@ -198,6 +206,7 @@ export function AppShell({
         {nav === "sheet" ? <SheetNav sections={sections} /> : null}
         {nav === "console" ? <ConsoleNav sections={sections} /> : null}
         {nav === "taskbar" ? <TaskbarNav sections={sections} /> : null}
+        {nav === "dpad" ? <DpadNav sections={sections} /> : null}
         {nav === "player" ? <PlayerBar sections={sections} library={arrangement.device === "phone"} /> : null}
         {drawerNav ? (
           <Drawer

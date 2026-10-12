@@ -103,6 +103,13 @@ export const BANNER_KEYS = [
   "live-equalizer",
   "live-cinemaglow",
   "live-pages",
+  // #89: the retro games
+  "lcdscreen",
+  "linestack",
+  "bunkers",
+  "live-lcdstars",
+  "live-fallingblocks",
+  "live-fleet",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -176,6 +183,10 @@ export const FRAME_KEYS = [
   "vinyl",
   "profiletile",
   "postage",
+  // #89: the retro games
+  "cartridge",
+  "blockframe",
+  "crab",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -242,4 +253,8 @@ export const NAME_KEYS = [
   "recap",
   "marathon",
   "typewriter",
+  // #89: the retro games
+  "lcdtext",
+  "bevelblocks",
+  "hiscore",
 ] as const;

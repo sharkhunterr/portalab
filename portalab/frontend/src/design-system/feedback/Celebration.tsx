@@ -113,6 +113,10 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   musicnotes: { count: 18, icon: "music", layer: "badge" },
   ribbons: { count: 12, layer: "screen" },
   inkstamp: { count: 6, layer: "screen" },
+  // #89: 8-bit hearts, lines clearing, laser shots
+  pixelhearts: { count: 16, layer: "badge" },
+  lineclear: { count: 8, layer: "screen" },
+  lasers: { count: 14, layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

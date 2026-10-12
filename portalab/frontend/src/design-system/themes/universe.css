@@ -3364,3 +3364,361 @@ h3,
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------- #89: the retro games */
+/* the pocket console: a grey body, a dark d-pad, magenta A and B, a green screen */
+:root[data-theme="pocket"] .shell-dpad {
+  border-color: #9a968f;
+  background: linear-gradient(180deg, #d6d3cd, #bdb9b2);
+}
+:root[data-theme="pocket"] .shell-dpad__pad button,
+:root[data-theme="pocket"] .shell-dpad__hub {
+  background: #2b2b2b;
+  color: #d6d3cd;
+}
+:root[data-theme="pocket"] .shell-dpad__screen {
+  border-color: #5f5d6b;
+  background: #9bbc0f;
+  color: #0f380f;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.62rem;
+  line-height: 1.6;
+}
+:root[data-theme="pocket"] .shell-dpad__screen small {
+  color: #306230;
+}
+:root[data-theme="pocket"] .shell-dpad__buttons button {
+  background: #8b1e4f;
+  color: #f2d7e3;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+}
+:root[data-theme="pocket"] .shell-header {
+  background: #9bbc0f;
+  border-block-end: 3px solid #0f380f;
+}
+/* the falling blocks: each section a bevelled piece of its own colour */
+:root[data-theme="blockfall"] .shell-tabs__item {
+  --block: #00e5ff;
+  border: 0.3rem solid;
+  border-color: color-mix(in srgb, var(--block) 55%, #ffffff) color-mix(in srgb, var(--block) 60%, #000000)
+    color-mix(in srgb, var(--block) 60%, #000000) color-mix(in srgb, var(--block) 55%, #ffffff);
+  border-radius: 0;
+  background: var(--block);
+  color: #0b0b2a;
+  font-weight: 700;
+}
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 2) .shell-tabs__item {
+  --block: #ffd23f;
+}
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 3) .shell-tabs__item {
+  --block: #c77dff;
+}
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 4) .shell-tabs__item {
+  --block: #3ddc84;
+}
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 5) .shell-tabs__item {
+  --block: #ff5c5c;
+}
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 6) .shell-tabs__item {
+  --block: #5c8cff;
+}
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 7) .shell-tabs__item {
+  --block: #ff9f40;
+}
+:root[data-theme="blockfall"] .shell-tabs__item[data-active],
+:root[data-theme="blockfall"] .shell-tabs__item[aria-expanded="true"] {
+  outline: 0.2rem solid #ffffff;
+  outline-offset: 0.15rem;
+}
+/* the invaders: the dock as the ground line, each section a bunker, the current one the cannon */
+:root[data-theme="invaders"] .shell-dock__bar {
+  border: 0;
+  border-block-end: 3px solid #39ff14;
+  border-radius: 0;
+  background: #050805e6;
+  box-shadow: 0 0.4rem 1rem #39ff1433;
+}
+:root[data-theme="invaders"] .shell-dock__item-icon {
+  position: relative;
+  border-radius: 1.4rem 1.4rem 0 0;
+  background: #39ff14;
+  color: #001a00;
+  box-shadow: none;
+  clip-path: polygon(0 100%, 0 30%, 18% 0, 82% 0, 100% 30%, 100% 100%, 72% 100%, 72% 90%, 28% 90%, 28% 100%);
+}
+:root[data-theme="invaders"] .shell-dock__item[data-active] .shell-dock__item-icon,
+:root[data-theme="invaders"] .shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: #ffffff;
+  color: #001a00;
+  clip-path: polygon(0 100%, 0 30%, 18% 0, 82% 0, 100% 30%, 100% 100%);
+}
+:root[data-theme="invaders"] .shell-dock__item[data-active]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.45rem;
+  inset-inline-start: calc(50% - 0.15rem);
+  inline-size: 0.3rem;
+  block-size: 0.5rem;
+  background: #ffffff;
+}
+:root[data-theme="invaders"] .shell-dock__item[data-active]::after {
+  background: #ff4d6d;
+}
+
+/* rpg box (pocket console): a role-playing game's text box, a double frame, its arrow blinking */
+.ds-notifications[data-style="rpgbox"] .ds-notification {
+  --color-text: #202020;
+  --color-text-muted: #404040;
+  overflow: visible;
+  border: 0.25rem solid #202020;
+  border-radius: 0.35rem;
+  background: #f8f8f0;
+  color: #202020;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.62rem;
+  line-height: 1.7;
+  box-shadow:
+    inset 0 0 0 0.2rem #f8f8f0,
+    inset 0 0 0 0.35rem #6890a8,
+    0.3rem 0.3rem 0 #20202055;
+}
+.ds-notifications[data-style="rpgbox"] .ds-notification::before {
+  inset: auto 0.9rem 0.55rem auto;
+  inline-size: 0.6rem;
+  block-size: 0.45rem;
+  background: #202020;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  animation: rpg-arrow 0.8s steps(2, jump-none) infinite;
+}
+@keyframes rpg-arrow {
+  50% {
+    opacity: 0;
+  }
+}
+.ds-notifications[data-style="rpgbox"] .ds-notification__icon {
+  border-radius: 0;
+  background: #306230;
+  color: #e3f1bc;
+}
+.ds-notifications[data-style="rpgbox"] :is(.ds-notification__title, .ds-notification__body) {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.62rem;
+  line-height: 1.7;
+}
+.ds-notifications[data-style="rpgbox"] .ds-notification__timer {
+  display: none;
+}
+/* block row (falling blocks): framed above and below by a row of bevelled blocks */
+.ds-notifications[data-style="blockrow"] .ds-notification {
+  --color-text: #f5f5ff;
+  --color-text-muted: #c8c8ec;
+  padding-block: 1.25rem;
+  border: 0;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 0.8rem) top / 100% 0.8rem no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      #00e5ff 0 0.8rem,
+      #ffd23f 0.8rem 1.6rem,
+      #c77dff 1.6rem 2.4rem,
+      #3ddc84 2.4rem 3.2rem,
+      #ff5c5c 3.2rem 4rem
+    )
+    top / 100% 0.8rem no-repeat,
+    repeating-linear-gradient(90deg, #00000055 0 2px, transparent 2px 0.8rem) bottom / 100% 0.8rem no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      #ff9f40 0 0.8rem,
+      #5c8cff 0.8rem 1.6rem,
+      #00e5ff 1.6rem 2.4rem,
+      #ffd23f 2.4rem 3.2rem,
+      #c77dff 3.2rem 4rem
+    )
+    bottom / 100% 0.8rem no-repeat,
+    #16163f;
+  color: #f5f5ff;
+  box-shadow: 0 0.6rem 1.4rem #00000088;
+}
+.ds-notifications[data-style="blockrow"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="blockrow"] .ds-notification__icon {
+  border-radius: 0;
+  background: #c77dff;
+  color: #0b0b2a;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055;
+}
+.ds-notifications[data-style="blockrow"] .ds-notification__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+}
+/* invasion (invaders): a phosphor screen, a pixel invader bobbing above it */
+.ds-notifications[data-style="invasion"] .ds-notification {
+  --color-text: #effff0;
+  --color-text-muted: #a3d9a5;
+  overflow: visible;
+  margin-block-start: 1.6rem;
+  border: 2px solid #39ff14;
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, #39ff140a 0 1px, transparent 1px 3px), #050805;
+  color: #effff0;
+  font-family: "Share Tech Mono", monospace;
+  box-shadow:
+    0 0 0.8rem #39ff1455,
+    inset 0 0 1rem #39ff1422;
+}
+.ds-notifications[data-style="invasion"] .ds-notification::before {
+  --p: 3px;
+  inset: calc(-1.6rem - 2px) auto auto 1rem;
+  inline-size: var(--p);
+  block-size: var(--p);
+  background: none;
+  color: #39ff14;
+  box-shadow:
+    calc(2 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(7 * var(--p)) 0 currentColor;
+  animation: invader-bob 0.6s steps(2, jump-none) infinite;
+}
+@keyframes invader-bob {
+  50% {
+    translate: 0.4rem 0;
+  }
+}
+.ds-notifications[data-style="invasion"] .ds-notification__icon {
+  border-radius: 0;
+  background: #39ff14;
+  color: #001a00;
+}
+.ds-notifications[data-style="invasion"] .ds-notification__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: #39ff14;
+}
+.ds-notifications[data-style="invasion"] .ds-notification__timer {
+  background: #ff4d6d;
+}
+
+/* animations */
+.ds-notifications[data-animation="pixelreveal"] .ds-notification {
+  animation-name: universe-notify-reveal;
+  animation-duration: 0.8s;
+  animation-timing-function: steps(8, end);
+}
+@keyframes universe-notify-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(-2rem -2rem -2rem -2rem);
+  }
+}
+.ds-notifications[data-animation="harddrop"] .ds-notification {
+  animation-name: universe-notify-harddrop;
+  animation-duration: 0.55s;
+  animation-timing-function: linear;
+}
+@keyframes universe-notify-harddrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-80vh);
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(0);
+  }
+  55% {
+    transform: translateY(-0.4rem);
+    filter: brightness(2);
+  }
+  70% {
+    transform: translateY(0) translateX(-3px);
+    filter: none;
+  }
+  85% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="march"] .ds-notification {
+  animation-name: universe-notify-march;
+  animation-duration: 1.2s;
+  animation-timing-function: steps(1, end);
+}
+@keyframes universe-notify-march {
+  0% {
+    opacity: 1;
+    transform: translate(60%, -4rem);
+  }
+  16% {
+    transform: translate(40%, -4rem);
+  }
+  32% {
+    transform: translate(20%, -2.5rem);
+  }
+  48% {
+    transform: translate(0, -2.5rem);
+  }
+  64% {
+    transform: translate(-6%, -1rem);
+  }
+  80% {
+    transform: translate(0, -1rem);
+  }
+  100% {
+    transform: none;
+  }
+}

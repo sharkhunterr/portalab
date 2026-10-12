@@ -233,6 +233,9 @@ NOTIFICATION_STYLES = Literal[
     "nowplaying",
     "nextepisode",
     "telegram",
+    "rpgbox",
+    "blockrow",
+    "invasion",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -287,6 +290,9 @@ NOTIFICATION_ANIMATIONS = Literal[
     "beatdrop",
     "curtainwipe",
     "spinpaper",
+    "pixelreveal",
+    "harddrop",
+    "march",
 ]
 AMBIENTS = Literal[
     "none",
@@ -391,6 +397,9 @@ AMBIENTS = Literal[
     "equalizer",
     "cinemaglow",
     "pages",
+    "lcdstars",
+    "fallingblocks",
+    "fleet",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -440,6 +449,9 @@ CELEBRATIONS = Literal[
     "musicnotes",
     "ribbons",
     "inkstamp",
+    "pixelhearts",
+    "lineclear",
+    "lasers",
 ]
 PATTERNS = Literal[
     "none",
@@ -492,6 +504,7 @@ LEVEL_UPS = Literal[
     "owlpost", "plunder", "rollout",
     "setupwizard", "unboxing", "viral",
     "encore", "finale", "extraedition",
+    "statsup", "fourlines", "wavecleared",
 ]  # fmt: skip
 
 
@@ -505,7 +518,7 @@ class Motion(_Closed):
 
 class Nav(_Closed):
     # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel;
-    # #89: a desktop's taskbar, a social feed, a music player, a newspaper's masthead
+    # #89: a desktop's taskbar, a social feed, a music player, a newspaper's masthead, a console's d-pad
     desktop: (
         Literal[
             "sidebar",
@@ -525,6 +538,7 @@ class Nav(_Closed):
             "feed",
             "player",
             "masthead",
+            "dpad",
         ]
         | None
     ) = None
@@ -547,6 +561,7 @@ class Nav(_Closed):
             "feed",
             "player",
             "masthead",
+            "dpad",
         ]
         | None
     ) = None
@@ -568,6 +583,7 @@ class Nav(_Closed):
             "feed",
             "player",
             "masthead",
+            "dpad",
         ]
         | None
     ) = None

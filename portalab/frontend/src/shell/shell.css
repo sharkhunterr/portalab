@@ -854,6 +854,8 @@
 }
 .shell[data-nav="tabs"][data-device="phone"] .shell-tabs {
   inset-block-start: var(--frame-top);
+  align-self: stretch; /* the screen's width, not its content's: the strip scrolls */
+  min-inline-size: 0;
   margin: 0;
   padding: var(--space-2) var(--space-3) 0;
   background: var(--glass-bg);
@@ -865,6 +867,10 @@
   display: flex;
   overflow-x: auto;
   scrollbar-width: none;
+}
+/* each bookmark keeps its width: the strip scrolls to the last one instead of squeezing them on top of each other */
+.shell[data-nav="tabs"][data-device="phone"] .shell-tabs__list > li {
+  flex: none;
 }
 .shell[data-nav="tabs"][data-device="phone"] .shell-tabs__item {
   inline-size: auto;
@@ -2590,4 +2596,171 @@ li[data-active] > .shell-player-library__row strong {
   .shell-player__progress > span {
     transition: none;
   }
+}
+
+/* d-pad: a pocket console's controls along the bottom — the cross, a little screen, the A and B buttons */
+.shell[data-nav="dpad"] {
+  --frame-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="dpad"][data-header-position="bottom"] {
+  --frame-bottom: calc(var(--header-height) + 6rem + env(safe-area-inset-bottom, 0px));
+}
+.shell-dpad {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(var(--frame-bottom) - 6rem - env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-nav);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  block-size: calc(6rem + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--space-5) env(safe-area-inset-bottom, 0px);
+  border-block-start: 1px solid var(--glass-border);
+  border-radius: 1.4rem 1.4rem 0 0;
+  background: var(--color-surface-raised);
+  box-shadow: 0 -0.4rem 1.2rem color-mix(in srgb, var(--color-text) 14%, transparent);
+}
+.shell-dpad__pad {
+  display: grid;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  grid-template: repeat(3, 1.75rem) / repeat(3, 1.75rem);
+  grid-template-areas:
+    ". up ."
+    "left hub right"
+    ". down .";
+  grid-column: 1;
+  grid-row: 1;
+}
+.shell-dpad__pad button,
+.shell-dpad__hub {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: var(--color-text);
+  color: var(--color-surface-raised);
+  cursor: pointer;
+}
+.shell-dpad__up {
+  grid-area: up;
+  border-radius: 0.3rem 0.3rem 0 0;
+}
+.shell-dpad__down {
+  grid-area: down;
+  border-radius: 0 0 0.3rem 0.3rem;
+}
+.shell-dpad__left {
+  grid-area: left;
+  border-radius: 0.3rem 0 0 0.3rem;
+}
+.shell-dpad__right {
+  grid-area: right;
+  border-radius: 0 0.3rem 0.3rem 0;
+}
+.shell-dpad__hub {
+  grid-area: hub;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-text) 75%, var(--color-surface)) 0 30%,
+    var(--color-text) 34%
+  );
+  cursor: default;
+}
+.shell-dpad__pad button:active {
+  filter: brightness(1.5);
+}
+.shell-dpad__screen {
+  display: grid;
+  grid-column: 2;
+  grid-row: 1;
+  align-content: center;
+  gap: 0.1rem;
+  min-inline-size: 0;
+  max-inline-size: 26rem;
+  justify-self: center;
+  inline-size: 100%;
+  min-block-size: 3.4rem;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 0.35rem solid color-mix(in srgb, var(--color-text) 60%, var(--color-surface));
+  border-radius: 0.4rem 0.4rem 1.6rem 0.4rem;
+  background: color-mix(in srgb, var(--color-accent) 22%, var(--color-surface));
+  color: var(--color-text);
+  text-align: center;
+}
+.shell-dpad__screen span,
+.shell-dpad__screen small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-dpad__screen span {
+  font-weight: var(--font-weight-bold);
+}
+.shell-dpad__screen small {
+  color: var(--color-text-muted);
+}
+.shell-dpad__buttons {
+  display: flex;
+  grid-column: 3;
+  grid-row: 1;
+  gap: var(--space-3);
+  rotate: -22deg;
+}
+.shell-dpad__buttons button {
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-accent-alt);
+  color: var(--color-surface-raised);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 0.2rem 0 color-mix(in srgb, var(--color-text) 45%, transparent);
+  cursor: pointer;
+}
+.shell-dpad__a {
+  translate: 0 -0.7rem;
+}
+.shell-dpad__buttons button:active,
+.shell-dpad__a[aria-expanded="true"] {
+  translate: 0 calc(-0.7rem + 2px);
+  box-shadow: none;
+}
+.shell-dpad__b:active {
+  translate: 0 2px;
+}
+.shell-dpad__menu {
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline: var(--space-2);
+  max-block-size: 70dvh;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  animation: shell-panel-in var(--motion-duration-normal) var(--motion-easing-out) both;
+}
+.shell[data-device="phone"] .shell-dpad {
+  gap: var(--space-2);
+  padding-inline: var(--space-3);
+}
+.shell[data-device="phone"] .shell-dpad__pad {
+  grid-template: repeat(3, 1.6rem) / repeat(3, 1.6rem);
+  grid-template-areas:
+    ". up ."
+    "left hub right"
+    ". down .";
+}
+.shell[data-device="phone"] .shell-dpad__buttons button {
+  inline-size: 2.3rem;
+  block-size: 2.3rem;
 }

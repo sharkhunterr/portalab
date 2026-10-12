@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 2,
+  "key": "pocket",
+  "name": "Console de poche",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#cadc9f",
+    "surfaceRaised": "#dbe7b5",
+    "text": "#0f380f",
+    "textMuted": "#2b552b",
+    "border": "#8bac0f",
+    "accent": "#306230",
+    "accentContrast": "#e3f1bc",
+    "focus": "#0f380f",
+    "accentAlt": "#8b1e4f",
+    "rarity": {
+      "common": "#2b552b",
+      "rare": "#1d4f7a",
+      "epic": "#6b2f8a",
+      "legendary": "#6e5000"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b4252",
+      "bg": "#eceff4",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#15603a",
+      "bg": "#e3f4ea",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#fdf1dc",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6b4a00",
+      "bg": "#faf1d7",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#a1121d",
+      "bg": "#fde7e8",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#57303a",
+      "bg": "#f3e6ea",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b2b8f",
+      "bg": "#ede6fb",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a1f52",
+      "bg": "#f9e4ef",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#3f4652",
+      "bg": "#eef0f3",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#0f4c75",
+      "bg": "#e1eff8",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Share Tech Mono\", \"VT323\", monospace",
+    "headingFamily": "\"Press Start 2P\", \"VT323\", monospace",
+    "headingCase": "uppercase",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0,
+    "md": 0.2
+  },
+  "motion": {
+    "profile": "playful",
+    "celebration": "pixelhearts",
+    "fastMs": 100,
+    "normalMs": 200,
+    "levelUp": "statsup"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "dpad",
+      "tablet": "dpad",
+      "phone": "dpad"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "pixel",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "gamepad",
+      "film": "film",
+      "media": "film",
+      "compass": "compass",
+      "users": "users",
+      "shop": "store",
+      "trophy": "trophy",
+      "search": "search",
+      "newspaper": "newspaper",
+      "book": "book",
+      "calendar": "calendar",
+      "chart": "battery"
+    }
+  },
+  "background": {
+    "fallback": "#cadc9f",
+    "pattern": "grid",
+    "ambient": "lcdstars"
+  },
+  "sounds": {
+    "notification": "asset:chiptune/notification.wav",
+    "alert": "asset:chiptune/alert.wav",
+    "success": "asset:chiptune/success.wav",
+    "reward": "asset:chiptune/reward.wav",
+    "levelUp": "asset:chiptune/level-up.wav",
+    "ui": "asset:chiptune/ui.wav"
+  },
+  "notification": {
+    "style": "rpgbox",
+    "animation": "pixelreveal"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Écran titre",
+      "nav:nav.section.home": "Écran titre",
+      "dashboard:title": "Écran titre",
+      "nav:nav.media": "Cartouches",
+      "nav:nav.section.media": "Cartouches",
+      "media:home.title": "Cartouches",
+      "nav:nav.media_requests": "Mes cartouches demandées",
+      "nav:nav.media_insights": "Temps de jeu",
+      "media:insights.title": "Temps de jeu",
+      "nav:nav.section.content": "Notice",
+      "nav:nav.news": "Nouvelles cartouches",
+      "news:title": "Nouvelles cartouches",
+      "nav:nav.wiki": "Soluces",
+      "wiki:title": "Soluces",
+      "nav:nav.search": "Rechercher",
+      "search:title": "Rechercher",
+      "nav:nav.calendar": "Sorties",
+      "calendar:title": "Sorties",
+      "nav:nav.services": "Accessoires",
+      "nav:nav.section.services": "Accessoires",
+      "nav:nav.statistics": "Records",
+      "statistics:title": "Records",
+      "nav:nav.community": "Joueurs reliés",
+      "nav:nav.section.community": "Joueurs reliés",
+      "community:title": "Joueurs reliés",
+      "nav:nav.progression": "Mon niveau",
+      "gamification:progression.title": "Mon niveau",
+      "nav:nav.campaigns": "Quêtes",
+      "campaigns:page.title": "Quêtes",
+      "nav:nav.marketplace": "Boutique de jeux",
+      "nav:nav.section.marketplace": "Boutique de jeux",
+      "marketplace:catalog.title": "Boutique de jeux",
+      "nav:nav.projects": "Jeux à financer",
+      "marketplace:projects.title": "Jeux à financer",
+      "marketplace:owned.title": "Mon sac",
+      "nav:nav.support": "Service après-vente",
+      "nav:nav.section.support": "Service après-vente",
+      "nav:nav.incidents": "Bugs",
+      "support:incident.title": "Bugs",
+      "nav:nav.feedback": "Signaler un bug",
+      "support:feedback.title": "Signaler un bug",
+      "gamification:value.coins": "Pièces",
+      "gamification:value.xp": "Points d'expérience",
+      "shell:dpad.menu": "Start"
+    },
+    "en": {
+      "nav:nav.home": "Title screen",
+      "nav:nav.section.home": "Title screen",
+      "dashboard:title": "Title screen",
+      "nav:nav.media": "Cartridges",
+      "nav:nav.section.media": "Cartridges",
+      "media:home.title": "Cartridges",
+      "nav:nav.media_requests": "My requested cartridges",
+      "nav:nav.media_insights": "Play time",
+      "media:insights.title": "Play time",
+      "nav:nav.section.content": "Manual",
+      "nav:nav.news": "New cartridges",
+      "news:title": "New cartridges",
+      "nav:nav.wiki": "Walkthroughs",
+      "wiki:title": "Walkthroughs",
+      "nav:nav.search": "Search",
+      "search:title": "Search",
+      "nav:nav.calendar": "Releases",
+      "calendar:title": "Releases",
+      "nav:nav.services": "Accessories",
+      "nav:nav.section.services": "Accessories",
+      "nav:nav.statistics": "Records",
+      "statistics:title": "Records",
+      "nav:nav.community": "Linked players",
+      "nav:nav.section.community": "Linked players",
+      "community:title": "Linked players",
+      "nav:nav.progression": "My level",
+      "gamification:progression.title": "My level",
+      "nav:nav.campaigns": "Quests",
+      "campaigns:page.title": "Quests",
+      "nav:nav.marketplace": "Game shop",
+      "nav:nav.section.marketplace": "Game shop",
+      "marketplace:catalog.title": "Game shop",
+      "nav:nav.projects": "Games to fund",
+      "marketplace:projects.title": "Games to fund",
+      "marketplace:owned.title": "My bag",
+      "nav:nav.support": "After-sales service",
+      "nav:nav.section.support": "After-sales service",
+      "nav:nav.incidents": "Bugs",
+      "support:incident.title": "Bugs",
+      "nav:nav.feedback": "Report a bug",
+      "support:feedback.title": "Report a bug",
+      "gamification:value.coins": "Coins",
+      "gamification:value.xp": "Experience points",
+      "shell:dpad.menu": "Start"
+    }
+  }
+}

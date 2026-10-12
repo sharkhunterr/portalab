@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 2,
+  "key": "invaders",
+  "name": "Envahisseurs",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#050805",
+    "surfaceRaised": "#0f170f",
+    "text": "#effff0",
+    "textMuted": "#a3d9a5",
+    "border": "#1f3a1f",
+    "accent": "#39ff14",
+    "accentContrast": "#001a00",
+    "focus": "#ffffff",
+    "accentAlt": "#ff4d6d",
+    "rarity": {
+      "common": "#a3d9a5",
+      "rare": "#5ec8ff",
+      "epic": "#d38bff",
+      "legendary": "#ffe14d"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Share Tech Mono\", \"VT323\", monospace",
+    "headingFamily": "\"Press Start 2P\", \"VT323\", monospace",
+    "headingCase": "uppercase",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0,
+    "md": 0
+  },
+  "motion": {
+    "profile": "playful",
+    "celebration": "lasers",
+    "fastMs": 90,
+    "normalMs": 180,
+    "levelUp": "wavecleared"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "dock",
+      "tablet": "dock",
+      "phone": "dock"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "terminal",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "rocket",
+      "film": "film",
+      "media": "film",
+      "compass": "crosshair",
+      "users": "users",
+      "shop": "store",
+      "trophy": "trophy",
+      "search": "crosshair",
+      "newspaper": "radio",
+      "book": "book",
+      "calendar": "calendar",
+      "chart": "chart"
+    }
+  },
+  "background": {
+    "fallback": "#050805",
+    "pattern": "stars",
+    "ambient": "fleet"
+  },
+  "sounds": {
+    "notification": "asset:chiptune/notification.wav",
+    "alert": "asset:chiptune/alert.wav",
+    "success": "asset:chiptune/success.wav",
+    "reward": "asset:chiptune/reward.wav",
+    "levelUp": "asset:chiptune/level-up.wav",
+    "ui": "asset:chiptune/ui.wav"
+  },
+  "notification": {
+    "style": "invasion",
+    "animation": "march"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Base terrestre",
+      "nav:nav.section.home": "Base terrestre",
+      "dashboard:title": "Base terrestre",
+      "nav:nav.media": "Écrans de contrôle",
+      "nav:nav.section.media": "Écrans de contrôle",
+      "media:home.title": "Écrans de contrôle",
+      "nav:nav.media_requests": "Renforts demandés",
+      "nav:nav.media_insights": "Vagues repoussées",
+      "media:insights.title": "Vagues repoussées",
+      "nav:nav.section.content": "Dossiers",
+      "nav:nav.news": "Alertes",
+      "news:title": "Alertes",
+      "nav:nav.wiki": "Manuel du défenseur",
+      "wiki:title": "Manuel du défenseur",
+      "nav:nav.search": "Viseur",
+      "search:title": "Viseur",
+      "nav:nav.calendar": "Prochaines vagues",
+      "calendar:title": "Prochaines vagues",
+      "nav:nav.services": "Bunkers",
+      "nav:nav.section.services": "Bunkers",
+      "nav:nav.statistics": "Meilleurs scores",
+      "statistics:title": "Meilleurs scores",
+      "nav:nav.community": "Escadrille",
+      "nav:nav.section.community": "Escadrille",
+      "community:title": "Escadrille",
+      "nav:nav.progression": "Mon rang",
+      "gamification:progression.title": "Mon rang",
+      "nav:nav.campaigns": "Invasions",
+      "campaigns:page.title": "Invasions",
+      "nav:nav.marketplace": "Armurerie",
+      "nav:nav.section.marketplace": "Armurerie",
+      "marketplace:catalog.title": "Armurerie",
+      "nav:nav.projects": "Défenses à financer",
+      "marketplace:projects.title": "Défenses à financer",
+      "marketplace:owned.title": "Mon arsenal",
+      "nav:nav.support": "Infirmerie",
+      "nav:nav.section.support": "Infirmerie",
+      "nav:nav.incidents": "Brèches",
+      "support:incident.title": "Brèches",
+      "nav:nav.feedback": "Rapport de mission",
+      "support:feedback.title": "Rapport de mission",
+      "gamification:value.coins": "Crédits",
+      "gamification:value.xp": "Points"
+    },
+    "en": {
+      "nav:nav.home": "Ground base",
+      "nav:nav.section.home": "Ground base",
+      "dashboard:title": "Ground base",
+      "nav:nav.media": "Control screens",
+      "nav:nav.section.media": "Control screens",
+      "media:home.title": "Control screens",
+      "nav:nav.media_requests": "Reinforcements requested",
+      "nav:nav.media_insights": "Waves repelled",
+      "media:insights.title": "Waves repelled",
+      "nav:nav.section.content": "Files",
+      "nav:nav.news": "Alerts",
+      "news:title": "Alerts",
+      "nav:nav.wiki": "Defender's manual",
+      "wiki:title": "Defender's manual",
+      "nav:nav.search": "Sights",
+      "search:title": "Sights",
+      "nav:nav.calendar": "Next waves",
+      "calendar:title": "Next waves",
+      "nav:nav.services": "Bunkers",
+      "nav:nav.section.services": "Bunkers",
+      "nav:nav.statistics": "High scores",
+      "statistics:title": "High scores",
+      "nav:nav.community": "Squadron",
+      "nav:nav.section.community": "Squadron",
+      "community:title": "Squadron",
+      "nav:nav.progression": "My rank",
+      "gamification:progression.title": "My rank",
+      "nav:nav.campaigns": "Invasions",
+      "campaigns:page.title": "Invasions",
+      "nav:nav.marketplace": "Armoury",
+      "nav:nav.section.marketplace": "Armoury",
+      "marketplace:catalog.title": "Armoury",
+      "nav:nav.projects": "Defences to fund",
+      "marketplace:projects.title": "Defences to fund",
+      "marketplace:owned.title": "My arsenal",
+      "nav:nav.support": "Sick bay",
+      "nav:nav.section.support": "Sick bay",
+      "nav:nav.incidents": "Breaches",
+      "support:incident.title": "Breaches",
+      "nav:nav.feedback": "Mission report",
+      "support:feedback.title": "Mission report",
+      "gamification:value.coins": "Credits",
+      "gamification:value.xp": "Points"
+    }
+  }
+}

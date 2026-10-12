@@ -1378,3 +1378,126 @@
     0 0 0 2px #1a1a1a,
     0.3rem 0.3rem 0 #a3171d;
 }
+
+/* ---------------------------------------------------------------- #89: the retro games */
+/* 8-bit hearts (pocket console): pixel hearts bursting out */
+[data-effect="pixelhearts"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.2rem;
+  aspect-ratio: 1;
+  background: #8b1e4f;
+  clip-path: polygon(
+    20% 0,
+    40% 0,
+    40% 10%,
+    60% 10%,
+    60% 0,
+    80% 0,
+    80% 10%,
+    100% 10%,
+    100% 50%,
+    90% 50%,
+    90% 60%,
+    80% 60%,
+    80% 70%,
+    70% 70%,
+    70% 80%,
+    60% 80%,
+    60% 90%,
+    40% 90%,
+    40% 80%,
+    30% 80%,
+    30% 70%,
+    20% 70%,
+    20% 60%,
+    10% 60%,
+    10% 50%,
+    0 50%,
+    0 10%,
+    20% 10%
+  );
+  animation-name: fx-burst;
+  animation-timing-function: steps(10, end);
+}
+[data-effect="pixelhearts"] .celebration-fx:nth-child(2n) {
+  background: #306230;
+}
+[data-effect="pixelhearts"] .ds-celebration__badge {
+  background: #9bbc0f;
+  color: #0f380f;
+  font-family: "Press Start 2P", monospace;
+  box-shadow: 0 0 0 3px #0f380f;
+}
+/* lines cleared (falling blocks): rows of blocks flashing across the screen, then gone */
+[data-effect="lineclear"] .celebration-fx {
+  left: 0;
+  top: calc(30% + var(--i) * 6%);
+  inline-size: 100%;
+  block-size: 1.6rem;
+  background:
+    repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 1.4rem, #00000055 1.4rem 1.6rem),
+    repeating-linear-gradient(
+      90deg,
+      #00e5ff 0 1.6rem,
+      #ffd23f 1.6rem 3.2rem,
+      #c77dff 3.2rem 4.8rem,
+      #3ddc84 4.8rem 6.4rem,
+      #ff5c5c 6.4rem 8rem
+    );
+  animation-name: fx-lineclear;
+  animation-timing-function: steps(1, end);
+}
+@keyframes fx-lineclear {
+  0% {
+    opacity: 1;
+  }
+  20% {
+    filter: brightness(3);
+  }
+  35% {
+    filter: none;
+  }
+  50% {
+    filter: brightness(3);
+  }
+  70% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+[data-effect="lineclear"] .ds-celebration__badge {
+  background: #c77dff;
+  color: #0b0b2a;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055;
+}
+/* laser shots (invaders): bolts shooting out of the reward */
+[data-effect="lasers"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.2rem;
+  block-size: 1.2rem;
+  background: #ffffff;
+  box-shadow:
+    0 0 6px #39ff14,
+    0 0 12px #39ff14;
+  animation-name: fx-arrow;
+}
+[data-effect="lasers"] .celebration-fx:nth-child(3n) {
+  box-shadow:
+    0 0 6px #ff4d6d,
+    0 0 12px #ff4d6d;
+}
+[data-effect="lasers"] .ds-celebration__badge {
+  background: #050805;
+  color: #39ff14;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    0 0 0 2px #39ff14,
+    0 0 18px #39ff14;
+}

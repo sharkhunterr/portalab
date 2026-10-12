@@ -3,6 +3,7 @@ import type { ThemeDefinition } from "../schema";
 import academy from "./academy.json";
 import alien from "./alien.json";
 import binge from "./binge.json";
+import blockfall from "./blockfall.json";
 import caribbean from "./caribbean.json";
 import cartoon from "./cartoon.json";
 import christmas from "./christmas.json";
@@ -22,6 +23,7 @@ import halloween from "./halloween.json";
 import heroes from "./heroes.json";
 import highContrast from "./high-contrast.json";
 import horror from "./horror.json";
+import invaders from "./invaders.json";
 import light from "./light.json";
 import manga from "./manga.json";
 import matrix from "./matrix.json";
@@ -33,6 +35,7 @@ import nostromo from "./nostromo.json";
 import nova from "./nova.json";
 import orbit from "./orbit.json";
 import plex from "./plex.json";
+import pocket from "./pocket.json";
 import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
 import sincity from "./sincity.json";
@@ -87,6 +90,9 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   groove,
   binge,
   gazette,
+  pocket,
+  blockfall,
+  invaders,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

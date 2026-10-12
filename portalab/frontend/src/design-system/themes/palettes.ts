@@ -195,6 +195,19 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#f4efe4", accentAlt: "#ff6b6b", contrast: "#1a1a1a" },
     light: { accent: "#1a1a1a", accentAlt: "#a3171d", contrast: "#fbf8f1" },
   },
+  // #89: the retro games
+  dotmatrix: {
+    dark: { accent: "#9bbc0f", accentAlt: "#e05a8a", contrast: "#0f380f" },
+    light: { accent: "#306230", accentAlt: "#8b1e4f", contrast: "#e3f1bc" },
+  },
+  blockcolors: {
+    dark: { accent: "#00e5ff", accentAlt: "#ffd23f", contrast: "#001a20" },
+    light: { accent: "#0b6e8a", accentAlt: "#8a5a00", contrast: "#ffffff" },
+  },
+  arcadegreen: {
+    dark: { accent: "#39ff14", accentAlt: "#ff4d6d", contrast: "#001a00" },
+    light: { accent: "#1d7a0b", accentAlt: "#b0203f", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {
