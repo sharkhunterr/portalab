@@ -5041,6 +5041,47 @@ export interface paths {
         patch: operations["reschedule_api_v1_maintenance__window_id__patch"];
         trace?: never;
     };
+    "/api/v1/marketplace/boosters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Boosters
+         * @description #81: the boosters on sale — how many cards, the odds per rarity, the rarity guaranteed.
+         */
+        get: operations["boosters_api_v1_marketplace_boosters_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/boosters/{key}/reveal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reveal
+         * @description #81 (proof of concept): open a booster — its cards drawn now, each saying whether I own it already
+         *     (a duplicate, refunded in Coins). Visual only: nothing is charged, granted or refunded yet.
+         */
+        post: operations["reveal_api_v1_marketplace_boosters__key__reveal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/categories": {
         parameters: {
             query?: never;
@@ -24687,6 +24728,61 @@ export interface operations {
                 "application/json": components["schemas"]["WindowPatch"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    boosters_api_v1_marketplace_boosters_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    reveal_api_v1_marketplace_boosters__key__reveal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

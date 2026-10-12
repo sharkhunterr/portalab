@@ -231,6 +231,13 @@ body {
   --rarity-rare: var(--color-accent);
   --rarity-epic: var(--color-accent);
   --rarity-legendary: var(--color-accent-alt);
+  /* #81: boosters tell rarities apart at a glance, whatever the theme — silver, blue, violet, gold */
+  --booster-common: #a8b3c4;
+  --booster-rare: #4da3ff;
+  --booster-epic: #b45cff;
+  --booster-legendary: #ffbe3b;
+  --booster-ink: #070b18;
+  --booster-light: #ffffff;
   --xp-gradient: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
   /* 027: calendar categories — readable on light and dark surfaces, always paired with an icon */
   --cal-movie: #e0598b;

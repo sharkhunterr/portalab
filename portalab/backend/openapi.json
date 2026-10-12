@@ -31292,6 +31292,79 @@
         ]
       }
     },
+    "/api/v1/marketplace/boosters": {
+      "get": {
+        "description": "#81: the boosters on sale \u2014 how many cards, the odds per rarity, the rarity guaranteed.",
+        "operationId": "boosters_api_v1_marketplace_boosters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Boosters Api V1 Marketplace Boosters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Boosters",
+        "tags": [
+          "marketplace-boosters"
+        ]
+      }
+    },
+    "/api/v1/marketplace/boosters/{key}/reveal": {
+      "post": {
+        "description": "#81 (proof of concept): open a booster \u2014 its cards drawn now, each saying whether I own it already\n(a duplicate, refunded in Coins). Visual only: nothing is charged, granted or refunded yet.",
+        "operationId": "reveal_api_v1_marketplace_boosters__key__reveal_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,64}$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reveal Api V1 Marketplace Boosters  Key  Reveal Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reveal",
+        "tags": [
+          "marketplace-boosters"
+        ]
+      }
+    },
     "/api/v1/marketplace/categories": {
       "get": {
         "operationId": "categories_api_v1_marketplace_categories_get",

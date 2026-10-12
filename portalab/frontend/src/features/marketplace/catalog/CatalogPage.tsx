@@ -9,6 +9,8 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useProgression } from "../../gamification/api";
 import { BoostTag } from "../../gamification/boost";
 import { type Product, useDescribe, useProducts } from "../api";
+import { useBoosters } from "../boosters/api";
+import { BoosterShelf } from "../boosters/BoosterShelf";
 import { LazyArt } from "./LazyArt";
 import { Price, priceOf } from "./Price";
 import { ProductCard } from "./ProductCard";
@@ -86,6 +88,8 @@ export const DEPARTMENTS: Array<{ key: string; icon: string; shelves: Shelf[] }>
     icon: "shop",
     shelves: [{ key: "packs", icon: "shop", types: ["bundle"], notCategory: "ultimate" }],
   },
+  // #81 (proof of concept): sealed packs of looks drawn at random — their own view, not product shelves
+  { key: "boosters", icon: "sparkles", shelves: [] },
 ];
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
@@ -182,8 +186,14 @@ export default function CatalogPage() {
   );
   const inDepartment = all.filter((p) => departmentOfProduct(p) === current.key);
   const featured = inDepartment.filter((p) => p.featured).slice(0, 3);
+  const boosters = useBoosters();
   const counts = Object.fromEntries(
-    DEPARTMENTS.map((d) => [d.key, all.filter((p) => departmentOfProduct(p) === d.key).length]),
+    DEPARTMENTS.map((d) => [
+      d.key,
+      d.key === "boosters"
+        ? (boosters.data?.length ?? 0)
+        : all.filter((p) => departmentOfProduct(p) === d.key).length,
+    ]),
   );
   const go = (key: string) => setParams(key === "themes" ? {} : { department: key });
   const wanted = params.get("product"); // a product sheet opened from elsewhere (the shop window widget)
@@ -221,7 +231,7 @@ export default function CatalogPage() {
         ))}
       </nav>
 
-      <div className="shop-toolbar">
+      <div className="shop-toolbar" hidden={current.key === "boosters"}>
         <fieldset className="shop-rarities" aria-label={t("marketplace:shop.rarity")}>
           <button type="button" aria-pressed={!rarity} onClick={() => setRarity("")}>
             {t("marketplace:shop.allRarities")}
@@ -262,7 +272,7 @@ export default function CatalogPage() {
         </p>
       ) : null}
 
-      {featured.length && !q && !rarity && !type ? (
+      {featured.length && !q && !rarity && !type && current.key !== "boosters" ? (
         <ul className="shop-featured__list" aria-label={t("marketplace:shop.featured")}>
           {featured.map((product) => (
             <li key={product.key} className="shop-hero" data-rarity={product.rarity ?? "common"}>
@@ -299,7 +309,8 @@ export default function CatalogPage() {
 
       {products.isPending ? <Skeleton shape="tile" count={6} label={t("marketplace:catalog.title")} /> : null}
       {products.isError ? <FunctionalState state="unavailable" onRetry={() => products.refetch()} /> : null}
-      {products.data && inDepartment.length === 0 ? (
+      {current.key === "boosters" ? <BoosterShelf /> : null}
+      {products.data && inDepartment.length === 0 && current.key !== "boosters" ? (
         <EmptyState
           icon="shop"
           title={t("marketplace:shop.nothing")}
