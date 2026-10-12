@@ -2772,3 +2772,350 @@ h3,
     transform: none;
   }
 }
+/* the scroll's rolls and the bottle's neck stand outside the notification */
+.ds-notifications:is([data-style="scroll"], [data-style="bottle"]) .ds-notification {
+  overflow: visible;
+}
+
+/* ---------------------------------------------------------------- #89: the desktop, the fruit company, the social network */
+/* window cards (Desktop 2001): a blue title bar on top, a red close button, a thin blue frame */
+[data-cards="window"] :is(.ds-card:not([data-variant]), .ds-panel, .admin-section, .widget),
+:root[data-cards="window"]:not([data-widget-frame="glass"], [data-widget-frame="plain"]) .widget-frame {
+  border: 3px solid transparent;
+  border-block-start-width: 1.55rem;
+  border-radius: 0.55rem 0.55rem 0.2rem 0.2rem;
+  background:
+    linear-gradient(var(--color-surface-raised), var(--color-surface-raised)) padding-box,
+    radial-gradient(circle at 50% 50%, #ffffff 0 1px, transparent 1.5px) right 0.45rem top 0.42rem / 0.75rem
+    0.75rem no-repeat border-box,
+    linear-gradient(135deg, transparent 42%, #ffffff 42% 58%, transparent 58%) right 0.45rem top 0.42rem /
+    0.75rem 0.75rem no-repeat border-box,
+    linear-gradient(45deg, transparent 42%, #ffffff 42% 58%, transparent 58%) right 0.45rem top 0.42rem /
+    0.75rem 0.75rem no-repeat border-box,
+    linear-gradient(180deg, #f39a7a, #d6421f 60%, #c2331a) right 0.3rem top 0.27rem / 1.05rem 1.05rem
+    no-repeat border-box,
+    linear-gradient(180deg, #3d8af7 0, #0a5fe8 0.35rem, #0451d6 0.9rem, #0a4fc5 1.55rem, #0831d9 1.56rem)
+    border-box;
+  box-shadow: 0 0.35rem 0.9rem #00205f33;
+}
+[data-cards="window"] .admin-section__header {
+  background: none;
+}
+:root[data-theme="classicdesk"] body {
+  background:
+    radial-gradient(ellipse 140% 60% at 30% 118%, #7cc35c 0 46%, #4f9a35 52%, transparent 53%),
+    linear-gradient(180deg, #8fb8ea, #c4dbf5 45%, #e8f1fb 78%) fixed;
+}
+
+/* the desktop's taskbar: a glossy blue bar, a green Start button, a lighter tray */
+:root[data-theme="classicdesk"] .shell-taskbar__bar {
+  border: 0;
+  background: linear-gradient(180deg, #3f8cf3, #245edb 12%, #1f55c8 80%, #1941a5);
+  box-shadow: inset 0 1px 0 #6aa6ff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__start {
+  padding-inline: 0.7rem 1.4rem;
+  background: radial-gradient(ellipse at 30% 0%, #8fe07a, #3c9a2b 45%, #2c7a1f);
+  color: #ffffff;
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-size: 1.15rem;
+  text-shadow: 1px 1px 1px #0b3d06;
+  box-shadow: inset -2px 0 3px #0b3d0688;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__task {
+  border-color: #0f3fa0;
+  background: linear-gradient(180deg, #4d98f7, #2a6fe3);
+  color: #ffffff;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__task[data-active],
+:root[data-theme="classicdesk"] .shell-taskbar__task[aria-expanded="true"] {
+  background: linear-gradient(180deg, #1a48b5, #1e56c9);
+  box-shadow: inset 1px 1px 3px #0a2a75;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__tray {
+  border-inline-start: 1px solid #0f3fa0;
+  background: linear-gradient(180deg, #2fa4f3, #0f8ae6 15%, #0d78d4);
+  color: #ffffff;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__menu {
+  border: 2px solid #0831d9;
+  border-start-end-radius: 0.6rem;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__menu-title {
+  background: linear-gradient(180deg, #3d8af7, #0a5fe8 30%, #0451d6);
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-size: 1.05rem;
+  text-shadow: 1px 1px 1px #0a2a75;
+}
+:root[data-theme="classicdesk"] .shell-taskbar__pages {
+  background: #d3e5fa;
+  border-inline-start-color: #95bdee;
+}
+:root[data-theme="classicdesk"] .shell-header {
+  background: linear-gradient(180deg, #3d8af7, #0a5fe8 30%, #0451d6 85%, #0831d9);
+  color: #ffffff;
+  border-block-end: 0;
+}
+:root[data-theme="classicdesk"] .shell-header :is(a, button):not(.ds-button, .shell-search *) {
+  color: #ffffff;
+}
+
+/* the fruit company's dock: bigger frosted glass, a little dot under the open app */
+:root[data-theme="cupertino"] .shell-dock__bar {
+  padding: 0.4rem 0.5rem;
+  border-color: #ffffff99;
+  border-radius: 1.3rem;
+  background: #ffffff8c;
+  box-shadow:
+    0 0.6rem 2rem #0000002e,
+    inset 0 0 0 1px #ffffff66;
+}
+:root[data-theme="cupertino"] .shell-dock__item-icon {
+  border-radius: 22%;
+  background: linear-gradient(180deg, #ffffff, #e8e8ed);
+  color: #1d1d1f;
+}
+:root[data-theme="cupertino"] .shell-dock__item[data-active] .shell-dock__item-icon,
+:root[data-theme="cupertino"] .shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: linear-gradient(180deg, #3d9bff, #0066cc);
+  color: #ffffff;
+}
+:root[data-theme="cupertino"] .shell-dock__item[data-active]::after {
+  background: #1d1d1f;
+}
+:root[data-theme="cupertino"] .shell-dock__item-label {
+  display: none;
+}
+:root[data-theme="cupertino"] .shell-header {
+  background: #f5f5f7b8;
+}
+
+/* the social network: a white bar of tabs, the current one underlined in blue */
+:root[data-theme="social"] .shell-feed {
+  background: #ffffff;
+  box-shadow: 0 1px 2px #0000001a;
+}
+:root[data-theme="social"] .shell-header {
+  background: #ffffff;
+  border-block-end-color: #e4e6eb;
+}
+:root[data-theme="social"] .shell-feed-side__icon {
+  background: linear-gradient(135deg, #1877f2, #a033ff);
+  color: #ffffff;
+}
+
+/* balloon (Desktop 2001): a pale yellow balloon tip, its tail pointing down to the tray */
+.ds-notifications[data-style="balloon"] .ds-notification {
+  overflow: visible;
+  margin-block-end: 0.8rem;
+  border: 1px solid #1b1b1b;
+  border-radius: 0.6rem;
+  --color-text: #1b1b1b;
+  --color-text-muted: #333333;
+  background: #ffffe1;
+  color: #1b1b1b;
+  font-family: Tahoma, Verdana, sans-serif;
+  box-shadow: 3px 3px 6px #00000044;
+}
+.ds-notifications[data-style="balloon"] .ds-notification::before {
+  inset-block: auto -0.85rem;
+  inset-inline: auto 1.6rem;
+  inline-size: 1.2rem;
+  block-size: 0.9rem;
+  background: #1b1b1b;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.ds-notifications[data-style="balloon"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.72rem;
+  inset-inline-end: calc(1.6rem + 1px);
+  inline-size: calc(1.2rem - 2px);
+  block-size: 0.75rem;
+  background: #ffffe1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.ds-notifications[data-style="balloon"] .ds-notification__icon {
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  background: radial-gradient(circle at 35% 30%, #7fb2ff, #1f55c8);
+  color: #ffffff;
+}
+.ds-notifications[data-style="balloon"] .ds-notification__title {
+  font-weight: 700;
+}
+.ds-notifications[data-style="balloon"] .ds-notification__body {
+  color: #333333;
+}
+.ds-notifications[data-style="balloon"] .ds-notification__close {
+  border: 1px solid #a0a0a0;
+  border-radius: 0.2rem;
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  color: #333333;
+}
+.ds-notifications[data-style="balloon"] .ds-notification__timer {
+  display: none;
+}
+/* traffic lights (Cupertino): a frosted window, its three coloured buttons at the top */
+.ds-notifications[data-style="trafficlights"] .ds-notification {
+  padding-block-start: 1.9rem;
+  border: 1px solid #ffffffaa;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle 0.36rem at 1rem 0.95rem, #ff5f57 98%, transparent),
+    radial-gradient(circle 0.36rem at 2rem 0.95rem, #febc2e 98%, transparent),
+    radial-gradient(circle 0.36rem at 3rem 0.95rem, #28c840 98%, transparent),
+    linear-gradient(180deg, #ffffffd9, #f5f5f7cc);
+  --color-text: #1d1d1f;
+  --color-text-muted: #515154;
+  color: #1d1d1f;
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow:
+    0 1rem 2.4rem #00000033,
+    inset 0 1px 0 #ffffff;
+}
+.ds-notifications[data-style="trafficlights"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="trafficlights"] .ds-notification__icon {
+  border-radius: 22%;
+  background: linear-gradient(180deg, #3d9bff, #0066cc);
+  color: #ffffff;
+}
+.ds-notifications[data-style="trafficlights"] .ds-notification__body {
+  color: #515154;
+}
+.ds-notifications[data-style="trafficlights"] .ds-notification__timer {
+  inset-inline: 1rem;
+  border-radius: 2px;
+  background: #0066cc;
+}
+/* chat head (Social): a speech bubble hanging from a round head, a green dot for « online » */
+.ds-notifications[data-style="chathead"] .ds-notification {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  overflow: visible;
+  margin-inline-start: 3.4rem;
+  border: 0;
+  border-radius: 1.2rem 1.2rem 1.2rem 0.3rem;
+  --color-text: #ffffff;
+  --color-text-muted: #ffffffdd;
+  background: linear-gradient(135deg, #1877f2, #7b4bff 70%, #c13ed2);
+  color: #ffffff;
+  box-shadow: 0 0.4rem 1.2rem #1877f244;
+}
+.ds-notifications[data-style="chathead"] .ds-notification::before {
+  inset: auto auto 0.1rem -3.35rem;
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #31a24c;
+  translate: 2.05rem 0;
+  z-index: 1;
+}
+.ds-notifications[data-style="chathead"] .ds-notification__icon {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: -3.4rem;
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  background: linear-gradient(135deg, #e4e6eb, #ffffff);
+  color: #1877f2;
+  box-shadow: 0 0.2rem 0.6rem #00000033;
+}
+.ds-notifications[data-style="chathead"] .ds-notification__body,
+.ds-notifications[data-style="chathead"] .ds-notification__link,
+.ds-notifications[data-style="chathead"] .ds-notification__close {
+  color: #ffffffdd;
+}
+.ds-notifications[data-style="chathead"] .ds-notification__badge {
+  background: #ffffff33;
+  color: #ffffff;
+}
+.ds-notifications[data-style="chathead"] .ds-notification__timer {
+  inset-inline: 1rem;
+  background: #ffffff88;
+}
+
+/* animations */
+.ds-notifications[data-animation="trayrise"] .ds-notification {
+  transform-origin: 100% 100%;
+  animation-name: universe-notify-tray;
+  animation-duration: 0.9s;
+  animation-timing-function: ease-out;
+}
+@keyframes universe-notify-tray {
+  0% {
+    opacity: 0;
+    transform: translateY(120%) scale(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-8%) scale(1.02);
+  }
+  75% {
+    transform: translateY(3%);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="genie"] .ds-notification {
+  transform-origin: 100% 100%;
+  animation-name: universe-notify-genie;
+  animation-duration: 0.75s;
+  animation-timing-function: cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+@keyframes universe-notify-genie {
+  0% {
+    opacity: 0;
+    clip-path: polygon(46% 0, 54% 0, 100% 100%, 92% 100%);
+    transform: translate(20%, 80%) scale(0.2, 0.05) skewX(-30deg);
+  }
+  45% {
+    opacity: 1;
+    clip-path: polygon(20% 0, 80% 0, 100% 100%, 60% 100%);
+    transform: translate(8%, 20%) scale(0.7, 0.6) skewX(-12deg);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="chatpop"] .ds-notification {
+  animation-name: universe-notify-chatpop;
+  animation-duration: 1.1s;
+  animation-timing-function: ease-out;
+}
+@keyframes universe-notify-chatpop {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 82% 55% 0 round 1rem);
+    transform: scale(0.9);
+  }
+  12% {
+    opacity: 1;
+  }
+  20%,
+  40% {
+    clip-path: inset(0 82% 55% 0 round 1rem);
+    transform: scale(0.94) translateY(-2px);
+  }
+  30%,
+  50% {
+    clip-path: inset(0 82% 55% 0 round 1rem);
+    transform: scale(0.9);
+  }
+  72% {
+    clip-path: inset(-10% -10% -10% -10% round 1.2rem);
+    transform: scale(1.04);
+  }
+  100% {
+    clip-path: inset(-10% -10% -10% -10% round 1.2rem);
+    transform: none;
+  }
+}

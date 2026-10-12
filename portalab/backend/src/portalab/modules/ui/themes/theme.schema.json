@@ -782,7 +782,10 @@
             "splash",
             "wandsparks",
             "cannonball",
-            "bolts"
+            "bolts",
+            "cardcascade",
+            "balloons",
+            "likes"
           ]
         },
         "levelUp": {
@@ -829,7 +832,10 @@
             "timeportal",
             "owlpost",
             "plunder",
-            "rollout"
+            "rollout",
+            "setupwizard",
+            "unboxing",
+            "viral"
           ]
         }
       },
@@ -856,7 +862,11 @@
                 "lights",
                 "vcr",
                 "sheet",
-                "console"
+                "console",
+                "taskbar",
+                "feed",
+                "player",
+                "masthead"
               ]
             },
             "tablet": {
@@ -874,7 +884,11 @@
                 "lights",
                 "vcr",
                 "sheet",
-                "console"
+                "console",
+                "taskbar",
+                "feed",
+                "player",
+                "masthead"
               ]
             },
             "phone": {
@@ -891,7 +905,11 @@
                 "lights",
                 "vcr",
                 "sheet",
-                "console"
+                "console",
+                "taskbar",
+                "feed",
+                "player",
+                "masthead"
               ]
             }
           },
@@ -926,7 +944,8 @@
             "terminal",
             "ornate",
             "hologram",
-            "console"
+            "console",
+            "window"
           ]
         },
         "content": {
@@ -1125,7 +1144,10 @@
             "seagulls",
             "floatingcandles",
             "cannonsmoke",
-            "gears"
+            "gears",
+            "skyclouds",
+            "silkwaves",
+            "reactions"
           ]
         }
       },
@@ -1244,7 +1266,10 @@
             "postcard",
             "scroll",
             "bottle",
-            "chamfer"
+            "chamfer",
+            "balloon",
+            "trafficlights",
+            "chathead"
           ]
         },
         "animation": {
@@ -1294,7 +1319,10 @@
             "warp",
             "swoop",
             "anchor",
-            "transform"
+            "transform",
+            "trayrise",
+            "genie",
+            "chatpop"
           ]
         }
       },

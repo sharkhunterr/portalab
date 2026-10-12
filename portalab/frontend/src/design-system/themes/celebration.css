@@ -1154,3 +1154,128 @@
   color: #fff;
   box-shadow: 0 0 22px #ef4444;
 }
+
+/* ---------------------------------------------------------------- #89: the desktop, the fruit company, the social network */
+/* card cascade (Desktop 2001): playing cards bouncing down the screen like a won game of patience */
+[data-effect="cardcascade"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -12);
+  inline-size: 2.6rem;
+  block-size: 3.6rem;
+  border: 1px solid #1b1b1b55;
+  border-radius: 0.25rem;
+  background: #ffffff;
+  color: #1b1b1b;
+  font:
+    700 1.5rem / 1 Georgia,
+    serif;
+  box-shadow: 1px 2px 3px #00000044;
+  animation-name: fx-cascade;
+  animation-duration: 2.6s;
+  animation-timing-function: linear;
+}
+[data-effect="cardcascade"] .celebration-fx::after {
+  content: "♠";
+}
+[data-effect="cardcascade"] .celebration-fx:nth-child(2n)::after {
+  content: "♥";
+  color: #c81e1e;
+}
+[data-effect="cardcascade"] .celebration-fx:nth-child(3n)::after {
+  content: "♦";
+  color: #c81e1e;
+}
+[data-effect="cardcascade"] .celebration-fx:nth-child(5n)::after {
+  content: "♣";
+  color: #1b1b1b;
+}
+[data-effect="cardcascade"] .celebration-fx:nth-child(2n) {
+  --dir: -1;
+}
+@keyframes fx-cascade {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  30% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 9), calc(var(--fx-vh, 1vh) * 100));
+    animation-timing-function: cubic-bezier(0, 0, 0.5, 1);
+  }
+  48% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 15), calc(var(--fx-vh, 1vh) * 62));
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  66% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 21), calc(var(--fx-vh, 1vh) * 100));
+    animation-timing-function: cubic-bezier(0, 0, 0.5, 1);
+  }
+  78% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 25), calc(var(--fx-vh, 1vh) * 82));
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 29), calc(var(--fx-vh, 1vh) * 100));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 31), calc(var(--fx-vh, 1vh) * 94));
+  }
+}
+[data-effect="cardcascade"] .ds-celebration__badge {
+  background: radial-gradient(ellipse at 30% 0%, #8fe07a, #3c9a2b 45%, #2c7a1f);
+  color: #ffffff;
+  box-shadow: 0 0 18px #3c9a2b;
+}
+/* balloons (Cupertino): glossy balloons on their strings, floating up across the screen */
+[data-effect="balloons"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -12);
+  inline-size: 2.4rem;
+  block-size: 3rem;
+  border-radius: 50% 50% 48% 48% / 56% 56% 44% 44%;
+  background: radial-gradient(circle at 32% 28%, #ffffffcc 0 9%, transparent 22%), hsl(var(--h) 85% 58%);
+  box-shadow: inset -0.3rem -0.4rem 0.6rem #0000002e;
+  animation-name: fx-rise;
+  animation-duration: 3.4s;
+  animation-timing-function: ease-in;
+}
+[data-effect="balloons"] .celebration-fx::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  inline-size: 1px;
+  block-size: 3rem;
+  background: linear-gradient(180deg, #6e6e73, transparent);
+}
+[data-effect="balloons"] .ds-celebration__badge {
+  background: linear-gradient(180deg, #3d9bff, #0066cc);
+  color: #ffffff;
+  box-shadow: 0 0 22px #0071e366;
+}
+/* thumbs up (Social): thumbs up and hearts popping out of the reward */
+[data-effect="likes"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.9rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #4da3ff, #1877f2);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px #ffffff;
+  animation-name: fx-burst;
+}
+[data-effect="likes"] .celebration-fx svg {
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+}
+[data-effect="likes"] .celebration-fx:nth-child(3n) {
+  background: linear-gradient(180deg, #ff6b81, #e41e3f);
+}
+[data-effect="likes"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #1877f2, #7b4bff 70%, #c13ed2);
+  color: #ffffff;
+  box-shadow: 0 0 22px #1877f2aa;
+}

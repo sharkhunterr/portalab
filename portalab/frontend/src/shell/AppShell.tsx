@@ -26,6 +26,7 @@ import {
   VcrNav,
 } from "./nav/PrincipleNavs";
 import { NavContent } from "./nav/SectionNav";
+import { FeedSide, FeedTabs, MastheadNav, PlayerBar, PlayerLibrary, TaskbarNav } from "./nav/UniverseNavs";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
 import { RegionBoundary } from "./router/RouteBoundary";
@@ -38,7 +39,8 @@ import { useShellStrings } from "./strings";
 /**
  * Persistent shell (spec 004 T017; 027 US1–US3): one environment for every module — the personal header,
  * the section navigation in the arrangement the theme chose for the device (sidebar, rail, top bar,
- * drawer, phone bottom bar, orbit bubble, dock, book tabs, launcher screen, terminal line, film reel; header on top
+ * drawer, phone bottom bar, orbit bubble, dock, book tabs, launcher screen, terminal line, film reel, desktop
+ * taskbar, social feed, music player, newspaper masthead; header on top
  * or as a footer bar), the global status banner,
  * breadcrumbs and the page outlet. Only the outlet changes on navigation, and a change of arrangement
  * never remounts it: the page keeps its state. Unknown to anonymous visitors (CD-025).
@@ -166,8 +168,12 @@ export function AppShell({
         {nav === "reel" ? <ReelNav sections={sections} /> : null}
         {nav === "lights" ? <LightsNav sections={sections} /> : null}
         {nav === "vcr" ? <VcrNav sections={sections} /> : null}
+        {nav === "masthead" ? <MastheadNav sections={sections} /> : null}
+        {nav === "feed" ? <FeedTabs sections={sections} /> : null}
         <div className="shell-body">
           {nav === "tabs" ? <TabsNav sections={sections} /> : null}
+          {nav === "feed" && arrangement.device !== "phone" ? <FeedSide sections={sections} /> : null}
+          {nav === "player" && arrangement.device !== "phone" ? <PlayerLibrary sections={sections} /> : null}
           {nav === "sidebar" || nav === "rail" ? (
             <nav aria-label={shellStrings.mainNav} className="shell-side" data-variant={nav}>
               {nav === "sidebar" ? <ProfileCard data={header} /> : null}
@@ -191,6 +197,8 @@ export function AppShell({
         {nav === "launcher" ? <LauncherNav sections={sections} /> : null}
         {nav === "sheet" ? <SheetNav sections={sections} /> : null}
         {nav === "console" ? <ConsoleNav sections={sections} /> : null}
+        {nav === "taskbar" ? <TaskbarNav sections={sections} /> : null}
+        {nav === "player" ? <PlayerBar sections={sections} library={arrangement.device === "phone"} /> : null}
         {drawerNav ? (
           <Drawer
             title={shellStrings.mainNav}

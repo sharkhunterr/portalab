@@ -62,11 +62,11 @@ export function destinationsOf(section: NavSection, currentKey: string | undefin
 }
 
 /** A section is one link (direct or member hub) or opens a list (Administration, plain sections). */
-function opensList(section: NavSection): boolean {
+export function opensList(section: NavSection): boolean {
   return !section.direct && !isHubSection(section) && destinationsOf(section, undefined).length > 1;
 }
 
-function useCurrent(sections: readonly NavSection[]) {
+export function useCurrent(sections: readonly NavSection[]) {
   const location = useLocation();
   const current = currentEntry(sections, location.pathname);
   const isActive = (section: NavSection) => sectionEntries(section).some((e) => e.key === current?.key);
@@ -74,7 +74,7 @@ function useCurrent(sections: readonly NavSection[]) {
 }
 
 /** Arrow keys move between the items of a bar (focusable children with ``data-nav-item``). */
-function moveFocus(event: KeyboardEvent<HTMLElement>, vertical = false) {
+export function moveFocus(event: KeyboardEvent<HTMLElement>, vertical = false) {
   const next = vertical ? ["ArrowDown"] : ["ArrowRight"];
   const previous = vertical ? ["ArrowUp"] : ["ArrowLeft"];
   if (![...next, ...previous].includes(event.key)) return;
@@ -86,7 +86,7 @@ function moveFocus(event: KeyboardEvent<HTMLElement>, vertical = false) {
   items[(index + step + items.length) % items.length]?.focus();
 }
 
-function DestinationList({
+export function DestinationList({
   section,
   currentKey,
   onPick,
@@ -119,7 +119,7 @@ function DestinationList({
 }
 
 /** A section as one item of a bar: a link, or a button opening its list (``aria-expanded``). */
-function SectionItem({
+export function SectionItem({
   section,
   active,
   open,
@@ -178,7 +178,7 @@ function SectionItem({
 }
 
 /** One open list at a time, closed on navigation, Escape or a click outside. */
-function useOpenSection() {
+export function useOpenSection() {
   const location = useLocation();
   const [open, setOpen] = useState<string | null>(null);
   const root = useRef<HTMLElement>(null);

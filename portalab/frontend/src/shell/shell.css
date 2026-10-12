@@ -321,6 +321,7 @@
 .shell-entry {
   display: flex;
   align-items: center;
+  gap: var(--space-2);
   min-block-size: max(var(--target-min), 2.25rem);
   padding: 0.25rem var(--space-3);
   border-radius: var(--radius-md);
@@ -1908,4 +1909,685 @@
 }
 .shell-profile__banner ~ .shell-profile__who .shell-profile__name {
   text-shadow: 0 1px 3px color-mix(in srgb, var(--color-surface) 85%, transparent);
+}
+
+/* ---------------------------------------------------------------- #89: universe navigations */
+.shell[data-nav="taskbar"] {
+  --frame-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="taskbar"][data-header-position="bottom"] {
+  --frame-bottom: calc(var(--header-height) + 3rem + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="player"] {
+  --frame-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="player"][data-header-position="bottom"] {
+  --frame-bottom: calc(var(--header-height) + 4.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* taskbar: a bar along the bottom, a Start button, the sections as tasks, a clock in the tray */
+.shell-taskbar {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(var(--frame-bottom) - 3rem - env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-nav);
+  pointer-events: none;
+}
+.shell-taskbar > * {
+  pointer-events: auto;
+}
+.shell-taskbar__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  block-size: calc(3rem + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--space-2) env(safe-area-inset-bottom, 0px) 0;
+  border-block-start: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  box-shadow: var(--shadow-2);
+}
+.shell-taskbar__start {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: stretch;
+  padding-inline: var(--space-3) var(--space-5);
+  border: 0;
+  border-start-end-radius: var(--radius-lg);
+  border-end-end-radius: var(--radius-lg);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  font-style: italic;
+  cursor: pointer;
+}
+.shell-taskbar__start[aria-expanded="true"] {
+  filter: brightness(0.9);
+}
+.shell-taskbar__tasks {
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shell-taskbar__task {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  max-inline-size: 11rem;
+  block-size: 2.25rem;
+  padding-inline: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface-raised) 70%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.shell-taskbar__task-icon {
+  display: inline-grid;
+  flex: none;
+}
+.shell-taskbar__task-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shell-taskbar__task[data-active],
+.shell-taskbar__task[aria-expanded="true"] {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, var(--color-border));
+  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-surface));
+  box-shadow: inset 0 1px 3px color-mix(in srgb, var(--color-text) 25%, transparent);
+}
+.shell-taskbar__tray {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: stretch;
+  padding-inline: var(--space-3);
+  border-inline-start: 1px solid var(--glass-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+.shell-taskbar__menu,
+.shell-taskbar__panel {
+  position: absolute;
+  inset-block-end: calc(100% + 0px);
+  inset-inline-start: 0;
+  inline-size: min(32rem, 100vw);
+  max-block-size: min(70dvh, 34rem);
+  overflow: hidden auto;
+  border: 1px solid var(--glass-border);
+  border-start-end-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  animation: shell-panel-in var(--motion-duration-normal) var(--motion-easing-out) both;
+}
+.shell-taskbar__panel {
+  inset-inline-start: var(--space-8);
+  inline-size: min(20rem, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-3);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.shell-taskbar__menu-title {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-bold);
+}
+.shell-taskbar__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.shell-taskbar__sections {
+  display: grid;
+  align-content: start;
+  gap: 0.1rem;
+  margin: 0;
+  padding: var(--space-2);
+  list-style: none;
+  background: var(--color-surface);
+}
+.shell-taskbar__sections button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+  cursor: pointer;
+}
+.shell-taskbar__sections button[data-active] {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+.shell-taskbar__pages {
+  padding: var(--space-2);
+  border-inline-start: 1px solid var(--color-border);
+}
+.shell-taskbar__pages-title {
+  margin: 0 0 var(--space-1);
+  padding-inline: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.shell[data-device="phone"] .shell-taskbar__task {
+  padding-inline: var(--space-2);
+}
+.shell[data-device="phone"] .shell-taskbar__task-label,
+.shell[data-device="phone"] .shell-taskbar__start span {
+  display: none;
+}
+.shell[data-device="phone"] .shell-taskbar__start {
+  padding-inline: var(--space-3);
+}
+
+/* feed: the sections as icon tabs in the middle, shortcuts on the left */
+.shell-feed {
+  position: sticky;
+  inset-block-start: var(--frame-top);
+  z-index: calc(var(--z-header) - 1);
+  border-block-end: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+}
+.shell-feed__tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+  margin: 0 auto;
+  padding: 0 var(--space-2);
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shell-feed__tab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-inline-size: clamp(3rem, 9vw, 7rem);
+  block-size: 3.25rem;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.shell-feed__tab:hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.shell-feed__tab-label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.shell-feed__tab[data-active],
+.shell-feed__tab[aria-expanded="true"] {
+  color: var(--color-accent);
+}
+.shell-feed__tab[data-active]::after {
+  content: "";
+  position: absolute;
+  inset-inline: var(--space-2);
+  inset-block-end: 0;
+  block-size: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--color-accent);
+}
+.shell-feed__panel {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  inline-size: min(20rem, calc(100vw - 2 * var(--space-4)));
+  max-block-size: 60dvh;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  animation: shell-panel-in var(--motion-duration-normal) var(--motion-easing-out) both;
+}
+.shell-feed-side {
+  position: sticky;
+  inset-block-start: calc(var(--frame-top) + 3.25rem);
+  flex: none;
+  inline-size: var(--sidebar-width);
+  max-block-size: calc(100dvh - var(--frame-top) - 3.25rem - var(--frame-bottom));
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-3);
+}
+.shell-feed-side__title {
+  margin: var(--space-3) 0 var(--space-1);
+  padding-inline: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+.shell-feed-side__list .shell-entry {
+  gap: var(--space-3);
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+.shell-feed-side__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+  color: var(--color-accent);
+}
+.shell[data-device="tablet"] .shell-feed-side {
+  inline-size: var(--rail-width);
+  padding-inline: var(--space-1);
+}
+.shell[data-device="tablet"] .shell-feed-side__title,
+.shell[data-device="tablet"] .shell-feed-side .shell-entries:first-of-type {
+  display: none;
+}
+.shell[data-device="tablet"] .shell-feed-side .shell-entry {
+  justify-content: center;
+  font-size: 0;
+}
+
+/* player: a library of playlists on the left, a « now playing » bar at the bottom */
+.shell-player-library {
+  position: sticky;
+  inset-block-start: calc(var(--frame-top) + var(--space-2));
+  flex: none;
+  inline-size: var(--sidebar-width);
+  max-block-size: calc(100dvh - var(--frame-top) - var(--frame-bottom) - var(--space-4));
+  margin: var(--space-2) 0 0 var(--space-2);
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.shell-player-library__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  padding-inline: var(--space-2);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-bold);
+}
+.shell-player-library__list {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-player-library__row {
+  display: flex;
+  align-items: center;
+}
+.shell-player-library__playlist {
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.shell-player-library__playlist:hover,
+li[data-active] > .shell-player-library__row .shell-player-library__playlist {
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+.shell-player-library__cover {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 70%, var(--color-surface)),
+    color-mix(in oklch, var(--color-accent-alt) 50%, var(--color-surface))
+  );
+  filter: hue-rotate(calc(var(--hue, 0) * 1deg));
+  color: var(--color-accent-contrast);
+}
+.shell-player-library__text {
+  display: grid;
+  min-inline-size: 0;
+}
+.shell-player-library__text strong,
+.shell-player-library__text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+li[data-active] > .shell-player-library__row strong {
+  color: var(--color-accent);
+}
+.shell-player-library__text small {
+  color: var(--color-text-muted);
+}
+.shell-player-library__more {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.shell-player-library__tracks {
+  padding-inline-start: calc(2.75rem + var(--space-3));
+}
+.shell[data-device="tablet"] .shell-player-library {
+  inline-size: calc(2.75rem + 2 * var(--space-2) + 2 * var(--space-2));
+}
+.shell[data-device="tablet"] .shell-player-library__text,
+.shell[data-device="tablet"] .shell-player-library__more,
+.shell[data-device="tablet"] .shell-player-library__tracks,
+.shell[data-device="tablet"] .shell-player-library__title {
+  display: none;
+}
+.shell-player {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(var(--frame-bottom) - 4.75rem - env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  block-size: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--space-4) env(safe-area-inset-bottom, 0px);
+  border-block-start: 1px solid var(--glass-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-2);
+}
+.shell-player__track {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.shell-player__cover {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 3.25rem;
+  block-size: 3.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+}
+.shell-player__text {
+  display: grid;
+  min-inline-size: 0;
+}
+.shell-player__text strong,
+.shell-player__text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-player__text small {
+  color: var(--color-text-muted);
+}
+.shell-player__controls {
+  display: grid;
+  flex: 1.4 1 0;
+  justify-items: center;
+  gap: var(--space-1);
+  max-inline-size: 38rem;
+}
+.shell-player__buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.shell-player__buttons button,
+.shell-player__library {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.shell-player__buttons button:hover,
+.shell-player__library:hover,
+.shell-player__library[aria-expanded="true"] {
+  color: var(--color-text);
+}
+.shell-player__play {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 50%;
+  background: var(--color-text);
+  color: var(--color-surface);
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+.shell-player__play:hover {
+  transform: scale(1.06);
+}
+.shell-player__progress {
+  inline-size: 100%;
+  block-size: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-text) 18%, transparent);
+}
+.shell-player__progress > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: inline-size 120ms linear;
+}
+.shell-player__extra {
+  display: flex;
+  flex: 1 1 0;
+  justify-content: flex-end;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+.shell-player__sheet {
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline: var(--space-2);
+  max-block-size: 70dvh;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  animation: shell-panel-in var(--motion-duration-normal) var(--motion-easing-out) both;
+}
+.shell-player__sheet-title {
+  margin: var(--space-2) 0 0;
+  padding-inline: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.shell[data-device="phone"] .shell-player {
+  gap: var(--space-2);
+  padding-inline: var(--space-2);
+}
+.shell[data-device="phone"] .shell-player__extra,
+.shell[data-device="phone"] .shell-player__progress,
+.shell[data-device="phone"] .shell-player__buttons button[aria-label]:first-child {
+  display: none;
+}
+.shell[data-device="phone"] .shell-player__cover {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+}
+.shell[data-device="phone"] .shell-player__controls {
+  flex: none;
+}
+.shell[data-device="phone"] .shell-player__buttons {
+  gap: 0;
+}
+
+/* masthead: the paper's name, its date line, the sections as its columns */
+.shell-masthead {
+  position: relative;
+  z-index: calc(var(--z-header) - 1);
+  padding: var(--space-4) var(--space-4) 0;
+  background: var(--color-surface);
+  text-align: center;
+}
+.shell-masthead__head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: var(--space-3);
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  padding-block-end: var(--space-2);
+  border-block-end: 3px double var(--color-text);
+}
+.shell-masthead__title {
+  font-family: var(--font-display, var(--font-sans));
+  font-size: clamp(1.8rem, 5.5vw, 3.6rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.shell-masthead__edition,
+.shell-masthead__date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.shell-masthead__edition {
+  text-align: start;
+}
+.shell-masthead__date {
+  text-align: end;
+}
+.shell-masthead__sections {
+  display: flex;
+  justify-content: center;
+  max-inline-size: var(--content-max);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  border-block-end: 1px solid var(--color-text);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shell-masthead__sections > li + li {
+  border-inline-start: 1px solid var(--color-border);
+}
+.shell-masthead__section {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.shell-masthead__section-icon {
+  display: none;
+}
+.shell-masthead__section[data-active],
+.shell-masthead__section[aria-expanded="true"] {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.35em;
+}
+.shell-masthead__panel {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  inline-size: min(22rem, calc(100vw - 2 * var(--space-4)));
+  max-block-size: 60dvh;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--color-text);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  text-align: start;
+}
+.shell[data-device="phone"] .shell-masthead {
+  padding-inline: var(--space-2);
+}
+.shell[data-device="phone"] .shell-masthead__head {
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+}
+.shell[data-device="phone"] .shell-masthead__edition {
+  display: none;
+}
+.shell[data-device="phone"] .shell-masthead__date {
+  text-align: center;
+}
+.shell[data-device="phone"] .shell-masthead__sections {
+  justify-content: flex-start;
+}
+.shell[data-device="phone"] .shell-masthead__section {
+  padding-inline: var(--space-3);
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell-player__progress > span {
+    transition: none;
+  }
 }

@@ -80,6 +80,10 @@ export const PALETTE_KEYS = [
   "scarletgold",
   "rum",
   "gunmetal",
+  // #89: the desktop, the fruit company, the social network
+  "luna",
+  "graphite",
+  "chatgradient",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -142,6 +146,10 @@ export const NOTIFICATION_STYLES = [
   "scroll",
   "bottle",
   "chamfer",
+  // #89: the desktop, the fruit company, the social network
+  "balloon",
+  "trafficlights",
+  "chathead",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -194,6 +202,10 @@ export const NOTIFICATION_ANIMATIONS = [
   "swoop",
   "anchor",
   "transform",
+  // #89: the desktop, the fruit company, the social network
+  "trayrise",
+  "genie",
+  "chatpop",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -296,6 +308,10 @@ export const AMBIENTS = [
   "floatingcandles",
   "cannonsmoke",
   "gears",
+  // #89: the desktop, the fruit company, the social network
+  "skyclouds",
+  "silkwaves",
+  "reactions",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -362,6 +378,10 @@ export const LEVEL_BADGES = [
   "snitch",
   "doubloon",
   "chevron",
+  // #89: the desktop, the fruit company, the social network
+  "startbutton",
+  "aquagel",
+  "speechbubble",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -410,6 +430,10 @@ export const LEVEL_UPS = [
   "owlpost",
   "plunder",
   "rollout",
+  // #89: the desktop, the fruit company, the social network
+  "setupwizard",
+  "unboxing",
+  "viral",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -456,6 +480,10 @@ export const CELEBRATION_KEYS = [
   "wandsparks",
   "cannonball",
   "bolts",
+  // #89: the desktop, the fruit company, the social network
+  "cardcascade",
+  "balloons",
+  "likes",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

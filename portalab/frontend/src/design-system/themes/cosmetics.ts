@@ -89,6 +89,13 @@ export const BANNER_KEYS = [
   "live-floatingcandles",
   "live-cannonsmoke",
   "live-gears",
+  // #89: the desktop, the fruit company, the social network
+  "greenhill",
+  "coastline",
+  "friendswall",
+  "live-skyclouds",
+  "live-silkwaves",
+  "live-reactions",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -154,6 +161,10 @@ export const FRAME_KEYS = [
   "housecrest",
   "shipwheel",
   "visor",
+  // #89: the desktop, the fruit company, the social network
+  "window",
+  "appicon",
+  "storyring",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -212,4 +223,8 @@ export const NAME_KEYS = [
   "spellbound",
   "pirata",
   "steelplate",
+  // #89: the desktop, the fruit company, the social network
+  "titlebar",
+  "aluminium",
+  "verified",
 ] as const;

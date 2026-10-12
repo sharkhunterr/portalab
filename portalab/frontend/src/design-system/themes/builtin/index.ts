@@ -5,8 +5,10 @@ import alien from "./alien.json";
 import caribbean from "./caribbean.json";
 import cartoon from "./cartoon.json";
 import christmas from "./christmas.json";
+import classicdesk from "./classicdesk.json";
 import comic from "./comic.json";
 import cozy from "./cozy.json";
+import cupertino from "./cupertino.json";
 import cyberpunk from "./cyberpunk.json";
 import dark from "./dark.json";
 import desert from "./desert.json";
@@ -31,6 +33,7 @@ import plex from "./plex.json";
 import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
 import sincity from "./sincity.json";
+import social from "./social.json";
 import studio from "./studio.json";
 import upsidedown from "./upsidedown.json";
 import vhs from "./vhs.json";
@@ -75,6 +78,9 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   academy,
   caribbean,
   mecha,
+  classicdesk,
+  cupertino,
+  social,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

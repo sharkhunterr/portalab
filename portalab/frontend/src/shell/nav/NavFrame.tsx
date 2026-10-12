@@ -22,7 +22,11 @@ export type NavVariant =
   | "lights"
   | "vcr"
   | "sheet"
-  | "console";
+  | "console"
+  | "taskbar"
+  | "feed"
+  | "player"
+  | "masthead";
 
 export interface Arrangement {
   device: DeviceClass;

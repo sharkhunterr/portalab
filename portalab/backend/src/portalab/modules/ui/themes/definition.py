@@ -227,6 +227,9 @@ NOTIFICATION_STYLES = Literal[
     "scroll",
     "bottle",
     "chamfer",
+    "balloon",
+    "trafficlights",
+    "chathead",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -275,6 +278,9 @@ NOTIFICATION_ANIMATIONS = Literal[
     "swoop",
     "anchor",
     "transform",
+    "trayrise",
+    "genie",
+    "chatpop",
 ]
 AMBIENTS = Literal[
     "none",
@@ -373,6 +379,9 @@ AMBIENTS = Literal[
     "floatingcandles",
     "cannonsmoke",
     "gears",
+    "skyclouds",
+    "silkwaves",
+    "reactions",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -416,6 +425,9 @@ CELEBRATIONS = Literal[
     "wandsparks",
     "cannonball",
     "bolts",
+    "cardcascade",
+    "balloons",
+    "likes",
 ]
 PATTERNS = Literal[
     "none",
@@ -466,6 +478,7 @@ LEVEL_UPS = Literal[
     "timeportal",
     # #81, #89: the seasons and the universes
     "owlpost", "plunder", "rollout",
+    "setupwizard", "unboxing", "viral",
 ]  # fmt: skip
 
 
@@ -478,7 +491,8 @@ class Motion(_Closed):
 
 
 class Nav(_Closed):
-    # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel
+    # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel;
+    # #89: a desktop's taskbar, a social feed, a music player, a newspaper's masthead
     desktop: (
         Literal[
             "sidebar",
@@ -494,7 +508,10 @@ class Nav(_Closed):
             "vcr",
             "sheet",
             "console",
-            "console",
+            "taskbar",
+            "feed",
+            "player",
+            "masthead",
         ]
         | None
     ) = None
@@ -513,7 +530,10 @@ class Nav(_Closed):
             "vcr",
             "sheet",
             "console",
-            "console",
+            "taskbar",
+            "feed",
+            "player",
+            "masthead",
         ]
         | None
     ) = None
@@ -531,7 +551,10 @@ class Nav(_Closed):
             "vcr",
             "sheet",
             "console",
-            "console",
+            "taskbar",
+            "feed",
+            "player",
+            "masthead",
         ]
         | None
     ) = None
@@ -557,7 +580,7 @@ class Layout(_Closed):
             "ornate",
             "hologram",
             "console",
-            "console",
+            "window",
         ]
         | None
     ) = None

@@ -105,6 +105,10 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   wandsparks: { count: 24, layer: "badge" },
   cannonball: { count: 12, layer: "badge" },
   bolts: { count: 18, layer: "badge" },
+  // #89: playing cards cascading, balloons rising, thumbs up popping
+  cardcascade: { count: 14, layer: "screen" },
+  balloons: { count: 14, layer: "screen" },
+  likes: { count: 20, icon: "thumbs-up", layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

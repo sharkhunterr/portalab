@@ -169,6 +169,19 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#f87171", accentAlt: "#cbd5e1", contrast: "#2a0606" },
     light: { accent: "#b91c1c", accentAlt: "#374151", contrast: "#ffffff" },
   },
+  // #89: the desktop, the fruit company, the social network
+  luna: {
+    dark: { accent: "#6ea8ff", accentAlt: "#7fd36b", contrast: "#04122e" },
+    light: { accent: "#1f55c8", accentAlt: "#2c7a1f", contrast: "#ffffff" },
+  },
+  graphite: {
+    dark: { accent: "#d1d5db", accentAlt: "#7dd3fc", contrast: "#111827" },
+    light: { accent: "#3a3a3c", accentAlt: "#0066cc", contrast: "#ffffff" },
+  },
+  chatgradient: {
+    dark: { accent: "#7aa7ff", accentAlt: "#f472b6", contrast: "#07122a" },
+    light: { accent: "#1660c9", accentAlt: "#b0237a", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

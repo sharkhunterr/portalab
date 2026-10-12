@@ -70,6 +70,8 @@ PROFILE_BANNERS: tuple[str, ...] = (
     "live-loveletters", "live-butterflies", "live-seagulls",
     # #89: the universes
     "greathall", "jollyship", "assemblyline", "live-floatingcandles", "live-cannonsmoke", "live-gears",
+    # #89: the desktop, the fruit company, the social network
+    "greenhill", "coastline", "friendswall", "live-skyclouds", "live-silkwaves", "live-reactions",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -87,6 +89,8 @@ AVATAR_FRAMES: tuple[str, ...] = (
     "sunburst",
     # #89: the universes
     "housecrest", "shipwheel", "visor",
+    # #89: the desktop, the fruit company, the social network
+    "window", "appicon", "storyring",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -99,6 +103,8 @@ PALETTES: tuple[str, ...] = (
     "pumpkinspice", "evergreen", "cherry", "pastel", "tropical",
     # #89: the universes
     "scarletgold", "rum", "gunmetal",
+    # #89: the desktop, the fruit company, the social network
+    "luna", "graphite", "chatgradient",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -125,6 +131,8 @@ AMBIENTS: tuple[str, ...] = (
     "cobwebs", "ornaments", "loveletters", "butterflies", "seagulls",
     # #89: the universes
     "floatingcandles", "cannonsmoke", "gears",
+    # #89: the desktop, the fruit company, the social network
+    "skyclouds", "silkwaves", "reactions",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
@@ -138,6 +146,8 @@ CELEBRATIONS: tuple[str, ...] = (
     "candy", "gifts", "cupid", "eggs", "splash",
     # #89: the universes
     "wandsparks", "cannonball", "bolts",
+    # #89: the desktop, the fruit company, the social network
+    "cardcascade", "balloons", "likes",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -155,6 +165,8 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     "tombstone", "giftwrap", "loveletter", "bloom", "postcard",
     # #89: the universes
     "scroll", "bottle", "chamfer",
+    # #89: the desktop, the fruit company, the social network
+    "balloon", "trafficlights", "chathead",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -170,6 +182,8 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "ignite", "surge", "splash", "frostbite", "stardust", "hex", "decrypt", "petalfall", "eclipse", "warp",
     # #89: the universes
     "swoop", "anchor", "transform",
+    # #89: the desktop, the fruit company, the social network
+    "trayrise", "genie", "chatpop",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -187,6 +201,8 @@ NAME_STYLES: tuple[str, ...] = (
     "nameamour", "namesunburst",
     # #89: the universes
     "spellbound", "pirata", "steelplate",
+    # #89: the desktop, the fruit company, the social network
+    "titlebar", "aluminium", "verified",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
@@ -217,6 +233,8 @@ LEVEL_BADGES: tuple[str, ...] = (
     "jackolantern", "bauble", "heart", "easteregg", "sunset", "spectre", "tinsel", "verdant",
     # #89: the universes
     "snitch", "doubloon", "chevron",
+    # #89: the desktop, the fruit company, the social network
+    "startbutton", "aquagel", "speechbubble",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -232,6 +250,8 @@ LEVEL_UPS: tuple[str, ...] = (
     "timeportal",  # #78: the time portal
     # #89: the universes
     "owlpost", "plunder", "rollout",
+    # #89: the desktop, the fruit company, the social network
+    "setupwizard", "unboxing", "viral",
 )  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
@@ -241,6 +261,8 @@ UNIVERSE_THEMES: tuple[str, ...] = (
     "vhs", "nostromo",
     # #89: the universes
     "academy", "caribbean", "mecha",
+    # #89: the desktop, the fruit company, the social network
+    "classicdesk", "cupertino", "social",
 )  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),

@@ -53,6 +53,9 @@ const COUNTS: Partial<Record<Ambient, number>> = {
   floatingcandles: 16,
   cannonsmoke: 10,
   gears: 12,
+  skyclouds: 9,
+  silkwaves: 5,
+  reactions: 18,
 };
 
 const GLYPHS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ0123456789ﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎ:.=*+-<>";

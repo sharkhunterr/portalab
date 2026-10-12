@@ -3063,3 +3063,230 @@
   text-shadow: 0 1px 0 #111827;
   box-shadow: none;
 }
+
+/* ---------------------------------------------------------------- #89: the desktop, the fruit company, the social network */
+/* banners */
+.profile-banner[data-banner="greenhill"] {
+  background:
+    radial-gradient(ellipse 9% 16% at 22% 30%, #ffffff 0 96%, transparent),
+    radial-gradient(ellipse 7% 12% at 27% 26%, #ffffff 0 96%, transparent),
+    radial-gradient(ellipse 12% 14% at 70% 22%, #ffffffdd 0 96%, transparent),
+    radial-gradient(ellipse 8% 10% at 76% 18%, #ffffffdd 0 96%, transparent),
+    radial-gradient(ellipse 120% 70% at 35% 135%, #8bd16a 0 60%, #4e9a2f 66%, transparent 67%),
+    radial-gradient(ellipse 90% 50% at 95% 125%, #5fae3f 0 70%, transparent 71%),
+    linear-gradient(180deg, #1d5fd1, #4f8ee6 45%, #a9cdf3);
+}
+.profile-banner[data-banner="coastline"] {
+  background:
+    radial-gradient(circle 1.6rem at 68% 62%, #fff1d6, #ffb88a 70%, transparent 74%),
+    linear-gradient(0deg, #2b2f5c 0 26%, transparent 26%),
+    repeating-linear-gradient(0deg, #ffffff14 0 1px, transparent 1px 6px) 0 100% / 100% 26% no-repeat,
+    linear-gradient(170deg, transparent 0 48%, #241b3a 48%) 0 0 / 38% 100% no-repeat,
+    linear-gradient(195deg, transparent 0 58%, #2f2347 58%) 100% 0 / 30% 100% no-repeat,
+    linear-gradient(180deg, #3b2f7a, #9c4f9e 40%, #f08a8a 68%, #ffc58f);
+}
+.profile-banner[data-banner="friendswall"] {
+  background:
+    repeating-linear-gradient(90deg, #ffffff 0 5px, transparent 5px 20%),
+    repeating-linear-gradient(0deg, #ffffff 0 5px, transparent 5px 50%),
+    radial-gradient(circle at 50% 42%, #ffffffcc 0 12%, transparent 13%) 0 0 / 20% 50%,
+    radial-gradient(ellipse 30% 22% at 50% 100%, #ffffffaa 0 95%, transparent) 0 0 / 20% 50%,
+    linear-gradient(90deg, #f472b6 0 20%, #60a5fa 20% 40%, #fbbf24 40% 60%, #34d399 60% 80%, #a78bfa 80%) top
+    / 100% 50% no-repeat,
+    linear-gradient(90deg, #22d3ee 0 20%, #fb7185 20% 40%, #818cf8 40% 60%, #f59e0b 60% 80%, #4ade80 80%)
+    bottom / 100% 50% no-repeat;
+}
+
+/* frames — a window, an app icon, a ring of stories */
+.avatar-frame[data-frame="window"] {
+  padding: 16px 4px 4px;
+  border-radius: 7px 7px 2px 2px;
+  background:
+    linear-gradient(135deg, transparent 40%, #ffffff 40% 60%, transparent 60%) right 5px top 3px / 10px 10px
+    no-repeat,
+    linear-gradient(45deg, transparent 40%, #ffffff 40% 60%, transparent 60%) right 5px top 3px / 10px 10px
+    no-repeat,
+    linear-gradient(180deg, #f39a7a, #d6421f) right 3px top 1px / 14px 14px no-repeat,
+    linear-gradient(180deg, #3d8af7 0, #0a5fe8 5px, #0451d6 12px, #0831d9 16px, #0831d9);
+  box-shadow: 2px 3px 6px #00205f55;
+}
+.avatar-frame[data-frame="window"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+}
+.avatar-frame[data-frame="appicon"] {
+  padding: 4px;
+  border-radius: 28%;
+  background: linear-gradient(180deg, #ffffff, #d9d9de);
+  box-shadow:
+    0 4px 10px #00000033,
+    inset 0 0 0 1px #00000014;
+}
+.avatar-frame[data-frame="appicon"] > :not(.avatar-frame__fx) {
+  border-radius: 24%;
+}
+.avatar-frame[data-frame="appicon"]::after {
+  content: "1";
+  position: absolute;
+  inset-block-start: -6%;
+  inset-inline-end: -6%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: 26%;
+  min-inline-size: 1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: #ffffff;
+  font:
+    700 0.7rem / 1 -apple-system,
+    "Inter Variable",
+    sans-serif;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+.avatar-frame[data-frame="storyring"] {
+  padding: 6px;
+}
+.avatar-frame[data-frame="storyring"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(#feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75);
+  mask:
+    repeating-conic-gradient(#000 0 52deg, transparent 52deg 60deg),
+    radial-gradient(circle, transparent 0 calc(50% - 4px), #000 calc(50% - 3.5px));
+  mask-composite: intersect;
+  animation: frame-turn 18s linear infinite;
+}
+.avatar-frame[data-frame="storyring"] > :not(.avatar-frame__fx) {
+  box-shadow: 0 0 0 2px var(--color-surface-raised);
+}
+
+/* name styles */
+.name-style[data-name="titlebar"] {
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #0831d9,
+    -1px -1px 0 #0831d9,
+    1px -1px 0 #0831d9,
+    -1px 1px 0 #0831d9,
+    2px 2px 3px #00205f;
+}
+.name-style[data-name="aluminium"] {
+  font-family: -apple-system, "SF Pro Display", "Inter Variable", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background:
+    linear-gradient(100deg, transparent 38%, #ffffffe6 50%, transparent 62%),
+    linear-gradient(180deg, #f5f5f7 0%, #c7c7cc 42%, #6e6e73 56%, #aeaeb2 100%);
+  background-size:
+    250% 100%,
+    100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.6px #1d1d1f) drop-shadow(0 1px 1px #00000055);
+  animation: name-shimmer 7s linear infinite;
+}
+.name-style[data-name="verified"] {
+  font-weight: 800;
+}
+.name-style[data-name="verified"]::after {
+  content: "✓";
+  display: inline-grid;
+  place-items: center;
+  inline-size: 0.95em;
+  block-size: 0.95em;
+  margin-inline-start: 0.3em;
+  vertical-align: -0.08em;
+  background: #1877f2;
+  color: #ffffff;
+  font-size: 0.75em;
+  font-weight: 900;
+  line-height: 1;
+  clip-path: polygon(
+    50% 0,
+    61% 9%,
+    75% 7%,
+    80% 20%,
+    93% 25%,
+    91% 39%,
+    100% 50%,
+    91% 61%,
+    93% 75%,
+    80% 80%,
+    75% 93%,
+    61% 91%,
+    50% 100%,
+    39% 91%,
+    25% 93%,
+    20% 80%,
+    7% 75%,
+    9% 61%,
+    0 50%,
+    9% 39%,
+    7% 25%,
+    20% 20%,
+    25% 7%,
+    39% 9%
+  );
+}
+
+/* level badges — a start button, a gel drop, a speech bubble */
+:is(:root[data-level-badge="startbutton"] .ds-level:not([data-look]), .ds-level[data-look="startbutton"]) {
+  padding-inline: 0.45rem 0.75rem;
+  border-radius: 0.2rem 999px 999px 0.2rem;
+  background: radial-gradient(ellipse at 30% 0%, #8fe07a, #3c9a2b 45%, #2c7a1f);
+  color: #ffffff;
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-style: italic;
+  text-shadow: 1px 1px 1px #0b3d06;
+  box-shadow:
+    inset -2px 0 3px #0b3d0688,
+    0 1px 2px #00000055;
+}
+:is(:root[data-level-badge="aquagel"] .ds-level:not([data-look]), .ds-level[data-look="aquagel"]) {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: radial-gradient(ellipse 120% 90% at 50% 110%, #8fd8ff, #1e88ff 55%, #0050c8);
+  color: #ffffff;
+  text-shadow: 0 1px 1px #003a8c;
+  box-shadow:
+    0 2px 5px #0050c855,
+    inset 0 -1px 2px #003a8c66;
+}
+:is(:root[data-level-badge="aquagel"] .ds-level:not([data-look]), .ds-level[data-look="aquagel"])::before {
+  content: "";
+  position: absolute;
+  inset: 6% 14% 52%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffffd9, #ffffff22);
+  pointer-events: none;
+}
+:is(:root[data-level-badge="speechbubble"] .ds-level:not([data-look]), .ds-level[data-look="speechbubble"]) {
+  position: relative;
+  overflow: visible;
+  margin-block-end: 0.3rem;
+  border-radius: 0.9rem 0.9rem 0.9rem 0.25rem;
+  background: linear-gradient(135deg, #1877f2, #7b4bff);
+  color: #ffffff;
+}
+:is(
+  :root[data-level-badge="speechbubble"] .ds-level:not([data-look]),
+  .ds-level[data-look="speechbubble"]
+)::after {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(100% - 1px);
+  inset-inline-start: 0;
+  inline-size: 0.55rem;
+  block-size: 0.4rem;
+  background: #1877f2;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}

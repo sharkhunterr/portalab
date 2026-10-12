@@ -101,6 +101,9 @@ const LAYOUTS: Record<string, string> = {
   owlpost: "scroll",
   plunder: "scroll",
   rollout: "panel",
+  setupwizard: "card",
+  unboxing: "card",
+  viral: "card",
 };
 /** The big word some looks shout (an onomatopoeia, a code). */
 const WORDS: Record<string, string> = {
@@ -116,6 +119,7 @@ const WORDS: Record<string, string> = {
   nostromo: "MU/TH/UR 6000",
   plunder: "YO HO HO!",
   rollout: "LEVEL UP — ENGAGED",
+  viral: "♥ 99+",
 };
 /** How many particles each look scatters. */
 const PARTICLES: Record<string, number> = {
@@ -143,6 +147,9 @@ const PARTICLES: Record<string, number> = {
   owlpost: 26,
   plunder: 28,
   rollout: 16,
+  setupwizard: 10,
+  unboxing: 14,
+  viral: 30,
 };
 
 function sample(level: number): Summary {

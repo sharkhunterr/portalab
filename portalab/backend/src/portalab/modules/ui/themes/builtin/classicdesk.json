@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 2,
+  "key": "classicdesk",
+  "name": "Bureau 2001",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#ece9d8",
+    "surfaceRaised": "#ffffff",
+    "text": "#1b1b1b",
+    "textMuted": "#4a4a42",
+    "border": "#aca899",
+    "accent": "#1f55c8",
+    "accentContrast": "#ffffff",
+    "focus": "#1f55c8",
+    "accentAlt": "#2c7a1f",
+    "rarity": {
+      "common": "#5b5b52",
+      "rare": "#1f55c8",
+      "epic": "#7a2fb8",
+      "legendary": "#a35f00"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b4252",
+      "bg": "#eceff4",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#15603a",
+      "bg": "#e3f4ea",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#fdf1dc",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6b4a00",
+      "bg": "#faf1d7",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#a1121d",
+      "bg": "#fde7e8",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#57303a",
+      "bg": "#f3e6ea",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b2b8f",
+      "bg": "#ede6fb",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a1f52",
+      "bg": "#f9e4ef",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#3f4652",
+      "bg": "#eef0f3",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#0f4c75",
+      "bg": "#e1eff8",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Tahoma, Verdana, \"DejaVu Sans\", sans-serif",
+    "headingFamily": "\"Trebuchet MS\", Tahoma, Verdana, sans-serif",
+    "headingCase": "none",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.2,
+    "md": 0.45
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "cardcascade",
+    "fastMs": 120,
+    "normalMs": 220,
+    "levelUp": "setupwizard"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "taskbar",
+      "tablet": "taskbar",
+      "phone": "taskbar"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "window",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "monitor",
+      "film": "film",
+      "media": "film",
+      "compass": "globe",
+      "users": "users",
+      "shop": "store",
+      "trophy": "trophy",
+      "search": "search",
+      "newspaper": "mail",
+      "book": "folder",
+      "calendar": "calendar",
+      "chart": "chart"
+    }
+  },
+  "background": {
+    "fallback": "#dbe7f5",
+    "pattern": "none",
+    "ambient": "skyclouds"
+  },
+  "sounds": {
+    "notification": "asset:digital/notification.wav",
+    "alert": "asset:digital/alert.wav",
+    "success": "asset:digital/success.wav",
+    "reward": "asset:digital/reward.wav",
+    "levelUp": "asset:digital/level-up.wav",
+    "ui": "asset:digital/ui.wav"
+  },
+  "notification": {
+    "style": "balloon",
+    "animation": "trayrise"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Bureau",
+      "nav:nav.section.home": "Bureau",
+      "dashboard:title": "Bureau",
+      "nav:nav.media": "Lecteur multimédia",
+      "nav:nav.section.media": "Lecteur multimédia",
+      "media:home.title": "Lecteur multimédia",
+      "nav:nav.media_requests": "Mes téléchargements demandés",
+      "nav:nav.media_insights": "Journal de lecture",
+      "media:insights.title": "Journal de lecture",
+      "nav:nav.section.content": "Mes documents",
+      "nav:nav.news": "Courrier",
+      "news:title": "Courrier",
+      "nav:nav.wiki": "Aide et support",
+      "wiki:title": "Aide et support",
+      "nav:nav.search": "Rechercher",
+      "search:title": "Rechercher",
+      "nav:nav.calendar": "Date et heure",
+      "calendar:title": "Date et heure",
+      "nav:nav.services": "Panneau de configuration",
+      "nav:nav.section.services": "Panneau de configuration",
+      "nav:nav.statistics": "Gestionnaire des tâches",
+      "statistics:title": "Gestionnaire des tâches",
+      "nav:nav.community": "Voisinage réseau",
+      "nav:nav.section.community": "Voisinage réseau",
+      "community:title": "Voisinage réseau",
+      "nav:nav.progression": "Propriétés système",
+      "gamification:progression.title": "Propriétés système",
+      "nav:nav.campaigns": "Mises à jour",
+      "campaigns:page.title": "Mises à jour",
+      "nav:nav.marketplace": "Ajout de programmes",
+      "nav:nav.section.marketplace": "Ajout de programmes",
+      "marketplace:catalog.title": "Ajout de programmes",
+      "nav:nav.projects": "Programmes en cours",
+      "marketplace:projects.title": "Programmes en cours",
+      "marketplace:owned.title": "Mes programmes",
+      "nav:nav.support": "Dépannage",
+      "nav:nav.section.support": "Dépannage",
+      "nav:nav.incidents": "Erreurs signalées",
+      "support:incident.title": "Erreurs signalées",
+      "nav:nav.feedback": "Envoyer le rapport",
+      "support:feedback.title": "Envoyer le rapport",
+      "gamification:value.coins": "Crédits",
+      "gamification:value.xp": "Mégaoctets",
+      "shell:taskbar.start": "démarrer",
+      "shell:taskbar.menu": "Tous les programmes"
+    },
+    "en": {
+      "nav:nav.home": "Desktop",
+      "nav:nav.section.home": "Desktop",
+      "dashboard:title": "Desktop",
+      "nav:nav.media": "Media player",
+      "nav:nav.section.media": "Media player",
+      "media:home.title": "Media player",
+      "nav:nav.media_requests": "My requested downloads",
+      "nav:nav.media_insights": "Playback log",
+      "media:insights.title": "Playback log",
+      "nav:nav.section.content": "My documents",
+      "nav:nav.news": "Mail",
+      "news:title": "Mail",
+      "nav:nav.wiki": "Help and support",
+      "wiki:title": "Help and support",
+      "nav:nav.search": "Search",
+      "search:title": "Search",
+      "nav:nav.calendar": "Date and time",
+      "calendar:title": "Date and time",
+      "nav:nav.services": "Control panel",
+      "nav:nav.section.services": "Control panel",
+      "nav:nav.statistics": "Task manager",
+      "statistics:title": "Task manager",
+      "nav:nav.community": "Network places",
+      "nav:nav.section.community": "Network places",
+      "community:title": "Network places",
+      "nav:nav.progression": "System properties",
+      "gamification:progression.title": "System properties",
+      "nav:nav.campaigns": "Updates",
+      "campaigns:page.title": "Updates",
+      "nav:nav.marketplace": "Add programs",
+      "nav:nav.section.marketplace": "Add programs",
+      "marketplace:catalog.title": "Add programs",
+      "nav:nav.projects": "Programs in progress",
+      "marketplace:projects.title": "Programs in progress",
+      "marketplace:owned.title": "My programs",
+      "nav:nav.support": "Troubleshooting",
+      "nav:nav.section.support": "Troubleshooting",
+      "nav:nav.incidents": "Reported errors",
+      "support:incident.title": "Reported errors",
+      "nav:nav.feedback": "Send the report",
+      "support:feedback.title": "Send the report",
+      "gamification:value.coins": "Credits",
+      "gamification:value.xp": "Megabytes",
+      "shell:taskbar.start": "start",
+      "shell:taskbar.menu": "All programs"
+    }
+  }
+}
