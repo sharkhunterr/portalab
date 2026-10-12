@@ -1,9 +1,10 @@
 """#81 (proof of concept): boosters — a sealed pack of cosmetic items drawn at random, revealed card by card.
 
 One booster for now, defined here; its odds per rarity will be set by the administrators later. The draw
-happens on the server (a system random source): each card's rarity by the odds, the last one at least
-rare, never the same item twice in a pack. A card the member already owns is a duplicate — it will be
-refunded in Coins. **Nothing is charged, granted or refunded yet**: the reveal is visual only.
+happens on the server (a system random source): each card's rarity by the odds, one at least rare, never
+the same item twice in a pack, the cards then shuffled (their place tells nothing). A card the member
+already owns is a duplicate — it will be refunded in Coins. **Nothing is charged, granted or refunded
+yet**: the reveal is visual only.
 """
 
 import random
@@ -79,8 +80,8 @@ def draw[T](
     key_of: Callable[[T], str],
     rng: random.Random | None = None,
 ) -> list[T]:
-    """The booster's cards from ``pool``: a rarity per card by the odds (the last at least the guarantee),
-    then an item of that rarity — the nearest rarity below when there is none — never twice the same."""
+    """The booster's cards from ``pool``: a rarity per card by the odds (one at least the guarantee), then
+    an item of that rarity — the nearest rarity below when there is none — never twice the same; shuffled."""
     chance = rng or random.SystemRandom()
     by_rarity: dict[str, list[T]] = {r: [] for r in RARITIES}
     for item in pool:
@@ -99,6 +100,6 @@ def draw[T](
                 taken.add(key_of(picked))
                 cards.append(picked)
                 break
-    # the pack is revealed from the plainest card to the rarest (the anticipation builds up)
-    cards.sort(key=lambda c: RARITIES.index(rarity_of(c)) if rarity_of(c) in RARITIES else 0)
+    # in no particular order: the guaranteed card is not always last, the rarest not always at the end
+    chance.shuffle(cards)
     return cards

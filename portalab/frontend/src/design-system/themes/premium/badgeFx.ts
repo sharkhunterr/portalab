@@ -41,6 +41,10 @@ export const FX_EFFECTS = [
   "goldrush",
   "aurorasky",
   "timeportal",
+  // a stage's backdrop: drifting banks of fog under moving projectors (the booster opening)
+  "mist",
+  // a legendary card's moment on that stage
+  "radiance",
 ] as const;
 export type FxBadge = (typeof FX_EFFECTS)[number];
 const FULL_STAGE = new Set<string>([
@@ -53,6 +57,8 @@ const FULL_STAGE = new Set<string>([
   "goldrush",
   "aurorasky",
   "timeportal",
+  "mist",
+  "radiance",
 ]);
 
 // high precision where the device has it: in medium precision (many phones by default) fast-moving noise
@@ -795,6 +801,93 @@ const EFFECTS: Record<FxBadge, string> = {
     float ang = hash(vec2(fi, 96.0)) * 6.2832 + life * 3.0;
     vec2 sp = vec2(cos(ang), sin(ang)) * (1.0 - life) * 0.9;
     o = over(o, mix(vec3(1.0, 0.85, 0.5), vec3(0.6, 0.85, 1.0), hash(vec2(fi, 97.0))), smoothstep(0.008, 0.0, length(c - sp)) * life * k);
+  }
+`,
+  // mist: banks of fog drifting slowly over the floor, warped on themselves, and projectors hung above the
+  // stage, each sweeping on its own — their light only shows where it goes through the haze
+  mist: `
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float aspect = u_res.x / u_res.y;
+  float tm = u_time * 0.05;
+  vec2 q = c * 1.7;
+  vec2 warp = vec2(fbm(q + vec2(tm, -tm * 0.6)), fbm(q * 1.3 + vec2(-tm * 0.8, tm) + 3.1));
+  float fog = fbm(q * 1.15 + warp * 1.8 + vec2(tm * 1.6, tm * 0.3));
+  float low = smoothstep(0.3, -0.5, c.y);
+  float dens = smoothstep(0.22, 0.8, fog) * (0.35 + 0.65 * low);
+  vec3 dark = mix(vec3(0.16, 0.11, 0.34), vec3(0.1, 0.17, 0.38), smoothstep(-0.6, 0.6, c.x + warp.x - 0.5));
+  o = over(o, dark, dens * 0.72);
+  float light = 0.0;
+  vec3 tint = vec3(0.0);
+  float span = min(aspect, 1.9) * 0.46;
+  for (int i = 0; i < 4; i++) {
+    float fi = float(i);
+    float x = (fi / 3.0 - 0.5) * 2.0 * span;
+    vec2 v = c - vec2(x, 0.6);
+    // aimed below, leaning towards the middle, swinging slowly — never two in step
+    float aim = sin(u_time * (0.16 + 0.05 * fi) + fi * 2.1) * 0.42 - x * 0.45;
+    float off = atan(v.x, -v.y) - aim;
+    float width = 0.075 + 0.025 * sin(u_time * 0.23 + fi * 1.3);
+    float cone = smoothstep(width, width * 0.15, abs(off)) * smoothstep(1.7, 0.15, length(v)) * step(v.y, 0.0);
+    cone *= 0.75 + 0.25 * sin(u_time * (0.4 + 0.1 * fi) + fi * 4.0);
+    vec3 col = mix(vec3(0.74, 0.66, 1.0), vec3(0.62, 0.8, 1.0), mod(fi, 2.0));
+    light += cone;
+    tint += col * cone;
+  }
+  vec3 beam = tint / max(light, 0.001);
+  o = over(o, beam, min(light, 1.0) * (0.06 + 0.55 * dens + 0.25 * fbm(q * 2.4 - warp + tm * 3.0) * min(light, 1.0)));
+  float wisp = smoothstep(0.62, 0.8, fbm(q * 3.0 - warp * 2.0 + vec2(-tm * 2.5, tm)));
+  o = over(o, vec3(0.78, 0.74, 0.98), wisp * (0.06 + 0.3 * min(light, 1.0)) * (0.4 + 0.6 * low));
+`,
+  // radiance: a legendary's moment — the dark closes in, golden motes are drawn in a spiral to the middle
+  // while a halo swells; at the turn a flash, two rings of light and soft rays breathing out, embers rising
+  // and slow bokeh — then it all fades away (timed from when it starts: the turn comes at 2.1 s)
+  radiance: `
+  // sized on the screen's narrow side: on a phone held upright the halo stays round the card
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y) - vec2(0.0, 0.05);
+  float a = u_age;
+  float r = length(c);
+  float ang = atan(c.y, c.x);
+  float hit = a - 2.1;
+  float after = step(0.0, hit);
+  float fade = 1.0 - smoothstep(3.0, 3.75, a);
+  vec3 gold = vec3(1.0, 0.72, 0.28);
+  vec3 pale = vec3(1.0, 0.94, 0.78);
+  o = over(o, vec3(0.03, 0.015, 0.0), 0.55 * smoothstep(0.0, 0.9, a) * fade * smoothstep(0.15, 0.8, r));
+  float swell = smoothstep(0.0, 2.1, a);
+  float halo = exp(-r * r * mix(40.0, 9.0, swell * swell)) * (0.25 + 0.75 * swell);
+  halo = mix(halo, exp(-r * r * 7.0) * 0.6, after * smoothstep(0.0, 0.3, hit));
+  o = over(o, gold, halo * 0.7 * fade);
+  float soft = 0.5 + 0.5 * sin(ang * 7.0 + sin(ang * 3.0 + a * 0.5) * 2.0 + a * 0.35);
+  soft *= 0.5 + 0.5 * sin(ang * 11.0 - a * 0.6 + 1.3);
+  float rays = pow(soft, 2.5) * exp(-r * 1.7) * mix(0.15 * swell * swell, 0.9, after * smoothstep(0.0, 0.25, hit));
+  o = over(o, mix(gold, pale, 0.4), rays * 0.6 * fade);
+  for (int i = 0; i < 28; i++) {
+    float fi = float(i);
+    float life = fract(a * (0.45 + 0.2 * hash(vec2(fi, 11.0))) + hash(vec2(fi, 12.0)));
+    float th = hash(vec2(fi, 13.0)) * 6.2832 + life * 2.5;
+    vec2 pos = vec2(cos(th), sin(th)) * mix(1.0, 0.04, life * life);
+    float m = smoothstep(0.012, 0.0, length(c - pos)) * smoothstep(0.0, 0.2, life) * (1.0 - after);
+    o = over(o, pale, m * swell);
+  }
+  o = over(o, vec3(1.0, 0.98, 0.92), after * exp(-hit * 6.0) * exp(-r * 2.6) * fade);
+  float ring1 = smoothstep(0.035, 0.0, abs(r - hit * 1.5)) * exp(-hit * 1.6);
+  float ring2 = smoothstep(0.02, 0.0, abs(r - (hit - 0.15) * 1.1)) * exp(-hit * 2.0) * step(0.15, hit);
+  o = over(o, pale, (ring1 * 0.75 + ring2 * 0.5) * after * fade);
+  for (int i = 0; i < 40; i++) {
+    float fi = float(i);
+    float dir = hash(vec2(fi, 21.0)) * 6.2832;
+    float speed = 0.25 + 0.6 * hash(vec2(fi, 22.0));
+    float h = max(hit, 0.0);
+    vec2 pos = vec2(cos(dir), sin(dir)) * speed * (1.0 - exp(-h * 2.2)) * 0.9 + vec2(sin(h * 2.0 + fi) * 0.03, h * 0.12);
+    float flick = 0.6 + 0.4 * sin(a * 18.0 + fi * 3.0);
+    float e = smoothstep(0.009, 0.0, length(c - pos)) * flick * smoothstep(1.4, 0.3, h);
+    o = over(o, mix(gold, pale, hash(vec2(fi, 23.0))), e * after * fade);
+  }
+  for (int i = 0; i < 9; i++) {
+    float fi = float(i);
+    vec2 pos = vec2((hash(vec2(fi, 31.0)) - 0.5) * 1.6, (hash(vec2(fi, 32.0)) - 0.5) * 0.9 + a * 0.03);
+    float b = smoothstep(0.07, 0.02, length(c - pos));
+    o = over(o, vec3(1.0, 0.86, 0.58), b * 0.1 * swell * fade);
   }
 `,
 };

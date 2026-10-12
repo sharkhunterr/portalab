@@ -1,6 +1,7 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "../../../design-system/components/Button";
+import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { sound } from "../../../design-system/sound/SoundService";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
@@ -11,29 +12,49 @@ import { ProductArt } from "../catalog/ProductArt";
 import { type Booster, type BoosterCard, localized, useReveal } from "./api";
 import { BoosterPack } from "./BoosterShelf";
 
-type Phase = "sealed" | "opening" | "spread" | "done";
+type Phase = "sealed" | "tearing" | "emerging" | "spread" | "done";
+type CardState = "hidden" | "charging" | "revealed";
+const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
-const OPENING_MS = 1300;
-const SPOTLIGHT_MS = 2300;
+// how long each rarity builds up before its card turns (the rarer, the longer the suspense)
+const CHARGE_MS = [180, 700, 1250, 2100];
+// how long its moment lasts once turned
+const AFTER_MS = [450, 800, 1100, 1700];
+const TEAR_MS = 1500;
+// the GPU's bursts around a card per rarity (none for a common one; a legendary has the whole stage)
+const GPU_BURST = ["", "burst:voltage", "burst:plasma", ""];
+const EMERGE_MS = 1100;
+// the fractures on the back of an epic or legendary card (in a 100 × 140 box), main lines then branches
+const CRACKS = [
+  "M50 70 L43 61 L46 52 L37 41 L40 30 L31 18 L33 6",
+  "M43 61 L33 60 L25 54",
+  "M50 70 L59 64 L63 55 L74 49 L79 38 L91 31",
+  "M63 55 L60 44 L66 36",
+  "M50 70 L56 81 L52 91 L60 102 L57 114 L65 131",
+  "M52 91 L42 97 L36 108",
+  "M50 70 L39 76 L30 74 L20 83 L9 85",
+  "M60 102 L71 106 L77 117",
+];
 
-/** A burst of sparks flying out of a point — more and wider the rarer the card. */
-function Burst({ count, spread, seed }: { count: number; spread: number; seed: number }) {
+/** A deterministic pseudo-random sequence: the same layout on every render. */
+function noise(seed: number, n: number): number {
+  const x = Math.sin(seed * 9301 + n * 49297 + 233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/** Sparks flying out of a point — more, wider and longer the rarer the card. */
+function Burst({ rank, seed }: { rank: number; seed: number }) {
+  const count = [10, 18, 30, 54][rank] ?? 10;
+  const spread = [70, 110, 170, 260][rank] ?? 70;
   const sparks = useMemo(
     () =>
-      Array.from({ length: count }, (_, i) => {
-        const r = (n: number) => {
-          const x = Math.sin((seed + 1) * 9301 + i * 49297 + n * 233) * 43758.5453;
-          return x - Math.floor(x);
-        };
-        return {
-          "--angle": `${(360 / count) * i + r(1) * 24}deg`,
-          "--distance": `${spread * (0.55 + r(2) * 0.6)}px`,
-          "--delay": `${r(3) * 120}ms`,
-          "--size": `${4 + r(4) * 7}px`,
-          "--hue": i % 3,
-        } as CSSProperties;
-      }),
-    [count, spread, seed],
+      Array.from({ length: count }, (_, i) => ({
+        "--angle": `${(360 / count) * i + noise(seed + i, 1) * 20}deg`,
+        "--distance": `${spread * (0.5 + noise(seed + i, 2) * 0.7)}px`,
+        "--delay": `${noise(seed + i, 3) * 140}ms`,
+        "--size": `${3 + noise(seed + i, 4) * (4 + rank * 2)}px`,
+      })) as CSSProperties[],
+    [count, spread, seed, rank],
   );
   return (
     <span className="booster-burst" aria-hidden="true">
@@ -45,51 +66,105 @@ function Burst({ count, spread, seed }: { count: number; spread: number; seed: n
   );
 }
 
+/** The mist the stage stands in: clouds drifting, dust rising, projectors sweeping it from above. */
+function Atmosphere() {
+  const dust = useMemo(
+    () =>
+      Array.from({ length: 34 }, (_, i) => ({
+        "--x": `${noise(i, 1) * 100}%`,
+        "--delay": `${-noise(i, 2) * 14}s`,
+        "--duration": `${9 + noise(i, 3) * 10}s`,
+        "--size": `${1 + noise(i, 4) * 3}px`,
+        "--drift": `${(noise(i, 5) - 0.5) * 120}px`,
+      })) as CSSProperties[],
+    [],
+  );
+  return (
+    <span className="booster-atmosphere" aria-hidden="true">
+      {/* HD: the fog and the projectors drawn by the GPU; the CSS ones below stay where it cannot draw */}
+      <span className="booster-atmosphere__gpu">
+        <FxLayer effect="mist" maxSide={900} className="booster-stage__gpu-canvas" />
+      </span>
+      <span className="booster-atmosphere__beam" data-beam="1" />
+      <span className="booster-atmosphere__beam" data-beam="2" />
+      <span className="booster-atmosphere__beam" data-beam="3" />
+      <span className="booster-atmosphere__fog" data-layer="1" />
+      <span className="booster-atmosphere__fog" data-layer="2" />
+      <span className="booster-atmosphere__fog" data-layer="3" />
+      <span className="booster-atmosphere__dust">
+        {dust.map((style, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: dust motes, fixed
+          <span key={i} style={style} />
+        ))}
+      </span>
+      <span className="booster-atmosphere__glow" />
+      <span className="booster-atmosphere__vignette" />
+    </span>
+  );
+}
+
 function Card({
   card,
   index,
-  flipped,
-  spotlight,
-  onFlip,
+  total,
+  state,
+  onReveal,
 }: {
   card: BoosterCard;
   index: number;
-  flipped: boolean;
-  spotlight: boolean;
-  onFlip: () => void;
+  total: number;
+  state: CardState;
+  onReveal: () => void;
 }) {
   const t = useT();
   const format = useFormat();
   const rarity = card.product.rarity ?? "common";
   const rank = RANK[rarity] ?? 0;
-  const label = flipped
-    ? `${card.product.name} — ${t(`marketplace:rarity.${rarity}`)}${card.duplicate ? ` — ${t("marketplace:booster.duplicate")}` : ""}`
-    : t("marketplace:booster.hidden", { n: index + 1 });
+  const label =
+    state === "revealed"
+      ? `${card.product.name} — ${t(`marketplace:rarity.${rarity}`)}${card.duplicate ? ` — ${t("marketplace:booster.duplicate")}` : ""}`
+      : t("marketplace:booster.hidden", { n: index + 1 });
   return (
     <li
       className="booster-card"
-      data-rarity={rarity}
-      data-flipped={flipped || undefined}
-      data-spotlight={spotlight || undefined}
-      data-duplicate={card.duplicate || undefined}
-      style={{ "--i": index } as CSSProperties}
+      // face down, nothing tells its rarity — not even in the page
+      data-rarity={state === "hidden" ? undefined : rarity}
+      data-state={state}
+      data-duplicate={(state === "revealed" && card.duplicate) || undefined}
+      style={{ "--i": index, "--offset": index - (total - 1) / 2 } as CSSProperties}
     >
+      {state !== "hidden" && rank >= 1 ? (
+        <span className="booster-fx" aria-hidden="true">
+          <span className="booster-fx__ring" />
+          {rank >= 2 ? <span className="booster-fx__vortex" /> : null}
+          {rank >= 3 ? <span className="booster-fx__halo" /> : null}
+        </span>
+      ) : null}
       <button
         type="button"
         className="booster-card__button"
-        onClick={onFlip}
-        disabled={flipped}
+        onClick={onReveal}
+        disabled={state !== "hidden"}
         aria-label={label}
       >
         <span className="booster-card__inner">
           <span className="booster-card__back" aria-hidden="true">
             <span className="booster-card__back-pattern" />
-            <Icon name="sparkles" size={28} />
+            <span className="booster-card__back-sigil">
+              <Icon name="sparkles" size={30} />
+            </span>
+            {/* light breaking through: jagged fractures spreading from the middle */}
+            <svg className="booster-card__cracks" viewBox="0 0 100 140" preserveAspectRatio="none">
+              {CRACKS.map((d) => (
+                <path key={d} d={d} pathLength={1} />
+              ))}
+            </svg>
           </span>
           <span className="booster-card__face" aria-hidden="true">
             <span className="booster-card__shine" />
             <span className="booster-card__art">
-              <ProductArt product={card.product} size="card" />
+              {/* the card says itself whether it is new or a duplicate */}
+              <ProductArt product={{ ...card.product, owned: false }} size="card" />
             </span>
             <span className="booster-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
             <strong className="booster-card__name">{card.product.name}</strong>
@@ -102,10 +177,21 @@ function Card({
           </span>
         </span>
       </button>
-      {flipped && rank >= 1 ? (
-        <Burst count={rank === 3 ? 42 : rank === 2 ? 26 : 14} spread={60 + rank * 45} seed={index} />
+      {state === "revealed" && GPU_BURST[rank] ? (
+        // HD: electricity around a rare card, plasma around an epic one
+        <span className="booster-fx__gpu" aria-hidden="true">
+          <FxLayer effect={GPU_BURST[rank] ?? ""} aura className="booster-fx__gpu-canvas" />
+        </span>
       ) : null}
-      {flipped && card.duplicate ? (
+      {state === "revealed" ? (
+        <>
+          <span className="booster-fx__wave" aria-hidden="true" />
+          {rank >= 2 ? <span className="booster-fx__wave booster-fx__wave--late" aria-hidden="true" /> : null}
+          <span className="booster-fx__puff" aria-hidden="true" />
+          <Burst rank={rank} seed={index * 7 + 3} />
+        </>
+      ) : null}
+      {state === "revealed" && card.duplicate ? (
         <span className="booster-card__refund" aria-hidden="true">
           <Icon name="coins" size={14} />+{format.number(card.refund)}
         </span>
@@ -115,11 +201,14 @@ function Card({
 }
 
 /**
- * #81 (proof of concept): opening a booster — the sealed pack floats; a tap shakes it, it tears open in a
- * flash and its cards are dealt face down, the rarer ones already glowing through. Each turns on a tap (or
- * all, one after another): a rare one glints, an epic one bursts, a legendary one takes the stage — the
- * screen dims, golden rays turn behind it. A card already owned gets a « duplicate » stamp and the Coins it
- * would give back. A summary closes it. Visual only: nothing is charged, granted or refunded yet.
+ * #81 (proof of concept): opening a booster, in the mist — the sealed pack floats under projectors sweeping
+ * the haze; a tap and a bright line runs along its top, the strip tears off and flies away, light pours out and the
+ * cards rise from it, then line up face down, all alike. Each card turns on a tap (or all, one after
+ * another), and its rarity is its moment: a common one turns in a puff of mist; a rare one gathers a blue
+ * ring that bursts into a shockwave; an epic one shakes inside a violet vortex and explodes; a legendary
+ * one rises to the middle while everything darkens and golden motes spiral into a swelling halo, light
+ * cracks through its back — a flash, rings of light, soft rays, embers rising. A card already owned gets a
+ * « duplicate » stamp and the Coins it would give back. A summary closes it. Visual only: nothing is charged, granted or refunded.
  */
 export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose: () => void }) {
   const t = useT();
@@ -128,8 +217,8 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
   const reduced = useTheme().effective.reducedMotion;
   const reveal = useReveal();
   const [phase, setPhase] = useState<Phase>("sealed");
-  const [flipped, setFlipped] = useState<ReadonlySet<number>>(new Set());
-  const [spotlight, setSpotlight] = useState<number | null>(null);
+  const [states, setStates] = useState<CardState[]>([]);
+  const [moment, setMoment] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
   const dialog = useRef<HTMLDivElement>(null);
   const cards = reveal.data?.cards ?? [];
@@ -138,9 +227,11 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
   }, []);
 
   const draw = useCallback(() => {
+    for (const id of timers.current) window.clearTimeout(id);
+    timers.current = [];
     reveal.reset();
-    setFlipped(new Set());
-    setSpotlight(null);
+    setStates([]);
+    setMoment(null);
     setPhase("sealed");
     reveal.mutate(booster.key);
   }, [booster.key, reveal]);
@@ -149,11 +240,14 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
   useEffect(() => {
     draw();
     dialog.current?.focus();
-    const keep = timers.current;
     return () => {
-      for (const id of keep) window.clearTimeout(id);
+      for (const id of timers.current) window.clearTimeout(id);
     };
   }, []);
+
+  useEffect(() => {
+    if (reveal.data) setStates(reveal.data.cards.map(() => "hidden"));
+  }, [reveal.data]);
 
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
@@ -170,42 +264,47 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
       setPhase("spread");
       return;
     }
-    setPhase("opening");
-    later(() => setPhase("spread"), OPENING_MS);
+    setPhase("tearing");
+    later(() => setPhase("emerging"), TEAR_MS);
+    later(() => setPhase("spread"), TEAR_MS + EMERGE_MS);
   };
 
-  const flip = useCallback(
+  const revealOne = useCallback(
     (index: number) => {
       const card = cards[index];
       if (!card) return;
-      setFlipped((current) => new Set(current).add(index));
       const rank = RANK[card.product.rarity ?? "common"] ?? 0;
-      void sound.play(rank >= 2 ? "reward" : rank === 1 ? "success" : "ui");
-      if (rank === 3 && !reduced) {
-        setSpotlight(index);
-        later(() => setSpotlight((now) => (now === index ? null : now)), SPOTLIGHT_MS);
-      }
+      const charge = reduced ? 0 : (CHARGE_MS[rank] ?? 0);
+      setStates((now) => now.map((s, i) => (i === index && s === "hidden" ? "charging" : s)));
+      if (rank >= 2 && !reduced) setMoment(RARITIES[rank] ?? null);
+      later(() => {
+        setStates((now) => now.map((s, i) => (i === index ? "revealed" : s)));
+        void sound.play(rank >= 2 ? "reward" : rank === 1 ? "success" : "ui");
+        later(() => setMoment((m) => (m === RARITIES[rank] ? null : m)), AFTER_MS[rank] ?? 400);
+      }, charge);
     },
     [cards, later, reduced],
   );
 
   const revealAll = () => {
     let wait = 0;
-    cards.forEach((card, index) => {
-      if (flipped.has(index)) return;
-      later(() => flip(index), wait);
-      wait += (RANK[card.product.rarity ?? "common"] ?? 0) === 3 && !reduced ? SPOTLIGHT_MS + 200 : 520;
+    states.forEach((state, index) => {
+      if (state !== "hidden") return;
+      later(() => revealOne(index), wait);
+      const rank = RANK[cards[index]?.product.rarity ?? "common"] ?? 0;
+      wait += reduced ? 150 : (CHARGE_MS[rank] ?? 0) + (AFTER_MS[rank] ?? 400) + 150;
     });
   };
 
-  const all = cards.length > 0 && flipped.size === cards.length;
+  const all = states.length > 0 && states.every((s) => s === "revealed");
   useEffect(() => {
-    if (all && phase === "spread") later(() => setPhase("done"), reduced ? 0 : 1100);
+    if (all && phase === "spread") later(() => setPhase("done"), reduced ? 0 : 1400);
   }, [all, phase, later, reduced]);
 
   const refund = cards.reduce((sum, card) => sum + (card.duplicate ? card.refund : 0), 0);
   const best = cards.reduce((top, card) => Math.max(top, RANK[card.product.rarity ?? "common"] ?? 0), 0);
   const name = localized(booster.names, locale);
+  const busy = states.some((s) => s === "charging");
 
   return createPortal(
     <div
@@ -216,12 +315,17 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
       aria-label={t("marketplace:booster.opening", { name })}
       tabIndex={-1}
       data-phase={phase}
-      data-spotlight={spotlight !== null || undefined}
-      // the stage takes the best card's colour only once every card is turned (no spoiler)
-      data-best={phase === "done" ? ["common", "rare", "epic", "legendary"][best] : undefined}
+      data-moment={moment ?? undefined}
+      data-best={phase === "done" ? RARITIES[best] : undefined}
       data-reduced={reduced || undefined}
     >
-      <span className="booster-stage__rays" aria-hidden="true" />
+      <Atmosphere />
+      {moment === "legendary" ? (
+        // HD: the dark closing in, motes drawn to the middle, then a flash, rings, rays and embers as it turns
+        <span className="booster-stage__gpu" aria-hidden="true">
+          <FxLayer effect="radiance" maxSide={1100} className="booster-stage__gpu-canvas" />
+        </span>
+      ) : null}
       <button
         type="button"
         className="booster-stage__close"
@@ -235,25 +339,31 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
         {t("marketplace:booster.previewNote")}
       </p>
 
-      {phase === "sealed" || phase === "opening" ? (
+      {phase === "sealed" || phase === "tearing" || phase === "emerging" ? (
         <div className="booster-stage__pack">
           <button
             type="button"
             className="booster-stage__tear"
             onClick={open}
-            disabled={!reveal.data || phase === "opening"}
+            disabled={!reveal.data || phase !== "sealed"}
             aria-label={t("marketplace:booster.tear", { name })}
           >
             <BoosterPack booster={booster} stage />
-            {phase === "opening" ? <span className="booster-stage__flash" aria-hidden="true" /> : null}
+            <span className="booster-stage__tearline" aria-hidden="true" />
+            <span className="booster-stage__glow" aria-hidden="true" />
+            <span className="booster-stage__rising" aria-hidden="true">
+              {cards.map((card, index) => (
+                <span key={card.product.key} style={{ "--i": index } as CSSProperties} />
+              ))}
+            </span>
           </button>
           <p className="booster-stage__hint" aria-live="polite">
             {reveal.isError
               ? t("marketplace:booster.failed")
               : reveal.data
-                ? phase === "opening"
-                  ? t("marketplace:booster.tearing")
-                  : t("marketplace:booster.tapToOpen")
+                ? phase === "sealed"
+                  ? t("marketplace:booster.tapToOpen")
+                  : t("marketplace:booster.tearing")
                 : t("marketplace:booster.sealing")}
           </p>
         </div>
@@ -265,16 +375,18 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
                 key={card.product.key}
                 card={card}
                 index={index}
-                flipped={flipped.has(index)}
-                spotlight={spotlight === index}
-                onFlip={() => flip(index)}
+                total={cards.length}
+                state={states[index] ?? "hidden"}
+                onReveal={() => {
+                  if (!busy) revealOne(index);
+                }}
               />
             ))}
           </ul>
           {phase === "spread" && !all ? (
             <div className="booster-stage__actions">
               <p className="booster-stage__hint">{t("marketplace:booster.tapCards")}</p>
-              <Button variant="secondary" onClick={revealAll}>
+              <Button variant="secondary" onClick={revealAll} disabled={busy}>
                 <Icon name="sparkles" size={16} />
                 {t("marketplace:booster.revealAll")}
               </Button>
@@ -282,7 +394,7 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
           ) : null}
           {phase === "done" ? (
             <section className="booster-summary" aria-label={t("marketplace:booster.summary")}>
-              <h2>{t(`marketplace:booster.verdict.${["common", "rare", "epic", "legendary"][best]}`)}</h2>
+              <h2>{t(`marketplace:booster.verdict.${RARITIES[best]}`)}</h2>
               <ul className="booster-summary__list">
                 {cards.map((card) => (
                   <li key={card.product.key} data-rarity={card.product.rarity ?? "common"}>
