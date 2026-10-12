@@ -557,7 +557,9 @@ class DemoSeeder:
                 await catalog.create(self.admin, raw)
                 await catalog.move(self.admin, product["key"], "available")
                 made += 1
-            if product.get("reward_only"):  # 027: given by an achievement, never sold
+            if product["type"] == "booster" and exists:
+                pass  # #81: its odds and refunds are the administrators' — never seeded back over them
+            elif product.get("reward_only"):  # 027: given by an achievement, never sold
                 current, _ = await catalog.get(product["key"])
                 if current.state == "available":
                     await catalog.move(self.admin, product["key"], "unavailable")
@@ -586,12 +588,14 @@ class DemoSeeder:
                 poster_effect="none",
                 featured=product["featured"],
                 icon=product["icon"],
+                season=product.get("season"),
             )
-            if (current.rarity, current.poster_effect, current.featured, current.icon) != (
+            if (current.rarity, current.poster_effect, current.featured, current.icon, current.season) != (
                 presentation.rarity,
                 presentation.poster_effect,
                 presentation.featured,
                 presentation.icon,
+                presentation.season,
             ) or current.category_id is None:
                 await catalog.present(self.admin, product["key"], presentation, product["collection"])
             limit = product["limit"] or (None, None)

@@ -59,6 +59,7 @@ class Unlock(BaseModel):
     kind: Literal[
         "badge", "title", "avatar_frame", "profile_banner", "profile_background", "name_style", "level_badge",
         "level_up", "notification_style", "notification_animation", "effect", "ambient", "palette", "theme",
+        "booster",  # #81: a sealed booster, to open from the reserve
     ]  # fmt: skip
     label: str = Field(min_length=1, max_length=80)
 

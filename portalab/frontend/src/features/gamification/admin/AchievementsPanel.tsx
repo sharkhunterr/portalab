@@ -24,9 +24,12 @@ import {
   keyOf,
   type QuestDefinition,
   type Reward,
+  UNLOCK_KINDS,
+  type Unlock,
   useAchievementAdmin,
   useEventTypes,
   useQuestAdmin,
+  useShopProducts,
   VALUES,
   type Versioned,
 } from "./tuning";
@@ -238,6 +241,58 @@ function RewardsEditor({ rewards, onChange }: { rewards: Reward[]; onChange: (ne
   );
 }
 
+/** #81: the shop products an achievement gives — a look, or a sealed booster opened from the reserve. */
+function UnlocksEditor({ unlocks, onChange }: { unlocks: Unlock[]; onChange: (next: Unlock[]) => void }) {
+  const t = useT();
+  const products = useShopProducts();
+  const choices = (products.data ?? []).filter(
+    (p) => p.state !== "archived" && (UNLOCK_KINDS as readonly string[]).includes(p.type),
+  );
+  return (
+    <fieldset className="gam-fieldset">
+      <legend>{t("gamification:admin.unlocks")}</legend>
+      <p className="admin-muted">{t("gamification:admin.unlocksHint")}</p>
+      {unlocks.map((unlock, index) => (
+        <div key={unlock.product} className="gam-unlock">
+          <span className="gam-chip" data-kind="shop">
+            {unlock.label}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t("gamification:admin.remove")}
+            onClick={() => onChange(unlocks.filter((_, i) => i !== index))}
+          >
+            <Icon name="trash" size={16} />
+          </Button>
+        </div>
+      ))}
+      {unlocks.length < 4 ? (
+        <SelectField
+          label={t("gamification:admin.unlockAdd")}
+          value=""
+          onChange={(e) => {
+            const product = choices.find((p) => p.key === e.target.value);
+            if (product && !unlocks.some((u) => u.product === product.key)) {
+              onChange([
+                ...unlocks,
+                { product: product.key, kind: product.type, label: product.name.slice(0, 80) },
+              ]);
+            }
+          }}
+        >
+          <option value="">{t("gamification:admin.unlockNone")}</option>
+          {choices.map((p) => (
+            <option key={p.key} value={p.key}>
+              {p.name}
+            </option>
+          ))}
+        </SelectField>
+      ) : null}
+    </fieldset>
+  );
+}
+
 function useSubmitError() {
   const t = useT();
   const [error, setError] = useState<string | null>(null);
@@ -366,6 +421,7 @@ function AchievementForm({
         ) : null}
       </fieldset>
       <RewardsEditor rewards={def.rewards ?? []} onChange={(rewards) => patch({ rewards })} />
+      <UnlocksEditor unlocks={def.unlocks ?? []} onChange={(unlocks) => patch({ unlocks })} />
       {error ? (
         <p role="alert" className="services-admin__ko">
           {error}

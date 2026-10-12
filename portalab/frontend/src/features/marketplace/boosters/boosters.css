@@ -1794,3 +1794,132 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------- a booster as a product */
+/* in a shop tile, a pack sheet or a list */
+/* the pack fits the art's height (a tile is wider than tall): never cut at the top */
+.booster-pack[data-size="card"] {
+  inline-size: auto;
+  block-size: 100%;
+  max-block-size: 11rem;
+}
+.booster-pack[data-size="card"] .booster-pack__name {
+  font-size: 0.78rem;
+}
+.booster-pack[data-size="mini"] {
+  inline-size: 2.6rem;
+  border-radius: 0.35rem 0.35rem 0.45rem 0.45rem;
+}
+.booster-pack[data-size="mini"] .booster-pack__count {
+  inset: auto 0.1rem 0.1rem auto;
+  padding: 0 0.2rem;
+  font-size: 0.5rem;
+}
+.product-art .booster-pack {
+  margin: auto;
+  animation: booster-float 4s ease-in-out infinite;
+}
+/* the sheet: what it holds */
+.booster-details .booster-offer__facts {
+  margin-block: 0 var(--space-3);
+}
+.booster-details__note {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.booster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+/* a card won early: held, usable once its level or Contribution is reached */
+.booster-card__locked {
+  position: absolute;
+  inset: auto 0 -1.6rem;
+  z-index: 5;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--booster-light);
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------------- the administrators' settings */
+.admin-boosters {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.admin-booster {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.admin-booster__body {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+.admin-booster__odds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+.admin-booster__odds span,
+.admin-booster__rarity {
+  --tone: var(--booster-common);
+  color: var(--tone);
+  font-weight: 600;
+}
+:is(.admin-booster__odds span, .admin-booster__row)[data-rarity="rare"] {
+  --tone: var(--booster-rare);
+}
+:is(.admin-booster__odds span, .admin-booster__row)[data-rarity="epic"] {
+  --tone: var(--booster-epic);
+}
+:is(.admin-booster__odds span, .admin-booster__row)[data-rarity="legendary"] {
+  --tone: var(--booster-legendary);
+}
+.admin-booster__row .admin-booster__rarity {
+  color: var(--tone);
+}
+.admin-booster__form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4);
+}
+.admin-booster__row {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) 4rem minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: end;
+}
+.admin-booster__percent {
+  padding-block-end: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+@media (max-width: 40rem) {
+  .admin-booster {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .admin-booster > :last-child {
+    grid-column: 1 / -1;
+  }
+  .admin-booster__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

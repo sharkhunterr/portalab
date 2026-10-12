@@ -68,7 +68,21 @@ export interface AchievementDefinition {
   category?: string | undefined;
   criteria: Criterion[];
   rewards?: Reward[] | undefined;
+  /** shop products it gives (a badge, a title, a frame… or a sealed booster) */
+  unlocks?: Unlock[] | undefined;
 }
+
+export interface Unlock {
+  product: string;
+  kind: string;
+  label: string;
+}
+
+/** The kinds of shop products an achievement may give. */
+export const UNLOCK_KINDS = [
+  "badge", "title", "avatar_frame", "profile_banner", "profile_background", "name_style", "level_badge",
+  "level_up", "notification_style", "notification_animation", "effect", "ambient", "palette", "theme", "booster",
+] as const; // biome-ignore format: a list
 
 export interface QuestDefinition {
   kind: "quest" | "daily" | "challenge";
@@ -188,6 +202,7 @@ export const useQuestAdmin = () => useVersioned<QuestDefinition>("quests");
 export interface ShopProduct {
   key: string;
   name: string;
+  type: string;
   state: string;
   min_level?: number | null;
   price_coins?: number | null;

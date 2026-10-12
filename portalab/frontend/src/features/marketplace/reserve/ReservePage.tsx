@@ -7,7 +7,14 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
-import { localized, type ReserveEntry, requestKey, useReserve, useUseReserve } from "../boosters/api";
+import {
+  localized,
+  openBooster,
+  type ReserveEntry,
+  requestKey,
+  useReserve,
+  useUseReserve,
+} from "../boosters/api";
 import { ProductArt } from "../catalog/ProductArt";
 import "../marketplace.css";
 import "./reserve.css";
@@ -30,41 +37,49 @@ function Item({ entry, onUsed }: { entry: ReserveEntry; onUsed: (name: string, t
         <strong>{name}</strong>
         <p>{localized(entry.product.descriptions ?? {}, locale)}</p>
       </div>
-      <Dialog
-        open={open}
-        onOpenChange={setOpen}
-        trigger={
-          <Button disabled={use.isPending}>
-            <Icon name="zap" size={16} />
-            {t("marketplace:reserve.use")}
-          </Button>
-        }
-        title={t("marketplace:reserve.useTitle", { name })}
-        description={t(
-          entry.needs_configuration ? "marketplace:reserve.useTicket" : "marketplace:reserve.useHint",
-        )}
-        closeLabel={t("marketplace:reserve.cancel")}
-        footer={
-          <Button
-            disabled={use.isPending}
-            onClick={() =>
-              use.mutate(
-                { key: entry.product.key, requestKey: requestKey() },
-                {
-                  onSuccess: (result) => {
-                    setOpen(false);
-                    onUsed(name, result.state === "needs_configuration");
+      {entry.booster ? (
+        // a sealed booster (offered, or bought earlier): opened on the stage, for free
+        <Button onClick={() => openBooster(entry.product.key, true)}>
+          <Icon name="gift" size={16} />
+          {t("marketplace:reserve.open")}
+        </Button>
+      ) : (
+        <Dialog
+          open={open}
+          onOpenChange={setOpen}
+          trigger={
+            <Button disabled={use.isPending}>
+              <Icon name="zap" size={16} />
+              {t("marketplace:reserve.use")}
+            </Button>
+          }
+          title={t("marketplace:reserve.useTitle", { name })}
+          description={t(
+            entry.needs_configuration ? "marketplace:reserve.useTicket" : "marketplace:reserve.useHint",
+          )}
+          closeLabel={t("marketplace:reserve.cancel")}
+          footer={
+            <Button
+              disabled={use.isPending}
+              onClick={() =>
+                use.mutate(
+                  { key: entry.product.key, requestKey: requestKey() },
+                  {
+                    onSuccess: (result) => {
+                      setOpen(false);
+                      onUsed(name, result.state === "needs_configuration");
+                    },
                   },
-                },
-              )
-            }
-          >
-            {t("marketplace:reserve.confirm")}
-          </Button>
-        }
-      >
-        {use.isError ? <p role="alert">{t("marketplace:reserve.failed")}</p> : null}
-      </Dialog>
+                )
+              }
+            >
+              {t("marketplace:reserve.confirm")}
+            </Button>
+          }
+        >
+          {use.isError ? <p role="alert">{t("marketplace:reserve.failed")}</p> : null}
+        </Dialog>
+      )}
     </li>
   );
 }

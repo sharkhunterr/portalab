@@ -1,21 +1,39 @@
-"""#81 — boosters for real: those on sale (with their odds, refunds and openings left), opening one charges
-its price, grants the looks not owned yet, gives the duplicates' Coins back at once (a fixed amount per
-rarity) and is replayed by its ``Idempotency-Key``; the reserve booster fills the reserve (items stack,
-never a duplicate), using an item grants it as a purchase would; Discovery opens three times per member."""
+"""#81 — boosters are products of the catalog (type ``booster``): in the shop with their odds, refunds and
+openings left; opening one charges its price, grants the looks not owned yet, gives the duplicates' Coins
+back at once (a fixed amount per rarity) and is replayed by its ``Idempotency-Key``; a look won below its
+level or Contribution is held ``locked`` and usable once they are reached; a booster offered (a level
+reward, an achievement) waits sealed in the reserve and opens for free; a season's booster draws from its
+season's looks and is on sale in its weeks only; the reserve booster fills the reserve (items stack, never
+a duplicate), using an item grants it as a purchase would; Discovery opens three times per member."""
 
 from typing import Any
 
 from httpx import AsyncClient
 
 from portalab.capabilities.media_core import QUOTA
+from portalab.modules.gamification.ledger.writer import Entry
 from tests.integration.identity.helpers import login
 from tests.integration.marketplace.conftest import FakeQuota, MkHarness, product_def, published
 
+CLASSIC = {"pool": "looks", "cards": 5, "odds": {"common": 62, "rare": 26, "epic": 10, "legendary": 2}}
 
-async def look(mk: MkHarness, key: str, rarity: str, kind: str = "badge", **version: Any) -> None:
+
+async def look(
+    mk: MkHarness, key: str, rarity: str, kind: str = "badge", season: str | None = None, **version: Any
+) -> None:
     body = {
         **product_def(key, kind, price_coins=200, **version),
-        "presentation": {"rarity": rarity},
+        "presentation": {"rarity": rarity, "season": season},
+    }
+    await mk.module.catalog.create(mk.p("boss"), body)
+    await mk.module.catalog.move(mk.p("boss"), key, "available")
+
+
+async def booster(mk: MkHarness, key: str, price: int, **payload: Any) -> None:
+    body = {
+        **product_def(key, "booster", price_coins=price, payload={**CLASSIC, **payload}),
+        "repeatable": True,
+        "presentation": {"rarity": "rare"},
     }
     await mk.module.catalog.create(mk.p("boss"), body)
     await mk.module.catalog.move(mk.p("boss"), key, "available")
@@ -31,22 +49,28 @@ async def test_opening_a_booster(mk: MkHarness, client: AsyncClient) -> None:
         await look(mk, key, rarity)
     await look(mk, "pulsar", "common", "title", payload={"label": "Pulsar"})
     await published(mk, "some_widget", "widget", price_coins=300)  # not a look: never in a booster
+    await booster(mk, "booster_cosmos", 450, guarantee="rare")
     await mk.module.grants.grant(mk.p("boss"), mk.people["ursula"], "night_owl", "gift")
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
 
-    shelf = {b["key"]: b for b in (await client.get("/api/v1/marketplace/boosters")).json()}
-    assert {
-        "booster_cosmos",
-        "booster_legend",
-        "booster_prestige",
-        "booster_reserve",
-        "booster_discovery",
-    } <= set(shelf)
-    cosmos = shelf["booster_cosmos"]
-    assert cosmos["cards"] == 5 and cosmos["guarantee"] == "rare" and cosmos["kind"] == "looks"
-    assert cosmos["refunds"] == {"common": 10, "rare": 15, "epic": 20, "legendary": 30}
-    assert shelf["booster_reserve"]["kind"] == "reserve" and shelf["booster_discovery"]["left"] == 3
+    # a product like any other: a tile in the shop, with what it holds
+    tile = next(
+        p for p in (await client.get("/api/v1/marketplace/products")).json() if p["type"] == "booster"
+    )
+    assert (
+        tile["key"] == "booster_cosmos"
+        and tile["booster"]["cards"] == 5
+        and tile["booster"]["odds"]["common"] == 62
+    )
+    assert tile["booster"]["refunds"] == {"common": 10, "rare": 15, "epic": 20, "legendary": 30}
+    [shelf] = (await client.get("/api/v1/marketplace/boosters")).json()
+    assert (
+        shelf["kind"] == "looks"
+        and shelf["guarantee"] == "rare"
+        and shelf["sealed"] == 0
+        and shelf["left"] is None
+    )
 
     # five looks in the pool, five cards: all of them, the owl a duplicate (10 Coins back, not its price)
     first = await client.post(
@@ -61,7 +85,7 @@ async def test_opening_a_booster(mk: MkHarness, client: AsyncClient) -> None:
     assert opened["opening"]["price"] == 450 and opened["opening"]["refund"] == 10
     assert await mk.balance("ursula") == 1000 - 450 + 10
     owned = {p["key"]: p["owned"] for p in (await client.get("/api/v1/marketplace/products")).json()}
-    assert all(owned[key] for key in cards) and not owned["some_widget"]
+    assert all(owned[key] for key in cards) and not owned["some_widget"] and not owned["booster_cosmos"]
     mine = (await client.get("/api/v1/me/marketplace/owned")).json()
     assert {r["product_key"] for r in mine if r["origin"] == "booster"} == set(cards) - {"night_owl"}
 
@@ -81,8 +105,86 @@ async def test_opening_a_booster(mk: MkHarness, client: AsyncClient) -> None:
 
     history = (await client.get("/api/v1/marketplace/boosters/openings")).json()
     assert [h["id"] for h in history] == [second["opening"]["id"], opened["opening"]["id"]]
-    assert history[0]["names"]["en"] == "Cosmos booster" and len(history[0]["cards"]) == 5
+    assert history[0]["names"]["en"] == "Booster Cosmos" and len(history[0]["cards"]) == 5
     assert (await client.post("/api/v1/marketplace/boosters/nothing/open")).status_code == 404
+    sealed = await client.post("/api/v1/marketplace/boosters/booster_cosmos/open", params={"sealed": "true"})
+    assert sealed.status_code == 409 and sealed.json()["code"] == "marketplace.reserve_empty"
+
+
+async def test_locked_until_its_conditions_then_offered_and_seasons(
+    mk: MkHarness, client: AsyncClient
+) -> None:
+    await look(
+        mk,
+        "pumpkin",
+        "common",
+        season="halloween",
+        conditions=[{"kind": "min_contribution", "contribution": 5}],
+    )
+    await look(mk, "snowman", "common", season="christmas")
+    await booster(mk, "booster_halloween", 450, season="halloween", cards=1)
+    await booster(mk, "booster_christmas", 450, season="christmas", cards=1)
+    await mk.coins("ursula", 1000)
+    await login(client, "ursula")
+    # 1 October: Halloween's booster is on sale, Christmas' is not
+    shop = {p["key"] for p in (await client.get("/api/v1/marketplace/products")).json()}
+    assert "booster_halloween" in shop and "booster_christmas" not in shop
+    assert {b["key"] for b in (await client.get("/api/v1/marketplace/boosters")).json()} == {
+        "booster_halloween"
+    }
+    closed = await client.post("/api/v1/marketplace/boosters/booster_christmas/open")
+    assert closed.status_code == 409 and closed.json()["code"] == "marketplace.not_available"
+
+    # its season's looks only — won below its Contribution: held, locked, not usable
+    opened = (await client.post("/api/v1/marketplace/boosters/booster_halloween/open")).json()
+    [card] = opened["cards"]
+    assert card["product"]["key"] == "pumpkin" and card["outcome"] == "new" and card["locked"] is True
+    states = {r["product_key"]: r["state"] for r in (await client.get("/api/v1/me/marketplace/owned")).json()}
+    assert states["pumpkin"] == "locked"
+    pumpkin = (await client.get("/api/v1/marketplace/products/pumpkin")).json()
+    assert pumpkin["owned"] is True and pumpkin["locked"] is True
+    # its Contribution reached: usable
+    async with mk.database.unit_of_work() as uow:
+        await mk.economy.writer.record(
+            uow.session,
+            Entry(
+                user_id=mk.people["ursula"],
+                value="contribution",
+                delta=10,
+                kind="grant",
+                source_kind="system",
+                idempotency_key="contribution:test",
+                occurred_at=mk.clock.now(),
+            ),
+        )
+    listed = {p["key"]: p for p in (await client.get("/api/v1/marketplace/products")).json()}
+    assert listed["pumpkin"]["owned"] is True and listed["pumpkin"]["locked"] is False
+    states = {r["product_key"]: r["state"] for r in (await client.get("/api/v1/me/marketplace/owned")).json()}
+    assert states["pumpkin"] == "active"
+
+    # offered (an achievement, a level reward): sealed in the reserve, opened for free even out of season —
+    # its duplicate's Coins credited
+    await mk.module.grants.grant(mk.p("boss"), mk.people["ursula"], "booster_christmas", "achievement")
+    await mk.module.grants.grant(mk.p("boss"), mk.people["ursula"], "booster_halloween", "level 5")
+    shelf = {b["key"]: b for b in (await client.get("/api/v1/marketplace/boosters")).json()}
+    assert shelf["booster_christmas"]["sealed"] == 1 and shelf["booster_christmas"]["on_sale"] is False
+    reserve = {i["product"]["key"]: i for i in (await client.get("/api/v1/marketplace/reserve")).json()}
+    assert reserve["booster_christmas"]["booster"] is True and reserve["booster_christmas"]["quantity"] == 1
+    used = await client.post("/api/v1/marketplace/reserve/booster_christmas/use")
+    assert used.status_code == 409 and used.json()["code"] == "marketplace.open_booster"
+    before = await mk.balance("ursula")
+    gift = (
+        await client.post("/api/v1/marketplace/boosters/booster_christmas/open", params={"sealed": "true"})
+    ).json()
+    assert gift["opening"]["price"] == 0 and [c["product"]["key"] for c in gift["cards"]] == ["snowman"]
+    assert gift["booster"]["sealed"] == 0 and gift["booster"]["on_sale"] is False  # out of the list, as it is
+    assert await mk.balance("ursula") == before
+    again = (
+        await client.post("/api/v1/marketplace/boosters/booster_halloween/open", params={"sealed": "true"})
+    ).json()
+    assert again["cards"][0]["outcome"] == "duplicate" and again["opening"]["refund"] == 10
+    assert await mk.balance("ursula") in (before, before + 10)  # credited when the economy's perks run
+    assert (await client.get("/api/v1/marketplace/reserve")).json() == []
 
 
 async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
@@ -97,6 +199,7 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
         await mk.module.catalog.create(mk.p("boss"), body)
         await mk.module.catalog.move(mk.p("boss"), key, "available")
     await look(mk, "night_owl", "common")  # a look: never in the reserve booster
+    await booster(mk, "booster_reserve", 300, pool="reserve", cards=3, guarantee="rare")
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
     for _ in range(2):
@@ -132,6 +235,7 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
 async def test_discovery_opens_three_times(mk: MkHarness, client: AsyncClient) -> None:
     for index in range(4):
         await look(mk, f"look_{index}", "common")
+    await booster(mk, "booster_discovery", 120, cards=3, per_member=3)
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
     for left in (2, 1, 0):
@@ -140,7 +244,6 @@ async def test_discovery_opens_three_times(mk: MkHarness, client: AsyncClient) -
     refused = await client.post("/api/v1/marketplace/boosters/booster_discovery/open")
     assert refused.status_code == 409 and refused.json()["code"] == "marketplace.booster_limit"
     # the refused one charged nothing (duplicates of the earlier ones gave a little back)
-    spent = 3 * 120
     history = (await client.get("/api/v1/marketplace/boosters/openings")).json()
     back = sum(h["refund"] for h in history)
-    assert len(history) == 3 and await mk.balance("ursula") == 1000 - spent + back
+    assert len(history) == 3 and await mk.balance("ursula") == 1000 - 3 * 120 + back

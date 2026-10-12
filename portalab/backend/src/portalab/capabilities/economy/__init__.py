@@ -204,6 +204,10 @@ class Perks(Protocol):
         """A gains boost for ``hours`` (queued after the member's boost in progress)."""
         ...
 
+    async def credit_coins(self, user: UUID, amount: int, source: str, idempotency_key: str) -> None:
+        """#81: Coins given back outside a purchase (a duplicate in an offered booster); once per key."""
+        ...
+
 
 @dataclass(frozen=True, slots=True)
 class ExternalDefinition:

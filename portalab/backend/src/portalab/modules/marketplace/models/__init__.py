@@ -118,6 +118,7 @@ class Product(MarketplaceBase):
             name="poster_effect",
         ),
         Index("ix_products_state", "state", "category_id"),
+        Index("ix_products_season", "season"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
@@ -135,6 +136,8 @@ class Product(MarketplaceBase):
         String(12), nullable=False, default="auto", server_default="auto"
     )
     icon: Mapped[str | None] = mapped_column(String(64))
+    # #81: the season it belongs to (Halloween, Christmas…): highlighted then, its season's booster and pack
+    season: Mapped[str | None] = mapped_column(String(24))
     # availability (027): how many may exist (None: the rarity's supply), how many one member may buy in a
     # period (repeatable products) — scarcity, never priority
     supply: Mapped[int | None] = mapped_column(Integer)
@@ -181,7 +184,7 @@ class Ownership(MarketplaceBase):
         CheckConstraint("origin IN ('purchase', 'grant', 'booster')", name="origin"),
         CheckConstraint(
             "state IN ('active', 'needs_configuration', 'activation_failed', 'revoked', 'refunded', "
-            "'expired')",
+            "'expired', 'locked')",
             name="state",
         ),
         Index(

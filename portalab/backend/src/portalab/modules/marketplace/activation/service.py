@@ -19,7 +19,10 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 from portalab.modules.marketplace.observability import log, metrics
 
-LIVE = ("active", "needs_configuration", "activation_failed")
+# what a member holds — ``locked`` (#81): won in a booster before they meet its level or Contribution
+LIVE = ("active", "needs_configuration", "activation_failed", "locked")
+# what a member may use (wear, see in their entitlements)
+USABLE = ("active", "needs_configuration", "activation_failed")
 MAX_ATTEMPTS = 10
 
 
@@ -58,7 +61,7 @@ class Activation:
             ownership = await session.get(Ownership, ownership_id)
         if ownership is None:
             raise NotFound("This product is not owned.", code="marketplace.not_owned")
-        if ownership.state not in LIVE:
+        if ownership.state not in USABLE:  # a locked one waits for its conditions (#81)
             return ownership
         view = await self.view(ownership)
         product_type = self.types.get(view.product_type)
@@ -76,7 +79,7 @@ class Activation:
         async with self.database.unit_of_work() as uow:
             row = await uow.session.get(Ownership, ownership_id, with_for_update=True)
             assert row is not None
-            if row.state not in LIVE:
+            if row.state not in USABLE:
                 return row
             became_active = state == "active" and row.state != "active"
             row.state, row.activation_detail = state, (detail or None)

@@ -12,7 +12,7 @@ import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { useProgression } from "../../gamification/api";
 import { ProductArt } from "../catalog/ProductArt";
 import { type Booster, type BoosterCard, localized, requestKey, useOpenBooster } from "./api";
-import { BoosterPack, useCanOpen } from "./BoosterShelf";
+import { BoosterPack, useCanOpen } from "./Boosters";
 
 type Phase = "sealed" | "tearing" | "emerging" | "spread" | "done";
 type CardState = "hidden" | "charging" | "revealed";
@@ -211,6 +211,15 @@ function Card({
           <Burst rank={rank} seed={index * 7 + 3} />
         </>
       ) : null}
+      {state === "revealed" && card.locked ? (
+        // won early: held, usable once its level or Contribution is reached
+        <span className="booster-card__locked">
+          <Icon name="lock" size={12} />
+          {card.product.min_level
+            ? t("marketplace:card.level", { level: card.product.min_level })
+            : t("marketplace:card.contribution", { points: card.product.min_contribution ?? 0 })}
+        </span>
+      ) : null}
       {state === "revealed" && card.duplicate ? (
         <span className="booster-card__refund" aria-hidden="true">
           <Icon name="coins" size={14} />+{format.number(card.refund)}
@@ -232,7 +241,16 @@ function Card({
  * pack opens it for real (its price charged, the looks granted, the duplicates' Coins credited); a summary
  * closes it, with another to open if one can.
  */
-export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose: () => void }) {
+export function BoosterReveal({
+  booster,
+  sealed = false,
+  onClose,
+}: {
+  booster: Booster;
+  /** one of the sealed ones I keep (offered, or bought earlier): opened for free */
+  sealed?: boolean;
+  onClose: () => void;
+}) {
   const t = useT();
   const format = useFormat();
   const { locale } = useLocaleContext();
@@ -243,6 +261,9 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
   const coins = useProgression().data?.coins;
   const shown = opening.data?.booster ?? booster;
   const can = useCanOpen(shown);
+  // this opening: a sealed one I keep, or one bought now
+  const [gift, setGift] = useState(sealed && booster.sealed > 0);
+  const ready = gift || can.ok;
   const [phase, setPhase] = useState<Phase>("sealed");
   const [states, setStates] = useState<CardState[]>([]);
   const [moment, setMoment] = useState<string | null>(null);
@@ -259,6 +280,7 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
     timers.current = [];
     opening.reset();
     attempt.current = requestKey();
+    setGift(shown.sealed > 0);
     setStates([]);
     setMoment(null);
     setPhase("sealed");
@@ -295,8 +317,8 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
   };
   // a tap opens it for real: charged and drawn on the server, then it tears
   const open = () => {
-    if (phase !== "sealed" || opening.isPending || !can.ok) return;
-    opening.mutate({ key: booster.key, requestKey: attempt.current }, { onSuccess: tear });
+    if (phase !== "sealed" || opening.isPending || !ready) return;
+    opening.mutate({ key: booster.key, requestKey: attempt.current, sealed: gift }, { onSuccess: tear });
   };
   const code = String((opening.error as { code?: string } | null)?.code ?? "").replace("marketplace.", "");
   const failure = ["insufficient_coins", "booster_limit", "not_available"].includes(code)
@@ -383,7 +405,7 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
             type="button"
             className="booster-stage__tear"
             onClick={open}
-            disabled={phase !== "sealed" || opening.isPending || !can.ok}
+            disabled={phase !== "sealed" || opening.isPending || !ready}
             aria-busy={opening.isPending || undefined}
             aria-label={t("marketplace:booster.tear", { name })}
           >
@@ -403,9 +425,11 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
                 ? t("marketplace:booster.sealing")
                 : phase !== "sealed"
                   ? t("marketplace:booster.tearing")
-                  : can.ok
-                    ? t("marketplace:booster.tapToOpen", { price: format.number(booster.price) })
-                    : can.reason}
+                  : gift
+                    ? t("marketplace:booster.tapToOpenGift")
+                    : can.ok
+                      ? t("marketplace:booster.tapToOpen", { price: format.number(booster.price) })
+                      : can.reason}
           </p>
         </div>
       ) : (
@@ -475,9 +499,15 @@ export function BoosterReveal({ booster, onClose }: { booster: Booster; onClose:
                     {t("marketplace:booster.seeReserve")}
                   </Link>
                 ) : null}
-                <Button onClick={again} disabled={!can.ok} title={can.reason ?? undefined}>
+                <Button
+                  onClick={again}
+                  disabled={!(shown.sealed > 0 || can.ok)}
+                  title={shown.sealed > 0 ? undefined : (can.reason ?? undefined)}
+                >
                   <Icon name="sparkles" size={16} />
-                  {t("marketplace:booster.again", { price: format.number(shown.price) })}
+                  {shown.sealed > 0
+                    ? t("marketplace:booster.againGift", { count: shown.sealed })
+                    : t("marketplace:booster.again", { price: format.number(shown.price) })}
                 </Button>
               </div>
             </section>

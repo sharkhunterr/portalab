@@ -29,6 +29,9 @@ class _Perks:
     ) -> None:
         self.calls.append(("boost", factor, hours, list(values), source))
 
+    async def credit_coins(self, user: UUID, amount: int, source: str, idempotency_key: str) -> None:
+        self.calls.append(("coins", amount, source))
+
 
 def _registry(perks: _Perks | None) -> CapabilityRegistry:
     registry = CapabilityRegistry()

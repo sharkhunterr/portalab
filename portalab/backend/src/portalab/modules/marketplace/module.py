@@ -163,6 +163,7 @@ class MarketplaceModule:
             self.availability,
             self.activation,
             self.resolution,
+            self.eligibility,
             clock=clock,
         )
         self.revocations = Revocations(
@@ -288,6 +289,7 @@ class MarketplaceModule:
             bundle_grant=self._grant_from_bundle,
             project_launch=self._launch_project,
             requests=self.requests,
+            booster_seal=self.openings.seal,
         )
         if self.search.provider("product") is None:
             self.search.register(ProductSearchProvider(self.catalog, self.authorizer), owner=OWNER)
@@ -332,6 +334,7 @@ class MarketplaceModule:
 
         async def activations() -> None:
             await self.activation.retry()
+            await self.openings.unlock_all()  # #81: booster items whose level or Contribution is now met
 
         async def expiries() -> None:
             await self.revocations.expire()

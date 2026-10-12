@@ -41,6 +41,12 @@ export function ProductCard({
       {product.remaining === 0 && !owned ? (
         <span className="product-card__soldout">{t("marketplace:stock.soldOut")}</span>
       ) : null}
+      {owned && product.locked ? (
+        // #81: won in a booster before its level or Contribution — held, usable once they are reached
+        <span className="product-card__equipped" data-locked>
+          <Icon name="lock" size={12} /> {t("marketplace:product.locked")}
+        </span>
+      ) : null}
       {worn ? (
         <span className="product-card__equipped">
           <Icon name="check" size={12} /> {t("marketplace:equip.equipped")}
@@ -87,7 +93,7 @@ export function ProductCard({
           </span>
         ) : null}
         <div className="product-card__footer">
-          {owned && !worn && gear.wearable(product) ? (
+          {owned && !worn && !product.locked && gear.wearable(product) ? (
             <button
               type="button"
               className="product-card__equip"

@@ -163,6 +163,7 @@ class Catalog:
                 featured=data.presentation.featured,
                 poster_effect=data.presentation.poster_effect,
                 icon=data.presentation.icon,
+                season=data.presentation.season,
                 supply=data.availability.supply,
                 limit_count=data.availability.limit_count,
                 limit_days=data.availability.limit_days,
@@ -217,6 +218,7 @@ class Catalog:
                     raise ValidationFailed("Unknown collection.", code="marketplace.invalid_product")
             product.rarity, product.featured = presentation.rarity, presentation.featured
             product.poster_effect, product.icon = presentation.poster_effect, presentation.icon
+            product.season = presentation.season
             product.category_id, product.updated_at = category_id, utc_now(self.clock)
             await self._audit(session, actor, "product_presented", product, rarity=presentation.rarity)
         return product

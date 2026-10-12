@@ -74,7 +74,11 @@ class Availability:
     # --- copies --------------------------------------------------------------------------------------
     @staticmethod
     def supply_of(product: Product, rarities: Mapping[str, int | None]) -> int | None:
-        return product.supply if product.supply is not None else rarities.get(product.rarity)
+        # #81: a rarity's copies are for looks one collects — what one buys again and again (a booster, a
+        # boost, extra requests) is limited only by a supply of its own
+        if product.supply is not None:
+            return product.supply
+        return None if product.repeatable else rarities.get(product.rarity)
 
     async def in_circulation(
         self, product_ids: Iterable[UUID], session: AsyncSession | None = None

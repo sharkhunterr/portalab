@@ -1,20 +1,23 @@
 """#81: boosters — a sealed pack of items drawn at random, revealed card by card.
 
-The boosters are defined here (their odds will be set by the administrators later): the classic one
-(Cosmos), the legendary one (dear, a legendary card sure), Prestige HD (only looks drawn by the graphics
-chip), the Reserve (only items to keep: requests, freezes, boosts, rescues, tickets), the season's (on sale
-for its weeks only, with the looks of the season) and Discovery (small and cheap, three per member).
+A booster is a product of the catalog (type ``booster``): a tile in the shop and its sheet like any
+other, a price, versions and presentation set by the administrators — and in its payload what it holds
+(``pool``: the looks, the looks drawn by the graphics chip, or the items one keeps), the season it draws
+from, how many cards, the odds per rarity, the rarity guaranteed, what a duplicate gives back per rarity,
+how many times a member may open it and its pack's look. A season's booster is on sale only in its weeks.
 
 The draw happens on the server (a system random source): each card's rarity by the odds, one at least the
 guaranteed rarity, never the same item twice in a pack, the cards then shuffled (their place tells
-nothing). Opening one charges its price; a look not owned yet is granted, one already owned is a duplicate
-that gives back a fixed amount of Coins per rarity, an item to keep goes to the member's reserve.
+nothing). Opening one charges its price (or uses a sealed one offered — a level reward, an achievement);
+a look not owned yet is granted, one already owned is a duplicate that gives back a fixed amount of Coins
+per rarity, an item to keep goes to the member's reserve.
 """
 
 import random
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
+from typing import Any
 
 RARITIES = ("common", "rare", "epic", "legendary")
 # the looks (never features, services, packs…)
@@ -40,193 +43,144 @@ COSMETIC_TYPES = frozenset(
 RESERVE_TYPES = frozenset(
     {"quota", "streak_freeze", "xp_boost", "media_rescue", "special_request", "project_launch"}
 )
+POOLS = ("looks", "hd", "reserve")
 # a duplicate gives back a fixed amount per rarity, whatever the item's price
 DUPLICATE_REFUNDS: Mapping[str, int] = {"common": 10, "rare": 15, "epic": 20, "legendary": 30}
+DEFAULT_ODDS: Mapping[str, int] = {"common": 62, "rare": 26, "epic": 10, "legendary": 2}
 # Prestige HD: the looks the packs drawn by the graphics chip hold
 HD_PACKS = ("pack_hd_", "pack_living_badges")
+PAYLOAD_FIELDS = ("pool", "season", "cards", "odds", "guarantee", "refunds", "per_member", "look")
 
 Day = tuple[int, int]  # (month, day)
+
+
+@dataclass(frozen=True, slots=True)
+class Season:
+    """A time of the year: its looks, its pack and its booster are highlighted (the booster on sale) then."""
+
+    key: str
+    names: Mapping[str, str]
+    window: tuple[Day, Day]  # inclusive; may run over the new year
+
+
+SEASONS: dict[str, Season] = {
+    s.key: s
+    for s in (
+        Season("valentine", {"fr": "Saint-Valentin", "en": "Valentine's Day"}, ((2, 1), (2, 20))),
+        Season("spring", {"fr": "Printemps", "en": "Spring"}, ((3, 20), (5, 31))),
+        Season("summer", {"fr": "Été", "en": "Summer"}, ((6, 21), (9, 22))),
+        Season("halloween", {"fr": "Halloween", "en": "Halloween"}, ((10, 1), (11, 10))),
+        Season("christmas", {"fr": "Noël", "en": "Christmas"}, ((12, 1), (1, 6))),
+    )
+}
+
+
+def in_window(window: tuple[Day, Day], today: date) -> bool:
+    start, end = window
+    day = (today.month, today.day)
+    return start <= day <= end if start <= end else day >= start or day <= end
+
+
+def season_now(today: date) -> Season | None:
+    return next((s for s in SEASONS.values() if in_window(s.window, today)), None)
+
+
+def season_end(season: Season, today: date) -> date | None:
+    """The last day of the season's current weeks (``None``: not now)."""
+    if not in_window(season.window, today):
+        return None
+    month, day = season.window[1]
+    year = today.year + (1 if (month, day) < (today.month, today.day) else 0)
+    return date(year, month, day)
+
+
+def _int(value: Any, default: int, low: int, high: int) -> int:
+    try:
+        return max(low, min(high, int(value)))
+    except (TypeError, ValueError):
+        return default
+
+
+def _weights(raw: Any, fallback: Mapping[str, int], high: int) -> dict[str, int]:
+    values = raw if isinstance(raw, Mapping) else fallback
+    return {r: _int(values.get(r, fallback.get(r, 0)), fallback.get(r, 0), 0, high) for r in RARITIES}
 
 
 @dataclass(frozen=True, slots=True)
 class Booster:
     key: str
     names: Mapping[str, str]
-    descriptions: Mapping[str, str]
     price: int
-    cards: int
-    odds: Mapping[str, int]  # weight per rarity
-    guarantee: str  # one card at least of this rarity
-    theme: str = "cosmos"  # how its pack looks
-    types: frozenset[str] = field(default=COSMETIC_TYPES)
+    cards: int = 5
+    odds: Mapping[str, int] = field(default_factory=lambda: dict(DEFAULT_ODDS))  # weight per rarity
+    guarantee: str = "common"  # one card at least of this rarity
     refunds: Mapping[str, int] = field(default_factory=lambda: dict(DUPLICATE_REFUNDS))
-    # the pool limited to what these packs hold (a key, or the start of keys); empty: every product of
-    # its types
-    packs: tuple[str, ...] = ()
-    # on sale from one day to another of each year (inclusive; may run over the new year)
-    window: tuple[Day, Day] | None = None
-    # how many times a member may open it, ever
-    per_member: int | None = None
+    pool: str = "looks"
+    season: str | None = None  # draws from that season's looks, on sale in its weeks only
+    per_member: int | None = None  # how many times a member may open it, ever
+    look: str = "cosmos"  # how its pack looks
+
+    @property
+    def types(self) -> frozenset[str]:
+        return RESERVE_TYPES if self.pool == "reserve" else COSMETIC_TYPES
+
+    @property
+    def packs(self) -> tuple[str, ...]:
+        return HD_PACKS if self.pool == "hd" else ()
 
 
-def _season(
-    key: str, theme: str, names: Mapping[str, str], about: Mapping[str, str], packs: tuple[str, ...],
-    window: tuple[Day, Day],
-) -> Booster:  # fmt: skip
+def booster_of(key: str, names: Mapping[str, str], price: int | None, payload: Mapping[str, Any]) -> Booster:
+    """A booster product's settings from its payload — values out of bounds brought back within them."""
+    odds = _weights(payload.get("odds"), {r: 0 for r in RARITIES}, 10_000)
+    season = payload.get("season")
+    per_member = payload.get("per_member")
     return Booster(
         key=key,
-        names=names,
-        descriptions=about,
-        price=450,
-        cards=5,
-        odds={"common": 55, "rare": 33, "epic": 10, "legendary": 2},
-        guarantee="rare",
-        theme=theme,
-        packs=packs,
-        window=window,
+        names=dict(names),
+        price=max(0, int(price or 0)),
+        cards=_int(payload.get("cards"), 5, 1, 10),
+        odds=odds if sum(odds.values()) else dict(DEFAULT_ODDS),
+        guarantee=str(payload.get("guarantee")) if payload.get("guarantee") in RARITIES else "common",
+        refunds=_weights(payload.get("refunds"), DUPLICATE_REFUNDS, 100_000),
+        pool=str(payload.get("pool")) if payload.get("pool") in POOLS else "looks",
+        season=str(season) if season in SEASONS else None,
+        per_member=_int(per_member, 1, 1, 1000) if per_member else None,
+        look=str(payload.get("look") or "cosmos")[:24],
     )
-
-
-BOOSTERS: dict[str, Booster] = {
-    b.key: b
-    for b in (
-        Booster(
-            key="booster_cosmos",
-            names={"fr": "Booster Cosmos", "en": "Cosmos booster"},
-            descriptions={
-                "fr": "Le classique : cinq looks tirés au hasard — ambiances, cadres, bannières, titres, "
-                "badges, styles… dont au moins un rare.",
-                "en": "The classic: five looks drawn at random — ambiences, frames, banners, titles, "
-                "badges, styles… at least one rare.",
-            },
-            price=450,
-            cards=5,
-            odds={"common": 62, "rare": 26, "epic": 10, "legendary": 2},
-            guarantee="rare",
-        ),
-        Booster(
-            key="booster_legend",
-            names={"fr": "Booster Légendaire", "en": "Legendary booster"},
-            descriptions={
-                "fr": "Trois cartes, pas une en dessous d'épique, et une légendaire assurée.",
-                "en": "Three cards, none below epic, and a legendary one for sure.",
-            },
-            price=3000,
-            cards=3,
-            odds={"epic": 70, "legendary": 30},
-            guarantee="legendary",
-            theme="legend",
-        ),
-        Booster(
-            key="booster_prestige",
-            names={"fr": "Booster Prestige HD", "en": "Prestige HD booster"},
-            descriptions={
-                "fr": "Uniquement des looks dessinés par la puce graphique — flammes, plasma, or liquide… "
-                "Trois cartes, dont au moins une épique.",
-                "en": "Only looks drawn by the graphics chip — flames, plasma, liquid gold… Three cards, at "
-                "least one epic.",
-            },
-            price=1200,
-            cards=3,
-            odds={"rare": 20, "epic": 62, "legendary": 18},
-            guarantee="epic",
-            theme="prestige",
-            packs=HD_PACKS,
-        ),
-        Booster(
-            key="booster_reserve",
-            names={"fr": "Booster Réserve", "en": "Reserve booster"},
-            descriptions={
-                "fr": "Des objets à garder pour plus tard : demandes en plus, gels de série, boosts, "
-                "sauvetages… et peut-être un film en 4K. Ils vont dans votre réserve.",
-                "en": "Items to keep for later: extra requests, streak freezes, boosts, rescues… and maybe "
-                "a film in 4K. They go to your reserve.",
-            },
-            price=300,
-            cards=3,
-            odds={"common": 60, "rare": 30, "epic": 9, "legendary": 1},
-            guarantee="rare",
-            theme="reserve",
-            types=RESERVE_TYPES,
-        ),
-        Booster(
-            key="booster_discovery",
-            names={"fr": "Booster Découverte", "en": "Discovery booster"},
-            descriptions={
-                "fr": "Pour commencer : trois looks pour un petit prix. Trois ouvertures par membre.",
-                "en": "To get started: three looks for a small price. Three openings per member.",
-            },
-            price=120,
-            cards=3,
-            odds={"common": 72, "rare": 25, "epic": 3},
-            guarantee="common",
-            theme="discovery",
-            per_member=3,
-        ),
-        _season(
-            "booster_spring",
-            "spring",
-            {"fr": "Booster Printemps", "en": "Spring booster"},
-            {
-                "fr": "De saison : fleurs, grand air et couleurs fraîches — jusqu'au 20 juin.",
-                "en": "In season: blossom, fresh air and bright colours — until 20 June.",
-            },
-            ("pack_hd_sakura", "pack_great_outdoors", "pack_paint_studio"),
-            ((3, 20), (6, 20)),
-        ),
-        _season(
-            "booster_summer",
-            "summer",
-            {"fr": "Booster Été", "en": "Summer booster"},
-            {
-                "fr": "De saison : sable, océan et nuits néon — jusqu'au 22 septembre.",
-                "en": "In season: sand, ocean and neon nights — until 22 September.",
-            },
-            ("ultimate_desert", "pack_hd_ocean", "pack_retro", "pack_neon_nights"),
-            ((6, 21), (9, 22)),
-        ),
-        _season(
-            "booster_halloween",
-            "halloween",
-            {"fr": "Booster Halloween", "en": "Halloween booster"},
-            {
-                "fr": "De saison : frissons, ténèbres et monde à l'envers — jusqu'au 10 novembre.",
-                "en": "In season: chills, darkness and the upside down — until 10 November.",
-            },
-            ("ultimate_halloween", "ultimate_horror", "pack_chills", "ultimate_upsidedown"),
-            ((10, 1), (11, 10)),
-        ),
-        _season(
-            "booster_winter",
-            "winter",
-            {"fr": "Booster Noël", "en": "Christmas booster"},
-            {
-                "fr": "De saison : neige, guirlandes et coin du feu — jusqu'au 6 janvier.",
-                "en": "In season: snow, fairy lights and the fireside — until 6 January.",
-            },
-            ("ultimate_christmas", "pack_christmas_eve", "pack_cocooning"),
-            ((12, 1), (1, 6)),
-        ),
-    )
-}
 
 
 def on_sale(booster: Booster, today: date) -> bool:
-    """Whether the booster is on sale that day (always, or within its window of the year)."""
-    if booster.window is None:
-        return True
-    start, end = booster.window
-    day = (today.month, today.day)
-    return start <= day <= end if start <= end else day >= start or day <= end
+    """Whether the booster is on sale that day (always, or within its season's weeks)."""
+    season = SEASONS.get(booster.season or "")
+    return season is None or in_window(season.window, today)
 
 
 def until(booster: Booster, today: date) -> date | None:
-    """The last day of its current window (``None``: always on sale, or not on sale now)."""
-    if booster.window is None or not on_sale(booster, today):
-        return None
-    (_, _), (month, day) = booster.window
-    year = today.year + (1 if (month, day) < (today.month, today.day) else 0)
-    return date(year, month, day)
+    """The last day a season's booster is on sale now (``None``: always on sale, or not now)."""
+    season = SEASONS.get(booster.season or "")
+    return season_end(season, today) if season else None
+
+
+def booster_info(
+    key: str, names: Mapping[str, str], price: int | None, payload: Mapping[str, Any], today: date | None
+) -> dict[str, Any]:
+    """What the shop shows of a booster: how many cards, the odds, the rarity guaranteed, what a duplicate
+    gives back, what it draws from, its season and until when it is on sale, its pack's look."""
+    booster = booster_of(key, names, price, payload)
+    end = until(booster, today) if today else None
+    return {
+        "cards": booster.cards,
+        "odds": odds_percent(booster),
+        "weights": dict(booster.odds),
+        "guarantee": booster.guarantee,
+        "refunds": {rarity: refund_of(booster, rarity) for rarity in RARITIES},
+        "pool": booster.pool,
+        "kind": "reserve" if booster.pool == "reserve" else "looks",
+        "season": booster.season,
+        "until": end.isoformat() if end else None,
+        "per_member": booster.per_member,
+        "look": booster.look,
+    }
 
 
 def odds_percent(booster: Booster) -> dict[str, float]:

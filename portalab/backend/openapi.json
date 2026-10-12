@@ -6954,6 +6954,18 @@
       },
       "MarketplaceProductOut": {
         "properties": {
+          "booster": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booster"
+          },
           "category": {
             "anyOf": [
               {
@@ -7043,6 +7055,11 @@
               }
             ],
             "title": "Limit Days"
+          },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
           },
           "min_contribution": {
             "anyOf": [
@@ -7137,6 +7154,17 @@
           "repeatable": {
             "title": "Repeatable",
             "type": "boolean"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Season"
           },
           "state": {
             "title": "State",
@@ -10735,6 +10763,24 @@
             ],
             "title": "Rarity",
             "type": "string"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "enum": [
+                  "valentine",
+                  "spring",
+                  "summer",
+                  "halloween",
+                  "christmas"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Season"
           }
         },
         "title": "PresentationIn",
@@ -31294,7 +31340,7 @@
     },
     "/api/v1/marketplace/boosters": {
       "get": {
-        "description": "#81: the boosters on sale now \u2014 how many cards, the odds per rarity, the rarity guaranteed, what a\nduplicate gives back, until when a season's is on sale and how many openings I have left.",
+        "description": "#81: the boosters on sale now \u2014 how many cards, the odds per rarity, the rarity guaranteed, what a\nduplicate gives back, until when a season's is on sale, how many openings I have left and the sealed\nones I keep.",
         "operationId": "boosters_api_v1_marketplace_boosters_get",
         "responses": {
           "200": {
@@ -31372,7 +31418,7 @@
     },
     "/api/v1/marketplace/boosters/{key}/open": {
       "post": {
-        "description": "#81: open a booster \u2014 its price charged, its cards drawn now: a look I did not own is mine, one I\nowned is a duplicate whose Coins come back at once, an item to keep goes to my reserve.",
+        "description": "#81: open a booster \u2014 bought now (its price charged), or ``sealed``: one I keep in my reserve\n(offered, or bought earlier). A look I did not own is mine (held, not usable yet, below its level or\nContribution), one I owned is a duplicate whose Coins come back at once, an item to keep goes to my\nreserve.",
         "operationId": "open_booster_api_v1_marketplace_boosters__key__open_post",
         "parameters": [
           {
@@ -31383,6 +31429,16 @@
               "pattern": "^[a-z0-9_]{1,96}$",
               "title": "Key",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sealed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Sealed",
+              "type": "boolean"
             }
           },
           {

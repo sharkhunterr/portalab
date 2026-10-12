@@ -5051,7 +5051,8 @@ export interface paths {
         /**
          * Boosters
          * @description #81: the boosters on sale now — how many cards, the odds per rarity, the rarity guaranteed, what a
-         *     duplicate gives back, until when a season's is on sale and how many openings I have left.
+         *     duplicate gives back, until when a season's is on sale, how many openings I have left and the sealed
+         *     ones I keep.
          */
         get: operations["boosters_api_v1_marketplace_boosters_get"];
         put?: never;
@@ -5093,8 +5094,10 @@ export interface paths {
         put?: never;
         /**
          * Open Booster
-         * @description #81: open a booster — its price charged, its cards drawn now: a look I did not own is mine, one I
-         *     owned is a duplicate whose Coins come back at once, an item to keep goes to my reserve.
+         * @description #81: open a booster — bought now (its price charged), or ``sealed``: one I keep in my reserve
+         *     (offered, or bought earlier). A look I did not own is mine (held, not usable yet, below its level or
+         *     Contribution), one I owned is a duplicate whose Coins come back at once, an item to keep goes to my
+         *     reserve.
          */
         post: operations["open_booster_api_v1_marketplace_boosters__key__open_post"];
         delete?: never;
@@ -11096,6 +11099,10 @@ export interface components {
         };
         /** MarketplaceProductOut */
         MarketplaceProductOut: {
+            /** Booster */
+            booster?: {
+                [key: string]: unknown;
+            } | null;
             /** Category */
             category?: string | null;
             /** Conditions */
@@ -11127,6 +11134,11 @@ export interface components {
             limit_count?: number | null;
             /** Limit Days */
             limit_days?: number | null;
+            /**
+             * Locked
+             * @default false
+             */
+            locked: boolean;
             /** Min Contribution */
             min_contribution?: number | null;
             /** Min Level */
@@ -11165,6 +11177,8 @@ export interface components {
             remaining?: number | null;
             /** Repeatable */
             repeatable: boolean;
+            /** Season */
+            season?: string | null;
             /** State */
             state: string;
             /** Supply */
@@ -12494,6 +12508,8 @@ export interface components {
              * @enum {string}
              */
             rarity: "common" | "rare" | "epic" | "legendary";
+            /** Season */
+            season?: ("valentine" | "spring" | "summer" | "halloween" | "christmas") | null;
         };
         /** PrivacyInventory */
         PrivacyInventory: {
@@ -24870,7 +24886,9 @@ export interface operations {
     };
     open_booster_api_v1_marketplace_boosters__key__open_post: {
         parameters: {
-            query?: never;
+            query?: {
+                sealed?: boolean;
+            };
             header?: {
                 "Idempotency-Key"?: string | null;
             };

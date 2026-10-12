@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate, useNavigationType } from "react-route
 import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
+import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
 import { focusHeaderSearch, HeaderSearch, openFloatingSearch } from "./header/HeaderSearch";
@@ -153,6 +154,7 @@ export function AppShell({
         />
         <GlobalStatusBanner />
         <LevelUpMoment />
+        <BoosterStageHost />
         <AnnouncementBanner />
         <MaintenanceBanner />
         {nav === "topbar" ? (

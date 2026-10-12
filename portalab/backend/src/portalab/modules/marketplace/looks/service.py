@@ -24,7 +24,7 @@ from portalab.capabilities.themes import (
 from portalab.core.db import Database
 from portalab.core.errors import ValidationFailed
 from portalab.core.time import Clock, utc_now
-from portalab.modules.marketplace.activation.service import LIVE
+from portalab.modules.marketplace.activation.service import LIVE, USABLE
 from portalab.modules.marketplace.entitlements.reader import CosmeticsReader
 from portalab.modules.marketplace.models import Equipped, Ownership, Product, ProductVersion
 
@@ -79,7 +79,7 @@ class ProfileLooks:
                     ProductVersion.version == Product.current_version,
                     Product.type == product_type,
                     Ownership.user_id == user,
-                    Ownership.state.in_(LIVE),
+                    Ownership.state.in_(USABLE),
                 )
                 .distinct()
             )

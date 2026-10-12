@@ -21,18 +21,23 @@ from portalab.capabilities.economy import Modifier, Value
 from portalab.capabilities.events import Envelope
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.gamification.ledger.writer import Entry
 from portalab.modules.gamification.models import Boost, FreezeGrant, StreakDay
 from portalab.modules.gamification.streaks.service import Streaks
 
 MAX_FACTOR = 5.0
 MAX_HOURS = 24 * 30
+MAX_CREDIT = 10_000
 
 
 class Perks:
-    def __init__(self, database: Database, streaks: Streaks, clock: Clock | None = None) -> None:
+    def __init__(
+        self, database: Database, streaks: Streaks, clock: Clock | None = None, writer: Any | None = None
+    ) -> None:
         self.database = database
         self.streaks = streaks
         self.clock = clock
+        self.writer = writer
 
     # --- what the shop grants -------------------------------------------------------------------------
     async def grant_freezes(self, user: UUID, count: int, source: str) -> None:
@@ -71,6 +76,26 @@ class Perks:
                     ends_at=starts + timedelta(hours=min(float(hours), MAX_HOURS)),
                 )
                 .on_conflict_do_nothing(index_elements=["source"])
+            )
+
+    async def credit_coins(self, user: UUID, amount: int, source: str, idempotency_key: str) -> None:
+        """#81: Coins the shop gives back outside a purchase (a duplicate in an offered booster)."""
+        if amount <= 0 or self.writer is None:
+            return
+        async with self.database.unit_of_work() as uow:
+            await self.writer.record(
+                uow.session,
+                Entry(
+                    user_id=user,
+                    value="coins",
+                    delta=min(int(amount), MAX_CREDIT),
+                    kind="grant",
+                    source_kind="marketplace",
+                    source_ref=source[:200],
+                    idempotency_key=f"perk:{idempotency_key}"[:200],
+                    occurred_at=utc_now(self.clock),
+                    base_amount=min(int(amount), MAX_CREDIT),
+                ),
             )
 
     # --- boosts as a reward modifier --------------------------------------------------------------------

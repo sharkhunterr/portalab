@@ -93,6 +93,8 @@ class PresentationIn(BaseModel):
     featured: bool = False
     poster_effect: PosterEffect = "auto"
     icon: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9-]{0,63}$")
+    # #81: the season it belongs to (Halloween, Christmas…) — its season's booster and pack draw from it
+    season: Literal["valentine", "spring", "summer", "halloween", "christmas"] | None = None
 
 
 class AvailabilityIn(BaseModel):

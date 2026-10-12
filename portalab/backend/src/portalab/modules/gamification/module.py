@@ -164,7 +164,7 @@ class GamificationModule:
         self.progression = ProgressionService(database, self.levels, self.achievements.unlock_shares)
         self.streaks = Streaks(database, config)
         self.pace = Pace(config)
-        self.perks = Perks(database, self.streaks, clock=clock)
+        self.perks = Perks(database, self.streaks, clock=clock, writer=self.writer)
         self.level_rewards = LevelRewards(database, self.writer, capabilities, config)
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock

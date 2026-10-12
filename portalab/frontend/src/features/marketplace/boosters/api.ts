@@ -2,25 +2,46 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../../api/client";
 import type { Product } from "../api";
 
-/** #81: the boosters on sale, opening one, the boosters I opened, my reserve and using one of its items. */
-export interface Booster {
+/** #81: what a booster holds — on its product (``product.booster``) and in the shelf of boosters. */
+export interface BoosterInfo {
+  cards: number;
+  /** the odds per rarity, in % */
+  odds: Record<string, number>;
+  /** the weights the administrators set (the odds before they are brought to 100 %) */
+  weights: Record<string, number>;
+  guarantee: string;
+  /** the Coins a duplicate gives back, per rarity (fixed, not the item's price) */
+  refunds: Record<string, number>;
+  pool: "looks" | "hd" | "reserve";
+  /** what comes out of it: looks for the collection, or items for the reserve */
+  kind: "looks" | "reserve";
+  season: string | null;
+  /** a season's: the last day it is on sale */
+  until: string | null;
+  per_member: number | null;
+  /** its pack's look */
+  look: string;
+}
+
+/** #81: a booster of the shop, with what is mine about it. */
+export interface Booster extends BoosterInfo {
   key: string;
   names: Record<string, string>;
   descriptions: Record<string, string>;
   price: number;
-  cards: number;
-  odds: Record<string, number>;
-  guarantee: string;
-  /** the Coins a duplicate gives back, per rarity (fixed, not the item's price) */
-  refunds: Record<string, number>;
+  rarity: string;
   theme: string;
-  /** what comes out of it: looks for the collection, or items for the reserve */
-  kind: "looks" | "reserve";
-  /** a season's: the last day it is on sale */
-  until: string | null;
-  per_member: number | null;
+  /** on sale now (a season's only in its weeks) */
+  on_sale: boolean;
   /** openings I have left (``null``: no limit) */
   left: number | null;
+  /** sealed ones I keep (offered — a level reward, an achievement — or bought): opened for free */
+  sealed: number;
+}
+
+/** A booster product's info (``product.booster``). */
+export function boosterOf(product: Product): BoosterInfo | null {
+  return (product as Product & { booster?: BoosterInfo | null }).booster ?? null;
 }
 
 export type Outcome = "new" | "duplicate" | "reserve";
@@ -30,6 +51,8 @@ export interface BoosterCard {
   outcome: Outcome;
   duplicate: boolean;
   refund: number;
+  /** won before its level or Contribution: held, usable once they are reached */
+  locked: boolean;
 }
 
 export interface Opened {
@@ -51,6 +74,7 @@ export interface PastOpening {
     rarity: string | null;
     outcome: Outcome;
     refund: number;
+    locked?: boolean;
   }[];
 }
 
@@ -59,24 +83,28 @@ export interface ReserveEntry {
   quantity: number;
   /** a ticket: a form to fill once used (a film in 4K, a community project…) */
   needs_configuration: boolean;
+  /** a sealed booster: opened, not used */
+  booster: boolean;
 }
 
 const KEY = ["marketplace"] as const;
 
-export function useBoosters() {
+export function useBoosters(enabled = true) {
   return useQuery({
     queryKey: [...KEY, "boosters"],
+    enabled,
     queryFn: async () => ((await api.GET("/api/v1/marketplace/boosters")).data ?? []) as unknown as Booster[],
   });
 }
 
-/** Opening a booster: its price charged, its cards drawn — the shop, my Coins and my reserve change. */
+/** Opening a booster — bought now, or a sealed one I keep: its cards drawn; the shop, my Coins and my
+ * reserve change. */
 export function useOpenBooster() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ key, requestKey }: { key: string; requestKey: string }) => {
+    mutationFn: async ({ key, requestKey, sealed }: { key: string; requestKey: string; sealed: boolean }) => {
       const { data, error } = await api.POST("/api/v1/marketplace/boosters/{key}/open", {
-        params: { path: { key }, header: { "Idempotency-Key": requestKey } },
+        params: { path: { key }, query: { sealed }, header: { "Idempotency-Key": requestKey } },
       });
       if (error) throw error;
       return data as unknown as Opened;
@@ -123,6 +151,12 @@ export function useUseReserve() {
       void client.invalidateQueries({ queryKey: ["gamification"] });
     },
   });
+}
+
+/** Open a booster on the stage, wherever one is (the shop's sheet, the reserve). */
+export const BOOSTER_EVENT = "portalab:booster-open";
+export function openBooster(key: string, sealed = false): void {
+  window.dispatchEvent(new CustomEvent(BOOSTER_EVENT, { detail: { key, sealed } }));
 }
 
 /** A name in the reader's language. */

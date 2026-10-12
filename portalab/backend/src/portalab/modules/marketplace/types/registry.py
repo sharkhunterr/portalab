@@ -23,6 +23,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import CAPABILITY as THEMES
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.core.permissions import PermissionRegistry
+from portalab.modules.marketplace.boosters import PAYLOAD_FIELDS
 
 OWNER = "module:marketplace"
 # 027: a request (special, service) is settled by the administrators — declined, its Coins come back
@@ -38,6 +39,7 @@ NOT_REFUNDABLE = frozenset(
         "streak_freeze",
         "xp_boost",
         "media_rescue",
+        "booster",
     }
 )
 
@@ -331,6 +333,20 @@ class BoostHandler(Owned):
         return ActivationResult("active")
 
 
+class BoosterHandler(Owned):
+    """``booster`` (#81): owned — bought, or offered (a level reward, an achievement unlocked) — it goes
+    sealed into the member's reserve, to be opened when they want (no Coins then). Not refundable."""
+
+    def __init__(self, seal: Callable[[UUID, str, str], Awaitable[None]] | None) -> None:
+        self.seal = seal
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        if self.seal is None:
+            return ActivationResult("failed", "boosters unavailable")
+        await self.seal(ownership.user_id, ownership.product_key, f"ownership:{ownership.id}")
+        return ActivationResult("active")
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
@@ -341,6 +357,7 @@ def register_builtin_types(
     bundle_grant: Callable[[UUID, str, str], Awaitable[bool]] | None = None,
     project_launch: Callable[[UUID, UUID, str, str], Awaitable[None]] | None = None,
     requests: Any | None = None,
+    booster_seal: Callable[[UUID, str, str], Awaitable[None]] | None = None,
 ) -> None:
     owned = Owned()
     for key, handler, fields in (
@@ -376,6 +393,8 @@ def register_builtin_types(
         ("xp_boost", BoostHandler(capabilities), ("factor", "hours", "values")),
         # #57: saving a title from the library's cleanup (Maintainerr)
         ("media_rescue", RescueHandler(capabilities), ("count",)),
+        # #81: a sealed booster, to open from the reserve
+        ("booster", BoosterHandler(booster_seal), PAYLOAD_FIELDS),
     ):
         if registry.get(key) is None:
             registry.register(

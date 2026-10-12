@@ -47,6 +47,7 @@ def _p(
     reward_only: bool = False,
     contribution: int | None = None,
     config_required: bool = False,
+    season: str | None = None,
 ) -> None:
     SHOP.append(
         {
@@ -69,6 +70,8 @@ def _p(
             # 027: Contribution points needed (for those who take part), and a form to fill once bought
             "contribution": contribution,
             "config_required": config_required,
+            # #81: the season it belongs to — its season's booster and pack draw from it
+            "season": season,
         }
     )
 
@@ -2218,6 +2221,109 @@ RETIRED = (
     "bg_night_owl",
 )
 
+# #81: the seasons — what already belonged to one (the new seasonal items set theirs where they are made)
+SEASON_OF: dict[str, str] = {
+    **dict.fromkeys(
+        ("ambient_bats", "ambient_haunted", "ambient_leaves", "ambient_autumnlane", "badge_ghost",
+         "badge_pumpkin_king", "banner_halloween", "banner_live_bats", "effect_pumpkin", "frame_pumpkin",
+         "levelup_pumpkin", "name_halloween", "name_horror", "theme_halloween", "theme_horror"),
+        "halloween",
+    ),
+    **dict.fromkeys(
+        ("ambient_christmasnight", "ambient_snow", "ambient_hearth", "ambient_knit", "ambient_candlelight",
+         "badge_snowflake", "banner_live_snow", "banner_snowfall", "effect_snow", "effect_flicker",
+         "frame_frostcrown", "frame_holly", "frame_lights", "level_frost", "level_lights", "levelup_gift",
+         "levelup_hearth", "name_christmas", "name_cozy", "name_ice", "name_namefrost", "notif_frostbite",
+         "palette_ice", "title_frostborn", "theme_christmas", "theme_cozy"),
+        "christmas",
+    ),
+    **dict.fromkeys(("ambient_hearts", "banner_live_hearts", "effect_hearts", "palette_rose"), "valentine"),
+    **dict.fromkeys(
+        ("ambient_petals", "ambient_meadow", "badge_blossom", "banner_live_petals", "banner_sakura",
+         "banner_live_meadow", "effect_bloom", "effect_petals", "effect_petalstorm", "frame_sakura",
+         "level_sakura", "levelup_sakurastorm", "name_namesakura", "notif_petalfall", "notif_sakura",
+         "title_spring_spirit"),
+        "spring",
+    ),
+    **dict.fromkeys(
+        ("ambient_fireflies", "ambient_summerfield", "ambient_pixelbeach", "ambient_sand", "ambient_sandstorm",
+         "banner_live_fireflies", "frame_sand", "name_desert", "palette_sunset", "title_sand_lord",
+         "levelup_sandstorm", "theme_desert"),
+        "summer",
+    ),
+}  # fmt: skip
+_KEYS = {product["key"] for product in SHOP}
+for product in SHOP:
+    product["season"] = product.get("season") or SEASON_OF.get(product["key"])
+
+# #81: a pack per season — every look of the season together (made from the seasons, never by hand)
+SEASON_PACKS: dict[str, tuple[str, str, str, str, str]] = {
+    "valentine": ("Valentine's pack", "Pack Saint-Valentin", "heart",
+                  "Every look of Valentine's Day together.", "Tous les looks de la Saint-Valentin réunis."),
+    "spring": ("Spring pack", "Pack Printemps", "flower",
+               "Every look of spring together: blossom, meadows, fresh colours.",
+               "Tous les looks du printemps réunis : fleurs, prairies, couleurs fraîches."),
+    "summer": ("Summer pack", "Pack Été", "sun",
+               "Every look of summer together: sun, sand, sea and warm nights.",
+               "Tous les looks de l'été réunis : soleil, sable, mer et nuits chaudes."),
+    "halloween": ("Halloween pack", "Pack Halloween", "ghost",
+                  "Every look of Halloween together: pumpkins, ghosts, bats and chills.",
+                  "Tous les looks d'Halloween réunis : citrouilles, fantômes, chauves-souris et frissons."),
+    "christmas": ("Christmas pack", "Pack Noël", "snowflake",
+                  "Every look of Christmas together: snow, fairy lights and the fireside.",
+                  "Tous les looks de Noël réunis : neige, guirlandes et coin du feu."),
+}  # fmt: skip
+_LOOK_TYPES = {
+    "ambient", "avatar_frame", "profile_banner", "name_style", "level_badge", "level_up", "badge", "title",
+    "notification_style", "notification_animation", "effect", "palette",
+}  # fmt: skip
+for _season, (_en, _fr, _icon, _about_en, _about_fr) in SEASON_PACKS.items():
+    _held = [
+        p["key"] for p in SHOP if p["season"] == _season and p["type"] in _LOOK_TYPES and not p["reward_only"]
+    ]
+    if len(_held) >= 3:
+        _p(f"pack_season_{_season}", "bundle", None, "rare", _en, _fr, _about_en, _about_fr, {"products": _held},
+           collection="packs", icon=_icon, season=_season)  # fmt: skip
+
+# #81: the boosters — products like the others; their odds and refunds are the administrators' (the demo
+# seeds them once, never back over what was tuned)
+_CLASSIC_ODDS = {"common": 62, "rare": 26, "epic": 10, "legendary": 2}
+_SEASON_ODDS = {"common": 55, "rare": 33, "epic": 10, "legendary": 2}
+BOOSTERS: tuple[tuple[str, int, str, str, str, str, str, dict[str, Any]], ...] = (
+    ("booster_cosmos", 450, "rare", "Cosmos booster", "Booster Cosmos",
+     "The classic: five looks drawn at random — ambiences, frames, banners, titles, badges, styles… at least one rare.",
+     "Le classique : cinq looks tirés au hasard — ambiances, cadres, bannières, titres, badges, styles… dont au moins un rare.",
+     {"pool": "looks", "cards": 5, "odds": _CLASSIC_ODDS, "guarantee": "rare", "look": "cosmos"}),
+    ("booster_legend", 3000, "legendary", "Legendary booster", "Booster Légendaire",
+     "Three cards, none below epic, and a legendary one for sure.",
+     "Trois cartes, pas une en dessous d'épique, et une légendaire assurée.",
+     {"pool": "looks", "cards": 3, "odds": {"epic": 70, "legendary": 30}, "guarantee": "legendary", "look": "legend"}),
+    ("booster_prestige", 1200, "epic", "Prestige HD booster", "Booster Prestige HD",
+     "Only looks drawn by the graphics chip — flames, plasma, liquid gold… Three cards, at least one epic.",
+     "Uniquement des looks dessinés par la puce graphique — flammes, plasma, or liquide… Trois cartes, dont au moins une épique.",
+     {"pool": "hd", "cards": 3, "odds": {"rare": 20, "epic": 62, "legendary": 18}, "guarantee": "epic", "look": "prestige"}),
+    ("booster_reserve", 300, "rare", "Reserve booster", "Booster Réserve",
+     "Items to keep for later: extra requests, streak freezes, boosts, rescues… and maybe a film in 4K. They go to your reserve.",
+     "Des objets à garder pour plus tard : demandes en plus, gels de série, boosts, sauvetages… et peut-être un film en 4K. Ils vont dans votre réserve.",
+     {"pool": "reserve", "cards": 3, "odds": {"common": 60, "rare": 30, "epic": 9, "legendary": 1}, "guarantee": "rare", "look": "reserve"}),
+    ("booster_discovery", 120, "common", "Discovery booster", "Booster Découverte",
+     "To get started: three looks for a small price. Three openings per member.",
+     "Pour commencer : trois looks pour un petit prix. Trois ouvertures par membre.",
+     {"pool": "looks", "cards": 3, "odds": {"common": 72, "rare": 25, "epic": 3}, "guarantee": "common", "per_member": 3, "look": "discovery"}),
+    *(
+        (f"booster_{season}", 450, "epic", f"{names[0].replace(' pack', '')} booster",
+         f"Booster {names[1].replace('Pack ', '')}",
+         "In season: five of its looks drawn at random, at least one rare — on sale in its weeks only.",
+         "De saison : cinq de ses looks tirés au hasard, dont au moins un rare — en vente pendant ses semaines seulement.",
+         {"pool": "looks", "season": season, "cards": 5, "odds": _SEASON_ODDS, "guarantee": "rare",
+          "look": "winter" if season == "christmas" else season})
+        for season, names in SEASON_PACKS.items()
+    ),
+)  # fmt: skip
+for _b in BOOSTERS:
+    _p(_b[0], "booster", _b[1], _b[2], _b[3], _b[4], _b[5], _b[6], _b[7], collection="boosters",
+       icon="sparkles", repeatable=True, season=_b[7].get("season"))  # fmt: skip
+
 # rarities stay rare: legendary for a handful of flagship items, the cheaper « rare » ones are common
 # 027: a handful of legendaries (the flagships), rare from 600 Coins, epic from 1000 — most of the shop common
 LEGENDARY = {
@@ -2230,11 +2336,15 @@ LEGENDARY = {
     "notif_warp", "effect_timerift", "effect_nova", "effect_rebirth", "name_namegold", "name_namechrono",
 }  # fmt: skip
 for product in SHOP:
-    if product["rarity"] == "legendary" and product["key"] not in LEGENDARY:
+    if product["rarity"] == "legendary" and product["key"] not in LEGENDARY and product["type"] != "booster":
         product["rarity"] = "epic"
-    elif product["rarity"] == "rare" and (product["price"] or 0) < 600:
+    elif product["rarity"] == "rare" and (product["price"] or 0) < 600 and product["type"] != "booster":
         product["rarity"] = "common"
-    if product["rarity"] == "epic" and (product["price"] or 0) < 1000 and product["type"] != "bundle":
+    if (
+        product["rarity"] == "epic"
+        and (product["price"] or 0) < 1000
+        and product["type"] not in ("bundle", "booster")
+    ):
         product["rarity"] = "rare" if (product["price"] or 0) >= 600 else "common"
 
 _BY_KEY = {product["key"]: product for product in SHOP}
@@ -2262,6 +2372,7 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("ultimate", "Theme packs", "crown", 1),
     ("themes", "Interfaces", "palette", 3),
     ("packs", "Packs", "shop", 5),
+    ("boosters", "Boosters", "sparkles", 6),
     ("halloween", "Halloween", "moon", 10),
     ("new_wave", "New Wave", "zap", 20),
     ("badges", "Badges", "star", 22),

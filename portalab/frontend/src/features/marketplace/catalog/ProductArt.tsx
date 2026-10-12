@@ -17,6 +17,7 @@ import { LevelUpPreview } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useProducts } from "../api";
 import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
+import { ProductPack } from "../boosters/Boosters";
 import "../product-art.css";
 
 /** 027: a widget product shows the widget itself, in miniature, with the member's own data — a look for a
@@ -63,6 +64,7 @@ export const TYPE_BADGE_ICON: Record<string, string> = {
   profile_background: "sparkles",
   name_style: "feather",
   bundle: "shop",
+  booster: "sparkles",
   notification_style: "bell",
   notification_animation: "sparkles",
   profile_banner: "image",
@@ -274,6 +276,8 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       return <PaletteArt palette={text(preview, "palette")} fallback={fallback} />;
     case "theme":
       return <ThemeArt theme={text(preview, "theme") ?? product.theme ?? undefined} fallback={fallback} />;
+    case "booster": // #81: its sealed pack
+      return <ProductPack product={product} size={size === "mini" ? "mini" : "card"} />;
     case "bundle":
       return Array.isArray(preview.products) ? (
         <PackArt keys={preview.products as string[]} fallback={fallback} />

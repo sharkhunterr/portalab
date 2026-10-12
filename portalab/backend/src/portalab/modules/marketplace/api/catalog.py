@@ -4,7 +4,7 @@ ownership), ``marketplace.purchase`` to acquire (``Idempotency-Key``), and the m
 owned products, configuration and refunds."""
 
 from collections.abc import Mapping, Sequence
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Annotated, Any
 from uuid import UUID, uuid4
 
@@ -18,6 +18,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.time import utc_now
 from portalab.modules.marketplace.activation.service import LIVE
 from portalab.modules.marketplace.api.projects import Module
+from portalab.modules.marketplace.boosters import PAYLOAD_FIELDS, booster_info
 from portalab.modules.marketplace.integrations import name_of
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 from portalab.modules.marketplace.module import MarketplaceModule
@@ -81,6 +82,11 @@ class MarketplaceProductOut(BaseModel):
     limit_days: int | None = None
     min_level: int | None = None
     min_contribution: int | None = None  # 027: Contribution points needed to acquire it
+    # #81: the season it belongs to; held but not usable yet (won before meeting its level or Contribution)
+    season: str | None = None
+    locked: bool = False
+    # #81: a booster — what it holds, its odds, the rarity guaranteed, what a duplicate gives back, until when
+    booster: dict[str, Any] | None = None
     # 027: the price now and the campaign reduction behind it (None: the catalog price applies)
     price_now: int | None = None
     discount: MarketplaceDiscountOut | None = None
@@ -115,6 +121,7 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "streak_freeze": ("count",),  # #54/#55: the perk's effect, on its card
     "media_rescue": ("count",),  # #57: how many titles it saves
     "xp_boost": ("factor", "hours", "values"),
+    "booster": PAYLOAD_FIELDS,  # #81: what it holds and its odds
 }
 
 
@@ -156,6 +163,8 @@ def product_out(
     categories: Mapping[UUID, str] | None = None,
     stock: Mapping[UUID, tuple[int | None, int | None]] | None = None,
     discounts: Sequence[ShopDiscount] = (),
+    locked: bool = False,
+    today: date | None = None,
 ) -> MarketplaceProductOut:
     supply, remaining = (stock or {}).get(product.id, (None, None))
     category = (categories or {}).get(product.category_id) if product.category_id else None
@@ -195,6 +204,11 @@ def product_out(
             (int(c["contribution"]) for c in version.conditions if c.get("kind") == "min_contribution"),
             default=None,
         ),
+        season=product.season,
+        locked=locked,
+        booster=booster_info(product.key, version.names, version.price_coins, version.payload or {}, today)
+        if product.type == "booster"
+        else None,
         price_now=now,
         discount=MarketplaceDiscountOut(
             percent=discount.percent,
@@ -240,6 +254,15 @@ async def ownership_out(module: MarketplaceModule, row: Ownership) -> Marketplac
     )
 
 
+async def locked_ids(module: MarketplaceModule, user: UUID) -> set[UUID]:
+    """#81: the products a member holds but cannot use yet (level or Contribution not reached)."""
+    async with module.database.session() as session:
+        rows = await session.execute(
+            select(Ownership.product_id).where(Ownership.user_id == user, Ownership.state == "locked")
+        )
+        return set(rows.scalars())
+
+
 async def owned_ids(module: MarketplaceModule, user: UUID) -> set[UUID]:
     async with module.database.session() as session:
         rows = await session.execute(
@@ -264,13 +287,29 @@ async def products(
     type: Annotated[str | None, Query(max_length=96)] = None,
     q: Annotated[str | None, Query(max_length=64)] = None,
 ) -> list[MarketplaceProductOut]:
-    mine = await owned_ids(module, _me(principal))
+    user = _me(principal)
+    await module.openings.unlock(user)  # #81: what a booster gave early, usable once its conditions are met
+    mine = await owned_ids(module, user)
+    locked = await locked_ids(module, user)
     rows = await module.catalog.listing(category=category, product_type=type, q=q, owned_ids=mine)
+    today = module.openings.today()
+    # #81: a season's booster is in the shop in its weeks only
+    rows = [(p, v) for p, v in rows if p.type != "booster" or module.openings.sold(p, v, today)]
     keys = await category_keys(module)
     stock = await module.availability.stock(p for p, _ in rows)
     discounts = await active_discounts(module.capabilities, utc_now(module.clock))
     return [
-        product_out(p, v, p.id in mine, categories=keys, stock=stock, discounts=discounts) for p, v in rows
+        product_out(
+            p,
+            v,
+            p.id in mine,
+            categories=keys,
+            stock=stock,
+            discounts=discounts,
+            locked=p.id in locked,
+            today=today,
+        )
+        for p, v in rows
     ]
 
 
@@ -290,6 +329,8 @@ async def product_detail(principal: Reader, key: str, module: Module) -> Marketp
         categories=await category_keys(module),
         stock=stock,
         discounts=discounts,
+        locked=product.id in await locked_ids(module, user),
+        today=module.openings.today(),
     )
     checks = await module.eligibility.checks(user, list(version.conditions), out.price_now)
     if product.id not in mine or product.repeatable:

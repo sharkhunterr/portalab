@@ -8,7 +8,7 @@ from uuid import UUID
 from sqlalchemy import Select, select
 
 from portalab.core.db import Database
-from portalab.modules.marketplace.activation.service import LIVE
+from portalab.modules.marketplace.activation.service import USABLE
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 
 
@@ -21,7 +21,7 @@ class Entitlements:
             found = await session.scalar(
                 select(Ownership.id)
                 .join(Product, Product.id == Ownership.product_id)
-                .where(Ownership.user_id == user_id, Product.key == product, Ownership.state.in_(LIVE))
+                .where(Ownership.user_id == user_id, Product.key == product, Ownership.state.in_(USABLE))
                 .limit(1)
             )
         return found is not None
@@ -40,7 +40,9 @@ class Entitlements:
                     (ProductVersion.product_id == Product.id)
                     & (ProductVersion.version == Product.current_version),
                 )
-                .where(Ownership.user_id == user_id, Product.type == product_type, Ownership.state.in_(LIVE))
+                .where(
+                    Ownership.user_id == user_id, Product.type == product_type, Ownership.state.in_(USABLE)
+                )
                 .distinct()
                 .order_by(Product.key)
             )
@@ -60,7 +62,9 @@ class Entitlements:
             rows = await session.execute(
                 select(Product.key)
                 .join(Ownership, Ownership.product_id == Product.id)
-                .where(Ownership.user_id == user_id, Product.type == product_type, Ownership.state.in_(LIVE))
+                .where(
+                    Ownership.user_id == user_id, Product.type == product_type, Ownership.state.in_(USABLE)
+                )
                 .distinct()
             )
             return sorted(rows.scalars())
@@ -90,7 +94,7 @@ class ThemeEntitlementsReader:
             rows = await session.scalars(
                 self._themes()
                 .join(Ownership, Ownership.product_id == Product.id)
-                .where(Ownership.user_id == user_id, Ownership.state.in_(LIVE))
+                .where(Ownership.user_id == user_id, Ownership.state.in_(USABLE))
             )
             return frozenset(key for key in rows if key)
 
@@ -124,7 +128,7 @@ class CosmeticsReader:
             rows = await session.scalars(
                 self._choices(kind, field)
                 .join(Ownership, Ownership.product_id == Product.id)
-                .where(Ownership.user_id == user_id, Ownership.state.in_(LIVE))
+                .where(Ownership.user_id == user_id, Ownership.state.in_(USABLE))
             )
             return frozenset(key for key in rows if key)
 

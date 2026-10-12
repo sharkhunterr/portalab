@@ -13,6 +13,7 @@ import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { showLevelUp } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useAcquire, useDescribe, useProducts } from "../api";
+import { BoosterActions, BoosterDetails } from "../boosters/Boosters";
 import { Price, priceOf } from "../catalog/Price";
 import { ProductArt, TYPE_BADGE_ICON } from "../catalog/ProductArt";
 import { useEquipment } from "../equip";
@@ -164,10 +165,16 @@ export function ProductSheet({ product }: { product: Product }) {
           {t(`marketplace:type.${product.type}`)}
         </span>
         {isHdProduct(product) ? <HdTag large /> : null}
-        {product.owned ? (
-          <span className="product-chip" data-tone="ok">
-            <Icon name="check" size={14} />
-            {t("marketplace:product.owned")}
+        {product.owned && !product.repeatable ? (
+          <span className="product-chip" data-tone={product.locked ? undefined : "ok"}>
+            <Icon name={product.locked ? "lock" : "check"} size={14} />
+            {t(product.locked ? "marketplace:product.locked" : "marketplace:product.owned")}
+          </span>
+        ) : null}
+        {product.season ? (
+          <span className="product-chip" data-season>
+            <Icon name="calendar" size={14} />
+            {t(`marketplace:season.${product.season}`)}
           </span>
         ) : null}
       </div>
@@ -178,7 +185,12 @@ export function ProductSheet({ product }: { product: Product }) {
             <h3 id="product-what">{t("marketplace:sheet.what")}</h3>
             <p>{t(`marketplace:what.${product.type}`)}</p>
           </section>
-          {product.type === "bundle" ? <PackContents product={product} /> : <InPacks product={product} />}
+          {product.type === "booster" ? <BoosterDetails product={product} /> : null}
+          {product.type === "bundle" ? (
+            <PackContents product={product} />
+          ) : product.type === "booster" ? null : (
+            <InPacks product={product} />
+          )}
         </div>
         <dl className="product-sheet__facts">
           <Fact icon="coins" label={t("marketplace:sheet.price")}>
@@ -316,6 +328,11 @@ export function TryOn({ product }: { product: Product }) {
 
 /** Buying from the sheet: « Buy » → a one-line confirmation (price, refund policy) → done or why not. */
 export function PurchaseBar({ product }: { product: Product }) {
+  if (product.type === "booster") return <BoosterActions product={product} />; // #81: opened, not bought
+  return <BuyBar product={product} />;
+}
+
+function BuyBar({ product }: { product: Product }) {
   const t = useT();
   const canBuy = useHasPermission("marketplace.purchase");
   const acquire = useAcquire(product.key);
@@ -340,6 +357,15 @@ export function PurchaseBar({ product }: { product: Product }) {
   const unmet = (product.eligibility ?? []).some((c) => !c.met);
   const owned = product.owned && !product.repeatable;
   const blocked = owned ? "owned" : soldOut ? "soldOut" : unmet ? "locked" : null;
+  if (owned && product.locked) {
+    // #81: won in a booster before its level or Contribution: held, usable once they are reached
+    return (
+      <span className="purchase-bar__blocked">
+        <Icon name="lock" size={16} />
+        {t("marketplace:product.lockedLong")}
+      </span>
+    );
+  }
   if (owned && gear.wearable(product)) {
     // 027: an owned look — worn now, or one tap to wear it
     return gear.equipped(product) ? (

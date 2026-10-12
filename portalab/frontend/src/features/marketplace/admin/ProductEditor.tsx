@@ -56,7 +56,11 @@ const TYPES = [
   "xp_boost",
   // #57: saving a title from the library's cleanup (Maintainerr)
   "media_rescue",
+  // #81: a sealed pack drawn at random (its odds and refunds: « Boosters » below)
+  "booster",
 ] as const;
+/** #81: the seasons a product may belong to (its season's booster and pack draw from it). */
+export const SEASONS = ["valentine", "spring", "summer", "halloween", "christmas"] as const;
 /** 027: the designs each cosmetic type can sell (keys shared with the backend). */
 const DESIGNS: Partial<
   Record<(typeof TYPES)[number], { field: string; values: readonly string[]; ns: string }>
@@ -120,6 +124,7 @@ export interface Presentation {
   poster_effect: (typeof EFFECTS)[number];
   featured: boolean;
   icon: string | null;
+  season: (typeof SEASONS)[number] | null;
 }
 
 function PresentationFields({
@@ -159,6 +164,18 @@ function PresentationFields({
         {categories.map((c) => (
           <option key={c.key} value={c.key}>
             {t(c.label_key)}
+          </option>
+        ))}
+      </SelectField>
+      <SelectField
+        label={t("marketplace:admin.season")}
+        value={value.season ?? ""}
+        onChange={(e) => onChange({ ...value, season: (e.target.value || null) as Presentation["season"] })}
+      >
+        <option value="">{t("marketplace:admin.noSeason")}</option>
+        {SEASONS.map((season) => (
+          <option key={season} value={season}>
+            {t(`marketplace:season.${season}`)}
           </option>
         ))}
       </SelectField>
@@ -402,6 +419,7 @@ const DEFAULT_PRESENTATION: Presentation = {
   poster_effect: "auto",
   featured: false,
   icon: null,
+  season: null,
 };
 
 /** Shop presentation of an existing product: merchandising only, no new price version. */
@@ -432,6 +450,7 @@ export function PresentationDialog({
             poster_effect: (product.poster_effect ?? "auto") as Presentation["poster_effect"],
             featured: Boolean(product.featured),
             icon: product.icon ?? null,
+            season: (product.season ?? null) as Presentation["season"],
           });
           setCategory(product.category ?? "");
           setAvailability({
@@ -568,6 +587,14 @@ export function NewProductDialog({
         return { count: units };
       case "xp_boost":
         return { factor, hours, values: ["xp"] };
+      case "booster": // the classic's settings, tuned afterwards in « Boosters »
+        return {
+          pool: "looks",
+          cards: 5,
+          odds: { common: 62, rare: 26, epic: 10, legendary: 2 },
+          guarantee: "rare",
+          look: "cosmos",
+        };
       default:
         {
           const designed = DESIGNS[type];
@@ -610,7 +637,7 @@ export function NewProductDialog({
               const body = availabilityBody(availability);
               return {
                 availability: body.availability,
-                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue"].includes(type),
+                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue", "booster"].includes(type),
               };
             })(),
             version: {

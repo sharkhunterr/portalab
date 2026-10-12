@@ -1,10 +1,11 @@
-"""#81: boosters in the shop — those on sale with what each holds, the odds and what a duplicate gives
-back; opening one (``marketplace.purchase``, ``Idempotency-Key``): its price charged, the looks granted,
-the duplicates' Coins given back, the items to keep put in the reserve; the boosters I opened; my reserve
-and using one of its items."""
+"""#81: boosters (products of type ``booster``) — those on sale with what each holds, the odds and what a
+duplicate gives back, and the sealed ones I keep; opening one (``marketplace.purchase``,
+``Idempotency-Key``): its price charged (or a sealed one used), the looks granted, the duplicates' Coins
+given back, the items to keep put in the reserve; the boosters I opened; my reserve and using one of its
+items."""
 
 from typing import Annotated, Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Header, Path, Query
 from sqlalchemy import select
@@ -18,49 +19,57 @@ from portalab.modules.marketplace.api.catalog import (
     product_out,
 )
 from portalab.modules.marketplace.api.projects import Module
-from portalab.modules.marketplace.boosters import (
-    BOOSTERS,
-    RARITIES,
-    RESERVE_TYPES,
-    Booster,
-    odds_percent,
-    refund_of,
-    until,
-)
+from portalab.modules.marketplace.boosters import booster_info
 from portalab.modules.marketplace.models import Product, ProductVersion
 from portalab.modules.marketplace.pricing import active_discounts
+from portalab.modules.marketplace.products.service import ProductNotFound
 
 router = APIRouter(prefix="/api/v1", tags=["marketplace-boosters"])
 
 KEY = Path(pattern=r"^[a-z0-9_]{1,96}$")
 
 
-def _booster_out(module: Module, booster: Booster, opened: int = 0) -> dict[str, Any]:
-    end = until(booster, module.openings.today())
+def _booster_out(
+    module: Module, product: Product, version: ProductVersion, opened: int = 0, sealed: int = 0
+) -> dict[str, Any]:
+    info = booster_info(
+        product.key, version.names, version.price_coins, version.payload or {}, module.openings.today()
+    )
+    per_member = info["per_member"]
     return {
-        "key": booster.key,
-        "names": dict(booster.names),
-        "descriptions": dict(booster.descriptions),
-        "price": booster.price,
-        "cards": booster.cards,
-        "odds": odds_percent(booster),
-        "guarantee": booster.guarantee,
-        "refunds": {rarity: refund_of(booster, rarity) for rarity in RARITIES},
-        "theme": booster.theme,
-        # what comes out of it: looks for the collection, or items for the reserve
-        "kind": "reserve" if booster.types <= RESERVE_TYPES else "looks",
-        "until": end.isoformat() if end else None,
-        "per_member": booster.per_member,
-        "left": None if booster.per_member is None else max(0, booster.per_member - opened),
+        "key": product.key,
+        "names": dict(version.names),
+        "descriptions": dict(version.descriptions),
+        "price": version.price_coins or 0,
+        "rarity": product.rarity,
+        **info,
+        "theme": info["look"],
+        "on_sale": product.state == "available" and module.openings.sold(product, version),
+        "left": None if per_member is None else max(0, per_member - opened),
+        # sealed ones I keep (offered — a level reward, an achievement — or bought): opened for free
+        "sealed": sealed,
     }
+
+
+async def _boosters(module: Module, user: UUID) -> list[dict[str, Any]]:
+    opened = await module.openings.opened(user)
+    sealed = await module.openings.sealed(user)
+    shown = {p.key: (p, v) for p, v, _ in await module.openings.boosters()}
+    # an offered booster stays openable out of its season
+    for key in set(sealed) - set(shown):
+        try:
+            shown[key] = await module.catalog.get(key)
+        except ProductNotFound:
+            continue
+    return [_booster_out(module, p, v, opened.get(p.key, 0), sealed.get(p.key, 0)) for p, v in shown.values()]
 
 
 @router.get("/marketplace/boosters")
 async def boosters(principal: Reader, module: Module) -> list[dict[str, Any]]:
     """#81: the boosters on sale now — how many cards, the odds per rarity, the rarity guaranteed, what a
-    duplicate gives back, until when a season's is on sale and how many openings I have left."""
-    opened = await module.openings.opened(_me(principal))
-    return [_booster_out(module, b, opened.get(b.key, 0)) for b in module.openings.on_sale()]
+    duplicate gives back, until when a season's is on sale, how many openings I have left and the sealed
+    ones I keep."""
+    return await _boosters(module, _me(principal))
 
 
 @router.post("/marketplace/boosters/{key}/open", status_code=201)
@@ -68,17 +77,27 @@ async def open_booster(
     principal: Buyer,
     module: Module,
     key: Annotated[str, KEY],
+    sealed: Annotated[bool, Query()] = False,
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key", max_length=100)] = None,
 ) -> dict[str, Any]:
-    """#81: open a booster — its price charged, its cards drawn now: a look I did not own is mine, one I
-    owned is a duplicate whose Coins come back at once, an item to keep goes to my reserve."""
-    opening, drawn = await module.openings.open(principal, key, idempotency_key or str(uuid4()))
+    """#81: open a booster — bought now (its price charged), or ``sealed``: one I keep in my reserve
+    (offered, or bought earlier). A look I did not own is mine (held, not usable yet, below its level or
+    Contribution), one I owned is a duplicate whose Coins come back at once, an item to keep goes to my
+    reserve."""
+    user = _me(principal)
+    opening, drawn = await module.openings.open(
+        principal, key, idempotency_key or str(uuid4()), sealed=sealed
+    )
     keys = await category_keys(module)
     discounts = await active_discounts(module.capabilities, utc_now(module.clock))
-    booster = BOOSTERS[opening.booster_key]
-    opened = await module.openings.opened(_me(principal))
+    mine = {b["key"]: b for b in await _boosters(module, user)}
+    booster = mine.get(opening.booster_key)
+    if booster is None:  # out of its season, its last offered one just opened: as it is now
+        product, version = await module.catalog.get(opening.booster_key)
+        opened = await module.openings.opened(user)
+        booster = _booster_out(module, product, version, opened.get(product.key, 0), 0)
     return {
-        "booster": _booster_out(module, booster, opened.get(booster.key, 0)),
+        "booster": booster,
         "opening": {
             "id": str(opening.id),
             "opened_at": opening.opened_at.isoformat(),
@@ -93,10 +112,12 @@ async def open_booster(
                     card.outcome != "reserve",
                     categories=keys,
                     discounts=discounts,
+                    locked=card.locked,
                 ).model_dump(),
                 "outcome": card.outcome,
                 "duplicate": card.outcome == "duplicate",
                 "refund": card.refund,
+                "locked": card.locked,
             }
             for card in drawn
         ],
@@ -109,7 +130,7 @@ async def openings(
 ) -> list[dict[str, Any]]:
     """#81: the boosters I opened, the latest first — what each cost, what came out, what came back."""
     rows = await module.openings.history(_me(principal), limit)
-    keys = {str(card["product"]) for row in rows for card in row.drawn}
+    keys = {str(card["product"]) for row in rows for card in row.drawn} | {row.booster_key for row in rows}
     async with module.database.session() as session:
         found = await session.execute(
             select(Product.key, ProductVersion.names)
@@ -125,7 +146,7 @@ async def openings(
         {
             "id": str(row.id),
             "booster": row.booster_key,
-            "names": dict(BOOSTERS[row.booster_key].names) if row.booster_key in BOOSTERS else {},
+            "names": names.get(row.booster_key, {}),
             "opened_at": row.opened_at.isoformat(),
             "price": row.price,
             "refund": row.refund,
@@ -136,6 +157,7 @@ async def openings(
                     "rarity": card.get("rarity"),
                     "outcome": card.get("outcome"),
                     "refund": card.get("refund", 0),
+                    "locked": bool(card.get("locked")),
                 }
                 for card in row.drawn
             ],
@@ -157,6 +179,8 @@ async def reserve(principal: Reader, module: Module) -> list[dict[str, Any]]:
             ).model_dump(),
             "quantity": quantity,
             "needs_configuration": version.config_required,
+            # a sealed booster: opened, not used
+            "booster": product.type == "booster",
         }
         for product, version, quantity in items
     ]

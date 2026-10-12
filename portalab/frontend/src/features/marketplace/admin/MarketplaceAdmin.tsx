@@ -10,6 +10,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { type Category, type Product, useCategories } from "../api";
 import { ProductArt } from "../catalog/ProductArt";
+import { BoostersAdmin } from "./BoostersAdmin";
 import { NewProductDialog, PresentationDialog } from "./ProductEditor";
 import { RaritySupply } from "./RaritySupply";
 import { RequestsQueue } from "./RequestsQueue";
@@ -142,6 +143,7 @@ export default function MarketplaceAdmin() {
           ))}
         </ul>
       </AdminSection>
+      <BoostersAdmin products={(products.data ?? []) as Product[]} onSaved={refresh} />
       <RaritySupply />
       <AdminSection title={t("marketplace:shop.byCollection")} icon="star">
         <ul className="admin-collections">
