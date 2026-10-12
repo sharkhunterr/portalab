@@ -1170,3 +1170,36 @@ a.media-card__link:focus-visible .media-card__frame {
     grid-column: 1 / -1;
   }
 }
+
+/* #4: the requests for a title — the state, who (me, or a member), when, the seasons and 4K, why */
+.media-requests {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.media-requests li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.media-requests li[data-mine] {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.media-requests__who,
+.media-requests__reason {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.media-requests__reason {
+  flex-basis: 100%;
+  font-style: italic;
+}
+.media-requests__cancel {
+  margin-inline-start: auto;
+}

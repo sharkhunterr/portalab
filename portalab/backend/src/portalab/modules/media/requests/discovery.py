@@ -162,7 +162,10 @@ class RequestableCatalog:
                     "status": status,
                     "object_id": str(object_id) if object_id else None,
                     "request": {"mine": asked[request_key]} if request_key in asked else None,
-                    "route": f"/media/discover/{title.kind}/{title.tmdb_id}",
+                    # one page per title: the library's when it has it (same look, watching, journey)
+                    "route": f"/media/{object_id}"
+                    if object_id
+                    else f"/media/discover/{title.kind}/{title.tmdb_id}",
                 }
             )
         return out

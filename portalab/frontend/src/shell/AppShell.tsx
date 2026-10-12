@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate, useNavigationType } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
@@ -67,6 +67,15 @@ export function AppShell({
   const [menuOpen, setMenuOpen] = useState(false);
   // biome-ignore lint/correctness/useExhaustiveDependencies: close the menu panel on navigation
   useEffect(() => setMenuOpen(false), [location.pathname]);
+  // a new page opens at its top (going back keeps where one was; an anchor keeps its target)
+  const navigation = useNavigationType();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on each new page only
+  useEffect(() => {
+    if (navigation === "POP" || location.hash) return;
+    window.scrollTo({ top: 0, left: 0 });
+    const main = document.getElementById("main-content");
+    if (main) main.scrollTop = 0;
+  }, [location.pathname]);
   const sections = view.sections;
   const nav = sidebarCollapsed && arrangement.nav === "sidebar" ? "rail" : arrangement.nav;
   const drawerNav = nav === "drawer" || nav === "bottom-bar";

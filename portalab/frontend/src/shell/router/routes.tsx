@@ -45,6 +45,7 @@ const MediaAccounts = lazy(() => import("../../features/media/links/LinksSetting
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
 const MediaSourcesAdmin = lazy(() => import("../../features/admin/media/MediaSourcesAdmin"));
 const MediaQuotasAdmin = lazy(() => import("../../features/admin/media/RequestQuotasAdmin"));
+const MediaRequestsAdmin = lazy(() => import("../../features/admin/media/RequestsAdmin"));
 const NewsPage = lazy(() => import("../../features/news/NewsPage"));
 const Article = lazy(() => import("../../features/news/ArticlePage"));
 const NewsAdmin = lazy(() => import("../../features/news/NewsAdmin"));
@@ -371,6 +372,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
             { path: "media-quotas", element: <MediaQuotasAdmin />, handle: h({ crumb: "Request quotas" }) },
+            { path: "media-requests", element: <MediaRequestsAdmin />, handle: h({ crumb: "Requests" }) },
             {
               path: "media-sources",
               element: <MediaSourcesAdmin />,

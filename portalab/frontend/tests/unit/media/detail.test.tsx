@@ -115,9 +115,8 @@ describe("media detail", () => {
     // 027: sections with nothing to tell are left out (no « not enough people », no « no data »)
     expect(screen.queryByRole("heading", { name: "Statistics" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Requests" })).toBeNull();
-    // #4: a film with its TMDB id is asked for through the shared form (seasons, 4K, quota)
-    const ask = screen.getByRole("link", { name: "Request" });
-    expect(ask.getAttribute("href")).toBe("/media/discover/movie/329865");
+    // #4: a film with its TMDB id is asked for here, through the shared form (seasons, 4K, quota)
+    expect(await screen.findByRole("button", { name: "Request" })).toBeTruthy();
     expect(posts).toEqual([]);
   });
 });

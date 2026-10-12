@@ -15,11 +15,14 @@ import {
 import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
-import { PageHeader } from "../../../design-system/components/PageHeader";
+import { useDiscoverTitle } from "../discover/api";
+import { RequestDialog } from "../discover/RequestDialog";
+import { useMeasures } from "../insights/api";
 import { usePlayerInfo, useResetResume } from "../player/api";
-import { artworkSlides, Backdrop, Enrichment, useMetadata } from "./Enrichment";
+import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
+import { TitleHero } from "./TitleHero";
 
 /**
  * Media detail (spec 024 T017/T020): a header and independent section frames — each section loads, fails
@@ -287,6 +290,51 @@ function TitleBadges({ media }: { media: { id: string; kind: string; available: 
   );
 }
 
+/** #4: every request for this title — mine with what they say (seasons, 4K, why one was declined) and a
+ * way to cancel it while it waits; the others as « a member ». */
+function RequestsBody({ data }: { data: Data }) {
+  const t = useT();
+  const format = useFormat();
+  const { cancel } = useRequestActions();
+  const items = list(data.requests).length ? list(data.requests) : list(data.mine);
+  return (
+    <>
+      <p className="media-muted">{t("media:detail.openRequests", { count: Number(data.open_total ?? 0) })}</p>
+      <ul className="media-requests">
+        {items.map((r) => {
+          const seasons = Array.isArray(r.seasons) ? (r.seasons as number[]) : null;
+          return (
+            <li key={String(r.id)} data-mine={r.mine ? true : undefined}>
+              <span className="media-badge" data-tone={String(r.state)}>
+                {t(`media:requests.state.${String(r.state)}`)}
+              </span>
+              <span className="media-requests__who">
+                {r.mine ? t("media:detail.requestMine") : t("media:detail.requestOther")}
+                {r.requested_at
+                  ? ` · ${format.relative((Date.parse(String(r.requested_at)) - Date.now()) / 1000)}`
+                  : ""}
+                {seasons?.length ? ` · ${t("media:moderation.seasons", { list: seasons.join(", ") })}` : ""}
+                {r.is4k ? " · 4K" : ""}
+              </span>
+              {r.reason ? <span className="media-requests__reason">« {String(r.reason)} »</span> : null}
+              {r.cancellable ? (
+                <button
+                  type="button"
+                  className="ds-button ds-button--ghost media-requests__cancel"
+                  disabled={cancel.isPending}
+                  onClick={() => cancel.mutate(String(r.id))}
+                >
+                  {t("media:detail.cancelRequest")}
+                </button>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
 function SectionBody({
   name,
   section,
@@ -406,16 +454,7 @@ function SectionBody({
       );
     }
     case "requests":
-      return (
-        <>
-          <p>{t("media:detail.openRequests", { count: Number(data.open_total ?? 0) })}</p>
-          <ul className="media-list">
-            {list(data.mine).map((r) => (
-              <li key={String(r.id)}>{t(`media:requests.state.${String(r.state)}`)}</li>
-            ))}
-          </ul>
-        </>
-      );
+      return <RequestsBody data={data} />;
     case "people":
       return <p>{(data.people as string[] | undefined)?.join(", ")}</p>;
     case "statistics":
@@ -488,7 +527,7 @@ function hasContent(name: string, data: Data, enriched = false): boolean {
     case "history":
       return list(data.mine).length > 0 || list(data.concerned_users).length > 0;
     case "requests":
-      return Number(data.open_total ?? 0) > 0 || list(data.mine).length > 0;
+      return Number(data.open_total ?? 0) > 0 || list(data.requests).length > 0 || list(data.mine).length > 0;
     case "people":
       return Array.isArray(data.people) && data.people.length > 0;
     case "statistics":
@@ -658,18 +697,48 @@ function RequestButton({
   kind: string;
   tmdb?: string | undefined;
 }) {
-  const t = useT();
   const { submit } = useRequestActions();
   if (tmdb && (kind === "movie" || kind === "series")) {
-    // #4: the same form as everywhere — seasons, 4K, what it takes of my quota
-    return (
-      <Link className="ds-button ds-button--primary" to={`/media/discover/${kind}/${tmdb}`}>
-        <Icon name="plus" size={16} />
-        {t("media:detail.request")}
-      </Link>
-    );
+    return <AskHere objectId={objectId} kind={kind} tmdb={tmdb} submit={submit} />;
   }
   return <DirectRequest objectId={objectId} submit={submit} />;
+}
+
+/** #4: the same form as everywhere — a series' missing seasons, 4K, what it takes of my quota — here. */
+function AskHere({
+  objectId,
+  kind,
+  tmdb,
+  submit,
+}: {
+  objectId: string;
+  kind: "movie" | "series";
+  tmdb: string;
+  submit: ReturnType<typeof useRequestActions>["submit"];
+}) {
+  const t = useT();
+  const details = useDiscoverTitle(kind, tmdb);
+  if (details.isError) return <DirectRequest objectId={objectId} submit={submit} />;
+  if (!details.data) return null;
+  const data = details.data;
+  return (
+    <RequestDialog
+      target={{
+        tmdb_id: data.tmdb_id,
+        kind: data.kind,
+        title: data.title,
+        ids: data.ids,
+        seasons: data.seasons,
+        four_k: data.four_k,
+      }}
+      trigger={
+        <Button>
+          <Icon name="plus" size={16} />
+          {t("media:detail.request")}
+        </Button>
+      }
+    />
+  );
 }
 
 function DirectRequest({
@@ -701,47 +770,56 @@ function DirectRequest({
 
 export function DetailPage() {
   const t = useT();
+  const format = useFormat();
+  const measures = useMeasures();
   const { objectId = "" } = useParams();
   const headingId = useId();
   const detail = useMediaDetail(objectId);
   // with enriched details (TMDB), the cast and the technical timeline would only repeat or distract
   const metadata = useMetadata(objectId);
-  const enriched = Boolean(metadata.data);
-  const gallery = artworkSlides(metadata.data).length > 0; // 027: the artwork one swipes through
+  const known = detail.data;
+  const seerrKind =
+    known && (known.kind === "movie" || known.kind === "series") && known.ids?.tmdb ? known.kind : null;
+  const asked = useDiscoverTitle(
+    seerrKind ?? "movie",
+    known?.ids?.tmdb ?? "",
+    Boolean(seerrKind) && !metadata.data && !metadata.isPending,
+  );
   const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;
   const media = detail.data;
   const poster = imageUrl(media.image_id);
+  // a title just asked for has no enriched details yet: the request service's stand in meanwhile
+  const stand = !metadata.data && seerrKind ? asked.data : undefined;
+  const fallback = stand?.metadata && Object.keys(stand.metadata).length ? stand : undefined;
+  const details =
+    metadata.data ?? (fallback ? normalize({ ...fallback.metadata, title: media.title }) : undefined);
+  const enriched = Boolean(details);
   return (
     <article aria-labelledby={headingId} className="media-detail">
-      <PageHeader
-        titleId={headingId}
+      {/* #4: the same head as a title to ask for — backdrop, poster, facts, badges, actions */}
+      <TitleHero
+        headingId={headingId}
         level={2}
-        artwork={poster}
-        art={gallery ? <Backdrop objectId={media.id} fill /> : undefined}
-        title={
-          <>
-            {media.title} {media.year ? <span className="media-muted">({media.year})</span> : null}
-          </>
-        }
-        context={
-          <>
-            {media.platform ? (
-              // 027: a game's console first, plainly
-              <span className="media-platform">
-                <Icon name="joystick" size={14} />
-                {media.platform}
-              </span>
-            ) : null}
-            <TitleBadges media={media} />
-            {t(`media:kind.${media.kind}`)}
-            {media.genres.filter((g) => g !== media.platform).length
-              ? ` · ${media.genres.filter((g) => g !== media.platform).join(", ")}`
-              : ""}
-          </>
-        }
+        title={media.title}
+        kind={media.kind}
+        poster={poster ?? metadataImage(metadata.data?.posters?.[0] ?? fallback?.poster, "w342")}
+        backdrop={metadataImage(details?.backdrop ?? details?.backdrops?.[0] ?? fallback?.backdrop, "w1280")}
+        facts={[
+          media.year ? String(media.year) : null,
+          media.platform ?? null,
+          t(`media:kind.${media.kind}`),
+          metadata.data?.runtime_min ? measures.duration(metadata.data.runtime_min * 60) : null,
+          metadata.data?.vote_average
+            ? `★ ${format.number(Math.round(metadata.data.vote_average * 10) / 10)}`
+            : null,
+          !enriched && media.genres.length
+            ? media.genres.filter((g) => g !== media.platform).join(", ")
+            : null,
+        ]}
+        badges={<TitleBadges media={media} />}
         primary={
           media.available ? (
             <Watch objectId={media.id} kind={media.kind} />
@@ -752,7 +830,7 @@ export function DetailPage() {
       />
       <LeavingNotice objectId={media.id} />
       <RequestJourney objectId={media.id} />
-      <Enrichment objectId={media.id} />
+      {metadata.data ? <Enrichment objectId={media.id} /> : details ? <EnrichedView data={details} /> : null}
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

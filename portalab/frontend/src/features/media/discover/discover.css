@@ -58,7 +58,11 @@
   padding: clamp(var(--space-3), 4vw, var(--space-6));
 }
 .discover-title__poster {
+  flex: none;
   inline-size: clamp(7rem, 22vw, 11rem);
+}
+.discover-title__poster .media-card__poster {
+  inline-size: 100%;
   aspect-ratio: 2 / 3;
   border-radius: var(--radius-md);
   object-fit: cover;

@@ -275,34 +275,47 @@ class Sections:
         )
 
     async def _requests(self, object_id: UUID, view: Any, viewer: Principal) -> Section:
+        """#4: every request for this title — mine with all they say (seasons, 4K, the decision's reason),
+        the others as « a member » — and how many are still open."""
         user = self._user(viewer)
         async with self.database.session() as session:
-            mine = (
+            rows = (
                 (
                     await session.execute(
                         select(MediaRequest)
-                        .where(MediaRequest.object_id == object_id, MediaRequest.requester_user_id == user)
+                        .where(MediaRequest.object_id == object_id)
                         .order_by(MediaRequest.requested_at.desc())
+                        .limit(20)
                     )
                 )
                 .scalars()
                 .all()
             )
-            total = await session.scalar(
-                select(func.count()).where(
-                    MediaRequest.object_id == object_id,
-                    MediaRequest.state.in_(("pending", "approved", "processing")),
-                )
+        items = []
+        for row in rows:
+            ref = row.external_ref or {}
+            mine = row.requester_user_id is not None and row.requester_user_id == user
+            decision = ref.get("decision") or {}
+            items.append(
+                {
+                    "id": str(row.id),
+                    "state": row.state,
+                    "requested_at": row.requested_at.isoformat(),
+                    "updated_at": row.updated_at.isoformat(),
+                    "mine": mine,
+                    "seasons": ref.get("seasons"),
+                    "is4k": bool(ref.get("is4k")),
+                    "reason": decision.get("reason") if mine else None,
+                    "cancellable": mine and row.state in ("pending", "approved"),
+                }
             )
         return Section(
             "available",
             utc_now(self.clock),
             {
-                "mine": [
-                    {"id": str(r.id), "state": r.state, "requested_at": r.requested_at.isoformat()}
-                    for r in mine
-                ],
-                "open_total": int(total or 0),
+                "requests": items,
+                "mine": [i for i in items if i["mine"]],
+                "open_total": sum(1 for r in rows if r.state in ("pending", "approved", "processing")),
             },
         )
 

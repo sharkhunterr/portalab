@@ -1,12 +1,12 @@
 import { useId } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
-import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { EnrichedView, metadataImage, normalize } from "../detail/Enrichment";
+import { TitleHero } from "../detail/TitleHero";
 import { QuotaLine } from "../requests/QuotaSummary";
 import { useDiscoverTitle } from "./api";
 import { RequestDialog } from "./RequestDialog";
@@ -30,6 +30,8 @@ export function DiscoverTitlePage() {
     return <FunctionalState state="unavailable" onRetry={() => title.refetch()} />;
   }
   const data = title.data;
+  // one page per title: the library's (same look, with watching and the request's journey) when it has it
+  if (data.object_id) return <Navigate to={`/media/${data.object_id}`} replace />;
   const backdrop = metadataImage(data.backdrop, "w1280");
   const poster = metadataImage(data.poster, "w342");
   const askable =
@@ -44,65 +46,62 @@ export function DiscoverTitlePage() {
   ].filter(Boolean);
   return (
     <article className="discover-title" aria-labelledby={headingId}>
-      <header className="discover-title__hero">
-        {backdrop ? <img className="discover-title__backdrop" src={backdrop} alt="" /> : null}
-        <div className="discover-title__head">
-          {poster ? <img className="discover-title__poster" src={poster} alt="" /> : null}
-          <div className="discover-title__text">
-            <PageHeader
-              level={1}
-              titleId={headingId}
-              title={data.title}
-              context={facts.join(" · ")}
-              primary={
-                data.object_id && data.status === "available" ? (
-                  <Link className="ds-button ds-button--primary" to={`/media/${data.object_id}`}>
-                    <Icon name="play" size={16} />
-                    {t("media:discover.openInLibrary")}
-                  </Link>
-                ) : askable ? (
-                  <RequestDialog
-                    target={{
-                      tmdb_id: data.tmdb_id,
-                      kind: data.kind,
-                      title: data.title,
-                      ids: data.ids,
-                      seasons: data.seasons,
-                      four_k: data.four_k,
-                    }}
-                    trigger={
-                      <Button>
-                        <Icon name="plus" size={16} />
-                        {t("media:discover.ask")}
-                      </Button>
-                    }
-                  />
-                ) : null
-              }
-              secondary={
-                data.trailer ? (
-                  <a
-                    className="ds-button ds-button--secondary"
-                    href={`https://www.youtube.com/watch?v=${encodeURIComponent(data.trailer)}`}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <Icon name="play" size={16} />
-                    {t("media:discover.trailer")}
-                  </a>
-                ) : undefined
+      <TitleHero
+        headingId={headingId}
+        title={data.title}
+        kind={data.kind}
+        facts={facts}
+        poster={poster}
+        backdrop={backdrop}
+        primary={
+          data.object_id && data.status === "available" ? (
+            <Link className="ds-button ds-button--primary" to={`/media/${data.object_id}`}>
+              <Icon name="play" size={16} />
+              {t("media:discover.openInLibrary")}
+            </Link>
+          ) : askable ? (
+            <RequestDialog
+              target={{
+                tmdb_id: data.tmdb_id,
+                kind: data.kind,
+                title: data.title,
+                ids: data.ids,
+                seasons: data.seasons,
+                four_k: data.four_k,
+              }}
+              trigger={
+                <Button>
+                  <Icon name="plus" size={16} />
+                  {t("media:discover.ask")}
+                </Button>
               }
             />
-            <p className="discover-title__state">
-              <StatusBadge item={data} />
-              {data.object_id && data.status !== "available" ? (
-                <Link to={`/media/${data.object_id}`}>{t("media:discover.seeJourney")}</Link>
-              ) : null}
-            </p>
-            {askable ? <QuotaLine kind={data.kind} /> : null}
-          </div>
-        </div>
-      </header>
+          ) : null
+        }
+        secondary={
+          data.trailer ? (
+            <a
+              className="ds-button ds-button--secondary"
+              href={`https://www.youtube.com/watch?v=${encodeURIComponent(data.trailer)}`}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <Icon name="play" size={16} />
+              {t("media:discover.trailer")}
+            </a>
+          ) : undefined
+        }
+        badges={
+          <>
+            <StatusBadge item={data} />
+            {data.object_id && data.status !== "available" ? (
+              <Link to={`/media/${data.object_id}`}>{t("media:discover.seeJourney")}</Link>
+            ) : null}
+          </>
+        }
+      >
+        {askable ? <QuotaLine kind={data.kind} /> : null}
+      </TitleHero>
       {/* the same rich details as a library title: facts, cast and crew, the saga, money, production */}
       <EnrichedView data={normalize({ ...data.metadata, title: data.title })} />
       {data.seasons.length ? (

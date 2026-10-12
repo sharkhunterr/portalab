@@ -36,7 +36,12 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
     assert "support.tickets" in entries(by_key["support"])
     topics = {t["key"]: {e["key"] for e in t["entries"]} for t in by_key["admin"]["topics"]}
     # 027 hubs: Administration in a few hubs, each opening on its first page
-    assert list(topics) == [
+    # #4: « media » (requests to decide, quotas, identity, history) shows when the media module is there
+    order = list(topics)
+    if "media" in order:
+        assert order.index("media") == order.index("services") + 1
+        assert {"media.requests_admin", "media.quotas", "media.admin", "media.sources"} <= topics["media"]
+    assert [key for key in order if key != "media"] == [
         "pilot",
         "members",
         "services",

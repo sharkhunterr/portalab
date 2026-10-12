@@ -96,9 +96,10 @@ export function useDiscoverSearch(q: string) {
   });
 }
 
-export function useDiscoverTitle(kind: string, tmdb: string) {
+export function useDiscoverTitle(kind: string, tmdb: string, enabled = true) {
   return useQuery({
     queryKey: [...KEY, "title", kind, tmdb],
+    enabled: enabled && Boolean(tmdb),
     retry: false,
     queryFn: async () => {
       const { data, error } = await api.GET("/api/v1/media/discover/{kind}/{tmdb_id}", {

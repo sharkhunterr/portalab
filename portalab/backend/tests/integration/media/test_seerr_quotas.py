@@ -190,8 +190,10 @@ async def test_titles_to_ask_for_and_search(
 
     found = (await client.get("/api/v1/media/discover/search", params={"q": "matrix"})).json()
     matrix, reloaded = found["items"]
-    assert matrix["request"] == {"mine": True} and matrix["route"] == "/media/discover/movie/603"
-    assert matrix["object_id"] and reloaded["status"] == "available" and reloaded["request"] is None
+    # one page per title: a title the catalog has opens its library page
+    assert matrix["request"] == {"mine": True} and matrix["route"] == f"/media/{matrix['object_id']}"
+    assert reloaded["status"] == "available" and reloaded["request"] is None
+    assert reloaded["route"] == "/media/discover/movie/604"  # the library does not have it
     shelf = (await client.get("/api/v1/media/discover/shelves/trending")).json()
     assert [i["title"] for i in shelf["items"]] == ["Game of Thrones"]
     got = (await client.get("/api/v1/media/discover/series/1399")).json()
@@ -206,6 +208,61 @@ async def test_titles_to_ask_for_and_search(
     ).items  # type: ignore[arg-type]
     # the available title is left to the library's own results; the asked one says so
     assert [(i.title, i.url_ref, i.facets.get("status")) for i in items] == [
-        ("The Matrix (1999)", "/media/discover/movie/603", "requested")
+        ("The Matrix (1999)", matrix["route"], "requested")
     ]
     assert items[0].facets["poster"] == "/matrix.jpg"
+
+
+async def test_administrators_approve_and_decline(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """#4: the queue shows who asked; a decision goes to the request service, keeps its reason, gives
+    back a bought unit when declined, and is audited."""
+    people = await users(app, media, "alex", admin="boss")
+    seerr = media.service(5, "seerr")
+    fake = media.requests(seerr)
+    await media.configure("media.requests.quotaPerPeriod", 0)
+    await media.module.quota.add_units(people["alex"], 2, "order:1", "purchase:order:1")
+    await login(client, "alex")
+    for tmdb, title in (("603", "The Matrix"), ("680", "Pulp Fiction")):
+        body = {"ids": {"tmdb": tmdb}, "kind": "movie", "title": title, "idempotency_key": f"mod-{tmdb}-0001"}
+        assert (await client.post("/api/v1/media/requests", json=body)).status_code == 201
+    assert (await media.module.quota.available(people["alex"]))["extra_units"] == 0
+    assert (await client.get("/api/v1/admin/media/requests")).status_code == 403
+
+    await login(client, "boss")
+    queue = (await client.get("/api/v1/admin/media/requests")).json()["items"]
+    by_title = {i["title"]: i for i in queue}
+    assert set(by_title) == {"The Matrix", "Pulp Fiction"} and all(i["decidable"] for i in queue)
+    assert by_title["The Matrix"]["requester"]["id"] == str(people["alex"])
+
+    approved = await client.post(
+        f"/api/v1/admin/media/requests/{by_title['The Matrix']['id']}/approve", json={}
+    )
+    assert approved.json() == {"state": "approved"} and fake.states["req-1"] == "approved"
+    declined = await client.post(
+        f"/api/v1/admin/media/requests/{by_title['Pulp Fiction']['id']}/decline",
+        json={"reason": "Already in 4K on the server"},
+    )
+    assert declined.json() == {"state": "declined"} and fake.states["req-2"] == "declined"
+    assert (await media.module.quota.available(people["alex"]))["extra_units"] == 1  # given back
+    again = await client.post(
+        f"/api/v1/admin/media/requests/{by_title['Pulp Fiction']['id']}/approve", json={}
+    )
+    assert again.status_code == 422  # no longer waiting
+    every = {
+        i["title"]: i for i in (await client.get("/api/v1/admin/media/requests?state=all")).json()["items"]
+    }
+    assert every["Pulp Fiction"]["decision"]["reason"] == "Already in 4K on the server"
+    assert every["Pulp Fiction"]["decision"]["approved"] is False
+    async with media.database.session() as session:
+        audited = (
+            (
+                await session.execute(
+                    text("SELECT action FROM audit.audit_entries WHERE action LIKE 'media.request_%'")
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert sorted(audited) == ["media.request_approved", "media.request_declined"]

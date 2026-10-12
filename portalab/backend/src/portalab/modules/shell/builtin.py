@@ -17,6 +17,9 @@ ADMIN_TOPICS: tuple[dict[str, object], ...] = (
         "aliases": ("access",),
     },
     {"key": "services", "label_key": "nav.hub.services", "icon": "server", "order_hint": 30},
+    # #4: everything about the media — members' requests to approve, their quotas, the titles' identity,
+    # the history and the metadata
+    {"key": "media", "label_key": "nav.hub.media", "icon": "film", "order_hint": 35},
     {"key": "support", "label_key": "nav.hub.support", "icon": "lifebuoy", "order_hint": 40},
     {
         "key": "communication",
@@ -609,8 +612,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "film",
         "route": "/admin/media",
         "group": "admin",
-        "topic": "services",
-        "order_hint": 2,
+        "topic": "media",
+        "order_hint": 3,
         "required_permission": "media.manage",
     },
     {
@@ -621,8 +624,21 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "chart",
         "route": "/admin/media-sources",
         "group": "admin",
-        "topic": "services",
-        "order_hint": 3,
+        "topic": "media",
+        "order_hint": 4,
+        "required_permission": "media.manage",
+    },
+    {
+        # #4: members' requests to approve or decline (with a reason they read)
+        "key": "media.requests_admin",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.admin.media_requests",
+        "icon": "inbox",
+        "route": "/admin/media-requests",
+        "group": "admin",
+        "topic": "media",
+        "order_hint": 1,
         "required_permission": "media.manage",
     },
     {
@@ -634,8 +650,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "coins",
         "route": "/admin/media-quotas",
         "group": "admin",
-        "topic": "services",
-        "order_hint": 4,
+        "topic": "media",
+        "order_hint": 2,
         "required_permission": "media.manage",
     },
     {

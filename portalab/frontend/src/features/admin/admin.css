@@ -852,3 +852,70 @@
   margin: 0;
   color: var(--color-accent-alt);
 }
+
+/* #4: members' requests to decide — poster, what and who, then the decision */
+.moderation-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.moderation-item {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.moderation-item__poster .media-card__poster {
+  inline-size: 4rem;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+.moderation-item__body {
+  display: grid;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+.moderation-item__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.moderation-item__head a {
+  color: inherit;
+}
+.moderation-item__facts,
+.moderation-item__who,
+.moderation-item__reason {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.moderation-item__reason {
+  font-style: italic;
+}
+.moderation-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+@media (max-width: 40rem) {
+  .moderation-item {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+  }
+  .moderation-item__actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+  .moderation-item__actions > * {
+    flex: 1;
+  }
+}

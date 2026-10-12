@@ -938,6 +938,48 @@ async def quotas_set_one(
     return await module.requests.service_quotas.overview()
 
 
+# --- #4: approving and declining members' requests ------------------------------------------------------
+class RequestDecisionIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str | None = Field(default=None, max_length=500)
+
+
+@router.get("/admin/media/requests")
+async def requests_queue(
+    _: Manager,
+    module: Module,
+    state: Annotated[str, Query(pattern=r"^(pending|open|all)$")] = "pending",
+) -> dict[str, Any]:
+    """#4: members' requests — the pending ones first — with who asked, the seasons and 4K, the poster,
+    and the decision taken (by whom, why)."""
+    items = await module.moderation.queue(state)
+    return {"items": await with_posters(module.database, module.enricher, items, lookups=60)}
+
+
+@router.post("/admin/media/requests/{request_id}/approve")
+async def request_approve(
+    principal: Manager, request_id: UUID, body: RequestDecisionIn, module: Module
+) -> dict[str, Any]:
+    """#4: approve a request — the request service sends it to the download manager."""
+    state = await module.moderation.decide(request_id, True, body.reason, principal.user_id)
+    await _audit(
+        module, principal, "media.request_approved", f"request:{request_id}", {"reason": body.reason}
+    )
+    return {"state": state}
+
+
+@router.post("/admin/media/requests/{request_id}/decline")
+async def request_decline(
+    principal: Manager, request_id: UUID, body: RequestDecisionIn, module: Module
+) -> dict[str, Any]:
+    """#4: decline a request, with a reason the member reads; a bought unit comes back."""
+    state = await module.moderation.decide(request_id, False, body.reason, principal.user_id)
+    await _audit(
+        module, principal, "media.request_declined", f"request:{request_id}", {"reason": body.reason}
+    )
+    return {"state": state}
+
+
 @router.get("/admin/media/match-candidates", response_model=list[MediaMatchCandidateOut])
 async def match_candidates(_: Manager, module: Module) -> list[MediaMatchCandidateOut]:
     async with module.database.session() as session:

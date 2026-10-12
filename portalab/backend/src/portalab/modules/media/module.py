@@ -141,6 +141,7 @@ from portalab.modules.media.providers.widgets import (
 from portalab.modules.media.requests.discovery import RequestableCatalog
 from portalab.modules.media.requests.insights import RequestInsights
 from portalab.modules.media.requests.journey import RequestJourney
+from portalab.modules.media.requests.moderation import RequestModeration
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
 from portalab.modules.media.sections.service import Sections
@@ -249,6 +250,7 @@ class MediaModule:
         )
         self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
         self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
+        self.moderation = RequestModeration(self.requests)  # #4: administrators approve or decline
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(

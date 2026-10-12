@@ -457,6 +457,17 @@ class _Requests:
         state, source_state = state_of(created)
         return SourceRequest(external_request_id=str(created["id"]), state=state, source_state=source_state)
 
+    async def decide(self, external_request_id: str, approve: bool) -> SourceRequest:
+        """#4: an administrator approves (Seerr sends it to Radarr or Sonarr) or declines a request."""
+        verb = "approve" if approve else "decline"
+        request = await self.connector.request(
+            self.service, "POST", f"/api/v1/request/{safe_id(external_request_id)}/{verb}"
+        )
+        if not isinstance(request, Mapping):
+            raise InvalidPayload("unexpected answer to a decision")
+        state, source_state = state_of(request)
+        return SourceRequest(external_request_id=external_request_id, state=state, source_state=source_state)
+
     async def status(self, external_request_id: str) -> SourceRequest:
         request = await self.connector.get_json(
             self.service, f"/api/v1/request/{safe_id(external_request_id)}"

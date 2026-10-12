@@ -143,6 +143,14 @@ class FakeRequests:
     async def cancel(self, external_request_id: str) -> None:
         self.states[external_request_id] = "cancelled"
 
+    async def decide(self, external_request_id: str, approve: bool) -> SourceRequest:
+        """#4: an administrator's decision taken from the portal."""
+        if self.down:
+            raise ConnectionError("fake request service unreachable")
+        state = "approved" if approve else "declined"
+        self.states[external_request_id] = state
+        return SourceRequest(external_request_id, state, f"source:{state}")  # type: ignore[arg-type]
+
 
 def library_record(
     external_id: str,
