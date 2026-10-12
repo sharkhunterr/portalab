@@ -76,9 +76,7 @@ class ProductSearchProvider:
             return []
         empty = ParsedQuery(text="", normalized="", terms=())
         wanted = set(ids)
-        return [
-            self._item(p, v, empty, "en") for p, v in await self.catalog.listing(limit=200) if p.key in wanted
-        ]
+        return [self._item(p, v, empty, "en") for p, v in await self.catalog.listing() if p.key in wanted]
 
 
 FEATURED_WIDGET = WidgetDefinition(
@@ -120,7 +118,7 @@ class FeaturedWidget:
         owned = await self._owned(principal.acting_for or principal.user_id)
         rows = [
             (p, v)
-            for p, v in await self.catalog.listing(limit=1000)
+            for p, v in await self.catalog.listing()
             if p.id not in owned and p.type != "project_launch"
         ]
         if not rows:

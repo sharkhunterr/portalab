@@ -356,9 +356,10 @@ class Catalog:
         q: str | None = None,
         states: tuple[str, ...] = ("available",),
         owned_ids: set[UUID] | None = None,
-        # the shop's whole catalogue in one answer: past 500 products, the last ones (themes, titles…) were
-        # silently cut off (#80)
-        limit: int = 2000,
+        # the shop's whole catalogue in one answer, never cut: a cap in the query silently dropped the last
+        # products by key — the themes past 500 (#80), then the theme packs and widgets past 1000 (#91); a
+        # ``limit`` applies after the text filter, so a search looks through every product
+        limit: int | None = None,
     ) -> list[tuple[Product, ProductVersion]]:
         statement = (
             select(Product, ProductVersion)
@@ -368,7 +369,6 @@ class Catalog:
                 & (ProductVersion.version == Product.current_version),
             )
             .order_by(Product.key)
-            .limit(max(1, min(limit, 1000)))
         )
         if owned_ids is not None:
             statement = statement.where((Product.state.in_(states)) | (Product.id.in_(owned_ids)))
@@ -389,4 +389,4 @@ class Catalog:
                 for p, v in rows
                 if needle in p.key.casefold() or any(needle in n.casefold() for n in v.names.values())
             ]
-        return rows
+        return rows if limit is None else rows[: max(1, limit)]

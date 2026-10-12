@@ -87,10 +87,20 @@ class TestProductProvider(SearchProviderContractKit):
 
 
 async def test_the_whole_catalogue_is_listed_past_five_hundred_products(mk: MkHarness) -> None:
-    """#80: the shop lists every product — past 500, the last ones (the themes) were silently cut off."""
+    """#80, #91: the shop lists every product, never cut — past 500, then past 1000, the last ones by key (the
+    themes, then the theme packs and the widgets) were silently dropped."""
     import inspect
 
     from portalab.modules.marketplace.products.service import Catalog
 
-    default = inspect.signature(Catalog.listing).parameters["limit"].default
-    assert default >= 1500
+    assert inspect.signature(Catalog.listing).parameters["limit"].default is None
+
+
+async def test_a_search_looks_through_every_product_before_limiting(mk: MkHarness) -> None:
+    """#91: the text filter comes before the limit — a product far down the keys is still found."""
+    for key in ("aardvark", "abacus", "abbey"):
+        await published(mk, key)
+    await published(mk, "zebra_crossing")
+    found = await mk.module.catalog.listing(q="zebra", limit=2)
+    assert [p.key for p, _ in found] == ["zebra_crossing"]
+    assert len(await mk.module.catalog.listing(limit=2)) == 2
