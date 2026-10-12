@@ -11,6 +11,8 @@ export interface Booster {
   cards: number;
   odds: Record<string, number>;
   guarantee: string;
+  /** the Coins a duplicate gives back, per rarity (fixed, not the item's price) */
+  refunds: Record<string, number>;
   theme: string;
 }
 

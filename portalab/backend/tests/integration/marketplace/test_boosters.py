@@ -23,13 +23,14 @@ async def test_booster_reveal(mk: MkHarness, client: AsyncClient) -> None:
     await login(client, "ursula")
     [booster] = (await client.get("/api/v1/marketplace/boosters")).json()
     assert booster["key"] == "booster_cosmos" and booster["cards"] == 5 and booster["guarantee"] == "rare"
+    assert booster["refunds"] == {"common": 10, "rare": 15, "epic": 20, "legendary": 30}
     before = (await client.get("/api/v1/marketplace/products")).json()
     opened = (await client.post("/api/v1/marketplace/boosters/booster_cosmos/reveal")).json()
     keys = [card["product"]["key"] for card in opened["cards"]]
     assert opened["preview"] is True and len(keys) == 5 and len(set(keys)) == 5
     assert "some_widget" not in keys
     owl = next(card for card in opened["cards"] if card["product"]["key"] == "night_owl")
-    assert owl["duplicate"] is True and owl["refund"] == 50  # a quarter of 200
+    assert owl["duplicate"] is True and owl["refund"] == 10  # a common one, whatever its price (200)
     assert all(not card["duplicate"] and card["refund"] == 0 for card in opened["cards"] if card is not owl)
     # visual only: nothing changed hands
     after = (await client.get("/api/v1/marketplace/products")).json()

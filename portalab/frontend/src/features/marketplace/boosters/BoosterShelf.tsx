@@ -65,6 +65,15 @@ function BoosterOffer({ booster }: { booster: Booster }) {
                 <span style={{ inlineSize: `${Math.max(2, booster.odds[rarity] ?? 0)}%` }} />
               </span>
               <span className="booster-odds__value">{format.number(booster.odds[rarity] ?? 0)} %</span>
+              <span
+                className="booster-odds__refund"
+                title={t("marketplace:booster.refundPer", { coins: format.number(booster.refunds?.[rarity] ?? 0) })}
+              >
+                <Icon name="coins" size={12} />+{format.number(booster.refunds?.[rarity] ?? 0)}
+                <span className="visually-hidden">
+                  {t("marketplace:booster.refundPer", { coins: format.number(booster.refunds?.[rarity] ?? 0) })}
+                </span>
+              </span>
             </li>
           ))}
         </ul>

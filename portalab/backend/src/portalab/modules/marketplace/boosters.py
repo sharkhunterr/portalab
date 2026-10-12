@@ -3,8 +3,8 @@
 One booster for now, defined here; its odds per rarity will be set by the administrators later. The draw
 happens on the server (a system random source): each card's rarity by the odds, one at least rare, never
 the same item twice in a pack, the cards then shuffled (their place tells nothing). A card the member
-already owns is a duplicate — it will be refunded in Coins. **Nothing is charged, granted or refunded
-yet**: the reveal is visual only.
+already owns is a duplicate — it will give back a fixed amount of Coins per rarity. **Nothing is
+charged, granted or refunded yet**: the reveal is visual only.
 """
 
 import random
@@ -29,8 +29,8 @@ COSMETIC_TYPES = frozenset(
         "palette",
     }
 )
-DUPLICATE_SHARE = 0.25  # a duplicate gives back a quarter of the item's price (shown, not paid yet)
-DUPLICATE_MIN = 10
+# a duplicate gives back a fixed amount per rarity, whatever the item's price (shown, not paid yet)
+DUPLICATE_REFUNDS: Mapping[str, int] = {"common": 10, "rare": 15, "epic": 20, "legendary": 30}
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +44,7 @@ class Booster:
     guarantee: str  # the last card's rarity at least
     theme: str = "cosmos"
     types: frozenset[str] = field(default=COSMETIC_TYPES)
+    refunds: Mapping[str, int] = field(default_factory=lambda: dict(DUPLICATE_REFUNDS))
 
 
 BOOSTERS: dict[str, Booster] = {
@@ -69,8 +70,9 @@ def odds_percent(booster: Booster) -> dict[str, float]:
     return {rarity: round(booster.odds.get(rarity, 0) * 100 / total, 1) for rarity in RARITIES}
 
 
-def refund_of(price: int | None) -> int:
-    return max(DUPLICATE_MIN, round((price or 0) * DUPLICATE_SHARE))
+def refund_of(booster: Booster, rarity: str | None) -> int:
+    """The Coins a duplicate of this rarity gives back — fixed per rarity, not the item's price."""
+    return booster.refunds.get(rarity or "common", booster.refunds.get("common", 0))
 
 
 def draw[T](

@@ -123,6 +123,7 @@
   "booster.open": "Open a booster",
   "booster.opening": "Opening the {name}",
   "booster.previewNote": "Preview: nothing is charged or added to your account.",
+  "booster.refundPer": "A duplicate of this rarity gives {coins} Coins back",
   "booster.refundLine": "duplicate · +{coins} Coins",
   "booster.refundTotal": "Duplicates: +{coins} Coins refunded",
   "booster.revealAll": "Reveal all",

@@ -123,6 +123,7 @@
   "booster.open": "Ouvrir un booster",
   "booster.opening": "Ouverture du {name}",
   "booster.previewNote": "Aperçu : rien n'est débité ni ajouté à votre compte.",
+  "booster.refundPer": "Un doublon de cette rareté rend {coins} Coins",
   "booster.refundLine": "doublon · +{coins} Coins",
   "booster.refundTotal": "Doublons : +{coins} Coins remboursés",
   "booster.revealAll": "Tout révéler",

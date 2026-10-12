@@ -14,7 +14,14 @@ from portalab.modules.marketplace.api.catalog import (
     product_out,
 )
 from portalab.modules.marketplace.api.projects import Module
-from portalab.modules.marketplace.boosters import BOOSTERS, Booster, draw, odds_percent, refund_of
+from portalab.modules.marketplace.boosters import (
+    BOOSTERS,
+    RARITIES,
+    Booster,
+    draw,
+    odds_percent,
+    refund_of,
+)
 from portalab.modules.marketplace.pricing import active_discounts
 from portalab.modules.marketplace.products.service import ProductNotFound
 
@@ -30,13 +37,15 @@ def _booster_out(booster: Booster) -> dict[str, Any]:
         "cards": booster.cards,
         "odds": odds_percent(booster),
         "guarantee": booster.guarantee,
+        "refunds": {rarity: refund_of(booster, rarity) for rarity in RARITIES},
         "theme": booster.theme,
     }
 
 
 @router.get("/marketplace/boosters")
 async def boosters(_: Reader) -> list[dict[str, Any]]:
-    """#81: the boosters on sale — how many cards, the odds per rarity, the rarity guaranteed."""
+    """#81: the boosters on sale — how many cards, the odds per rarity, the rarity guaranteed and what a
+    duplicate gives back per rarity."""
     return [_booster_out(b) for b in BOOSTERS.values()]
 
 
@@ -69,7 +78,7 @@ async def reveal(
                     product, version, owned, categories=keys, discounts=discounts
                 ).model_dump(),
                 "duplicate": owned,
-                "refund": refund_of(version.price_coins) if owned else 0,
+                "refund": refund_of(booster, product.rarity) if owned else 0,
             }
         )
     return {"booster": _booster_out(booster), "cards": cards, "preview": True}
