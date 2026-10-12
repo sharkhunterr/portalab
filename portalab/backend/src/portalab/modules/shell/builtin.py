@@ -523,6 +523,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "marketplace.read",
     },
     {
+        # #81: the items kept to use when one wants (requests, freezes, boosts, rescues, tickets)
+        "key": "marketplace.reserve",
+        "owner": "module:marketplace",
+        "kind": "entry",
+        "label_key": "nav.marketplace_reserve",
+        "icon": "potion",
+        "route": "/marketplace/reserve",
+        "group": "marketplace",
+        "order_hint": 62,
+        "required_permission": "marketplace.read",
+    },
+    {
         "key": "marketplace.projects",
         "owner": "module:marketplace",
         "kind": "entry",

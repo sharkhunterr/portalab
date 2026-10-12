@@ -5050,7 +5050,8 @@ export interface paths {
         };
         /**
          * Boosters
-         * @description #81: the boosters on sale — how many cards, the odds per rarity, the rarity guaranteed.
+         * @description #81: the boosters on sale now — how many cards, the odds per rarity, the rarity guaranteed, what a
+         *     duplicate gives back, until when a season's is on sale and how many openings I have left.
          */
         get: operations["boosters_api_v1_marketplace_boosters_get"];
         put?: never;
@@ -5061,7 +5062,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/marketplace/boosters/{key}/reveal": {
+    "/api/v1/marketplace/boosters/openings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Openings
+         * @description #81: the boosters I opened, the latest first — what each cost, what came out, what came back.
+         */
+        get: operations["openings_api_v1_marketplace_boosters_openings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/boosters/{key}/open": {
         parameters: {
             query?: never;
             header?: never;
@@ -5071,11 +5092,11 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Reveal
-         * @description #81 (proof of concept): open a booster — its cards drawn now, each saying whether I own it already
-         *     (a duplicate, refunded in Coins). Visual only: nothing is charged, granted or refunded yet.
+         * Open Booster
+         * @description #81: open a booster — its price charged, its cards drawn now: a look I did not own is mine, one I
+         *     owned is a duplicate whose Coins come back at once, an item to keep goes to my reserve.
          */
-        post: operations["reveal_api_v1_marketplace_boosters__key__reveal_post"];
+        post: operations["open_booster_api_v1_marketplace_boosters__key__open_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5144,6 +5165,47 @@ export interface paths {
         put?: never;
         /** Acquire */
         post: operations["acquire_api_v1_marketplace_products__key__acquire_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/reserve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reserve
+         * @description #81: the items I keep to use when I want — requests, freezes, boosts, rescues, tickets.
+         */
+        get: operations["reserve_api_v1_marketplace_reserve_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/reserve/{key}/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Use
+         * @description #81: use one item of my reserve — it is granted and takes effect as if bought (a ticket then waits
+         *     for its form in « My purchases »).
+         */
+        post: operations["use_api_v1_marketplace_reserve__key__use_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -24773,10 +24835,45 @@ export interface operations {
             };
         };
     };
-    reveal_api_v1_marketplace_boosters__key__reveal_post: {
+    openings_api_v1_marketplace_boosters_openings_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_booster_api_v1_marketplace_boosters__key__open_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
             path: {
                 key: string;
             };
@@ -24785,7 +24882,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24910,6 +25007,63 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarketplaceOwnershipOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reserve_api_v1_marketplace_reserve_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    use_api_v1_marketplace_reserve__key__use_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

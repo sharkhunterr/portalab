@@ -177,7 +177,8 @@ class ProductVersion(MarketplaceBase):
 class Ownership(MarketplaceBase):
     __tablename__ = "ownerships"
     __table_args__ = (
-        CheckConstraint("origin IN ('purchase', 'grant')", name="origin"),
+        # #81: ``booster`` — drawn in a booster, or taken from the reserve a booster filled
+        CheckConstraint("origin IN ('purchase', 'grant', 'booster')", name="origin"),
         CheckConstraint(
             "state IN ('active', 'needs_configuration', 'activation_failed', 'revoked', 'refunded', "
             "'expired')",
@@ -273,4 +274,42 @@ class MarketRequest(MarketplaceBase):
     decided_by: Mapped[UUID | None] = mapped_column()
     decided_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class BoosterOpening(MarketplaceBase):
+    """#81 — a booster a member opened: what it cost, what came out of it (``drawn``: ``{product, rarity,
+    outcome: new|duplicate|reserve, refund}`` in the order drawn) and what the duplicates gave back. The
+    spend and its partial refund are 013 ledger transactions, referenced by id."""
+
+    __tablename__ = "booster_openings"
+    __table_args__ = (
+        CheckConstraint("price >= 0 AND refund >= 0", name="amounts"),
+        Index("ix_booster_openings_user", "user_id", "opened_at"),
+        Index("ix_booster_openings_user_booster", "user_id", "booster_key"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    booster_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    refund: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
+    spend_tx_ref: Mapped[UUID | None] = mapped_column()
+    refund_tx_ref: Mapped[UUID | None] = mapped_column()
+    drawn: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    idempotency_key: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
+    opened_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class ReserveItem(MarketplaceBase):
+    """#81 — the items a member keeps to use when they want (requests, freezes, boosts, rescues,
+    tickets): how many of each product. Using one takes it out and grants the product (origin
+    ``booster``), which activates as a purchase would. They never expire and cannot be given."""
+
+    __tablename__ = "reserve"
+    __table_args__ = (CheckConstraint("quantity >= 0", name="quantity"),)
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    product_id: Mapped[UUID] = mapped_column(ForeignKey("marketplace.products.id"), primary_key=True)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

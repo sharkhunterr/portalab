@@ -76,6 +76,7 @@ const ProjectConsole = lazy(() => import("../../features/marketplace/admin/Proje
 const Catalog = lazy(() => import("../../features/marketplace/catalog/CatalogPage"));
 const ProductRoute = lazy(() => import("../../features/marketplace/product/ProductRoute"));
 const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
+const Reserve = lazy(() => import("../../features/marketplace/reserve/ReservePage"));
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
 const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStudio"));
 const MembersAdmin = lazy(() => import("../../features/admin/members/MembersAdmin"));
@@ -123,6 +124,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           children: [
             { index: true, element: <Catalog /> },
             { path: "owned", element: <Owned />, handle: h({ crumb: "My products" }) },
+            { path: "reserve", element: <Reserve />, handle: h({ crumb: "My reserve" }) },
             {
               path: "products/:key",
               element: <ProductRoute />,

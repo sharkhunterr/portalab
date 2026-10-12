@@ -1,0 +1,76 @@
+/* #81: the reserve — the items won in boosters, each with how many are left and a button to use one */
+.reserve__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reserve-item {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  grid-template-areas:
+    "art text"
+    "art action";
+  gap: var(--space-2) var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.reserve-item > .ds-button,
+.reserve-item > button {
+  grid-area: action;
+  justify-self: start;
+}
+.reserve-item__art {
+  position: relative;
+  grid-area: art;
+}
+.reserve-item__count {
+  position: absolute;
+  inset: auto -0.4rem -0.4rem auto;
+  min-inline-size: 2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.reserve-item__text {
+  grid-area: text;
+  min-inline-size: 0;
+}
+.reserve-item__text p {
+  margin: 0.2rem 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.reserve__empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6, 2.5rem) var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+.reserve__empty p {
+  margin: 0;
+}
+.reserve__done {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}

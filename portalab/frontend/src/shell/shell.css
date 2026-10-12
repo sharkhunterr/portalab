@@ -1869,6 +1869,13 @@
   inline-size: 18px;
   block-size: 18px;
 }
+/* on a phone the boost shows its factor only (no rocket): the header keeps within the screen's width */
+.shell-progress[data-compact="true"] .boost-tag {
+  padding-inline: 0.4rem;
+}
+.shell-progress[data-compact="true"] .boost-tag svg {
+  display: none;
+}
 .shell-progress .boost-tag small {
   font-weight: var(--font-weight-regular, 400);
 }

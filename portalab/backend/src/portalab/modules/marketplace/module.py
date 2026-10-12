@@ -67,6 +67,7 @@ from portalab.modules.marketplace.looks.service import ProfileLooks
 from portalab.modules.marketplace.models import Project, ProjectFunding
 from portalab.modules.marketplace.notify import CATEGORIES, notify_funders
 from portalab.modules.marketplace.observability import log, metrics
+from portalab.modules.marketplace.openings.service import Openings
 from portalab.modules.marketplace.privacy.participant import MarketplaceParticipant
 from portalab.modules.marketplace.products.service import Catalog
 from portalab.modules.marketplace.projects.service import Projects
@@ -153,6 +154,17 @@ class MarketplaceModule:
             database, events, audit, product_types, self.activation, self.resolution, clock=clock
         )
         self.grants = Grants(database, events, audit, self.activation, clock=clock)
+        # #81: boosters opened for real, and the reserve of items they fill
+        self.openings = Openings(
+            database,
+            events,
+            capabilities,
+            self.catalog,
+            self.availability,
+            self.activation,
+            self.resolution,
+            clock=clock,
+        )
         self.revocations = Revocations(
             database, events, audit, capabilities, self.activation, self.refunds, clock=clock
         )

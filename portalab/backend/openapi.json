@@ -31294,7 +31294,7 @@
     },
     "/api/v1/marketplace/boosters": {
       "get": {
-        "description": "#81: the boosters on sale \u2014 how many cards, the odds per rarity, the rarity guaranteed.",
+        "description": "#81: the boosters on sale now \u2014 how many cards, the odds per rarity, the rarity guaranteed, what a\nduplicate gives back, until when a season's is on sale and how many openings I have left.",
         "operationId": "boosters_api_v1_marketplace_boosters_get",
         "responses": {
           "200": {
@@ -31319,19 +31319,21 @@
         ]
       }
     },
-    "/api/v1/marketplace/boosters/{key}/reveal": {
-      "post": {
-        "description": "#81 (proof of concept): open a booster \u2014 its cards drawn now, each saying whether I own it already\n(a duplicate, refunded in Coins). Visual only: nothing is charged, granted or refunded yet.",
-        "operationId": "reveal_api_v1_marketplace_boosters__key__reveal_post",
+    "/api/v1/marketplace/boosters/openings": {
+      "get": {
+        "description": "#81: the boosters I opened, the latest first \u2014 what each cost, what came out, what came back.",
+        "operationId": "openings_api_v1_marketplace_boosters_openings_get",
         "parameters": [
           {
-            "in": "path",
-            "name": "key",
-            "required": true,
+            "in": "query",
+            "name": "limit",
+            "required": false,
             "schema": {
-              "pattern": "^[a-z0-9_]{1,64}$",
-              "title": "Key",
-              "type": "string"
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
             }
           }
         ],
@@ -31340,8 +31342,74 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Openings Api V1 Marketplace Boosters Openings Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Openings",
+        "tags": [
+          "marketplace-boosters"
+        ]
+      }
+    },
+    "/api/v1/marketplace/boosters/{key}/open": {
+      "post": {
+        "description": "#81: open a booster \u2014 its price charged, its cards drawn now: a look I did not own is mine, one I\nowned is a duplicate whose Coins come back at once, an item to keep goes to my reserve.",
+        "operationId": "open_booster_api_v1_marketplace_boosters__key__open_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,96}$",
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
                   "additionalProperties": true,
-                  "title": "Response Reveal Api V1 Marketplace Boosters  Key  Reveal Post",
+                  "title": "Response Open Booster Api V1 Marketplace Boosters  Key  Open Post",
                   "type": "object"
                 }
               }
@@ -31359,7 +31427,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Reveal",
+        "summary": "Open Booster",
         "tags": [
           "marketplace-boosters"
         ]
@@ -31576,6 +31644,96 @@
         "summary": "Acquire",
         "tags": [
           "marketplace"
+        ]
+      }
+    },
+    "/api/v1/marketplace/reserve": {
+      "get": {
+        "description": "#81: the items I keep to use when I want \u2014 requests, freezes, boosts, rescues, tickets.",
+        "operationId": "reserve_api_v1_marketplace_reserve_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Reserve Api V1 Marketplace Reserve Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Reserve",
+        "tags": [
+          "marketplace-boosters"
+        ]
+      }
+    },
+    "/api/v1/marketplace/reserve/{key}/use": {
+      "post": {
+        "description": "#81: use one item of my reserve \u2014 it is granted and takes effect as if bought (a ticket then waits\nfor its form in \u00ab My purchases \u00bb).",
+        "operationId": "use_api_v1_marketplace_reserve__key__use_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,96}$",
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Use Api V1 Marketplace Reserve  Key  Use Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Use",
+        "tags": [
+          "marketplace-boosters"
         ]
       }
     },

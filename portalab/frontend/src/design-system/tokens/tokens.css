@@ -238,6 +238,18 @@ body {
   --booster-legendary: #ffbe3b;
   --booster-ink: #070b18;
   --booster-light: #ffffff;
+  /* each booster's pack: its own two colours */
+  --booster-ember: #ff7a1a;
+  --booster-chrome: #9ff3ff;
+  --booster-magenta: #ff4fd8;
+  --booster-teal: #2fd4b5;
+  --booster-mint: #7cf0a8;
+  --booster-sky: #58c7ff;
+  --booster-blossom: #ff8fc8;
+  --booster-sun: #ffd447;
+  --booster-pumpkin: #ff8a1f;
+  --booster-holly: #e8384f;
+  --booster-pine: #2fbf71;
   --xp-gradient: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
   /* 027: calendar categories — readable on light and dark surfaces, always paired with an icon */
   --cal-movie: #e0598b;

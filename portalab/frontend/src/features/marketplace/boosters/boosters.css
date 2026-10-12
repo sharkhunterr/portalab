@@ -18,6 +18,53 @@
 }
 
 /* ---------------------------------------------------------------- the pack */
+/* the classic's colours (no weight: a theme's below win) */
+:where(.booster-pack, .booster-offer) {
+  --pack-a: var(--booster-epic);
+  --pack-b: var(--booster-rare);
+  --pack-glow: var(--booster-legendary);
+}
+/* each booster its own pack: the legendary one in gold and fire, Prestige HD in chrome, the reserve's in
+   teal, Discovery in sky blue, the seasons in theirs */
+[data-theme-pack="legend"] {
+  --pack-a: var(--booster-legendary);
+  --pack-b: var(--booster-ember);
+}
+[data-theme-pack="prestige"] {
+  --pack-glow: var(--booster-chrome);
+  --pack-a: var(--booster-chrome);
+  --pack-b: var(--booster-magenta);
+}
+[data-theme-pack="reserve"] {
+  --pack-glow: var(--booster-mint);
+  --pack-a: var(--booster-teal);
+  --pack-b: var(--booster-mint);
+}
+[data-theme-pack="discovery"] {
+  --pack-glow: var(--booster-sun);
+  --pack-a: var(--booster-sky);
+  --pack-b: var(--booster-mint);
+}
+[data-theme-pack="spring"] {
+  --pack-glow: var(--booster-blossom);
+  --pack-a: var(--booster-blossom);
+  --pack-b: var(--booster-mint);
+}
+[data-theme-pack="summer"] {
+  --pack-glow: var(--booster-sun);
+  --pack-a: var(--booster-sun);
+  --pack-b: var(--booster-sky);
+}
+[data-theme-pack="halloween"] {
+  --pack-glow: var(--booster-pumpkin);
+  --pack-a: var(--booster-pumpkin);
+  --pack-b: var(--booster-epic);
+}
+[data-theme-pack="winter"] {
+  --pack-glow: var(--booster-light);
+  --pack-a: var(--booster-holly);
+  --pack-b: var(--booster-pine);
+}
 .booster-pack {
   position: relative;
   display: grid;
@@ -27,24 +74,12 @@
   overflow: hidden;
   border-radius: 0.9rem 0.9rem 1.1rem 1.1rem;
   background:
-    radial-gradient(
-      circle at 30% 20%,
-      color-mix(in srgb, var(--booster-epic) 75%, transparent),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 75% 80%,
-      color-mix(in srgb, var(--booster-rare) 70%, transparent),
-      transparent 55%
-    ),
-    linear-gradient(
-      160deg,
-      var(--booster-ink),
-      color-mix(in srgb, var(--booster-epic) 45%, var(--booster-ink))
-    );
+    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--pack-a) 75%, transparent), transparent 55%),
+    radial-gradient(circle at 75% 80%, color-mix(in srgb, var(--pack-b) 70%, transparent), transparent 55%),
+    linear-gradient(160deg, var(--booster-ink), color-mix(in srgb, var(--pack-a) 45%, var(--booster-ink)));
   box-shadow:
     0 1.2rem 2.6rem color-mix(in srgb, var(--booster-ink) 70%, transparent),
-    0 0 2rem color-mix(in srgb, var(--booster-epic) 45%, transparent),
+    0 0 2rem color-mix(in srgb, var(--pack-a) 45%, transparent),
     inset 0 0 0 2px color-mix(in srgb, var(--booster-light) 18%, transparent);
   color: var(--booster-light);
   isolation: isolate;
@@ -111,12 +146,8 @@
   inline-size: 42%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--booster-legendary) 55%, transparent),
-    transparent 70%
-  );
-  filter: drop-shadow(0 0 0.6rem var(--booster-legendary));
+  background: radial-gradient(circle, color-mix(in srgb, var(--pack-glow) 55%, transparent), transparent 70%);
+  filter: drop-shadow(0 0 0.6rem var(--pack-glow));
   color: var(--booster-light);
 }
 .booster-pack__name {
@@ -156,14 +187,10 @@
   gap: var(--space-5, 1.5rem);
   align-items: center;
   padding: var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--booster-epic) 45%, var(--color-border));
+  border: 1px solid color-mix(in srgb, var(--pack-a) 45%, var(--color-border));
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(
-      circle at 10% 50%,
-      color-mix(in srgb, var(--booster-epic) 26%, transparent),
-      transparent 60%
-    ),
+    radial-gradient(circle at 10% 50%, color-mix(in srgb, var(--pack-a) 26%, transparent), transparent 60%),
     var(--color-surface-raised);
 }
 .booster-offer__pack {
@@ -221,6 +248,9 @@
   gap: var(--space-2);
   align-items: center;
 }
+.booster-odds[data-kind="reserve"] li {
+  grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem;
+}
 /* what a duplicate of that rarity gives back */
 .booster-odds__refund {
   display: inline-flex;
@@ -266,9 +296,94 @@
   font-size: var(--font-size-lg);
   font-weight: 700;
 }
-.booster-offer__note {
+.booster-offer__why {
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
+}
+.booster-offer__pack:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.6) brightness(0.85);
+}
+/* the shelf's head: my Coins, and my reserve */
+.booster-shelf__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+.booster-shelf__balance,
+.booster-shelf__reserve {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 600;
+}
+/* my latest openings: one line each, a dot per card in its rarity's colour */
+.booster-history {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.booster-history summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  cursor: pointer;
+}
+.booster-history ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.booster-history li {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) auto auto;
+  gap: var(--space-3);
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+.booster-history__when,
+.booster-history__price {
+  color: var(--color-text-muted);
+}
+.booster-history__cards {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+.booster-history__card {
+  --tone: var(--booster-common);
+  inline-size: 0.7rem;
+  block-size: 0.95rem;
+  border-radius: 0.15rem;
+  background: var(--tone);
+  box-shadow: 0 0 0.35rem color-mix(in srgb, var(--tone) 60%, transparent);
+}
+.booster-history__card[data-rarity="rare"] {
+  --tone: var(--booster-rare);
+}
+.booster-history__card[data-rarity="epic"] {
+  --tone: var(--booster-epic);
+}
+.booster-history__card[data-rarity="legendary"] {
+  --tone: var(--booster-legendary);
+}
+.booster-history__card[data-outcome="duplicate"] {
+  opacity: 0.45;
+}
+@media (max-width: 40rem) {
+  .booster-history li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .booster-history__when,
+  .booster-history__price {
+    grid-column: 1 / -1;
+  }
 }
 @media (max-width: 40rem) {
   .booster-offer {
@@ -1421,6 +1536,13 @@
   font-weight: 800;
   text-transform: uppercase;
 }
+/* an item to keep: off to the reserve */
+.booster-card__new[data-reserve] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: var(--booster-teal);
+}
 .booster-card__shine {
   position: absolute;
   inset: -60%;
@@ -1545,6 +1667,17 @@
   box-shadow: 0 0 3rem color-mix(in srgb, var(--tone) 25%, transparent);
   backdrop-filter: blur(6px);
   animation: booster-rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+.booster-summary__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--booster-teal) 22%, transparent);
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
 }
 .booster-stage[data-best="rare"] .booster-summary {
   --tone: var(--booster-rare);
