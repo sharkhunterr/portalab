@@ -64,6 +64,9 @@ const COUNTS: Partial<Record<Ambient, number>> = {
   fleet: 15,
   ghosts: 6,
   spincoins: 12,
+  groovywaves: 6,
+  beachballs: 7,
+  dandelion: 16,
 };
 
 const GLYPHS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ0123456789ﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎ:.=*+-<>";

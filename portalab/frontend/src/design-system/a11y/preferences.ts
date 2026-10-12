@@ -94,6 +94,10 @@ export const PALETTE_KEYS = [
   "arcadegreen",
   "mazeblue",
   "brickred",
+  // #89: funk, the beach, spring
+  "seventies",
+  "sandbar",
+  "lilac",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -170,6 +174,10 @@ export const NOTIFICATION_STYLES = [
   "invasion",
   "ghostly",
   "bricks",
+  // #89: funk, the beach, spring
+  "jukebox",
+  "beachtowel",
+  "seedpacket",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -236,6 +244,10 @@ export const NOTIFICATION_ANIMATIONS = [
   "march",
   "chomp",
   "jumpin",
+  // #89: funk, the beach, spring
+  "funkwalk",
+  "surfin",
+  "sprout",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -352,6 +364,10 @@ export const AMBIENTS = [
   "fleet",
   "ghosts",
   "spincoins",
+  // #89: funk, the beach, spring
+  "groovywaves",
+  "beachballs",
+  "dandelion",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -432,6 +448,10 @@ export const LEVEL_BADGES = [
   "saucer",
   "chomper",
   "qblock",
+  // #89: funk, the beach, spring
+  "eighttrack",
+  "flipflop",
+  "ladybug",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -494,6 +514,10 @@ export const LEVEL_UPS = [
   "wavecleared",
   "powerup",
   "flagpole",
+  // #89: funk, the beach, spring
+  "jukeboxdrop",
+  "sandcastle",
+  "fullbloom",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -554,6 +578,10 @@ export const CELEBRATION_KEYS = [
   "lasers",
   "pellets",
   "coinpop",
+  // #89: funk, the beach, spring
+  "flowerpower",
+  "seashells",
+  "songbirds",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

@@ -112,6 +112,9 @@ const LAYOUTS: Record<string, string> = {
   wavecleared: "card",
   powerup: "card",
   flagpole: "card",
+  jukeboxdrop: "card",
+  sandcastle: "card",
+  fullbloom: "card",
 };
 /** The big word some looks shout (an onomatopoeia, a code). */
 const WORDS: Record<string, string> = {
@@ -133,6 +136,7 @@ const WORDS: Record<string, string> = {
   wavecleared: "WAVE CLEARED",
   powerup: "READY!",
   flagpole: "COURSE CLEAR!",
+  jukeboxdrop: "FUNKY!",
 };
 /** How many particles each look scatters. */
 const PARTICLES: Record<string, number> = {
@@ -171,6 +175,9 @@ const PARTICLES: Record<string, number> = {
   wavecleared: 24,
   powerup: 4,
   flagpole: 16,
+  jukeboxdrop: 16,
+  sandcastle: 6,
+  fullbloom: 30,
 };
 
 function sample(level: number): Summary {

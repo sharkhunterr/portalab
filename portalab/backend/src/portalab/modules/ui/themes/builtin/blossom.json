@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 2,
+  "key": "blossom",
+  "name": "Printemps",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f3f8ee",
+    "surfaceRaised": "#ffffff",
+    "text": "#1f3320",
+    "textMuted": "#4a5e48",
+    "border": "#cfe0c3",
+    "accent": "#2f7a3a",
+    "accentContrast": "#ffffff",
+    "focus": "#2f7a3a",
+    "accentAlt": "#b0306a",
+    "rarity": {
+      "common": "#4a5e48",
+      "rare": "#1f6aa0",
+      "epic": "#8a3fb8",
+      "legendary": "#8a5a00"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b4252",
+      "bg": "#eceff4",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#15603a",
+      "bg": "#e3f4ea",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#fdf1dc",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6b4a00",
+      "bg": "#faf1d7",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#a1121d",
+      "bg": "#fde7e8",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#57303a",
+      "bg": "#f3e6ea",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b2b8f",
+      "bg": "#ede6fb",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a1f52",
+      "bg": "#f9e4ef",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#3f4652",
+      "bg": "#eef0f3",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#0f4c75",
+      "bg": "#e1eff8",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, \"Fredoka\", sans-serif",
+    "headingFamily": "Caveat, \"Comic Neue\", cursive",
+    "headingCase": "none",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.7,
+    "md": 1.2
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "songbirds",
+    "fastMs": 150,
+    "normalMs": 320,
+    "levelUp": "fullbloom"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "sidebar",
+      "tablet": "rail",
+      "phone": "bottom-bar"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "elevated",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "flower",
+      "film": "film",
+      "media": "film",
+      "compass": "compass",
+      "users": "users",
+      "shop": "store",
+      "trophy": "trophy",
+      "search": "search",
+      "newspaper": "newspaper",
+      "book": "book",
+      "calendar": "calendar",
+      "chart": "sprout"
+    }
+  },
+  "background": {
+    "fallback": "#f3f8ee",
+    "pattern": "none",
+    "ambient": "dandelion"
+  },
+  "sounds": {
+    "notification": "asset:soft/notification.wav",
+    "alert": "asset:soft/alert.wav",
+    "success": "asset:soft/success.wav",
+    "reward": "asset:soft/reward.wav",
+    "levelUp": "asset:soft/level-up.wav",
+    "ui": "asset:soft/ui.wav"
+  },
+  "notification": {
+    "style": "seedpacket",
+    "animation": "sprout"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le jardin",
+      "nav:nav.section.home": "Le jardin",
+      "dashboard:title": "Le jardin",
+      "nav:nav.media": "La serre aux films",
+      "nav:nav.section.media": "La serre aux films",
+      "media:home.title": "La serre aux films",
+      "nav:nav.media_requests": "Mes semis demandés",
+      "nav:nav.media_insights": "Mes récoltes",
+      "media:insights.title": "Mes récoltes",
+      "nav:nav.section.content": "L'herbier",
+      "nav:nav.news": "Les bourgeons",
+      "news:title": "Les bourgeons",
+      "nav:nav.wiki": "Le carnet du jardinier",
+      "wiki:title": "Le carnet du jardinier",
+      "nav:nav.search": "Chercher",
+      "search:title": "Chercher",
+      "nav:nav.calendar": "Le calendrier des semis",
+      "calendar:title": "Le calendrier des semis",
+      "nav:nav.services": "Les outils",
+      "nav:nav.section.services": "Les outils",
+      "nav:nav.statistics": "La pousse",
+      "statistics:title": "La pousse",
+      "nav:nav.community": "Les voisins de jardin",
+      "nav:nav.section.community": "Les voisins de jardin",
+      "community:title": "Les voisins de jardin",
+      "nav:nav.progression": "Ma floraison",
+      "gamification:progression.title": "Ma floraison",
+      "nav:nav.campaigns": "Concours de jardins",
+      "campaigns:page.title": "Concours de jardins",
+      "nav:nav.marketplace": "La jardinerie",
+      "nav:nav.section.marketplace": "La jardinerie",
+      "marketplace:catalog.title": "La jardinerie",
+      "nav:nav.projects": "Jardins partagés",
+      "marketplace:projects.title": "Jardins partagés",
+      "marketplace:owned.title": "Ma remise",
+      "nav:nav.support": "La cabane",
+      "nav:nav.section.support": "La cabane",
+      "nav:nav.incidents": "Les mauvaises herbes",
+      "support:incident.title": "Les mauvaises herbes",
+      "nav:nav.feedback": "Un mot au jardinier",
+      "support:feedback.title": "Un mot au jardinier",
+      "gamification:value.coins": "Graines",
+      "gamification:value.xp": "Pétales"
+    },
+    "en": {
+      "nav:nav.home": "The garden",
+      "nav:nav.section.home": "The garden",
+      "dashboard:title": "The garden",
+      "nav:nav.media": "The film greenhouse",
+      "nav:nav.section.media": "The film greenhouse",
+      "media:home.title": "The film greenhouse",
+      "nav:nav.media_requests": "My requested seedlings",
+      "nav:nav.media_insights": "My harvests",
+      "media:insights.title": "My harvests",
+      "nav:nav.section.content": "The herbarium",
+      "nav:nav.news": "The buds",
+      "news:title": "The buds",
+      "nav:nav.wiki": "The gardener's notebook",
+      "wiki:title": "The gardener's notebook",
+      "nav:nav.search": "Search",
+      "search:title": "Search",
+      "nav:nav.calendar": "The sowing calendar",
+      "calendar:title": "The sowing calendar",
+      "nav:nav.services": "The tools",
+      "nav:nav.section.services": "The tools",
+      "nav:nav.statistics": "The growth",
+      "statistics:title": "The growth",
+      "nav:nav.community": "Garden neighbours",
+      "nav:nav.section.community": "Garden neighbours",
+      "community:title": "Garden neighbours",
+      "nav:nav.progression": "My blossoming",
+      "gamification:progression.title": "My blossoming",
+      "nav:nav.campaigns": "Garden contests",
+      "campaigns:page.title": "Garden contests",
+      "nav:nav.marketplace": "The garden centre",
+      "nav:nav.section.marketplace": "The garden centre",
+      "marketplace:catalog.title": "The garden centre",
+      "nav:nav.projects": "Shared gardens",
+      "marketplace:projects.title": "Shared gardens",
+      "marketplace:owned.title": "My shed",
+      "nav:nav.support": "The hut",
+      "nav:nav.section.support": "The hut",
+      "nav:nav.incidents": "The weeds",
+      "support:incident.title": "The weeds",
+      "nav:nav.feedback": "A word to the gardener",
+      "support:feedback.title": "A word to the gardener",
+      "gamification:value.coins": "Seeds",
+      "gamification:value.xp": "Petals"
+    }
+  }
+}

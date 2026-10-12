@@ -793,7 +793,10 @@
             "lineclear",
             "lasers",
             "pellets",
-            "coinpop"
+            "coinpop",
+            "flowerpower",
+            "seashells",
+            "songbirds"
           ]
         },
         "levelUp": {
@@ -851,7 +854,10 @@
             "fourlines",
             "wavecleared",
             "powerup",
-            "flagpole"
+            "flagpole",
+            "jukeboxdrop",
+            "sandcastle",
+            "fullbloom"
           ]
         }
       },
@@ -1174,7 +1180,10 @@
             "fallingblocks",
             "fleet",
             "ghosts",
-            "spincoins"
+            "spincoins",
+            "groovywaves",
+            "beachballs",
+            "dandelion"
           ]
         }
       },
@@ -1304,7 +1313,10 @@
             "blockrow",
             "invasion",
             "ghostly",
-            "bricks"
+            "bricks",
+            "jukebox",
+            "beachtowel",
+            "seedpacket"
           ]
         },
         "animation": {
@@ -1365,7 +1377,10 @@
             "harddrop",
             "march",
             "chomp",
-            "jumpin"
+            "jumpin",
+            "funkwalk",
+            "surfin",
+            "sprout"
           ]
         }
       },

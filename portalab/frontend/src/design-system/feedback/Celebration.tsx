@@ -119,6 +119,10 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   lasers: { count: 14, layer: "badge" },
   pellets: { count: 16, layer: "badge" },
   coinpop: { count: 10, layer: "badge" },
+  // #89: flower power, seashells, songbirds
+  flowerpower: { count: 14, layer: "badge" },
+  seashells: { count: 14, layer: "badge" },
+  songbirds: { count: 10, layer: "screen" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

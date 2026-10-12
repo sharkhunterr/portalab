@@ -238,6 +238,9 @@ NOTIFICATION_STYLES = Literal[
     "invasion",
     "ghostly",
     "bricks",
+    "jukebox",
+    "beachtowel",
+    "seedpacket",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -297,6 +300,9 @@ NOTIFICATION_ANIMATIONS = Literal[
     "march",
     "chomp",
     "jumpin",
+    "funkwalk",
+    "surfin",
+    "sprout",
 ]
 AMBIENTS = Literal[
     "none",
@@ -406,6 +412,9 @@ AMBIENTS = Literal[
     "fleet",
     "ghosts",
     "spincoins",
+    "groovywaves",
+    "beachballs",
+    "dandelion",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -460,6 +469,9 @@ CELEBRATIONS = Literal[
     "lasers",
     "pellets",
     "coinpop",
+    "flowerpower",
+    "seashells",
+    "songbirds",
 ]
 PATTERNS = Literal[
     "none",
@@ -513,6 +525,7 @@ LEVEL_UPS = Literal[
     "setupwizard", "unboxing", "viral",
     "encore", "finale", "extraedition",
     "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
+    "jukeboxdrop", "sandcastle", "fullbloom",
 ]  # fmt: skip
 
 

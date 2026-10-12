@@ -77,6 +77,8 @@ PROFILE_BANNERS: tuple[str, ...] = (
     # #89: the retro games
     "lcdscreen", "linestack", "bunkers", "live-lcdstars", "live-fallingblocks", "live-fleet",
     "mazewalls", "brickworld", "live-ghosts", "live-spincoins",
+    # #89: funk, the beach, spring
+    "sunset70s", "lifeguard", "tulipfield", "live-groovywaves", "live-beachballs", "live-dandelion",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -100,6 +102,8 @@ AVATAR_FRAMES: tuple[str, ...] = (
     "vinyl", "profiletile", "postage",
     # #89: the retro games
     "cartridge", "blockframe", "crab", "corridor", "warppipe",
+    # #89: funk, the beach, spring
+    "retroarc", "parasol", "flowerwreath",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -118,6 +122,8 @@ PALETTES: tuple[str, ...] = (
     "groove", "redcarpet", "newsprint",
     # #89: the retro games
     "dotmatrix", "blockcolors", "arcadegreen", "mazeblue", "brickred",
+    # #89: funk, the beach, spring
+    "seventies", "sandbar", "lilac",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -150,6 +156,8 @@ AMBIENTS: tuple[str, ...] = (
     "equalizer", "cinemaglow", "pages",
     # #89: the retro games
     "lcdstars", "fallingblocks", "fleet", "ghosts", "spincoins",
+    # #89: funk, the beach, spring
+    "groovywaves", "beachballs", "dandelion",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
@@ -169,6 +177,8 @@ CELEBRATIONS: tuple[str, ...] = (
     "musicnotes", "ribbons", "inkstamp",
     # #89: the retro games
     "pixelhearts", "lineclear", "lasers", "pellets", "coinpop",
+    # #89: funk, the beach, spring
+    "flowerpower", "seashells", "songbirds",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -192,6 +202,8 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     "nowplaying", "nextepisode", "telegram",
     # #89: the retro games
     "rpgbox", "blockrow", "invasion", "ghostly", "bricks",
+    # #89: funk, the beach, spring
+    "jukebox", "beachtowel", "seedpacket",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -213,6 +225,8 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "beatdrop", "curtainwipe", "spinpaper",
     # #89: the retro games
     "pixelreveal", "harddrop", "march", "chomp", "jumpin",
+    # #89: funk, the beach, spring
+    "funkwalk", "surfin", "sprout",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -236,6 +250,8 @@ NAME_STYLES: tuple[str, ...] = (
     "recap", "marathon", "typewriter",
     # #89: the retro games
     "lcdtext", "bevelblocks", "hiscore", "neonmaze", "gametitle",
+    # #89: funk, the beach, spring
+    "funkadelic", "surfwave", "watercolour",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
@@ -272,6 +288,8 @@ LEVEL_BADGES: tuple[str, ...] = (
     "eqbars", "toprank", "presscard",
     # #89: the retro games
     "batteryled", "tpiece", "saucer", "chomper", "qblock",
+    # #89: funk, the beach, spring
+    "eighttrack", "flipflop", "ladybug",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -293,6 +311,8 @@ LEVEL_UPS: tuple[str, ...] = (
     "encore", "finale", "extraedition",
     # #89: the retro games
     "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
+    # #89: funk, the beach, spring
+    "jukeboxdrop", "sandcastle", "fullbloom",
 )  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
@@ -308,6 +328,8 @@ UNIVERSE_THEMES: tuple[str, ...] = (
     "groove", "binge", "gazette",
     # #89: the retro games
     "pocket", "blockfall", "invaders", "mazechase", "platformer",
+    # #89: funk, the beach, spring
+    "funky", "beach", "blossom",
 )  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),

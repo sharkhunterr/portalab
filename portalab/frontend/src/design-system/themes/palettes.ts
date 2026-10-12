@@ -216,6 +216,19 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#ff8a5c", accentAlt: "#6fdc6f", contrast: "#2a0a00" },
     light: { accent: "#c4320a", accentAlt: "#1e7a1e", contrast: "#ffffff" },
   },
+  // #89: funk, the beach, spring
+  seventies: {
+    dark: { accent: "#ff8c1a", accentAlt: "#ffd23f", contrast: "#2a1000" },
+    light: { accent: "#a84300", accentAlt: "#7a5200", contrast: "#ffffff" },
+  },
+  sandbar: {
+    dark: { accent: "#3fd0e0", accentAlt: "#ffb36b", contrast: "#022a30" },
+    light: { accent: "#0b6f86", accentAlt: "#c2410c", contrast: "#ffffff" },
+  },
+  lilac: {
+    dark: { accent: "#c8a2ff", accentAlt: "#8fdc8f", contrast: "#1e0a3a" },
+    light: { accent: "#6b3fb0", accentAlt: "#2f7a3a", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

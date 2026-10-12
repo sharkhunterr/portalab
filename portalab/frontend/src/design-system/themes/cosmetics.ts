@@ -114,6 +114,13 @@ export const BANNER_KEYS = [
   "brickworld",
   "live-ghosts",
   "live-spincoins",
+  // #89: funk, the beach, spring
+  "sunset70s",
+  "lifeguard",
+  "tulipfield",
+  "live-groovywaves",
+  "live-beachballs",
+  "live-dandelion",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -193,6 +200,10 @@ export const FRAME_KEYS = [
   "crab",
   "corridor",
   "warppipe",
+  // #89: funk, the beach, spring
+  "retroarc",
+  "parasol",
+  "flowerwreath",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -265,4 +276,8 @@ export const NAME_KEYS = [
   "hiscore",
   "neonmaze",
   "gametitle",
+  // #89: funk, the beach, spring
+  "funkadelic",
+  "surfwave",
+  "watercolour",
 ] as const;

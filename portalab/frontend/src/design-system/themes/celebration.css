@@ -1569,3 +1569,74 @@
     inset 3px 3px 0 #ffe08a,
     inset -3px -3px 0 #c47a00;
 }
+
+/* ---------------------------------------------------------------- #89: funk, the beach, spring */
+/* flower power (funky): seventies daisies spinning out */
+[data-effect="flowerpower"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.6rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #ff8c1a 0 22%, transparent 24%),
+    repeating-conic-gradient(#fff1dc 0 22deg, transparent 22deg 36deg);
+  mask: radial-gradient(circle, #000 0 70%, transparent 72%);
+  animation-name: fx-burst;
+}
+[data-effect="flowerpower"] .celebration-fx:nth-child(3n) {
+  background:
+    radial-gradient(circle, #c2410c 0 22%, transparent 24%),
+    repeating-conic-gradient(#ffd23f 0 22deg, transparent 22deg 36deg);
+}
+[data-effect="flowerpower"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ff8c1a, #ffd23f);
+  color: #2a1000;
+  font-family: Shrikhand, Righteous, cursive;
+  box-shadow: 3px 3px 0 #6b3a1c;
+}
+/* seashells (beach): shells and starfish scattering */
+[data-effect="seashells"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.3rem;
+  aspect-ratio: 1;
+  background: repeating-conic-gradient(from -60deg at 50% 100%, #ffd6c4 0 10deg, #ffb59a 10deg 20deg);
+  clip-path: polygon(50% 100%, 0 35%, 15% 12%, 35% 2%, 50% 0, 65% 2%, 85% 12%, 100% 35%);
+  animation-name: fx-burst;
+}
+[data-effect="seashells"] .celebration-fx:nth-child(2n) {
+  background: #ff9a3c;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+[data-effect="seashells"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #0b9fb8, #3fd0e0);
+  color: #ffffff;
+  font-family: Pacifico, Fredoka, cursive;
+  box-shadow: 0 0 18px #3fd0e0;
+}
+/* songbirds (spring): little birds flying up across the screen, flapping */
+[data-effect="songbirds"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -6);
+  inline-size: 1.8rem;
+  block-size: 0.9rem;
+  background: #3a5a8a;
+  clip-path: polygon(0 20%, 25% 60%, 50% 40%, 75% 60%, 100% 20%, 78% 80%, 50% 62%, 22% 80%);
+  animation:
+    fx-rise 3s ease-out var(--d) both,
+    fx-flap 0.3s ease-in-out infinite alternate;
+}
+[data-effect="songbirds"] .celebration-fx:nth-child(3n) {
+  background: #b0306a;
+}
+@keyframes fx-flap {
+  to {
+    scale: 1 0.4;
+  }
+}
+[data-effect="songbirds"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #7cc46a, #2f7a3a);
+  color: #ffffff;
+  font-family: Caveat, "Comic Neue", cursive;
+  box-shadow: 0 0 16px #7cc46a;
+}

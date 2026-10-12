@@ -4015,3 +4015,342 @@ h3,
 :root[data-theme="mazechase"] .shell-lights__item {
   text-transform: none;
 }
+
+/* ---------------------------------------------------------------- #89: funk, the beach, spring */
+/* funky: the dock as a jukebox — a chrome arch, glowing tubes, each section a selection button A1, A2… */
+:root[data-theme="funky"] .shell-dock__bar {
+  counter-reset: jukebox;
+  padding: 0.7rem 1.2rem 0.5rem;
+  border: 3px solid #e8e0d0;
+  border-radius: 3rem 3rem 0.9rem 0.9rem;
+  background:
+    linear-gradient(90deg, #ff8c1a, #ffd23f, #ff5ca8, #ffd23f, #ff8c1a) top / 100% 0.35rem no-repeat,
+    repeating-linear-gradient(90deg, #5a2f14 0 6px, #6b3a1c 6px 9px),
+    #5a2f14;
+  box-shadow:
+    0 0 0 2px #8a8278,
+    0 0 1.6rem #ff8c1a66,
+    inset 0 0.4rem 0.8rem #ffd23f44;
+}
+:root[data-theme="funky"] .shell-dock__bar > li {
+  counter-increment: jukebox;
+}
+:root[data-theme="funky"] .shell-dock__item-icon {
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, #fff1dc, #e6c9a3);
+  color: #5a2f14;
+}
+:root[data-theme="funky"] .shell-dock__item-label {
+  color: #fff1dc;
+}
+:root[data-theme="funky"] .shell-dock__item-label::before {
+  content: "A" counter(jukebox) " · ";
+  color: #ffd23f;
+  font-weight: 800;
+}
+:root[data-theme="funky"] .shell-dock__item[data-active] .shell-dock__item-icon,
+:root[data-theme="funky"] .shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: linear-gradient(180deg, #ffd23f, #ff8c1a);
+  color: #2a1000;
+  box-shadow: 0 0 0.8rem #ffd23f;
+}
+:root[data-theme="funky"] .shell-dock__item[data-active]::after {
+  background: #ffd23f;
+}
+/* the beach: the string of lights becomes a rope of striped pennants */
+:root[data-theme="beach"] .shell-lights {
+  border-block-end: 0;
+  background: linear-gradient(180deg, #bfe7f2, #fbf1dc);
+}
+:root[data-theme="beach"] .shell-lights__wall {
+  padding-block: 2rem 0.6rem;
+}
+:root[data-theme="beach"] .shell-lights__wall::before {
+  inset-block-start: 0.5rem;
+  block-size: 3px;
+  background: repeating-linear-gradient(90deg, #a07a4a 0 6px, #c9a46a 6px 10px);
+}
+:root[data-theme="beach"] .shell-lights__wall > li {
+  --bulb: hsl(calc(190 + var(--i) * 70) 75% 48%);
+}
+:root[data-theme="beach"] .shell-lights__bulb {
+  inset-block-start: -1.5rem;
+  inline-size: 1.5rem;
+  block-size: 1.3rem;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--bulb) 0 0.25rem, #ffffff 0.25rem 0.5rem);
+  box-shadow: none;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  animation: beach-flutter calc(1.6s + var(--i) * 0.2s) ease-in-out infinite alternate;
+}
+:root[data-theme="beach"] .shell-lights__wall > li:has([data-active]) .shell-lights__bulb {
+  block-size: 1.8rem;
+  background: repeating-linear-gradient(90deg, #c2410c 0 0.25rem, #ffffff 0.25rem 0.5rem);
+  box-shadow: none;
+  animation: beach-flutter 0.8s ease-in-out infinite alternate;
+}
+@keyframes beach-flutter {
+  from {
+    rotate: -6deg;
+  }
+  to {
+    rotate: 6deg;
+  }
+}
+:root[data-theme="beach"] .shell-lights__item {
+  color: #3f5a6b;
+  font-family: Pacifico, Fredoka, cursive;
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: none;
+}
+:root[data-theme="beach"] .shell-lights__item[data-active] {
+  color: #c2410c;
+  text-shadow: none;
+}
+:root[data-theme="beach"] .shell-lights__panel {
+  background: #fffaf0;
+}
+/* spring: the sidebar as a vine — a stem down the side, a leaf by each section, a flower on the current one */
+:root[data-theme="blossom"] .shell-side {
+  border-inline-end: 0;
+  background:
+    linear-gradient(#5a9a4a, #5a9a4a) 1.05rem 0 / 3px 100% no-repeat,
+    radial-gradient(ellipse 0.55rem 0.28rem at 1.55rem 1.4rem, #7cc46a 96%, transparent) 0 0 / 100% 3rem,
+    radial-gradient(ellipse 0.55rem 0.28rem at 0.6rem 2.9rem, #6ab35a 96%, transparent) 0 0 / 100% 3rem,
+    linear-gradient(180deg, #eef7e8, #f3f8ee);
+}
+:root[data-theme="blossom"] .shell-section__head[data-active] {
+  background: #ffffffcc;
+  color: #1f3320;
+}
+:root[data-theme="blossom"] .shell-section__head[data-active] .ds-icon {
+  color: #b0306a;
+}
+:root[data-theme="blossom"] .shell-bottom-bar {
+  border-block-start: 3px solid #7cc46a;
+  background: #f3f8eef2;
+}
+
+/* jukebox (funky): a notification under a jukebox's chrome arch, its tubes glowing */
+.ds-notifications[data-style="jukebox"] .ds-notification {
+  --color-text: #fff1dc;
+  --color-text-muted: #e6c9a3;
+  padding-block-start: 1.4rem;
+  border: 3px solid #e8e0d0;
+  border-radius: 2.6rem 2.6rem 0.7rem 0.7rem;
+  background:
+    linear-gradient(90deg, #ff8c1a, #ffd23f, #ff5ca8, #ffd23f, #ff8c1a) 50% 0.45rem / 70% 0.3rem no-repeat,
+    linear-gradient(180deg, #6b3a1c, #3d2214);
+  color: #fff1dc;
+  box-shadow:
+    0 0 0 2px #8a8278,
+    0 0 1.4rem #ff8c1a77;
+}
+.ds-notifications[data-style="jukebox"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="jukebox"] .ds-notification__icon {
+  background: radial-gradient(circle, #2a160c 0 22%, #ffd23f 24% 40%, #2a160c 42%);
+  color: transparent;
+}
+.ds-notifications[data-style="jukebox"] .ds-notification__title {
+  font-family: Shrikhand, Righteous, cursive;
+  font-weight: 400;
+  color: #ffd23f;
+}
+.ds-notifications[data-style="jukebox"] .ds-notification__link {
+  color: #ffd23f;
+}
+.ds-notifications[data-style="jukebox"] .ds-notification__timer {
+  background: #ff8c1a;
+}
+/* beach towel (beach): laid out on a striped towel, its fringes at both ends */
+.ds-notifications[data-style="beachtowel"] .ds-notification {
+  --color-text: #173042;
+  --color-text-muted: #3f5a6b;
+  overflow: visible;
+  margin-inline: 0.7rem;
+  padding-inline: 2.2rem 1rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      #0b9fb8 0 0.45rem,
+      #ffffff 0.45rem 0.7rem,
+      #ff7a45 0.7rem 1.15rem,
+      #ffffff 1.15rem 1.4rem
+    )
+    0 0 / 1.4rem 100% no-repeat,
+    repeating-linear-gradient(
+      180deg,
+      #0b9fb8 0 0.45rem,
+      #ffffff 0.45rem 0.7rem,
+      #ff7a45 0.7rem 1.15rem,
+      #ffffff 1.15rem 1.4rem
+    )
+    100% 0 / 0.5rem 100% no-repeat,
+    #fffaf0;
+  color: #173042;
+  box-shadow: 0 0.5rem 1.2rem #17304233;
+}
+.ds-notifications[data-style="beachtowel"] .ds-notification::before,
+.ds-notifications[data-style="beachtowel"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block: 0.2rem;
+  inline-size: 0.6rem;
+  background: repeating-linear-gradient(180deg, #e8dcc0 0 2px, transparent 2px 5px);
+}
+.ds-notifications[data-style="beachtowel"] .ds-notification::before {
+  inset-inline: -0.6rem auto;
+}
+.ds-notifications[data-style="beachtowel"] .ds-notification::after {
+  inset-inline: auto -0.6rem;
+}
+.ds-notifications[data-style="beachtowel"] .ds-notification__icon {
+  background: #ffd23f;
+  color: #7a4a00;
+}
+.ds-notifications[data-style="beachtowel"] .ds-notification__title {
+  font-family: Pacifico, Fredoka, cursive;
+  font-weight: 400;
+}
+.ds-notifications[data-style="beachtowel"] .ds-notification__timer {
+  background: #0b9fb8;
+}
+/* seed packet (spring): a paper packet, its torn top edge and a strip of flowers */
+.ds-notifications[data-style="seedpacket"] .ds-notification {
+  --color-text: #1f3320;
+  --color-text-muted: #4a5e48;
+  padding-block-start: 2.2rem;
+  border: 0;
+  border-radius: 0 0 0.4rem 0.4rem;
+  background:
+    radial-gradient(circle 0.32rem at 12% 1.05rem, #f472b6 96%, transparent),
+    radial-gradient(circle 0.32rem at 32% 0.95rem, #fde047 96%, transparent),
+    radial-gradient(circle 0.32rem at 52% 1.1rem, #c084fc 96%, transparent),
+    radial-gradient(circle 0.32rem at 72% 0.95rem, #fb7185 96%, transparent),
+    radial-gradient(circle 0.32rem at 90% 1.05rem, #fde047 96%, transparent),
+    linear-gradient(#7cc46a, #7cc46a) 0 1.3rem / 100% 0.35rem no-repeat,
+    linear-gradient(#cfe8c4, #cfe8c4) 0 0 / 100% 1.65rem no-repeat,
+    #fffdf6;
+  color: #1f3320;
+  clip-path: polygon(
+    0 0.4rem,
+    4% 0,
+    8% 0.4rem,
+    12% 0,
+    16% 0.4rem,
+    20% 0,
+    24% 0.4rem,
+    28% 0,
+    32% 0.4rem,
+    36% 0,
+    40% 0.4rem,
+    44% 0,
+    48% 0.4rem,
+    52% 0,
+    56% 0.4rem,
+    60% 0,
+    64% 0.4rem,
+    68% 0,
+    72% 0.4rem,
+    76% 0,
+    80% 0.4rem,
+    84% 0,
+    88% 0.4rem,
+    92% 0,
+    96% 0.4rem,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  box-shadow: none;
+}
+.ds-notifications[data-style="seedpacket"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="seedpacket"] .ds-notification__icon {
+  background: #7cc46a;
+  color: #ffffff;
+}
+.ds-notifications[data-style="seedpacket"] .ds-notification__title {
+  font-family: Caveat, "Comic Neue", cursive;
+  font-size: 1.25rem;
+}
+.ds-notifications[data-style="seedpacket"] .ds-notification__timer {
+  background: #b0306a;
+}
+
+/* animations */
+.ds-notifications[data-animation="funkwalk"] .ds-notification {
+  transform-origin: 50% 100%;
+  animation-name: universe-notify-funkwalk;
+  animation-duration: 1.1s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes universe-notify-funkwalk {
+  0% {
+    opacity: 0;
+    transform: translateX(110%) rotate(8deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(70%) rotate(-7deg);
+  }
+  40% {
+    transform: translateX(40%) rotate(7deg);
+  }
+  60% {
+    transform: translateX(15%) rotate(-5deg);
+  }
+  80% {
+    transform: translateX(0) rotate(3deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="surfin"] .ds-notification {
+  animation-name: universe-notify-surf;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+}
+@keyframes universe-notify-surf {
+  0% {
+    opacity: 0;
+    transform: translate(-120%, 40%) rotate(-10deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-20%, -18%) rotate(6deg);
+  }
+  75% {
+    transform: translate(4%, 4%) rotate(-2deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="sprout"] .ds-notification {
+  transform-origin: 50% 100%;
+  animation-name: universe-notify-sprout;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+@keyframes universe-notify-sprout {
+  0% {
+    opacity: 0;
+    transform: scale(0.1, 0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(0.35, 1.05);
+  }
+  100% {
+    transform: none;
+  }
+}

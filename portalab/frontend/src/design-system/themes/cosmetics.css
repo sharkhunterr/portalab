@@ -3855,3 +3855,206 @@
     filter: brightness(1.15);
   }
 }
+
+/* ---------------------------------------------------------------- #89: funk, the beach, spring */
+/* banners */
+.profile-banner[data-banner="sunset70s"] {
+  background:
+    radial-gradient(ellipse 60% 40% at 25% 105%, #6b3a1c 96%, transparent),
+    radial-gradient(ellipse 50% 34% at 85% 105%, #5a2f14 96%, transparent),
+    repeating-linear-gradient(180deg, transparent 0 0.9rem, #2a160c 0.9rem 1.2rem) 50% 100% / 100% 55%
+    no-repeat,
+    radial-gradient(circle 4.5rem at 50% 78%, #ffd23f 0 35%, #ff8c1a 36% 70%, #c2410c 71% 99%, transparent),
+    linear-gradient(180deg, #2a160c, #6b3a1c);
+}
+.profile-banner[data-banner="lifeguard"] {
+  background:
+    linear-gradient(#ef4444, #ef4444) 70% 20% / 1.4rem 0.8rem no-repeat,
+    linear-gradient(#4a3a2a, #4a3a2a) 68% 18% / 2px 2.2rem no-repeat,
+    linear-gradient(#ffffff, #ffffff) 62% 40% / 4rem 1.8rem no-repeat,
+    linear-gradient(#ef4444, #ef4444) 62% 46% / 4.4rem 2.2rem no-repeat,
+    linear-gradient(#8a6a4a, #8a6a4a) 60% 100% / 3px 45% no-repeat,
+    linear-gradient(#8a6a4a, #8a6a4a) 66% 100% / 3px 45% no-repeat,
+    linear-gradient(#f3dcae, #e8c98a) 0 100% / 100% 32% no-repeat,
+    linear-gradient(180deg, #0b9fb8, #3fd0e0) 0 68% / 100% 18% no-repeat,
+    linear-gradient(180deg, #7fc8f2, #c9ecfa);
+}
+.profile-banner[data-banner="tulipfield"] {
+  background:
+    radial-gradient(ellipse 0.6rem 0.8rem at 50% 30%, #ef4444 96%, transparent) 0 58% / 1.6rem 1.8rem repeat-x,
+    radial-gradient(ellipse 0.6rem 0.8rem at 50% 30%, #fde047 96%, transparent) 0.8rem 72% / 1.6rem 1.8rem
+    repeat-x,
+    radial-gradient(ellipse 0.6rem 0.8rem at 50% 30%, #f472b6 96%, transparent) 0 88% / 1.6rem 1.8rem repeat-x,
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 0.75rem,
+      #4a8a3a 0.75rem 0.85rem,
+      transparent 0.85rem 1.6rem
+    )
+    0 100% / 100% 50% no-repeat,
+    linear-gradient(#7cc46a, #4a8a3a) 0 100% / 100% 48% no-repeat,
+    linear-gradient(180deg, #a8d8f0, #e8f6fb);
+}
+/* frames — a seventies rainbow, a parasol, a flower wreath */
+.avatar-frame[data-frame="retroarc"] {
+  padding: 18px 6px 4px;
+  border-radius: 0;
+  background: radial-gradient(
+    circle at 50% 100%,
+    transparent 0 50%,
+    #ff8c1a 50% 63%,
+    #ffd23f 63% 76%,
+    #8b4513 76% 89%,
+    transparent 89%
+  );
+}
+.avatar-frame[data-frame="parasol"] {
+  padding: 22px 6px 4px;
+  border-radius: 0;
+}
+.avatar-frame[data-frame="parasol"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: -14%;
+  z-index: 2;
+  block-size: 30px;
+  border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  background: repeating-conic-gradient(from 270deg at 50% 100%, #ef4444 0 15deg, #ffffff 15deg 30deg);
+  clip-path: polygon(
+    0 100%,
+    0 70%,
+    10% 40%,
+    25% 15%,
+    50% 0,
+    75% 15%,
+    90% 40%,
+    100% 70%,
+    100% 100%,
+    87.5% 88%,
+    75% 100%,
+    62.5% 88%,
+    50% 100%,
+    37.5% 88%,
+    25% 100%,
+    12.5% 88%
+  );
+  filter: drop-shadow(0 3px 2px #00000033);
+}
+.avatar-frame[data-frame="flowerwreath"] {
+  padding: 8px;
+  background: repeating-conic-gradient(
+    #f472b6 0 9deg,
+    #6fbf5a 9deg 15deg,
+    #fde047 15deg 24deg,
+    #6fbf5a 24deg 30deg
+  );
+  mask:
+    radial-gradient(circle, #000 0 64%, transparent 65%),
+    repeating-conic-gradient(#000 0 9deg, transparent 9deg 15deg);
+}
+.avatar-frame[data-frame="flowerwreath"] > :not(.avatar-frame__fx) {
+  box-shadow: 0 0 0 2px #ffffff;
+}
+/* name styles */
+.name-style[data-name="funkadelic"] {
+  font-family: Shrikhand, Righteous, cursive;
+  color: #ffd23f;
+  text-shadow:
+    2px 2px 0 #ff8c1a,
+    4px 4px 0 #c2410c,
+    6px 6px 0 #6b3a1c;
+}
+.name-style[data-name="surfwave"] {
+  position: relative;
+  padding-block-end: 0.3em;
+  font-family: Pacifico, Fredoka, cursive;
+  background: linear-gradient(90deg, #0b6f86, #0b9fb8, #3fd0e0, #0b6f86);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 6s linear infinite;
+}
+.name-style[data-name="surfwave"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 0.28em;
+  background:
+    radial-gradient(circle at 50% 100%, transparent 0.18em, #0b9fb8 0.2em 0.28em, transparent 0.3em) 0 0 /
+    0.6em 0.56em repeat-x;
+  animation: name-wave 2s linear infinite;
+}
+@keyframes name-wave {
+  to {
+    background-position: 0.6em 0;
+  }
+}
+.name-style[data-name="watercolour"] {
+  font-family: Caveat, "Comic Neue", cursive;
+  font-weight: 700;
+  font-size: 1.2em;
+  background:
+    radial-gradient(circle at 20% 40%, #f472b6, transparent 55%),
+    radial-gradient(circle at 70% 60%, #6fbf5a, transparent 55%), linear-gradient(90deg, #b0306a, #2f7a3a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 0.5px #1f3320aa;
+  filter: drop-shadow(0 1px 0 #ffffffaa);
+}
+/* level badges — an 8-track cartridge, a flip-flop, a ladybird */
+:is(:root[data-level-badge="eighttrack"] .ds-level:not([data-look]), .ds-level[data-look="eighttrack"]) {
+  padding: 0 0.6rem;
+  border: 3px solid #1a1a1a;
+  border-radius: 0.3rem 0.3rem 0.6rem 0.6rem;
+  background:
+    repeating-linear-gradient(180deg, #ff8c1a 0 2px, #ffd23f 2px 4px) 0 0 / 100% 22% no-repeat,
+    #fff1dc;
+  color: #2a160c;
+  font-weight: 800;
+}
+:is(:root[data-level-badge="flipflop"] .ds-level:not([data-look]), .ds-level[data-look="flipflop"]) {
+  position: relative;
+  overflow: visible;
+  padding-inline: 0.5rem 0.9rem;
+  border-radius: 999px 1.4rem 1.4rem 999px;
+  background: linear-gradient(180deg, #ff9a6b, #ff7a45);
+  color: #3a1200;
+  box-shadow: inset 0 -3px 0 #c2410c66;
+}
+:is(:root[data-level-badge="flipflop"] .ds-level:not([data-look]), .ds-level[data-look="flipflop"])::after {
+  content: "";
+  position: absolute;
+  inset-block: 15%;
+  inset-inline-end: 0.35rem;
+  inline-size: 0.5rem;
+  border-block: 3px solid #0b9fb8;
+  border-inline-start: 3px solid #0b9fb8;
+  border-radius: 0.6rem 0 0 0.6rem;
+}
+:is(:root[data-level-badge="ladybug"] .ds-level:not([data-look]), .ds-level[data-look="ladybug"]) {
+  position: relative;
+  overflow: visible;
+  margin-inline-start: 0.5rem;
+  padding-inline: 0.6rem;
+  border-radius: 45%;
+  background:
+    radial-gradient(circle 2.5px at 25% 30%, #1a1a1a 96%, transparent),
+    radial-gradient(circle 2.5px at 78% 70%, #1a1a1a 96%, transparent),
+    radial-gradient(circle 2px at 75% 25%, #1a1a1a 96%, transparent),
+    radial-gradient(circle 2px at 22% 75%, #1a1a1a 96%, transparent), #e11d28;
+  color: #ffffff;
+  text-shadow: 0 1px 1px #1a1a1a;
+}
+:is(:root[data-level-badge="ladybug"] .ds-level:not([data-look]), .ds-level[data-look="ladybug"])::before {
+  content: "";
+  position: absolute;
+  inset-block: 25%;
+  inset-inline-start: -0.45rem;
+  inline-size: 0.6rem;
+  border-radius: 50%;
+  background: #1a1a1a;
+}

@@ -52,3 +52,20 @@ def test_pack_contents_exist() -> None:
     for product in demo_shop.SHOP:
         if product["type"] == "bundle":
             assert set(product["payload"]["products"]) <= keys, product["key"]
+
+
+def test_every_demo_product_is_a_valid_definition() -> None:
+    """#89: one invalid product (a key with a hyphen) stopped the whole demo catalogue half-way — the theme
+    packs after it were never created."""
+    from portalab.modules.marketplace.products.definition import parse_product
+
+    for product in demo_shop.SHOP:
+        parse_product(demo_shop.definition(product))
+
+
+def test_no_two_demo_products_share_a_key() -> None:
+    """#89: a look made twice (the same title in a season and a universe) was silently created once."""
+    import collections
+
+    keys = collections.Counter(product["key"] for product in demo_shop.SHOP)
+    assert [key for key, count in keys.items() if count > 1] == []
