@@ -101,6 +101,10 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   cupid: { count: 10, layer: "badge" },
   eggs: { count: 18, layer: "screen" },
   splash: { count: 26, layer: "badge" },
+  // #89: the universes — a wand's sparks, cannonballs, nuts and bolts
+  wandsparks: { count: 24, layer: "badge" },
+  cannonball: { count: 12, layer: "badge" },
+  bolts: { count: 18, layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

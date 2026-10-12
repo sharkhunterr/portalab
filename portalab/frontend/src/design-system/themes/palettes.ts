@@ -156,6 +156,19 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#2dd4bf", accentAlt: "#fb7185", contrast: "#03201c" },
     light: { accent: "#0f766e", accentAlt: "#be123c", contrast: "#ffffff" },
   },
+  // #89: the universes
+  scarletgold: {
+    dark: { accent: "#f5c542", accentAlt: "#f87171", contrast: "#2a1a00" },
+    light: { accent: "#991b1b", accentAlt: "#92400e", contrast: "#ffffff" },
+  },
+  rum: {
+    dark: { accent: "#f0b84a", accentAlt: "#5eead4", contrast: "#241500" },
+    light: { accent: "#92400e", accentAlt: "#115e59", contrast: "#ffffff" },
+  },
+  gunmetal: {
+    dark: { accent: "#f87171", accentAlt: "#cbd5e1", contrast: "#2a0606" },
+    light: { accent: "#b91c1c", accentAlt: "#374151", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

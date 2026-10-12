@@ -8,6 +8,8 @@
   "closeMenu": "Close menu",
   "coins": "Coins",
   "coinsGained": "+{amount} Coins",
+  "console.status": "NOMINAL",
+  "console.system": "MU/TH/UR 6000",
   "contribution": "Contribution",
   "degraded": "{count, plural, one {# service is degraded or unavailable.} other {# services are degraded or unavailable.}} Navigation and search still work.",
   "goHome": "Go to the home page",

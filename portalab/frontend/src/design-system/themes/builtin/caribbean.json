@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 2,
+  "key": "caribbean",
+  "name": "Caraïbes",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0b1f24",
+    "surfaceRaised": "#123038",
+    "text": "#f3ead2",
+    "textMuted": "#b9c9c2",
+    "border": "#2a4a4f",
+    "accent": "#f0b84a",
+    "accentContrast": "#241500",
+    "focus": "#ffd36b",
+    "accentAlt": "#5eead4",
+    "rarity": {
+      "common": "#b9c9c2",
+      "rare": "#5eb9ff",
+      "epic": "#c58bf2",
+      "legendary": "#f0b84a"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"IM Fell English\", Georgia, serif",
+    "headingFamily": "\"Pirata One\", \"IM Fell English\", serif",
+    "headingCase": "none",
+    "headingEffect": "shadow"
+  },
+  "radii": {
+    "sm": 0.3,
+    "md": 0.6
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "cannonball",
+    "fastMs": 160,
+    "normalMs": 320,
+    "levelUp": "plunder"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "launcher",
+      "tablet": "launcher",
+      "phone": "launcher"
+    },
+    "header": "full",
+    "headerPosition": "top",
+    "cards": "paper",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "anchor",
+      "film": "clapperboard",
+      "media": "clapperboard",
+      "compass": "compass",
+      "users": "users",
+      "shop": "gem",
+      "trophy": "crown",
+      "search": "telescope",
+      "newspaper": "scroll",
+      "book": "map",
+      "calendar": "moon"
+    }
+  },
+  "background": {
+    "fallback": "#0b1f24",
+    "pattern": "waves",
+    "ambient": "cannonsmoke"
+  },
+  "sounds": {
+    "notification": "asset:soft/notification.wav",
+    "alert": "asset:soft/alert.wav",
+    "success": "asset:soft/success.wav",
+    "reward": "asset:soft/reward.wav",
+    "levelUp": "asset:soft/level-up.wav",
+    "ui": "asset:soft/ui.wav"
+  },
+  "notification": {
+    "style": "bottle",
+    "animation": "anchor"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le pont",
+      "nav:nav.section.home": "Le pont",
+      "dashboard:title": "Le pont",
+      "nav:nav.media": "La cale aux films",
+      "nav:nav.section.media": "La cale aux films",
+      "media:home.title": "La cale aux films",
+      "nav:nav.media_requests": "Mes bouteilles à la mer",
+      "nav:nav.media_insights": "Journal de bord",
+      "media:insights.title": "Journal de bord",
+      "nav:nav.section.content": "Les cartes",
+      "nav:nav.news": "Le crieur du port",
+      "news:title": "Le crieur du port",
+      "nav:nav.wiki": "Le code des pirates",
+      "wiki:title": "Le code des pirates",
+      "nav:nav.search": "Longue-vue",
+      "search:title": "Longue-vue",
+      "nav:nav.calendar": "Les marées",
+      "calendar:title": "Les marées",
+      "nav:nav.services": "L'arsenal",
+      "nav:nav.section.services": "L'arsenal",
+      "nav:nav.statistics": "Le livre de bord",
+      "statistics:title": "Le livre de bord",
+      "nav:nav.community": "L'équipage",
+      "nav:nav.section.community": "L'équipage",
+      "community:title": "L'équipage",
+      "nav:nav.progression": "Mon grade",
+      "gamification:progression.title": "Mon grade",
+      "nav:nav.campaigns": "Abordages",
+      "campaigns:page.title": "Abordages",
+      "nav:nav.marketplace": "Le comptoir",
+      "nav:nav.section.marketplace": "Le comptoir",
+      "marketplace:catalog.title": "Le comptoir",
+      "nav:nav.projects": "Les expéditions",
+      "marketplace:projects.title": "Les expéditions",
+      "marketplace:owned.title": "Mon coffre",
+      "nav:nav.support": "Le charpentier",
+      "nav:nav.section.support": "Le charpentier",
+      "nav:nav.incidents": "Voies d'eau",
+      "support:incident.title": "Voies d'eau",
+      "nav:nav.feedback": "Message au capitaine",
+      "support:feedback.title": "Message au capitaine",
+      "gamification:value.coins": "Doublons",
+      "gamification:value.xp": "Renommée"
+    },
+    "en": {
+      "nav:nav.home": "The deck",
+      "nav:nav.section.home": "The deck",
+      "dashboard:title": "The deck",
+      "nav:nav.media": "The film hold",
+      "nav:nav.section.media": "The film hold",
+      "media:home.title": "The film hold",
+      "nav:nav.media_requests": "My messages in bottles",
+      "nav:nav.media_insights": "Ship's log",
+      "media:insights.title": "Ship's log",
+      "nav:nav.section.content": "The charts",
+      "nav:nav.news": "The harbour crier",
+      "news:title": "The harbour crier",
+      "nav:nav.wiki": "The pirates' code",
+      "wiki:title": "The pirates' code",
+      "nav:nav.search": "Spyglass",
+      "search:title": "Spyglass",
+      "nav:nav.calendar": "The tides",
+      "calendar:title": "The tides",
+      "nav:nav.services": "The armoury",
+      "nav:nav.section.services": "The armoury",
+      "nav:nav.statistics": "The logbook",
+      "statistics:title": "The logbook",
+      "nav:nav.community": "The crew",
+      "nav:nav.section.community": "The crew",
+      "community:title": "The crew",
+      "nav:nav.progression": "My rank",
+      "gamification:progression.title": "My rank",
+      "nav:nav.campaigns": "Boardings",
+      "campaigns:page.title": "Boardings",
+      "nav:nav.marketplace": "The trading post",
+      "nav:nav.section.marketplace": "The trading post",
+      "marketplace:catalog.title": "The trading post",
+      "nav:nav.projects": "The expeditions",
+      "marketplace:projects.title": "The expeditions",
+      "marketplace:owned.title": "My chest",
+      "nav:nav.support": "The carpenter",
+      "nav:nav.section.support": "The carpenter",
+      "nav:nav.incidents": "Leaks",
+      "support:incident.title": "Leaks",
+      "nav:nav.feedback": "Word to the captain",
+      "support:feedback.title": "Word to the captain",
+      "gamification:value.coins": "Doubloons",
+      "gamification:value.xp": "Renown"
+    }
+  }
+}

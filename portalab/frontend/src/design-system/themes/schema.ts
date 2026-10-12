@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { AMBIENTS, LEVEL_UPS, NOTIFICATION_ANIMATIONS, NOTIFICATION_STYLES } from "../a11y/preferences";
+import {
+  AMBIENTS,
+  CELEBRATION_KEYS,
+  LEVEL_UPS,
+  NOTIFICATION_ANIMATIONS,
+  NOTIFICATION_STYLES,
+} from "../a11y/preferences";
 import { isColor } from "./contrast";
 
 /**
@@ -114,40 +120,8 @@ export const CONTENT_WIDTHS = ["narrow", "wide", "full"] as const;
 export const CORNER_STYLES = ["square", "soft", "round"] as const;
 export const WIDGET_FRAMES = ["card", "plain", "glass"] as const;
 export const MOTION_PROFILES = ["none", "subtle", "lively", "playful"] as const;
-export const CELEBRATIONS = [
-  "none",
-  "sparkle",
-  "confetti",
-  "glow",
-  "snow",
-  "bats",
-  "pixels",
-  "hearts",
-  "stars",
-  "coins",
-  "lightning",
-  "petals",
-  "bubbles",
-  "assemble",
-  "burn",
-  "shatter",
-  "freeze",
-  "glitch",
-  "portal",
-  "flicker",
-  "fireworks",
-  "rewind",
-  "bloom",
-  "tracker",
-  "nova",
-  "goldshower",
-  "petalstorm",
-  "rebirth",
-  "stormstrike",
-  "skyveil",
-  "arcana",
-  "timerift",
-] as const;
+/** the celebrations a theme may play (the same keys as the shop's) */
+export const CELEBRATIONS = CELEBRATION_KEYS;
 /** 027: what a theme draws behind the portal — a static pattern and an animated ambient layer. */
 export const BACKDROP_PATTERNS = [
   "none",

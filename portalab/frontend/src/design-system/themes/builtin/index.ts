@@ -1,5 +1,8 @@
 import type { ThemeDefinition } from "../schema";
+// #89: the universes
+import academy from "./academy.json";
 import alien from "./alien.json";
+import caribbean from "./caribbean.json";
 import cartoon from "./cartoon.json";
 import christmas from "./christmas.json";
 import comic from "./comic.json";
@@ -17,6 +20,7 @@ import horror from "./horror.json";
 import light from "./light.json";
 import manga from "./manga.json";
 import matrix from "./matrix.json";
+import mecha from "./mecha.json";
 import middleearth from "./middleearth.json";
 import minimal from "./minimal.json";
 import neowave from "./neowave.json";
@@ -67,6 +71,10 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   vhs,
   nostromo,
   nova,
+  // #89: the universes
+  academy,
+  caribbean,
+  mecha,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

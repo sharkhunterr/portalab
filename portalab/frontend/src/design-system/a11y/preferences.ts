@@ -76,6 +76,10 @@ export const PALETTE_KEYS = [
   "cherry",
   "pastel",
   "tropical",
+  // #89: the universes
+  "scarletgold",
+  "rum",
+  "gunmetal",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -134,6 +138,10 @@ export const NOTIFICATION_STYLES = [
   "loveletter",
   "bloom",
   "postcard",
+  // #89: the universes
+  "scroll",
+  "bottle",
+  "chamfer",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -182,6 +190,10 @@ export const NOTIFICATION_ANIMATIONS = [
   "petalfall",
   "eclipse",
   "warp",
+  // #89: the universes
+  "swoop",
+  "anchor",
+  "transform",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -280,6 +292,10 @@ export const AMBIENTS = [
   "loveletters",
   "butterflies",
   "seagulls",
+  // #89: the universes
+  "floatingcandles",
+  "cannonsmoke",
+  "gears",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -342,6 +358,10 @@ export const LEVEL_BADGES = [
   "spectre",
   "tinsel",
   "verdant",
+  // #89: the universes
+  "snitch",
+  "doubloon",
+  "chevron",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -386,6 +406,10 @@ export const LEVEL_UPS = [
   "sakurastorm",
   "aurorasky",
   "timeportal",
+  // #89: the universes
+  "owlpost",
+  "plunder",
+  "rollout",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -428,6 +452,10 @@ export const CELEBRATION_KEYS = [
   "cupid",
   "eggs",
   "splash",
+  // #89: the universes
+  "wandsparks",
+  "cannonball",
+  "bolts",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

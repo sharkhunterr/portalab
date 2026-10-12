@@ -49,3 +49,7 @@ import "@fontsource/shrikhand/latin-400.css";
 import "@fontsource/syncopate/latin-400.css";
 import "@fontsource/syncopate/latin-700.css";
 import "@fontsource/vt323/latin-400.css";
+// #89: the universes
+import "@fontsource/black-ops-one/latin-400.css";
+import "@fontsource/pirata-one/latin-400.css";
+import "@fontsource/uncial-antiqua/latin-400.css";

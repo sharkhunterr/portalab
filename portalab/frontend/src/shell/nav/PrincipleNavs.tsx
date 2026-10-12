@@ -10,6 +10,7 @@ import {
 import { NavLink, useLocation } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
+import { useT } from "../../i18n/hooks/useT";
 import { useShellStrings } from "../strings";
 import type { NavSection } from "./NavigationProvider";
 import { currentEntry, isHubSection, sectionEntries } from "./SectionNav";
@@ -765,6 +766,7 @@ function ShipClock() {
  */
 export function ConsoleNav({ sections }: { sections: readonly NavSection[] }) {
   const strings = useShellStrings();
+  const t = useT(); // the console's system and status: the theme's own words (MU/TH/UR by default)
   const { current, isActive } = useCurrent(sections);
   const { open, setOpen, root } = useOpenSection();
   const section = sections.find((s) => s.key === open);
@@ -779,11 +781,11 @@ export function ConsoleNav({ sections }: { sections: readonly NavSection[] }) {
       ) : null}
       <p className="shell-console__status" aria-hidden="true">
         <span className="shell-console__lamp" />
-        <span>MU/TH/UR 6000</span>
+        <span>{t("shell:console.system")}</span>
         <span className="shell-console__sep">·</span>
         <span className="shell-console__here">{here ? strings.label(here.label_key) : "—"}</span>
         <span className="shell-console__sep">·</span>
-        <span>NOMINAL</span>
+        <span>{t("shell:console.status")}</span>
         <ShipClock />
         <svg
           className="shell-console__ecg"

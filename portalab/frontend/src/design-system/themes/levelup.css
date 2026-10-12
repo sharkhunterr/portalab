@@ -2040,3 +2040,161 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------- #89: the universes */
+/* owl post (magic school) — a night sky; an owl swoops in with the letter, gold sparkles twinkling */
+.levelup[data-look="owlpost"] {
+  --glow: #f5c542;
+}
+.levelup[data-look="owlpost"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, #1e3a8a66, transparent 60%), #0b1026cc;
+}
+.levelup[data-look="owlpost"] .levelup__scene {
+  display: block;
+  inset-block-start: 14%;
+  inset-inline-start: 50%;
+  inline-size: 7rem;
+  block-size: 4.5rem;
+  background:
+    radial-gradient(circle at 42% 40%, #fde68a 0 5%, #111 6% 8%, transparent 9%),
+    radial-gradient(circle at 58% 40%, #fde68a 0 5%, #111 6% 8%, transparent 9%),
+    radial-gradient(ellipse 18% 28% at 50% 50%, #8b5e34 0 95%, transparent),
+    linear-gradient(160deg, transparent 0 30%, #6b4423 30% 50%, transparent 50%) left / 50% 100% no-repeat,
+    linear-gradient(200deg, transparent 0 30%, #6b4423 30% 50%, transparent 50%) right / 50% 100% no-repeat;
+  translate: -50% 0;
+  animation: levelup-owl 1.4s cubic-bezier(0.25, 0.8, 0.3, 1) both;
+}
+@keyframes levelup-owl {
+  0% {
+    transform: translate(-70vw, -30vh) rotate(-20deg) scale(0.4);
+  }
+  70% {
+    transform: translate(0.5rem, 0.5rem) rotate(4deg) scale(1.05);
+  }
+  100% {
+    transform: none;
+  }
+}
+.levelup[data-look="owlpost"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 0.35rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 8px #f5c542;
+  animation: levelup-twinkle calc(0.6s + var(--r) * 1.2s) ease-in-out calc(var(--r) * -2s) infinite alternate;
+}
+.levelup[data-look="owlpost"] .levelup__card {
+  animation: levelup-unroll 0.9s ease-out 1s both;
+}
+/* plunder (pirates) — a treasure chest bursting open, gold doubloons flying, YO HO HO! */
+.levelup[data-look="plunder"] {
+  --glow: #e0a800;
+}
+.levelup[data-look="plunder"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle at 50% 88%, #ffd54f66, transparent 55%), #0a2a33cc;
+}
+.levelup[data-look="plunder"] .levelup__scene {
+  display: block;
+  inset-block-end: 6%;
+  inset-inline-start: 50%;
+  inline-size: 9rem;
+  block-size: 5rem;
+  border-radius: 0.6rem 0.6rem 0.3rem 0.3rem;
+  background:
+    linear-gradient(90deg, transparent 44%, #e0a800 44% 56%, transparent 56%),
+    linear-gradient(0deg, transparent 46%, #e0a800 46% 54%, transparent 54%),
+    linear-gradient(180deg, #8b5a2b, #5c3a1a);
+  box-shadow: 0 -1rem 3rem #ffd54f88;
+  translate: -50% 0;
+}
+.levelup[data-look="plunder"] .levelup__fx {
+  display: block;
+  inset-block-end: 12%;
+  inset-inline-start: 50%;
+  inline-size: 1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff2b3, #e0a800 55%, #8a6200);
+  --angle: calc(-70deg + var(--r) * 140deg);
+  animation: levelup-coin calc(1.4s + var(--r)) cubic-bezier(0.2, 0.8, 0.4, 1) calc(0.4s + var(--i) * 0.03s)
+    both;
+}
+@keyframes levelup-coin {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(0) rotateY(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-30vh - var(--r) * 30vh)) rotateY(720deg);
+  }
+}
+.levelup[data-look="plunder"] .levelup__burst {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline: 0;
+  color: #ffd54f;
+  font-family: "Pirata One", "IM Fell English", serif;
+  font-size: clamp(2.4rem, 8vw, 4.5rem);
+  text-align: center;
+  text-shadow: 0 3px 0 #5c3a1a;
+  animation: levelup-kapow 0.6s cubic-bezier(0.2, 1.8, 0.4, 1) 0.5s both;
+}
+/* roll out (robots) — steel plates flying in from all sides, locking into place around the card */
+.levelup[data-look="rollout"] {
+  --glow: #ef4444;
+}
+.levelup[data-look="rollout"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, #ffffff08 0 1px, transparent 1px 3rem),
+    repeating-linear-gradient(0deg, #ffffff08 0 1px, transparent 1px 3rem), #0b0f17dd;
+}
+.levelup[data-look="rollout"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: calc(2rem + var(--r) * 5rem);
+  block-size: calc(1rem + var(--r) * 2rem);
+  background: linear-gradient(135deg, #e5e7eb, #6b7280 50%, #374151);
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  animation: levelup-plate 0.9s steps(5, end) calc(var(--i) * 0.05s) both;
+}
+@keyframes levelup-plate {
+  0% {
+    opacity: 0;
+    transform: translate(calc((var(--r) - 0.5) * 120vw), -60vh) rotate(180deg);
+  }
+  100% {
+    opacity: 0.9;
+    transform: none;
+  }
+}
+.levelup[data-look="rollout"] .levelup__card {
+  border: 2px solid #ef4444;
+  clip-path: polygon(1.2rem 0, 100% 0, 100% calc(100% - 1.2rem), calc(100% - 1.2rem) 100%, 0 100%, 0 1.2rem);
+  animation: levelup-card 0.6s steps(4, end) 0.9s both;
+}
+.levelup[data-look="rollout"] .levelup__burst {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline: 0;
+  color: #f9fafb;
+  font-family: "Black Ops One", "Orbitron", sans-serif;
+  font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 12px #ef4444;
+  animation: levelup-flicker-in 0.8s steps(1, end) 1s both;
+}

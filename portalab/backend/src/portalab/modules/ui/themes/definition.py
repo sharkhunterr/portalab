@@ -218,6 +218,15 @@ NOTIFICATION_STYLES = Literal[
     "aurora",
     "plasma",
     "chrono",
+    # #81, #89: the seasons and the universes
+    "tombstone",
+    "giftwrap",
+    "loveletter",
+    "bloom",
+    "postcard",
+    "scroll",
+    "bottle",
+    "chamfer",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -262,6 +271,10 @@ NOTIFICATION_ANIMATIONS = Literal[
     "petalfall",
     "eclipse",
     "warp",
+    # #81, #89: the seasons and the universes
+    "swoop",
+    "anchor",
+    "transform",
 ]
 AMBIENTS = Literal[
     "none",
@@ -351,6 +364,15 @@ AMBIENTS = Literal[
     "lavalamp",
     "impasto",
     "paintribbon",
+    # #81, #89: the seasons and the universes
+    "cobwebs",
+    "ornaments",
+    "loveletters",
+    "butterflies",
+    "seagulls",
+    "floatingcandles",
+    "cannonsmoke",
+    "gears",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -385,6 +407,15 @@ CELEBRATIONS = Literal[
     "skyveil",
     "arcana",
     "timerift",
+    # #81, #89: the seasons and the universes
+    "candy",
+    "gifts",
+    "cupid",
+    "eggs",
+    "splash",
+    "wandsparks",
+    "cannonball",
+    "bolts",
 ]
 PATTERNS = Literal[
     "none",
@@ -433,6 +464,8 @@ LEVEL_UPS = Literal[
     "nostromo",
     "phoenix", "thunderstrike", "tidalwave", "supernova", "goldrush", "arcanum", "sakurastorm", "aurorasky",
     "timeportal",
+    # #81, #89: the seasons and the universes
+    "owlpost", "plunder", "rollout",
 ]  # fmt: skip
 
 

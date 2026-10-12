@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 2,
+  "key": "mecha",
+  "name": "Méca",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0e1116",
+    "surfaceRaised": "#1a1f27",
+    "text": "#eef1f5",
+    "textMuted": "#a3acb9",
+    "border": "#323a46",
+    "accent": "#f87171",
+    "accentContrast": "#2a0606",
+    "focus": "#60a5fa",
+    "accentAlt": "#60a5fa",
+    "rarity": {
+      "common": "#a3acb9",
+      "rare": "#60a5fa",
+      "epic": "#c084fc",
+      "legendary": "#fbbf24"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Rajdhani, \"Chakra Petch\", sans-serif",
+    "headingFamily": "\"Black Ops One\", Orbitron, sans-serif",
+    "headingCase": "uppercase",
+    "headingEffect": "emboss"
+  },
+  "radii": {
+    "sm": 0.1,
+    "md": 0.2
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "bolts",
+    "fastMs": 120,
+    "normalMs": 240,
+    "levelUp": "rollout"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "console",
+      "tablet": "console",
+      "phone": "console"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "console",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "bot",
+      "film": "monitor",
+      "media": "monitor",
+      "compass": "crosshair",
+      "users": "users",
+      "shop": "cpu",
+      "trophy": "medal",
+      "search": "scan",
+      "newspaper": "radio",
+      "book": "database",
+      "calendar": "clock",
+      "chart": "gauge"
+    }
+  },
+  "background": {
+    "fallback": "#0e1116",
+    "pattern": "hexagons",
+    "ambient": "gears"
+  },
+  "sounds": {
+    "notification": "asset:scifi/notification.wav",
+    "alert": "asset:scifi/alert.wav",
+    "success": "asset:scifi/success.wav",
+    "reward": "asset:scifi/reward.wav",
+    "levelUp": "asset:scifi/level-up.wav",
+    "ui": "asset:scifi/ui.wav"
+  },
+  "notification": {
+    "style": "chamfer",
+    "animation": "transform"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Base",
+      "nav:nav.section.home": "Base",
+      "dashboard:title": "Base",
+      "nav:nav.media": "Archives vidéo",
+      "nav:nav.section.media": "Archives vidéo",
+      "media:home.title": "Archives vidéo",
+      "nav:nav.media_requests": "Mes demandes de mission",
+      "nav:nav.media_insights": "Analyse des combats",
+      "media:insights.title": "Analyse des combats",
+      "nav:nav.section.content": "Banques de données",
+      "nav:nav.news": "Transmissions",
+      "news:title": "Transmissions",
+      "nav:nav.wiki": "Manuel technique",
+      "wiki:title": "Manuel technique",
+      "nav:nav.search": "Scanner",
+      "search:title": "Scanner",
+      "nav:nav.calendar": "Planning des missions",
+      "calendar:title": "Planning des missions",
+      "nav:nav.services": "Systèmes",
+      "nav:nav.section.services": "Systèmes",
+      "nav:nav.statistics": "Télémétrie",
+      "statistics:title": "Télémétrie",
+      "nav:nav.community": "Escouade",
+      "nav:nav.section.community": "Escouade",
+      "community:title": "Escouade",
+      "nav:nav.progression": "Niveau d'énergie",
+      "gamification:progression.title": "Niveau d'énergie",
+      "nav:nav.campaigns": "Opérations",
+      "campaigns:page.title": "Opérations",
+      "nav:nav.marketplace": "Armurerie",
+      "nav:nav.section.marketplace": "Armurerie",
+      "marketplace:catalog.title": "Armurerie",
+      "nav:nav.projects": "Prototypes",
+      "marketplace:projects.title": "Prototypes",
+      "marketplace:owned.title": "Mon hangar",
+      "nav:nav.support": "Atelier de réparation",
+      "nav:nav.section.support": "Atelier de réparation",
+      "nav:nav.incidents": "Avaries",
+      "support:incident.title": "Avaries",
+      "nav:nav.feedback": "Rapport au commandant",
+      "support:feedback.title": "Rapport au commandant",
+      "gamification:value.coins": "Cellules d'énergie",
+      "gamification:value.xp": "Puissance",
+      "shell:console.system": "MÉCA-OS 9",
+      "shell:console.status": "OPÉRATIONNEL"
+    },
+    "en": {
+      "nav:nav.home": "Base",
+      "nav:nav.section.home": "Base",
+      "dashboard:title": "Base",
+      "nav:nav.media": "Video archives",
+      "nav:nav.section.media": "Video archives",
+      "media:home.title": "Video archives",
+      "nav:nav.media_requests": "My mission requests",
+      "nav:nav.media_insights": "Battle analysis",
+      "media:insights.title": "Battle analysis",
+      "nav:nav.section.content": "Data banks",
+      "nav:nav.news": "Transmissions",
+      "news:title": "Transmissions",
+      "nav:nav.wiki": "Technical manual",
+      "wiki:title": "Technical manual",
+      "nav:nav.search": "Scanner",
+      "search:title": "Scanner",
+      "nav:nav.calendar": "Mission schedule",
+      "calendar:title": "Mission schedule",
+      "nav:nav.services": "Systems",
+      "nav:nav.section.services": "Systems",
+      "nav:nav.statistics": "Telemetry",
+      "statistics:title": "Telemetry",
+      "nav:nav.community": "Squad",
+      "nav:nav.section.community": "Squad",
+      "community:title": "Squad",
+      "nav:nav.progression": "Power level",
+      "gamification:progression.title": "Power level",
+      "nav:nav.campaigns": "Operations",
+      "campaigns:page.title": "Operations",
+      "nav:nav.marketplace": "Armoury",
+      "nav:nav.section.marketplace": "Armoury",
+      "marketplace:catalog.title": "Armoury",
+      "nav:nav.projects": "Prototypes",
+      "marketplace:projects.title": "Prototypes",
+      "marketplace:owned.title": "My hangar",
+      "nav:nav.support": "Repair bay",
+      "nav:nav.section.support": "Repair bay",
+      "nav:nav.incidents": "Damage",
+      "support:incident.title": "Damage",
+      "nav:nav.feedback": "Report to command",
+      "support:feedback.title": "Report to command",
+      "gamification:value.coins": "Energy cells",
+      "gamification:value.xp": "Power",
+      "shell:console.system": "MECH-OS 9",
+      "shell:console.status": "OPERATIONAL"
+    }
+  }
+}

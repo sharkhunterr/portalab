@@ -2,6 +2,7 @@ import {
   Activity,
   Airplay,
   AlertTriangle,
+  Anchor,
   Armchair,
   ArrowDown,
   ArrowLeft,
@@ -391,6 +392,7 @@ export const ICONS: Record<string, LucideIcon> = {
   flashlight: Flashlight,
   shell: Shell,
   rabbit: Rabbit, // #81: spring
+  anchor: Anchor, // #89: pirates
   pizza: Pizza,
   sofa: Sofa,
   lamp: Lamp,

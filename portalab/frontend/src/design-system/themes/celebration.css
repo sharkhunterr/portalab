@@ -1094,3 +1094,63 @@
   color: #052f3a;
   box-shadow: 0 0 22px #5ad1e6;
 }
+
+/* ---------------------------------------------------------------- #89: the universes */
+/* wand sparks (magic school): streaks of gold and scarlet shooting out, twinkling */
+[data-effect="wandsparks"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.25rem;
+  block-size: 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(0deg, transparent, #ffd36b 40%, #fffbe0);
+  box-shadow: 0 0 8px #ffbf47;
+  animation-name: fx-arrow;
+}
+[data-effect="wandsparks"] .celebration-fx:nth-child(3n) {
+  background: linear-gradient(0deg, transparent, #e11d48 40%, #ffd1dc);
+  box-shadow: 0 0 8px #e11d48;
+}
+[data-effect="wandsparks"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #7f1d1d, #b45309 60%, #fde68a);
+  color: #fffbeb;
+  box-shadow: 0 0 22px #f59e0b;
+}
+/* cannonball (pirates): black balls bursting out, a puff of smoke behind each */
+[data-effect="cannonball"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.2rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #6b6b6b, #111 60%);
+  box-shadow:
+    0 0 0 0.35rem #d8d4cc55,
+    0 0 1rem #d8d4cc66;
+  animation-name: fx-burst;
+}
+[data-effect="cannonball"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #3f2a14, #b8860b);
+  color: #fff8e1;
+  box-shadow: 0 0 22px #d8d4cc;
+}
+/* bolts (robots): hex nuts and bolts spinning out */
+[data-effect="bolts"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1rem;
+  aspect-ratio: 1.15;
+  background:
+    radial-gradient(circle, #1f2937 0 22%, transparent 24%), linear-gradient(135deg, #e5e7eb, #6b7280);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  animation-name: fx-burst;
+}
+[data-effect="bolts"] .celebration-fx:nth-child(2n) {
+  inline-size: 0.4rem;
+  aspect-ratio: 0.3;
+  border-radius: 0.1rem;
+  clip-path: none;
+  background: repeating-linear-gradient(0deg, #9ca3af 0 2px, #4b5563 2px 3px);
+}
+[data-effect="bolts"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #374151, #9ca3af);
+  color: #fff;
+  box-shadow: 0 0 22px #ef4444;
+}

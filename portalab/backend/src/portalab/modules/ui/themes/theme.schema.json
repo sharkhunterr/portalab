@@ -774,7 +774,15 @@
             "stormstrike",
             "skyveil",
             "arcana",
-            "timerift"
+            "timerift",
+            "candy",
+            "gifts",
+            "cupid",
+            "eggs",
+            "splash",
+            "wandsparks",
+            "cannonball",
+            "bolts"
           ]
         },
         "levelUp": {
@@ -818,7 +826,10 @@
             "arcanum",
             "sakurastorm",
             "aurorasky",
-            "timeportal"
+            "timeportal",
+            "owlpost",
+            "plunder",
+            "rollout"
           ]
         }
       },
@@ -1111,7 +1122,10 @@
             "ornaments",
             "loveletters",
             "butterflies",
-            "seagulls"
+            "seagulls",
+            "floatingcandles",
+            "cannonsmoke",
+            "gears"
           ]
         }
       },
@@ -1227,7 +1241,10 @@
             "giftwrap",
             "loveletter",
             "bloom",
-            "postcard"
+            "postcard",
+            "scroll",
+            "bottle",
+            "chamfer"
           ]
         },
         "animation": {
@@ -1274,7 +1291,10 @@
             "decrypt",
             "petalfall",
             "eclipse",
-            "warp"
+            "warp",
+            "swoop",
+            "anchor",
+            "transform"
           ]
         }
       },

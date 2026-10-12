@@ -1309,6 +1309,20 @@ THEME_RARITY = {
     "upsidedown": ("legendary", 1500, 12), "middleearth": ("legendary", 1500, 12),
     "vhs": ("epic", 900, 5), "nova": ("legendary", 1500, 10), "nostromo": ("legendary", 1500, 12),
 }  # fmt: skip
+# #89: the universes' interfaces
+THEME_TEXT |= {
+    "academy": ("Academy", "Académie",
+                "A school of magic: scarlet and gold, parchment scrolls, floating candles in the Great Hall, owls bringing your news.",
+                "Une école de magie : écarlate et or, parchemins, bougies flottantes dans la Grande Salle, des hiboux qui apportent vos nouvelles."),
+    "caribbean": ("Caribbean", "Caraïbes",
+                  "Pirates of the islands: a harbour of charts and lanterns, messages in bottles, cannon smoke and doubloons.",
+                  "Les pirates des îles : un port de cartes et de lanternes, des bouteilles à la mer, la fumée des canons et des doublons."),
+    "mecha": ("Mecha", "Méca",
+              "Robots in disguise: steel plates with cut corners, a console docked at the bottom, gears turning and panels that unfold.",
+              "Des robots déguisés : des plaques d'acier aux coins coupés, une console à quai en bas, des engrenages qui tournent et des panneaux qui se déplient."),
+}  # fmt: skip
+THEME_RARITY |= {"academy": ("legendary", 1500, 12), "caribbean": ("epic", 900, 6), "mecha": ("epic", 900, 6)}
+
 # 027: an interface (the « theme » product) is its colours, fonts, layout, navigation and words; its sold
 # looks (animated background, notifications, celebration, level-up) come with its theme pack
 PACK_NOTE = (
@@ -1843,6 +1857,383 @@ UNIVERSE_EXTRAS = {
 }  # fmt: skip
 
 
+def _looks(items: tuple[tuple[Any, ...], ...], *, season: str | None = None) -> tuple[list[str], list[str]]:
+    """#81, #89: a season's or a universe's looks from short rows (kind, design, names, price, level, texts):
+    the products made, and those drawn by the graphics chip among them."""
+    made: list[str] = []
+    _hd: list[str] = []
+    _season = season
+    for _item in items:
+        _before = len(SHOP)
+        _kind = _item[0]
+        if _kind == "ambient":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"ambient_{_v}",
+                "ambient",
+                _price,
+                "common",
+                f"{_en} ambience",
+                f"Ambiance {_fr.lower()}",
+                _aen,
+                _afr,
+                {"ambient": _v},
+                collection="ambients",
+                icon="sparkles",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "live":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"banner_live_{_v}",
+                "profile_banner",
+                _price,
+                "common",
+                f"{_en} animated banner",
+                f"Bannière animée {_fr}",
+                f"{_en} playing in your profile's banner, for every visitor to see.",
+                f"Des {_fr} dans la bannière de votre profil, pour tous vos visiteurs.",
+                {"banner": f"live-{_v}"},
+                collection="profile",
+                icon="image",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "effect":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"effect_{_v}",
+                "effect",
+                _price,
+                "common",
+                f"{_en} celebration",
+                f"Célébration {_fr.lower()}",
+                _aen,
+                _afr,
+                {"effect": _v},
+                collection="celebrations",
+                icon="party",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "palette":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"palette_{_v}",
+                "palette",
+                _price,
+                "common",
+                f"{_en} palette",
+                f"Palette {_fr.lower()}",
+                _aen,
+                _afr,
+                {"palette": _v},
+                collection="palettes",
+                icon="palette",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "name":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"name_{_v}",
+                "name_style",
+                _price,
+                "common",
+                f"{_en} name style",
+                f"Style de nom {_fr}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="names",
+                icon="feather",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "banner":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"banner_{_v}",
+                "profile_banner",
+                _price,
+                "common",
+                f"{_en} banner",
+                f"Bannière {_fr.lower()}",
+                _aen,
+                _afr,
+                {"banner": _v},
+                collection="profile",
+                icon="image",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "title":
+            _, _label, _fr, _style, _price, _level, _, _ = _item
+            _p(
+                f"title_{_label.lower().replace(' ', '_').replace(chr(39), '')}",
+                "title",
+                _price,
+                "common",
+                f"Title: {_label}",
+                _fr,
+                f"« {_label} » under your name.",
+                f"« {_label} » sous votre nom.",
+                {"label": _label, "style": _style},
+                collection="titles",
+                icon="trophy",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "badge":
+            _, _label, _fr, _icon, _style, _price, _level, _, _ = _item
+            _p(
+                f"badge_{_label.lower().replace(' ', '_').replace(chr(39), '')}",
+                "badge",
+                _price,
+                "common",
+                f"{_label} badge",
+                _fr,
+                f"A « {_label} » badge on your profile.",
+                f"Un badge « {_label} » sur votre profil.",
+                {"label": _label, "icon": _icon, "style": _style},
+                collection="badges",
+                icon="star",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "frame":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"frame_{_v}",
+                "avatar_frame",
+                _price,
+                "rare",
+                f"{_en} frame",
+                f"Cadre {_fr.lower()}",
+                _aen,
+                _afr,
+                {"frame": _v},
+                collection="profile",
+                icon="user",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "level":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"level_{_v}",
+                "level_badge",
+                _price,
+                "rare",
+                f"{_en} level badge",
+                f"Badge de niveau {_fr.lower()}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="levels",
+                icon="trophy",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "notif":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"notif_{_v}",
+                "notification_style",
+                _price,
+                "rare",
+                f"{_en} notifications",
+                f"Notifications {_fr.lower()}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="looks",
+                icon="bell",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "hdframe":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _key = f"frame_{_v}"
+            _p(
+                _key,
+                "avatar_frame",
+                _price,
+                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
+                f"{_en} frame",
+                f"Cadre {_fr.lower()}",
+                _aen,
+                _afr,
+                {"frame": _v},
+                collection="profile",
+                icon="user",
+                level=_level,
+                season=_season,
+            )
+            _hd.append(_key)
+        elif _kind == "hdname":
+            _, _v, _en, _fr, _price, _level, _, _ = _item
+            _key = f"name_name{_v}"
+            _p(
+                _key,
+                "name_style",
+                _price,
+                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
+                f"{_en} name style",
+                f"Style de nom {_fr}",
+                f"An aura around your name. {HD_ABOUT[0]}",
+                f"Une aura autour de votre nom. {HD_ABOUT[1]}",
+                {"style": f"name{_v}"},
+                collection="names",
+                icon="feather",
+                level=_level,
+                season=_season,
+            )
+            _hd.append(_key)
+        elif _kind == "hdlevel":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _key = f"level_{_v}"
+            _p(
+                _key,
+                "level_badge",
+                _price,
+                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
+                f"{_en} level badge",
+                f"Badge de niveau {_fr.lower()}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="levels",
+                icon="trophy",
+                level=_level,
+                season=_season,
+            )
+            _hd.append(_key)
+        elif _kind == "anim":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(f"notif_{_v}", "notification_animation", _price, "rare", f"{_en} notification animation",
+               f"Animation de notification {_fr.lower()}", _aen, _afr, {"animation": _v}, collection="looks",
+               icon="bell-ring", level=_level, season=_season)  # fmt: skip
+        elif _kind == "levelup":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(f"levelup_{_v}", "level_up", _price, "epic", f"{_en} level-up", f"Passage de niveau {_fr.lower()}",
+               _aen, _afr, {"animation": _v}, collection="levels", icon="trophy", level=_level, season=_season)  # fmt: skip
+        made.extend(product["key"] for product in SHOP[_before:])
+    return made, _hd
+
+
+# #89: the universes' looks — every kind, most of them common; shapes of their own (a shield, a ship's wheel, a
+# winged ball, a bottle…)
+UNIVERSE_ROWS: dict[str, tuple[tuple[Any, ...], ...]] = {
+    "academy": (
+        ("ambient", "floatingcandles", "Floating candles", "Bougies flottantes", 300, None,
+         "Candles hanging in the air, bobbing, their flames flickering.", "Des bougies suspendues dans les airs qui flottent, leurs flammes qui vacillent."),
+        ("live", "floatingcandles", "Floating candles", "bougies flottantes", 350, None, "", ""),
+        ("banner", "greathall", "Great Hall", "Grande Salle", 300, None,
+         "Long tables under an enchanted night sky, candles floating.", "De longues tables sous un ciel nocturne enchanté, des bougies qui flottent."),
+        ("effect", "wandsparks", "Wand sparks", "Étincelles de baguette", 250, None,
+         "Gold and scarlet sparks shooting out of the reward.", "Des étincelles d'or et d'écarlate qui jaillissent de la récompense."),
+        ("palette", "scarletgold", "Scarlet and gold", "Écarlate et or", 200, None,
+         "A house's scarlet and gold over the theme.", "L'écarlate et l'or d'une maison sur le thème."),
+        ("name", "spellbound", "Spellbound", "ensorcelé", 300, None,
+         "A name in uncial letters of shimmering gold.", "Un nom en lettres onciales d'or chatoyant."),
+        ("title", "Head prefect", "Titre : Préfet en chef", "shimmer", 150, None, "", ""),
+        ("badge", "Seeker", "Badge Attrapeur", "sparkle", "gold", 200, None, "", ""),
+        ("frame", "housecrest", "House crest", "Blason de maison", 650, 4,
+         "Your avatar on a house's quartered shield.", "Votre avatar sur l'écu écartelé d'une maison."),
+        ("level", "snitch", "Golden snitch", "Balle dorée ailée", 700, 4,
+         "Your level on a golden ball beating its little wings.", "Votre niveau sur une balle dorée qui bat de ses petites ailes."),
+        ("notif", "scroll", "Scroll", "Parchemin enroulé", 650, 4,
+         "Notifications unrolled like a scroll between its two rolls.", "Des notifications déroulées comme un parchemin entre ses deux rouleaux."),
+        ("anim", "swoop", "Owl swoop", "Piqué du hibou", 650, 4,
+         "Notifications swooping in like an owl bringing the mail.", "Des notifications qui arrivent en piqué comme un hibou qui apporte le courrier."),
+        ("levelup", "owlpost", "Owl post", "Hibou postal", 1100, 8,
+         "An owl swoops in with a letter: your new level, under a sky of gold sparkles.",
+         "Un hibou arrive en piqué avec une lettre : votre nouveau niveau, sous un ciel d'étincelles dorées."),
+    ),
+    "caribbean": (
+        ("ambient", "cannonsmoke", "Cannon smoke", "Fumée de canon", 300, None,
+         "Puffs of cannon smoke drifting across.", "Des bouffées de fumée de canon qui dérivent."),
+        ("live", "cannonsmoke", "Cannon smoke", "fumée de canon", 350, None, "", ""),
+        ("banner", "jollyship", "Ship at night", "Navire de nuit", 300, None,
+         "A ship under full sail on a moonlit sea.", "Un navire toutes voiles dehors sur une mer sous la lune."),
+        ("effect", "cannonball", "Cannonballs", "Boulets de canon", 250, None,
+         "Cannonballs bursting out of the reward in a puff of smoke.", "Des boulets de canon qui jaillissent de la récompense dans un nuage de fumée."),
+        ("palette", "rum", "Rum and lagoon", "Rhum et lagon", 200, None,
+         "Amber rum and lagoon turquoise over the theme.", "Rhum ambré et turquoise du lagon sur le thème."),
+        ("name", "pirata", "Pirate", "pirate", 300, None,
+         "A name in a pirate's blackletter, old gold.", "Un nom en gothique de pirate, vieil or."),
+        ("title", "Terror of the seven seas", "Titre : Terreur des sept mers", "flame", 150, None, "", ""),
+        ("badge", "Captain", "Badge Capitaine", "anchor", "shimmer", 200, None, "", ""),
+        ("frame", "shipwheel", "Ship's wheel", "Barre de navire", 650, 4,
+         "Your avatar at the helm, the wheel turning slowly.", "Votre avatar à la barre, la roue qui tourne lentement."),
+        ("level", "doubloon", "Doubloon", "Doublon", 700, 4,
+         "Your level struck on a notched gold doubloon.", "Votre niveau frappé sur un doublon d'or cranté."),
+        ("notif", "bottle", "Message in a bottle", "Bouteille à la mer", 650, 4,
+         "Notifications arriving as messages in bottles.", "Des notifications qui arrivent en bouteilles à la mer."),
+        ("anim", "anchor", "Anchor drop", "Ancre jetée", 650, 4,
+         "Notifications dropping like an anchor and swaying.", "Des notifications qui tombent comme une ancre et se balancent."),
+        ("levelup", "plunder", "Plunder", "Butin", 1100, 8,
+         "A treasure chest bursts open, doubloons flying: YO HO HO!",
+         "Un coffre au trésor qui s'ouvre, des doublons qui volent : YO HO HO !"),
+    ),
+    "mecha": (
+        ("ambient", "gears", "Gears", "Engrenages", 300, None,
+         "Steel gears turning one way and the other.", "Des engrenages d'acier qui tournent dans un sens et dans l'autre."),
+        ("live", "gears", "Gears", "engrenages", 350, None, "", ""),
+        ("banner", "assemblyline", "Assembly line", "Chaîne de montage", 300, None,
+         "Robot arms over an assembly line, warning lights blinking.", "Des bras robotisés au-dessus d'une chaîne de montage, des voyants qui clignotent."),
+        ("effect", "bolts", "Nuts and bolts", "Écrous et boulons", 250, None,
+         "Nuts and bolts spinning out of the reward.", "Des écrous et des boulons qui jaillissent en tournant de la récompense."),
+        ("palette", "gunmetal", "Gunmetal", "Acier canon", 200, None,
+         "Steel grey and warning red over the theme.", "Gris acier et rouge d'alerte sur le thème."),
+        ("name", "steelplate", "Steel plate", "plaque d'acier", 300, None,
+         "A name stamped in chrome stencil.", "Un nom frappé au pochoir chromé."),
+        ("title", "More than meets the eye", "Titre : Plus qu'il n'y paraît", "glitch", 150, None, "", ""),
+        ("badge", "Mech pilot", "Badge Pilote de méca", "bot", "neon", 200, None, "", ""),
+        ("frame", "visor", "Visor", "Visière", 650, 4,
+         "Your avatar behind a bolted hexagonal visor.", "Votre avatar derrière une visière hexagonale boulonnée."),
+        ("level", "chevron", "Chevron", "Chevron", 700, 4,
+         "Your level on a steel chevron.", "Votre niveau sur un chevron d'acier."),
+        ("notif", "chamfer", "Steel panel", "Panneau d'acier", 650, 4,
+         "Notifications on steel panels with cut corners.", "Des notifications sur des panneaux d'acier aux coins coupés."),
+        ("anim", "transform", "Transform", "Transformation", 650, 4,
+         "Notifications unfolding panel by panel.", "Des notifications qui se déplient panneau par panneau."),
+        ("levelup", "rollout", "Roll out", "En route", 1100, 8,
+         "Steel plates fly in from every side and lock into place around your new level.",
+         "Des plaques d'acier arrivent de partout et se verrouillent autour de votre nouveau niveau."),
+    ),
+}  # fmt: skip
+UNIVERSE_MADE: dict[str, list[str]] = {theme: _looks(rows)[0] for theme, rows in UNIVERSE_ROWS.items()}
+_SLOTS = ("banner_", "frame_", "name_", "notif_", "effect_", "ambient_", "badge_", "title_")
+
+
+def _slot(made: list[str], prefix: str) -> str | None:
+    """The first made product of a slot (a static banner, not an animated one; a notification style first)."""
+    found = [key for key in made if key.startswith(prefix) and not key.startswith("banner_live_")]
+    if prefix == "notif_":
+        found = [
+            key for key in found if any(p["key"] == key and p["type"] == "notification_style" for p in SHOP)
+        ]
+    return found[0] if found else None
+
+
+for _theme, _made in UNIVERSE_MADE.items():
+    _row = tuple(_slot(_made, prefix) for prefix in _SLOTS)
+    UNIVERSES[_theme] = (
+        _row[0] or "",
+        _row[1] or "",
+        _row[2] or "",
+        _row[3] or "",
+        _row[4],
+        _row[5],
+        _row[6] or "",
+        _row[7],
+    )
+    UNIVERSE_EXTRAS[_theme] = tuple(key for key in _made if key not in _row)
+
+
 # 027 (#30): each universe's dashboard looks — its theme pack includes them (and the widget a look needs)
 UNIVERSE_LOOKS: dict[str, tuple[str, ...]] = {
     "cyberpunk": ("opt_style_services_pulse", "opt_style_activity_live", "opt_style_stats_countup"),
@@ -2365,253 +2756,7 @@ SEASONAL: tuple[tuple[str, tuple[tuple[Any, ...], ...]], ...] = (
 SEASONAL_LEGENDARY = ("level_spectre", "frame_tinsel", "name_namesunburst")
 HD_ABOUT = ("Drawn by the graphics chip.", "Dessiné par la puce graphique.")
 for _season, _items in SEASONAL:
-    _hd: list[str] = []
-    for _item in _items:
-        _kind = _item[0]
-        if _kind == "ambient":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"ambient_{_v}",
-                "ambient",
-                _price,
-                "common",
-                f"{_en} ambience",
-                f"Ambiance {_fr.lower()}",
-                _aen,
-                _afr,
-                {"ambient": _v},
-                collection="ambients",
-                icon="sparkles",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "live":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"banner_live_{_v}",
-                "profile_banner",
-                _price,
-                "common",
-                f"{_en} animated banner",
-                f"Bannière animée {_fr}",
-                f"{_en} playing in your profile's banner, for every visitor to see.",
-                f"Des {_fr} dans la bannière de votre profil, pour tous vos visiteurs.",
-                {"banner": f"live-{_v}"},
-                collection="profile",
-                icon="image",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "effect":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"effect_{_v}",
-                "effect",
-                _price,
-                "common",
-                f"{_en} celebration",
-                f"Célébration {_fr.lower()}",
-                _aen,
-                _afr,
-                {"effect": _v},
-                collection="celebrations",
-                icon="party",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "palette":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"palette_{_v}",
-                "palette",
-                _price,
-                "common",
-                f"{_en} palette",
-                f"Palette {_fr.lower()}",
-                _aen,
-                _afr,
-                {"palette": _v},
-                collection="palettes",
-                icon="palette",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "name":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"name_{_v}",
-                "name_style",
-                _price,
-                "common",
-                f"{_en} name style",
-                f"Style de nom {_fr}",
-                _aen,
-                _afr,
-                {"style": _v},
-                collection="names",
-                icon="feather",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "banner":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"banner_{_v}",
-                "profile_banner",
-                _price,
-                "common",
-                f"{_en} banner",
-                f"Bannière {_fr.lower()}",
-                _aen,
-                _afr,
-                {"banner": _v},
-                collection="profile",
-                icon="image",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "title":
-            _, _label, _fr, _style, _price, _level, _, _ = _item
-            _p(
-                f"title_{_label.lower().replace(' ', '_').replace(chr(39), '')}",
-                "title",
-                _price,
-                "common",
-                f"Title: {_label}",
-                _fr,
-                f"« {_label} » under your name.",
-                f"« {_label} » sous votre nom.",
-                {"label": _label, "style": _style},
-                collection="titles",
-                icon="trophy",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "badge":
-            _, _label, _fr, _icon, _style, _price, _level, _, _ = _item
-            _p(
-                f"badge_{_label.lower().replace(' ', '_').replace(chr(39), '')}",
-                "badge",
-                _price,
-                "common",
-                f"{_label} badge",
-                _fr,
-                f"A « {_label} » badge on your profile.",
-                f"Un badge « {_label} » sur votre profil.",
-                {"label": _label, "icon": _icon, "style": _style},
-                collection="badges",
-                icon="star",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "frame":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"frame_{_v}",
-                "avatar_frame",
-                _price,
-                "rare",
-                f"{_en} frame",
-                f"Cadre {_fr.lower()}",
-                _aen,
-                _afr,
-                {"frame": _v},
-                collection="profile",
-                icon="user",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "level":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"level_{_v}",
-                "level_badge",
-                _price,
-                "rare",
-                f"{_en} level badge",
-                f"Badge de niveau {_fr.lower()}",
-                _aen,
-                _afr,
-                {"style": _v},
-                collection="levels",
-                icon="trophy",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "notif":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _p(
-                f"notif_{_v}",
-                "notification_style",
-                _price,
-                "rare",
-                f"{_en} notifications",
-                f"Notifications {_fr.lower()}",
-                _aen,
-                _afr,
-                {"style": _v},
-                collection="looks",
-                icon="bell",
-                level=_level,
-                season=_season,
-            )
-        elif _kind == "hdframe":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _key = f"frame_{_v}"
-            _p(
-                _key,
-                "avatar_frame",
-                _price,
-                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
-                f"{_en} frame",
-                f"Cadre {_fr.lower()}",
-                _aen,
-                _afr,
-                {"frame": _v},
-                collection="profile",
-                icon="user",
-                level=_level,
-                season=_season,
-            )
-            _hd.append(_key)
-        elif _kind == "hdname":
-            _, _v, _en, _fr, _price, _level, _, _ = _item
-            _key = f"name_name{_v}"
-            _p(
-                _key,
-                "name_style",
-                _price,
-                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
-                f"{_en} name style",
-                f"Style de nom {_fr}",
-                f"An aura around your name. {HD_ABOUT[0]}",
-                f"Une aura autour de votre nom. {HD_ABOUT[1]}",
-                {"style": f"name{_v}"},
-                collection="names",
-                icon="feather",
-                level=_level,
-                season=_season,
-            )
-            _hd.append(_key)
-        elif _kind == "hdlevel":
-            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
-            _key = f"level_{_v}"
-            _p(
-                _key,
-                "level_badge",
-                _price,
-                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
-                f"{_en} level badge",
-                f"Badge de niveau {_fr.lower()}",
-                _aen,
-                _afr,
-                {"style": _v},
-                collection="levels",
-                icon="trophy",
-                level=_level,
-                season=_season,
-            )
-            _hd.append(_key)
+    _made, _hd = _looks(_items, season=_season)
     _names = {
         "halloween": ("Halloween", "Halloween"),
         "christmas": ("Christmas", "Noël"),

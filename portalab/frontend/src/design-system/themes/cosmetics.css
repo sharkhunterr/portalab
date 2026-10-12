@@ -2864,3 +2864,202 @@
 .avatar-frame[data-frame="sunburst"][data-fx-failed] {
   background: repeating-conic-gradient(#ffb347 0 12deg, #ffe08a 12deg 24deg);
 }
+
+/* ---------------------------------------------------------------- #89: the universes */
+/* banners */
+.profile-banner[data-banner="greathall"] {
+  background:
+    radial-gradient(circle at 12% 30%, #ffd36b 0 2px, transparent 4px) 0 0 / 4.5rem 3rem,
+    radial-gradient(circle at 60% 60%, #ffffffaa 0 1px, transparent 2px) 0 0 / 2.2rem 1.8rem,
+    linear-gradient(0deg, #2a1410 0 16%, transparent 16%),
+    repeating-linear-gradient(90deg, transparent 0 10%, #1a0f0a 10% 11.5%, transparent 11.5% 20%) 0 100% /
+    100% 70% no-repeat,
+    linear-gradient(180deg, #0b1a3a, #1e2f5c 55%, #5a2a1a);
+}
+.profile-banner[data-banner="jollyship"] {
+  background:
+    radial-gradient(circle 1.4rem at 82% 28%, #fdf6d8, #efe2b0 80%, transparent 84%),
+    linear-gradient(0deg, #0a2a33 0 30%, transparent 30%),
+    linear-gradient(170deg, transparent 0 54%, #120c08 54% 57%, transparent 57%) 30% 70% / 30% 30% no-repeat,
+    conic-gradient(from 200deg at 40% 40%, transparent 0 40deg, #f3ecd8cc 40deg 70deg, transparent 70deg) 30%
+    30% / 20% 50% no-repeat,
+    conic-gradient(from 210deg at 40% 40%, transparent 0 40deg, #e9e0c8cc 40deg 66deg, transparent 66deg) 40%
+    32% / 18% 46% no-repeat,
+    repeating-linear-gradient(0deg, #0e3a46 0 3px, #134e5e 3px 6px) 0 100% / 100% 30% no-repeat,
+    linear-gradient(180deg, #071526, #123a5a 60%, #2c6a7a);
+}
+.profile-banner[data-banner="assemblyline"] {
+  background:
+    repeating-linear-gradient(90deg, #ef444499 0 6px, transparent 6px 40px) 0 82% / 100% 4px no-repeat,
+    linear-gradient(0deg, #111827 0 18%, transparent 18%),
+    linear-gradient(135deg, transparent 46%, #4b5563 46% 52%, transparent 52%) 20% 40% / 14% 50% no-repeat,
+    linear-gradient(45deg, transparent 46%, #4b5563 46% 52%, transparent 52%) 70% 40% / 14% 50% no-repeat,
+    repeating-linear-gradient(45deg, #1f2937 0 1rem, #273244 1rem 2rem);
+}
+
+/* frames — not round: a house's shield, a ship's wheel, a robot's visor */
+.avatar-frame[data-frame="housecrest"] {
+  padding: 7px 7px 12px;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, #7f1d1d 50%, #b45309 50%) top / 100% 50% no-repeat,
+    linear-gradient(90deg, #1e3a8a 50%, #166534 50%) bottom / 100% 50% no-repeat;
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+  filter: drop-shadow(0 0 0.5rem #f59e0b88);
+}
+.avatar-frame[data-frame="housecrest"] > :not(.avatar-frame__fx) {
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+  border-radius: 0;
+}
+.avatar-frame[data-frame="shipwheel"] {
+  padding: 15px;
+  background:
+    radial-gradient(circle, transparent 0 58%, #a0692f 59% 72%, #5c3a1a 73% 75%, transparent 76%),
+    repeating-conic-gradient(from 11.25deg, #7a4f26 0 7deg, transparent 7deg 45deg);
+  filter: drop-shadow(0 0 0.4rem #00000088);
+  clip-path: polygon(
+    50% 0,
+    56% 12%,
+    71% 6%,
+    72% 19%,
+    85% 15%,
+    82% 28%,
+    100% 50%,
+    82% 72%,
+    85% 85%,
+    72% 81%,
+    71% 94%,
+    56% 88%,
+    50% 100%,
+    44% 88%,
+    29% 94%,
+    28% 81%,
+    15% 85%,
+    18% 72%,
+    0 50%,
+    18% 28%,
+    15% 15%,
+    28% 19%,
+    29% 6%,
+    44% 12%
+  );
+  animation: frame-turn 30s linear infinite;
+}
+.avatar-frame[data-frame="shipwheel"] > * {
+  animation: frame-turn 30s linear infinite reverse;
+}
+.avatar-frame[data-frame="visor"] {
+  padding: 8px;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 12% 50%, #d1d5db 0 3px, #374151 4px, transparent 5px),
+    radial-gradient(circle at 88% 50%, #d1d5db 0 3px, #374151 4px, transparent 5px),
+    linear-gradient(135deg, #9ca3af, #374151 45%, #ef4444 46% 54%, #374151 55%, #9ca3af);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+.avatar-frame[data-frame="visor"] > :not(.avatar-frame__fx) {
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  border-radius: 0;
+}
+
+/* name styles */
+.name-style[data-name="spellbound"] {
+  font-family: "Uncial Antiqua", "Cinzel Decorative", serif;
+  background: linear-gradient(90deg, #b45309, #fde68a, #b45309);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px #f59e0b88);
+  animation: name-shimmer 6s linear infinite;
+}
+.name-style[data-name="pirata"] {
+  font-family: "Pirata One", "IM Fell English", serif;
+  letter-spacing: 0.03em;
+  color: #e8c66a;
+  text-shadow:
+    0 1px 0 #5a3a12,
+    0 0 8px #00000088;
+}
+.name-style[data-name="steelplate"] {
+  font-family: "Black Ops One", "Orbitron", sans-serif;
+  letter-spacing: 0.05em;
+  background: linear-gradient(180deg, #f9fafb, #9ca3af 48%, #4b5563 52%, #d1d5db);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 #111827) drop-shadow(0 0 4px #ef444455);
+}
+
+/* level badges — free shapes: a winged golden ball, a notched doubloon, a steel chevron */
+:is(:root[data-level-badge="snitch"] .ds-level:not([data-look]), .ds-level[data-look="snitch"]) {
+  position: relative;
+  margin-inline: 0.9rem;
+  background: radial-gradient(circle at 35% 30%, #fff7cc, #f5c542 40%, #a16207);
+  color: #3b2400;
+  border-radius: 999px;
+  box-shadow: 0 0 10px #f5c54288;
+  overflow: visible;
+}
+:is(:root[data-level-badge="snitch"] .ds-level:not([data-look]), .ds-level[data-look="snitch"])::before,
+:is(:root[data-level-badge="snitch"] .ds-level:not([data-look]), .ds-level[data-look="snitch"])::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 10%;
+  inline-size: 1.1rem;
+  block-size: 0.7rem;
+  background: repeating-linear-gradient(170deg, #f8fafc 0 2px, #cbd5e1 2px 3px);
+  border-radius: 100% 10% 60% 10%;
+  transform-origin: 100% 60%;
+  animation: level-wing 0.25s ease-in-out infinite alternate;
+}
+:is(:root[data-level-badge="snitch"] .ds-level:not([data-look]), .ds-level[data-look="snitch"])::before {
+  inset-inline-end: calc(100% - 0.15rem);
+}
+:is(:root[data-level-badge="snitch"] .ds-level:not([data-look]), .ds-level[data-look="snitch"])::after {
+  inset-inline-start: calc(100% - 0.15rem);
+  scale: -1 1;
+  transform-origin: 0 60%;
+}
+@keyframes level-wing {
+  to {
+    rotate: -18deg;
+  }
+}
+:is(:root[data-level-badge="doubloon"] .ds-level:not([data-look]), .ds-level[data-look="doubloon"]) {
+  padding-inline: 0.55rem;
+  background: radial-gradient(circle at 40% 35%, #fff2b3, #e0a800 55%, #8a6200);
+  color: #3a2800;
+  clip-path: polygon(
+    10% 20%,
+    20% 8%,
+    35% 2%,
+    50% 0,
+    65% 2%,
+    80% 8%,
+    90% 20%,
+    98% 35%,
+    100% 50%,
+    98% 65%,
+    90% 80%,
+    80% 92%,
+    65% 98%,
+    50% 100%,
+    35% 98%,
+    20% 92%,
+    10% 80%,
+    2% 65%,
+    0 50%,
+    2% 35%
+  );
+  text-shadow: 0 1px 0 #fff4;
+}
+:is(:root[data-level-badge="chevron"] .ds-level:not([data-look]), .ds-level[data-look="chevron"]) {
+  padding-inline: 0.8rem 1rem;
+  border-radius: 0;
+  background: linear-gradient(180deg, #e5e7eb, #6b7280 50%, #374151);
+  color: #fff;
+  clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%, 12% 50%);
+  text-shadow: 0 1px 0 #111827;
+  box-shadow: none;
+}

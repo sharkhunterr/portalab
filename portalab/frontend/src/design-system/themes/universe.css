@@ -2614,3 +2614,161 @@ h3,
 .ds-notifications[data-style="postcard"] .ds-notification__body {
   color: #4a3a22;
 }
+
+/* ---------------------------------------------------------------- #89: the universes' notifications */
+/* scroll (magic school): an unrolled parchment, its two rolls at the ends */
+.ds-notifications[data-style="scroll"] .ds-notification {
+  position: relative;
+  margin-inline: 0.9rem;
+  border: 0;
+  border-radius: 0.2rem;
+  background:
+    radial-gradient(ellipse at 15% 20%, #00000012, transparent 55%), linear-gradient(180deg, #f6e7c1, #ead39c);
+  color: #3a2410;
+  font-family: "EB Garamond", Georgia, serif;
+  box-shadow: 0 6px 18px #00000055;
+}
+.ds-notifications[data-style="scroll"] .ds-notification::before,
+.ds-notifications[data-style="scroll"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block: -0.35rem;
+  inline-size: 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b88a4a, #f3dfae 45%, #a87a3a);
+  box-shadow: 0 2px 4px #0005;
+}
+.ds-notifications[data-style="scroll"] .ds-notification::before {
+  inset-inline-start: -0.8rem;
+}
+.ds-notifications[data-style="scroll"] .ds-notification::after {
+  inset-inline-end: -0.8rem;
+}
+.ds-notifications[data-style="scroll"] .ds-notification__title {
+  font-family: "Uncial Antiqua", "Cinzel", serif;
+}
+.ds-notifications[data-style="scroll"] .ds-notification__body {
+  color: #5a3a1a;
+}
+/* bottle (pirates): a message in a bottle — rounded glass, its neck and cork on the side */
+.ds-notifications[data-style="bottle"] .ds-notification {
+  position: relative;
+  margin-inline-start: 2.4rem;
+  border: 2px solid #9bd3c6aa;
+  border-radius: 1.4rem 2.2rem 2.2rem 1.4rem;
+  background:
+    linear-gradient(180deg, #ffffff33, transparent 40%),
+    linear-gradient(180deg, #f1e3bf, #e4cf9c) padding-box;
+  color: #2e2412;
+  box-shadow:
+    inset 0 0 0 4px #7fc4b333,
+    0 6px 18px #00000055;
+}
+.ds-notifications[data-style="bottle"] .ds-notification::before {
+  content: "";
+  position: absolute;
+  inset-block: 30%;
+  inset-inline-start: -2.4rem;
+  inline-size: 2.4rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+  background:
+    linear-gradient(90deg, #8b5a2b 0 34%, transparent 34%), linear-gradient(180deg, #a8dccf88, #6fb3a388);
+}
+.ds-notifications[data-style="bottle"] .ds-notification__title {
+  font-family: "Pirata One", "IM Fell English", serif;
+  letter-spacing: 0.02em;
+}
+.ds-notifications[data-style="bottle"] .ds-notification__body {
+  color: #4a3a1a;
+}
+/* chamfer (robots): a steel panel with cut corners, a red light running along its edge */
+.ds-notifications[data-style="chamfer"] .ds-notification {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, #ef4444 0 0.3rem, transparent 0.3rem),
+    repeating-linear-gradient(135deg, #ffffff06 0 6px, transparent 6px 12px),
+    linear-gradient(180deg, #4b5563, #1f2937);
+  color: #f9fafb;
+  clip-path: polygon(0.9rem 0, 100% 0, 100% calc(100% - 0.9rem), calc(100% - 0.9rem) 100%, 0 100%, 0 0.9rem);
+  font-family: "Rajdhani", "Chakra Petch", sans-serif;
+  box-shadow: none;
+  filter: drop-shadow(0 6px 12px #00000066);
+}
+.ds-notifications[data-style="chamfer"] .ds-notification__title {
+  font-family: "Black Ops One", "Orbitron", sans-serif;
+  letter-spacing: 0.04em;
+}
+.ds-notifications[data-style="chamfer"] .ds-notification__body {
+  color: #d1d5db;
+}
+
+/* animations */
+.ds-notifications[data-animation="swoop"] .ds-notification {
+  animation-name: universe-notify-swoop;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+@keyframes universe-notify-swoop {
+  0% {
+    opacity: 0;
+    transform: translate(-60vw, -40vh) rotate(-25deg) scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(1.5rem, 0.8rem) rotate(6deg) scale(1.04);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="anchor"] .ds-notification {
+  transform-origin: 50% -2rem;
+  animation-name: universe-notify-anchor;
+  animation-duration: 1.2s;
+  animation-timing-function: ease-out;
+}
+@keyframes universe-notify-anchor {
+  0% {
+    opacity: 0;
+    transform: translateY(-110%) rotate(0deg);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(6%) rotate(0deg);
+  }
+  55% {
+    transform: translateY(0) rotate(5deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+  90% {
+    transform: rotate(1.5deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="transform"] .ds-notification {
+  animation-name: universe-notify-transform;
+  animation-duration: 0.85s;
+  animation-timing-function: steps(6, end);
+}
+@keyframes universe-notify-transform {
+  0% {
+    opacity: 0;
+    transform: scale(0.15, 0.1) rotate(90deg);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(0.4, 1) rotate(0deg);
+  }
+  65% {
+    transform: scale(1, 0.4);
+  }
+  100% {
+    transform: none;
+  }
+}

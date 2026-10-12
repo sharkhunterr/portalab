@@ -82,6 +82,13 @@ export const BANNER_KEYS = [
   "live-loveletters",
   "live-butterflies",
   "live-seagulls",
+  // #89: the universes
+  "greathall",
+  "jollyship",
+  "assemblyline",
+  "live-floatingcandles",
+  "live-cannonsmoke",
+  "live-gears",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -143,6 +150,10 @@ export const FRAME_KEYS = [
   "amour",
   "verdant",
   "sunburst",
+  // #89: the universes
+  "housecrest",
+  "shipwheel",
+  "visor",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -197,4 +208,8 @@ export const NAME_KEYS = [
   "nametinsel",
   "nameamour",
   "namesunburst",
+  // #89: the universes
+  "spellbound",
+  "pirata",
+  "steelplate",
 ] as const;
