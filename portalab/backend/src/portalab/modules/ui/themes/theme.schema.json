@@ -1106,7 +1106,12 @@
             "popmarbling",
             "lavalamp",
             "impasto",
-            "paintribbon"
+            "paintribbon",
+            "cobwebs",
+            "ornaments",
+            "loveletters",
+            "butterflies",
+            "seagulls"
           ]
         }
       },
@@ -1217,7 +1222,12 @@
             "candy",
             "aurora",
             "plasma",
-            "chrono"
+            "chrono",
+            "tombstone",
+            "giftwrap",
+            "loveletter",
+            "bloom",
+            "postcard"
           ]
         },
         "animation": {

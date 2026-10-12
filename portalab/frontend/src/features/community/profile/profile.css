@@ -269,9 +269,11 @@
   display: grid;
   place-items: center;
   min-block-size: 3.5rem;
+  padding: 0.9rem 0.4rem;
   font-size: 1.35rem;
   font-weight: var(--font-weight-bold);
-  overflow: hidden;
+  /* a name's aura spreads around it (the choice's card clips it, never the name's own box) */
+  overflow: visible;
 }
 .looks-list {
   display: flex;

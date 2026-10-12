@@ -923,3 +923,174 @@
     0 0 0 5px #e8c23488,
     0 0 26px #3de88a55;
 }
+
+/* ---------------------------------------------------------------- #81: the seasons */
+/* candy (Halloween): wrapped sweets raining down, spinning */
+[data-effect="candy"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -5);
+  inline-size: 2.2rem;
+  block-size: 0.9rem;
+  background:
+    radial-gradient(ellipse 30% 46% at 50% 50%, hsl(var(--h) 85% 58%) 0 95%, transparent),
+    conic-gradient(
+      from 90deg at 18% 50%,
+      transparent 0 60deg,
+      hsl(var(--h) 70% 72%) 60deg 120deg,
+      transparent 0
+    )
+    left / 50% 100% no-repeat,
+    conic-gradient(
+      from -90deg at 82% 50%,
+      transparent 0 60deg,
+      hsl(var(--h) 70% 72%) 60deg 120deg,
+      transparent 0
+    )
+    right / 50% 100% no-repeat;
+  filter: drop-shadow(0 1px 2px #0005);
+  animation-name: fx-candy;
+  animation-timing-function: cubic-bezier(0.3, 0, 0.8, 1);
+}
+@keyframes fx-candy {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.9;
+    transform: translate3d(calc(var(--s) * 3rem - 2rem), calc(var(--fx-vh, 1vh) * 108), 0) rotate(var(--r));
+  }
+}
+[data-effect="candy"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ff9f1c, #a3e635);
+  color: #2a0f00;
+  box-shadow: 0 0 22px #ff9f1c;
+}
+
+/* gifts (Christmas): wrapped presents bursting out of the bubble */
+[data-effect="gifts"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  --wrap: hsl(calc(var(--h) / 4 + 345) 75% 48%);
+  inline-size: 1.5rem;
+  block-size: 1.4rem;
+  border-radius: 0.15rem;
+  background:
+    linear-gradient(90deg, transparent 42%, #f4d03f 42% 58%, transparent 58%),
+    linear-gradient(0deg, transparent 42%, #f4d03f 42% 58%, transparent 58%), var(--wrap);
+  box-shadow: inset 0 -3px 0 #0003;
+  animation-name: fx-burst;
+}
+[data-effect="gifts"] .celebration-fx:nth-child(2n) {
+  --wrap: #1f8f4e;
+}
+[data-effect="gifts"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #d61f3a, #1f8f4e);
+  color: #fffaf0;
+  box-shadow: 0 0 22px #f4d03f;
+}
+
+/* cupid (Valentine's Day): arrows with heart tips shooting out of the bubble */
+[data-effect="cupid"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.32rem;
+  block-size: 3.2rem;
+  background:
+    radial-gradient(circle at 30% 8%, #ff3d6e 0 22%, transparent 24%),
+    radial-gradient(circle at 70% 8%, #ff3d6e 0 22%, transparent 24%),
+    linear-gradient(180deg, transparent 4%, #ff3d6e 4% 14%, #c9a46a 14% 86%, #ffd1dc 86%);
+  border-radius: 0.2rem;
+  filter: drop-shadow(0 0 4px #ff85b3);
+  animation-name: fx-arrow;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@keyframes fx-arrow {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-7rem - var(--s) * 4rem)) scale(1);
+  }
+}
+[data-effect="cupid"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ffd1dc, #ff3d6e);
+  color: #3d0014;
+  box-shadow: 0 0 22px #ff85b3;
+}
+
+/* eggs (spring): painted eggs bouncing up from the bottom */
+[data-effect="eggs"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -6);
+  inline-size: 1.5rem;
+  block-size: 1.95rem;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: repeating-linear-gradient(
+    160deg,
+    hsl(var(--h) 70% 82%) 0 0.35rem,
+    hsl(calc(var(--h) + 60) 75% 70%) 0.35rem 0.5rem,
+    #ffffff 0.5rem 0.62rem
+  );
+  box-shadow: inset -3px -4px 6px #0002;
+  animation-name: fx-egg;
+  animation-timing-function: cubic-bezier(0.25, 1.4, 0.5, 1);
+}
+@keyframes fx-egg {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(0, calc(var(--fx-vh, 1vh) * (-35 - var(--s) * 20)), 0) rotate(calc(var(--r) / 4));
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, calc(var(--fx-vh, 1vh) * (-28 - var(--s) * 18)), 0) rotate(calc(var(--r) / 3));
+  }
+}
+[data-effect="eggs"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #fef9c3, #c4b5fd 60%, #a7f3d0);
+  color: #2e1065;
+  box-shadow: 0 0 22px #c4b5fd;
+}
+
+/* splash (summer): sea water splashing out of the bubble, then falling back */
+[data-effect="splash"] .celebration-fx {
+  --angle: calc(180deg / var(--n) * var(--i) - 90deg);
+  inline-size: calc(0.45rem + var(--s) * 0.35rem);
+  aspect-ratio: 0.75;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #5ad1e6 45%, #0e7490);
+  opacity: 0.9;
+  animation-name: fx-splash;
+  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+}
+@keyframes fx-splash {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(calc(-4rem - var(--s) * 3rem)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--angle) * 1.3)) translateY(calc(-2rem - var(--s) * 2rem)) translateX(1rem)
+      scale(0.8);
+  }
+}
+[data-effect="splash"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #a5f3fc, #0891b2);
+  color: #052f3a;
+  box-shadow: 0 0 22px #5ad1e6;
+}

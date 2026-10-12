@@ -65,6 +65,8 @@ PROFILE_BANNERS: tuple[str, ...] = (
     "live-inferno", "live-thunderstorm", "live-reef", "live-volcano", "live-whiteout", "live-blackhole",
     "live-liquidmetal", "live-neoncity", "live-matrix", "live-goldenhour", "live-darkness", "live-lavalamp",
     "live-polar", "live-plasma",
+    # #81: the seasons
+    "graveyard", "wrapping", "sweetheart", "garden", "seaside", "live-cobwebs", "live-ornaments", "live-loveletters", "live-butterflies", "live-seagulls",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -77,6 +79,8 @@ AVATAR_FRAMES: tuple[str, ...] = (
     "pyre", "tesla", "abyssal", "obsidian", "frostcrown", "starlit", "regalia", "biohazard", "prism",
     "sigil", "mainframe", "hanami", "wraith", "sweetie", "borealis", "corona",
     "chronogate",  # #78: the time portal
+    # #81: the seasons
+    "cauldron", "candycane", "heartbeat", "daisy", "lifebuoy", "spectre", "tinsel", "amour", "verdant", "sunburst",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -85,6 +89,8 @@ PALETTES: tuple[str, ...] = (
     "hawkins", "gondor",
     "vhs", "nova",
     "vhs", "nostromo",
+    # #81: the seasons
+    "pumpkinspice", "evergreen", "cherry", "pastel", "tropical",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -107,6 +113,8 @@ AMBIENTS: tuple[str, ...] = (
     "paintmix", "acrylicpour", "watercolor", "marbling",
     "poppaint", "poppour", "popwatercolor", "popmarbling", "lavalamp",
     "impasto", "paintribbon",
+    # #81: the seasons
+    "cobwebs", "ornaments", "loveletters", "butterflies", "seagulls",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
@@ -116,6 +124,8 @@ CELEBRATIONS: tuple[str, ...] = (
     "rewind", "tracker",
     # #78: drawn by the GPU
     "nova", "goldshower", "petalstorm", "rebirth", "stormstrike", "skyveil", "arcana", "timerift",
+    # #81: the seasons
+    "candy", "gifts", "cupid", "eggs", "splash",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -129,6 +139,8 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     "blaze", "voltage", "aqua", "magma", "glacier", "galaxy", "aurum", "toxic", "holo", "runes", "matrix",
     "sakura", "shadow", "candy", "aurora", "plasma",
     "chrono",  # #78: the time portal
+    # #81: the seasons
+    "tombstone", "giftwrap", "loveletter", "bloom", "postcard",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -154,6 +166,8 @@ NAME_STYLES: tuple[str, ...] = (
     # #78: drawn by the GPU
     "nameblaze", "namevolt", "namefrost", "namegalaxy", "namegold", "nameshadow", "namesakura",
     "nameplasma", "nameaurora", "namechrono",
+    # #81: the seasons
+    "slime", "gingerbread", "lovestruck", "springtime", "tropical", "namespectre", "nametinsel", "nameamour", "namesunburst",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
@@ -180,6 +194,8 @@ LEVEL_BADGES: tuple[str, ...] = (
     "glacier", "galaxy", "aurum", "toxic", "holo", "runes", "matrix", "sakura", "shadow", "candy", "aurora",
     "plasma",
     "chrono",  # #78: the time portal
+    # #81: the seasons
+    "jackolantern", "bauble", "heart", "easteregg", "sunset", "spectre", "tinsel", "verdant",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (

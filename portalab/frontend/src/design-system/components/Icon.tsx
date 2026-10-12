@@ -144,6 +144,7 @@ import {
   Popcorn,
   Puzzle,
   Pyramid,
+  Rabbit,
   Radiation,
   Radio,
   Rainbow,
@@ -389,6 +390,7 @@ export const ICONS: Record<string, LucideIcon> = {
   tent: Tent,
   flashlight: Flashlight,
   shell: Shell,
+  rabbit: Rabbit, // #81: spring
   pizza: Pizza,
   sofa: Sofa,
   lamp: Lamp,

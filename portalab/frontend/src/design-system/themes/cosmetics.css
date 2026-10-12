@@ -2470,16 +2470,17 @@
   isolation: isolate;
   display: inline-block;
   padding-inline: 0.15em;
-  border-radius: 0.4em;
+  /* a pill: the aura rounds the word, never a box */
+  border-radius: 999px;
   color: #fff;
   text-shadow:
     0 0 6px rgb(255 255 255 / 55%),
     0 1px 2px rgb(0 0 0 / 80%);
 }
 .fx-layer--name {
-  inset: -0.9em -0.7em -0.5em;
-  inline-size: calc(100% + 1.4em);
-  block-size: calc(100% + 1.4em);
+  inset: -1.5em -1.4em;
+  inline-size: calc(100% + 2.8em);
+  block-size: calc(100% + 3em);
 }
 /* #78: a celebration drawn by the GPU over the whole screen, fading out at its end */
 .celebration-gpu {
@@ -2591,4 +2592,275 @@
   .ds-notification[data-teleport] > :not(canvas) {
     animation: none;
   }
+}
+
+/* ---------------------------------------------------------------- #81: the seasons */
+/* banners */
+.profile-banner[data-banner="graveyard"] {
+  background:
+    radial-gradient(circle 1.6rem at 78% 30%, #f4f1de, #e9e4c5 80%, transparent 84%),
+    radial-gradient(circle 3.4rem at 78% 30%, #f4f1de2e, transparent),
+    linear-gradient(0deg, #15131f 0 18%, transparent 18%),
+    linear-gradient(90deg, transparent 21.6%, #6b6880 21.6% 22.4%, transparent 22.4%) 0 62% / 100% 12%
+    no-repeat,
+    linear-gradient(0deg, transparent 40%, #6b6880 40% 52%, transparent 52%) 20.5% 64% / 3.4% 14% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #7d7a91 0 98%, transparent) 10% 84% / 5.5% 30% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #6f6c84 0 98%, transparent) 36% 86% / 4.5% 24% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #85829a 0 98%, transparent) 52% 84% / 6% 34% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #6f6c84 0 98%, transparent) 64% 88% / 4% 22% no-repeat,
+    linear-gradient(180deg, #1b1035, #3a1d5c 60%, #5b2a3c);
+}
+.profile-banner[data-banner="wrapping"] {
+  background:
+    linear-gradient(90deg, transparent 46%, #f4d03f 46% 54%, transparent 54%),
+    linear-gradient(0deg, transparent 40%, #f4d03f 40% 52%, transparent 52%),
+    radial-gradient(circle at 25% 30%, #ffffff55 0 2px, transparent 3px) 0 0 / 2.2rem 2.2rem,
+    radial-gradient(circle at 75% 70%, #f4d03f88 0 2px, transparent 3px) 0 0 / 2.2rem 2.2rem,
+    linear-gradient(135deg, #8f0f1f, #c4162f 50%, #8f0f1f);
+}
+.profile-banner[data-banner="sweetheart"] {
+  background:
+    radial-gradient(circle at 20% 40%, #ff8fb1 0 2px, transparent 3px) 0 0 / 3rem 3rem,
+    radial-gradient(60% 90% at 50% 120%, #ff5c8a, transparent 70%),
+    radial-gradient(40% 60% at 85% 20%, #ffd1dc88, transparent),
+    linear-gradient(180deg, #3d0a2a, #8b1e4a 55%, #e05780);
+}
+.profile-banner[data-banner="garden"] {
+  background:
+    radial-gradient(circle at 12% 78%, #fef08a 0 4px, #f472b6 5px 9px, transparent 10px),
+    radial-gradient(circle at 38% 84%, #fde68a 0 4px, #c084fc 5px 9px, transparent 10px),
+    radial-gradient(circle at 64% 76%, #fef08a 0 4px, #fb7185 5px 9px, transparent 10px),
+    radial-gradient(circle at 86% 86%, #fde68a 0 4px, #60a5fa 5px 9px, transparent 10px),
+    linear-gradient(0deg, #3f8f3a 0 30%, #6cbf5a 30% 36%, transparent 36%),
+    linear-gradient(180deg, #8fd3ff, #d9f2ff 70%);
+}
+.profile-banner[data-banner="seaside"] {
+  background:
+    radial-gradient(circle 2rem at 70% 52%, #ffe08a, #ffb347 70%, transparent 74%),
+    linear-gradient(0deg, #f2d7a1 0 18%, transparent 18%),
+    repeating-linear-gradient(0deg, #1e88b6 0 3px, #2aa3cf 3px 7px) 0 100% / 100% 40% no-repeat,
+    linear-gradient(180deg, #ff9a6b, #ffcf8f 55%, #ffe6b5 60%);
+}
+
+/* frames */
+.avatar-frame[data-frame="cauldron"] {
+  background:
+    radial-gradient(circle at 30% 18%, #b6ff7a 0 7%, transparent 8%),
+    radial-gradient(circle at 62% 10%, #b6ff7a 0 5%, transparent 6%),
+    radial-gradient(circle at 78% 26%, #b6ff7a 0 6%, transparent 7%),
+    conic-gradient(#3b1a5a, #6d28d9, #3b1a5a, #16a34a, #3b1a5a);
+  box-shadow: 0 0 0.9rem #84cc16aa;
+  animation: frame-bubble 2.6s ease-in-out infinite;
+}
+@keyframes frame-bubble {
+  50% {
+    box-shadow: 0 0 1.4rem #a3e635cc;
+    filter: hue-rotate(-12deg);
+  }
+}
+.avatar-frame[data-frame="candycane"] {
+  background: repeating-conic-gradient(#d61f3a 0 15deg, #ffffff 15deg 30deg);
+  box-shadow: 0 0 0.6rem #d61f3a77;
+  animation: frame-turn 14s linear infinite;
+}
+.avatar-frame[data-frame="candycane"] > * {
+  animation: frame-turn 14s linear infinite reverse;
+}
+@keyframes frame-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+.avatar-frame[data-frame="heartbeat"] {
+  background: radial-gradient(circle, #ff3d6e 60%, #b3123a);
+  box-shadow: 0 0 0.8rem #ff3d6e;
+  animation: frame-heartbeat 1.2s ease-in-out infinite;
+}
+@keyframes frame-heartbeat {
+  0%,
+  40%,
+  100% {
+    box-shadow: 0 0 0.6rem #ff3d6e99;
+  }
+  15% {
+    box-shadow:
+      0 0 0 3px #ff3d6e55,
+      0 0 1.4rem #ff3d6e;
+  }
+  28% {
+    box-shadow: 0 0 1rem #ff3d6ecc;
+  }
+}
+.avatar-frame[data-frame="daisy"] {
+  background:
+    repeating-conic-gradient(#fffdf5 0 12deg, #f4f1e6 12deg 18deg, transparent 18deg 24deg),
+    radial-gradient(circle, #facc15 0 58%, #84cc16 60%);
+  box-shadow: 0 0 0.6rem #fef08a88;
+}
+.avatar-frame[data-frame="lifebuoy"] {
+  padding: 7px;
+  background: repeating-conic-gradient(from 22.5deg, #e23d3d 0 45deg, #ffffff 45deg 90deg), #ffffff;
+  box-shadow:
+    inset 0 0 0 1px #0002,
+    0 2px 6px #0004;
+}
+
+/* name styles */
+.name-style[data-name="slime"] {
+  background: linear-gradient(180deg, #d9f99d, #65a30d 70%, #3f6212);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 #3f6212) drop-shadow(0 0 6px #84cc1688);
+  font-weight: 800;
+}
+.name-style[data-name="gingerbread"] {
+  color: #9a5a2b;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 1px #fff7ed;
+  paint-order: stroke fill;
+  text-shadow: 0 2px 0 #5c3417;
+}
+.name-style[data-name="lovestruck"] {
+  background: linear-gradient(90deg, #ff3d6e, #ff9ab6, #ff3d6e);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    name-shimmer 4s linear infinite,
+    name-beat 1.4s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes name-beat {
+  0%,
+  45%,
+  100% {
+    scale: 1;
+  }
+  15% {
+    scale: 1.06;
+  }
+  30% {
+    scale: 1.02;
+  }
+}
+.name-style[data-name="springtime"] {
+  background: linear-gradient(90deg, #c4b5fd, #f9a8d4, #a7f3d0, #fde68a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+.name-style[data-name="springtime"]::after {
+  content: "✿";
+  margin-inline-start: 0.25em;
+  color: #f9a8d4;
+  -webkit-text-fill-color: #f9a8d4;
+  display: inline-block;
+  animation: name-bloom 3s ease-in-out infinite;
+}
+@keyframes name-bloom {
+  50% {
+    rotate: 25deg;
+    scale: 1.15;
+  }
+}
+.name-style[data-name="tropical"] {
+  background: linear-gradient(90deg, #06b6d4, #2dd4bf, #fb7185, #fdba74);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  animation:
+    name-shimmer 6s linear infinite,
+    name-sway 3.2s ease-in-out infinite;
+}
+@keyframes name-sway {
+  50% {
+    translate: 0 -2px;
+    rotate: -1deg;
+  }
+}
+
+/* level badges */
+:is(:root[data-level-badge="jackolantern"] .ds-level:not([data-look]), .ds-level[data-look="jackolantern"]) {
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 60%, #ffd86b55, transparent),
+    repeating-linear-gradient(90deg, #f97316 0 22%, #ea580c 22% 25%), #f97316;
+  color: #2a0c00;
+  border-radius: 45% 45% 40% 40%;
+  box-shadow:
+    0 -3px 0 -1px #3f6212,
+    0 0 12px #f9731699,
+    inset 0 0 8px #ffd86b88;
+  text-shadow: 0 0 6px #ffd86b;
+}
+:is(:root[data-level-badge="bauble"] .ds-level:not([data-look]), .ds-level[data-look="bauble"]) {
+  background:
+    radial-gradient(circle at 32% 28%, #ffffffcc 0 10%, transparent 26%),
+    radial-gradient(circle, #e0263e, #8f0f1f);
+  color: #fff7ed;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  box-shadow:
+    0 -3px 0 -1px #e8b22c,
+    0 0 10px #e0263e88;
+}
+:is(:root[data-level-badge="heart"] .ds-level:not([data-look]), .ds-level[data-look="heart"]) {
+  background:
+    radial-gradient(circle at 35% 30%, #ffffff99 0 10%, transparent 28%),
+    linear-gradient(135deg, #ff6b8f, #c2123d);
+  color: #fff;
+  border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+  box-shadow: 0 0 12px #ff3d6e88;
+}
+:is(:root[data-level-badge="easteregg"] .ds-level:not([data-look]), .ds-level[data-look="easteregg"]) {
+  background: repeating-linear-gradient(
+    160deg,
+    #c4b5fd 0 5px,
+    #fde68a 5px 8px,
+    #a7f3d0 8px 13px,
+    #ffffff 13px 15px
+  );
+  color: #2e1065;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow:
+    0 0 0 1.5px #ffffff,
+    0 0 10px #c4b5fd;
+}
+:is(:root[data-level-badge="sunset"] .ds-level:not([data-look]), .ds-level[data-look="sunset"]) {
+  background:
+    radial-gradient(circle at 50% 78%, #ffe08a 0 22%, transparent 24%),
+    linear-gradient(0deg, #1e88b6 0 30%, transparent 30%), linear-gradient(180deg, #ff6b6b, #ffb347);
+  color: #2a0a00;
+  box-shadow: 0 0 10px #ffb34799;
+}
+
+/* #81: the seasons' looks drawn by the GPU — without WebGL, a CSS look of the same */
+.ds-level[data-fx="spectre"][data-fx-failed] {
+  background: linear-gradient(0deg, #0f0a1f, #2f6b66 70%, #c8fff0);
+}
+.ds-level[data-fx="tinsel"][data-fx-failed] {
+  background: repeating-linear-gradient(135deg, #e8b22c 0 4px, #1f8f4e 4px 8px);
+}
+.ds-level[data-fx="verdant"][data-fx-failed] {
+  background: linear-gradient(0deg, #14532d, #4ade80 70%, #ecfccb);
+}
+.avatar-frame[data-frame="spectre"][data-fx-failed] {
+  background: conic-gradient(#0f0a1f, #2f6b66, #c8fff0, #2f6b66, #0f0a1f);
+}
+.avatar-frame[data-frame="tinsel"][data-fx-failed] {
+  background: repeating-conic-gradient(#e8b22c 0 10deg, #1f8f4e 10deg 20deg);
+}
+.avatar-frame[data-frame="amour"][data-fx-failed] {
+  background: conic-gradient(#ff3d6e, #ffb3c6, #c2123d, #ff3d6e);
+}
+.avatar-frame[data-frame="verdant"][data-fx-failed] {
+  background: conic-gradient(#14532d, #4ade80, #ecfccb, #4ade80, #14532d);
+}
+.avatar-frame[data-frame="sunburst"][data-fx-failed] {
+  background: repeating-conic-gradient(#ffb347 0 12deg, #ffe08a 12deg 24deg);
 }

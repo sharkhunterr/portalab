@@ -2494,3 +2494,123 @@ h3,
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------- #81: the seasons' notifications */
+/* tombstone (Halloween): carved in old stone, a rounded top */
+.ds-notifications[data-style="tombstone"] .ds-notification {
+  border: 1px solid #5d5a6b;
+  border-radius: 1.6rem 1.6rem 0.3rem 0.3rem;
+  background:
+    radial-gradient(circle at 20% 30%, #00000022 0 2px, transparent 3px) 0 0 / 1.4rem 1.2rem,
+    radial-gradient(ellipse at 50% 0%, #ffffff18, transparent 60%),
+    linear-gradient(180deg, #8b8798, #5f5b6e);
+  color: #f1effa;
+  box-shadow:
+    0 8px 18px #00000066,
+    inset 0 2px 0 #ffffff22,
+    inset 0 -4px 0 #00000033;
+}
+.ds-notifications[data-style="tombstone"] .ds-notification__title {
+  font-family: "Cinzel", Georgia, serif;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 #00000088;
+}
+.ds-notifications[data-style="tombstone"] .ds-notification__body {
+  color: #dcd8ea;
+}
+/* gift wrap (Christmas): red paper and a golden ribbon across */
+.ds-notifications[data-style="giftwrap"] .ds-notification {
+  border: 1px solid #8f0f1f;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(90deg, transparent 0 1.1rem, #f4d03f 1.1rem 1.6rem, transparent 1.6rem),
+    radial-gradient(circle, #ffffff33 0 1.5px, transparent 2px) 0 0 / 1.2rem 1.2rem,
+    linear-gradient(135deg, #b3132b, #d61f3a);
+  color: #fffaf0;
+  box-shadow: 0 6px 18px #00000055;
+}
+.ds-notifications[data-style="giftwrap"] .ds-notification__body {
+  color: #ffe9d6;
+}
+/* love letter (Valentine's Day): an envelope sealed with a red heart */
+.ds-notifications[data-style="loveletter"] .ds-notification {
+  position: relative;
+  border: 1px solid #e9b8c3;
+  border-radius: 0.3rem;
+  background:
+    linear-gradient(20deg, transparent 49.5%, #f1cad3 50%, transparent 50.5%) left top / 50% 2.2rem no-repeat,
+    linear-gradient(-20deg, transparent 49.5%, #f1cad3 50%, transparent 50.5%) right top / 50% 2.2rem
+    no-repeat,
+    linear-gradient(180deg, #fff7f8, #ffe4ea);
+  color: #4a0f22;
+  box-shadow: 0 6px 18px #00000040;
+}
+.ds-notifications[data-style="loveletter"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset: -0.45rem auto auto 50%;
+  inline-size: 1rem;
+  block-size: 0.9rem;
+  translate: -50% 0;
+  background: #d7263d;
+  clip-path: path("M8 15 C-6 5 2 -3 8 3 C14 -3 22 5 8 15 Z");
+  filter: drop-shadow(0 1px 1px #0004);
+}
+.ds-notifications[data-style="loveletter"] .ds-notification__body {
+  color: #7a2a42;
+}
+/* bloom (spring): fresh leaves and small flowers along the edge */
+.ds-notifications[data-style="bloom"] .ds-notification {
+  border: 1px solid #a7d7a0;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 0.8rem 0.8rem, #f9a8d4 0 4px, #fde68a 4px 5px, transparent 6px),
+    radial-gradient(
+      circle at calc(100% - 0.9rem) calc(100% - 0.8rem),
+      #c4b5fd 0 4px,
+      #fde68a 4px 5px,
+      transparent 6px
+    ),
+    radial-gradient(ellipse 0.9rem 0.4rem at 1.9rem 0.7rem, #6cbf5a 0 95%, transparent),
+    linear-gradient(180deg, #f6fff3, #e3f6dc);
+  color: #1f3d1a;
+  box-shadow: 0 6px 18px #00000033;
+}
+.ds-notifications[data-style="bloom"] .ds-notification__body {
+  color: #35602d;
+}
+/* postcard (summer): a postcard with its stamp and airmail edge */
+.ds-notifications[data-style="postcard"] .ds-notification {
+  position: relative;
+  border: 0.35rem solid transparent;
+  border-radius: 0.25rem;
+  background:
+    linear-gradient(#fffaf0, #fff3dc) padding-box,
+    repeating-linear-gradient(
+      45deg,
+      #e23d3d 0 0.6rem,
+      #fffaf0 0.6rem 1.2rem,
+      #2a6fdb 1.2rem 1.8rem,
+      #fffaf0 1.8rem 2.4rem
+    )
+    border-box;
+  color: #2a2014;
+  box-shadow: 0 6px 18px #00000040;
+}
+.ds-notifications[data-style="postcard"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset: 0.45rem 0.45rem auto auto;
+  inline-size: 1.6rem;
+  block-size: 1.9rem;
+  border: 2px dashed #ffffffcc;
+  background: linear-gradient(180deg, #ffb347, #ff6b6b 55%, #2aa3cf 55%);
+  rotate: 6deg;
+}
+.ds-notifications[data-style="postcard"] .ds-notification__title {
+  font-family: "Caveat", "Comic Neue", cursive;
+  font-size: 1.15em;
+}
+.ds-notifications[data-style="postcard"] .ds-notification__body {
+  color: #4a3a22;
+}

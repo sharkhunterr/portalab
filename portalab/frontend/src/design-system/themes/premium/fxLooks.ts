@@ -28,6 +28,10 @@ export const FX_LEVEL_BADGES: Record<string, string> = {
   aurora: "aurora",
   plasma: "plasma",
   chrono: "chrono",
+  // #81: the seasons
+  spectre: "spectre",
+  tinsel: "tinsel",
+  verdant: "verdant",
 };
 
 /** notification styles, and the styles of titles and badges (same keys: each effect's own name) */
@@ -83,6 +87,11 @@ export const FX_NAMES: Record<string, string> = {
   nameplasma: "plasma",
   nameaurora: "aurora",
   namechrono: "chrono",
+  // #81: the seasons
+  namespectre: "spectre",
+  nametinsel: "tinsel",
+  nameamour: "amour",
+  namesunburst: "sunburst",
 };
 
 /** #78: notification animations drawn by the GPU — an effect bursting as it appears and as it leaves */
@@ -130,6 +139,12 @@ export const FX_FRAMES: Record<string, FxSpec> = {
   borealis: { effect: "aurora", shape: 1 },
   corona: { effect: "plasma", shape: 0, radius: "50%" },
   chronogate: { effect: "chrono", shape: 5 },
+  // #81: the seasons
+  spectre: { effect: "spectre", shape: 3 },
+  tinsel: { effect: "tinsel", shape: 4 },
+  amour: { effect: "amour", shape: 0, radius: "50%" },
+  verdant: { effect: "verdant", shape: 1 },
+  sunburst: { effect: "sunburst", shape: 0, radius: "50%" },
 };
 
 /** full-stage level-up moments */
@@ -147,6 +162,19 @@ export const FX_LEVEL_UPS: ReadonlySet<string> = new Set([
 
 /** the shop products drawn by the GPU (a pack holding one shows it too) */
 export const FX_PRODUCTS: ReadonlySet<string> = new Set([
+  // #81: the seasons
+  "frame_spectre",
+  "name_namespectre",
+  "level_spectre",
+  "frame_tinsel",
+  "name_nametinsel",
+  "level_tinsel",
+  "frame_amour",
+  "name_nameamour",
+  "frame_verdant",
+  "level_verdant",
+  "frame_sunburst",
+  "name_namesunburst",
   "badge_atom",
   "badge_backdoor",
   "badge_blossom",

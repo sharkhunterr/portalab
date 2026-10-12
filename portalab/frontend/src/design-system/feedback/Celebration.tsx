@@ -94,6 +94,13 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   bloom: { count: 12, layer: "screen" },
   // 027: the motion tracker — echoes widening from the bubble, blips lighting up around it
   tracker: { count: 10, layer: "badge" },
+  // #81: the seasons — sweets raining down, presents and Cupid's arrows bursting out, painted eggs bouncing
+  // up, sea water splashing
+  candy: { count: 26, layer: "screen" },
+  gifts: { count: 14, layer: "badge" },
+  cupid: { count: 10, layer: "badge" },
+  eggs: { count: 18, layer: "screen" },
+  splash: { count: 26, layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

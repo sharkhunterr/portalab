@@ -2221,6 +2221,420 @@ RETIRED = (
     "bg_night_owl",
 )
 
+# #81: the seasons' looks — each season its ambience (and its animated banner), celebration, palette, name
+# style, banner, title, badge (mostly common), its frame, level badge and notifications (rare), and its
+# looks drawn by the graphics chip (epic, a legendary for three of them). Designs of their own, never one
+# already sold.
+SEASONAL: tuple[tuple[str, tuple[tuple[Any, ...], ...]], ...] = (
+    ("halloween", (
+        ("ambient", "cobwebs", "Cobwebs", "Toiles d'araignée", 300, None,
+         "Spiders lowering themselves on their threads, webs in the corners.",
+         "Des araignées qui descendent au bout de leur fil, des toiles dans les coins."),
+        ("live", "cobwebs", "Cobwebs", "toiles d'araignée", 350, None, "", ""),
+        ("effect", "candy", "Candy shower", "Pluie de bonbons", 250, None,
+         "Wrapped sweets bursting out of the reward.", "Des bonbons emballés qui jaillissent de la récompense."),
+        ("palette", "pumpkinspice", "Pumpkin spice", "Épices de citrouille", 200, None,
+         "Pumpkin orange and cinnamon over the theme.", "Orange citrouille et cannelle sur le thème."),
+        ("name", "slime", "Slime", "gluant", 300, None,
+         "A name dripping with green slime.", "Un nom qui dégouline de bave verte."),
+        ("banner", "graveyard", "Graveyard", "Cimetière", 300, None,
+         "Crooked tombstones under a full moon.", "Des tombes de travers sous la pleine lune."),
+        ("title", "Ghost hunter", "Titre : Chasseur de fantômes", "glitch", 150, None, "", ""),
+        ("badge", "Trick or treat", "Badge Bonbon ou sort", "candy", "pulse", 200, None, "", ""),
+        ("frame", "cauldron", "Cauldron", "Chaudron", 650, 4,
+         "A witch's cauldron bubbling green around your avatar.",
+         "Le chaudron d'une sorcière qui bouillonne en vert autour de votre avatar."),
+        ("level", "jackolantern", "Jack-o'-lantern", "Citrouille-lanterne", 700, 4,
+         "A carved pumpkin lit from inside.", "Une citrouille sculptée éclairée de l'intérieur."),
+        ("notif", "tombstone", "Tombstone", "Pierre tombale", 650, 4,
+         "Notifications carved in old stone.", "Des notifications gravées dans la vieille pierre."),
+        ("hdframe", "spectre", "Spectre", "Spectre", 1200, 8,
+         "Ghostly wisps rising around your avatar, drawn by the graphics chip.",
+         "Des volutes spectrales qui s'élèvent autour de votre avatar, dessinées par la puce graphique."),
+        ("hdname", "spectre", "Spectre", "spectral", 1100, 8, "", ""),
+        ("hdlevel", "spectre", "Spectre", "Spectre", 1700, 12,
+         "Your level haunted by a ghostly flame, drawn by the graphics chip.",
+         "Votre niveau hanté par une flamme spectrale, dessinée par la puce graphique."),
+    )),
+    ("christmas", (
+        ("ambient", "ornaments", "Ornaments", "Boules de Noël", 300, None,
+         "Shiny baubles swinging at the top of the screen.", "Des boules brillantes qui se balancent en haut de l'écran."),
+        ("live", "ornaments", "Ornaments", "boules de Noël", 350, None, "", ""),
+        ("effect", "gifts", "Gift burst", "Pluie de cadeaux", 250, None,
+         "Wrapped presents bursting out of the reward.", "Des paquets cadeaux qui jaillissent de la récompense."),
+        ("palette", "evergreen", "Evergreen", "Sapin", 200, None,
+         "Fir green and berry red over the theme.", "Vert sapin et rouge baie sur le thème."),
+        ("name", "gingerbread", "Gingerbread", "pain d'épices", 300, None,
+         "A name baked like gingerbread, piped with icing.", "Un nom cuit comme un pain d'épices, souligné de glaçage."),
+        ("banner", "wrapping", "Wrapping paper", "Papier cadeau", 300, None,
+         "Red paper with stars, tied with a golden ribbon.", "Du papier rouge étoilé noué d'un ruban doré."),
+        ("title", "Santa's elf", "Titre : Lutin du Père Noël", "frost", 150, None, "", ""),
+        ("badge", "Christmas tree", "Badge Sapin de Noël", "tree", "shimmer", 200, None, "", ""),
+        ("frame", "candycane", "Candy cane", "Sucre d'orge", 650, 4,
+         "Red and white stripes winding around your avatar.", "Des rayures rouges et blanches qui s'enroulent autour de votre avatar."),
+        ("level", "bauble", "Bauble", "Boule de Noël", 700, 4,
+         "Your level in a shiny Christmas bauble.", "Votre niveau dans une boule de Noël brillante."),
+        ("notif", "giftwrap", "Gift wrap", "Paquet cadeau", 650, 4,
+         "Notifications wrapped like presents.", "Des notifications emballées comme des cadeaux."),
+        ("hdname", "tinsel", "Tinsel", "guirlande", 1100, 8, "", ""),
+        ("hdlevel", "tinsel", "Tinsel", "Guirlande", 1200, 8,
+         "Your level wrapped in sparkling tinsel, drawn by the graphics chip.",
+         "Votre niveau enveloppé d'une guirlande scintillante, dessinée par la puce graphique."),
+        ("hdframe", "tinsel", "Tinsel", "Guirlande", 1700, 12,
+         "Golden and green tinsel sparkling around your avatar, drawn by the graphics chip.",
+         "Une guirlande dorée et verte qui scintille autour de votre avatar, dessinée par la puce graphique."),
+    )),
+    ("valentine", (
+        ("ambient", "loveletters", "Love letters", "Lettres d'amour", 300, None,
+         "Sealed envelopes drifting up like paper boats.", "Des enveloppes scellées qui montent comme des bateaux de papier."),
+        ("live", "loveletters", "Love letters", "lettres d'amour", 350, None, "", ""),
+        ("effect", "cupid", "Cupid's arrows", "Flèches de Cupidon", 250, None,
+         "Arrows with heart tips shooting out of the reward.", "Des flèches à pointe de cœur qui partent de la récompense."),
+        ("palette", "cherry", "Cherry", "Cerise", 200, None,
+         "Deep cherry red and blush pink over the theme.", "Rouge cerise profond et rose poudré sur le thème."),
+        ("name", "lovestruck", "Lovestruck", "amoureux", 300, None,
+         "A pink name beating like a heart.", "Un nom rose qui bat comme un cœur."),
+        ("banner", "sweetheart", "Sweetheart", "Mon cœur", 300, None,
+         "A pink dusk scattered with hearts.", "Un crépuscule rose parsemé de cœurs."),
+        ("title", "Hopeless romantic", "Titre : Romantique incurable", "pulse", 150, None, "", ""),
+        ("badge", "Cupid's arrow", "Badge Flèche de Cupidon", "heart", "float", 200, None, "", ""),
+        ("frame", "heartbeat", "Heartbeat", "Battement de cœur", 650, 4,
+         "A red ring beating around your avatar.", "Un anneau rouge qui bat autour de votre avatar."),
+        ("level", "heart", "Heart", "Cœur", 700, 4,
+         "Your level in a glossy heart.", "Votre niveau dans un cœur verni."),
+        ("notif", "loveletter", "Love letter", "Lettre d'amour", 650, 4,
+         "Notifications that arrive as sealed love letters.", "Des notifications qui arrivent en lettres d'amour scellées."),
+        ("hdframe", "amour", "Amour", "Amour", 1200, 8,
+         "Pink and red light swirling into hearts around your avatar, drawn by the graphics chip.",
+         "Une lumière rose et rouge qui tourbillonne en cœurs autour de votre avatar, dessinée par la puce graphique."),
+        ("hdname", "amour", "Amour", "amour", 1100, 8, "", ""),
+    )),
+    ("spring", (
+        ("ambient", "butterflies", "Butterflies", "Papillons", 300, None,
+         "Butterflies fluttering across the screen.", "Des papillons qui voltigent à travers l'écran."),
+        ("live", "butterflies", "Butterflies", "papillons", 350, None, "", ""),
+        ("effect", "eggs", "Easter eggs", "Œufs de Pâques", 250, None,
+         "Painted eggs bouncing out of the reward.", "Des œufs peints qui rebondissent hors de la récompense."),
+        ("palette", "pastel", "Pastel", "Pastel", 200, None,
+         "Soft lilac and mint over the theme.", "Lilas tendre et menthe sur le thème."),
+        ("name", "springtime", "Springtime", "printanier", 300, None,
+         "A name in pastel colours, a small flower blooming beside it.", "Un nom aux couleurs pastel, une petite fleur qui éclot à côté."),
+        ("banner", "garden", "Garden", "Jardin", 300, None,
+         "A garden in bloom under a clear sky.", "Un jardin en fleurs sous un ciel clair."),
+        ("title", "Green thumb", "Titre : Main verte", "float", 150, None, "", ""),
+        ("badge", "Easter bunny", "Badge Lapin de Pâques", "rabbit", "pulse", 200, None, "", ""),
+        ("frame", "daisy", "Daisy chain", "Couronne de pâquerettes", 650, 4,
+         "A ring of daisies around your avatar.", "Une couronne de pâquerettes autour de votre avatar."),
+        ("level", "easteregg", "Easter egg", "Œuf de Pâques", 700, 4,
+         "Your level on a painted egg.", "Votre niveau sur un œuf peint."),
+        ("notif", "bloom", "Bloom", "Floraison", 650, 4,
+         "Notifications framed with fresh leaves and flowers.", "Des notifications encadrées de feuilles et de fleurs fraîches."),
+        ("hdframe", "verdant", "Verdant", "Verdoyant", 1200, 8,
+         "Leaves of light growing around your avatar, drawn by the graphics chip.",
+         "Des feuilles de lumière qui poussent autour de votre avatar, dessinées par la puce graphique."),
+        ("hdlevel", "verdant", "Verdant", "Verdoyant", 1200, 8,
+         "Your level sprouting leaves of light, drawn by the graphics chip.",
+         "Votre niveau d'où poussent des feuilles de lumière, dessinées par la puce graphique."),
+    )),
+    ("summer", (
+        ("ambient", "seagulls", "Seagulls", "Mouettes", 300, None,
+         "Seagulls gliding over a summer sky.", "Des mouettes qui planent dans un ciel d'été."),
+        ("live", "seagulls", "Seagulls", "mouettes", 350, None, "", ""),
+        ("effect", "splash", "Splash", "Éclaboussures", 250, None,
+         "Sea water splashing out of the reward.", "De l'eau de mer qui gicle hors de la récompense."),
+        ("palette", "tropical", "Tropical", "Tropical", 200, None,
+         "Lagoon turquoise and coral over the theme.", "Turquoise lagon et corail sur le thème."),
+        ("name", "tropical", "Tropical", "tropical", 300, None,
+         "A name in lagoon and coral colours, gently swaying.", "Un nom aux couleurs de lagon et de corail, qui ondule doucement."),
+        ("banner", "seaside", "Seaside", "Bord de mer", 300, None,
+         "The sea, the sun low over it, a beach.", "La mer, le soleil bas au-dessus, une plage."),
+        ("title", "Beach king", "Titre : Roi de la plage", "gold", 150, None, "", ""),
+        ("badge", "Seashell", "Badge Coquillage", "shell", "shimmer", 200, None, "", ""),
+        ("frame", "lifebuoy", "Lifebuoy", "Bouée", 650, 4,
+         "A red and white lifebuoy around your avatar.", "Une bouée rouge et blanche autour de votre avatar."),
+        ("level", "sunset", "Sunset", "Coucher de soleil", 700, 4,
+         "Your level over the sun setting on the sea.", "Votre niveau sur le soleil couchant sur la mer."),
+        ("notif", "postcard", "Postcard", "Carte postale", 650, 4,
+         "Notifications that arrive as postcards.", "Des notifications qui arrivent en cartes postales."),
+        ("hdframe", "sunburst", "Sunburst", "Soleil ardent", 1200, 8,
+         "A blazing summer sun flaring around your avatar, drawn by the graphics chip.",
+         "Un soleil d'été qui flamboie autour de votre avatar, dessiné par la puce graphique."),
+        ("hdname", "sunburst", "Sunburst", "solaire", 1700, 12, "", ""),
+    )),
+)  # fmt: skip
+SEASONAL_LEGENDARY = ("level_spectre", "frame_tinsel", "name_namesunburst")
+HD_ABOUT = ("Drawn by the graphics chip.", "Dessiné par la puce graphique.")
+for _season, _items in SEASONAL:
+    _hd: list[str] = []
+    for _item in _items:
+        _kind = _item[0]
+        if _kind == "ambient":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"ambient_{_v}",
+                "ambient",
+                _price,
+                "common",
+                f"{_en} ambience",
+                f"Ambiance {_fr.lower()}",
+                _aen,
+                _afr,
+                {"ambient": _v},
+                collection="ambients",
+                icon="sparkles",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "live":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"banner_live_{_v}",
+                "profile_banner",
+                _price,
+                "common",
+                f"{_en} animated banner",
+                f"Bannière animée {_fr}",
+                f"{_en} playing in your profile's banner, for every visitor to see.",
+                f"Des {_fr} dans la bannière de votre profil, pour tous vos visiteurs.",
+                {"banner": f"live-{_v}"},
+                collection="profile",
+                icon="image",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "effect":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"effect_{_v}",
+                "effect",
+                _price,
+                "common",
+                f"{_en} celebration",
+                f"Célébration {_fr.lower()}",
+                _aen,
+                _afr,
+                {"effect": _v},
+                collection="celebrations",
+                icon="party",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "palette":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"palette_{_v}",
+                "palette",
+                _price,
+                "common",
+                f"{_en} palette",
+                f"Palette {_fr.lower()}",
+                _aen,
+                _afr,
+                {"palette": _v},
+                collection="palettes",
+                icon="palette",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "name":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"name_{_v}",
+                "name_style",
+                _price,
+                "common",
+                f"{_en} name style",
+                f"Style de nom {_fr}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="names",
+                icon="feather",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "banner":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"banner_{_v}",
+                "profile_banner",
+                _price,
+                "common",
+                f"{_en} banner",
+                f"Bannière {_fr.lower()}",
+                _aen,
+                _afr,
+                {"banner": _v},
+                collection="profile",
+                icon="image",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "title":
+            _, _label, _fr, _style, _price, _level, _, _ = _item
+            _p(
+                f"title_{_label.lower().replace(' ', '_').replace(chr(39), '')}",
+                "title",
+                _price,
+                "common",
+                f"Title: {_label}",
+                _fr,
+                f"« {_label} » under your name.",
+                f"« {_label} » sous votre nom.",
+                {"label": _label, "style": _style},
+                collection="titles",
+                icon="trophy",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "badge":
+            _, _label, _fr, _icon, _style, _price, _level, _, _ = _item
+            _p(
+                f"badge_{_label.lower().replace(' ', '_').replace(chr(39), '')}",
+                "badge",
+                _price,
+                "common",
+                f"{_label} badge",
+                _fr,
+                f"A « {_label} » badge on your profile.",
+                f"Un badge « {_label} » sur votre profil.",
+                {"label": _label, "icon": _icon, "style": _style},
+                collection="badges",
+                icon="star",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "frame":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"frame_{_v}",
+                "avatar_frame",
+                _price,
+                "rare",
+                f"{_en} frame",
+                f"Cadre {_fr.lower()}",
+                _aen,
+                _afr,
+                {"frame": _v},
+                collection="profile",
+                icon="user",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "level":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"level_{_v}",
+                "level_badge",
+                _price,
+                "rare",
+                f"{_en} level badge",
+                f"Badge de niveau {_fr.lower()}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="levels",
+                icon="trophy",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "notif":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _p(
+                f"notif_{_v}",
+                "notification_style",
+                _price,
+                "rare",
+                f"{_en} notifications",
+                f"Notifications {_fr.lower()}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="looks",
+                icon="bell",
+                level=_level,
+                season=_season,
+            )
+        elif _kind == "hdframe":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _key = f"frame_{_v}"
+            _p(
+                _key,
+                "avatar_frame",
+                _price,
+                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
+                f"{_en} frame",
+                f"Cadre {_fr.lower()}",
+                _aen,
+                _afr,
+                {"frame": _v},
+                collection="profile",
+                icon="user",
+                level=_level,
+                season=_season,
+            )
+            _hd.append(_key)
+        elif _kind == "hdname":
+            _, _v, _en, _fr, _price, _level, _, _ = _item
+            _key = f"name_name{_v}"
+            _p(
+                _key,
+                "name_style",
+                _price,
+                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
+                f"{_en} name style",
+                f"Style de nom {_fr}",
+                f"An aura around your name. {HD_ABOUT[0]}",
+                f"Une aura autour de votre nom. {HD_ABOUT[1]}",
+                {"style": f"name{_v}"},
+                collection="names",
+                icon="feather",
+                level=_level,
+                season=_season,
+            )
+            _hd.append(_key)
+        elif _kind == "hdlevel":
+            _, _v, _en, _fr, _price, _level, _aen, _afr = _item
+            _key = f"level_{_v}"
+            _p(
+                _key,
+                "level_badge",
+                _price,
+                "legendary" if _key in SEASONAL_LEGENDARY else "epic",
+                f"{_en} level badge",
+                f"Badge de niveau {_fr.lower()}",
+                _aen,
+                _afr,
+                {"style": _v},
+                collection="levels",
+                icon="trophy",
+                level=_level,
+                season=_season,
+            )
+            _hd.append(_key)
+    _names = {
+        "halloween": ("Halloween", "Halloween"),
+        "christmas": ("Christmas", "Noël"),
+        "valentine": ("Valentine's", "Saint-Valentin"),
+        "spring": ("Spring", "Printemps"),
+        "summer": ("Summer", "Été"),
+    }[_season]
+    _p(
+        f"pack_hd_{_season}",
+        "bundle",
+        None,
+        "epic",
+        f"{_names[0]} HD pack",
+        f"Pack {_names[1]} HD",
+        "The season's looks drawn by the graphics chip.",
+        "Les looks de la saison dessinés par la puce graphique.",
+        {"products": _hd},
+        collection="packs",
+        icon="shop",
+        level=8,
+        season=_season,
+    )
+
 # #81: the seasons — what already belonged to one (the new seasonal items set theirs where they are made)
 SEASON_OF: dict[str, str] = {
     **dict.fromkeys(
@@ -2334,6 +2748,7 @@ LEGENDARY = {
     "frame_starlit", "levelup_supernova", "levelup_phoenix", "frame_regalia",
     "level_chrono", "notif_chrono", "frame_chronogate", "levelup_timeportal", "pack_hd_time_portal",
     "notif_warp", "effect_timerift", "effect_nova", "effect_rebirth", "name_namegold", "name_namechrono",
+    *SEASONAL_LEGENDARY,
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY and product["type"] != "booster":

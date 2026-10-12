@@ -463,10 +463,12 @@
   font-size: 0.6rem;
 }
 .product-art__name {
+  max-inline-size: 100%;
   font-size: 1.4rem;
   font-weight: var(--font-weight-bold);
   text-align: center;
-  overflow: hidden;
+  /* never clipped here: a name's aura (drawn by the GPU) spreads around it — the art's frame clips it */
+  overflow: visible;
 }
 .product-art__name[data-size="sheet"] {
   font-size: clamp(2rem, 5vw, 3rem);

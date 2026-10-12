@@ -70,6 +70,12 @@ export const PALETTE_KEYS = [
   "vhs",
   "nova",
   "nostromo",
+  // #81: the seasons
+  "pumpkinspice",
+  "evergreen",
+  "cherry",
+  "pastel",
+  "tropical",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -122,6 +128,12 @@ export const NOTIFICATION_STYLES = [
   "aurora",
   "plasma",
   "chrono",
+  // #81: the seasons
+  "tombstone",
+  "giftwrap",
+  "loveletter",
+  "bloom",
+  "postcard",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -262,6 +274,12 @@ export const AMBIENTS = [
   "lavalamp",
   "impasto",
   "paintribbon",
+  // #81: the seasons
+  "cobwebs",
+  "ornaments",
+  "loveletters",
+  "butterflies",
+  "seagulls",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -315,6 +333,15 @@ export const LEVEL_BADGES = [
   "aurora",
   "plasma",
   "chrono",
+  // #81: the seasons
+  "jackolantern",
+  "bauble",
+  "heart",
+  "easteregg",
+  "sunset",
+  "spectre",
+  "tinsel",
+  "verdant",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -395,6 +422,12 @@ export const CELEBRATION_KEYS = [
   "skyveil",
   "arcana",
   "timerift",
+  // #81: the seasons
+  "candy",
+  "gifts",
+  "cupid",
+  "eggs",
+  "splash",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];

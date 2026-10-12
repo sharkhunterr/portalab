@@ -31,6 +31,12 @@ export const FX_EFFECTS = [
   "aurora",
   "plasma",
   "chrono",
+  // #81: the seasons' looks
+  "spectre",
+  "tinsel",
+  "amour",
+  "verdant",
+  "sunburst",
   // full-stage level-up moments: drawn over the whole canvas, timed from when they start
   "supernova",
   "phoenix",
@@ -501,6 +507,94 @@ const EFFECTS: Record<FxBadge, string> = {
   o = over(o, body, smoothstep(0.03, -0.03, d));
 `,
   // —— full-stage level-up moments: c in units of the stage height, centred; tl the moment's own time ——
+  // #81 spectre (Halloween): ghostly wisps rising from it, a smoky body, faint eyes drifting in the smoke
+  spectre: `
+  vec2 q = vec2(p.x * 1.2, p.y * 0.9 - t * 0.7);
+  float wisp = fbm(q * 1.6 + vec2(fbm(q * 2.2 + t * 0.3) * 1.2, 0.0));
+  float reach = 0.2 + 1.0 * smoothstep(-1.0, 1.5, p.y);
+  float f = (1.2 - max(d, 0.0) / (reach * (0.4 + wisp))) * smoothstep(-0.2, 0.05, d);
+  vec3 ghost = mix(vec3(0.15, 0.55, 0.5), vec3(0.78, 1.0, 0.93), smoothstep(0.4, 1.0, f));
+  o = over(o, ghost, smoothstep(0.25, 0.7, f) * 0.85);
+  vec3 body = mix(vec3(0.06, 0.03, 0.12), vec3(0.18, 0.36, 0.34), fbm(p * 2.0 + vec2(0.0, -t * 0.4)));
+  body += vec3(0.5, 1.0, 0.85) * smoothstep(-0.2, 0.0, d) * 0.5;
+  o = over(o, body, smoothstep(0.03, -0.03, d));
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    float life = fract(t * 0.18 + hash(vec2(fi, 7.0)));
+    vec2 pos = vec2((hash(vec2(fi, 8.0)) - 0.5) * 2.0 * ax, -0.6 + life * 2.4);
+    float eyes = smoothstep(0.07, 0.0, length(p - pos - vec2(0.09, 0.0)))
+      + smoothstep(0.07, 0.0, length(p - pos + vec2(0.09, 0.0)));
+    o = over(o, vec3(0.8, 1.0, 0.9), eyes * sin(life * 3.14159) * 0.9);
+  }
+`,
+  // #81 tinsel (Christmas): gold and green tinsel twisting around it, glitter, a warm red body
+  tinsel: `
+  float s = atan(p.y, p.x / max(ax, 0.001));
+  float band = exp(-pow(max(d, 0.0) * 6.0 - 0.35, 2.0) * 6.0) * step(0.0, d);
+  float twist = 0.5 + 0.5 * sin(s * 18.0 + d * 40.0 - t * 2.5);
+  vec3 col = mix(vec3(0.95, 0.75, 0.2), vec3(0.15, 0.75, 0.35), step(0.5, fract(s * 1.4 + t * 0.05)));
+  o = over(o, col, band * (0.45 + 0.55 * twist));
+  vec2 g = p * 14.0;
+  float glint = step(0.9, hash(floor(g) + floor(t * 6.0))) * smoothstep(0.35, 0.0, length(fract(g) - 0.5));
+  o = over(o, vec3(1.0, 0.97, 0.8), glint * band * 1.5);
+  o = over(o, vec3(1.0, 0.85, 0.35), exp(-max(d, 0.0) * 5.0) * 0.25 * step(0.0, d));
+  vec3 body = mix(vec3(0.35, 0.03, 0.06), vec3(0.6, 0.12, 0.1), fbm(p * 2.5 + t * 0.2));
+  body += vec3(1.0, 0.8, 0.3) * smoothstep(-0.18, 0.0, d) * 0.6;
+  o = over(o, body, smoothstep(0.03, -0.03, d));
+`,
+  // #81 amour (Valentine's Day): pink and red light swirling round it, little hearts rising
+  amour: `
+  float sw = fbm(vec2(atan(p.y, p.x) * 2.0 + t * 0.6, length(p) * 2.0 - t * 0.8));
+  vec3 glow = mix(vec3(0.9, 0.15, 0.35), vec3(1.0, 0.6, 0.75), sw);
+  o = over(o, glow, exp(-max(d, 0.0) * 3.5) * (0.35 + 0.4 * sw) * step(0.0, d));
+  vec3 body = mix(vec3(0.3, 0.02, 0.1), vec3(0.85, 0.2, 0.4), fbm(p * 2.0 + vec2(t * 0.3, 0.0)));
+  body += vec3(1.0, 0.7, 0.8) * smoothstep(-0.18, 0.0, d) * 0.5;
+  o = over(o, body, smoothstep(0.03, -0.03, d));
+  for (int i = 0; i < 8; i++) {
+    float fi = float(i);
+    float life = fract(t * 0.2 * (1.0 + hash(vec2(fi, 41.0))) + hash(vec2(fi, 42.0)));
+    vec2 pos = vec2((hash(vec2(fi, 43.0)) - 0.5) * 2.2 * ax + 0.15 * sin(life * 8.0 + fi), -1.1 + life * 2.8);
+    vec2 h = (p - pos) / 0.12;
+    h.x = abs(h.x);
+    float hd = length(vec2(h.x, h.y - sqrt(h.x) * 0.55)) - 1.0;
+    o = over(o, vec3(1.0, 0.35, 0.55), smoothstep(0.12, -0.12, hd) * sin(life * 3.14159) * 0.95);
+  }
+`,
+  // #81 verdant (spring): leaves of light growing all around it, swaying, pollen rising
+  verdant: `
+  float s = atan(p.y, p.x / max(ax, 0.001));
+  float n = 9.0;
+  float cell = floor((s + 3.14159) / 6.28318 * n);
+  float local = fract((s + 3.14159) / 6.28318 * n) - 0.5 + 0.08 * sin(t * 1.3 + cell);
+  float grow = 0.5 + 0.5 * sin(t * 0.8 + cell * 1.7);
+  float len = 0.25 + 0.35 * grow;
+  float r = max(d, 0.0);
+  float k = clamp(r / len, 0.0, 1.0);
+  float leaf = smoothstep(0.03, 0.0, abs(local) * 2.2 - sin(k * 3.14159) * 0.9) * step(r, len) * step(0.0, d);
+  o = over(o, mix(vec3(0.2, 0.7, 0.3), vec3(0.78, 1.0, 0.45), k), leaf * 0.9);
+  o = over(o, vec3(0.6, 1.0, 0.5), exp(-r * 4.0) * 0.3 * step(0.0, d));
+  vec3 body = mix(vec3(0.03, 0.15, 0.06), vec3(0.2, 0.45, 0.2), fbm(p * 2.2 + t * 0.15));
+  body += vec3(0.8, 1.0, 0.6) * smoothstep(-0.18, 0.0, d) * 0.5;
+  o = over(o, body, smoothstep(0.03, -0.03, d));
+  for (int i = 0; i < 8; i++) {
+    float fi = float(i);
+    float life = fract(t * 0.25 + hash(vec2(fi, 51.0)));
+    vec2 pos = vec2((hash(vec2(fi, 52.0)) - 0.5) * 2.4 * ax + 0.1 * sin(life * 9.0), -1.0 + life * 2.6);
+    o = over(o, vec3(1.0, 0.95, 0.5), smoothstep(0.05, 0.0, length(p - pos)) * sin(life * 3.14159));
+  }
+`,
+  // #81 sunburst (summer): a blazing sun — rays flaring out and turning slowly, a molten bright body
+  sunburst: `
+  float s = atan(p.y, p.x / max(ax, 0.001));
+  float r = max(d, 0.0);
+  float rays = pow(0.5 + 0.5 * sin(s * 16.0 + t * 0.6), 6.0) + 0.6 * pow(0.5 + 0.5 * sin(s * 7.0 - t * 0.4 + 1.3), 4.0);
+  float flare = exp(-r * (2.2 + 3.0 * (1.0 - min(rays, 1.0)))) * step(0.0, d);
+  vec3 sun = mix(vec3(1.0, 0.45, 0.1), vec3(1.0, 0.92, 0.55), exp(-r * 3.0));
+  o = over(o, sun, flare * (0.5 + 0.4 * noise(vec2(s * 6.0, t * 2.0))));
+  vec3 body = mix(vec3(1.0, 0.55, 0.12), vec3(1.0, 0.93, 0.6), fbm(p * 2.5 + vec2(t * 0.3, -t * 0.2)));
+  body += vec3(1.0, 1.0, 0.85) * smoothstep(-0.2, 0.0, d) * 0.4;
+  o = over(o, body, smoothstep(0.03, -0.03, d));
+`,
   // supernova: a star gathers, bursts in a flash, a shock wave rings out, debris and a nebula afterglow
   supernova: `
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
@@ -900,8 +994,9 @@ const CLOSE = `
   }
   o.rgb *= 1.0 - 0.5 * min(u_calm, 1.0) * smoothstep(0.05, -0.1, d);
   if (u_calm > 1.5) {
-    // an aura: nothing inside, and only its light — its dark parts would draw a black plate round a name
-    o *= smoothstep(-0.02, 0.12, d);
+    // an aura: only its light, fading in softly from inside the shape — a sharp edge there would draw a
+    // frame (a box) round the name instead of a halo; its dark parts would draw a black plate
+    o *= smoothstep(-0.45, 0.4, d) * (0.55 + 0.45 * smoothstep(0.0, 0.5, d));
     o.a = min(o.a, max(o.r, max(o.g, o.b)) * 1.4);
   }
   if (u_burst > 0.5) {
@@ -910,7 +1005,8 @@ const CLOSE = `
     o *= clamp(max(flare, leave), 0.0, 1.0);
   }
   float edge = min(min(gl_FragCoord.x, u_res.x - gl_FragCoord.x), min(gl_FragCoord.y, u_res.y - gl_FragCoord.y));
-  gl_FragColor = o * smoothstep(0.0, u_box.w * 0.7, edge);
+  // an aura (a name) fades out well before its canvas' edges: never the outline of a box
+  gl_FragColor = o * smoothstep(0.0, u_box.w * (u_calm > 1.5 ? 1.8 : 0.7), edge);
 }`;
 const CLOSE_FULL = `
   gl_FragColor = o;

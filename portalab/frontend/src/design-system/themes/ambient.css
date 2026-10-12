@@ -1238,3 +1238,240 @@
   position: absolute;
   inset: 0;
 }
+
+/* ---------------------------------------------------------------- #81: the seasons */
+/* cobwebs (Halloween): spiders lowering themselves on their threads, webs in the two top corners */
+[data-ambient="cobwebs"] > span {
+  top: -60vh;
+  inline-size: 1px;
+  block-size: 60vh;
+  background: linear-gradient(180deg, transparent, #d6d3e2aa);
+  animation: ambient-spider calc(var(--duration) * 0.8) ease-in-out var(--delay) infinite alternate;
+}
+[data-ambient="cobwebs"] > span::after {
+  content: "";
+  position: absolute;
+  inset: auto auto -0.55rem 50%;
+  inline-size: calc(1.4rem + 1rem * var(--size));
+  aspect-ratio: 1.25;
+  translate: -50% 0;
+  background:
+    radial-gradient(circle at 42% 36%, #ff3b3b 0 4%, transparent 5%),
+    radial-gradient(circle at 58% 36%, #ff3b3b 0 4%, transparent 5%),
+    radial-gradient(ellipse 22% 18% at 50% 38%, #2a2438 0 95%, transparent),
+    radial-gradient(ellipse 30% 28% at 50% 68%, #3a3150 0 95%, transparent),
+    repeating-conic-gradient(from 20deg at 50% 52%, #2a2438 0 6deg, transparent 6deg 36deg);
+  mask: radial-gradient(ellipse 50% 50% at 50% 52%, #000 70%, transparent 72%);
+  filter: drop-shadow(0 0 2px #e9e4ffaa) drop-shadow(0 0 6px #d6d3e255);
+}
+[data-ambient="cobwebs"] > span:nth-child(-n + 2) {
+  top: -1px;
+  inline-size: 26vmin;
+  block-size: 26vmin;
+  background:
+    repeating-radial-gradient(circle at 0 0, transparent 0 9%, #d6d3e255 9% 9.6%),
+    repeating-conic-gradient(from 0deg at 0 0, #d6d3e266 0 0.6deg, transparent 0.6deg 11deg);
+  mask: radial-gradient(circle at 0 0, #000 60%, transparent 71%);
+  opacity: 0.55;
+  animation: ambient-web-sway 9s ease-in-out infinite alternate;
+}
+[data-ambient="cobwebs"] > span:nth-child(-n + 2)::after {
+  content: none;
+}
+[data-ambient="cobwebs"] > span:nth-child(1) {
+  left: 0;
+}
+[data-ambient="cobwebs"] > span:nth-child(2) {
+  left: auto;
+  right: 0;
+  scale: -1 1;
+}
+@keyframes ambient-spider {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 calc(18vh + 46vh * var(--size));
+  }
+}
+@keyframes ambient-web-sway {
+  to {
+    rotate: 2deg;
+  }
+}
+
+/* ornaments (Christmas): baubles swinging on their strings from the top — red, gold and green */
+[data-ambient="ornaments"] > span {
+  --ball: #d61f3a;
+  top: -1px;
+  inline-size: 1px;
+  block-size: calc(6vh + 22vh * var(--size));
+  background: linear-gradient(180deg, #ffffff22, #ffffff88);
+  transform-origin: 50% 0;
+  animation: ambient-swing calc(2.6s + var(--size) * 2.4s) ease-in-out var(--delay) infinite alternate;
+}
+[data-ambient="ornaments"] > span:nth-child(3n + 1) {
+  --ball: #e8b22c;
+}
+[data-ambient="ornaments"] > span:nth-child(3n + 2) {
+  --ball: #1f8f4e;
+}
+[data-ambient="ornaments"] > span::after {
+  content: "";
+  position: absolute;
+  inset: 100% auto auto 50%;
+  inline-size: calc(1.2rem + 1.4rem * var(--size));
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, #ffffffdd 0 9%, #ffffff44 15%, transparent 32%),
+    radial-gradient(circle at 50% 60%, var(--ball), color-mix(in srgb, var(--ball) 55%, #000) 75%);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--ball) 60%, transparent),
+    inset 0 -4px 8px #0006;
+}
+[data-ambient="ornaments"] > span::before {
+  content: "";
+  position: absolute;
+  inset: calc(100% - 0.25rem) auto auto 50%;
+  z-index: 1;
+  inline-size: 0.5rem;
+  block-size: 0.4rem;
+  translate: -50% 0;
+  border-radius: 0.1rem;
+  background: linear-gradient(90deg, #9a7b2f, #f3d98a, #9a7b2f);
+}
+@keyframes ambient-swing {
+  from {
+    rotate: -7deg;
+  }
+  to {
+    rotate: 7deg;
+  }
+}
+
+/* love letters (Valentine's Day): sealed envelopes drifting up, rocking like paper boats */
+[data-ambient="loveletters"] > span {
+  top: auto;
+  bottom: -6vh;
+  inline-size: calc(1.6rem * var(--size) + 0.6rem);
+  aspect-ratio: 1.45;
+  border-radius: 0.12rem;
+  background:
+    radial-gradient(circle at 50% 56%, #d7263d 0 9%, transparent 10%),
+    linear-gradient(35deg, transparent 49%, #e9c9cf 50%, transparent 51%) left / 50% 100% no-repeat,
+    linear-gradient(-35deg, transparent 49%, #e9c9cf 50%, transparent 51%) right / 50% 100% no-repeat,
+    linear-gradient(160deg, #fff7f8, #ffe1e7);
+  box-shadow: 0 2px 6px #0003;
+  opacity: 0.85;
+  animation-name: ambient-rise, ambient-rock;
+  animation-duration: calc(var(--duration) * 1.3), calc(2.4s + var(--size) * 2s);
+  animation-timing-function: linear, ease-in-out;
+  animation-direction: normal, alternate;
+}
+@keyframes ambient-rock {
+  from {
+    rotate: -12deg;
+  }
+  to {
+    rotate: 12deg;
+  }
+}
+
+/* butterflies (spring): pastel butterflies fluttering across, beating their wings */
+[data-ambient="butterflies"] > span {
+  --wing: hsl(calc(260 + var(--hue) / 3) 80% 76%);
+  inline-size: calc(1.3rem + 1.1rem * var(--size));
+  aspect-ratio: 1.15;
+  background:
+    linear-gradient(90deg, transparent 47%, #3b2a3f 47% 53%, transparent 53%),
+    radial-gradient(ellipse 30% 34% at 27% 34%, var(--wing) 0 92%, transparent),
+    radial-gradient(ellipse 30% 34% at 73% 34%, var(--wing) 0 92%, transparent),
+    radial-gradient(ellipse 22% 24% at 31% 72%, color-mix(in srgb, var(--wing) 70%, #fff) 0 92%, transparent),
+    radial-gradient(ellipse 22% 24% at 69% 72%, color-mix(in srgb, var(--wing) 70%, #fff) 0 92%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--wing) 50%, transparent));
+  animation-name: ambient-flutter-path, ambient-wingbeat;
+  animation-duration: calc(var(--duration) * 1.6), calc(0.22s + var(--size) * 0.18s);
+  animation-timing-function: ease-in-out, ease-in-out;
+  animation-direction: alternate, alternate;
+}
+@keyframes ambient-flutter-path {
+  0% {
+    translate: -12vw 0;
+  }
+  25% {
+    translate: 10vw -6vh;
+  }
+  50% {
+    translate: 26vw 4vh;
+  }
+  75% {
+    translate: 40vw -5vh;
+  }
+  100% {
+    translate: 58vw 2vh;
+  }
+}
+@keyframes ambient-wingbeat {
+  from {
+    scale: 1 1;
+  }
+  to {
+    scale: 0.35 1;
+  }
+}
+
+/* seagulls (summer): white gulls gliding across the sky, a slow wingbeat now and then */
+[data-ambient="seagulls"] > span {
+  top: calc(var(--y) * 0.55);
+  left: -15%;
+  inline-size: calc(2rem + 2rem * var(--size));
+  aspect-ratio: 3.2;
+  background: linear-gradient(180deg, #ffffff, #d7e3ee);
+  clip-path: polygon(
+    0 18%,
+    16% 30%,
+    34% 62%,
+    46% 70%,
+    50% 84%,
+    54% 70%,
+    66% 62%,
+    84% 30%,
+    100% 18%,
+    86% 46%,
+    68% 82%,
+    54% 100%,
+    46% 100%,
+    32% 82%,
+    14% 46%
+  );
+  filter: drop-shadow(0 2px 2px #0002);
+  opacity: 0.9;
+  animation-name: ambient-glide, ambient-gull-wing;
+  animation-duration: calc(var(--duration) * 2.2), calc(1.6s + var(--size) * 1s);
+  animation-timing-function: linear, ease-in-out;
+  animation-direction: normal, alternate;
+}
+/* across its box, whatever its size (the page, or a banner) */
+@keyframes ambient-glide {
+  from {
+    left: -15%;
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -4vh;
+  }
+  to {
+    left: 115%;
+    translate: 0 2vh;
+  }
+}
+@keyframes ambient-gull-wing {
+  from {
+    scale: 1 1;
+  }
+  to {
+    scale: 1 0.55;
+  }
+}

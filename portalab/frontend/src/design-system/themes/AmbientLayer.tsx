@@ -43,6 +43,12 @@ const COUNTS: Partial<Record<Ambient, number>> = {
   nostromo: 12,
   meadow: 60,
   ash: 50,
+  // #81: the seasons
+  cobwebs: 10,
+  ornaments: 14,
+  loveletters: 16,
+  butterflies: 14,
+  seagulls: 9,
 };
 
 const GLYPHS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ0123456789ﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎ:.=*+-<>";

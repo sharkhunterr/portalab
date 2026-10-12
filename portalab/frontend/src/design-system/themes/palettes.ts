@@ -135,6 +135,27 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#ff5c6c", accentAlt: "#c7d0dc", contrast: "#24040a" },
     light: { accent: "#b3122a", accentAlt: "#4b5563", contrast: "#ffffff" },
   },
+  // #81: the seasons
+  pumpkinspice: {
+    dark: { accent: "#ff9f43", accentAlt: "#d4a373", contrast: "#1f0e00" },
+    light: { accent: "#b45309", accentAlt: "#7c4a1e", contrast: "#ffffff" },
+  },
+  evergreen: {
+    dark: { accent: "#3ddc84", accentAlt: "#ff6b6b", contrast: "#03170b" },
+    light: { accent: "#166534", accentAlt: "#b91c1c", contrast: "#ffffff" },
+  },
+  cherry: {
+    dark: { accent: "#ff6f91", accentAlt: "#ffb3c6", contrast: "#26030d" },
+    light: { accent: "#be123c", accentAlt: "#9d174d", contrast: "#ffffff" },
+  },
+  pastel: {
+    dark: { accent: "#c4b5fd", accentAlt: "#99f6e4", contrast: "#1a1033" },
+    light: { accent: "#6d28d9", accentAlt: "#0f766e", contrast: "#ffffff" },
+  },
+  tropical: {
+    dark: { accent: "#2dd4bf", accentAlt: "#fb7185", contrast: "#03201c" },
+    light: { accent: "#0f766e", accentAlt: "#be123c", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

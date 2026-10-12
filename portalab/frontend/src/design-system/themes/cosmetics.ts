@@ -71,6 +71,17 @@ export const BANNER_KEYS = [
   "live-lavalamp",
   "live-polar",
   "live-plasma",
+  // #81: the seasons
+  "graveyard",
+  "wrapping",
+  "sweetheart",
+  "garden",
+  "seaside",
+  "live-cobwebs",
+  "live-ornaments",
+  "live-loveletters",
+  "live-butterflies",
+  "live-seagulls",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -121,6 +132,17 @@ export const FRAME_KEYS = [
   "borealis",
   "corona",
   "chronogate",
+  // #81: the seasons
+  "cauldron",
+  "candycane",
+  "heartbeat",
+  "daisy",
+  "lifebuoy",
+  "spectre",
+  "tinsel",
+  "amour",
+  "verdant",
+  "sunburst",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -165,4 +187,14 @@ export const NAME_KEYS = [
   "nameplasma",
   "nameaurora",
   "namechrono",
+  // #81: the seasons
+  "slime",
+  "gingerbread",
+  "lovestruck",
+  "springtime",
+  "tropical",
+  "namespectre",
+  "nametinsel",
+  "nameamour",
+  "namesunburst",
 ] as const;
