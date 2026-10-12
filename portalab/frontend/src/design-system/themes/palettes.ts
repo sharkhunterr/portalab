@@ -208,6 +208,14 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#39ff14", accentAlt: "#ff4d6d", contrast: "#001a00" },
     light: { accent: "#1d7a0b", accentAlt: "#b0203f", contrast: "#ffffff" },
   },
+  mazeblue: {
+    dark: { accent: "#ffe14d", accentAlt: "#00ffff", contrast: "#1a1400" },
+    light: { accent: "#1c1cb8", accentAlt: "#8a6a00", contrast: "#ffffff" },
+  },
+  brickred: {
+    dark: { accent: "#ff8a5c", accentAlt: "#6fdc6f", contrast: "#2a0a00" },
+    light: { accent: "#c4320a", accentAlt: "#1e7a1e", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

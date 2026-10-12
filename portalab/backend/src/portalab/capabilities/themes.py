@@ -76,6 +76,7 @@ PROFILE_BANNERS: tuple[str, ...] = (
     "soundwave", "postergrid", "frontpage", "live-equalizer", "live-cinemaglow", "live-pages",
     # #89: the retro games
     "lcdscreen", "linestack", "bunkers", "live-lcdstars", "live-fallingblocks", "live-fleet",
+    "mazewalls", "brickworld", "live-ghosts", "live-spincoins",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -98,7 +99,7 @@ AVATAR_FRAMES: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "vinyl", "profiletile", "postage",
     # #89: the retro games
-    "cartridge", "blockframe", "crab",
+    "cartridge", "blockframe", "crab", "corridor", "warppipe",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -116,7 +117,7 @@ PALETTES: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "groove", "redcarpet", "newsprint",
     # #89: the retro games
-    "dotmatrix", "blockcolors", "arcadegreen",
+    "dotmatrix", "blockcolors", "arcadegreen", "mazeblue", "brickred",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -148,7 +149,7 @@ AMBIENTS: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "equalizer", "cinemaglow", "pages",
     # #89: the retro games
-    "lcdstars", "fallingblocks", "fleet",
+    "lcdstars", "fallingblocks", "fleet", "ghosts", "spincoins",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
@@ -167,7 +168,7 @@ CELEBRATIONS: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "musicnotes", "ribbons", "inkstamp",
     # #89: the retro games
-    "pixelhearts", "lineclear", "lasers",
+    "pixelhearts", "lineclear", "lasers", "pellets", "coinpop",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -190,7 +191,7 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "nowplaying", "nextepisode", "telegram",
     # #89: the retro games
-    "rpgbox", "blockrow", "invasion",
+    "rpgbox", "blockrow", "invasion", "ghostly", "bricks",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -211,7 +212,7 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "beatdrop", "curtainwipe", "spinpaper",
     # #89: the retro games
-    "pixelreveal", "harddrop", "march",
+    "pixelreveal", "harddrop", "march", "chomp", "jumpin",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -234,7 +235,7 @@ NAME_STYLES: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "recap", "marathon", "typewriter",
     # #89: the retro games
-    "lcdtext", "bevelblocks", "hiscore",
+    "lcdtext", "bevelblocks", "hiscore", "neonmaze", "gametitle",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
@@ -270,7 +271,7 @@ LEVEL_BADGES: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "eqbars", "toprank", "presscard",
     # #89: the retro games
-    "batteryled", "tpiece", "saucer",
+    "batteryled", "tpiece", "saucer", "chomper", "qblock",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -291,7 +292,7 @@ LEVEL_UPS: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "encore", "finale", "extraedition",
     # #89: the retro games
-    "statsup", "fourlines", "wavecleared",
+    "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
 )  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
@@ -306,7 +307,7 @@ UNIVERSE_THEMES: tuple[str, ...] = (
     # #89: music streaming, series streaming, the newspaper
     "groove", "binge", "gazette",
     # #89: the retro games
-    "pocket", "blockfall", "invaders",
+    "pocket", "blockfall", "invaders", "mazechase", "platformer",
 )  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),

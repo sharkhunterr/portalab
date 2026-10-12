@@ -3739,3 +3739,119 @@
       0 0;
   }
 }
+/* the maze and the platformer */
+.profile-banner[data-banner="mazewalls"] {
+  background:
+    radial-gradient(circle 0.5rem at 88% 50%, #ffb897 96%, transparent),
+    radial-gradient(circle 2px, #ffb897 96%, transparent) 0.6rem 50% / 1.2rem 1.2rem repeat-x,
+    radial-gradient(circle 2px, #ffb897 96%, transparent) 0.6rem 20% / 1.2rem 1.2rem repeat-x,
+    linear-gradient(#2121de, #2121de) 0 34% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 40% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 62% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 68% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 30% 0 / 3px 34% no-repeat,
+    linear-gradient(#2121de, #2121de) 70% 100% / 3px 32% no-repeat,
+    #000000;
+}
+.profile-banner[data-banner="brickworld"] {
+  background:
+    radial-gradient(ellipse 9% 12% at 20% 28%, #ffffff 96%, transparent),
+    radial-gradient(ellipse 6% 9% at 25% 24%, #ffffff 96%, transparent),
+    linear-gradient(#000000 0 3px, transparent 3px) 30% 38% / 26% 22% no-repeat,
+    linear-gradient(#f8b800, #f8b800) 43% 38% / 4% 22% no-repeat,
+    linear-gradient(#000000 0 2px, transparent 2px) 30% 38% / 1.4rem 0.7rem,
+    linear-gradient(#c84c0c, #c84c0c) 30% 38% / 26% 22% no-repeat,
+    linear-gradient(90deg, #1e7a1e 0 10%, #3cb83c 10% 90%, #1e7a1e 90%) 82% 100% / 8% 42% no-repeat,
+    linear-gradient(90deg, #1e7a1e 0 8%, #3cb83c 8% 92%, #1e7a1e 92%) 82% 58% / 10% 9% no-repeat,
+    radial-gradient(ellipse 22% 36% at 8% 100%, #3cb83c 96%, transparent),
+    linear-gradient(#000000 0 2px, transparent 2px) 0 100% / 1.4rem 0.7rem repeat-x,
+    linear-gradient(#c84c0c, #c84c0c) 0 100% / 100% 12% no-repeat,
+    #6fb2ff;
+}
+.avatar-frame[data-frame="corridor"] {
+  padding: 9px;
+  border-radius: 1rem;
+  background: #000000;
+  box-shadow:
+    inset 0 0 0 2px #2121de,
+    inset 0 0 0 5px #000000,
+    inset 0 0 0 7px #2121de,
+    0 0 0.6rem #2121de88;
+}
+.avatar-frame[data-frame="corridor"] > :not(.avatar-frame__fx) {
+  border-radius: 0.6rem;
+}
+.avatar-frame[data-frame="warppipe"] {
+  padding: 12px 10px 0;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, #1e7a1e 0 12%, #6fdc6f 12% 24%, #3cb83c 24% 88%, #1e7a1e 88%) 0 0 / 100% 12px
+    no-repeat,
+    linear-gradient(90deg, #1e7a1e 0 14%, #6fdc6f 14% 26%, #3cb83c 26% 86%, #1e7a1e 86%) 50% 100% / 84% 100%
+    no-repeat;
+  box-shadow: inset 0 12px 0 -10px #000000;
+}
+.avatar-frame[data-frame="warppipe"] > :not(.avatar-frame__fx) {
+  border-radius: 50% 50% 0 0;
+}
+.name-style[data-name="neonmaze"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  color: #ffe14d;
+  text-shadow:
+    2px 0 0 #2121de,
+    -2px 0 0 #2121de,
+    0 2px 0 #2121de,
+    0 -2px 0 #2121de,
+    0 0 0.5em #2121de;
+}
+.name-style[data-name="gametitle"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85em;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #000000,
+    -1px -1px 0 #000000,
+    1px -1px 0 #000000,
+    -1px 1px 0 #000000,
+    0.18em 0.18em 0 #c84c0c,
+    0.24em 0.24em 0 #000000;
+}
+:is(:root[data-level-badge="chomper"] .ds-level:not([data-look]), .ds-level[data-look="chomper"]) {
+  gap: 0.35rem;
+  padding-inline: 0.35rem 0.6rem;
+  background: #000000;
+  color: #ffe14d;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  box-shadow: inset 0 0 0 2px #2121de;
+}
+:is(:root[data-level-badge="chomper"] .ds-level:not([data-look]), .ds-level[data-look="chomper"])::before {
+  content: "";
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  border-radius: 50%;
+  background: conic-gradient(from 60deg, transparent 0 60deg, #ffe14d 60deg);
+  animation: maze-chomp 0.35s steps(1, end) infinite;
+}
+:is(:root[data-level-badge="qblock"] .ds-level:not([data-look]), .ds-level[data-look="qblock"]) {
+  border: 2px solid #000000;
+  border-radius: 0.15rem;
+  background:
+    radial-gradient(circle 1.5px at 4px 4px, #7a3a00 96%, transparent),
+    radial-gradient(circle 1.5px at calc(100% - 4px) 4px, #7a3a00 96%, transparent),
+    radial-gradient(circle 1.5px at 4px calc(100% - 4px), #7a3a00 96%, transparent),
+    radial-gradient(circle 1.5px at calc(100% - 4px) calc(100% - 4px), #7a3a00 96%, transparent), #f8b800;
+  color: #5a2a00;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    inset 2px 2px 0 #ffe08a,
+    inset -2px -2px 0 #c47a00;
+  animation: level-qblock 1.6s steps(1, end) infinite;
+}
+@keyframes level-qblock {
+  80% {
+    filter: brightness(1.15);
+  }
+}

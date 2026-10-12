@@ -2819,3 +2819,198 @@
   font-size: 1.1rem;
   line-height: 1.5;
 }
+/* power pellet (maze) — READY! the ghosts turn blue and flee, the eater crosses the screen */
+.levelup[data-look="powerup"] {
+  --glow: #ffe14d;
+}
+.levelup[data-look="powerup"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    linear-gradient(#2121de, #2121de) 0 12% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 calc(12% + 8px) / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 88% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 calc(88% - 8px) / 100% 3px no-repeat,
+    #000000f2;
+}
+.levelup[data-look="powerup"] .levelup__scene {
+  display: block;
+  inset-block-start: 15%;
+  inset-inline-start: -10%;
+  inline-size: 3.4rem;
+  block-size: 3.4rem;
+  border-radius: 50%;
+  background: conic-gradient(from 60deg, transparent 0 60deg, #ffe14d 60deg);
+  animation:
+    levelup-eater 2.4s linear 0.4s both,
+    maze-chomp 0.3s steps(1, end) infinite;
+}
+@keyframes levelup-eater {
+  to {
+    inset-inline-start: 110%;
+  }
+}
+.levelup[data-look="powerup"] .levelup__fx {
+  display: block;
+  inset-block-start: 15%;
+  inset-inline-start: calc(30% + var(--i) * 12%);
+  inline-size: 3rem;
+  block-size: 3.2rem;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background:
+    radial-gradient(circle 0.2rem at 32% 42%, #ffffff 96%, transparent),
+    radial-gradient(circle 0.2rem at 68% 42%, #ffffff 96%, transparent), #2121de;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 83% 86%, 66% 100%, 50% 86%, 33% 100%, 17% 86%, 0 100%);
+  animation: levelup-flee 2.4s linear 0.4s both;
+}
+@keyframes levelup-flee {
+  0%,
+  60% {
+    opacity: 1;
+    filter: none;
+  }
+  65%,
+  75%,
+  85% {
+    filter: brightness(3) grayscale(1);
+  }
+  70%,
+  80% {
+    filter: none;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(80vw);
+  }
+}
+.levelup[data-look="powerup"] .levelup__burst {
+  display: block;
+  inset-block-start: 30%;
+  inset-inline: 0;
+  color: #ffe14d;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  text-align: center;
+  animation: levelup-gone 1.2s steps(1, end) both;
+}
+.levelup[data-look="powerup"] .levelup__card {
+  --color-text: #ffffff;
+  --color-text-muted: #c4c4f0;
+  --color-surface-raised: #0d0d26;
+  --color-border: #2121de;
+  border: 3px double #2121de;
+  border-radius: 1rem;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 0 1.4rem #2121de88;
+  animation: levelup-card 0.4s steps(4, end) 1.2s both;
+}
+.levelup[data-look="powerup"] .levelup__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #ffe14d;
+}
+/* course clear (platformer) — the flag slides down the pole, fireworks over the castle */
+.levelup[data-look="flagpole"] {
+  --glow: #f8b800;
+}
+.levelup[data-look="flagpole"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    linear-gradient(#000000 0 2px, transparent 2px) 0 100% / 1.4rem 0.7rem repeat-x,
+    linear-gradient(#c84c0c, #c84c0c) 0 100% / 100% 8% no-repeat,
+    linear-gradient(#000000, #000000) 85% 92% / 7rem 1px no-repeat,
+    repeating-linear-gradient(90deg, #8a8a8a 0 1.2rem, transparent 1.2rem 1.8rem) 85% 70% / 7rem 1.2rem
+    no-repeat,
+    linear-gradient(#b0b0b0, #8a8a8a) 85% 92% / 7rem 22% no-repeat,
+    linear-gradient(180deg, #6fb2fff2, #a8d4fff2);
+}
+.levelup[data-look="flagpole"] .levelup__scene {
+  display: block;
+  inset-block: 10% 8%;
+  inset-inline-start: 12%;
+  inline-size: 0.35rem;
+  background: linear-gradient(90deg, #6fdc6f, #1e7a1e);
+}
+.levelup[data-look="flagpole"] .levelup__scene::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.8rem;
+  inset-inline-start: -0.45rem;
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  border-radius: 50%;
+  background: #3cb83c;
+}
+.levelup[data-look="flagpole"] .levelup__scene::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.4rem;
+  inset-inline-end: 0.35rem;
+  inline-size: 2.6rem;
+  block-size: 2rem;
+  background: #ffffff;
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  animation: levelup-flag 1.2s ease-in 0.3s both;
+}
+@keyframes levelup-flag {
+  to {
+    translate: 0 60vh;
+  }
+}
+.levelup[data-look="flagpole"] .levelup__fx {
+  display: block;
+  inset-block-start: calc(6% + var(--y) * 0.3);
+  inset-inline-start: calc(55% + var(--x) * 0.4);
+  inline-size: 0.5rem;
+  aspect-ratio: 1;
+  background: hsl(calc(var(--i) * 60) 95% 60%);
+  box-shadow:
+    1rem 0 0 hsl(calc(var(--i) * 60) 95% 60%),
+    -1rem 0 0 hsl(calc(var(--i) * 60) 95% 60%),
+    0 1rem 0 hsl(calc(var(--i) * 60) 95% 60%),
+    0 -1rem 0 hsl(calc(var(--i) * 60) 95% 60%);
+  animation: levelup-pixel-firework 1s steps(4, end) calc(1.4s + var(--i) * 0.2s) infinite;
+}
+@keyframes levelup-pixel-firework {
+  from {
+    opacity: 1;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+.levelup[data-look="flagpole"] .levelup__burst {
+  display: block;
+  inset-block-start: 6%;
+  inset-inline: 0;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.2rem, 4.5vw, 2.2rem);
+  text-align: center;
+  text-shadow:
+    0.15em 0.15em 0 #c84c0c,
+    0.22em 0.22em 0 #000000;
+  animation: levelup-kapow 0.5s steps(5, end) 1.3s both;
+}
+.levelup[data-look="flagpole"] .levelup__card {
+  --color-text: #1a1a2e;
+  --color-text-muted: #3d3d5c;
+  --color-surface-raised: #fff2c8;
+  --color-border: #000000;
+  border: 3px solid #000000;
+  border-radius: 0.2rem;
+  background: #fff8e8;
+  color: #1a1a2e;
+  box-shadow: 0.4rem 0.4rem 0 #00000055;
+  animation: levelup-card 0.4s steps(4, end) 1.5s both;
+}
+.levelup[data-look="flagpole"] .levelup__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}

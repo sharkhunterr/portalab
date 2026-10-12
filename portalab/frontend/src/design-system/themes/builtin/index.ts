@@ -27,6 +27,7 @@ import invaders from "./invaders.json";
 import light from "./light.json";
 import manga from "./manga.json";
 import matrix from "./matrix.json";
+import mazechase from "./mazechase.json";
 import mecha from "./mecha.json";
 import middleearth from "./middleearth.json";
 import minimal from "./minimal.json";
@@ -34,6 +35,7 @@ import neowave from "./neowave.json";
 import nostromo from "./nostromo.json";
 import nova from "./nova.json";
 import orbit from "./orbit.json";
+import platformer from "./platformer.json";
 import plex from "./plex.json";
 import pocket from "./pocket.json";
 import portalabDark from "./portalab-dark.json";
@@ -93,6 +95,8 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   pocket,
   blockfall,
   invaders,
+  mazechase,
+  platformer,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

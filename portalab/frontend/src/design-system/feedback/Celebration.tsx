@@ -117,6 +117,8 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   pixelhearts: { count: 16, layer: "badge" },
   lineclear: { count: 8, layer: "screen" },
   lasers: { count: 14, layer: "badge" },
+  pellets: { count: 16, layer: "badge" },
+  coinpop: { count: 10, layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

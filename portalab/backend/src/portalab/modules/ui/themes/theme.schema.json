@@ -791,7 +791,9 @@
             "inkstamp",
             "pixelhearts",
             "lineclear",
-            "lasers"
+            "lasers",
+            "pellets",
+            "coinpop"
           ]
         },
         "levelUp": {
@@ -847,7 +849,9 @@
             "extraedition",
             "statsup",
             "fourlines",
-            "wavecleared"
+            "wavecleared",
+            "powerup",
+            "flagpole"
           ]
         }
       },
@@ -1168,7 +1172,9 @@
             "pages",
             "lcdstars",
             "fallingblocks",
-            "fleet"
+            "fleet",
+            "ghosts",
+            "spincoins"
           ]
         }
       },
@@ -1296,7 +1302,9 @@
             "telegram",
             "rpgbox",
             "blockrow",
-            "invasion"
+            "invasion",
+            "ghostly",
+            "bricks"
           ]
         },
         "animation": {
@@ -1355,7 +1363,9 @@
             "spinpaper",
             "pixelreveal",
             "harddrop",
-            "march"
+            "march",
+            "chomp",
+            "jumpin"
           ]
         }
       },

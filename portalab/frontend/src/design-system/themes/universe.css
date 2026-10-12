@@ -3722,3 +3722,296 @@ h3,
     transform: none;
   }
 }
+
+/* the maze: the string of lights becomes a corridor of pellets, the eater on the current section */
+:root[data-theme="mazechase"] .shell-lights {
+  border-block-end: 0;
+  background: #000000;
+}
+:root[data-theme="mazechase"] .shell-lights__wall {
+  padding-block: 1.5rem 0.7rem;
+  border-block: 3px double #2121de;
+}
+:root[data-theme="mazechase"] .shell-lights__wall::before {
+  display: none;
+}
+:root[data-theme="mazechase"] .shell-lights__bulb {
+  inset-block-start: -1rem;
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: 50%;
+  background: #ffb897;
+  box-shadow: none;
+  animation: none;
+}
+:root[data-theme="mazechase"] .shell-lights__wall > li:has([data-active]) .shell-lights__bulb {
+  inset-block-start: -1.3rem;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  background: conic-gradient(from 60deg, transparent 0 60deg, #ffe14d 60deg);
+  box-shadow: 0 0 0.6rem #ffe14d88;
+  animation: maze-chomp 0.35s steps(1, end) infinite;
+}
+:root[data-theme="mazechase"] .shell-lights__wall > li:is(:hover, :focus-within) .shell-lights__bulb {
+  background: #ffffff;
+  box-shadow: 0 0 0.5rem #ffffff;
+}
+@keyframes maze-chomp {
+  50% {
+    background: #ffe14d;
+  }
+}
+:root[data-theme="mazechase"] .shell-lights__item {
+  color: #c4c4f0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  line-height: 1.6;
+}
+:root[data-theme="mazechase"] .shell-lights__item[data-active] {
+  color: #ffe14d;
+  text-shadow: none;
+}
+:root[data-theme="mazechase"] .shell-lights__panel {
+  border-block-end: 3px double #2121de;
+  background: #000000;
+}
+/* the platformer: the launcher as a world map — a mystery block to open it, brick tiles, the level you're on flagged */
+:root[data-theme="platformer"] body {
+  background:
+    radial-gradient(ellipse 70% 20% at 20% 110%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%) fixed,
+    radial-gradient(ellipse 50% 16% at 85% 112%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%) fixed,
+    linear-gradient(180deg, #6fb2ff, #a8d4ff 55%, #cfe7ff) fixed;
+}
+:root[data-theme="platformer"] .shell-header {
+  background: #c84c0c;
+  background-image:
+    linear-gradient(#00000055 0 2px, transparent 2px) 0 0 / 2rem 1rem,
+    linear-gradient(90deg, #00000055 0 2px, transparent 2px) 0 0 / 2rem 1rem;
+  color: #ffffff;
+  border-block-end: 3px solid #000000;
+}
+:root[data-theme="platformer"] .shell-launcher__start {
+  border: 3px solid #000000;
+  border-radius: 0.2rem;
+  background:
+    radial-gradient(circle 2px at 6px 6px, #7a3a00 96%, transparent),
+    radial-gradient(circle 2px at calc(100% - 6px) 6px, #7a3a00 96%, transparent),
+    radial-gradient(circle 2px at 6px calc(100% - 6px), #7a3a00 96%, transparent),
+    radial-gradient(circle 2px at calc(100% - 6px) calc(100% - 6px), #7a3a00 96%, transparent), #f8b800;
+  color: #5a2a00;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+  box-shadow:
+    inset 3px 3px 0 #ffe08a,
+    inset -3px -3px 0 #c47a00,
+    0.25rem 0.25rem 0 #00000055;
+}
+:root[data-theme="platformer"] .shell-launcher__tile {
+  border: 3px solid #000000;
+  border-radius: 0;
+  background:
+    linear-gradient(#00000044 0 3px, transparent 3px) 0 0 / 2.4rem 1.2rem,
+    linear-gradient(90deg, #00000044 0 3px, transparent 3px) 0 0 / 2.4rem 2.4rem,
+    linear-gradient(90deg, #00000044 0 3px, transparent 3px) 1.2rem 1.2rem / 2.4rem 2.4rem,
+    #c84c0c;
+  color: #ffffff;
+  box-shadow: 0.3rem 0.3rem 0 #00000044;
+}
+:root[data-theme="platformer"] .shell-launcher__tile[data-active] {
+  background:
+    linear-gradient(90deg, #ffffff33 0 0.4rem, transparent 0.4rem), linear-gradient(180deg, #3cb83c, #1e7a1e);
+}
+:root[data-theme="platformer"] .shell-launcher__head {
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  text-shadow: 2px 2px 0 #000000;
+}
+:root[data-theme="platformer"] .shell-launcher__icon {
+  border-radius: 0.2rem;
+  background: #f8b800;
+  color: #5a2a00;
+  box-shadow:
+    inset 3px 3px 0 #ffe08a,
+    inset -3px -3px 0 #c47a00;
+}
+:root[data-theme="platformer"] .shell-launcher__pages .shell-entry {
+  border-color: #000000;
+  background: #fff8e8;
+  color: #1a1a2e;
+}
+
+/* ghostly (maze): a ghost-shaped notification — rounded top, wavy hem, two eyes looking around */
+.ds-notifications[data-style="ghostly"] .ds-notification {
+  --color-text: #1a0033;
+  --color-text-muted: #3d1a52;
+  padding-block-end: 1.6rem;
+  border: 0;
+  border-radius: 2.2rem 2.2rem 0 0;
+  background:
+    radial-gradient(circle 0.22rem at calc(100% - 3.3rem) 1.05rem, #2121de 96%, transparent),
+    radial-gradient(circle 0.22rem at calc(100% - 2.1rem) 1.05rem, #2121de 96%, transparent),
+    radial-gradient(ellipse 0.45rem 0.55rem at calc(100% - 3.4rem) 1rem, #ffffff 96%, transparent),
+    radial-gradient(ellipse 0.45rem 0.55rem at calc(100% - 2.2rem) 1rem, #ffffff 96%, transparent), #ffb8ff;
+  color: #1a0033;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    91.66% calc(100% - 0.8rem),
+    83.33% 100%,
+    75% calc(100% - 0.8rem),
+    66.66% 100%,
+    58.33% calc(100% - 0.8rem),
+    50% 100%,
+    41.66% calc(100% - 0.8rem),
+    33.33% 100%,
+    25% calc(100% - 0.8rem),
+    16.66% 100%,
+    8.33% calc(100% - 0.8rem),
+    0 100%
+  );
+  box-shadow: none;
+}
+.ds-notifications[data-style="ghostly"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="ghostly"] .ds-notification__icon {
+  background: #ffe14d;
+  color: #1a1400;
+}
+.ds-notifications[data-style="ghostly"] .ds-notification__close {
+  margin-inline-end: 3.6rem;
+}
+.ds-notifications[data-style="ghostly"] .ds-notification__link {
+  color: #2121de;
+  font-weight: 700;
+}
+.ds-notifications[data-style="ghostly"] .ds-notification__badge {
+  background: #2121de;
+  color: #ffffff;
+}
+.ds-notifications[data-style="ghostly"] .ds-notification__timer {
+  inset-block-end: 0.9rem;
+  inset-inline: 1rem;
+  background: #2121de;
+}
+/* bricks (platformer): a notification set in a wall of bricks */
+.ds-notifications[data-style="bricks"] .ds-notification {
+  --color-text: #1a1a2e;
+  --color-text-muted: #3d3d5c;
+  border: 0.7rem solid transparent;
+  border-radius: 0;
+  background:
+    linear-gradient(#fff8e8, #fff8e8) padding-box,
+    linear-gradient(#000000 0 2px, transparent 2px) 0 0 / 1.4rem 0.7rem border-box,
+    linear-gradient(90deg, #000000 0 2px, transparent 2px) 0 0 / 1.4rem 1.4rem border-box,
+    linear-gradient(90deg, #000000 0 2px, transparent 2px) 0.7rem 0.7rem / 1.4rem 1.4rem border-box,
+    #c84c0c border-box;
+  color: #1a1a2e;
+  box-shadow: 0.35rem 0.35rem 0 #00000055;
+}
+.ds-notifications[data-style="bricks"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="bricks"] .ds-notification__icon {
+  border-radius: 0.15rem;
+  background: #f8b800;
+  color: #5a2a00;
+  box-shadow:
+    inset 2px 2px 0 #ffe08a,
+    inset -2px -2px 0 #c47a00;
+}
+.ds-notifications[data-style="bricks"] .ds-notification__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+}
+.ds-notifications[data-style="bricks"] .ds-notification__timer {
+  background: #1e7a1e;
+}
+
+/* animations */
+.ds-notifications[data-animation="chomp"] .ds-notification {
+  animation-name: universe-notify-chomp;
+  animation-duration: 0.7s;
+  animation-timing-function: steps(6, end);
+}
+@keyframes universe-notify-chomp {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 50%, 0 100%, 0 100%);
+  }
+  20% {
+    opacity: 1;
+  }
+  35% {
+    clip-path: polygon(0 0, 60% 0, 20% 50%, 60% 100%, 0 100%);
+  }
+  55% {
+    clip-path: polygon(0 0, 70% 0, 70% 50%, 70% 100%, 0 100%);
+  }
+  75% {
+    clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 50%, 100% 100%, 0 100%);
+  }
+}
+.ds-notifications[data-animation="jumpin"] .ds-notification {
+  transform-origin: 50% 100%;
+  animation-name: universe-notify-jump;
+  animation-duration: 0.75s;
+  animation-timing-function: linear;
+}
+@keyframes universe-notify-jump {
+  0% {
+    opacity: 0;
+    transform: translateY(160%) scale(0.9);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  15% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-40%) scale(0.96, 1.06);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  75% {
+    transform: translateY(0) scale(1.08, 0.88);
+  }
+  88% {
+    transform: scale(0.97, 1.03);
+  }
+  100% {
+    transform: none;
+  }
+}
+:root[data-theme="platformer"] .ds-dialog:has(.shell-launcher__grid) {
+  background:
+    radial-gradient(ellipse 30% 14% at 15% 100%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%),
+    radial-gradient(ellipse 24% 10% at 80% 100%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%),
+    radial-gradient(ellipse 6% 4% at 70% 16%, #ffffff 96%, transparent),
+    radial-gradient(ellipse 4% 3% at 73% 13%, #ffffff 96%, transparent),
+    linear-gradient(180deg, #6fb2ff, #a8d4ff);
+}
+:root[data-theme="platformer"] .ds-dialog:has(.shell-launcher__grid) > h2 {
+  color: #ffffff;
+  text-shadow: 2px 2px 0 #000000;
+}
+:root[data-theme="platformer"] .shell-launcher__head span:last-child {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+:root[data-theme="platformer"] .shell-launcher__head {
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 0.6rem;
+}
+:root[data-theme="platformer"] .ds-dialog:has(.shell-launcher__grid) .ds-dialog__footer {
+  background: transparent;
+}
+:root[data-theme="mazechase"] .shell-lights__item {
+  text-transform: none;
+}

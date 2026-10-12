@@ -110,6 +110,10 @@ export const BANNER_KEYS = [
   "live-lcdstars",
   "live-fallingblocks",
   "live-fleet",
+  "mazewalls",
+  "brickworld",
+  "live-ghosts",
+  "live-spincoins",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -187,6 +191,8 @@ export const FRAME_KEYS = [
   "cartridge",
   "blockframe",
   "crab",
+  "corridor",
+  "warppipe",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -257,4 +263,6 @@ export const NAME_KEYS = [
   "lcdtext",
   "bevelblocks",
   "hiscore",
+  "neonmaze",
+  "gametitle",
 ] as const;

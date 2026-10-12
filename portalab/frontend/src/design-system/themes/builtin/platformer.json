@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 2,
+  "key": "platformer",
+  "name": "Plateformes",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#a8d4ff",
+    "surfaceRaised": "#fff8e8",
+    "text": "#1a1a2e",
+    "textMuted": "#3d3d5c",
+    "border": "#c84c0c",
+    "accent": "#c4320a",
+    "accentContrast": "#ffffff",
+    "focus": "#1a1a2e",
+    "accentAlt": "#1e7a1e",
+    "rarity": {
+      "common": "#3d3d5c",
+      "rare": "#1d4fa8",
+      "epic": "#7a2fb8",
+      "legendary": "#8a5a00"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b4252",
+      "bg": "#eceff4",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#15603a",
+      "bg": "#e3f4ea",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#fdf1dc",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6b4a00",
+      "bg": "#faf1d7",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#a1121d",
+      "bg": "#fde7e8",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#57303a",
+      "bg": "#f3e6ea",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b2b8f",
+      "bg": "#ede6fb",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a1f52",
+      "bg": "#f9e4ef",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#3f4652",
+      "bg": "#eef0f3",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#0f4c75",
+      "bg": "#e1eff8",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, \"Chakra Petch\", sans-serif",
+    "headingFamily": "\"Press Start 2P\", Nunito, monospace",
+    "headingCase": "uppercase",
+    "headingEffect": "shadow"
+  },
+  "radii": {
+    "sm": 0.2,
+    "md": 0.4
+  },
+  "motion": {
+    "profile": "playful",
+    "celebration": "coinpop",
+    "fastMs": 110,
+    "normalMs": 220,
+    "levelUp": "flagpole"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "launcher",
+      "tablet": "launcher",
+      "phone": "launcher"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "pixel",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "flag",
+      "film": "film",
+      "media": "film",
+      "compass": "compass",
+      "users": "users",
+      "shop": "store",
+      "trophy": "trophy",
+      "search": "search",
+      "newspaper": "newspaper",
+      "book": "book",
+      "calendar": "calendar",
+      "chart": "chart"
+    }
+  },
+  "background": {
+    "fallback": "#a8d4ff",
+    "pattern": "none",
+    "ambient": "spincoins"
+  },
+  "sounds": {
+    "notification": "asset:chiptune/notification.wav",
+    "alert": "asset:chiptune/alert.wav",
+    "success": "asset:chiptune/success.wav",
+    "reward": "asset:chiptune/reward.wav",
+    "levelUp": "asset:chiptune/level-up.wav",
+    "ui": "asset:chiptune/ui.wav"
+  },
+  "notification": {
+    "style": "bricks",
+    "animation": "jumpin"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Monde 1-1",
+      "nav:nav.section.home": "Monde 1-1",
+      "dashboard:title": "Monde 1-1",
+      "nav:nav.media": "Tuyaux vidéo",
+      "nav:nav.section.media": "Tuyaux vidéo",
+      "media:home.title": "Tuyaux vidéo",
+      "nav:nav.media_requests": "Champignons demandés",
+      "nav:nav.media_insights": "Niveaux terminés",
+      "media:insights.title": "Niveaux terminés",
+      "nav:nav.section.content": "Le château",
+      "nav:nav.news": "Nouveaux mondes",
+      "news:title": "Nouveaux mondes",
+      "nav:nav.wiki": "Passages secrets",
+      "wiki:title": "Passages secrets",
+      "nav:nav.search": "Chercher",
+      "search:title": "Chercher",
+      "nav:nav.calendar": "Prochains mondes",
+      "calendar:title": "Prochains mondes",
+      "nav:nav.services": "Tuyaux",
+      "nav:nav.section.services": "Tuyaux",
+      "nav:nav.statistics": "Records de vitesse",
+      "statistics:title": "Records de vitesse",
+      "nav:nav.community": "Équipe de héros",
+      "nav:nav.section.community": "Équipe de héros",
+      "community:title": "Équipe de héros",
+      "nav:nav.progression": "Mon monde",
+      "gamification:progression.title": "Mon monde",
+      "nav:nav.campaigns": "Défis du monde",
+      "campaigns:page.title": "Défis du monde",
+      "nav:nav.marketplace": "Boutique du champignon",
+      "nav:nav.section.marketplace": "Boutique du champignon",
+      "marketplace:catalog.title": "Boutique du champignon",
+      "nav:nav.projects": "Mondes à financer",
+      "marketplace:projects.title": "Mondes à financer",
+      "marketplace:owned.title": "Mes bonus",
+      "nav:nav.support": "Château de secours",
+      "nav:nav.section.support": "Château de secours",
+      "nav:nav.incidents": "Trous dans le sol",
+      "support:incident.title": "Trous dans le sol",
+      "nav:nav.feedback": "Proposer un niveau",
+      "support:feedback.title": "Proposer un niveau",
+      "gamification:value.coins": "Pièces",
+      "gamification:value.xp": "Étoiles",
+      "shell:menu": "Carte du monde"
+    },
+    "en": {
+      "nav:nav.home": "World 1-1",
+      "nav:nav.section.home": "World 1-1",
+      "dashboard:title": "World 1-1",
+      "nav:nav.media": "Video pipes",
+      "nav:nav.section.media": "Video pipes",
+      "media:home.title": "Video pipes",
+      "nav:nav.media_requests": "Requested mushrooms",
+      "nav:nav.media_insights": "Levels cleared",
+      "media:insights.title": "Levels cleared",
+      "nav:nav.section.content": "The castle",
+      "nav:nav.news": "New worlds",
+      "news:title": "New worlds",
+      "nav:nav.wiki": "Secret exits",
+      "wiki:title": "Secret exits",
+      "nav:nav.search": "Search",
+      "search:title": "Search",
+      "nav:nav.calendar": "Next worlds",
+      "calendar:title": "Next worlds",
+      "nav:nav.services": "Pipes",
+      "nav:nav.section.services": "Pipes",
+      "nav:nav.statistics": "Speedrun records",
+      "statistics:title": "Speedrun records",
+      "nav:nav.community": "Hero team",
+      "nav:nav.section.community": "Hero team",
+      "community:title": "Hero team",
+      "nav:nav.progression": "My world",
+      "gamification:progression.title": "My world",
+      "nav:nav.campaigns": "World challenges",
+      "campaigns:page.title": "World challenges",
+      "nav:nav.marketplace": "Mushroom shop",
+      "nav:nav.section.marketplace": "Mushroom shop",
+      "marketplace:catalog.title": "Mushroom shop",
+      "nav:nav.projects": "Worlds to fund",
+      "marketplace:projects.title": "Worlds to fund",
+      "marketplace:owned.title": "My power-ups",
+      "nav:nav.support": "Rescue castle",
+      "nav:nav.section.support": "Rescue castle",
+      "nav:nav.incidents": "Holes in the ground",
+      "support:incident.title": "Holes in the ground",
+      "nav:nav.feedback": "Suggest a level",
+      "support:feedback.title": "Suggest a level",
+      "gamification:value.coins": "Coins",
+      "gamification:value.xp": "Stars",
+      "shell:menu": "World map"
+    }
+  }
+}

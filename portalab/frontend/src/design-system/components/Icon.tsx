@@ -78,6 +78,7 @@ import {
   Feather,
   Film,
   Fingerprint,
+  Flag,
   Flame,
   Flashlight,
   FlaskConical,
@@ -421,6 +422,7 @@ export const ICONS: Record<string, LucideIcon> = {
   camera: Camera,
   // #89: the retro games
   gamepad: Gamepad2,
+  flag: Flag,
   blocks: Blocks,
   "chevron-up": ChevronUp,
   battery: BatteryFull,

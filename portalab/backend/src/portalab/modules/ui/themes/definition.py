@@ -236,6 +236,8 @@ NOTIFICATION_STYLES = Literal[
     "rpgbox",
     "blockrow",
     "invasion",
+    "ghostly",
+    "bricks",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -293,6 +295,8 @@ NOTIFICATION_ANIMATIONS = Literal[
     "pixelreveal",
     "harddrop",
     "march",
+    "chomp",
+    "jumpin",
 ]
 AMBIENTS = Literal[
     "none",
@@ -400,6 +404,8 @@ AMBIENTS = Literal[
     "lcdstars",
     "fallingblocks",
     "fleet",
+    "ghosts",
+    "spincoins",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -452,6 +458,8 @@ CELEBRATIONS = Literal[
     "pixelhearts",
     "lineclear",
     "lasers",
+    "pellets",
+    "coinpop",
 ]
 PATTERNS = Literal[
     "none",
@@ -504,7 +512,7 @@ LEVEL_UPS = Literal[
     "owlpost", "plunder", "rollout",
     "setupwizard", "unboxing", "viral",
     "encore", "finale", "extraedition",
-    "statsup", "fourlines", "wavecleared",
+    "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
 ]  # fmt: skip
 
 

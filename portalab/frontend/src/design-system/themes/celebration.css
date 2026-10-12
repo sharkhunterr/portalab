@@ -1501,3 +1501,71 @@
     0 0 0 2px #39ff14,
     0 0 18px #39ff14;
 }
+/* pellets (maze): pellets popping out, every fourth one a big blinking power pellet */
+[data-effect="pellets"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.45rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffb897;
+  animation-name: fx-burst;
+}
+[data-effect="pellets"] .celebration-fx:nth-child(4n) {
+  inline-size: 1rem;
+  box-shadow: 0 0 0.6rem #ffb897;
+}
+[data-effect="pellets"] .ds-celebration__badge {
+  background: #000000;
+  color: #ffe14d;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    0 0 0 3px #2121de,
+    0 0 18px #2121de;
+}
+/* coins popping (platformer): coins jumping up out of the reward, spinning */
+[data-effect="coinpop"] .celebration-fx {
+  left: calc(50% + (var(--i) - var(--n) / 2) * 1.6rem);
+  top: 50%;
+  inline-size: 1.1rem;
+  aspect-ratio: 0.8;
+  border-radius: 50%;
+  background:
+    linear-gradient(#c47a00, #c47a00) 50% 50% / 18% 50% no-repeat,
+    radial-gradient(ellipse at 40% 35%, #fff2b3, #f8b800 55%, #c47a00);
+  box-shadow: 0 0 0 2px #7a3a00;
+  animation-name: fx-coinpop;
+  animation-timing-function: linear;
+}
+@keyframes fx-coinpop {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  25% {
+    scale: 0.2 1;
+  }
+  45% {
+    transform: translateY(-6rem);
+    scale: 1 1;
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  70% {
+    scale: 0.2 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-1rem);
+    scale: 1 1;
+  }
+}
+[data-effect="coinpop"] .ds-celebration__badge {
+  border: 2px solid #000000;
+  border-radius: 0.2rem;
+  background: #f8b800;
+  color: #5a2a00;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    inset 3px 3px 0 #ffe08a,
+    inset -3px -3px 0 #c47a00;
+}

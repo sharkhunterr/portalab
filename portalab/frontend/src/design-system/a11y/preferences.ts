@@ -92,6 +92,8 @@ export const PALETTE_KEYS = [
   "dotmatrix",
   "blockcolors",
   "arcadegreen",
+  "mazeblue",
+  "brickred",
 ] as const;
 export type PaletteKey = (typeof PALETTE_KEYS)[number];
 /** ``theme``: the theme's own default (027). */
@@ -166,6 +168,8 @@ export const NOTIFICATION_STYLES = [
   "rpgbox",
   "blockrow",
   "invasion",
+  "ghostly",
+  "bricks",
 ] as const;
 export const NOTIFICATION_ANIMATIONS = [
   "slide",
@@ -230,6 +234,8 @@ export const NOTIFICATION_ANIMATIONS = [
   "pixelreveal",
   "harddrop",
   "march",
+  "chomp",
+  "jumpin",
 ] as const;
 /** 027: animated layers behind the portal (ambient) and celebrations — ``theme`` follows the theme. */
 export const AMBIENTS = [
@@ -344,6 +350,8 @@ export const AMBIENTS = [
   "lcdstars",
   "fallingblocks",
   "fleet",
+  "ghosts",
+  "spincoins",
 ] as const;
 /**
  * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
@@ -422,6 +430,8 @@ export const LEVEL_BADGES = [
   "batteryled",
   "tpiece",
   "saucer",
+  "chomper",
+  "qblock",
 ] as const;
 export type LevelBadge = (typeof LEVEL_BADGES)[number];
 /** 027: how a level-up is shown — ``classic`` is free, each universe has its own (the theme's default). */
@@ -482,6 +492,8 @@ export const LEVEL_UPS = [
   "statsup",
   "fourlines",
   "wavecleared",
+  "powerup",
+  "flagpole",
 ] as const;
 export type LevelUpLook = (typeof LEVEL_UPS)[number];
 export const CELEBRATION_KEYS = [
@@ -540,6 +552,8 @@ export const CELEBRATION_KEYS = [
   "pixelhearts",
   "lineclear",
   "lasers",
+  "pellets",
+  "coinpop",
 ] as const;
 export type Ambient = (typeof AMBIENTS)[number];
 export type CelebrationKey = (typeof CELEBRATION_KEYS)[number];
