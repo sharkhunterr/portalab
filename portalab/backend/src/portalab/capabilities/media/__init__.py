@@ -47,6 +47,8 @@ DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent
 ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
 STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
+REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
+REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -69,6 +71,18 @@ class SourceUnavailable(Exception):
     def __init__(self, state: str = "unavailable") -> None:
         super().__init__(state)
         self.state = state
+
+
+class SourceQuotaExceeded(Exception):
+    """#3: the request service refused a request: the account's quota is used up."""
+
+
+class SourceDuplicate(Exception):
+    """#4: the request service already has this title requested (or available)."""
+
+
+class SourceRefused(Exception):
+    """#4: the request service refused the request (the account may not ask for this — 4K, a kind…)."""
 
 
 def unwrap(value: Any) -> Any:
@@ -178,10 +192,125 @@ class MediaPlayback(Protocol):
 @runtime_checkable
 class RequestService(Protocol):
     async def submit(
-        self, ids: Mapping[str, str], kind: str, title: str, requester: str | None
-    ) -> SourceRequest: ...
+        self,
+        ids: Mapping[str, str],
+        kind: str,
+        title: str,
+        requester: str | None,
+        **options: Any,
+    ) -> SourceRequest:
+        """``options`` (#3, #4), given only when used: ``seasons`` (the season numbers of a series; all by
+        default), ``is4k`` and ``bypass_quota`` (a request paid with a unit bought in the shop: it must not
+        count against — nor be refused by — the account's quota on the service)."""
+        ...
 
     async def status(self, external_request_id: str) -> SourceRequest: ...
+
+
+@dataclass(frozen=True, slots=True)
+class QuotaWindow:
+    """#3: one kind's request limit on the service — ``limit`` requests every ``days`` days (no limit:
+    ``None``), how many count now and how many are left."""
+
+    limit: int | None = None
+    days: int | None = None
+    used: int = 0
+    remaining: int | None = None
+    restricted: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class SourceQuota:
+    movie: QuotaWindow = field(default_factory=QuotaWindow)
+    tv: QuotaWindow = field(default_factory=QuotaWindow)
+
+
+@dataclass(frozen=True, slots=True)
+class QuotaLimits:
+    """#3: limits as set (``None``: the service's default; a limit of 0: no limit)."""
+
+    movie_limit: int | None = None
+    movie_days: int | None = None
+    tv_limit: int | None = None
+    tv_days: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class QuotaAccount:
+    external_id: str
+    name: str | None
+    own: QuotaLimits
+    quota: SourceQuota | None = None
+    exempt: bool = False  # the service's managers have no quota (and theirs cannot be set)
+
+
+@runtime_checkable
+class RequestQuotas(Protocol):
+    async def quota(self, external_user: str) -> SourceQuota: ...
+
+    async def accounts(self) -> Sequence[QuotaAccount]: ...
+
+    async def set_limits(self, external_user: str, limits: QuotaLimits) -> None: ...
+
+    async def defaults(self) -> QuotaLimits: ...
+
+    async def set_defaults(self, limits: QuotaLimits) -> None: ...
+
+
+# what the request service says of a title: 1 unknown, pending, processing, partial(ly available), available
+RequestableStatus = Literal["unknown", "pending", "processing", "partial", "available"]
+
+
+@dataclass(frozen=True, slots=True)
+class RequestableTitle:
+    """#4: a film or a series one can ask for (TMDB, as the request service sees it)."""
+
+    tmdb_id: str
+    kind: str  # movie | series
+    title: str
+    year: int | None = None
+    overview: str | None = None
+    poster: str | None = None  # TMDB image path
+    backdrop: str | None = None
+    rating: float | None = None
+    status: RequestableStatus = "unknown"
+    release_date: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class RequestableSeason:
+    number: int
+    name: str | None = None
+    episodes: int | None = None
+    air_date: str | None = None
+    status: RequestableStatus = "unknown"  # pending: someone asked for it already
+
+
+@dataclass(frozen=True, slots=True)
+class RequestableDetails:
+    title: RequestableTitle
+    genres: tuple[str, ...] = ()
+    runtime: int | None = None  # minutes
+    tagline: str | None = None
+    cast: tuple[tuple[str, str | None, str | None], ...] = ()  # name, character, TMDB profile path
+    trailer: str | None = None  # a YouTube video key
+    seasons: tuple[RequestableSeason, ...] = ()
+    ids: Mapping[str, str] = field(default_factory=dict)  # tmdb, imdb, tvdb
+    four_k: bool = False  # the service has a 4K server for this kind
+    # the enriched details, in the shape of the library's own metadata (studios, budget and box office,
+    # countries, languages, the saga, the exact release date, certification, crew, networks…)
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+
+
+@runtime_checkable
+class RequestDiscovery(Protocol):
+    async def search(self, query: str, language: str, page: int = 1) -> Sequence[RequestableTitle]: ...
+
+    async def shelf(self, name: str, language: str) -> Sequence[RequestableTitle]:
+        """``trending``, ``popular_movies``, ``popular_series``, ``upcoming_movies``, ``upcoming_series``."""
+        ...
+
+    async def details(self, kind: str, tmdb_id: str, language: str) -> RequestableDetails | None: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -717,6 +846,8 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(ITEM_LINKS, ItemLinks, "Where a title opens in its service (027)"),
     _spec(STREAMING, MediaStreaming, "Play a title in the portal, transcoded by its service (027)"),
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
+    _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
+    _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
@@ -115,9 +115,10 @@ describe("media detail", () => {
     // 027: sections with nothing to tell are left out (no « not enough people », no « no data »)
     expect(screen.queryByRole("heading", { name: "Statistics" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Requests" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Request" }));
-    expect(await screen.findByText("You have used your requests for this period.")).toBeTruthy();
-    expect(posts).toEqual(["/api/v1/media/requests"]);
+    // #4: a film with its TMDB id is asked for through the shared form (seasons, 4K, quota)
+    const ask = screen.getByRole("link", { name: "Request" });
+    expect(ask.getAttribute("href")).toBe("/media/discover/movie/329865");
+    expect(posts).toEqual([]);
   });
 });
 
@@ -307,9 +308,12 @@ describe("catalog and requests", () => {
     await waitFor(() =>
       expect(queries.some((q) => q.includes("q=arr") && q.includes("availability=available"))).toBe(true),
     );
+    // the overview's card: the count, where they stand, the quota and the bought requests (#3)
+    renderAt("/media/requests", [{ path: "/media/requests", element: <RequestsPage /> }]);
+    expect(await screen.findByText(/1 request bought in the shop/)).toBeTruthy();
+    expect(screen.getByText(/2 left of/)).toBeTruthy();
+    cleanup();
     renderAt("/media/requests?tab=list", [{ path: "/media/requests", element: <RequestsPage /> }]);
-    expect(await screen.findByText("Requests left")).toBeTruthy();
-    expect(screen.getByText(/1 extra request/)).toBeTruthy();
     fireEvent.click(await screen.findByRole("button", { name: "Cancel: Arrival" }));
   });
 });

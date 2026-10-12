@@ -649,15 +649,43 @@ function Watch({ objectId, kind }: { objectId: string; kind: string }) {
   );
 }
 
-function RequestButton({ objectId }: { objectId: string }) {
+function RequestButton({
+  objectId,
+  kind,
+  tmdb,
+}: {
+  objectId: string;
+  kind: string;
+  tmdb?: string | undefined;
+}) {
   const t = useT();
   const { submit } = useRequestActions();
+  if (tmdb && (kind === "movie" || kind === "series")) {
+    // #4: the same form as everywhere — seasons, 4K, what it takes of my quota
+    return (
+      <Link className="ds-button ds-button--primary" to={`/media/discover/${kind}/${tmdb}`}>
+        <Icon name="plus" size={16} />
+        {t("media:detail.request")}
+      </Link>
+    );
+  }
+  return <DirectRequest objectId={objectId} submit={submit} />;
+}
+
+function DirectRequest({
+  objectId,
+  submit,
+}: {
+  objectId: string;
+  submit: ReturnType<typeof useRequestActions>["submit"];
+}) {
+  const t = useT();
   const [key] = useState(() => `detail-${objectId}-${Date.now()}`);
   const error = submit.error instanceof MediaError ? submit.error : null;
   return (
     <div>
       <Button
-        onClick={() => submit.mutate({ object_id: objectId, idempotency_key: key })}
+        onClick={() => submit.mutate({ object_id: objectId, idempotency_key: key, is4k: false })}
         disabled={submit.isPending}
       >
         {t("media:detail.request")}
@@ -718,7 +746,7 @@ export function DetailPage() {
           media.available ? (
             <Watch objectId={media.id} kind={media.kind} />
           ) : requested ? null : (
-            <RequestButton objectId={media.id} />
+            <RequestButton objectId={media.id} kind={media.kind} tmdb={media.ids?.tmdb} />
           )
         }
       />

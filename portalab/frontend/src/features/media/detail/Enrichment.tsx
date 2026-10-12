@@ -19,7 +19,7 @@ interface Person {
   image: string | null;
 }
 
-interface Metadata {
+export interface Metadata {
   title: string;
   tagline: string | null;
   overview: string | null;
@@ -64,7 +64,7 @@ export function metadataImage(ref: string | null | undefined, size = "w500"): st
   return ref ? `/api/v1/media/metadata-images?ref=${encodeURIComponent(ref)}&size=${size}` : null;
 }
 
-function normalize(raw: Partial<Metadata>): Metadata {
+export function normalize(raw: Partial<Metadata>): Metadata {
   const list = <T,>(value: T[] | undefined): T[] => (Array.isArray(value) ? value : []);
   return {
     title: raw.title ?? "",
@@ -199,12 +199,16 @@ export function Backdrop({ objectId, fill = false }: { objectId: string; fill?: 
 }
 
 export function Enrichment({ objectId }: { objectId: string }) {
+  const metadata = useMetadata(objectId);
+  return metadata.data ? <EnrichedView data={metadata.data} /> : null;
+}
+
+/** The enriched details as such — a library title's (the metadata provider's) or, #4, one the request
+ * service describes before it is asked for. */
+export function EnrichedView({ data }: { data: Metadata }) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  const metadata = useMetadata(objectId);
-  const data = metadata.data;
-  if (!data) return null;
   const cast = data.people.filter((p) => p.department === "cast");
   const crew = data.people.filter((p) => p.department !== "cast");
   const facts = [

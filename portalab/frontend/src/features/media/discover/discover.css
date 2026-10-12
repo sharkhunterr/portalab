@@ -1,0 +1,388 @@
+/* #4: asking for a title — its page, the shelves' cards and their state; #3: my quota */
+
+.discover-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.discover-status[data-status="available"] {
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-surface));
+  color: var(--color-accent-contrast);
+}
+.discover-status:is([data-status="mine"], [data-status="asked"], [data-status="pending"]) {
+  background: color-mix(in srgb, var(--color-accent-alt) 80%, var(--color-surface));
+  color: var(--color-accent-contrast);
+}
+.discover-card .media-card__frame {
+  position: relative;
+}
+.discover-card__badge {
+  position: absolute;
+  inset-block-start: 0.4rem;
+  inset-inline-end: 0.4rem;
+}
+.discover-card[data-status="available"] .media-card__poster {
+  opacity: 0.75;
+}
+
+/* a title before asking for it: its backdrop behind, the poster and the words in front */
+.discover-title__hero {
+  position: relative;
+  overflow: hidden;
+  margin-block-end: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.discover-title__backdrop {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  mask-image: linear-gradient(90deg, var(--color-text) 30%, transparent);
+}
+.discover-title__head {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+  padding: clamp(var(--space-3), 4vw, var(--space-6));
+}
+.discover-title__poster {
+  inline-size: clamp(7rem, 22vw, 11rem);
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  box-shadow: 0 0.6rem 1.6rem color-mix(in srgb, var(--color-bg, var(--color-surface)) 60%, transparent);
+}
+.discover-title__text {
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+}
+.discover-title__state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+}
+.discover-seasons {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.discover-seasons li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+
+/* the form: a series' seasons, 4K, what it takes of my quota */
+.request-dialog {
+  display: grid;
+  gap: var(--space-3);
+}
+.request-dialog__seasons {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.request-dialog__seasons legend {
+  margin-block-end: var(--space-1);
+  font-weight: 600;
+}
+.request-dialog__seasons ul {
+  display: grid;
+  gap: var(--space-1);
+  max-block-size: 18rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.request-dialog label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.request-dialog__seasons small,
+.request-dialog__state {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.request-dialog__error {
+  margin: 0;
+  color: var(--color-accent-alt);
+}
+.request-dialog__done {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+/* #3: my quota — films and series as tiles, what is left, when it comes back, the units bought */
+.request-quota {
+  display: grid;
+  gap: var(--space-3);
+  margin-block: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.request-quota__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.request-quota__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.request-quota__tile {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+.request-quota__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.request-quota__value {
+  font-size: var(--font-size-lg);
+  line-height: 1.2;
+}
+.request-quota__tile small,
+.request-quota__note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.request-quota__bar {
+  display: block;
+  block-size: 0.3rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+.request-quota__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--color-accent);
+}
+.request-quota__tile[data-restricted] .request-quota__bar span {
+  background: var(--color-accent-alt);
+}
+.request-quota__tile[data-restricted] .request-quota__value {
+  color: var(--color-accent-alt);
+}
+.request-quota__extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.request-quota__extra a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+.request-quota__note {
+  margin: 0;
+}
+
+/* « My requests »: the period in a small line, then one card — the count, where they stand, my quota */
+.requests-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-end: var(--space-2);
+}
+.requests-toolbar__period {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.requests-toolbar__period select {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+}
+.requests-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  gap: var(--space-3) var(--space-5, 1.5rem);
+  align-items: center;
+  margin-block-end: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.requests-summary__count {
+  display: grid;
+  gap: 0.1rem;
+}
+.requests-summary__count strong {
+  font-size: clamp(2rem, 7vw, 2.75rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.requests-summary__count span {
+  font-weight: 600;
+}
+.requests-summary__count small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.requests-summary__states {
+  display: grid;
+  gap: var(--space-2);
+}
+.requests-summary__bar {
+  display: flex;
+  gap: 2px;
+  block-size: 0.6rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+}
+.requests-summary__bar span {
+  min-inline-size: 0.4rem;
+}
+.requests-summary__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+.requests-summary__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+}
+.requests-summary__legend li::before {
+  content: "";
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: 50%;
+  background: var(--group);
+}
+.requests-summary__legend strong {
+  color: var(--color-text);
+}
+:is(.requests-summary__bar span, .requests-summary__legend li)[data-group="available"] {
+  --group: var(--color-accent);
+}
+:is(.requests-summary__bar span, .requests-summary__legend li)[data-group="approved"] {
+  --group: var(--color-accent-alt);
+}
+:is(.requests-summary__bar span, .requests-summary__legend li)[data-group="pending"] {
+  --group: color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+:is(.requests-summary__bar span, .requests-summary__legend li)[data-group="declined"] {
+  --group: color-mix(in srgb, var(--color-text) 20%, transparent);
+}
+.requests-summary__bar span {
+  background: var(--group);
+}
+.requests-summary__quota {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  border: 0;
+  border-block-start: 1px solid var(--color-border);
+  border-radius: 0;
+  background: none;
+}
+@media (max-width: 40rem) {
+  .requests-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.request-quota__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.request-quota__line[data-restricted] {
+  color: var(--color-accent-alt);
+}
+
+/* « Ask for a title »: the search on top */
+.discover-page__search {
+  display: block;
+  margin-block-end: var(--space-2);
+}
+.discover-page__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+}
+.discover-page__field input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  outline: none;
+}
+.discover-page__field:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}

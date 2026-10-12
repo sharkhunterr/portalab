@@ -15,11 +15,19 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.connector_sdk import SourceRecord
-from portalab.capabilities.media import REQUESTS, RequestPayload, SourceUnavailable, unwrap
+from portalab.capabilities.media import (
+    REQUESTS,
+    RequestPayload,
+    SourceDuplicate,
+    SourceQuotaExceeded,
+    SourceRefused,
+    SourceUnavailable,
+    unwrap,
+)
 from portalab.capabilities.record_sink import ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
-from portalab.core.errors import Unavailable, ValidationFailed
+from portalab.core.errors import Conflict, Forbidden, Unavailable, ValidationFailed
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import sort_title, strong_ids
@@ -27,7 +35,8 @@ from portalab.modules.media.identity.resolver import MediaNotFound, live_object
 from portalab.modules.media.links.service import UserLinkService
 from portalab.modules.media.models import ExternalId, MediaObject, MediaRequest, UserLink
 from portalab.modules.media.observability import metrics
-from portalab.modules.media.requests.quota import RequestQuota
+from portalab.modules.media.requests.quota import QuotaExceeded, RequestQuota
+from portalab.modules.media.requests.service_quota import ServiceQuotas, kind_of
 
 CANCELLABLE = ("pending", "approved")
 
@@ -35,6 +44,19 @@ CANCELLABLE = ("pending", "approved")
 class RequestServiceUnavailable(Unavailable):
     default_code = "media.service_unavailable"
     default_title = "No request service is available"
+
+
+class RequestDuplicate(Conflict):
+    default_code = "media.request_duplicate"
+    default_title = "Already requested"
+
+
+class RequestRefused(Forbidden):
+    default_code = "media.request_refused"
+    default_title = "The request service refused this request"
+
+
+OPEN_STATES = ("pending", "approved", "processing")
 
 
 class Requests:
@@ -54,6 +76,8 @@ class Requests:
         self.quota = quota
         self.links = links
         self.clock = clock
+        # #3: the request service's own quotas (Seerr) — the truth for members whose account is linked
+        self.service_quotas = ServiceQuotas(database, capabilities, clock=clock)
 
     def _providers(self) -> list[tuple[UUID, Any]]:
         try:
@@ -121,12 +145,16 @@ class Requests:
         ref: Mapping[str, Any] | None,
         service_id: UUID | None,
         idempotency_key: str | None,
+        seasons: Sequence[int] | None = None,
+        is4k: bool = False,
     ) -> MediaRequest:
         providers = self._providers()
         chosen = next(((s, p) for s, p in providers if service_id is None or s == service_id), None)
         if chosen is None:
             raise RequestServiceUnavailable("No request service is configured.")
         service, provider = chosen
+        # #3: the service's own quota for a linked account (read before anything is written)
+        service_quota = await self.service_quotas.check(user, service)
         key = f"{user}:{idempotency_key}"[:200] if idempotency_key else None
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
@@ -138,6 +166,12 @@ class Requests:
                 if existing is not None:
                     return existing
             target, external_ref = await self._target(session, object_id, ref)
+            if kind_of(external_ref["kind"]) == "movie":
+                await self._not_asked_yet(session, external_ref)
+            if seasons:
+                external_ref["seasons"] = sorted({int(n) for n in seasons if int(n) > 0})
+            if is4k:
+                external_ref["is4k"] = True
             row = MediaRequest(
                 object_id=target,
                 external_ref=external_ref,
@@ -152,18 +186,41 @@ class Requests:
             )
             session.add(row)
             await session.flush()
-            row.counted = await self.quota.consume(session, user, str(row.id))
-            request_id = row.id
+            window = None
+            if service_quota is not None:
+                window = getattr(service_quota, kind_of(external_ref["kind"]))
+            row.counted = await self.quota.consume(session, user, str(row.id), window)
+            request_id, counted = row.id, row.counted
         requester = await self._external_user(user, service)
+        options: dict[str, Any] = {}
+        if external_ref.get("seasons"):
+            options["seasons"] = external_ref["seasons"]
+        if is4k:
+            options["is4k"] = True
+        if counted == "extra" and service_quota is not None:
+            options["bypass_quota"] = True  # #3: paid with a bought unit — not counted by the service
         try:
             answer = unwrap(
                 await asyncio.wait_for(
                     provider.submit(
-                        external_ref["ids"], external_ref["kind"], external_ref["title"], requester
+                        external_ref["ids"], external_ref["kind"], external_ref["title"], requester, **options
                     ),
                     timeout=20,
                 )
             )
+        except (SourceQuotaExceeded, SourceDuplicate, SourceRefused) as exc:
+            # refused by the service: the request never was — nothing is used, nothing stays
+            async with self.database.unit_of_work() as uow:
+                refused = await uow.session.get(MediaRequest, request_id, with_for_update=True)
+                if refused is not None:
+                    await self.quota.give_back(uow.session, user, str(refused.id), refused.counted)
+                    await uow.session.delete(refused)
+            self.service_quotas.forget(user)
+            if isinstance(exc, SourceDuplicate):
+                raise RequestDuplicate("This title is already requested.") from exc
+            if isinstance(exc, SourceRefused):
+                raise RequestRefused("The request service refused this request (4K, or this kind).") from exc
+            raise QuotaExceeded("You have used your requests for this period.") from exc
         except (SourceUnavailable, TimeoutError, ConnectionError, OSError) as exc:
             metrics.increment("media.requests.failed")
             async with self.database.unit_of_work() as uow:
@@ -189,7 +246,23 @@ class Requests:
             await self.publish(uow.session, row, "media.request_created")
             if row.state == "available":
                 await self.publish(uow.session, row, "media.request_available")
-            return row
+        self.service_quotas.forget(user)
+        return row
+
+    async def _not_asked_yet(self, session: AsyncSession, external_ref: Mapping[str, Any]) -> None:
+        """#4: a film someone already asked for (still open) is not asked again — follow that request."""
+        wanted = set(strong_ids(external_ref.get("ids") or {}).items())
+        if not wanted:
+            return
+        rows = (
+            await session.execute(select(MediaRequest).where(MediaRequest.state.in_(OPEN_STATES)).limit(2000))
+        ).scalars()
+        for row in rows:
+            ref = row.external_ref or {}
+            if kind_of(str(ref.get("kind") or "")) != "movie":
+                continue
+            if wanted & set(strong_ids(ref.get("ids") or {}).items()):
+                raise RequestDuplicate("This film is already requested.")
 
     async def _external_user(self, user: UUID, service: UUID) -> str | None:
         async with self.database.session() as session:

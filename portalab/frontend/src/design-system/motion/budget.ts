@@ -82,10 +82,11 @@ export function liveLooks(): number {
   return PHONE ? 4 : 8;
 }
 
-/** How many canvas ambiences (previews in the shop and the pickers) may run at once. */
+/** How many canvas ambiences (the page's, a profile's animated banner, the shop's previews) may run at
+ * once — when saving, still the page's and the banner in view (at half the frame rate). */
 export function liveAmbiences(): number {
   if (current === "still") return 0;
-  if (current === "eco") return 1;
+  if (current === "eco") return PHONE ? 2 : 3;
   return PHONE ? 2 : 6;
 }
 

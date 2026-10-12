@@ -1797,6 +1797,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/media/quotas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Quotas Overview
+         * @description #3: every account of the request service (Seerr) — the member it is, its own limits (films,
+         *     series: requests per number of days), what it used and has left — and the service's defaults.
+         */
+        get: operations["quotas_overview_api_v1_admin_media_quotas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/quotas/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Quotas Set Many
+         * @description #3: the same limits for several accounts at once (a group of members); empty limits: the
+         *     defaults again.
+         */
+        put: operations["quotas_set_many_api_v1_admin_media_quotas_accounts_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/quotas/accounts/{account}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Quotas Set One
+         * @description #3: one account's own limits (empty: the defaults again).
+         */
+        put: operations["quotas_set_one_api_v1_admin_media_quotas_accounts__account__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/quotas/defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Quotas Set Defaults
+         * @description #3: the limits of every account that has none of its own.
+         */
+        put: operations["quotas_set_defaults_api_v1_admin_media_quotas_defaults_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/media/split": {
         parameters: {
             query?: never;
@@ -5537,6 +5619,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/requests/quota": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Request Quota
+         * @description #3: how many requests I have left (films and series), when they come back, and my bought units.
+         */
+        get: operations["my_request_quota_api_v1_me_media_requests_quota_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/requests/soon": {
         parameters: {
             query?: never;
@@ -6138,6 +6240,69 @@ export interface paths {
         };
         /** Browse */
         get: operations["browse_api_v1_media_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/discover/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Discover Search
+         * @description #4: films and series one can ask for (the request service's search, over TMDB), each with its
+         *     page in the catalog when it is there and the open request for it (mine, or a member's).
+         */
+        get: operations["discover_search_api_v1_media_discover_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/discover/shelves/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Discover Shelf
+         * @description #4: a shelf like the request service's own — ``trending``, ``popular_movies``,
+         *     ``popular_series``, ``upcoming_movies``, ``upcoming_series``.
+         */
+        get: operations["discover_shelf_api_v1_media_discover_shelves__name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/discover/{kind}/{tmdb_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Discover Title
+         * @description #4: a title before asking for it — synopsis, cast, trailer, seasons (which are there or asked for),
+         *     its page in the catalog and the open request for it.
+         */
+        get: operations["discover_title_api_v1_media_discover__kind___tmdb_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -11229,10 +11394,17 @@ export interface components {
             ids?: {
                 [key: string]: string;
             };
+            /**
+             * Is4K
+             * @default false
+             */
+            is4k: boolean;
             /** Kind */
             kind?: string | null;
             /** Object Id */
             object_id?: string | null;
+            /** Seasons */
+            seasons?: number[] | null;
             /** Service Id */
             service_id?: string | null;
             /** Title */
@@ -12487,6 +12659,25 @@ export interface components {
             definition: {
                 [key: string]: unknown;
             };
+        };
+        /** QuotaBulkIn */
+        QuotaBulkIn: {
+            /** Accounts */
+            accounts: string[];
+            movie?: components["schemas"]["QuotaKindIn"];
+            tv?: components["schemas"]["QuotaKindIn"];
+        };
+        /** QuotaKindIn */
+        QuotaKindIn: {
+            /** Days */
+            days?: number | null;
+            /** Limit */
+            limit?: number | null;
+        };
+        /** QuotaLimitsIn */
+        QuotaLimitsIn: {
+            movie?: components["schemas"]["QuotaKindIn"];
+            tv?: components["schemas"]["QuotaKindIn"];
         };
         /** RegisterRequest */
         RegisterRequest: {
@@ -17907,6 +18098,135 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quotas_overview_api_v1_admin_media_quotas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    quotas_set_many_api_v1_admin_media_quotas_accounts_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuotaBulkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quotas_set_one_api_v1_admin_media_quotas_accounts__account__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                account: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuotaLimitsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quotas_set_defaults_api_v1_admin_media_quotas_defaults_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuotaLimitsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -25285,6 +25605,28 @@ export interface operations {
             };
         };
     };
+    my_request_quota_api_v1_me_media_requests_quota_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     my_requests_soon_api_v1_me_media_requests_soon_get: {
         parameters: {
             query?: never;
@@ -26352,6 +26694,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discover_search_api_v1_media_discover_search_get: {
+        parameters: {
+            query: {
+                q: string;
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discover_shelf_api_v1_media_discover_shelves__name__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discover_title_api_v1_media_discover__kind___tmdb_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: string;
+                tmdb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

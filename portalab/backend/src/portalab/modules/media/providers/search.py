@@ -268,3 +268,71 @@ class MediaResolver:
         if found is None:
             return None
         return ObjectRef(kind="media", id=str(found.id), title=found.title, route=found.route)
+
+
+class RequestableSearchProvider:
+    """#4: « Ask for it » — the films and series the library does not have, found through the request
+    service (Seerr, over TMDB), each opening the page where one asks for it. Titles already available
+    are left to the library's own results."""
+
+    kind = "request"
+    label_key = "search.kind.request"
+    required_permission = MEDIA_REQUEST
+
+    def __init__(self, catalog: Any, authorizer: Authorizer, language: Any) -> None:
+        self.catalog = catalog
+        self.authorizer = authorizer
+        self.language = language
+
+    def facets(self) -> Sequence[FacetDef]:
+        return (FacetDef("type", "search.facet.type", values=("movie", "series")),)
+
+    async def _found(
+        self, query: ParsedQuery, principal: Principal, limit: int, language: str | None = None
+    ) -> list[SearchItem]:
+        user = principal.acting_for or principal.user_id
+        if user is None or not query.text.strip() or not self.catalog.configured():
+            return []
+        if not await self.authorizer.is_allowed(principal, MEDIA_REQUEST):
+            return []
+        cards = await self.catalog.search(query.text, user, language or await self.language())
+        wanted = set(query.filters.get("type") or ())
+        items = []
+        for card in cards:
+            if card["status"] == "available" or (wanted and card["kind"] not in wanted):
+                continue
+            state = "requested" if card["request"] or card["status"] in ("pending", "processing") else None
+            facets = {"type": card["kind"], **({"status": state} if state else {})}
+            if card.get("poster"):
+                facets["poster"] = str(card["poster"])
+            if card.get("year"):
+                facets["year"] = str(card["year"])
+            items.append(
+                SearchItem(
+                    kind=self.kind,
+                    id=f"{card['kind']}:{card['tmdb_id']}",
+                    title=f"{card['title']} ({card['year']})" if card.get("year") else card["title"],
+                    url_ref=card["route"],
+                    snippet=snippet(str(card.get("overview") or ""), query.terms),
+                    score=0.5,
+                    facets=facets,
+                )
+            )
+        return items[:limit]
+
+    async def search(
+        self, query: ParsedQuery, principal: Principal, ctx: LocaleContext, *, limit: int, cursor: str | None
+    ) -> ProviderResult:
+        started = time.perf_counter()
+        if cursor:  # one page: the request service's first answers are the relevant ones
+            return ProviderResult()
+        items = await self._found(query, principal, limit, ctx.language if ctx else None)
+        return ProviderResult(items=items, took_ms=int((time.perf_counter() - started) * 1000))
+
+    async def suggestions(
+        self, query: ParsedQuery, principal: Principal, *, per_type: int = 2
+    ) -> Sequence[SearchItem]:
+        return (await self._found(query, principal, 4))[:4]
+
+    async def hydrate(self, ids: Sequence[str], principal: Principal) -> Sequence[SearchItem]:
+        return []  # live results only: nothing to bring back later

@@ -4,6 +4,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { metadataImage } from "../../media/detail/Enrichment";
 import { Poster } from "../../media/MediaGrid";
 import { type GroupOut, type ItemOut, kindKey, runSearch, type SearchParams } from "../api";
 import { badgesOf, mediaGroup, ResultBadges, SourceIcon } from "../presentation";
@@ -52,10 +53,16 @@ function PosterResult({ item }: { item: ItemOut }) {
   const t = useT();
   const image = item.facets?.image;
   const badges = badgesOf(t, item).slice(1); // the type is the section's own heading
+  // #4: a title to ask for carries TMDB's poster
+  const src = image
+    ? `/api/v1/media/images/${image}`
+    : item.kind === "request"
+      ? metadataImage(item.facets?.poster, "w185")
+      : null;
   return (
     <li className="search-poster">
       <Link to={item.url_ref} className="search-poster__link">
-        <Poster src={image ? `/api/v1/media/images/${image}` : null} kind={item.facets?.type ?? "movie"} />
+        <Poster src={src} kind={item.facets?.type ?? "movie"} />
         <span className="search-poster__title">{item.title}</span>
       </Link>
       <ResultBadges badges={badges} />
@@ -137,7 +144,7 @@ export function ResultGroup({ group, params }: { group: GroupOut; params: Search
                   <span className="search-group__count">{section.items.length}</span>
                 </h4>
               ) : null}
-              {group.kind === "media" ? (
+              {group.kind === "media" || group.kind === "request" ? (
                 <ul className="search-posters">
                   {section.items.map((item) => (
                     <PosterResult key={`${item.kind}:${item.id}`} item={item} />

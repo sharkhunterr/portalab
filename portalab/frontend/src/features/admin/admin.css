@@ -836,3 +836,19 @@
 .alert-overrides__grid [data-overridden] {
   border-color: var(--color-accent);
 }
+
+/* #3: the request service's quotas — who, what they used, their limits */
+.quota-admin__who,
+.quota-admin__usage {
+  display: grid;
+  gap: 0.1rem;
+}
+.quota-admin__who small,
+.quota-admin__usage small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.quota-admin__error {
+  margin: 0;
+  color: var(--color-accent-alt);
+}

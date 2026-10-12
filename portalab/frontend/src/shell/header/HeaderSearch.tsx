@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router";
 import { api } from "../../api/client";
 import { useAnnounce } from "../../design-system/a11y/Announce";
 import { Icon } from "../../design-system/components/Icon";
+import { metadataImage } from "../../features/media/detail/Enrichment";
 import { kindKey, resolvePalette, useHistory } from "../../features/search/api";
 import {
   type Badge,
@@ -188,7 +189,12 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
         title: item.title,
         detail: detailOf(item),
         route: item.url_ref,
-        image: item.kind === "media" && item.facets?.image ? item.facets.image : undefined,
+        image:
+          item.kind === "media" && item.facets?.image
+            ? `/api/v1/media/images/${item.facets.image}`
+            : item.kind === "request" && item.facets?.poster // #4: a title to ask for (TMDB's poster)
+              ? (metadataImage(item.facets.poster, "w92") ?? undefined)
+              : undefined,
         badges: badgesOf(t, item),
       });
     }
@@ -348,12 +354,7 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
                   onKeyDown={() => undefined}
                 >
                   {option.image ? (
-                    <img
-                      className="header-search__poster"
-                      src={`/api/v1/media/images/${option.image}`}
-                      alt=""
-                      loading="lazy"
-                    />
+                    <img className="header-search__poster" src={option.image} alt="" loading="lazy" />
                   ) : (
                     <span className="header-search__icon" aria-hidden="true">
                       <Icon name={option.icon} size={16} />

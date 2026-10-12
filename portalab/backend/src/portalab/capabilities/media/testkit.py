@@ -123,12 +123,14 @@ class FakeRequests:
     initial_state: str = "pending"
 
     async def submit(
-        self, ids: Mapping[str, str], kind: str, title: str, requester: str | None
+        self, ids: Mapping[str, str], kind: str, title: str, requester: str | None, **options: Any
     ) -> SourceRequest:
         if self.down:
             raise ConnectionError("fake request service unreachable")
         external = f"req-{len(self.submitted) + 1}"
-        self.submitted.append({"ids": dict(ids), "kind": kind, "title": title, "requester": requester})
+        self.submitted.append(
+            {"ids": dict(ids), "kind": kind, "title": title, "requester": requester, **options}
+        )
         self.states[external] = self.initial_state
         return SourceRequest(external, self.initial_state, f"source:{self.initial_state}")  # type: ignore[arg-type]
 

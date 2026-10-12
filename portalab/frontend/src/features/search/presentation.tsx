@@ -25,6 +25,7 @@ export const KIND_ICONS: Record<string, string> = {
   incident: "alert",
   service: "server",
   campaign: "star",
+  request: "plus", // #4: titles to ask for
 };
 
 /** #67: media results told apart by type — films, series, books, audiobooks, games, music… */
@@ -69,7 +70,7 @@ const TONES: Record<string, Badge["tone"]> = {
 export function badgesOf(t: ReturnType<typeof useT>, item: Faceted): Badge[] {
   const facets = item.facets ?? {};
   const out: Badge[] = [];
-  if (item.kind === "media" && facets.type)
+  if ((item.kind === "media" || item.kind === "request") && facets.type)
     out.push({ label: t(`media:kind.${facets.type}`), tone: "neutral" });
   if ((item.kind === "product" || item.kind === "marketplace") && facets.type) {
     out.push({ label: t(`marketplace:type.${facets.type}`), tone: "neutral" });

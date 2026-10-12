@@ -1,5 +1,6 @@
 """Media module facade (spec 024)."""
 
+import contextlib
 import os
 from dataclasses import replace
 from datetime import timedelta
@@ -18,6 +19,8 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.i18n import RESOLVER as I18N_RESOLVER
+from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, METADATA, REQUESTS
 from portalab.capabilities.media_core import (
     CATALOG,
@@ -45,7 +48,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
 from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.core.audit_port import AuditSink
-from portalab.core.authz_port import Authorizer
+from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
@@ -118,7 +121,12 @@ from portalab.modules.media.providers.insight_widgets import STATS as STATS_WIDG
 from portalab.modules.media.providers.insight_widgets import TOP as TOP_WIDGET
 from portalab.modules.media.providers.insight_widgets import UPCOMING as UPCOMING_WIDGET
 from portalab.modules.media.providers.ports import HistoryReader, MediaActivityAttributes
-from portalab.modules.media.providers.search import ACTIONS, MediaResolver, MediaSearchProvider
+from portalab.modules.media.providers.search import (
+    ACTIONS,
+    MediaResolver,
+    MediaSearchProvider,
+    RequestableSearchProvider,
+)
 from portalab.modules.media.providers.summary import MediaChanges
 from portalab.modules.media.providers.widgets import (
     CONTINUE,
@@ -130,6 +138,7 @@ from portalab.modules.media.providers.widgets import (
 from portalab.modules.media.providers.widgets import (
     REQUESTS as REQUESTS_WIDGET,
 )
+from portalab.modules.media.requests.discovery import RequestableCatalog
 from portalab.modules.media.requests.insights import RequestInsights
 from portalab.modules.media.requests.journey import RequestJourney
 from portalab.modules.media.requests.quota import RequestQuota
@@ -239,6 +248,7 @@ class MediaModule:
             database, capabilities, self.catalog, self.request_insights, clock=clock
         )
         self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
+        self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(
@@ -277,6 +287,16 @@ class MediaModule:
         except Exception:
             return "en"
         return str(value or "en")
+
+    async def member_language(self, principal: Principal) -> str:
+        """#4: the member's own language (what they read the portal in), else the portal's."""
+        with contextlib.suppress(Exception):
+            providers = self.capabilities.system_providers(I18N_RESOLVER)
+            if providers and principal.user_id is not None:
+                ctx = await providers[0].provider.for_user(principal.acting_for or principal.user_id)
+                if isinstance(ctx, LocaleContext) and ctx.language:
+                    return str(ctx.language)
+        return await self.language()
 
     def threshold(self, kind: str) -> float | None:
         if kind in self.config.thresholds:
@@ -380,6 +400,10 @@ class MediaModule:
                 self.widgets.register(definition, widget, owner=OWNER)
         if not any(p.kind == "media" for p in self.widgets.summaries()):  # 027: since your last visit
             self.widgets.register_summary(MediaChanges(self.database, self.authorizer), owner=OWNER)
+        if self.search.provider("request") is None:  # #4: « Ask for it » in the search
+            self.search.register(
+                RequestableSearchProvider(self.requestable, self.authorizer, self.language), owner=OWNER
+            )
         if self.search.provider("media") is None:
             self.search.register(MediaSearchProvider(self.catalog, self.authorizer), owner=OWNER)
             self.search.register_resolver(MediaResolver(self.catalog_port), owner=OWNER)

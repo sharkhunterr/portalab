@@ -153,18 +153,20 @@ async def test_requests_and_quota(
     first = await client.post("/api/v1/media/requests", json=body)
     again = await client.post("/api/v1/media/requests", json=body)
     assert first.status_code == 201 and again.json()["id"] == first.json()["id"] and len(fake.submitted) == 1
-    over = await client.post("/api/v1/media/requests", json={**body, "idempotency_key": "req-key-0002"})
+    # #4: another film each time — the same one again would be a duplicate (followed, not asked again)
+    other = {**body, "ids": {"tmdb": "604"}, "title": "The Matrix Reloaded"}
+    over = await client.post("/api/v1/media/requests", json={**other, "idempotency_key": "req-key-0002"})
     assert over.status_code == 429 and over.json()["code"] == "media.request_quota_exceeded"
     quota = media.module.quota
     assert await quota.add_units(people["alex"], 2, "order:1", "purchase:order:1") == 2
     assert await quota.add_units(people["alex"], 2, "order:1", "purchase:order:1") == 2  # idempotent
     fake.down = True
-    failed = await client.post("/api/v1/media/requests", json={**body, "idempotency_key": "req-key-0003"})
+    failed = await client.post("/api/v1/media/requests", json={**other, "idempotency_key": "req-key-0003"})
     assert (
         failed.status_code == 503 and (await quota.available(people["alex"]))["extra_units"] == 2
     )  # given back
     fake.down = False
-    third = await client.post("/api/v1/media/requests", json={**body, "idempotency_key": "req-key-0004"})
+    third = await client.post("/api/v1/media/requests", json={**other, "idempotency_key": "req-key-0004"})
     assert third.status_code == 201 and (await quota.available(people["alex"]))["extra_units"] == 1
     mine = (await client.get("/api/v1/me/media/requests")).json()
     assert [i["state"] for i in mine["items"]].count("pending") == 2 and mine["quota"]["base_remaining"] == 0

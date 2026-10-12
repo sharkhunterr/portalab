@@ -21,19 +21,18 @@ import {
   AdminGrid,
   AdminPage,
   AdminSection,
-  AdminStats,
   AdminTabs,
   SearchBox,
   StatusBadge,
   type Tone,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useRequestActions } from "../api";
+import type { RequestQuota } from "../discover/api";
 import { useMeasures } from "../insights/api";
 import {
   GROUP_OF,
@@ -43,6 +42,7 @@ import {
   useRequestList,
   useSoon,
 } from "./api";
+import { RequestsSummary } from "./RequestsSummary";
 import "../../admin/admin.css";
 import "../media.css";
 import "../insights/insights.css"; // 027: the poster rows are the statistics' own
@@ -506,7 +506,6 @@ function Soon() {
 
 export function RequestsPage() {
   const t = useT();
-  const format = useFormat();
   const [params, setParams] = useSearchParams();
   const tab = (TABS as readonly string[]).includes(params.get("tab") ?? "")
     ? (params.get("tab") as string)
@@ -520,25 +519,6 @@ export function RequestsPage() {
       icon="inbox"
       title={t("media:requests.title")}
       description={t("media:myRequests.subtitle")}
-      primary={
-        <Link className="ds-button ds-button--primary" to="/media/browse">
-          <Icon name="plus" size={16} />
-          {t("media:myRequests.new")}
-        </Link>
-      }
-      secondary={
-        <SelectField
-          label={t("media:insights.period")}
-          value={period}
-          onChange={(e) => setPeriod(e.target.value)}
-        >
-          {PERIODS.map((p) => (
-            <option key={p} value={p}>
-              {t(`media:insights.periods.${p}`)}
-            </option>
-          ))}
-        </SelectField>
-      }
       tabs={
         <AdminTabs
           label={t("media:requests.title")}
@@ -548,45 +528,23 @@ export function RequestsPage() {
         />
       }
     >
-      {data ? (
-        <AdminStats
-          label={t("media:requests.title")}
-          stats={[
-            {
-              key: "total",
-              label: t("media:myRequests.stat.total"),
-              value: format.number(data.summary.total),
-              icon: "inbox",
-              tone: "info",
-              hint:
-                data.previous_total !== null
-                  ? t("media:myRequests.previousCount", { count: data.previous_total })
-                  : undefined,
-            },
-            {
-              key: "available",
-              label: t("media:myRequests.group.available"),
-              value: format.number(data.summary.available),
-              icon: "check",
-              tone: "ok",
-            },
-            {
-              key: "approved",
-              label: t("media:myRequests.group.approved"),
-              value: format.number(data.summary.approved),
-              icon: "arrow-down",
-              tone: "info",
-            },
-            {
-              key: "quota",
-              label: t("media:myRequests.stat.quota"),
-              value: format.number(Number(quota?.base_remaining ?? 0)),
-              hint: t("media:requests.extra", { count: Number(quota?.extra_units ?? 0) }),
-              icon: "coins",
-              tone: "neutral",
-            },
-          ]}
-        />
+      {tab === "overview" ? (
+        <div className="requests-toolbar">
+          <label className="requests-toolbar__period">
+            <span>{t("media:insights.period")}</span>
+            <select value={period} onChange={(e) => setPeriod(e.target.value)}>
+              {PERIODS.map((p) => (
+                <option key={p} value={p}>
+                  {t(`media:insights.periods.${p}`)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      ) : null}
+      {/* the period's count, where my requests stand, and #3 what I may still ask for */}
+      {tab === "overview" && data ? (
+        <RequestsSummary data={data} quota={quota as RequestQuota | undefined} />
       ) : null}
       {insights.isPending ? <FunctionalState state="loading" /> : null}
       {insights.isError ? <FunctionalState state="error" onRetry={() => insights.refetch()} /> : null}

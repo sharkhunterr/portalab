@@ -11,6 +11,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.media import QuotaWindow
 from portalab.core.db import Database
 from portalab.core.errors import PortalError, ValidationFailed
 from portalab.core.time import Clock, utc_now
@@ -75,8 +76,20 @@ class RequestQuota:
             "period_start": start.isoformat(),
         }
 
-    async def consume(self, session: AsyncSession, user: UUID, request_ref: str) -> str:
-        """Count one request against the base allowance, else one extra unit; raises when none is left."""
+    async def consume(
+        self, session: AsyncSession, user: UUID, request_ref: str, service: QuotaWindow | None = None
+    ) -> str:
+        """Count one request against the base allowance, else one extra unit; raises when none is left.
+        #3: with the request service's own quota (``service``, a linked account), that quota is the base:
+        ``service`` while it has room, then one extra unit."""
+        if service is not None:
+            if not service.restricted:
+                return "service"
+            _, extra, _ = await self._usage(session, user)
+            if extra > 0:
+                await self._ledger(session, user, -1, "consumption", request_ref, f"consume:{request_ref}")
+                return "extra"
+            raise QuotaExceeded("You have used your requests for this period.")
         used, extra, _ = await self._usage(session, user)
         if used < max(0, self.config().quota_per_period):
             return "base"

@@ -185,6 +185,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "media.read",
     },
     {
+        # #4: asking for a film or a series (the search and the shelves of the request service)
+        "key": "media.discover",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.media_discover",
+        "icon": "plus",
+        "route": "/media/discover",
+        "group": "media",
+        "order_hint": 23,
+        "required_permission": "media.request",
+    },
+    {
         "key": "media.requests",
         "owner": "module:media",
         "kind": "entry",
@@ -192,7 +204,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "inbox",
         "route": "/media/requests",
         "group": "media",
-        "order_hint": 23,
+        "order_hint": 24,
         "required_permission": "media.request",
     },
     {
@@ -203,7 +215,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "chart",
         "route": "/media/insights",
         "group": "media",
-        "order_hint": 24,
+        "order_hint": 25,
         "required_permission": "media.read",
     },
     {
@@ -611,6 +623,19 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "group": "admin",
         "topic": "services",
         "order_hint": 3,
+        "required_permission": "media.manage",
+    },
+    {
+        # #3: the request service's (Seerr) limits of every member, steered from the portal
+        "key": "media.quotas",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.admin.media_quotas",
+        "icon": "coins",
+        "route": "/admin/media-quotas",
+        "group": "admin",
+        "topic": "services",
+        "order_hint": 4,
         "required_permission": "media.manage",
     },
     {

@@ -10,6 +10,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { imageUrl, type MediaCard, type ShelfName, useNowPlaying, useShelf } from "../api";
 import { metadataImage } from "../detail/Enrichment";
+import { DiscoverShelves } from "../discover/DiscoverShelves";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
 
@@ -202,8 +203,8 @@ function Hero() {
         title={t("media:home.hello")}
         context={t("media:home.pitch")}
         secondary={
-          <Link className="ds-button ds-button--secondary" to="/media/requests">
-            <Icon name="inbox" size={16} />
+          <Link className="ds-button ds-button--secondary" to="/media/discover">
+            <Icon name="plus" size={16} />
             {t("media:home.request")}
           </Link>
         }
@@ -254,6 +255,8 @@ export function MediaHome() {
       ) : null}
       <Shelf name="trending" icon="trending" />
       <Shelf name="recommended" icon="heart" />
+      {/* #4: what one can ask for, like Seerr's home */}
+      <DiscoverShelves />
       <Row icon="list" title={t("media:home.byKind")}>
         <ul className="media-kinds">
           {KINDS.map((kind) => (

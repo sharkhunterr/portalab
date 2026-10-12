@@ -38,10 +38,13 @@ const MediaCatalog = lazy(() => import("../../features/media/catalog/CatalogPage
 const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"));
 const MediaPlayer = lazy(() => import("../../features/media/player/PlayerPage"));
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
+const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverPage"));
+const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
 const MediaSourcesAdmin = lazy(() => import("../../features/admin/media/MediaSourcesAdmin"));
+const MediaQuotasAdmin = lazy(() => import("../../features/admin/media/RequestQuotasAdmin"));
 const NewsPage = lazy(() => import("../../features/news/NewsPage"));
 const Article = lazy(() => import("../../features/news/ArticlePage"));
 const NewsAdmin = lazy(() => import("../../features/news/NewsAdmin"));
@@ -204,6 +207,17 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             },
             { path: "insights", element: <MediaInsights />, handle: h({ crumb: "Statistics" }) },
             {
+              // #4: asking for a film or a series — the search and shelves, then a title's page
+              path: "discover",
+              element: <MediaDiscover />,
+              handle: h({ crumb: "Ask for a title", requiredPermission: "media.request" }),
+            },
+            {
+              path: "discover/:kind/:tmdb",
+              element: <MediaDiscoverTitle />,
+              handle: h({ crumb: "Ask for a title", requiredPermission: "media.request" }),
+            },
+            {
               path: ":objectId",
               element: <MediaDetail />,
               handle: h({ crumb: "Media", existenceSensitive: true }),
@@ -356,6 +370,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "automations/:id/edit", element: <Automations />, handle: h({ crumb: "Edit" }) },
             { path: "news", element: <NewsAdmin />, handle: h({ crumb: "News desk" }) },
             { path: "media", element: <MediaAdmin />, handle: h({ crumb: "Media identity" }) },
+            { path: "media-quotas", element: <MediaQuotasAdmin />, handle: h({ crumb: "Request quotas" }) },
             {
               path: "media-sources",
               element: <MediaSourcesAdmin />,

@@ -8221,6 +8221,11 @@
             "title": "Ids",
             "type": "object"
           },
+          "is4k": {
+            "default": false,
+            "title": "Is4K",
+            "type": "boolean"
+          },
           "kind": {
             "anyOf": [
               {
@@ -8244,6 +8249,23 @@
               }
             ],
             "title": "Object Id"
+          },
+          "seasons": {
+            "anyOf": [
+              {
+                "items": {
+                  "maximum": 200.0,
+                  "minimum": 1.0,
+                  "type": "integer"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seasons"
           },
           "service_id": {
             "anyOf": [
@@ -11614,6 +11636,78 @@
           "definition"
         ],
         "title": "QuestIn",
+        "type": "object"
+      },
+      "QuotaBulkIn": {
+        "additionalProperties": false,
+        "properties": {
+          "accounts": {
+            "items": {
+              "pattern": "^[A-Za-z0-9_-]{1,64}$",
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Accounts",
+            "type": "array"
+          },
+          "movie": {
+            "$ref": "#/components/schemas/QuotaKindIn"
+          },
+          "tv": {
+            "$ref": "#/components/schemas/QuotaKindIn"
+          }
+        },
+        "required": [
+          "accounts"
+        ],
+        "title": "QuotaBulkIn",
+        "type": "object"
+      },
+      "QuotaKindIn": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "anyOf": [
+              {
+                "maximum": 3650.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          }
+        },
+        "title": "QuotaKindIn",
+        "type": "object"
+      },
+      "QuotaLimitsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "movie": {
+            "$ref": "#/components/schemas/QuotaKindIn"
+          },
+          "tv": {
+            "$ref": "#/components/schemas/QuotaKindIn"
+          }
+        },
+        "title": "QuotaLimitsIn",
         "type": "object"
       },
       "RegisterRequest": {
@@ -21725,6 +21819,174 @@
           }
         },
         "summary": "Overrides",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/quotas": {
+      "get": {
+        "description": "#3: every account of the request service (Seerr) \u2014 the member it is, its own limits (films,\nseries: requests per number of days), what it used and has left \u2014 and the service's defaults.",
+        "operationId": "quotas_overview_api_v1_admin_media_quotas_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Quotas Overview Api V1 Admin Media Quotas Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Quotas Overview",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/quotas/accounts": {
+      "put": {
+        "description": "#3: the same limits for several accounts at once (a group of members); empty limits: the\ndefaults again.",
+        "operationId": "quotas_set_many_api_v1_admin_media_quotas_accounts_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotaBulkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Quotas Set Many Api V1 Admin Media Quotas Accounts Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Quotas Set Many",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/quotas/accounts/{account}": {
+      "put": {
+        "description": "#3: one account's own limits (empty: the defaults again).",
+        "operationId": "quotas_set_one_api_v1_admin_media_quotas_accounts__account__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "account",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{1,64}$",
+              "title": "Account",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotaLimitsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Quotas Set One Api V1 Admin Media Quotas Accounts  Account  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Quotas Set One",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/admin/media/quotas/defaults": {
+      "put": {
+        "description": "#3: the limits of every account that has none of its own.",
+        "operationId": "quotas_set_defaults_api_v1_admin_media_quotas_defaults_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotaLimitsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Quotas Set Defaults Api V1 Admin Media Quotas Defaults Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Quotas Set Defaults",
         "tags": [
           "media"
         ]
@@ -32380,6 +32642,30 @@
         ]
       }
     },
+    "/api/v1/me/media/requests/quota": {
+      "get": {
+        "description": "#3: how many requests I have left (films and series), when they come back, and my bought units.",
+        "operationId": "my_request_quota_api_v1_me_media_requests_quota_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Request Quota Api V1 Me Media Requests Quota Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Request Quota",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/me/media/requests/soon": {
       "get": {
         "description": "027: my requests being downloaded or imported now, or with a release date coming.",
@@ -33852,6 +34138,167 @@
           }
         },
         "summary": "Browse",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/discover/search": {
+      "get": {
+        "description": "#4: films and series one can ask for (the request service's search, over TMDB), each with its\npage in the catalog when it is there and the open request for it (mine, or a member's).",
+        "operationId": "discover_search_api_v1_media_discover_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Discover Search Api V1 Media Discover Search Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover Search",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/discover/shelves/{name}": {
+      "get": {
+        "description": "#4: a shelf like the request service's own \u2014 ``trending``, ``popular_movies``,\n``popular_series``, ``upcoming_movies``, ``upcoming_series``.",
+        "operationId": "discover_shelf_api_v1_media_discover_shelves__name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z_]{3,40}$",
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Discover Shelf Api V1 Media Discover Shelves  Name  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover Shelf",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/discover/{kind}/{tmdb_id}": {
+      "get": {
+        "description": "#4: a title before asking for it \u2014 synopsis, cast, trailer, seasons (which are there or asked for),\nits page in the catalog and the open request for it.",
+        "operationId": "discover_title_api_v1_media_discover__kind___tmdb_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "pattern": "^(movie|series)$",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tmdb_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9]{1,12}$",
+              "title": "Tmdb Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Discover Title Api V1 Media Discover  Kind   Tmdb Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover Title",
         "tags": [
           "media"
         ]

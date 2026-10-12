@@ -15,6 +15,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.media import QuotaLimits
 from portalab.capabilities.themes import COSMETICS
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
@@ -158,6 +159,9 @@ class MediaRequestIn(BaseModel):
     title: str | None = Field(default=None, max_length=500)
     service_id: UUID | None = None
     idempotency_key: str | None = Field(default=None, min_length=8, max_length=120)
+    # #4: a series' seasons (all when left out) and 4K
+    seasons: list[Annotated[int, Field(ge=1, le=200)]] | None = Field(default=None, max_length=200)
+    is4k: bool = False
 
 
 class MediaRequestOut(BaseModel):
@@ -308,6 +312,60 @@ async def image(_: Reader, image_id: UUID, module: Module) -> Response:
     )
 
 
+async def _quota(module: MediaModule, user: UUID) -> dict[str, Any]:
+    """My requests' allowance: the portal's own (per period, with units bought in the shop) and — #3 — the
+    request service's (Seerr) when my account there is linked: then it is the one that counts."""
+    summary: dict[str, Any] = dict(await module.quota.summary(user))
+    summary["service"] = await module.requests.service_quotas.summary(user)
+    return summary
+
+
+# --- #4: asking for a title without leaving the portal ---------------------------------------------------
+@router.get("/media/discover/search")
+async def discover_search(
+    principal: Reader,
+    module: Module,
+    q: Annotated[str, Query(min_length=1, max_length=100)],
+    page: Annotated[int, Query(ge=1, le=20)] = 1,
+) -> dict[str, Any]:
+    """#4: films and series one can ask for (the request service's search, over TMDB), each with its
+    page in the catalog when it is there and the open request for it (mine, or a member's)."""
+    items = await module.requestable.search(q, _me(principal), await module.member_language(principal), page)
+    return {"items": items, "configured": module.requestable.configured()}
+
+
+@router.get("/media/discover/shelves/{name}")
+async def discover_shelf(
+    principal: Reader,
+    module: Module,
+    name: Annotated[str, Path(pattern=r"^[a-z_]{3,40}$")],
+) -> dict[str, Any]:
+    """#4: a shelf like the request service's own — ``trending``, ``popular_movies``,
+    ``popular_series``, ``upcoming_movies``, ``upcoming_series``."""
+    items = await module.requestable.shelf(name, _me(principal), await module.member_language(principal))
+    return {"items": items, "configured": module.requestable.configured()}
+
+
+@router.get("/media/discover/{kind}/{tmdb_id}")
+async def discover_title(
+    principal: Reader,
+    module: Module,
+    kind: Annotated[str, Path(pattern=r"^(movie|series)$")],
+    tmdb_id: Annotated[str, Path(pattern=r"^[0-9]{1,12}$")],
+) -> dict[str, Any]:
+    """#4: a title before asking for it — synopsis, cast, trailer, seasons (which are there or asked for),
+    its page in the catalog and the open request for it."""
+    return await module.requestable.details(
+        kind, tmdb_id, _me(principal), await module.member_language(principal)
+    )
+
+
+@router.get("/me/media/requests/quota")
+async def my_request_quota(principal: Requester, module: Module) -> dict[str, Any]:
+    """#3: how many requests I have left (films and series), when they come back, and my bought units."""
+    return await _quota(module, _me(principal))
+
+
 @router.post("/media/requests", response_model=MediaRequestOut, status_code=status.HTTP_201_CREATED)
 async def create_request(principal: Requester, body: MediaRequestIn, module: Module) -> MediaRequestOut:
     ref = None if body.object_id else {"ids": body.ids, "kind": body.kind, "title": body.title}
@@ -317,6 +375,8 @@ async def create_request(principal: Requester, body: MediaRequestIn, module: Mod
         ref=ref,
         service_id=body.service_id,
         idempotency_key=body.idempotency_key,
+        seasons=body.seasons,
+        is4k=body.is4k,
     )
     return _request(row)
 
@@ -691,7 +751,7 @@ async def my_journal(principal: User, module: Module) -> dict[str, Any]:
 async def my_requests(principal: Requester, module: Module) -> MyMediaRequests:
     user = _me(principal)
     rows = await module.requests.mine(user)
-    return MyMediaRequests(items=[_request(r) for r in rows], quota=await module.quota.summary(user))
+    return MyMediaRequests(items=[_request(r) for r in rows], quota=await _quota(module, user))
 
 
 @router.get("/me/media/requests/insights")
@@ -710,7 +770,7 @@ async def my_requests_insights(
         data[key] = empty
     data["locked"] = locked
     data["top_watched"] = await with_posters(module.database, module.enricher, data["top_watched"])
-    data["quota"] = await module.quota.summary(user)
+    data["quota"] = await _quota(module, user)
     return data
 
 
@@ -809,6 +869,73 @@ async def _confirm(
         )
     if not await confirmations.consume(token, principal, MEDIA_MANAGE, ref, payload):
         raise Forbidden("The confirmation is invalid or expired.", code="authz.confirmation_invalid")
+
+
+# --- #3: the request service's quotas, steered from the portal ------------------------------------------
+class QuotaKindIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    limit: int | None = Field(default=None, ge=0, le=1000)  # None: the default; 0: no limit
+    days: int | None = Field(default=None, ge=0, le=3650)
+
+
+class QuotaLimitsIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    movie: QuotaKindIn = Field(default_factory=QuotaKindIn)
+    tv: QuotaKindIn = Field(default_factory=QuotaKindIn)
+
+    def limits(self) -> QuotaLimits:
+        return QuotaLimits(
+            movie_limit=self.movie.limit,
+            movie_days=self.movie.days,
+            tv_limit=self.tv.limit,
+            tv_days=self.tv.days,
+        )
+
+
+class QuotaBulkIn(QuotaLimitsIn):
+    accounts: list[Annotated[str, Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")]] = Field(
+        min_length=1, max_length=500
+    )
+
+
+@router.get("/admin/media/quotas")
+async def quotas_overview(_: Manager, module: Module) -> dict[str, Any]:
+    """#3: every account of the request service (Seerr) — the member it is, its own limits (films,
+    series: requests per number of days), what it used and has left — and the service's defaults."""
+    return await module.requests.service_quotas.overview()
+
+
+@router.put("/admin/media/quotas/defaults")
+async def quotas_set_defaults(principal: Manager, body: QuotaLimitsIn, module: Module) -> dict[str, Any]:
+    """#3: the limits of every account that has none of its own."""
+    await module.requests.service_quotas.set_defaults(body.limits())
+    await _audit(module, principal, "media.quota_defaults_changed", "quotas", body.model_dump())
+    return await module.requests.service_quotas.overview()
+
+
+@router.put("/admin/media/quotas/accounts")
+async def quotas_set_many(principal: Manager, body: QuotaBulkIn, module: Module) -> dict[str, Any]:
+    """#3: the same limits for several accounts at once (a group of members); empty limits: the
+    defaults again."""
+    limits = body.limits()
+    for account in body.accounts:
+        await module.requests.service_quotas.set_limits(account, limits)
+    context = {**body.model_dump(exclude={"accounts"}), "accounts": body.accounts}
+    await _audit(module, principal, "media.quota_changed", "quotas", context)
+    return await module.requests.service_quotas.overview()
+
+
+@router.put("/admin/media/quotas/accounts/{account}")
+async def quotas_set_one(
+    principal: Manager,
+    account: Annotated[str, Path(pattern=r"^[A-Za-z0-9_-]{1,64}$")],
+    body: QuotaLimitsIn,
+    module: Module,
+) -> dict[str, Any]:
+    """#3: one account's own limits (empty: the defaults again)."""
+    await module.requests.service_quotas.set_limits(account, body.limits())
+    await _audit(module, principal, "media.quota_changed", f"quotas:{account}", body.model_dump())
+    return await module.requests.service_quotas.overview()
 
 
 @router.get("/admin/media/match-candidates", response_model=list[MediaMatchCandidateOut])
