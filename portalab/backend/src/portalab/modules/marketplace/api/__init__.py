@@ -8,7 +8,8 @@ def routers() -> list[APIRouter]:
     from portalab.modules.marketplace.api.boosters import router as boosters
     from portalab.modules.marketplace.api.catalog import router as catalog
     from portalab.modules.marketplace.api.catalog_admin import router as catalog_admin
+    from portalab.modules.marketplace.api.console import router as console
     from portalab.modules.marketplace.api.projects import router as projects
     from portalab.modules.marketplace.api.requests import router as requests
 
-    return [projects, admin, catalog, catalog_admin, requests, boosters]
+    return [projects, admin, catalog, catalog_admin, console, requests, boosters]

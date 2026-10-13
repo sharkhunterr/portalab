@@ -12,6 +12,7 @@ import type { Product } from "../api";
 import { type BoosterInfo, boosterOf } from "../boosters/api";
 import { ProductPack } from "../boosters/Boosters";
 import { withConfirmation } from "./confirm";
+import type { Season } from "./console/api";
 import { RARITIES, SEASONS } from "./ProductEditor";
 
 const POOLS = ["looks", "hd", "reserve"] as const;
@@ -57,7 +58,15 @@ function draftOf(product: Product, info: BoosterInfo): Draft {
 const whole = (value: string) => Math.max(0, Math.round(Number(value) || 0));
 
 /** One booster's settings — what it holds, its odds, what a duplicate gives back: a new version. */
-function BoosterSettings({ product, onSaved }: { product: Product; onSaved: () => void }) {
+function BoosterSettings({
+  product,
+  onSaved,
+  seasons,
+}: {
+  product: Product;
+  onSaved: () => void;
+  seasons?: readonly Season[] | undefined;
+}) {
   const t = useT();
   const format = useFormat();
   const info = boosterOf(product);
@@ -116,6 +125,7 @@ function BoosterSettings({ product, onSaved }: { product: Product; onSaved: () =
       </span>
       <div className="admin-booster__body">
         <strong>{product.name}</strong>
+        <SeasonState season={info.season ? seasons?.find((s) => s.key === info.season) : undefined} />
         <span className="widget__meta">
           {t(`marketplace:booster.pool.${info.pool}`)}
           {info.season ? ` · ${t(`marketplace:season.${info.season}`)}` : ""} ·{" "}
@@ -259,7 +269,30 @@ function BoosterSettings({ product, onSaved }: { product: Product; onSaved: () =
  * draws from (a new version of the product: what was opened before keeps its own). Offering one: a level
  * reward (Engagement › Levels) or an achievement (Engagement › Achievements) gives it sealed.
  */
-export function BoostersAdmin({ products, onSaved }: { products: readonly Product[]; onSaved: () => void }) {
+/** #98: a season's booster is on sale in its weeks only — whether it is now, else when it will be. */
+function SeasonState({ season }: { season: Season | undefined }) {
+  const t = useT();
+  if (!season) return null;
+  const when = (md: readonly number[]) =>
+    `${String(md[1]).padStart(2, "0")}/${String(md[0]).padStart(2, "0")}`;
+  return (
+    <span className="admin-booster__season" data-now={season.now || undefined}>
+      {season.now
+        ? t("marketplace:shopadmin.season.now")
+        : t("marketplace:shopadmin.season.later", { start: when(season.start), end: when(season.end) })}
+    </span>
+  );
+}
+
+export function BoostersAdmin({
+  products,
+  onSaved,
+  seasons,
+}: {
+  products: readonly Product[];
+  onSaved: () => void;
+  seasons?: readonly Season[] | undefined;
+}) {
   const t = useT();
   const boosters = products.filter((p) => p.type === "booster" && p.state !== "archived");
   return (
@@ -271,7 +304,7 @@ export function BoostersAdmin({ products, onSaved }: { products: readonly Produc
       {boosters.length ? (
         <ul className="admin-boosters">
           {boosters.map((product) => (
-            <BoosterSettings key={product.key} product={product} onSaved={onSaved} />
+            <BoosterSettings key={product.key} product={product} onSaved={onSaved} seasons={seasons} />
           ))}
         </ul>
       ) : (

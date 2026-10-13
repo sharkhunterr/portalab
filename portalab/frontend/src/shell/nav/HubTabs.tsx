@@ -1,6 +1,9 @@
 import { NavLink, useLocation } from "react-router";
+import { CountBadge } from "../../design-system/components/CountBadge";
 import { Icon } from "../../design-system/components/Icon";
+import { useT } from "../../i18n/hooks/useT";
 import { useShellStrings } from "../strings";
+import { useAttention } from "./attention";
 import { useNavigationView } from "./NavigationProvider";
 import { currentEntry, currentHub, type Hub, isCurrent } from "./SectionNav";
 
@@ -12,6 +15,8 @@ import { currentEntry, currentHub, type Hub, isCurrent } from "./SectionNav";
  */
 export function HubTabs() {
   const strings = useShellStrings();
+  const t = useT();
+  const attention = useAttention();
   const location = useLocation();
   const { view } = useNavigationView();
   // « My account » (027): the personal pages of the avatar menu are a hub too
@@ -40,6 +45,10 @@ export function HubTabs() {
             >
               {entry.icon ? <Icon name={entry.icon} size={16} /> : null}
               {strings.label(entry.label_key)}
+              <CountBadge
+                count={attention.of(entry)}
+                label={t("shell:attention", { count: attention.of(entry) })}
+              />
             </NavLink>
           </li>
         ))}

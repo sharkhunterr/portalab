@@ -14,6 +14,8 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import func, select
+
 from portalab.capabilities.economy import Transaction, Value
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Authorizer, Principal, ResourceRef
@@ -24,7 +26,7 @@ from portalab.modules.gamification.achievements.evaluator import Achievements
 from portalab.modules.gamification.anomaly.service import AnomalyService
 from portalab.modules.gamification.antiabuse.guards import Guards
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter, lock_user
-from portalab.modules.gamification.models import Withheld
+from portalab.modules.gamification.models import Balance, LedgerTransaction, Withheld
 from portalab.modules.gamification.notify import Note, Notifier
 from portalab.modules.gamification.permissions import GRANT
 
@@ -177,6 +179,117 @@ class RewardServiceImpl:
             guarded=False,
             audit=audit,
         )
+
+    async def withdraw_manual(
+        self, actor: Principal, user: UUID, value: Value, amount: int, *, reason: str, idempotency_key: str
+    ) -> Transaction:
+        """#98: an administrator takes a value back (Coins, XP, Contribution) — never below zero, with a
+        reason; a correction in the ledger, audited."""
+        await self._allowed(actor)
+        self._check(value, amount)
+        reason = " ".join(reason.split())
+        if len(reason) < 3:
+            raise ValidationFailed("A reason is required.", code="economy.reason_required")
+        now = utc_now(self.clock)
+        admin = actor.acting_for or actor.user_id
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            await lock_user(session, user)
+            balance = await session.get(Balance, (user, value))
+            take = min(amount, balance.amount if balance is not None else 0)
+            if take <= 0:
+                raise ValidationFailed("There is nothing to take back.", code="economy.nothing_to_take")
+            recorded = await self.writer.record(
+                session,
+                Entry(
+                    user_id=user,
+                    value=value,
+                    delta=-take,
+                    kind="correction",
+                    source_kind="manual",
+                    source_ref=f"admin:{admin}",
+                    idempotency_key=f"withdraw:{idempotency_key}",
+                    occurred_at=now,
+                    actor_user_id=admin,
+                    reason=reason,
+                ),
+            )
+            await self.audit.record(
+                session,
+                AuditRecord(
+                    action="economy.manual_withdrawal",
+                    actor=actor,
+                    resource=ResourceRef("progression", str(user), owner_id=user),
+                    decision="allow",
+                    context={"value": value, "amount": take},
+                    sensitive=True,
+                ),
+            )
+        return recorded.transaction
+
+    async def reverse(self, actor: Principal, transaction_id: UUID, *, reason: str) -> Transaction:
+        """#98: an entry of a member's history cancelled — what it gave taken back (as far as the balance
+        allows), what it took given back; the ledger keeps both, the correction pointing at the entry."""
+        await self._allowed(actor)
+        reason = " ".join(reason.split())
+        if len(reason) < 3:
+            raise ValidationFailed("A reason is required.", code="economy.reason_required")
+        now = utc_now(self.clock)
+        admin = actor.acting_for or actor.user_id
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            original = await session.get(LedgerTransaction, transaction_id)
+            if original is None:
+                raise ValidationFailed("This entry does not exist.", code="economy.unknown_transaction")
+            await lock_user(session, original.user_id)
+            undone = int(
+                await session.scalar(
+                    select(func.coalesce(func.sum(LedgerTransaction.delta), 0)).where(
+                        LedgerTransaction.reverses_transaction_id == transaction_id
+                    )
+                )
+                or 0
+            )
+            remaining = original.delta + undone
+            if remaining > 0:
+                balance = await session.get(Balance, (original.user_id, original.value))
+                remaining = min(remaining, balance.amount if balance is not None else 0)
+            if remaining == 0:
+                raise ValidationFailed("This entry was already cancelled.", code="economy.already_reversed")
+            count = int(
+                await session.scalar(
+                    select(func.count()).where(LedgerTransaction.reverses_transaction_id == transaction_id)
+                )
+                or 0
+            )
+            recorded = await self.writer.record(
+                session,
+                Entry(
+                    user_id=original.user_id,
+                    value=original.value,
+                    delta=-remaining,
+                    kind="correction",
+                    source_kind="manual",
+                    source_ref=f"admin:{admin}",
+                    idempotency_key=f"reverse:{transaction_id}:{count}",
+                    occurred_at=now,
+                    actor_user_id=admin,
+                    reason=reason,
+                    reverses_transaction_id=transaction_id,
+                ),
+            )
+            await self.audit.record(
+                session,
+                AuditRecord(
+                    action="economy.entry_reversed",
+                    actor=actor,
+                    resource=ResourceRef("progression", str(original.user_id), owner_id=original.user_id),
+                    decision="allow",
+                    context={"transaction": str(transaction_id), "delta": -remaining},
+                    sensitive=True,
+                ),
+            )
+        return recorded.transaction
 
     async def grant_via_automation(
         self,

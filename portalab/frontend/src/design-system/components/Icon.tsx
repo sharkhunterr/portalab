@@ -213,12 +213,14 @@ import {
   Tv,
   Type,
   Umbrella,
+  Undo2,
   User,
   UserPlus,
   Users,
   Volume1,
   Volume2,
   VolumeX,
+  Wallet,
   WandSparkles,
   Waves,
   Wind,
@@ -287,6 +289,8 @@ export const ICONS: Record<string, LucideIcon> = {
   "chevron-right": ChevronRight,
   clock: Clock,
   coins: Coins,
+  wallet: Wallet, // #98: Coins in circulation
+  undo: Undo2, // #98: an entry cancelled
   compass: Compass,
   more: Ellipsis,
   film: Film,

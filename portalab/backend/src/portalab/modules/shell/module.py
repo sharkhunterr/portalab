@@ -1,5 +1,9 @@
 """Shell module facade (spec 004): navigation registry, assembler, epochs, diagnostics, observability."""
 
+import asyncio
+from collections.abc import Mapping
+from typing import Any
+
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -7,6 +11,7 @@ from portalab.capabilities.events import (
     default_event_types,
 )
 from portalab.capabilities.navigation import NavigationRegistry, default_navigation
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -50,9 +55,32 @@ class ShellModule:
         self.epochs = Epochs(database, clock=clock)
         self.isolator = Isolator(database, events, clock=clock)
         self.assembler = NavigationAssembler(registry, authorizer, capabilities, self.epochs, clock=clock)
+        self.capabilities = capabilities
         self.event_types = event_types
         self.consumers = consumers
         self.observables = observables
+
+    async def attention(self, principal: Principal) -> dict[str, int]:
+        """#98: what waits for this principal, per navigation entry — every ``shell.attention`` provider
+        asked at once; one that fails or is slow counts nothing."""
+        try:
+            providers = self.capabilities.system_providers(ATTENTION)
+        except Exception:
+            return {}
+
+        async def ask(provider: Any) -> Mapping[str, int]:
+            try:
+                answer = await asyncio.wait_for(provider.counts(principal), timeout=5)
+            except Exception:
+                return {}
+            return answer if isinstance(answer, Mapping) else {}
+
+        totals: dict[str, int] = {}
+        for answer in await asyncio.gather(*(ask(p.provider) for p in providers)):
+            for key, count in answer.items():
+                if isinstance(count, int) and count > 0:
+                    totals[str(key)] = totals.get(str(key), 0) + count
+        return totals
 
     def register(self) -> None:
         register_builtin(self.registry)

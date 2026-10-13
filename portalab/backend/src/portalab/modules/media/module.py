@@ -34,6 +34,7 @@ from portalab.capabilities.media_core import (
     default_media_types,
     register_baseline,
 )
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import CategoryRegistry, declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -59,6 +60,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.core.visibility_port import VisibilityFilter
 from portalab.modules.media import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.media import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.media.attention import RequestsAttention
 from portalab.modules.media.availability.service import AvailabilityService
 from portalab.modules.media.books.service import BookService
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
@@ -339,6 +341,14 @@ class MediaModule:
 
     # --- registration ----------------------------------------------------------------------------------
     def register(self) -> None:
+        if not any(p.instance_ref == "media" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                RequestsAttention(self.database, self.authorizer),
+                instance_ref="media",
+                owner=OWNER,
+            )
         register_baseline(self.types, OWNER)
         if self.calendar.get(MediaReleaseCalendarSource.kind) is None:  # 027: releases in the calendar
             self.calendar.register(MediaReleaseCalendarSource(self.upcoming), owner=OWNER)

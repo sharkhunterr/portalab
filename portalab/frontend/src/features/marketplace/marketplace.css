@@ -1362,3 +1362,271 @@
 .owned-item .product-art__acquired {
   display: none;
 }
+
+/* #98: the shop's console for administrators */
+.mk-console {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+.mk-console__period {
+  justify-self: start;
+}
+.mk-console__chart {
+  min-inline-size: 0;
+}
+.mk-console__product {
+  display: grid;
+  min-inline-size: 0;
+}
+.mk-console__product strong,
+.mk-console__product small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mk-console__product small {
+  color: var(--color-text-muted);
+}
+.mk-console__member {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text, var(--color-accent));
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.mk-console__member:hover {
+  text-decoration: underline;
+}
+.mk-members {
+  display: grid;
+  grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+.mk-members__search {
+  padding: var(--space-3);
+}
+.mk-members__list {
+  display: grid;
+  max-block-size: 70vh;
+  margin: 0;
+  padding: 0 var(--space-2) var(--space-2);
+  overflow-y: auto;
+  list-style: none;
+}
+.mk-members__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.mk-members__item:hover,
+.mk-members__item[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.mk-members__name {
+  display: grid;
+  min-inline-size: 0;
+}
+.mk-members__name small {
+  color: var(--color-text-muted);
+}
+.mk-member {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+.mk-member__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+.mk-member__row .ds-field {
+  flex: 1 1 8rem;
+}
+.mk-member__toast {
+  pointer-events: none; /* informs, never covers a button */
+  position: fixed;
+  inset-inline: var(--space-3);
+  inset-block-end: calc(var(--frame-bottom, 0px) + var(--space-4));
+  z-index: var(--z-overlay, 50);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-inline-size: 28rem;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  font-weight: var(--font-weight-semibold);
+}
+.mk-member__toast[data-tone="ok"] {
+  border: 1px solid var(--state-ok-fg, var(--color-accent));
+  color: var(--state-ok-fg, var(--color-text));
+}
+.mk-member__toast[data-tone="bad"] {
+  border: 1px solid var(--state-error-fg, var(--color-accent));
+  color: var(--state-error-fg, var(--color-text));
+}
+.mk-member__found {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mk-member__found li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.mk-member__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.mk-member__delta[data-tone="ok"] {
+  color: var(--state-ok-fg, var(--color-text));
+}
+.mk-member__delta[data-tone="bad"] {
+  color: var(--state-error-fg, var(--color-text));
+}
+.mk-seasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mk-seasons li {
+  display: grid;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.mk-seasons li[data-now] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+.mk-seasons small {
+  color: var(--color-text-muted);
+}
+.admin-booster__season {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.admin-booster__season[data-now] {
+  color: var(--state-ok-fg, var(--color-accent));
+  font-weight: var(--font-weight-semibold);
+}
+@media (max-width: 48rem) {
+  .mk-members {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mk-members__list {
+    max-block-size: 16rem;
+  }
+}
+/* #98: figures at a glance — compact tiles */
+.mk-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11.5rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mk-kpi {
+  --kpi: var(--color-accent);
+  min-inline-size: 0;
+}
+.mk-kpi[data-tone="ok"] {
+  --kpi: var(--state-ok-fg, var(--color-accent));
+}
+.mk-kpi[data-tone="warn"] {
+  --kpi: var(--state-warn-fg, var(--color-accent-alt));
+}
+.mk-kpi[data-tone="muted"] {
+  --kpi: var(--color-text-muted);
+}
+.mk-kpi__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  block-size: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--kpi) 6%, var(--color-surface-raised));
+  color: var(--color-text);
+  text-decoration: none;
+}
+a.mk-kpi__link:hover {
+  border-color: color-mix(in srgb, var(--kpi) 55%, var(--color-border));
+}
+.mk-kpi__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--kpi) 18%, transparent);
+  color: var(--kpi);
+}
+.mk-kpi__text {
+  display: grid;
+  min-inline-size: 0;
+  line-height: 1.25;
+}
+.mk-kpi__value {
+  font-size: var(--font-size-xl, 1.4rem);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.mk-kpi__label {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mk-kpi__hint {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 30rem) {
+  .mk-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+  .mk-kpi__link {
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+  .mk-kpi__icon {
+    inline-size: 1.9rem;
+    block-size: 1.9rem;
+  }
+  .mk-kpi__value {
+    font-size: var(--font-size-lg);
+  }
+}

@@ -32,6 +32,7 @@ from portalab.capabilities import (
     user_grants,
     visibility,
 )
+from portalab.capabilities.navigation import attention
 from portalab.capabilities.registry import CapabilityRegistry, CapabilitySpec
 
 KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
@@ -46,6 +47,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     user_grants.SPEC,
     user_grants.ROLES_SPEC,
     confirmations.SPEC,
+    attention.SPEC,
     service_data.SPEC,
     visibility.PREFERENCE_SPEC,
     aggregation.SPEC,

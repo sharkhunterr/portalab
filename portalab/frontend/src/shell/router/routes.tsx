@@ -365,6 +365,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
             { path: "marketplace", element: <MarketplaceAdmin />, handle: h({ crumb: "Marketplace" }) },
+            // #98: the shop's console, one page each in the Shop hub
+            ...["members", "requests", "catalog", "boosters"].map((view) => ({
+              path: `marketplace/${view}`,
+              element: <MarketplaceAdmin />,
+              handle: h({ crumb: "Marketplace" }),
+            })),
             { path: "themes", element: <ThemeStudio />, handle: h({ crumb: "Theme studio" }) },
             { path: "members", element: <MembersAdmin />, handle: h({ crumb: "Members" }) },
             { path: "announcements", element: <AnnouncementsAdmin />, handle: h({ crumb: "Announcements" }) },

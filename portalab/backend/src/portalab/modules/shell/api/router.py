@@ -50,6 +50,15 @@ async def my_navigation(
     return JSONResponse(view, headers={"ETag": etag, "Cache-Control": "private, no-cache"})
 
 
+@router.get("/me/attention")
+async def my_attention(
+    principal: Annotated[Principal, require(AUTHENTICATED)], module: Module
+) -> dict[str, dict[str, int]]:
+    """#98: what waits for me, per navigation entry (a purchase to validate, a proposal to moderate…) —
+    the badges of the navigation; the shell adds them up for hubs and sections."""
+    return {"items": await module.attention(principal)}
+
+
 @router.get("/admin/shell/layout")
 async def get_layout(_: Manager, request: Request, module: Module) -> dict[str, Any]:
     providers = request.app.state.capabilities.system_providers(CONFIG)

@@ -4,12 +4,13 @@ verification and anomaly review. ``gamification.manage`` / ``rewards.grant`` / `
 
 import re
 import uuid
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Query, Response
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import case, func, select
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.core.audit_port import AuditRecord
@@ -18,7 +19,7 @@ from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import Conflict, Forbidden, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
 from portalab.modules.gamification.api.me import EconomyTransactionPage, Module, transaction_out
-from portalab.modules.gamification.models import RewardRule
+from portalab.modules.gamification.models import Balance, LedgerTransaction, RewardRule
 from portalab.modules.gamification.permissions import ECONOMY_MANAGE, GRANT, MANAGE
 from portalab.modules.gamification.rules.simulate import simulate
 from portalab.modules.gamification.verify.verifier import verify
@@ -263,6 +264,128 @@ async def manual_grant(principal: Granter, body: ManualGrantIn, module: Module) 
     )
     assert transaction is not None
     return {"transaction": transaction_out(transaction).model_dump(mode="json")}
+
+
+class ManualWithdrawalIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    user_id: UUID
+    value: Literal["xp", "contribution", "coins"]
+    amount: int = Field(ge=1, le=1_000_000)
+    reason: str = Field(min_length=3, max_length=200)
+    idempotency: str | None = Field(default=None, max_length=100)
+
+
+class ReverseIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str = Field(min_length=3, max_length=200)
+
+
+class EconomyDayOut(BaseModel):
+    day: date
+    coins_earned: int
+    coins_spent: int
+    xp: int
+
+
+class EconomyHolderOut(BaseModel):
+    user_id: UUID
+    coins: int
+    xp: int
+    contribution: int = 0
+    level: int | None
+
+
+class EconomySummaryOut(BaseModel):
+    days: int
+    coins_in_circulation: int
+    xp_total: int
+    members: int
+    coins_earned: int
+    coins_spent: int
+    series: list[EconomyDayOut]
+    holders: list[EconomyHolderOut]
+
+
+@router.post("/admin/gamification/manual-withdrawals")
+async def manual_withdrawal(principal: Granter, body: ManualWithdrawalIn, module: Module) -> dict[str, Any]:
+    """#98: take Coins, XP or Contribution back from a member (never below zero), with a reason."""
+    transaction = await module.rewards.withdraw_manual(
+        principal,
+        body.user_id,
+        body.value,
+        body.amount,
+        reason=body.reason,
+        idempotency_key=body.idempotency or str(uuid.uuid4()),
+    )
+    return {"transaction": transaction_out(transaction).model_dump(mode="json")}
+
+
+@router.post("/admin/economy/transactions/{transaction_id}/reverse")
+async def reverse_transaction(
+    principal: Granter, transaction_id: UUID, body: ReverseIn, module: Module
+) -> dict[str, Any]:
+    """#98: cancel an entry of a member's history — what it gave taken back, what it took given back."""
+    transaction = await module.rewards.reverse(principal, transaction_id, reason=body.reason)
+    return {"transaction": transaction_out(transaction).model_dump(mode="json")}
+
+
+@router.get("/admin/economy/summary", response_model=EconomySummaryOut)
+async def economy_summary(
+    _: Economist, module: Module, days: Annotated[int, Query(ge=1, le=365)] = 30
+) -> EconomySummaryOut:
+    """#98: the economy at a glance — Coins in circulation, XP earned, Coins earned and spent day by day,
+    and every member's balances (the most advanced first)."""
+    now = utc_now(module.clock)
+    since = now - timedelta(days=days)
+    async with module.database.session() as session:
+        balances = (await session.execute(select(Balance))).scalars().all()
+        rows = (
+            await session.execute(
+                select(
+                    func.date_trunc("day", LedgerTransaction.occurred_at).label("day"),
+                    LedgerTransaction.value,
+                    func.sum(case((LedgerTransaction.delta > 0, LedgerTransaction.delta), else_=0)),
+                    func.sum(case((LedgerTransaction.delta < 0, -LedgerTransaction.delta), else_=0)),
+                )
+                .where(LedgerTransaction.occurred_at >= since, LedgerTransaction.value.in_(("coins", "xp")))
+                .group_by("day", LedgerTransaction.value)
+            )
+        ).all()
+    series = {
+        (since + timedelta(days=i + 1)).date(): {"coins_earned": 0, "coins_spent": 0, "xp": 0}
+        for i in range(days)
+    }
+    for day, value, gained, lost in rows:
+        entry = series.get(day.date())
+        if entry is None:
+            continue
+        if value == "coins":
+            entry["coins_earned"] += int(gained or 0)
+            entry["coins_spent"] += int(lost or 0)
+        else:
+            entry["xp"] += int(gained or 0) - int(lost or 0)
+    holders: dict[UUID, dict[str, Any]] = {}
+    for balance in balances:
+        holder = holders.setdefault(
+            balance.user_id,
+            {"user_id": balance.user_id, "coins": 0, "xp": 0, "contribution": 0, "level": None},
+        )
+        if balance.value == "coins":
+            holder["coins"] = balance.amount
+        elif balance.value == "contribution":
+            holder["contribution"] = balance.amount
+        elif balance.value == "xp":
+            holder["xp"], holder["level"] = balance.amount, balance.level
+    return EconomySummaryOut(
+        days=days,
+        coins_in_circulation=sum(h["coins"] for h in holders.values()),
+        xp_total=sum(h["xp"] for h in holders.values()),
+        members=len(holders),
+        coins_earned=sum(e["coins_earned"] for e in series.values()),
+        coins_spent=sum(e["coins_spent"] for e in series.values()),
+        series=[EconomyDayOut(day=day, **values) for day, values in sorted(series.items())],
+        holders=[EconomyHolderOut(**h) for h in sorted(holders.values(), key=lambda h: -h["xp"])[:20]],
+    )
 
 
 # --- ledger, verification and anomalies (economy.manage) ---------------------------------------------

@@ -5,6 +5,7 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import type { DeviceClass } from "../../design-system/components/Layout";
 import { useT } from "../../i18n/hooks/useT";
+import { MenuWaiting } from "../nav/MenuWaiting";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { usePalette } from "../palette/PaletteContext";
 import { RegionBoundary } from "../router/RouteBoundary";
@@ -77,6 +78,7 @@ export function AppHeader({
             onClick={onOpenNavigation}
           >
             <Icon name="menu" />
+            <MenuWaiting />
           </Button>
         </div>
       </header>
@@ -94,6 +96,7 @@ export function AppHeader({
             onClick={onOpenNavigation}
           >
             <Icon name="menu" />
+            <MenuWaiting />
           </Button>
         ) : null}
         <a className="shell-brand" href="/" aria-label={strings.brand}>

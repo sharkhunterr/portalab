@@ -1,10 +1,13 @@
 import { useId } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
+import { CountBadge } from "../../design-system/components/CountBadge";
 import { Icon } from "../../design-system/components/Icon";
 import { Menu, Popover } from "../../design-system/components/Overlays";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
+import { useT } from "../../i18n/hooks/useT";
 import { useShellPreference } from "../preferences";
 import { useShellStrings } from "../strings";
+import { useAttention } from "./attention";
 import { type NavEntry, type NavSection, type NavTopic, useNavigationView } from "./NavigationProvider";
 
 /**
@@ -130,6 +133,12 @@ export function SectionNav({ sections, variant = "list", onNavigate }: SectionNa
   );
 }
 
+/** #98: how many items wait behind a link — its own entries, a hub's, a section's. */
+function Waiting({ count, dot = false }: { count: number; dot?: boolean }) {
+  const t = useT();
+  return <CountBadge count={count} dot={dot} label={t("shell:attention", { count })} />;
+}
+
 interface ItemProps {
   section: NavSection;
   active: boolean;
@@ -140,6 +149,7 @@ interface ItemProps {
 /** A direct link: a single-page section, or a member hub opening on its first page (its pages are tabs). */
 function DirectLink({ section, active, onNavigate, compact = false }: ItemProps & { compact?: boolean }) {
   const strings = useShellStrings();
+  const attention = useAttention();
   const entry = sectionEntries(section)[0] as NavEntry;
   const label = strings.label(section.label_key);
   return (
@@ -155,12 +165,14 @@ function DirectLink({ section, active, onNavigate, compact = false }: ItemProps 
     >
       <Icon name={section.icon ?? entry.icon} />
       <span className="shell-section__label">{label}</span>
+      <Waiting count={attention.ofSection(section)} dot={compact} />
     </NavLink>
   );
 }
 
 function EntryLinks({ section, currentKey, onNavigate }: Omit<ItemProps, "active">) {
   const strings = useShellStrings();
+  const attention = useAttention();
   const link = (entry: NavEntry) => (
     <li key={entry.key}>
       <NavLink
@@ -171,6 +183,7 @@ function EntryLinks({ section, currentKey, onNavigate }: Omit<ItemProps, "active
         onClick={onNavigate}
       >
         {strings.label(entry.label_key)}
+        <Waiting count={attention.of(entry)} />
       </NavLink>
     </li>
   );
@@ -192,6 +205,7 @@ function EntryLinks({ section, currentKey, onNavigate }: Omit<ItemProps, "active
               >
                 <Icon name={topic.icon ?? "settings"} size={18} />
                 {strings.label(topic.label_key)}
+                <Waiting count={attention.ofEntries(topic.entries)} />
               </NavLink>
             </li>
           );
@@ -219,6 +233,7 @@ function ListSection({
   ...props
 }: ItemProps & { open: boolean; onToggle: (open: boolean) => void }) {
   const strings = useShellStrings();
+  const attention = useAttention();
   const panel = useId();
   return (
     <div className="shell-section" data-open={open ? "true" : undefined}>
@@ -232,6 +247,7 @@ function ListSection({
       >
         <Icon name={props.section.icon} />
         <span className="shell-section__label">{strings.label(props.section.label_key)}</span>
+        <Waiting count={attention.ofSection(props.section)} />
         <Icon name="chevron-down" size={16} className="shell-section__chevron" />
       </button>
       <div id={panel} className="shell-section__panel" hidden={!open}>
@@ -244,6 +260,7 @@ function ListSection({
 /** Rail: icon buttons; a section opens a flyout panel with its pages (keyboard: Radix popover). */
 function RailSection(props: ItemProps) {
   const strings = useShellStrings();
+  const attention = useAttention();
   const label = strings.label(props.section.label_key);
   return (
     <Popover
@@ -258,6 +275,7 @@ function RailSection(props: ItemProps) {
         >
           <Icon name={props.section.icon} />
           <span className="shell-section__label">{label}</span>
+          <Waiting count={attention.ofSection(props.section)} dot />
         </button>
       }
     >
@@ -270,6 +288,7 @@ function RailSection(props: ItemProps) {
 /** Top bar: each section is a dropdown menu of its pages. */
 function BarSection({ section, active, onNavigate }: ItemProps) {
   const strings = useShellStrings();
+  const attention = useAttention();
   const navigate = useNavigate();
   const items = (
     section.audience === "administration"
@@ -297,6 +316,7 @@ function BarSection({ section, active, onNavigate }: ItemProps) {
         <button type="button" className="shell-section__head" data-active={active ? "true" : undefined}>
           <Icon name={section.icon} />
           <span className="shell-section__label">{strings.label(section.label_key)}</span>
+          <Waiting count={attention.ofSection(section)} />
           <Icon name="chevron-down" size={16} />
         </button>
       }

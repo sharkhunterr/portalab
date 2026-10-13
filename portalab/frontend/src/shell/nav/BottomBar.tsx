@@ -3,6 +3,7 @@ import { Icon } from "../../design-system/components/Icon";
 import { usePalette } from "../palette/PaletteContext";
 import { useSlots } from "../slots/providers";
 import { useShellStrings } from "../strings";
+import { MenuWaiting } from "./MenuWaiting";
 
 /**
  * Phone bottom bar (spec 027 FR-019): the most important destinations one tap away — Home, Search,
@@ -64,6 +65,7 @@ export function BottomBar({
       >
         <Icon name="menu" />
         <span>{strings.menu}</span>
+        <MenuWaiting />
       </button>
     </nav>
   );

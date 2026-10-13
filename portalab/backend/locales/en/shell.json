@@ -2,6 +2,7 @@
   "account": "Account",
   "assistant": "Assistant",
   "assistantUnavailable": "The assistant is not available right now.",
+  "attention": "{count, plural, one {# item to handle} other {# items to handle}}",
   "back": "Back",
   "brand": "Portalab",
   "breadcrumb": "Breadcrumb",

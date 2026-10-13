@@ -773,6 +773,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/economy/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Economy Summary
+         * @description #98: the economy at a glance — Coins in circulation, XP earned, Coins earned and spent day by day,
+         *     and every member's balances (the most advanced first).
+         */
+        get: operations["economy_summary_api_v1_admin_economy_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/economy/transactions": {
         parameters: {
             query?: never;
@@ -784,6 +805,26 @@ export interface paths {
         get: operations["ledger_api_v1_admin_economy_transactions_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/economy/transactions/{transaction_id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reverse Transaction
+         * @description #98: cancel an entry of a member's history — what it gave taken back, what it took given back.
+         */
+        post: operations["reverse_transaction_api_v1_admin_economy_transactions__transaction_id__reverse_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1015,6 +1056,26 @@ export interface paths {
         put?: never;
         /** Manual Grant */
         post: operations["manual_grant_api_v1_admin_gamification_manual_grants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gamification/manual-withdrawals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Manual Withdrawal
+         * @description #98: take Coins, XP or Contribution back from a member (never below zero), with a reason.
+         */
+        post: operations["manual_withdrawal_api_v1_admin_gamification_manual_withdrawals_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1357,6 +1418,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/marketplace/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catalog
+         * @description A page of the catalogue (the whole shop is too big for one page), searched by key or name, with how
+         *     many products of each type the search finds.
+         */
+        get: operations["catalog_api_v1_admin_marketplace_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/marketplace/categories": {
         parameters: {
             query?: never;
@@ -1386,6 +1468,65 @@ export interface paths {
         /** Grant */
         post: operations["grant_api_v1_admin_marketplace_grants_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/members/{user_id}/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inventory
+         * @description Every item a member holds or held — live ones first, then the history.
+         */
+        get: operations["inventory_api_v1_admin_marketplace_members__user_id__inventory_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_api_v1_admin_marketplace_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/ownerships/{ownership_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove From History
+         * @description Take an item out of the member's history altogether — its effect off when it is still live (no
+         *     Coins move: to give them back, refund it instead). One already refunded keeps its record (the refund is
+         *     part of the ledger).
+         */
+        delete: operations["remove_from_history_api_v1_admin_marketplace_ownerships__ownership_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1577,6 +1718,26 @@ export interface paths {
         put?: never;
         /** Decide Request */
         post: operations["decide_request_api_v1_admin_marketplace_requests__request_id___action__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marketplace/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Seasons
+         * @description The seasons' weeks: a season's booster is on sale in them only.
+         */
+        get: operations["seasons_api_v1_admin_marketplace_seasons_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5249,6 +5410,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Attention
+         * @description #98: what waits for me, per navigation entry (a purchase to validate, a proposal to moderate…) —
+         *     the badges of the navigation; the shell adds them up for hubs and sections.
+         */
+        get: operations["my_attention_api_v1_me_attention_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/avatar": {
         parameters: {
             query?: never;
@@ -8761,6 +8943,42 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** ActivityOut */
+        ActivityOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /**
+             * Coins
+             * @default 0
+             */
+            coins: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "purchase" | "grant" | "booster_item" | "booster" | "revoked" | "refunded" | "request";
+            /**
+             * Names
+             * @default {}
+             */
+            names: {
+                [key: string]: string;
+            };
+            /** Ownership Id */
+            ownership_id?: string | null;
+            /** Product */
+            product?: string | null;
+            /** State */
+            state?: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
         /** AddWidgetIn */
         AddWidgetIn: {
             /** Config */
@@ -9748,6 +9966,17 @@ export interface components {
             product?: string | null;
             widget: components["schemas"]["WidgetMeta"];
         };
+        /** CatalogPageOut */
+        CatalogPageOut: {
+            /** Items */
+            items: components["schemas"]["MarketplaceProductOut"][];
+            /** Total */
+            total: number;
+            /** Types */
+            types: {
+                [key: string]: number;
+            };
+        };
         /** CategoryPolicyIn */
         CategoryPolicyIn: {
             /** Disabled Channels */
@@ -10336,15 +10565,6 @@ export interface components {
             /** User Choosable */
             user_choosable: boolean;
         };
-        /** DayOut */
-        DayOut: {
-            /** Amount */
-            amount: number;
-            /** Day */
-            day: string;
-            /** Members */
-            members: number;
-        };
         /** DeletionStatus */
         DeletionStatus: {
             /** Deletion Due At */
@@ -10382,6 +10602,58 @@ export interface components {
             subject_id?: string | null;
             /** Subject Type */
             subject_type?: string | null;
+        };
+        /** EconomyDayOut */
+        EconomyDayOut: {
+            /** Coins Earned */
+            coins_earned: number;
+            /** Coins Spent */
+            coins_spent: number;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Xp */
+            xp: number;
+        };
+        /** EconomyHolderOut */
+        EconomyHolderOut: {
+            /** Coins */
+            coins: number;
+            /**
+             * Contribution
+             * @default 0
+             */
+            contribution: number;
+            /** Level */
+            level: number | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Xp */
+            xp: number;
+        };
+        /** EconomySummaryOut */
+        EconomySummaryOut: {
+            /** Coins Earned */
+            coins_earned: number;
+            /** Coins In Circulation */
+            coins_in_circulation: number;
+            /** Coins Spent */
+            coins_spent: number;
+            /** Days */
+            days: number;
+            /** Holders */
+            holders: components["schemas"]["EconomyHolderOut"][];
+            /** Members */
+            members: number;
+            /** Series */
+            series: components["schemas"]["EconomyDayOut"][];
+            /** Xp Total */
+            xp_total: number;
         };
         /** EconomyTransactionOut */
         EconomyTransactionOut: {
@@ -10983,6 +11255,41 @@ export interface components {
             /** Key */
             key: string;
         };
+        /** InventoryItemOut */
+        InventoryItemOut: {
+            /**
+             * Acquired At
+             * Format: date-time
+             */
+            acquired_at: string;
+            /** Names */
+            names: {
+                [key: string]: string;
+            };
+            /** Origin */
+            origin: string;
+            /**
+             * Ownership Id
+             * Format: uuid
+             */
+            ownership_id: string;
+            /** Price Paid */
+            price_paid: number;
+            /** Product */
+            product: string;
+            /** Rarity */
+            rarity: string;
+            /** Refunded */
+            refunded: boolean;
+            /** Revoke Ground */
+            revoke_ground: string | null;
+            /** Revoked At */
+            revoked_at: string | null;
+            /** State */
+            state: string;
+            /** Type */
+            type: string;
+        };
         /** Layout */
         Layout: {
             /** Group Order */
@@ -11171,6 +11478,25 @@ export interface components {
             amount: number;
             /** Confirmation */
             confirmation?: string | null;
+            /** Idempotency */
+            idempotency?: string | null;
+            /** Reason */
+            reason: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "xp" | "contribution" | "coins";
+        };
+        /** ManualWithdrawalIn */
+        ManualWithdrawalIn: {
+            /** Amount */
+            amount: number;
             /** Idempotency */
             idempotency?: string | null;
             /** Reason */
@@ -12500,6 +12826,37 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** OverviewOut */
+        OverviewOut: {
+            /** Activity */
+            activity: components["schemas"]["ActivityOut"][];
+            /** Booster Coins */
+            booster_coins: number;
+            /** Boosters Opened */
+            boosters_opened: number;
+            /** Buyers */
+            buyers: number;
+            /** Coins Spent */
+            coins_spent: number;
+            /** Days */
+            days: number;
+            /** Grants */
+            grants: number;
+            /** Items Owned */
+            items_owned: number;
+            /** Products On Sale */
+            products_on_sale: number;
+            /** Purchases */
+            purchases: number;
+            /** Refunds */
+            refunds: number;
+            /** Requests Pending */
+            requests_pending: number;
+            /** Series */
+            series: components["schemas"]["portalab__modules__marketplace__api__console__DayOut"][];
+            /** Top */
+            top: components["schemas"]["TopProductOut"][];
+        };
         /** PaceConfig */
         PaceConfig: {
             /**
@@ -12906,7 +13263,7 @@ export interface components {
         /** ProgressOut */
         ProgressOut: {
             /** Days */
-            days: components["schemas"]["DayOut"][];
+            days: components["schemas"]["portalab__modules__gamification__api__tuning__DayOut"][];
             /** Members */
             members: components["schemas"]["MemberSeriesOut"][];
             /** Sources */
@@ -13253,6 +13610,11 @@ export interface components {
             /** Kinds */
             kinds?: string[] | null;
         };
+        /** RemoveIn */
+        RemoveIn: {
+            /** Reason */
+            reason: string;
+        };
         /** ReopenIn */
         ReopenIn: {
             /** Reason */
@@ -13293,6 +13655,11 @@ export interface components {
              * @enum {string}
              */
             mode: "partial" | "full";
+        };
+        /** ReverseIn */
+        ReverseIn: {
+            /** Reason */
+            reason: string;
         };
         /** RewardRuleIn */
         RewardRuleIn: {
@@ -13497,6 +13864,23 @@ export interface components {
             hit: boolean;
             /** Text */
             text: string;
+        };
+        /** SeasonOut */
+        SeasonOut: {
+            /** End */
+            end: [
+                number,
+                number
+            ];
+            /** Key */
+            key: string;
+            /** Now */
+            now: boolean;
+            /** Start */
+            start: [
+                number,
+                number
+            ];
         };
         /** SeenIn */
         SeenIn: {
@@ -14416,6 +14800,21 @@ export interface components {
              */
             reason: string;
         };
+        /** TopProductOut */
+        TopProductOut: {
+            /** Coins */
+            coins: number;
+            /** Count */
+            count: number;
+            /** Key */
+            key: string;
+            /** Names */
+            names: {
+                [key: string]: string;
+            };
+            /** Type */
+            type: string;
+        };
         /** UserList */
         UserList: {
             /** Items */
@@ -14893,6 +15292,31 @@ export interface components {
             secrets?: {
                 [key: string]: string;
             };
+        };
+        /** DayOut */
+        portalab__modules__gamification__api__tuning__DayOut: {
+            /** Amount */
+            amount: number;
+            /** Day */
+            day: string;
+            /** Members */
+            members: number;
+        };
+        /** DayOut */
+        portalab__modules__marketplace__api__console__DayOut: {
+            /** Boosters */
+            boosters: number;
+            /** Coins */
+            coins: number;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Grants */
+            grants: number;
+            /** Purchases */
+            purchases: number;
         };
         /** PolicyIn */
         portalab__modules__privacy__api__routes__PolicyIn: {
@@ -16543,6 +16967,37 @@ export interface operations {
             };
         };
     };
+    economy_summary_api_v1_admin_economy_summary_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EconomySummaryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     ledger_api_v1_admin_economy_transactions_get: {
         parameters: {
             query: {
@@ -16563,6 +17018,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EconomyTransactionPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reverse_transaction_api_v1_admin_economy_transactions__transaction_id__reverse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                transaction_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReverseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -17073,6 +17565,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    manual_withdrawal_api_v1_admin_gamification_manual_withdrawals_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualWithdrawalIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
             };
             /** @description Validation Error */
             422: {
@@ -17836,6 +18363,41 @@ export interface operations {
             };
         };
     };
+    catalog_api_v1_admin_marketplace_catalog_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                type?: string | null;
+                state?: string | null;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     add_category_api_v1_admin_marketplace_categories_post: {
         parameters: {
             query?: never;
@@ -17892,6 +18454,101 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["MarketplaceOwnershipOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inventory_api_v1_admin_marketplace_members__user_id__inventory_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_api_v1_admin_marketplace_overview_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_from_history_api_v1_admin_marketplace_ownerships__ownership_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ownership_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -18308,6 +18965,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    seasons_api_v1_admin_marketplace_seasons_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonOut"][];
                 };
             };
         };
@@ -25516,6 +26193,30 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     }[];
+                };
+            };
+        };
+    };
+    my_attention_api_v1_me_attention_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: {
+                            [key: string]: number;
+                        };
+                    };
                 };
             };
         };

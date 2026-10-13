@@ -78,6 +78,87 @@
         "title": "AchievementIn",
         "type": "object"
       },
+      "ActivityOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "coins": {
+            "default": 0,
+            "title": "Coins",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "purchase",
+              "grant",
+              "booster_item",
+              "booster",
+              "revoked",
+              "refunded",
+              "request"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Names",
+            "type": "object"
+          },
+          "ownership_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ownership Id"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "at",
+          "user_id"
+        ],
+        "title": "ActivityOut",
+        "type": "object"
+      },
       "AddWidgetIn": {
         "additionalProperties": false,
         "properties": {
@@ -2919,6 +3000,35 @@
         "title": "CatalogEntryOut",
         "type": "object"
       },
+      "CatalogPageOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MarketplaceProductOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "types": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Types",
+            "type": "object"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "types"
+        ],
+        "title": "CatalogPageOut",
+        "type": "object"
+      },
       "CategoryPolicyIn": {
         "additionalProperties": false,
         "properties": {
@@ -4470,29 +4580,6 @@
         "title": "DatumOut",
         "type": "object"
       },
-      "DayOut": {
-        "properties": {
-          "amount": {
-            "title": "Amount",
-            "type": "integer"
-          },
-          "day": {
-            "title": "Day",
-            "type": "string"
-          },
-          "members": {
-            "title": "Members",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "day",
-          "amount",
-          "members"
-        ],
-        "title": "DayOut",
-        "type": "object"
-      },
       "DeletionStatus": {
         "properties": {
           "deletion_due_at": {
@@ -4617,6 +4704,130 @@
           }
         },
         "title": "DryRunIn",
+        "type": "object"
+      },
+      "EconomyDayOut": {
+        "properties": {
+          "coins_earned": {
+            "title": "Coins Earned",
+            "type": "integer"
+          },
+          "coins_spent": {
+            "title": "Coins Spent",
+            "type": "integer"
+          },
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "coins_earned",
+          "coins_spent",
+          "xp"
+        ],
+        "title": "EconomyDayOut",
+        "type": "object"
+      },
+      "EconomyHolderOut": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "contribution": {
+            "default": 0,
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "user_id",
+          "coins",
+          "xp",
+          "level"
+        ],
+        "title": "EconomyHolderOut",
+        "type": "object"
+      },
+      "EconomySummaryOut": {
+        "properties": {
+          "coins_earned": {
+            "title": "Coins Earned",
+            "type": "integer"
+          },
+          "coins_in_circulation": {
+            "title": "Coins In Circulation",
+            "type": "integer"
+          },
+          "coins_spent": {
+            "title": "Coins Spent",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "holders": {
+            "items": {
+              "$ref": "#/components/schemas/EconomyHolderOut"
+            },
+            "title": "Holders",
+            "type": "array"
+          },
+          "members": {
+            "title": "Members",
+            "type": "integer"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/EconomyDayOut"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "xp_total": {
+            "title": "Xp Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "coins_in_circulation",
+          "xp_total",
+          "members",
+          "coins_earned",
+          "coins_spent",
+          "series",
+          "holders"
+        ],
+        "title": "EconomySummaryOut",
         "type": "object"
       },
       "EconomyTransactionOut": {
@@ -6348,6 +6559,94 @@
         "title": "InstantiateIn",
         "type": "object"
       },
+      "InventoryItemOut": {
+        "properties": {
+          "acquired_at": {
+            "format": "date-time",
+            "title": "Acquired At",
+            "type": "string"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "object"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "ownership_id": {
+            "format": "uuid",
+            "title": "Ownership Id",
+            "type": "string"
+          },
+          "price_paid": {
+            "title": "Price Paid",
+            "type": "integer"
+          },
+          "product": {
+            "title": "Product",
+            "type": "string"
+          },
+          "rarity": {
+            "title": "Rarity",
+            "type": "string"
+          },
+          "refunded": {
+            "title": "Refunded",
+            "type": "boolean"
+          },
+          "revoke_ground": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoke Ground"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ownership_id",
+          "product",
+          "type",
+          "rarity",
+          "names",
+          "origin",
+          "price_paid",
+          "state",
+          "acquired_at",
+          "revoked_at",
+          "revoke_ground",
+          "refunded"
+        ],
+        "title": "InventoryItemOut",
+        "type": "object"
+      },
       "Layout": {
         "additionalProperties": false,
         "properties": {
@@ -6952,6 +7251,57 @@
           "reason"
         ],
         "title": "ManualGrantIn",
+        "type": "object"
+      },
+      "ManualWithdrawalIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Amount",
+            "type": "integer"
+          },
+          "idempotency": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "value": {
+            "enum": [
+              "xp",
+              "contribution",
+              "coins"
+            ],
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "value",
+          "amount",
+          "reason"
+        ],
+        "title": "ManualWithdrawalIn",
         "type": "object"
       },
       "MarketplaceAdminRefundIn": {
@@ -10455,6 +10805,93 @@
         "title": "OperationIn",
         "type": "object"
       },
+      "OverviewOut": {
+        "properties": {
+          "activity": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityOut"
+            },
+            "title": "Activity",
+            "type": "array"
+          },
+          "booster_coins": {
+            "title": "Booster Coins",
+            "type": "integer"
+          },
+          "boosters_opened": {
+            "title": "Boosters Opened",
+            "type": "integer"
+          },
+          "buyers": {
+            "title": "Buyers",
+            "type": "integer"
+          },
+          "coins_spent": {
+            "title": "Coins Spent",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "grants": {
+            "title": "Grants",
+            "type": "integer"
+          },
+          "items_owned": {
+            "title": "Items Owned",
+            "type": "integer"
+          },
+          "products_on_sale": {
+            "title": "Products On Sale",
+            "type": "integer"
+          },
+          "purchases": {
+            "title": "Purchases",
+            "type": "integer"
+          },
+          "refunds": {
+            "title": "Refunds",
+            "type": "integer"
+          },
+          "requests_pending": {
+            "title": "Requests Pending",
+            "type": "integer"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/portalab__modules__marketplace__api__console__DayOut"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "top": {
+            "items": {
+              "$ref": "#/components/schemas/TopProductOut"
+            },
+            "title": "Top",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "purchases",
+          "coins_spent",
+          "buyers",
+          "grants",
+          "boosters_opened",
+          "booster_coins",
+          "refunds",
+          "requests_pending",
+          "products_on_sale",
+          "items_owned",
+          "series",
+          "top",
+          "activity"
+        ],
+        "title": "OverviewOut",
+        "type": "object"
+      },
       "PaceConfig": {
         "additionalProperties": false,
         "properties": {
@@ -11668,7 +12105,7 @@
         "properties": {
           "days": {
             "items": {
-              "$ref": "#/components/schemas/DayOut"
+              "$ref": "#/components/schemas/portalab__modules__gamification__api__tuning__DayOut"
             },
             "title": "Days",
             "type": "array"
@@ -12685,6 +13122,21 @@
         "title": "ReindexIn",
         "type": "object"
       },
+      "RemoveIn": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "RemoveIn",
+        "type": "object"
+      },
       "ReopenIn": {
         "additionalProperties": false,
         "properties": {
@@ -12821,6 +13273,22 @@
           "mode"
         ],
         "title": "ResyncIn",
+        "type": "object"
+      },
+      "ReverseIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ReverseIn",
         "type": "object"
       },
       "RewardRuleIn": {
@@ -13363,6 +13831,54 @@
           "hit"
         ],
         "title": "SearchSegmentOut",
+        "type": "object"
+      },
+      "SeasonOut": {
+        "properties": {
+          "end": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "End",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "now": {
+            "title": "Now",
+            "type": "boolean"
+          },
+          "start": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Start",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "start",
+          "end",
+          "now"
+        ],
+        "title": "SeasonOut",
         "type": "object"
       },
       "SeenIn": {
@@ -15985,6 +16501,42 @@
         "title": "ToggleIn",
         "type": "object"
       },
+      "TopProductOut": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "object"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "type",
+          "names",
+          "count",
+          "coins"
+        ],
+        "title": "TopProductOut",
+        "type": "object"
+      },
       "UserList": {
         "properties": {
           "items": {
@@ -17333,6 +17885,63 @@
           "name"
         ],
         "title": "ConfirmIn",
+        "type": "object"
+      },
+      "portalab__modules__gamification__api__tuning__DayOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "members": {
+            "title": "Members",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "amount",
+          "members"
+        ],
+        "title": "DayOut",
+        "type": "object"
+      },
+      "portalab__modules__marketplace__api__console__DayOut": {
+        "properties": {
+          "boosters": {
+            "title": "Boosters",
+            "type": "integer"
+          },
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "grants": {
+            "title": "Grants",
+            "type": "integer"
+          },
+          "purchases": {
+            "title": "Purchases",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "purchases",
+          "coins",
+          "grants",
+          "boosters"
+        ],
+        "title": "DayOut",
         "type": "object"
       },
       "portalab__modules__privacy__api__routes__PolicyIn": {
@@ -19687,6 +20296,52 @@
         ]
       }
     },
+    "/api/v1/admin/economy/summary": {
+      "get": {
+        "description": "#98: the economy at a glance \u2014 Coins in circulation, XP earned, Coins earned and spent day by day,\nand every member's balances (the most advanced first).",
+        "operationId": "economy_summary_api_v1_admin_economy_summary_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EconomySummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Economy Summary",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
     "/api/v1/admin/economy/transactions": {
       "get": {
         "operationId": "ledger_api_v1_admin_economy_transactions_get",
@@ -19762,6 +20417,62 @@
           }
         },
         "summary": "Ledger",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/economy/transactions/{transaction_id}/reverse": {
+      "post": {
+        "description": "#98: cancel an entry of a member's history \u2014 what it gave taken back, what it took given back.",
+        "operationId": "reverse_transaction_api_v1_admin_economy_transactions__transaction_id__reverse_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "transaction_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Transaction Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reverse Transaction Api V1 Admin Economy Transactions  Transaction Id  Reverse Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reverse Transaction",
         "tags": [
           "gamification-admin"
         ]
@@ -20451,6 +21162,50 @@
           }
         },
         "summary": "Manual Grant",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/manual-withdrawals": {
+      "post": {
+        "description": "#98: take Coins, XP or Contribution back from a member (never below zero), with a reason.",
+        "operationId": "manual_withdrawal_api_v1_admin_gamification_manual_withdrawals_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualWithdrawalIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Manual Withdrawal Api V1 Admin Gamification Manual Withdrawals Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Manual Withdrawal",
         "tags": [
           "gamification-admin"
         ]
@@ -21578,6 +22333,116 @@
         ]
       }
     },
+    "/api/v1/admin/marketplace/catalog": {
+      "get": {
+        "description": "A page of the catalogue (the whole shop is too big for one page), searched by key or name, with how\nmany products of each type the search finds.",
+        "operationId": "catalog_api_v1_admin_marketplace_catalog_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 96,
+                  "pattern": "^[a-z][a-z0-9_.]*$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(draft|available|unavailable|archived)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 100000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 40,
+              "maximum": 2000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogPageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Catalog",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
     "/api/v1/admin/marketplace/categories": {
       "post": {
         "operationId": "add_category_api_v1_admin_marketplace_categories_post",
@@ -21659,6 +22524,146 @@
           }
         },
         "summary": "Grant",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/members/{user_id}/inventory": {
+      "get": {
+        "description": "Every item a member holds or held \u2014 live ones first, then the history.",
+        "operationId": "inventory_api_v1_admin_marketplace_members__user_id__inventory_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemOut"
+                  },
+                  "title": "Response Inventory Api V1 Admin Marketplace Members  User Id  Inventory Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inventory",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/overview": {
+      "get": {
+        "operationId": "overview_api_v1_admin_marketplace_overview_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Overview",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/ownerships/{ownership_id}": {
+      "delete": {
+        "description": "Take an item out of the member's history altogether \u2014 its effect off when it is still live (no\nCoins move: to give them back, refund it instead). One already refunded keeps its record (the refund is\npart of the ledger).",
+        "operationId": "remove_from_history_api_v1_admin_marketplace_ownerships__ownership_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ownership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ownership Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove From History",
         "tags": [
           "marketplace-admin"
         ]
@@ -22271,6 +23276,32 @@
         "summary": "Decide Request",
         "tags": [
           "marketplace-requests"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/seasons": {
+      "get": {
+        "description": "The seasons' weeks: a season's booster is on sale in them only.",
+        "operationId": "seasons_api_v1_admin_marketplace_seasons_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SeasonOut"
+                  },
+                  "title": "Response Seasons Api V1 Admin Marketplace Seasons Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Seasons",
+        "tags": [
+          "marketplace-admin"
         ]
       }
     },
@@ -32708,6 +33739,35 @@
         "summary": "My Achievements",
         "tags": [
           "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/attention": {
+      "get": {
+        "description": "#98: what waits for me, per navigation entry (a purchase to validate, a proposal to moderate\u2026) \u2014\nthe badges of the navigation; the shell adds them up for hubs and sections.",
+        "operationId": "my_attention_api_v1_me_attention_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "additionalProperties": {
+                      "type": "integer"
+                    },
+                    "type": "object"
+                  },
+                  "title": "Response My Attention Api V1 Me Attention Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Attention",
+        "tags": [
+          "shell"
         ]
       }
     },

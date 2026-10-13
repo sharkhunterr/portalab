@@ -2771,3 +2771,45 @@ li[data-active] > .shell-player-library__row strong {
   inline-size: 2.3rem;
   block-size: 2.3rem;
 }
+
+/* #98: something waits there — a small badge and its number (a dot where room is short) */
+.count-badge {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-inline-size: 1.15rem;
+  block-size: 1.15rem;
+  padding: 0 0.32rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-error-fg, var(--color-accent));
+  color: var(--color-accent-contrast);
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+.shell-section__head .count-badge,
+.shell-entry .count-badge {
+  margin-inline-start: auto;
+}
+.shell-section__head .count-badge + .shell-section__chevron {
+  margin-inline-start: 0;
+}
+.count-badge[data-dot] {
+  position: absolute;
+  inset-block-start: 0.35rem;
+  inset-inline-end: 0.35rem;
+  min-inline-size: 0;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  padding: 0;
+}
+.shell-sections--rail .shell-section__head,
+.shell-header .ds-button,
+.shell-bottom-bar__item {
+  position: relative;
+}
+.hub-tabs a .count-badge {
+  margin-inline-start: var(--space-1);
+}

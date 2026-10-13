@@ -2,6 +2,7 @@
   "account": "Compte",
   "assistant": "Assistant",
   "assistantUnavailable": "L'assistant n'est pas disponible pour le moment.",
+  "attention": "{count, plural, one {# élément à traiter} other {# éléments à traiter}}",
   "back": "Retour",
   "brand": "Portalab",
   "breadcrumb": "Fil d'Ariane",

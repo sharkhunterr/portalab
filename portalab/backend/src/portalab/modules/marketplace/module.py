@@ -21,6 +21,7 @@ from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.identity_directory import ACCOUNTS as IDENTITY_ACCOUNTS
 from portalab.capabilities.identity_provider import PROVISIONING
 from portalab.capabilities.marketplace import GIFTS, LIFECYCLE, ProductTypeRegistry, default_product_types
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -46,6 +47,7 @@ from portalab.core.permissions import PermissionRegistry, default_permissions
 from portalab.core.time import Clock
 from portalab.modules.marketplace import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.marketplace.activation.service import Activation
+from portalab.modules.marketplace.attention import ShopAttention
 from portalab.modules.marketplace.availability.service import Availability
 from portalab.modules.marketplace.eligibility.service import Eligibility
 from portalab.modules.marketplace.entitlements.reader import (
@@ -266,6 +268,14 @@ class MarketplaceModule:
             await provider.remove_from_group(account, group)
 
     def register(self) -> None:
+        if not any(p.instance_ref == "marketplace" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                ShopAttention(self.database, self.authorizer),
+                instance_ref="marketplace",
+                owner=OWNER,
+            )
         register_event_types(self.event_types)
         if not self.capabilities.system_providers(LIFECYCLE):
             self.capabilities.provide(LIFECYCLE, self.projects, instance_ref=INSTANCE, owner=OWNER)

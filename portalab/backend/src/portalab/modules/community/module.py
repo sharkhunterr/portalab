@@ -25,6 +25,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -50,6 +51,7 @@ from portalab.core.time import Clock
 from portalab.core.visibility_port import OwnerOnlyVisibility, VisibilityFilter
 from portalab.modules.community import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.community.achievements.view import AchievementsView
+from portalab.modules.community.attention import ModerationAttention
 from portalab.modules.community.discovery.providers import MemberSearchProvider
 from portalab.modules.community.discovery.shelves import register_builtin_shelves
 from portalab.modules.community.events.service import CommunityEvents
@@ -139,6 +141,14 @@ class CommunityModule:
         return summary.display_name if summary and not summary.anonymized else None
 
     def register(self) -> None:
+        if not any(p.instance_ref == "community" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                ModerationAttention(self.database, self.authorizer),
+                instance_ref="community",
+                owner=OWNER,
+            )
         register_event_types(self.event_types)
         register_slice_d_types(self.event_types)
         if self.consumers.get(CONSUMER) is None:
