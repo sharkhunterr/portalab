@@ -1372,6 +1372,198 @@
         "title": "Audience",
         "type": "object"
       },
+      "AudioChapterOut": {
+        "properties": {
+          "end_s": {
+            "title": "End S",
+            "type": "number"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "start_s": {
+            "title": "Start S",
+            "type": "number"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "title",
+          "start_s",
+          "end_s"
+        ],
+        "title": "AudioChapterOut",
+        "type": "object"
+      },
+      "AudioItemOut": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "bitrate_kbps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Kbps"
+          },
+          "chapters": {
+            "items": {
+              "$ref": "#/components/schemas/AudioChapterOut"
+            },
+            "title": "Chapters",
+            "type": "array"
+          },
+          "codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codec"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "external_id": {
+            "title": "External Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "narrator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Narrator"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tracks": {
+            "items": {
+              "$ref": "#/components/schemas/AudioTrackOut"
+            },
+            "title": "Tracks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "external_id",
+          "kind",
+          "title",
+          "author",
+          "narrator",
+          "duration_s",
+          "chapters",
+          "tracks",
+          "codec",
+          "bitrate_kbps"
+        ],
+        "title": "AudioItemOut",
+        "type": "object"
+      },
+      "AudioPositionOut": {
+        "properties": {
+          "percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "position_s": {
+            "title": "Position S",
+            "type": "number"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          }
+        },
+        "required": [
+          "position_s",
+          "track",
+          "percent"
+        ],
+        "title": "AudioPositionOut",
+        "type": "object"
+      },
+      "AudioTrackOut": {
+        "properties": {
+          "duration_s": {
+            "title": "Duration S",
+            "type": "number"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "start_s": {
+            "title": "Start S",
+            "type": "number"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "title",
+          "start_s",
+          "duration_s"
+        ],
+        "title": "AudioTrackOut",
+        "type": "object"
+      },
       "AuditPage": {
         "properties": {
           "items": {
@@ -1940,6 +2132,74 @@
           }
         },
         "title": "AvailabilityIn",
+        "type": "object"
+      },
+      "BookFormatOut": {
+        "properties": {
+          "file_ref": {
+            "title": "File Ref",
+            "type": "string"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          }
+        },
+        "required": [
+          "file_ref",
+          "format",
+          "size"
+        ],
+        "title": "BookFormatOut",
+        "type": "object"
+      },
+      "BookOut": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "external_id": {
+            "title": "External Id",
+            "type": "string"
+          },
+          "formats": {
+            "items": {
+              "$ref": "#/components/schemas/BookFormatOut"
+            },
+            "title": "Formats",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "external_id",
+          "title",
+          "author",
+          "formats"
+        ],
+        "title": "BookOut",
         "type": "object"
       },
       "BoostOut": {
@@ -6382,6 +6642,105 @@
         "title": "LevelUpOut",
         "type": "object"
       },
+      "ListenOut": {
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/AudioItemOut"
+          },
+          "resume": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AudioPositionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "service_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Name"
+          },
+          "synced": {
+            "title": "Synced",
+            "type": "boolean"
+          },
+          "ticket": {
+            "title": "Ticket",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticket",
+          "service_name",
+          "synced",
+          "item",
+          "resume"
+        ],
+        "title": "ListenOut",
+        "type": "object"
+      },
+      "ListenPositionIn": {
+        "properties": {
+          "duration_s": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "position_s": {
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Position S",
+            "type": "number"
+          },
+          "seq": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "state": {
+            "pattern": "^(playing|paused|stopped|finished)$",
+            "title": "State",
+            "type": "string"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          }
+        },
+        "required": [
+          "state",
+          "position_s",
+          "seq"
+        ],
+        "title": "ListenPositionIn",
+        "type": "object"
+      },
       "LoginRequest": {
         "additionalProperties": false,
         "properties": {
@@ -9980,6 +10339,22 @@
         "title": "PaceConfig",
         "type": "object"
       },
+      "PagesOut": {
+        "properties": {
+          "pages": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Pages",
+            "type": "array"
+          }
+        },
+        "required": [
+          "pages"
+        ],
+        "title": "PagesOut",
+        "type": "object"
+      },
       "PasswordConfirmation": {
         "additionalProperties": false,
         "properties": {
@@ -11754,6 +12129,143 @@
           }
         },
         "title": "QuotaLimitsIn",
+        "type": "object"
+      },
+      "ReadOut": {
+        "properties": {
+          "book": {
+            "$ref": "#/components/schemas/BookOut"
+          },
+          "resume": {
+            "items": {
+              "$ref": "#/components/schemas/ReadingPositionOut"
+            },
+            "title": "Resume",
+            "type": "array"
+          },
+          "service_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Name"
+          },
+          "synced": {
+            "title": "Synced",
+            "type": "boolean"
+          },
+          "ticket": {
+            "title": "Ticket",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticket",
+          "service_name",
+          "synced",
+          "book",
+          "resume"
+        ],
+        "title": "ReadOut",
+        "type": "object"
+      },
+      "ReadPositionIn": {
+        "properties": {
+          "file_ref": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9_-]{1,60}\\.(epub|pdf|cbx)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Ref"
+          },
+          "format": {
+            "pattern": "^(epub|pdf|cbx)$",
+            "title": "Format",
+            "type": "string"
+          },
+          "percent": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Percent",
+            "type": "number"
+          },
+          "position": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Position",
+            "type": "string"
+          },
+          "seconds": {
+            "default": 0,
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Seconds",
+            "type": "number"
+          },
+          "seq": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "state": {
+            "pattern": "^(playing|paused|stopped|finished)$",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "format",
+          "position",
+          "percent",
+          "seq"
+        ],
+        "title": "ReadPositionIn",
+        "type": "object"
+      },
+      "ReadingPositionOut": {
+        "properties": {
+          "file_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Ref"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "percent": {
+            "title": "Percent",
+            "type": "number"
+          },
+          "position": {
+            "title": "Position",
+            "type": "string"
+          }
+        },
+        "required": [
+          "format",
+          "position",
+          "percent",
+          "file_ref"
+        ],
+        "title": "ReadingPositionOut",
         "type": "object"
       },
       "RegisterRequest": {
@@ -35028,6 +35540,52 @@
         ]
       }
     },
+    "/api/v1/media/listen/{ticket}/position": {
+      "post": {
+        "operationId": "listen_position_api_v1_media_listen__ticket__position_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListenPositionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listen Position",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/metadata-images": {
       "get": {
         "description": "A metadata provider image (backdrop, portrait\u2026), served by the portal: browsers never call TMDB.",
@@ -35287,6 +35845,105 @@
           }
         },
         "summary": "Player Timeline",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/read/{ticket}/pages/{file_ref}": {
+      "get": {
+        "operationId": "read_pages_api_v1_media_read__ticket__pages__file_ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_ref",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{1,60}\\.(epub|pdf|cbx)$",
+              "title": "File Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Pages",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/read/{ticket}/position": {
+      "post": {
+        "operationId": "read_position_api_v1_media_read__ticket__position_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{10,40}$",
+              "title": "Ticket",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadPositionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Position",
         "tags": [
           "media"
         ]
@@ -35650,6 +36307,49 @@
         ]
       }
     },
+    "/api/v1/media/{object_id}/listen": {
+      "get": {
+        "operationId": "listen_info_api_v1_media__object_id__listen_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListenOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listen Info",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/{object_id}/metadata": {
       "get": {
         "description": "Enriched details of a film or a series (backdrop, cast, saga, budget, revenue\u2026), when known.",
@@ -35852,6 +36552,49 @@
           }
         },
         "summary": "Player Start",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/read": {
+      "get": {
+        "operationId": "read_info_api_v1_media__object_id__read_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Info",
         "tags": [
           "media"
         ]

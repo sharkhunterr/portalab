@@ -7,6 +7,7 @@
   here; connect one service per reader to follow several.
 * ``service.accounts``: Grimmory users (administrator account needed; otherwise the configured one).
 * ``service.health_probe``: an authenticated round trip.
+* ``media.audio`` (#20) and ``media.reading`` (#21): listening and reading in the portal (:mod:`.books`).
 
 Authentication: a Grimmory username (configuration) and password (secret) exchanged for a short-lived
 bearer token (``POST /api/v1/auth/login``), renewed before it expires or when refused.
@@ -31,13 +32,16 @@ from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
+    AUDIO,
     ITEM_LINKS,
     LIBRARY,
+    READING,
     ActivityPage,
     ServiceAccount,
     SourceActivity,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
+from portalab.connectors.grimmory.books import Listening, Reading
 from portalab.connectors.http_base import (
     LIBRARY_LISTING_BYTES,
     BaseConfig,
@@ -185,6 +189,8 @@ class GrimmoryConnector(HttpConnector):
         binding(ACCOUNTS),
         binding(HEALTH_PROBE),
         binding(ITEM_LINKS),
+        binding(AUDIO),
+        binding(READING),
     )
     status_path = "/api/v1/libraries"
     public_path = "/api/v1/healthcheck"
@@ -321,6 +327,10 @@ class GrimmoryConnector(HttpConnector):
             return _Probe(self, service)
         if capability == ITEM_LINKS:
             return _Links()
+        if capability == AUDIO:
+            return Listening(self, service)
+        if capability == READING:
+            return Reading(self, service)
         return None
 
 

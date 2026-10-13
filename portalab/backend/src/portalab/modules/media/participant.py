@@ -13,6 +13,7 @@ from portalab.core.db import Database
 from portalab.modules.media.insights.ingest import mark_days
 from portalab.modules.media.models import (
     Activity,
+    BookPosition,
     HistoryEntry,
     MediaObject,
     MediaRequest,
@@ -109,6 +110,21 @@ class MediaParticipant:
                         },
                     )
                 )
+            for book in (
+                await session.execute(select(BookPosition).where(BookPosition.user_id == user_id))
+            ).scalars():
+                records.append(  # #20, #21: where I stopped listening or reading in the portal
+                    ExportRecord(
+                        "media.book_position",
+                        {
+                            "object": str(book.object_id),
+                            "format": book.format,
+                            "position": book.position,
+                            "percent": book.percent,
+                            "at": book.updated_at.isoformat(),
+                        },
+                    )
+                )
         return records
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
@@ -128,6 +144,7 @@ class MediaParticipant:
                 QuotaUnits,
                 QuotaLedger,
                 RescueLedger,
+                BookPosition,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(

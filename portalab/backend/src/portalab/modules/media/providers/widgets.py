@@ -99,10 +99,13 @@ class ContinueWidget(_Base):
         items = [
             {
                 "title": o.title,
+                "id": str(o.id),
+                "kind": o.kind,  # #20, #21: an audiobook or a book resumes straight away from the card
                 "route": f"/media/{o.id}",
                 "meta": f"{round(p.percent * 100)} %",
                 "progress": p.percent,  # 027: a bar under the title
                 "image_id": images.get(o.id),
+                "at": p.last_occurred_at.isoformat(),
             }
             for p, o in rows
         ]
@@ -126,6 +129,9 @@ class ContinueWidget(_Base):
             if row.get("route") and row["route"] in known:
                 continue
             items.append({**row, "route": row.get("route") or "/media/insights"})
+        # #20, #21: the most recent first, whatever told it (a server, the portal's player, listening or
+        # reading in the portal, the imported history) — a book read this morning is not pushed out by films
+        items.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
         return self.payload(items[:10])
 
 

@@ -247,6 +247,27 @@ class UserProgress(MediaBase):
     finished_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
+class BookPosition(MediaBase):
+    """#20, #21: where a member stopped in a book, in the portal's own listening or reading — per format
+    (``audio``, ``epub``, ``pdf``, ``cbx``): a position in seconds (audio), an EPUB CFI or a page number.
+    Kept here for every member; written back to the service too when it keeps the member's progress."""
+
+    __tablename__ = "book_positions"
+    __table_args__ = (Index("ix_book_positions_user", "user_id", "updated_at"),)
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    object_id: Mapped[UUID] = mapped_column(ForeignKey("media.objects.id"), primary_key=True)
+    format: Mapped[str] = mapped_column(String(8), primary_key=True)
+    service_id: Mapped[UUID] = mapped_column(nullable=False)
+    external_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    file_ref: Mapped[str | None] = mapped_column(String(80))
+    position: Mapped[str] = mapped_column(String(2000), nullable=False)
+    track: Mapped[int | None] = mapped_column(Integer)
+    percent: Mapped[float] = mapped_column(Float, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    event_at: Mapped[datetime | None] = mapped_column(TZDateTime)  # the last progress event published
+
+
 class QuotaUnits(MediaBase):
     __tablename__ = "request_quota_units"
     __table_args__ = (CheckConstraint("units_remaining >= 0", name="units_remaining"),)

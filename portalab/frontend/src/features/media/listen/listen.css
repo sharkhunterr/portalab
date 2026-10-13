@@ -1,0 +1,296 @@
+/*
+ * #20 — the audiobook player of the whole portal: a bar just above the theme's bottom navigation (or the
+ * bottom of the screen), and its bigger view — both dressed like the video player and the book reader (the
+ * --player-* tokens: stage, ink, accent, round buttons, seek bar), so every player of the portal looks alike.
+ */
+.listen-mini {
+  position: fixed;
+  inset-inline: var(--space-2);
+  inset-block-end: calc(var(--frame-bottom) + var(--space-2));
+  z-index: calc(var(--z-nav) + 1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-inline-size: 46rem;
+  margin-inline: auto;
+  padding: var(--space-2) var(--space-3) calc(var(--space-2) + 2px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--player-ink) 18%, transparent);
+  border-radius: var(--player-radius);
+  background: color-mix(in srgb, var(--player-stage) 90%, transparent);
+  color: var(--player-ink);
+  font-family: var(--player-font);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  box-shadow: var(--shadow-3);
+}
+:root[data-playing] .listen-mini {
+  display: none;
+}
+.listen-mini__progress {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 3px;
+  background: var(--player-track);
+}
+.listen-mini__progress > span {
+  display: block;
+  block-size: 100%;
+  background: var(--player-accent);
+}
+.listen-mini__open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.listen-mini__text {
+  display: grid;
+  min-inline-size: 0;
+}
+.listen-mini__text strong,
+.listen-mini__text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.listen-mini__text small {
+  color: var(--player-ink-muted);
+}
+.listen-mini__controls {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+.listen-mini__controls button {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.listen-mini__controls button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--player-ink) 14%, transparent);
+}
+.listen-mini__controls button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.listen-mini__controls .listen-mini__play {
+  background: var(--player-accent);
+  color: var(--color-accent-contrast);
+}
+.listen-mini__play[data-buffering] {
+  animation: listen-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes listen-pulse {
+  to {
+    opacity: 0.55;
+  }
+}
+.listen-mini__time {
+  padding-inline: var(--space-2);
+  color: var(--player-ink-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.listen-mini__controls .listen-mini__close {
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: var(--player-ink-muted);
+}
+.listen-cover {
+  display: grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--player-accent) 22%, var(--player-stage));
+  color: var(--player-accent);
+}
+.listen-cover[data-size="small"] {
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+}
+.listen-cover[data-size="large"] {
+  inline-size: min(18rem, 60vw, 38vh);
+  aspect-ratio: 1;
+  border-radius: var(--player-radius);
+  box-shadow: 0 1.5rem 3rem color-mix(in srgb, var(--player-stage) 70%, transparent);
+}
+.listen-cover img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.shell[data-listening] .shell-main {
+  padding-block-end: calc(var(--space-8) + var(--frame-bottom) + 4.5rem);
+}
+.shell[data-device="phone"] .listen-mini__time,
+.shell[data-device="phone"] .listen-mini__skip {
+  display: none;
+}
+
+/* the bigger view: a stage like the video player's */
+.listen-stage {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-overlay) + 2);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background:
+    radial-gradient(
+      ellipse at 50% 30%,
+      color-mix(in srgb, var(--player-accent) 22%, transparent),
+      transparent 60%
+    ),
+    var(--player-stage);
+  color: var(--player-ink);
+  font-family: var(--player-font);
+  outline: none;
+}
+.listen-stage .player-top,
+.listen-stage .player-bottom {
+  position: static;
+}
+.listen-stage__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.listen-stage__top .player-title {
+  flex: 1;
+  margin: 0;
+}
+.listen-stage__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  gap: var(--space-5);
+  align-items: center;
+  min-block-size: 0;
+  padding: var(--space-3) clamp(0.75rem, 3vw, 2rem);
+}
+.listen-stage__art {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+.listen-stage__chapter {
+  margin: var(--space-3) 0 0;
+  font-family: var(--player-title-font, var(--player-font));
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+.listen-stage__muted {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: 30rem;
+  margin: 0;
+  color: var(--player-ink-muted);
+  font-size: var(--font-size-sm);
+}
+.listen-stage__panel {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  max-block-size: 100%;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border-radius: var(--player-radius);
+  background: var(--player-panel);
+  color: var(--player-panel-ink);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.listen-stage__panel:empty {
+  display: none;
+}
+.listen-stage__panel h3 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-md);
+}
+.listen-stage__panel :is(ul, ol) {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.listen-stage__panel li {
+  display: flex;
+  align-items: center;
+}
+.listen-stage__panel li[data-current] .player-row {
+  background: color-mix(in srgb, var(--player-accent) 22%, transparent);
+  font-weight: var(--font-weight-bold);
+}
+.listen-stage__panel .player-icon {
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: var(--player-panel-ink);
+}
+.listen-stage__bottom {
+  display: grid;
+  gap: var(--space-2);
+  padding-block-end: calc(clamp(0.5rem, 2vw, 1.25rem) + env(safe-area-inset-bottom, 0px));
+}
+.listen-stage .player-main {
+  background: var(--player-accent);
+  color: var(--color-accent-contrast);
+}
+.listen-stage__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--player-ink) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--player-stage) 55%, transparent);
+}
+.listen-stage__option[data-on] {
+  border-color: var(--player-accent);
+  color: var(--player-accent);
+}
+.listen-stage__option select {
+  min-block-size: 2.25rem;
+  border: 0;
+  background: none;
+  color: var(--player-ink);
+  font: inherit;
+}
+.listen-stage__option option {
+  background: var(--player-panel);
+  color: var(--player-panel-ink);
+}
+@media (max-width: 48rem) {
+  .listen-stage__body {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    overflow-y: auto;
+  }
+  .listen-stage__panel {
+    max-block-size: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .listen-mini__play[data-buffering] {
+    animation: none;
+  }
+}

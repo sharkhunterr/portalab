@@ -16,6 +16,10 @@
 * ``media.streaming`` (027, #2): play a title inside the portal, the service deciding between direct
   stream and transcoding (Plex's universal transcoder) — HLS relayed by the portal, so no service address
   or token ever reaches a browser; played as the member's own account on the service.
+* ``media.audio`` (#20): listen to an audiobook in the portal — its chapters and files, its audio relayed
+  by the portal with byte ranges (seeking), the member's position written back to the service.
+* ``media.reading`` (#21): read a book in the portal — its formats (EPUB, PDF, comic book archive), the
+  file or the pages relayed by the portal, the reading position written back to the service.
 
 Providers are bound to one service (``instance_ref`` = the service id) and are usually wrapped by the 001
 isolation guard, so calls may return a :class:`~portalab.capabilities.results.CapabilityResult`;
@@ -46,6 +50,8 @@ ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one t
 DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
 ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
 STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder
+AUDIO = "media.audio"  # #20: audiobooks (then music) played in the portal, relayed with byte ranges
+READING = "media.reading"  # #21: books read in the portal (EPUB, PDF, comic book archives)
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
@@ -745,6 +751,7 @@ class StreamBody:
     content_type: str
     length: int | None
     chunks: AsyncIterator[bytes]
+    content_range: str | None = None  # #20: the part of the file a 206 answer carries (``bytes a-b/n``)
 
 
 @dataclass(frozen=True, slots=True)
@@ -801,6 +808,136 @@ class MediaStreaming(Protocol):
         ...
 
 
+# --- #20: listening in the portal ------------------------------------------------------------------------
+@dataclass(frozen=True, slots=True)
+class AudioChapter:
+    index: int
+    title: str
+    start_s: float
+    end_s: float
+
+
+@dataclass(frozen=True, slots=True)
+class AudioTrack:
+    """One file of an audiobook made of several (a file per chapter): where it starts in the whole."""
+
+    index: int
+    title: str
+    start_s: float
+    duration_s: float
+    size: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class AudioPosition:
+    """Where the account stopped on the service: in the whole, and in which file."""
+
+    position_s: float
+    track: int | None = None
+    percent: float | None = None  # 0..1
+    at: datetime | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class AudioItem:
+    external_id: str
+    kind: str  # audiobook | track
+    title: str
+    author: str | None = None
+    narrator: str | None = None
+    duration_s: float | None = None
+    chapters: tuple[AudioChapter, ...] = ()
+    tracks: tuple[AudioTrack, ...] = ()  # several files; empty: one file with its chapters
+    codec: str | None = None
+    bitrate_kbps: int | None = None
+    position: AudioPosition | None = None  # the service's resume point for this account
+    file_ref: str | None = None  # the service's own id of the file (its progress is kept per file)
+
+
+@runtime_checkable
+class AudioChannel(Protocol):
+    """One member's line to the service for listening."""
+
+    async def item(self, external_id: str) -> AudioItem: ...
+
+    def open(
+        self, external_id: str, track: int | None, byte_range: str | None
+    ) -> AbstractAsyncContextManager[StreamBody]:
+        """The audio file (or one file of several), from ``byte_range`` (an HTTP ``Range`` value)."""
+        ...
+
+    async def report(self, item: AudioItem, position: AudioPosition) -> None:
+        """Write where the member is back to the service (resume point, « read » at the end)."""
+        ...
+
+
+@runtime_checkable
+class MediaAudio(Protocol):
+    def channel(self, external_user_id: str | None) -> AudioChannel:
+        """The channel of one account on the service (``None``: the service's own account)."""
+        ...
+
+
+# --- #21: reading in the portal --------------------------------------------------------------------------
+READING_FORMATS: tuple[str, ...] = ("epub", "pdf", "cbx")  # what the portal's reader opens
+
+
+@dataclass(frozen=True, slots=True)
+class BookFormat:
+    """One file of a book: an EPUB and a PDF of the same title are two formats."""
+
+    file_ref: str
+    format: str  # epub | pdf | cbx | mobi | azw3 | fb2
+    size: int | None = None
+    pages: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ReadingPosition:
+    """Where the account stopped in one format: an EPUB CFI, or a page number for PDF and comics."""
+
+    format: str
+    position: str
+    percent: float  # 0..1
+    file_ref: str | None = None
+    at: datetime | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ReadableBook:
+    external_id: str
+    title: str
+    author: str | None = None
+    formats: tuple[BookFormat, ...] = ()
+    positions: tuple[ReadingPosition, ...] = ()
+
+
+@runtime_checkable
+class ReadingChannel(Protocol):
+    async def book(self, external_id: str) -> ReadableBook: ...
+
+    def open(self, external_id: str, file_ref: str) -> AbstractAsyncContextManager[StreamBody]:
+        """The whole file of one format (EPUB, PDF)."""
+        ...
+
+    async def pages(self, external_id: str, file_ref: str) -> list[int]:
+        """The page numbers of a comic book archive."""
+        ...
+
+    def page(self, external_id: str, file_ref: str, number: int) -> AbstractAsyncContextManager[StreamBody]:
+        """One page of a comic book archive, as an image."""
+        ...
+
+    async def report(self, book: ReadableBook, position: ReadingPosition) -> None:
+        """Write the reading position back to the service."""
+        ...
+
+
+@runtime_checkable
+class MediaReading(Protocol):
+    def channel(self, external_user_id: str | None) -> ReadingChannel: ...
+
+
 DIGEST = "media.digest"
 
 
@@ -845,6 +982,8 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(DOWNLOAD_CLIENTS, DownloadClient, "Transfers of a torrent client, by hash (027)"),
     _spec(ITEM_LINKS, ItemLinks, "Where a title opens in its service (027)"),
     _spec(STREAMING, MediaStreaming, "Play a title in the portal, transcoded by its service (027)"),
+    _spec(AUDIO, MediaAudio, "Listen to an audiobook in the portal, relayed with byte ranges (#20)"),
+    _spec(READING, MediaReading, "Read a book in the portal: EPUB, PDF, comic book archives (#21)"),
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),

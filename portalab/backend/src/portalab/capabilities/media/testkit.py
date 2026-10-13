@@ -22,9 +22,15 @@ from typing import Any
 from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
     REQUEST_STATES,
+    AudioChapter,
+    AudioItem,
+    AudioPosition,
+    BookFormat,
     LibraryPayload,
     MediaPlayback,
     PlayableItem,
+    ReadableBook,
+    ReadingPosition,
     RequestPayload,
     RequestService,
     ResumePoint,
@@ -342,3 +348,127 @@ class FakeChannel:
             raise ProviderNotFound("no such picture")
         self.owner.calls.append((self.account, "image", ref))
         return PNG_1PX
+
+
+# --- #20, #21: listening and reading -------------------------------------------------------------------
+AUDIO_BYTES = bytes(range(256)) * 4  # a 1 KiB « audio file »
+
+
+@dataclass
+class FakeAudio:
+    """``media.audio``: one audiobook (``a1``, 1 hour, two chapters); the account ``owner`` is the one the
+    service keeps progress for (it stopped at 600 s). Records ``(account, operation, details)``."""
+
+    calls: list[tuple[str | None, str, Any]] = field(default_factory=list)
+
+    def channel(self, external_user_id: str | None) -> "FakeAudioChannel":
+        return FakeAudioChannel(self, external_user_id)
+
+
+class FakeAudioChannel:
+    def __init__(self, owner: FakeAudio, account: str | None) -> None:
+        self.owner, self.account = owner, account
+
+    async def own(self) -> bool:
+        return self.account == "owner"
+
+    async def item(self, external_id: str) -> AudioItem:
+        if external_id != "a1":
+            raise ProviderNotFound("no such audiobook")
+        self.owner.calls.append((self.account, "item", external_id))
+        return AudioItem(
+            external_id="a1",
+            kind="audiobook",
+            title="The Book",
+            author="An Author",
+            duration_s=3600.0,
+            chapters=(AudioChapter(0, "One", 0.0, 1800.0), AudioChapter(1, "Two", 1800.0, 3600.0)),
+            position=(
+                AudioPosition(600.0, None, 600 / 3600, datetime(2026, 1, 1, tzinfo=UTC))
+                if self.account == "owner"
+                else None
+            ),
+            file_ref="f1",
+        )
+
+    @asynccontextmanager
+    async def open(
+        self, external_id: str, track: int | None, byte_range: str | None
+    ) -> AsyncIterator[StreamBody]:
+        self.owner.calls.append((self.account, "open", (track, byte_range)))
+        data, status, span = AUDIO_BYTES, 200, None
+        if byte_range and byte_range.startswith("bytes="):
+            start_text, _, end_text = byte_range[6:].partition("-")
+            start = int(start_text or 0)
+            end = int(end_text) if end_text else len(AUDIO_BYTES) - 1
+            data, status = AUDIO_BYTES[start : end + 1], 206
+            span = f"bytes {start}-{end}/{len(AUDIO_BYTES)}"
+
+        async def chunks() -> AsyncIterator[bytes]:
+            yield data
+
+        yield StreamBody(status, "audio/mpeg", len(data), chunks(), span)
+
+    async def report(self, item: AudioItem, position: AudioPosition) -> None:
+        if self.account == "owner":
+            self.owner.calls.append((self.account, "report", (item.file_ref, position.position_s)))
+
+
+@dataclass
+class FakeReading:
+    """``media.reading``: one book (``b1``) in EPUB and in a comic book archive (three pages); ``owner``
+    stopped at a CFI in the EPUB."""
+
+    calls: list[tuple[str | None, str, Any]] = field(default_factory=list)
+
+    def channel(self, external_user_id: str | None) -> "FakeReadingChannel":
+        return FakeReadingChannel(self, external_user_id)
+
+
+class FakeReadingChannel:
+    def __init__(self, owner: FakeReading, account: str | None) -> None:
+        self.owner, self.account = owner, account
+
+    async def own(self) -> bool:
+        return self.account == "owner"
+
+    async def book(self, external_id: str) -> ReadableBook:
+        if external_id != "b1":
+            raise ProviderNotFound("no such book")
+        return ReadableBook(
+            external_id="b1",
+            title="A Novel",
+            author="A Writer",
+            formats=(BookFormat("11.epub", "epub", 2048), BookFormat("12.cbx", "cbx", 4096)),
+            positions=(
+                (ReadingPosition("epub", "epubcfi(/6/4!/4/2)", 0.25, at=datetime(2026, 1, 1, tzinfo=UTC)),)
+                if self.account == "owner"
+                else ()
+            ),
+        )
+
+    @asynccontextmanager
+    async def open(self, external_id: str, file_ref: str) -> AsyncIterator[StreamBody]:
+        self.owner.calls.append((self.account, "open", file_ref))
+
+        async def chunks() -> AsyncIterator[bytes]:
+            yield b"PK\x03\x04 an epub"
+
+        yield StreamBody(200, "application/epub+zip", None, chunks())
+
+    async def pages(self, external_id: str, file_ref: str) -> list[int]:
+        return [1, 2, 3]
+
+    @asynccontextmanager
+    async def page(self, external_id: str, file_ref: str, number: int) -> AsyncIterator[StreamBody]:
+        if number not in (1, 2, 3):
+            raise ProviderNotFound("no such page")
+
+        async def chunks() -> AsyncIterator[bytes]:
+            yield PNG_1PX
+
+        yield StreamBody(200, "image/png", len(PNG_1PX), chunks())
+
+    async def report(self, book: ReadableBook, position: ReadingPosition) -> None:
+        if self.account == "owner":
+            self.owner.calls.append((self.account, "report", (position.format, position.position)))

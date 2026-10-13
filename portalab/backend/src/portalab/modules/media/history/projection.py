@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import and_, delete, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -32,6 +32,7 @@ TYPES = frozenset(
     }
 )
 RESUME_FLOOR = 0.05
+BOOK_KINDS = ("book", "audiobook")
 
 
 class HistoryProjection:
@@ -198,7 +199,12 @@ class HistoryProjection:
                 .where(
                     UserProgress.user_id == user,
                     UserProgress.state == "in_progress",
-                    UserProgress.percent >= RESUME_FLOOR,
+                    # #20, #21: a book or an audiobook is « under way » from its first page or minute (a few
+                    # percent of a long audiobook are already hours); a film from 5 %
+                    or_(
+                        UserProgress.percent >= RESUME_FLOOR,
+                        and_(MediaObject.kind.in_(BOOK_KINDS), UserProgress.percent > 0),
+                    ),
                     MediaObject.status == "active",
                 )
                 .order_by(UserProgress.last_occurred_at.desc())

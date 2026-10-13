@@ -2,9 +2,10 @@
 
 from fastapi import APIRouter
 
+from portalab.modules.media.api.books import router as books_router
 from portalab.modules.media.api.player import router as player_router
 from portalab.modules.media.api.router import router
 
 
 def routers() -> list[APIRouter]:
-    return [player_router, router]
+    return [player_router, books_router, router]

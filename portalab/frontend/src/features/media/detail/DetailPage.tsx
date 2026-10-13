@@ -15,9 +15,11 @@ import {
 import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
+import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
 import { RequestDialog } from "../discover/RequestDialog";
 import { useMeasures } from "../insights/api";
+import { openBook, useListen } from "../listen/store";
 import { usePlayerInfo, useResetResume } from "../player/api";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
@@ -635,8 +637,92 @@ function OpenIn({
   );
 }
 
+/** 027 (#2), #20, #21: watch, listen or read here — the service's page stays one click away. */
+function Watch({
+  objectId,
+  kind,
+  title,
+  image,
+}: {
+  objectId: string;
+  kind: string;
+  title: string;
+  image: string | null | undefined;
+}) {
+  if (kind === "audiobook") return <Listen objectId={objectId} title={title} image={image ?? null} />;
+  if (kind === "book") return <Read objectId={objectId} />;
+  return <WatchVideo objectId={objectId} kind={kind} />;
+}
+
+/** #20: listen here — the audiobook plays in the portal's bar and carries on while browsing. */
+function Listen({ objectId, title, image }: { objectId: string; title: string; image: string | null }) {
+  const t = useT();
+  const format = useFormat();
+  const info = useListenInfo(objectId, true);
+  const listen = useListen();
+  const resume = info.data?.resume;
+  const share = resume?.percent ?? 0;
+  const here = listen.objectId === objectId;
+  const started = Boolean(resume && resume.position_s > 30 && share < 0.99);
+  return (
+    <div className="media-watch">
+      {info.data ? (
+        <>
+          <button
+            type="button"
+            className="ds-button ds-button--primary media-watch-here"
+            onClick={() => void openBook(objectId, { title, image })}
+          >
+            <Icon name={here && listen.playing ? "headphones" : "play"} size={18} />
+            {here && listen.playing
+              ? t("media:listen.cta.playing")
+              : started
+                ? t("media:listen.cta.resume", { percent: format.percent(share) })
+                : t("media:listen.cta.listen")}
+          </button>
+          {started ? (
+            <button
+              type="button"
+              className="ds-button ds-button--secondary media-watch-icon"
+              onClick={() => void openBook(objectId, { title, image, at: 0 })}
+              aria-label={t("media:player.cta.restart")}
+              title={t("media:player.cta.restart")}
+            >
+              <Icon name="replay" size={18} />
+            </button>
+          ) : null}
+        </>
+      ) : null}
+      <OpenIn objectId={objectId} kind="audiobook" secondary={Boolean(info.data)} />
+    </div>
+  );
+}
+
+/** #21: read here — the reader opens over the whole window (a page of its own, entered by a full load). */
+function Read({ objectId }: { objectId: string }) {
+  const t = useT();
+  const format = useFormat();
+  const info = useReadInfo(objectId);
+  const readable = info.data?.book.formats.filter((f) => ["epub", "pdf", "cbx"].includes(f.format)) ?? [];
+  const best = [...(info.data?.resume ?? [])].sort((a, b) => b.percent - a.percent)[0];
+  const started = Boolean(best && best.percent > 0.005 && best.percent < 0.995);
+  return (
+    <div className="media-watch">
+      {readable.length ? (
+        <a className="ds-button ds-button--primary media-watch-here" href={`/media/${objectId}/read`}>
+          <Icon name="book-open" size={18} />
+          {started && best
+            ? t("media:reader.cta.resume", { percent: format.percent(best.percent) })
+            : t("media:reader.cta.read")}
+        </a>
+      ) : null}
+      <OpenIn objectId={objectId} kind="book" secondary={readable.length > 0} />
+    </div>
+  );
+}
+
 /** 027 (#2): watch here, in the portal's own player — the service's page stays one click away. */
-function Watch({ objectId, kind }: { objectId: string; kind: string }) {
+function WatchVideo({ objectId, kind }: { objectId: string; kind: string }) {
   const t = useT();
   const player = usePlayerInfo(objectId, null, PLAYABLE.includes(kind));
   const code = player.error instanceof MediaError ? player.error.code : undefined;
@@ -822,7 +908,7 @@ export function DetailPage() {
         badges={<TitleBadges media={media} />}
         primary={
           media.available ? (
-            <Watch objectId={media.id} kind={media.kind} />
+            <Watch objectId={media.id} kind={media.kind} title={media.title} image={media.image_id} />
           ) : requested ? null : (
             <RequestButton objectId={media.id} kind={media.kind} tmdb={media.ids?.tmdb} />
           )

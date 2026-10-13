@@ -36,6 +36,9 @@ class MediaConfig:
     player_owner_fallback: bool = False  # members with no linked account play through the service's own
     player_max_quality: str = "original"  # the best quality members may pick (a key of QUALITIES)
     player_cast_base_url: str = ""  # 027 (#11): the portal's address as Chromecasts/Apple TVs reach it
+    # #20, #21: listening to audiobooks and reading books in the portal
+    listening_enabled: bool = True
+    reading_enabled: bool = True
 
 
 SETTINGS: dict[str, str] = {
@@ -52,6 +55,8 @@ SETTINGS: dict[str, str] = {
     "player_owner_fallback": "media.player.ownerFallback",
     "player_max_quality": "media.player.maxQuality",
     "player_cast_base_url": "media.player.castBaseUrl",
+    "listening_enabled": "media.listening.enabled",
+    "reading_enabled": "media.reading.enabled",
 }
 
 _DESCRIPTIONS = {
@@ -73,6 +78,10 @@ _DESCRIPTIONS = {
     "player_cast_base_url": "Address Chromecasts and Apple TVs fetch the stream from, when it differs "
     "from the portal's (empty: the portal's own). They refuse self-signed certificates: give an address "
     "with a valid certificate, or a plain http one on the local network.",
+    "listening_enabled": "Members may listen to audiobooks in the portal (relayed from the library, "
+    "Grimmory), the player carrying on while they browse.",
+    "reading_enabled": "Members may read books in the portal: EPUB, PDF and comic book archives (relayed "
+    "from the library, Grimmory).",
 }
 
 

@@ -14,6 +14,7 @@ const ROUTES = join(SRC, "shell", "router", "routes.tsx");
 const EXEMPT = new Set([
   "pages/NotAvailablePage",
   "features/media/player/PlayerPage", // 027 (#2): the video player covers the whole window, no page chrome
+  "features/media/reader/ReaderPage", // #21: the book reader covers the whole window, no page chrome
 ]);
 
 function resolveModule(spec) {

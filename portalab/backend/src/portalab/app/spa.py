@@ -6,8 +6,13 @@ deployment asking for a file of the previous build gets a 404 it can recover fro
 page taken for code. ``index.html`` is never cached, so a reload always finds the current build.
 The SPA bundle is public (the sign-in surface needs it, CD-025); every API
 call it makes is still default-deny on the server.
+
+#21: the book reader (``/media/<id>/read``) is a page of its own, entered by a full load: the EPUB it shows
+is laid out in frames that carry their own styles and fonts, so its document allows inline styles, fonts and
+frames from ``blob:`` — and still no script but the portal's own (the book's frames are sandboxed besides).
 """
 
+import re
 from pathlib import Path
 
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -17,6 +22,13 @@ from starlette.types import Scope
 
 NEVER_FALLBACK = ("/api/", "/healthz", "/readyz", "/assets/")
 NO_STORE = {"Cache-Control": "no-cache, no-store, must-revalidate"}
+READER = re.compile(r"^/media/[0-9a-fA-F-]{36}/read/?$")
+READER_CSP = (
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' blob:; "
+    "img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self'; media-src 'self' blob:; "
+    "frame-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; "
+    "form-action 'self'; frame-ancestors 'none'"
+)
 
 
 class SPAStaticFiles(StaticFiles):
@@ -29,6 +41,8 @@ class SPAStaticFiles(StaticFiles):
                 raise
             response = await super().get_response("index.html", scope)
             response.headers.update(NO_STORE)
+            if READER.match(request_path):
+                response.headers["Content-Security-Policy"] = READER_CSP
             return response
         if path in ("", ".", "index.html"):
             response.headers.update(NO_STORE)

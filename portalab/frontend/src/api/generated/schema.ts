@@ -6553,6 +6553,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/listen/{ticket}/position": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Listen Position */
+        post: operations["listen_position_api_v1_media_listen__ticket__position_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/metadata-images": {
         parameters: {
             query?: never;
@@ -6638,6 +6655,40 @@ export interface paths {
         put?: never;
         /** Player Timeline */
         post: operations["player_timeline_api_v1_media_player__ticket__timeline_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/read/{ticket}/pages/{file_ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Pages */
+        get: operations["read_pages_api_v1_media_read__ticket__pages__file_ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/read/{ticket}/position": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read Position */
+        post: operations["read_position_api_v1_media_read__ticket__position_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6796,6 +6847,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/{object_id}/listen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listen Info */
+        get: operations["listen_info_api_v1_media__object_id__listen_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/{object_id}/metadata": {
         parameters: {
             query?: never;
@@ -6864,6 +6932,23 @@ export interface paths {
         put?: never;
         /** Player Start */
         post: operations["player_start_api_v1_media__object_id__player_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Info */
+        get: operations["read_info_api_v1_media__object_id__read_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -9050,6 +9135,60 @@ export interface components {
             /** Refs */
             refs?: string[];
         };
+        /** AudioChapterOut */
+        AudioChapterOut: {
+            /** End S */
+            end_s: number;
+            /** Index */
+            index: number;
+            /** Start S */
+            start_s: number;
+            /** Title */
+            title: string;
+        };
+        /** AudioItemOut */
+        AudioItemOut: {
+            /** Author */
+            author: string | null;
+            /** Bitrate Kbps */
+            bitrate_kbps: number | null;
+            /** Chapters */
+            chapters: components["schemas"]["AudioChapterOut"][];
+            /** Codec */
+            codec: string | null;
+            /** Duration S */
+            duration_s: number | null;
+            /** External Id */
+            external_id: string;
+            /** Kind */
+            kind: string;
+            /** Narrator */
+            narrator: string | null;
+            /** Title */
+            title: string;
+            /** Tracks */
+            tracks: components["schemas"]["AudioTrackOut"][];
+        };
+        /** AudioPositionOut */
+        AudioPositionOut: {
+            /** Percent */
+            percent: number | null;
+            /** Position S */
+            position_s: number;
+            /** Track */
+            track: number | null;
+        };
+        /** AudioTrackOut */
+        AudioTrackOut: {
+            /** Duration S */
+            duration_s: number;
+            /** Index */
+            index: number;
+            /** Start S */
+            start_s: number;
+            /** Title */
+            title: string;
+        };
         /** AuditPage */
         AuditPage: {
             /** Items */
@@ -9285,6 +9424,26 @@ export interface components {
             limit_days?: number | null;
             /** Supply */
             supply?: number | null;
+        };
+        /** BookFormatOut */
+        BookFormatOut: {
+            /** File Ref */
+            file_ref: string;
+            /** Format */
+            format: string;
+            /** Size */
+            size: number | null;
+        };
+        /** BookOut */
+        BookOut: {
+            /** Author */
+            author: string | null;
+            /** External Id */
+            external_id: string;
+            /** Formats */
+            formats: components["schemas"]["BookFormatOut"][];
+            /** Title */
+            title: string;
         };
         /**
          * BoostOut
@@ -10905,6 +11064,30 @@ export interface components {
             /** Level */
             level: number;
         };
+        /** ListenOut */
+        ListenOut: {
+            item: components["schemas"]["AudioItemOut"];
+            resume: components["schemas"]["AudioPositionOut"] | null;
+            /** Service Name */
+            service_name: string | null;
+            /** Synced */
+            synced: boolean;
+            /** Ticket */
+            ticket: string;
+        };
+        /** ListenPositionIn */
+        ListenPositionIn: {
+            /** Duration S */
+            duration_s?: number | null;
+            /** Position S */
+            position_s: number;
+            /** Seq */
+            seq: number;
+            /** State */
+            state: string;
+            /** Track */
+            track?: number | null;
+        };
         /** LoginRequest */
         LoginRequest: {
             /** Login */
@@ -12247,6 +12430,11 @@ export interface components {
             /** Values */
             values?: string[];
         };
+        /** PagesOut */
+        PagesOut: {
+            /** Pages */
+            pages: number[];
+        };
         /** PasswordConfirmation */
         PasswordConfirmation: {
             /** Password */
@@ -12858,6 +13046,49 @@ export interface components {
         QuotaLimitsIn: {
             movie?: components["schemas"]["QuotaKindIn"];
             tv?: components["schemas"]["QuotaKindIn"];
+        };
+        /** ReadOut */
+        ReadOut: {
+            book: components["schemas"]["BookOut"];
+            /** Resume */
+            resume: components["schemas"]["ReadingPositionOut"][];
+            /** Service Name */
+            service_name: string | null;
+            /** Synced */
+            synced: boolean;
+            /** Ticket */
+            ticket: string;
+        };
+        /** ReadPositionIn */
+        ReadPositionIn: {
+            /** File Ref */
+            file_ref?: string | null;
+            /** Format */
+            format: string;
+            /** Percent */
+            percent: number;
+            /** Position */
+            position: string;
+            /**
+             * Seconds
+             * @default 0
+             */
+            seconds: number;
+            /** Seq */
+            seq: number;
+            /** State */
+            state: string;
+        };
+        /** ReadingPositionOut */
+        ReadingPositionOut: {
+            /** File Ref */
+            file_ref: string | null;
+            /** Format */
+            format: string;
+            /** Percent */
+            percent: number;
+            /** Position */
+            position: string;
         };
         /** RegisterRequest */
         RegisterRequest: {
@@ -27385,6 +27616,39 @@ export interface operations {
             };
         };
     };
+    listen_position_api_v1_media_listen__ticket__position_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ListenPositionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     metadata_image_api_v1_media_metadata_images_get: {
         parameters: {
             query: {
@@ -27524,6 +27788,71 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["PlayerTimelineIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_pages_api_v1_media_read__ticket__pages__file_ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket: string;
+                file_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_position_api_v1_media_read__ticket__position_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReadPositionIn"];
             };
         };
         responses: {
@@ -27805,6 +28134,37 @@ export interface operations {
             };
         };
     };
+    listen_info_api_v1_media__object_id__listen_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     object_metadata_api_v1_media__object_id__metadata_get: {
         parameters: {
             query?: never;
@@ -27926,6 +28286,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StreamStartOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_info_api_v1_media__object_id__read_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadOut"];
                 };
             };
             /** @description Validation Error */

@@ -1,10 +1,11 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { lazy, type ReactNode, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { useMeasures } from "../../media/insights/api";
+import { openBook } from "../../media/listen/store";
 import type { SoonCard } from "../../media/requests/api";
 import { SoonList } from "../../media/requests/SoonList";
 import { CompactLine, PosterStrip } from "./compact";
@@ -157,6 +158,33 @@ const KIND_ICON: Record<string, string> = {
 };
 
 /** « Continue » (027): what I am in the middle of — poster, title, episode or author, a progress bar. */
+/** #20, #21: a book or an audiobook resumes straight from its card — the audiobook in the portal's bar,
+ * the book in the reader (a page of its own, so a full load); anything else opens its page. */
+function Resume({ card, src, body }: { card: Card; src: string | null; body: ReactNode }) {
+  const t = useT();
+  const id = card.id ?? /^\/media\/([0-9a-f-]{36})$/.exec(card.route ?? "")?.[1];
+  if (id && card.kind === "audiobook") {
+    return (
+      <button
+        type="button"
+        className="widget-continue__resume"
+        onClick={() => void openBook(id, { title: card.title, image: src })}
+        title={t("media:listen.cta.listen")}
+      >
+        {body}
+      </button>
+    );
+  }
+  if (id && card.kind === "book") {
+    return (
+      <a href={`/media/${id}/read`} title={t("media:reader.cta.read")}>
+        {body}
+      </a>
+    );
+  }
+  return card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>;
+}
+
 function Continue({ payload, config, compact }: WidgetProps) {
   const t = useT();
   const all = ((payload.data ?? {}) as { items?: Array<Card & { progress?: number | null }> }).items ?? [];
@@ -218,7 +246,7 @@ function Continue({ payload, config, compact }: WidgetProps) {
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may share a title
           <li key={`${card.id ?? card.title}-${index}`}>
-            {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
+            <Resume card={card} src={card.image_id ?? null} body={body} />
           </li>
         );
       })}

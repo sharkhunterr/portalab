@@ -37,6 +37,7 @@ const MediaHome = lazy(() => import("../../features/media/home/MediaHome"));
 const MediaCatalog = lazy(() => import("../../features/media/catalog/CatalogPage"));
 const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"));
 const MediaPlayer = lazy(() => import("../../features/media/player/PlayerPage"));
+const MediaReader = lazy(() => import("../../features/media/reader/ReaderPage"));
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
 const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverPage"));
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
@@ -230,6 +231,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               path: ":objectId/watch",
               element: <MediaPlayer />,
               handle: h({ crumb: "Watch", requiredPermission: "media.play", existenceSensitive: true }),
+            },
+            {
+              // #21: the book reader, over the whole window (a page of its own, entered by a full load)
+              path: ":objectId/read",
+              element: <MediaReader />,
+              handle: h({ crumb: "Read", requiredPermission: "media.play", existenceSensitive: true }),
             },
           ],
         },

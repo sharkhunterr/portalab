@@ -4,6 +4,8 @@ import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";
+import { ListenHost } from "../features/media/listen/ListenHost";
+import { useListen } from "../features/media/listen/store";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
 import { focusHeaderSearch, HeaderSearch, openFloatingSearch } from "./header/HeaderSearch";
@@ -74,6 +76,7 @@ export function AppShell({
   const arrangement = useArrangement();
   const { view } = useNavigationView();
   const header = useHeaderData();
+  const listening = useListen().objectId !== null; // #20: the audiobook bar takes its place at the bottom
   useWornLevelBadge(Boolean(header.me)); // 027: the level badge look the member wears, everywhere
   const [menuOpen, setMenuOpen] = useState(false);
   // biome-ignore lint/correctness/useExhaustiveDependencies: close the menu panel on navigation
@@ -151,6 +154,7 @@ export function AppShell({
         data-nav={nav}
         data-device={arrangement.device}
         data-header-position={arrangement.headerPosition}
+        data-listening={listening || undefined}
       >
         <AppHeader
           device={arrangement.device}
@@ -165,6 +169,7 @@ export function AppShell({
         <GlobalStatusBanner />
         <LevelUpMoment />
         <BoosterStageHost />
+        <ListenHost />
         <AnnouncementBanner />
         <MaintenanceBanner />
         {nav === "topbar" ? (

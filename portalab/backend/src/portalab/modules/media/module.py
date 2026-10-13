@@ -60,6 +60,7 @@ from portalab.core.visibility_port import VisibilityFilter
 from portalab.modules.media import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.media import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.media.availability.service import AvailabilityService
+from portalab.modules.media.books.service import BookService
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
 from portalab.modules.media.cleanup import CleanupService
 from portalab.modules.media.discovery.shelves import BaselineRecommender, Discovery
@@ -255,6 +256,10 @@ class MediaModule:
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(
             database, capabilities, lambda: self.config, player_key or os.urandom(32), clock=clock
+        )
+        # #20, #21: listening and reading in the portal (their tickets: another key of the same secret)
+        self.books = BookService(
+            database, events, capabilities, lambda: self.config, player_key or os.urandom(32), clock=clock
         )
 
     # --- configuration ---------------------------------------------------------------------------------
