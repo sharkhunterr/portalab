@@ -11,16 +11,43 @@ PARIS = ZoneInfo("Europe/Paris")
 
 # --- what earns XP ---------------------------------------------------------------------------------------
 RULES: dict[str, dict[str, Any]] = {
-    # a play counts once (10 XP) and for its length (1 XP a minute, up to 4 h): ten 5-minute episodes
-    # give 150 XP, one 4-hour film 250 XP; at most 1500 XP a day from playback
-    "media_playback": {
+    # #94: the minutes actually watched, listened to or read count (1 XP a minute, up to 4 h a sitting),
+    # finished or not; finishing earns a bonus of its own — a film is a whole work (30 XP, 5 Coins), an
+    # episode a part of one (5 XP, 1 Coin: a series' bonus comes episode after episode), a book or an
+    # audiobook a long one (50 XP, 10 Coins)
+    "media_watch_time": {
         "event_type": "media.playback_finished",
-        "label": "Lecture d'un film, d'un épisode ou d'un livre audio",
-        "grants": [
-            {"value": "xp", "amount": 10, "per_unit": {"field": "duration_s", "factor": 1 / 60, "max": 240}},
-            {"value": "coins", "amount": 2},
-        ],
+        "label": "Minutes regardées, écoutées ou lues (jusqu'à la fin)",
+        "grants": [{"value": "xp", "per_unit": {"field": "watched_s", "factor": 1 / 60, "max": 240}}],
         "limits": {"caps": [{"period": "day", "max_amount": 1500, "value": "xp"}]},
+    },
+    "media_watch_time_partial": {
+        "event_type": "media.playback_abandoned",
+        "label": "Minutes regardées, écoutées ou lues (séance interrompue)",
+        "predicate": [{"field": "watched_s", "op": "gte", "value": 120}],
+        "grants": [{"value": "xp", "per_unit": {"field": "watched_s", "factor": 1 / 60, "max": 240}}],
+        "limits": {"caps": [{"period": "day", "max_amount": 1000, "value": "xp"}]},
+    },
+    "media_finished_movie": {
+        "event_type": "media.playback_finished",
+        "label": "Film vu jusqu'au bout",
+        "predicate": [{"field": "kind", "op": "eq", "value": "movie"}],
+        "grants": [{"value": "xp", "amount": 30}, {"value": "coins", "amount": 5}],
+        "limits": {"caps": [{"period": "day", "max_amount": 150, "value": "xp"}]},
+    },
+    "media_finished_episode": {
+        "event_type": "media.playback_finished",
+        "label": "Épisode vu jusqu'au bout",
+        "predicate": [{"field": "kind", "op": "eq", "value": "episode"}],
+        "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 1}],
+        "limits": {"caps": [{"period": "day", "max_amount": 60, "value": "xp"}]},
+    },
+    "media_finished_book": {
+        "event_type": "media.playback_finished",
+        "label": "Livre ou livre audio terminé",
+        "predicate": [{"field": "kind", "op": "in", "value": ["book", "audiobook"]}],
+        "grants": [{"value": "xp", "amount": 50}, {"value": "coins", "amount": 10}],
+        "limits": {"caps": [{"period": "day", "max_amount": 150, "value": "xp"}]},
     },
     "shop_purchase": {
         "event_type": "marketplace.purchase",
@@ -55,16 +82,29 @@ RULES: dict[str, dict[str, Any]] = {
     },
 }
 
-# play streaks: x1.5 from 2 days in a row, x2 from 5, x2.5 from 10 — on XP and Coins of plays
+# play streaks: x1.5 from 2 days in a row, x2 from 5, x2.5 from 10 — on XP and Coins of plays; a day counts
+# from 5 minutes watched, listened to or read, finished or not (#94)
 STREAK: dict[str, Any] = {
     "enabled": True,
-    "event_types": ["media.playback_finished"],
+    "event_types": ["media.playback_finished", "media.playback_abandoned"],
+    "min_watched_s": 300,
     "values": ["xp", "coins"],
     "tiers": [
         {"days": 2, "multiplier": 1.5},
         {"days": 5, "multiplier": 2.0},
         {"days": 10, "multiplier": 2.5},
     ],
+}
+
+# #94: the former rule (a play's whole length, only once finished) — retired where it was left unchanged
+RETIRED_RULES: dict[str, dict[str, Any]] = {
+    "media_playback": {
+        "event_type": "media.playback_finished",
+        "grants": [
+            {"value": "xp", "amount": 10, "per_unit": {"field": "duration_s", "factor": 1 / 60, "max": 240}},
+            {"value": "coins", "amount": 2},
+        ],
+    },
 }
 
 LEVEL_REWARDS: list[dict[str, Any]] = [

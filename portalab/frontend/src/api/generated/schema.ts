@@ -13707,6 +13707,11 @@ export interface components {
             enabled: boolean;
             /** Event Types */
             event_types?: string[];
+            /**
+             * Min Watched S
+             * @default 300
+             */
+            min_watched_s: number;
             /** Tiers */
             tiers?: components["schemas"]["Tier"][];
             /** Values */

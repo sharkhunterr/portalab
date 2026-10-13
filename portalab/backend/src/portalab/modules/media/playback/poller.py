@@ -151,6 +151,9 @@ class PlaybackPoller:
             "percent": percent(row.max_position_s, row.duration_s),
             "occurred_at": now.isoformat(),
         }
+        watched = self._watched(row, now)
+        if watched is not None:
+            payload["watched_s"] = watched
         dedup = (
             f"media.playback_finished:{row.session_key}"
             if name == "media.playback_finished"
@@ -166,6 +169,18 @@ class PlaybackPoller:
             dedup_key=dedup,
         )
         metrics.increment(f"media.playback.{name.split('_', 1)[1]}")
+
+    @staticmethod
+    def _watched(row: PlaybackSession, now: datetime) -> float | None:
+        """#94: what this sitting watched — from where it began to the furthest point reached, never more
+        than the time it lasted (a jump ahead is not watched)."""
+        if row.start_position_s is None:
+            return None
+        watched = max(0.0, row.max_position_s - row.start_position_s)
+        lasted = (now - row.started_at).total_seconds()
+        if lasted > 0:  # a live sitting (a play read from a history is published at its own time)
+            watched = min(watched, lasted + 60)
+        return round(watched, 1)
 
     async def _report(
         self, service_id: UUID, session_key: str, report: SourcePlayback, now: datetime
@@ -192,6 +207,7 @@ class PlaybackPoller:
                     state=report.state,
                     position_s=position,
                     max_position_s=position,
+                    start_position_s=position,  # #94: the minutes watched are counted from here
                     duration_s=report.duration_s,
                     device=(report.device or None) and report.device[:120],
                     title=(report.title or None) and report.title[:500],
@@ -305,6 +321,7 @@ class PlaybackPoller:
                     state="stopped",
                     position_s=item.position_s,
                     max_position_s=item.position_s,
+                    start_position_s=0.0,
                     duration_s=item.duration_s,
                     device=None,
                     started_at=item.occurred_at,

@@ -79,6 +79,7 @@ from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
 from portalab.modules.media.insights.ingest import ActivityIngestor
+from portalab.modules.media.insights.rewards import HistoryRewards
 from portalab.modules.media.insights.stats import InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
 from portalab.modules.media.links.accounts import AccountMatching
@@ -218,6 +219,8 @@ class MediaModule:
             database, events, capabilities, self.links, lambda: self.config, self.threshold, clock=clock
         )
         self.history = HistoryProjection(database, events, clock=clock)
+        # #94: a finished play the live watch missed (seen in a service's history) still counts
+        self.history_rewards = HistoryRewards(database, events, self.threshold, clock=clock)
         self.quota = RequestQuota(database, lambda: self.config, clock=clock)
         self.requests = Requests(database, events, capabilities, self.quota, self.links, clock=clock)
         self.request_sink = RequestSink(self.requests)
@@ -444,6 +447,7 @@ class MediaModule:
 
         async def ingest() -> None:
             await self.ingestor.run()
+            await self.history_rewards.run()
             await self.aggregator.run()
 
         async def aggregate() -> None:

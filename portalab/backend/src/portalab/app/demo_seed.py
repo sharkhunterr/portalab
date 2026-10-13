@@ -23,7 +23,6 @@ from uuid import UUID
 from sqlalchemy import text
 
 from portalab.app import demo_economy
-from portalab.app.demo_history import seed_history
 from portalab.app.demo_shop import COLLECTIONS, RETIRED, SHOP, definition
 from portalab.app.wiring import Platform
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
@@ -34,6 +33,7 @@ from portalab.core.logging import get_logger
 from portalab.core.time import utc_now
 from portalab.modules.administration.firstrun.service import WizardRequest
 from portalab.modules.gamification.achievements.definition import parse_achievement
+from portalab.modules.gamification.rules.definition import RuleDefinition
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.services.common import SYSTEM
 from portalab.modules.identity.services.credentials import set_password
@@ -43,15 +43,6 @@ from portalab.modules.wiki.pages import PageInput
 log = get_logger("portalab.demo")
 
 MEMBERS = (("alice", "Alice Martin"), ("bruno", "Bruno Lefèvre"), ("chloe", "Chloé Dubois"))
-
-# Target progression (default curve: level n from 100*(n-1)^1.5 XP) — a portal that looks played.
-# the XP comes from each member's history (demo_history): the levels follow from their weeks on the portal
-PROGRESSION: dict[str, dict[str, int]] = {
-    "admin": {"coins": 1500, "contribution": 3},
-    "alice": {"coins": 1800, "contribution": 5},
-    "bruno": {"coins": 900, "contribution": 2},
-    "chloe": {"coins": 400, "contribution": 1},
-}
 
 ACHIEVEMENTS: dict[str, dict[str, Any]] = {
     "first_steps": {
@@ -268,13 +259,12 @@ def _product(key: str, kind: str, price: int, en: str, fr: str, desc: str, paylo
 
 
 PRODUCTS: tuple[dict[str, Any], ...] = tuple(definition(product) for product in SHOP)  # 027: demo_shop
-OWNED_BY_ADMIN = ("badge_pioneer", "effect_confetti")
-OWNED_BY_ALICE = ("badge_night_owl",)
 
 FUNDING_RULES = {"consume_at": "released", "min_funding": 5, "max_funding_per_user": 300}
-PROJECTS: tuple[tuple[str, str, dict[str, int], str], ...] = (
-    ("demo-offline-mode", "Offline mode", {"alice": 120, "bruno": 60, "admin": 40}, "released"),
-    ("demo-shared-playlists", "Shared playlists", {"alice": 80, "chloe": 30}, "open"),
+# #94: open for funding — members fund them with Coins they earned, the demo funds nothing
+PROJECTS: tuple[tuple[str, str, str], ...] = (
+    ("demo-offline-mode", "Offline mode", "open"),
+    ("demo-shared-playlists", "Shared playlists", "open"),
 )
 
 ARTICLES: tuple[tuple[str, str, str], ...] = (
@@ -385,10 +375,7 @@ class DemoSeeder:
         await self._step("first run", self.first_run)
         await self._step("members", self.members)
         await self._step("gamification definitions", self.gamification_definitions)
-        await self._step("progression", self.progression)
-        await self._step("achievements unlocked", self.unlock_achievements)
         await self._step("marketplace catalog", self.catalog)
-        await self._step("marketplace purchases", self.purchases)
         await self._step("community projects", self.projects)
         await self._step("campaign", self.campaign)
         await self._step("economy", self.economy)
@@ -399,7 +386,6 @@ class DemoSeeder:
         await self._step("wiki", self.wiki)
         await self._step("support", self.support)
         await self._step("notifications", self.notifications)
-        await self._step("progression history", self.history)
         await self._step("leaderboards", self.leaderboards)
         return self.report
 
@@ -474,55 +460,6 @@ class DemoSeeder:
             await gamification.rules.publish(self.admin, key, rule.version)
             made += 1
         return f"{made} definitions created"
-
-    async def progression(self) -> str:
-        rewards = self.platform.gamification.rewards
-        granted = 0
-        for name, values in PROGRESSION.items():
-            if name not in self.people:
-                continue
-            for value, amount in values.items():
-                if value == "contribution":
-                    for index in range(amount):
-                        source = f"demo:{name}:{index}"
-                        if await self._scalar(
-                            "SELECT 1 FROM gamification.transactions WHERE idempotency_key = :k",
-                            k=f"contribution:{source}",
-                        ):
-                            continue
-                        result = await rewards.grant_contribution(
-                            self.people[name], "demo", source, self.admin
-                        )
-                        granted += result != "withheld"
-                    continue
-                done = await rewards.grant_manual(
-                    self.admin,
-                    self.people[name],
-                    value,  # type: ignore[arg-type]
-                    amount,
-                    reason="Demo data",
-                    idempotency_key=f"demo:{name}:{value}",
-                )
-                granted += done is not None and not done.duplicate
-        return f"{granted} new grants"
-
-    async def history(self) -> str:
-        return await seed_history(self.platform.gamification, self.people)
-
-    async def unlock_achievements(self) -> str:
-        rewards = self.platform.gamification.rewards
-        unlocked = 0
-        for name, keys in (
-            ("admin", ("first_steps", "saver", "rising_star", "veteran")),
-            ("alice", ("first_steps", "regular", "saver", "rising_star", "veteran")),
-            ("bruno", ("first_steps", "saver", "rising_star")),
-            ("chloe", ("first_steps",)),
-        ):
-            if name not in self.people:
-                continue
-            for key in keys:
-                unlocked += bool(await rewards.unlock(self.admin, self.people[name], key))
-        return f"{unlocked} newly unlocked"
 
     async def _access_permissions(self) -> None:
         """027: the permissions the demo shop's « access » products grant are allowed for such products."""
@@ -615,18 +552,10 @@ class DemoSeeder:
                 retired += 1
         return f"{made} products published, {revised} revised, {retired} retired"
 
-    async def purchases(self) -> str:
-        purchases = self.platform.marketplace.purchases
-        for name, keys in (("admin", OWNED_BY_ADMIN), ("alice", OWNED_BY_ALICE)):
-            for key in keys:
-                if name in self.people:
-                    await purchases.acquire(self.p(name), key, f"demo:{name}:{key}")
-        return "owned items in place"
-
     async def projects(self) -> str:
         marketplace = self.platform.marketplace
         made = 0
-        for ref, title, funders, target in PROJECTS:
+        for ref, title, target in PROJECTS:
             project_id = await self._scalar(
                 "SELECT id FROM marketplace.projects WHERE proposal_ref = :r", r=ref
             )
@@ -635,11 +564,6 @@ class DemoSeeder:
             project = await marketplace.projects.register(ref, self.people.get("alice"), title)
             await marketplace.transition(self.admin, project.id, "proposal")
             await marketplace.transition(self.admin, project.id, "open", rules=FUNDING_RULES)
-            for name, amount in funders.items():
-                if name in self.people:
-                    await marketplace.fundings.fund(
-                        self.p(name), project.id, amount, acknowledged=True, request_key=f"demo:{ref}"
-                    )
             if target == "released":
                 for state in ("validation", "development", "beta", "released"):
                     await marketplace.transition(self.admin, project.id, state, note="Demo data")
@@ -676,11 +600,15 @@ class DemoSeeder:
             rule = await gamification.rules.save(self.admin, key, raw)
             await gamification.rules.publish(self.admin, key, rule.version)
             made += 1
+        retired = await self._retire_rules(gamification)
         writer = gamification.capabilities.system_providers(CONFIG_WRITER_CAPABILITY)
         await gamification.refresh_config()
         settings = 0
         if writer:
-            if not (gamification.config.streak or {}).get("enabled"):
+            streak = gamification.config.streak or {}
+            if streak.get("event_types") == ["media.playback_finished"] and "min_watched_s" not in streak:
+                streak = {}  # #94: the former demo streak (finished plays only) gives way to the new one
+            if not streak.get("enabled"):
                 await writer[0].provider.set_global(
                     self.admin, "economy.streak", demo_economy.STREAK, reason="demo economy"
                 )
@@ -691,7 +619,31 @@ class DemoSeeder:
                 )
                 settings += 1
             await gamification.refresh_config()
-        return f"{made} rules, {settings} settings"
+        return f"{made} rules, {retired} retired, {settings} settings"
+
+    async def _retire_rules(self, gamification: Any) -> int:
+        """#94: a former demo rule still as the demo published it is retired (one an administrator changed
+        is left alone)."""
+        retired = 0
+        for key, former in demo_economy.RETIRED_RULES.items():
+            current = await self._scalar(
+                "SELECT definition FROM gamification.reward_rules WHERE key = :k AND status = 'active' "
+                "ORDER BY version DESC LIMIT 1",
+                k=key,
+            )
+            if not isinstance(current, dict):
+                continue
+            try:
+                same = current.get("event_type") == former["event_type"] and (
+                    RuleDefinition.model_validate({**current, "label": ""}).grants
+                    == RuleDefinition.model_validate({**former, "label": ""}).grants
+                )
+            except ValueError:
+                same = False
+            if same:
+                await gamification.rules.retire(self.admin, key)
+                retired += 1
+        return retired
 
     async def seasonal_campaigns(self) -> str:
         campaigns = self.platform.campaigns

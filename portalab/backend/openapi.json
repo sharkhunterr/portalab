@@ -14011,6 +14011,13 @@
             "title": "Event Types",
             "type": "array"
           },
+          "min_watched_s": {
+            "default": 300,
+            "maximum": 86400.0,
+            "minimum": 0.0,
+            "title": "Min Watched S",
+            "type": "integer"
+          },
           "tiers": {
             "items": {
               "$ref": "#/components/schemas/Tier"

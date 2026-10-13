@@ -246,6 +246,7 @@ class PlaybackSession(MediaBase):
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     as_of: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     last_event_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    start_position_s: Mapped[float | None] = mapped_column(Float)  # #94: where this sitting began
     state_seq: Mapped[int] = mapped_column(Integer, nullable=False)
     ended: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
@@ -308,6 +309,10 @@ class BookPosition(MediaBase):
     percent: Mapped[float] = mapped_column(Float, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     event_at: Mapped[datetime | None] = mapped_column(TZDateTime)  # the last progress event published
+    # #94: the sitting under way — its session, where and when it began (the minutes it counts)
+    session_ref: Mapped[str | None] = mapped_column(String(64))
+    session_start_s: Mapped[float | None] = mapped_column(Float)
+    session_started_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
 class QuotaUnits(MediaBase):
@@ -432,6 +437,9 @@ class Activity(MediaBase):
     stream: Mapped[str | None] = mapped_column(String(12))  # direct, copy, transcode (027)
     quality: Mapped[str | None] = mapped_column(String(12))  # 4k, 1080p, 720p, sd (027)
     received_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    # #94: when this play was turned into the progression's ``media.playback_finished`` (the live watch
+    # missed it) — at most once
+    rewarded_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
 class ActivityCursor(MediaBase):

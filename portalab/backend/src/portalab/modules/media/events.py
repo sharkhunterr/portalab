@@ -38,6 +38,7 @@ class Playback(BaseModel):
     duration_s: float | None = None
     percent: float | None = None
     occurred_at: str
+    watched_s: float | None = None  # #94: the time actually watched, listened to or read in this sitting
 
 
 class ResumeAvailable(BaseModel):
@@ -100,8 +101,9 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                 dedup_fields=("session", "state_seq"),
                 retention_class="business",
                 visibility_class="private",
-                rewardable=frozenset({"kind", "percent", "duration_s", "position_s"})
-                if name == "media.playback_finished"
+                # #94: a sitting's minutes count whether it finished or not; finishing earns a bonus
+                rewardable=frozenset({"kind", "percent", "duration_s", "position_s", "watched_s"})
+                if name in ("media.playback_finished", "media.playback_abandoned")
                 else frozenset(),
                 aggregatable=frozenset({"kind", "percent"}),
                 automatable=name in ("media.playback_started", "media.playback_finished"),

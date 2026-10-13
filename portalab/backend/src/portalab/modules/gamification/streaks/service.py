@@ -34,6 +34,9 @@ class StreakConfig(BaseModel):
     event_types: list[str] = Field(default_factory=list, max_length=20)
     values: list[str] = Field(default_factory=lambda: ["xp"], max_length=3)
     tiers: list[Tier] = Field(default_factory=list, max_length=10)
+    # #94: a sitting counts for the streak from this many seconds watched, listened to or read (when the
+    # event tells them: ``watched_s``) — a play opened and closed at once does not keep a streak alive
+    min_watched_s: int = Field(default=300, ge=0, le=86_400)
 
 
 def parse_streak(raw: Any) -> StreakConfig:
@@ -131,6 +134,9 @@ class Streaks:
         config = self.settings()
         if not config.enabled or event.type not in config.event_types:
             return []
+        watched = event.payload.get("watched_s")
+        if isinstance(watched, int | float) and watched < config.min_watched_s:
+            return []  # too short to count
         day = self._day(at)
         async with self.database.unit_of_work() as uow:
             await uow.session.execute(

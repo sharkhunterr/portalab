@@ -57,25 +57,25 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
     assert first.steps["first run"] == "completed"
     after_first = await counts(database)
     assert after_first["users"] == 1 + len(MEMBERS)
-    assert after_first["products"] == len(PRODUCTS) and after_first["ownerships"] >= 3
+    assert after_first["products"] == len(PRODUCTS) and after_first["ownerships"] == 0
     assert after_first["rewards"] == sum(1 for p in SHOP if p["reward_only"])
-    assert after_first["projects"] == 2 and after_first["fundings"] >= 5
-    assert after_first["achievements"] >= 10 and after_first["campaigns"] == 4  # demo + 3 seasonal (027)
+    assert after_first["projects"] == 2 and after_first["fundings"] == 0
+    assert after_first["achievements"] == 0 and after_first["campaigns"] == 4  # demo + 3 seasonal (027)
     assert after_first["articles"] == 3 and after_first["pages"] >= 3
     assert after_first["tickets"] == 2 and after_first["feedback"] == 2
 
+    # #94: every account starts from nothing — the demo grants no XP, Coins, achievement, item or streak
+    assert after_first["transactions"] == 0
     progression = await platform.gamification.progression.progress(admin)
-    assert progression.level >= 4 and progression.coins > 0
-    # #62: the level comes from weeks of history, day after day, not from one lump
+    assert progression.xp == 0 and progression.coins == 0
     async with database.session() as session:
-        days = await session.scalar(
-            text(
-                "SELECT count(DISTINCT occurred_at::date) FROM gamification.transactions "
-                "WHERE user_id = :u AND value = 'xp' AND delta > 0"
-            ),
-            {"u": admin},
+        written = await session.scalar(
+            text("SELECT count(*) FROM gamification.transactions WHERE user_id = :u"), {"u": admin}
         )
-    assert days >= 20
+        streak = await session.scalar(
+            text("SELECT count(*) FROM gamification.streak_days WHERE user_id = :u"), {"u": admin}
+        )
+    assert written == 0 and streak == 0
 
     lines = users_file.read_text(encoding="utf-8").splitlines()
     assert [line.split("\t")[0] for line in lines] == [login for login, _ in MEMBERS]

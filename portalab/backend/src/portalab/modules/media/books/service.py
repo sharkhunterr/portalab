@@ -451,6 +451,19 @@ class BookService:
                 row.service_id, row.external_id = ticket.service, ticket.item
                 row.file_ref, row.position, row.track = file_ref, position[:2000], track
                 row.percent, row.updated_at = percent, now
+            watched = None
+            if row is not None:  # #94: the minutes of this sitting — what the progression counts
+                if row.session_ref != ticket.session[:64] or row.session_started_at is None:
+                    row.session_ref, row.session_start_s = ticket.session[:64], position_s
+                    row.session_started_at = now
+                elapsed = (now - row.session_started_at).total_seconds()
+                if kind == "book":  # a book reports the time spent reading in this sitting
+                    watched = min(max(0.0, position_s), elapsed + 60)
+                else:  # an audiobook its position: what was heard since the sitting began (up to 3x)
+                    heard = position_s - (
+                        row.session_start_s if row.session_start_s is not None else position_s
+                    )
+                    watched = min(max(0.0, heard), elapsed * 3 + 60)
             name = self._event(state, seq, row.event_at if row is not None else None, now)
             if name is None:
                 return
@@ -466,6 +479,7 @@ class BookService:
                 "duration_s": duration_s,
                 "percent": round(percent, 4),
                 "occurred_at": now.isoformat(),
+                **({"watched_s": round(watched, 1)} if watched is not None else {}),
             }
             await self.events.publish(
                 session,
