@@ -7,6 +7,7 @@ import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
 import { RarityTag, rarityIn } from "./Rarity";
+import { type Waiting, WaitingTag, waitingIn } from "./waiting";
 
 /**
  * Colour palettes (027): accent colours over any theme, chosen with swatches — only the member's own; how
@@ -22,11 +23,12 @@ export function PalettePicker() {
     retry: false,
     queryFn: async () =>
       (await api.GET("/api/v1/ui/notification-looks")).data as unknown as {
-        palettes?: Array<{ key: string; locked: boolean; rarity?: string | null }>;
+        palettes?: Array<{ key: string; locked: boolean; rarity?: string | null; waiting?: Waiting | null }>;
       },
   });
   const locked = (key: string) => Boolean(looks.data?.palettes?.find((p) => p.key === key)?.locked);
-  const owned = PALETTE_KEYS.filter((key) => !locked(key));
+  // #99: those won but waiting for a level show too, locked
+  const owned = PALETTE_KEYS.filter((key) => !locked(key) || waitingIn(looks.data?.palettes, key));
   return (
     <section className="looks appearance-card" aria-labelledby="palette-picker">
       <h3 id="palette-picker">{t("notifications:palette.title")}</h3>
@@ -36,11 +38,13 @@ export function PalettePicker() {
         {owned.map((key) => {
           const colors = paletteFor(key, scheme);
           const current = preferences.palette === key;
+          const waiting = waitingIn(looks.data?.palettes, key);
           return (
             <label
               key={key}
               className="palettes__item"
               data-current={current || undefined}
+              data-waiting={waiting ? "true" : undefined}
               data-rarity={rarityIn(looks.data?.palettes, key)}
             >
               <RarityTag rarity={rarityIn(looks.data?.palettes, key)} />
@@ -49,6 +53,7 @@ export function PalettePicker() {
                 name="palette"
                 value={key}
                 checked={current}
+                disabled={Boolean(waiting)}
                 onChange={() => setPreference("palette", key as PaletteKey)}
               />
               <span className="palettes__swatch" aria-hidden="true">
@@ -56,6 +61,7 @@ export function PalettePicker() {
                 <span style={{ background: colors?.accentAlt ?? "var(--color-accent-alt)" }} />
               </span>
               <span className="looks__name">{t(`notifications:palette.names.${key}`)}</span>
+              {waiting ? <WaitingTag waiting={waiting} /> : null}
             </label>
           );
         })}

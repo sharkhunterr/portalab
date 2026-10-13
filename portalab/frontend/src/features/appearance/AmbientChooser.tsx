@@ -8,6 +8,7 @@ import { AmbientLayer } from "../../design-system/themes/AmbientLayer";
 import { useT } from "../../i18n/hooks/useT";
 import { HdTag, isHdAmbient } from "./Rarity";
 import { WeatherPlace } from "./WeatherPlace";
+import { type Waiting, WaitingTag } from "./waiting";
 
 /**
  * #71: the ambiences a member may wear, as a plain list — no animation runs in it (dozens of live previews
@@ -19,6 +20,8 @@ export interface AmbientChoice {
   locked: boolean;
   rarity?: string | null;
   price?: number | null;
+  /** #99: won but not wearable yet — what it waits for */
+  waiting?: Waiting | null;
 }
 
 const RARITY_ORDER = ["legendary", "epic", "rare", "common"] as const;
@@ -53,7 +56,8 @@ export function AmbientChooser({
       const at = RARITY_ORDER.indexOf(rarity as (typeof RARITY_ORDER)[number]);
       return at < 0 ? RARITY_ORDER.length : at;
     };
-    const owned = choices.filter((c) => !c.locked).map((c) => c.key);
+    // #99: those won but waiting for a level show too, locked (they can still be previewed)
+    const owned = choices.filter((c) => !c.locked || c.waiting).map((c) => c.key);
     owned.sort((a, b) => rank(a) - rank(b) || name(a).localeCompare(name(b)));
     return ["theme", ...owned];
   }, [choices, byKey, name]);
@@ -104,7 +108,13 @@ export function AmbientChooser({
           const rarity = key === "theme" ? "theme" : rarityOf(choice);
           const active = current === key;
           return (
-            <li key={key} className="ambient-row" data-rarity={rarity} data-current={active || undefined}>
+            <li
+              key={key}
+              className="ambient-row"
+              data-rarity={rarity}
+              data-current={active || undefined}
+              data-waiting={choice?.waiting ? "true" : undefined}
+            >
               <span className="ambient-row__gem" aria-hidden="true">
                 <Icon name={key === "theme" ? "palette" : isHdAmbient(key) ? "gem" : "sparkle"} size={16} />
               </span>
@@ -124,7 +134,9 @@ export function AmbientChooser({
                   </span>
                 </span>
               </button>
-              {active ? (
+              {choice?.waiting ? (
+                <WaitingTag waiting={choice.waiting} />
+              ) : active ? (
                 <span className="ambient-row__active">
                   <Icon name="check" size={14} />
                   {t("notifications:universe.active")}
@@ -154,7 +166,9 @@ export function AmbientChooser({
         closeLabel={t("notifications:universe.close")}
         size="lg"
         footer={
-          open && current !== open ? (
+          opened?.waiting ? (
+            <WaitingTag waiting={opened.waiting} />
+          ) : open && current !== open ? (
             <Button
               onClick={() => {
                 apply(open);

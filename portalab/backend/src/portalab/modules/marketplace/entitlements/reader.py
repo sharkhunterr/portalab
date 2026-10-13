@@ -12,6 +12,22 @@ from portalab.modules.marketplace.activation.service import USABLE
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 
 
+def waits_for(conditions: Any) -> dict[str, int]:
+    """#99: what a locked item waits for — the highest level, the most Contribution its conditions ask."""
+    out: dict[str, int] = {}
+    for condition in conditions if isinstance(conditions, list) else []:
+        if not isinstance(condition, dict):
+            continue
+        for kind, key, name in (
+            ("min_level", "level", "level"),
+            ("min_contribution", "contribution", "contribution"),
+        ):
+            value = condition.get(key) if condition.get("kind") == kind else None
+            if isinstance(value, int):
+                out[name] = max(out.get(name, 0), value)
+    return out
+
+
 class Entitlements:
     def __init__(self, database: Database) -> None:
         self.database = database
@@ -131,6 +147,18 @@ class CosmeticsReader:
                 .where(Ownership.user_id == user_id, Ownership.state.in_(USABLE))
             )
             return frozenset(key for key in rows if key)
+
+    async def waiting(self, user_id: UUID, kind: str, field: str) -> dict[str, dict[str, int]]:
+        """#99: the choices a member won (a booster) but may not wear yet — their level, or Contribution, is
+        not reached: what each one waits for (``{"level": 7}``), to show them locked with the reason."""
+        async with self.database.session() as session:
+            rows = await session.execute(
+                self._choices(kind, field)
+                .add_columns(Ownership.conditions_snapshot)
+                .join(Ownership, Ownership.product_id == Product.id)
+                .where(Ownership.user_id == user_id, Ownership.state == "locked")
+            )
+            return {choice: waits_for(conditions) for choice, conditions in rows.all() if choice}
 
     async def details(self, kind: str, field: str) -> dict[str, dict[str, Any]]:
         """#71: for each choice sold, the product selling it: its key, rarity and price."""

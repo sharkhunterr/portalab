@@ -25,7 +25,7 @@ from portalab.core.db import Database
 from portalab.core.errors import ValidationFailed
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.activation.service import LIVE, USABLE
-from portalab.modules.marketplace.entitlements.reader import CosmeticsReader
+from portalab.modules.marketplace.entitlements.reader import CosmeticsReader, waits_for
 from portalab.modules.marketplace.models import Equipped, Ownership, Product, ProductVersion
 
 BACKDROP_REF = re.compile(r"^/[A-Za-z0-9_-]{1,64}\.(jpg|jpeg|png)$")
@@ -62,6 +62,17 @@ class ProfileLooks:
             owned |= await self.cosmetics.owned(user, "ambient", "ambient")
         return frozenset(sold - owned)
 
+    async def waiting(self, user: UUID, slot: str) -> dict[str, dict[str, int]]:
+        """#99: the designs of ``slot`` the member won but may not wear yet, and what each waits for."""
+        reader = getattr(self.cosmetics, "waiting", None)
+        if reader is None:
+            return {}
+        kind, field = PROFILE_SLOTS[slot]
+        result: dict[str, dict[str, int]] = await reader(user, kind, field)
+        if slot == "background":
+            result = {**await reader(user, "ambient", "ambient"), **result}
+        return result
+
     async def backdrop_unlocked(self, user: UUID) -> bool:
         sold = await self.cosmetics.sold("profile_backdrop", "feature")
         if not sold:
@@ -72,19 +83,29 @@ class ProfileLooks:
         """The titles or badges a member owns, as worn: key, label, icon, animated style."""
         async with self.database.session() as session:
             rows = await session.execute(
-                select(Product.key, ProductVersion.payload, Product.rarity)
+                select(
+                    Product.key,
+                    ProductVersion.payload,
+                    Product.rarity,
+                    Ownership.state,
+                    Ownership.conditions_snapshot,
+                )
                 .join(ProductVersion, ProductVersion.product_id == Product.id)
                 .join(Ownership, Ownership.product_id == Product.id)
                 .where(
                     ProductVersion.version == Product.current_version,
                     Product.type == product_type,
                     Ownership.user_id == user,
-                    Ownership.state.in_(USABLE),
+                    Ownership.state.in_((*USABLE, "locked")),
                 )
-                .distinct()
             )
+            found: dict[str, Any] = {}
+            for key, payload, rarity, state, conditions in rows.all():
+                # #99: one won but waiting for a level shows locked, with what it waits for
+                if key not in found or state != "locked":
+                    found[key] = (payload, rarity, waits_for(conditions) if state == "locked" else None)
             items = []
-            for key, payload, rarity in rows.all():
+            for key, (payload, rarity, waiting) in found.items():
                 style = str((payload or {}).get("style") or "none")
                 items.append(
                     {
@@ -93,6 +114,7 @@ class ProfileLooks:
                         "icon": (payload or {}).get("icon"),
                         "style": style if style in BADGE_STYLES else "none",
                         "rarity": rarity,  # #79
+                        **({"waiting": waiting} if waiting else {}),
                     }
                 )
         return sorted(items, key=lambda item: item["label"])
@@ -125,9 +147,18 @@ class ProfileLooks:
     async def catalog(self, user: UUID) -> dict[str, Any]:
         locked = {slot: await self.locked(user, slot) for slot in CHOICES}
         sold = {slot: await self._sold(slot) for slot in CHOICES}
+        waiting = {slot: await self.waiting(user, slot) for slot in CHOICES}
 
         def listed(slot: str, keys: tuple[str, ...]) -> list[dict[str, Any]]:
-            return [{"key": k, "locked": k in locked[slot], **sold[slot].get(k, {})} for k in keys]
+            return [
+                {
+                    "key": k,
+                    "locked": k in locked[slot],
+                    **sold[slot].get(k, {}),
+                    **({"waiting": waiting[slot][k]} if k in waiting[slot] else {}),
+                }
+                for k in keys
+            ]
 
         return {
             "banners": listed("banner", PROFILE_BANNERS),

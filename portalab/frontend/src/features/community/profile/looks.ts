@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "../../../api/client";
+import type { Waiting } from "../../appearance/waiting";
 
 /**
  * Profile looks (027): the banner, the avatar frame and the film backdrop a member wears — the designs
@@ -11,6 +12,8 @@ export interface LookChoice {
   locked: boolean;
   /** #72: the rarity of the product selling it (none: free) */
   rarity?: string | null;
+  /** #99: won but not wearable yet — what it waits for (a level, Contribution) */
+  waiting?: Waiting | null;
 }
 
 export interface Backdrop {
@@ -27,6 +30,8 @@ export interface WornItem {
   style?: string | null;
   /** #79: the rarity of the product it comes from */
   rarity?: string | null;
+  /** #99: won but not wearable yet — what it waits for */
+  waiting?: Waiting | null;
 }
 
 export interface Equipped {

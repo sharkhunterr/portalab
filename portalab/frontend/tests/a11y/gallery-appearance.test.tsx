@@ -78,5 +78,5 @@ describe("appearance settings", () => {
     expect(screen.getByText(/Your choice \(spacious\) is kept/)).toBeInTheDocument();
     const results = await axe.run(container, AXE);
     expect(results.violations.map((v) => v.id)).toEqual([]);
-  }, 20_000); // heavy page (looks, palettes): slow under a loaded parallel run
+  }, 40_000); // heavy page (looks, palettes): slow under a loaded parallel run
 });

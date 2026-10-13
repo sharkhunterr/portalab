@@ -576,3 +576,32 @@
   min-width: 0;
   max-width: 100%;
 }
+
+/* #99: a look won but waiting for a level — shown locked, with what it waits for */
+[data-waiting] {
+  opacity: 0.72;
+}
+[data-waiting] :is(img, svg, .looks__preview) {
+  filter: grayscale(0.4);
+}
+.look-waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: help;
+}
+.look-waiting__why {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-inline-size: 16rem;
+  margin: 0;
+}

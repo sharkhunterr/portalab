@@ -12,6 +12,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { type AmbientChoice, AmbientChooser } from "./AmbientChooser";
 import { InShop } from "./InShop";
 import { RarityTag, rarityIn } from "./Rarity";
+import { type Waiting, WaitingTag, waitingIn } from "./waiting";
 
 /**
  * Ambient animation and celebration (027): the animated layer behind the portal (snow, code rain, bats,
@@ -23,6 +24,7 @@ interface Choice {
   key: string;
   locked: boolean;
   rarity?: string | null;
+  waiting?: Waiting | null;
 }
 
 export function UniverseLooks() {
@@ -49,9 +51,14 @@ export function UniverseLooks() {
     locked(catalog.data?.celebrations, effective.theme.motion?.celebration ?? "sparkle");
   const tryIt = () => celebrate({ kind: "reward", text: "+40 XP" });
   const celebrations = (["theme", ...CELEBRATION_KEYS] as const).filter(
-    (key) => key === "theme" || !locked(catalog.data?.celebrations, key),
+    // #99: those won but waiting for a level show too, locked
+    (key) =>
+      key === "theme" ||
+      !locked(catalog.data?.celebrations, key) ||
+      waitingIn(catalog.data?.celebrations, key),
   );
-  const lockedCount = (list: Choice[] | undefined) => (list ?? []).filter((c) => c.locked).length;
+  const lockedCount = (list: Choice[] | undefined) =>
+    (list ?? []).filter((c) => c.locked && !c.waiting).length;
   const renderer = useMemo(() => webglInfo(), []); // #68: how the premium ambiences are drawn here
   return (
     <section className="looks appearance-card" aria-labelledby="universe-looks">
@@ -74,11 +81,13 @@ export function UniverseLooks() {
         <legend>{t("notifications:universe.celebration")}</legend>
         {celebrations.map((key) => {
           const current = preferences.celebration === key;
+          const waiting = waitingIn(catalog.data?.celebrations, key);
           return (
             <label
               key={key}
               className="looks__chip"
               data-current={current || undefined}
+              data-waiting={waiting ? "true" : undefined}
               data-rarity={rarityIn(catalog.data?.celebrations, key)}
             >
               <input
@@ -86,6 +95,7 @@ export function UniverseLooks() {
                 name="celebration"
                 value={key}
                 checked={current}
+                disabled={Boolean(waiting)}
                 onChange={() => {
                   setPreference("celebration", key as CelebrationKey | "theme");
                   setTimeout(tryIt, 80);
@@ -96,6 +106,7 @@ export function UniverseLooks() {
                 ? t("notifications:universe.followTheme")
                 : t(`notifications:universe.celebrations.${key}`)}
               <RarityTag rarity={rarityIn(catalog.data?.celebrations, key)} />
+              {waiting ? <WaitingTag waiting={waiting} /> : null}
             </label>
           );
         })}

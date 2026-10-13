@@ -247,3 +247,26 @@ async def test_discovery_opens_three_times(mk: MkHarness, client: AsyncClient) -
     history = (await client.get("/api/v1/marketplace/boosters/openings")).json()
     back = sum(h["refund"] for h in history)
     assert len(history) == 3 and await mk.balance("ursula") == 1000 - 3 * 120 + back
+
+
+async def test_a_look_waiting_for_its_level_is_listed_locked_with_its_level(
+    mk: MkHarness, client: AsyncClient
+) -> None:
+    """#99 — a look won below its level is the member's, yet not wearable: the looks' catalogues list it
+    locked with what it waits for (before, it was simply missing from the member's looks)."""
+    level = [{"kind": "min_level", "level": 7}]
+    await look(mk, "level_neon", "common", kind="level_badge", payload={"style": "neon"}, conditions=level)
+    await look(mk, "night_owl", "common", conditions=level)
+    await booster(mk, "booster_looks", 100, cards=2)
+    await mk.coins("ursula", 1000)
+    await login(client, "ursula")
+    opened = (await client.post("/api/v1/marketplace/boosters/booster_looks/open")).json()
+    assert {c["product"]["key"] for c in opened["cards"]} == {"level_neon", "night_owl"}
+    assert all(c["locked"] for c in opened["cards"])
+
+    user = mk.people["ursula"]
+    levels = {c["key"]: c for c in (await mk.module.looks.catalog(user))["levels"]}
+    assert levels["neon"]["locked"] is True and levels["neon"]["waiting"] == {"level": 7}
+    assert "waiting" not in levels["classic"]
+    [badge] = await mk.module.looks.owned_items(user, "badge")
+    assert badge["key"] == "night_owl" and badge["waiting"] == {"level": 7}

@@ -6,6 +6,7 @@ import { useEquipLook, useProfileLooks } from "../community/profile/looks";
 import { useProgression } from "../gamification/api";
 import { InShop } from "./InShop";
 import { HdTag, isHdLevelBadge, RarityTag, rarityIn } from "./Rarity";
+import { WaitingTag, waitingIn } from "./waiting";
 
 /**
  * The level (XP) badge's look (027): worn on the profile — everyone sees it, in the header, the navigation
@@ -21,7 +22,8 @@ export function LevelBadgePicker() {
   const progression = useProgression();
   const level = progression.data?.level ?? 12;
   const locked = (key: string) => Boolean(looks.data?.levels?.find((p) => p.key === key)?.locked);
-  const owned = LEVEL_BADGES.filter((key) => !locked(key));
+  // #99: those won but waiting for a level show too, locked, with what they wait for
+  const owned = LEVEL_BADGES.filter((key) => !locked(key) || waitingIn(looks.data?.levels, key));
   const worn = looks.data?.equipped?.level ?? "classic";
   return (
     <section className="looks appearance-card" aria-labelledby="level-badge-picker">
@@ -32,12 +34,14 @@ export function LevelBadgePicker() {
         {owned.map((key) => {
           const current = worn === key;
           const name = t(`notifications:levelBadge.names.${key}`);
+          const waiting = waitingIn(looks.data?.levels, key);
           return (
             <label
               key={key}
               className="level-badges__item"
               data-current={current || undefined}
               data-rarity={rarityIn(looks.data?.levels, key)}
+              data-waiting={waiting ? "true" : undefined}
             >
               <RarityTag rarity={rarityIn(looks.data?.levels, key)} />
               <input
@@ -45,7 +49,7 @@ export function LevelBadgePicker() {
                 name="level-badge"
                 value={key}
                 checked={current}
-                disabled={equip.isPending}
+                disabled={equip.isPending || Boolean(waiting)}
                 onChange={() =>
                   equip.mutate(
                     { slot: "level", value: key === "classic" ? null : key },
@@ -57,6 +61,7 @@ export function LevelBadgePicker() {
               <span className="looks__name">
                 {name}
                 {isHdLevelBadge(key) ? <HdTag /> : null}
+                {waiting ? <WaitingTag waiting={waiting} /> : null}
               </span>
             </label>
           );

@@ -17,6 +17,7 @@ import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
 import { RarityTag, rarityIn } from "./Rarity";
+import { type Waiting, WaitingTag, waitingIn } from "./waiting";
 import "./notification-looks.css";
 
 /**
@@ -28,6 +29,7 @@ interface Choice {
   key: string;
   locked: boolean;
   rarity?: string | null;
+  waiting?: Waiting | null;
 }
 
 function useLooks() {
@@ -66,12 +68,18 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
       href: "/progression",
       linkLabel: t("notifications:open"),
     });
-  const lockedCount = (list: Choice[] | undefined) => (list ?? []).filter((c) => c.locked).length;
+  const lockedCount = (list: Choice[] | undefined) =>
+    (list ?? []).filter((c) => c.locked && !c.waiting).length;
+  // #99: those won but waiting for a level show too, locked
   const styles = (["theme", ...NOTIFICATION_STYLES] as const).filter(
-    (style) => style === "theme" || !locked(looks.data?.styles, style),
+    (style) =>
+      style === "theme" || !locked(looks.data?.styles, style) || waitingIn(looks.data?.styles, style),
   );
   const animations = (["theme", ...NOTIFICATION_ANIMATIONS] as const).filter(
-    (animation) => animation === "theme" || !locked(looks.data?.animations, animation),
+    (animation) =>
+      animation === "theme" ||
+      !locked(looks.data?.animations, animation) ||
+      waitingIn(looks.data?.animations, animation),
   );
   return (
     <section className="looks appearance-card" aria-labelledby="notification-looks">
@@ -88,11 +96,13 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
         <legend>{t("notifications:looks.style")}</legend>
         {styles.map((style) => {
           const current = preferences.notificationStyle === style;
+          const waiting = waitingIn(looks.data?.styles, style);
           return (
             <label
               key={style}
               className="looks__style"
               data-current={current || undefined}
+              data-waiting={waiting ? "true" : undefined}
               data-rarity={rarityIn(looks.data?.styles, style)}
             >
               <RarityTag rarity={rarityIn(looks.data?.styles, style)} />
@@ -101,6 +111,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
                 name="notification-style"
                 value={style}
                 checked={current}
+                disabled={Boolean(waiting)}
                 onChange={() => setPreference("notificationStyle", style as NotificationStyle | "theme")}
               />
               <span
@@ -134,6 +145,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
                   ? t("notifications:universe.followTheme")
                   : t(`notifications:looks.styles.${style}`)}
               </span>
+              {waiting ? <WaitingTag waiting={waiting} /> : null}
             </label>
           );
         })}
@@ -143,11 +155,13 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
         <legend>{t("notifications:looks.animation")}</legend>
         {animations.map((animation) => {
           const current = preferences.notificationAnimation === animation;
+          const waiting = waitingIn(looks.data?.animations, animation);
           return (
             <label
               key={animation}
               className="looks__chip"
               data-current={current || undefined}
+              data-waiting={waiting ? "true" : undefined}
               data-rarity={rarityIn(looks.data?.animations, animation)}
             >
               <input
@@ -155,6 +169,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
                 name="notification-animation"
                 value={animation}
                 checked={current}
+                disabled={Boolean(waiting)}
                 onChange={() => {
                   setPreference("notificationAnimation", animation as NotificationAnimation | "theme");
                   setTimeout(tryIt, 50); // see it right away
@@ -165,6 +180,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
                 ? t("notifications:universe.followTheme")
                 : t(`notifications:looks.animations.${animation}`)}
               <RarityTag rarity={rarityIn(looks.data?.animations, animation)} />
+              {waiting ? <WaitingTag waiting={waiting} /> : null}
             </label>
           );
         })}

@@ -55,6 +55,18 @@ class NotificationLooks:
         owned = await entitlements.owned(user_id, kind, field) if user_id else frozenset()
         return frozenset(sold - owned - free)
 
+    async def waiting(self, user_id: UUID | None, kind: str, field: str) -> dict[str, dict[str, int]]:
+        """#99: the choices the user won (a booster) but may not pick yet, and what each waits for."""
+        entitlements = self._entitlements()
+        reader = getattr(entitlements, "waiting", None)
+        if reader is None or user_id is None:
+            return {}
+        try:
+            result: dict[str, dict[str, int]] = await reader(user_id, kind, field)
+        except Exception:
+            return {}
+        return result
+
     async def catalog(self, user_id: UUID | None) -> dict[str, Any]:
         styles = await self.locked("ui.notificationStyle", user_id)
         animations = await self.locked("ui.notificationAnimation", user_id)
@@ -67,7 +79,16 @@ class NotificationLooks:
         async def listed(setting: str, keys: tuple[str, ...], locked: frozenset[str]) -> list[dict[str, Any]]:
             kind, field, _ = KINDS[setting]
             sold = await self.details(kind, field)
-            return [{"key": k, "locked": k in locked, **sold.get(k, {})} for k in keys]
+            waiting = await self.waiting(user_id, kind, field)  # #99: won, waiting for a level
+            return [
+                {
+                    "key": k,
+                    "locked": k in locked,
+                    **sold.get(k, {}),
+                    **({"waiting": waiting[k]} if k in waiting else {}),
+                }
+                for k in keys
+            ]
 
         return {
             "styles": await listed("ui.notificationStyle", STYLES, styles),

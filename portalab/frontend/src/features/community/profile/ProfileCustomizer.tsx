@@ -12,6 +12,7 @@ import { FX_FRAMES, FX_NAMES, FX_STYLES } from "../../../design-system/themes/pr
 import { useT } from "../../../i18n/hooks/useT";
 import { InShop } from "../../appearance/InShop";
 import { HdTag, isHdAmbient, isHdLevelBadge, RarityTag } from "../../appearance/Rarity";
+import { WaitingTag } from "../../appearance/waiting";
 import { useProgression } from "../../gamification/api";
 import { imageUrl } from "../../media/api";
 import { backdropUrl, type LookChoice, useEquipLook, useProfileLooks, type WornItem } from "./looks";
@@ -65,13 +66,37 @@ function Choices({
   const equip = useEquipLook();
   const notify = useNotify();
   // #79: only what the member owns is offered; the rest is counted in one line, toward the shop
-  const owned = choices.filter((choice) => !choice.locked);
+  // #99: those won but waiting for a level show too, locked, with what they wait for
+  const owned = choices.filter((choice) => !choice.locked || choice.waiting);
   const locked = choices.length - owned.length;
   return (
     <>
       <div className="looks-grid" data-slot={slot}>
         {owned.map((choice) => {
           const selected = (current ?? NONE[slot] ?? null) === choice.key;
+          if (choice.waiting) {
+            return (
+              <div
+                key={choice.key}
+                className="looks-grid__item"
+                data-rarity={choice.rarity ?? undefined}
+                data-waiting="true"
+              >
+                <RarityTag rarity={choice.rarity} />
+                <div className="looks-grid__locked">
+                  {render(choice.key)}
+                  <span className="looks-grid__name">
+                    {slot === "background"
+                      ? t(`notifications:universe.ambients.${choice.key}`)
+                      : slot === "level"
+                        ? t(`notifications:levelBadge.names.${choice.key}`)
+                        : t(`community:looks.${slot}.${choice.key}`)}
+                  </span>
+                  <WaitingTag waiting={choice.waiting} />
+                </div>
+              </div>
+            );
+          }
           return (
             <div
               key={choice.key}
@@ -251,18 +276,26 @@ function TitlePicker({
   return (
     <>
       <div className="looks-list">
-        {[null, ...titles].map((item) => (
-          <button
-            key={item?.key ?? "none"}
-            type="button"
-            aria-pressed={(current ?? null) === (item?.key ?? null)}
-            disabled={equip.isPending}
-            onClick={() => equip.mutate({ slot: "title", value: item?.key ?? null })}
-          >
-            {item ? <WornBadge item={item} kind="title" /> : t("community:looks.noTitle")}
-            {item ? <ItemTags item={item} /> : null}
-          </button>
-        ))}
+        {[null, ...titles].map((item) =>
+          item?.waiting ? (
+            <div key={item.key} className="looks-list__locked" data-waiting="true">
+              <WornBadge item={item} kind="title" />
+              <ItemTags item={item} />
+              <WaitingTag waiting={item.waiting} />
+            </div>
+          ) : (
+            <button
+              key={item?.key ?? "none"}
+              type="button"
+              aria-pressed={(current ?? null) === (item?.key ?? null)}
+              disabled={equip.isPending}
+              onClick={() => equip.mutate({ slot: "title", value: item?.key ?? null })}
+            >
+              {item ? <WornBadge item={item} kind="title" /> : t("community:looks.noTitle")}
+              {item ? <ItemTags item={item} /> : null}
+            </button>
+          ),
+        )}
       </div>
       <InShop count={inShop} type="title" />
     </>
@@ -282,18 +315,26 @@ function BadgePicker({ badges, current, inShop }: { badges: WornItem[]; current:
     <>
       <p className="admin-muted">{t("community:looks.badgesHint")}</p>
       <div className="looks-list">
-        {badges.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            aria-pressed={current.includes(item.key)}
-            disabled={equip.isPending}
-            onClick={() => toggle(item.key)}
-          >
-            <WornBadge item={item} kind="badge" />
-            <ItemTags item={item} />
-          </button>
-        ))}
+        {badges.map((item) =>
+          item.waiting ? (
+            <div key={item.key} className="looks-list__locked" data-waiting="true">
+              <WornBadge item={item} kind="badge" />
+              <ItemTags item={item} />
+              <WaitingTag waiting={item.waiting} />
+            </div>
+          ) : (
+            <button
+              key={item.key}
+              type="button"
+              aria-pressed={current.includes(item.key)}
+              disabled={equip.isPending}
+              onClick={() => toggle(item.key)}
+            >
+              <WornBadge item={item} kind="badge" />
+              <ItemTags item={item} />
+            </button>
+          ),
+        )}
       </div>
       <InShop count={inShop} type="badge" />
     </>

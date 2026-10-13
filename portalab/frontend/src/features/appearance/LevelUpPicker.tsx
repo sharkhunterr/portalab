@@ -10,6 +10,7 @@ import { useProgression } from "../gamification/api";
 import { showLevelUp } from "../gamification/levelup/LevelUpMoment";
 import { InShop } from "./InShop";
 import { RarityTag, rarityIn } from "./Rarity";
+import { type Waiting, WaitingTag, waitingIn } from "./waiting";
 
 /**
  * How a level-up is shown (027): the classic moment and those the member owns — each can be tried; how
@@ -25,11 +26,12 @@ export function LevelUpPicker() {
     retry: false,
     queryFn: async () =>
       (await api.GET("/api/v1/ui/notification-looks")).data as unknown as {
-        level_ups?: Array<{ key: string; locked: boolean; rarity?: string | null }>;
+        level_ups?: Array<{ key: string; locked: boolean; rarity?: string | null; waiting?: Waiting | null }>;
       },
   });
   const locked = (key: string) => Boolean(catalog.data?.level_ups?.find((p) => p.key === key)?.locked);
-  const owned = LEVEL_UPS.filter((key) => !locked(key));
+  // #99: those won but waiting for a level show too, locked
+  const owned = LEVEL_UPS.filter((key) => !locked(key) || waitingIn(catalog.data?.level_ups, key));
   return (
     <section className="looks appearance-card" aria-labelledby="level-up-picker">
       <h3 id="level-up-picker">{t("notifications:levelUp.title")}</h3>
@@ -42,12 +44,14 @@ export function LevelUpPicker() {
             className="looks__chip"
             data-current={preferences.levelUp === key || undefined}
             data-rarity={rarityIn(catalog.data?.level_ups, key)}
+            data-waiting={waitingIn(catalog.data?.level_ups, key) ? "true" : undefined}
           >
             <input
               type="radio"
               name="level-up"
               value={key}
               checked={preferences.levelUp === key}
+              disabled={Boolean(waitingIn(catalog.data?.level_ups, key))}
               onChange={() => setPreference("levelUp", key as LevelUpLook | "theme")}
             />
             <Icon name="trophy" size={14} />
@@ -55,6 +59,10 @@ export function LevelUpPicker() {
               ? t("notifications:universe.followTheme")
               : t(`notifications:levelUp.names.${key}`)}
             <RarityTag rarity={rarityIn(catalog.data?.level_ups, key)} />
+            {(() => {
+              const waiting = waitingIn(catalog.data?.level_ups, key);
+              return waiting ? <WaitingTag waiting={waiting} /> : null;
+            })()}
           </label>
         ))}
       </fieldset>
