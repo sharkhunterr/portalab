@@ -171,6 +171,56 @@ ACHIEVEMENTS |= {
     )
 }  # fmt: skip
 
+
+# #103: what the portal added since — its own player and reader, casting to a TV, books and audiobooks,
+# music, live TV, boosters and requests that come true (a filter keeps to the right kind of play)
+def _where(event: str, count: int, **fields: Any) -> list[dict[str, Any]]:
+    filters = [{"field": key, "op": "eq", "value": value} for key, value in fields.items()]
+    return [{"kind": "event_count", "event_type": event, "filter": filters, "count": count}]
+
+
+FINISHED = "media.playback_finished"
+ACHIEVEMENTS |= {
+    key: {"category": category, "label": label, "description": about, "icon": icon, "criteria": criteria,
+          "rewards": rewards}
+    for key, category, label, about, icon, criteria, rewards in (
+        ("private_screening", "service_usage", "Private screening",
+         "Watch a film to the end in the portal's player.", "film",
+         _where(FINISHED, 1, kind="movie", via="portal"), [{"value": "xp", "amount": 20}]),
+        ("home_cinema", "service_usage", "Home cinema",
+         "Finish ten films or episodes in the portal's player.", "armchair",
+         _where(FINISHED, 10, via="portal"), [{"value": "coins", "amount": 40}]),
+        ("big_screen", "service_usage", "Big screen", "Cast a film or an episode to a TV from the portal.",
+         "cast", _count("media.cast_started", 1), [{"value": "xp", "amount": 20}]),
+        ("projectionist", "service_usage", "Projectionist", "Cast to a TV twenty-five times.", "tv",
+         _count("media.cast_started", 25), [{"value": "coins", "amount": 60}]),
+        ("page_turner", "service_usage", "Page turner", "Finish a book.", "book-open",
+         _where(FINISHED, 1, kind="book"), [{"value": "xp", "amount": 20}]),
+        ("reading_nook", "service_usage", "Reading nook", "Read a book to the end in the portal's reader.",
+         "glasses", _where(FINISHED, 1, kind="book", via="portal"), [{"value": "xp", "amount": 15}]),
+        ("bookworm", "service_usage", "Bookworm", "Finish ten books.", "library",
+         _where(FINISHED, 10, kind="book"),
+         [{"value": "coins", "amount": 60}, {"value": "contribution", "amount": 1}]),
+        ("all_ears", "service_usage", "All ears", "Listen to an audiobook to the end.", "headphones",
+         _where(FINISHED, 1, kind="audiobook"), [{"value": "xp", "amount": 20}]),
+        ("story_time", "service_usage", "Story time", "Listen to ten audiobooks to the end.", "mic",
+         _where(FINISHED, 10, kind="audiobook"), [{"value": "coins", "amount": 60}]),
+        ("music_lover", "service_usage", "Music lover", "Listen to fifty songs.", "music",
+         _where(FINISHED, 50, kind="track"), [{"value": "xp", "amount": 30}]),
+        ("channel_surfer", "service_usage", "Channel surfer", "Tune in to live TV.", "radio",
+         _where("media.playback_started", 1, kind="live"), [{"value": "xp", "amount": 10}]),
+        ("wish_granted", "service_usage", "Wish granted", "One of your requests becomes available.",
+         "sparkles", _count("media.request_available", 1),
+         [{"value": "xp", "amount": 15}, {"value": "contribution", "amount": 1}]),
+        ("surprise_pack", "purchase", "Surprise pack", "Open a booster.", "package",
+         _count("marketplace.booster_opened", 1), [{"value": "xp", "amount": 15}]),
+        ("pack_addict", "purchase", "Pack addict", "Open twenty boosters.", "gift",
+         _count("marketplace.booster_opened", 20), [{"value": "coins", "amount": 50}]),
+        ("lucky_hand", "purchase", "Lucky hand", "Draw a legendary card from a booster.", "dices",
+         _where("marketplace.booster_opened", 1, best="legendary"), [{"value": "coins", "amount": 75}]),
+    )
+}  # fmt: skip
+
 # 027: what some achievements unlock — cosmetics in their spirit, most of them exclusive (out of sale)
 ACHIEVEMENTS["completionist"] = {
     "category": "purchase",
@@ -207,6 +257,17 @@ UNLOCKS: dict[str, list[dict[str, str]]] = {
         _unlock("badge_completionist", "badge", "The Collector"),
         _unlock("title_completionist", "title", "The Collector"),
     ],
+    # #103: exclusive looks and sealed boosters (each its own booster: one is offered only once)
+    "private_screening": [_unlock("title_front_row", "title", "Front row")],
+    "home_cinema": [_unlock("booster_reserve", "booster", "Reserve booster")],
+    "big_screen": [_unlock("badge_big_screen", "badge", "Big screen")],
+    "projectionist": [_unlock("title_projectionist", "title", "Projectionist")],
+    "bookworm": [_unlock("badge_bookworm", "badge", "Bookworm")],
+    "story_time": [_unlock("booster_cosmos", "booster", "Cosmos booster")],
+    "music_lover": [_unlock("title_music_lover", "title", "Music lover")],
+    "surprise_pack": [_unlock("booster_discovery", "booster", "Discovery booster")],
+    "pack_addict": [_unlock("booster_prestige", "booster", "Prestige HD booster")],
+    "lucky_hand": [_unlock("badge_lucky_hand", "badge", "Lucky hand")],
 }  # fmt: skip
 for key, unlocks in UNLOCKS.items():
     ACHIEVEMENTS[key] = {**ACHIEVEMENTS[key], "unlocks": unlocks}

@@ -34,6 +34,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, Forbidden, NotFound, PortalError, Unavailable
+from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.models import SourceItem, UserLink
 from portalab.modules.media.player.subtitles import SubtitleFeeds
@@ -51,6 +52,8 @@ PLAYABLE = ("movie", "episode", "series", "season")
 STATES = ("playing", "paused", "buffering", "stopped")
 TIMEOUT_S = 30.0
 SEGMENT_TIMEOUT_S = 90.0
+CREDITS_TIMEOUT_S = 5.0  # #101: asked as a play ends — never holds it long
+CREDITS_REMEMBERED = 2000
 
 
 class PlayerOff(Forbidden):
@@ -121,14 +124,17 @@ class PlayerService:
         config: Callable[[], MediaConfig],
         key: bytes,
         *,
+        events: EventPublisher | None = None,
         clock: Clock | None = None,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
         self.config = config
         self.key = key
+        self.events = events
         self.clock = clock
         self.feeds = SubtitleFeeds()
+        self.credits: dict[UUID, float | None] = {}  # #101: where each title's end credits begin
 
     # --- where and as whom --------------------------------------------------------------------------------
     def _providers(self) -> dict[str, tuple[Any, str | None]]:
@@ -198,6 +204,42 @@ class PlayerService:
             raise PlayerFailed("This media server is not available.")
         return provider[0].channel(account)
 
+    async def credits_start(self, object_id: UUID) -> float | None:
+        """#101: where a film's or an episode's end credits begin, as its media server marks them (``None``
+        when it does not, or does not answer) — remembered, it is asked once per title."""
+        if object_id in self.credits:
+            return self.credits[object_id]
+        providers = self._providers()
+        if not providers:
+            return None
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(SourceItem.service_id, SourceItem.external_id).where(
+                        SourceItem.object_id == object_id,
+                        SourceItem.active.is_(True),
+                        SourceItem.kind.in_(("movie", "episode")),
+                    )
+                )
+            ).all()
+        source = next((r for r in rows if str(r.service_id) in providers), None)
+        if source is None:
+            return None
+        try:
+            item: PlayableItem = await asyncio.wait_for(
+                self._channel(source.service_id, None).playable(source.external_id), timeout=CREDITS_TIMEOUT_S
+            )
+        except Exception:
+            return None  # not remembered: asked again next time
+        duration = item.duration_s or 0.0
+        # the end credits: the first credits marker past the middle (an opening one does not end anything)
+        starts = [m.start_s for m in item.markers if m.kind == "credits" and m.start_s >= duration / 2]
+        found = min(starts) if starts else None
+        if len(self.credits) >= CREDITS_REMEMBERED:
+            self.credits.pop(next(iter(self.credits)))
+        self.credits[object_id] = found
+        return found
+
     def qualities(self) -> list[str]:
         keys = list(QUALITIES)
         cap = self.config().player_max_quality
@@ -257,7 +299,28 @@ class PlayerService:
         if remote:
             expires = int(utc_now(self.clock).timestamp()) + REMOTE_LIFETIME_S
             remote_ticket = sign(remote_key(self.key), replace(ticket, expires=expires))
+            await self._cast(user, object_id, source.kind, started.session)
         return sign(self.key, ticket), remote_ticket, started
+
+    async def _cast(self, user: UUID, object_id: UUID, kind: str, session: str) -> None:
+        """#103: a title sent to a casting device — an event of the member's (their achievements)."""
+        if self.events is None:
+            return
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await self.events.publish(
+                uow.session,
+                "media.cast_started",
+                {
+                    "object": str(object_id),
+                    "kind": "movie" if kind == "movie" else "episode",
+                    "session": session[:64],
+                },
+                occurred_at=now,
+                subject=SubjectRef("user", str(user)),
+                source="media",
+                dedup_key=f"media.cast_started:{session[:64]}",
+            )
 
     async def continuing(self, user: UUID, limit: int = 12) -> Continuing:
         """What the member is in the middle of, as each media server they are linked to keeps it (Plex's

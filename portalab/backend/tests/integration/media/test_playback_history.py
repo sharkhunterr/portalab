@@ -11,7 +11,8 @@ import pytest
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from portalab.capabilities.media.testkit import library_record
+from portalab.capabilities.media import PORTAL_PLAYER, STREAMING, StreamMarker
+from portalab.capabilities.media.testkit import FakeStreaming, library_record
 from portalab.core.time import FixedClock
 from tests.integration.media.conftest import MediaHarness, users
 
@@ -82,6 +83,36 @@ async def test_playback_lifecycle(app: FastAPI, media: MediaHarness, clock: Fixe
             await session.execute(text("SELECT count(*) FROM media.playback_sessions WHERE user_id IS NULL"))
         ).scalar_one()
     assert unlinked == 1
+
+
+async def test_a_film_is_finished_at_its_end_credits(app: FastAPI, media: MediaHarness) -> None:
+    """#101: where the media server marks the end credits, a film stopped before them is not finished —
+    even past the 90 % threshold — and one stopped as they begin is."""
+    people = await users(app, media, "lea")
+    plex = media.service(1, "plex")
+    await media.module.library.upsert([library_record("m1", title="Film", duration_s=6000)], plex)
+    media.provide(STREAMING, plex, FakeStreaming()).markers = (
+        StreamMarker(kind="credits", start_s=5800.0, end_s=5990.0),
+    )
+    link = await media.module.links.claim(people["lea"], plex.service_id, "lea")
+    await media.module.links.verify(None, link.id, None)
+    fake = media.playback(plex)
+    for key, at in (("early", 5500), ("credits", 5780)):  # 91.7 %, then 20 s before the credits
+        device = PORTAL_PLAYER if key == "credits" else "TV"  # #103: the second one in the portal's player
+        fake.play(
+            key, external_user_id="lea", item_external_id="m1", kind="movie", duration_s=6000, device=device
+        )
+        await media.module.poller.poll(plex.service_id, fake)
+        fake.play(key, position_s=at)
+        await media.module.poller.poll(plex.service_id, fake)
+        fake.stop(key)
+        await media.module.poller.poll(plex.service_id, fake)
+    ends = [
+        (k, p.get("via"))
+        for k, p, _ in await media.events("media.playback")
+        if k in ("media.playback_finished", "media.playback_abandoned")
+    ]
+    assert ends == [("media.playback_abandoned", None), ("media.playback_finished", "portal")]
 
 
 async def test_history_projection(app: FastAPI, media: MediaHarness, clock: FixedClock) -> None:

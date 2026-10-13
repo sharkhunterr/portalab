@@ -26,6 +26,7 @@ from typing import Any
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import ServiceHandle
 from portalab.capabilities.media import (
+    PORTAL_PLAYER,
     QUALITIES,
     PlayableItem,
     ResumePoint,
@@ -321,8 +322,8 @@ class PlexChannel:
             "X-Plex-Product": "Portalab",
             "X-Plex-Version": "1.0",
             "X-Plex-Platform": "Chrome",
-            "X-Plex-Device": "Portalab",
-            "X-Plex-Device-Name": "Portalab",
+            "X-Plex-Device": PORTAL_PLAYER,
+            "X-Plex-Device-Name": PORTAL_PLAYER,
         }
         if session:
             headers["X-Plex-Session-Identifier"] = session

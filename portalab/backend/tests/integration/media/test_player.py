@@ -4,12 +4,13 @@ a signed ticket only its member may use; playlists and segments are relayed; tex
 the position is reported; the quality is capped by the settings; the player can be turned off."""
 
 import asyncio
+from uuid import UUID, uuid4
 
 import httpx
 import pytest
 from fastapi import FastAPI
 
-from portalab.capabilities.media import STREAMING
+from portalab.capabilities.media import STREAMING, StreamMarker
 from portalab.capabilities.media.testkit import FakeStreaming, library_record
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
@@ -87,6 +88,10 @@ async def test_play_as_the_members_account(
         json={"item": "m1", "remote": True, "subtitle": "s1", "burn": True},
     )
     remote_path = casting.json()["remote_playlist"]
+    # #103: a title cast to a TV is Zoé's event (her achievements); playing in the browser is not
+    [cast] = await media.events("media.cast_started")
+    assert cast[1] == {"object": object_id, "kind": "movie", "session": cast[1]["session"]}
+    assert cast[2] == str(people["zoe"])
     assert remote_path.startswith("/api/v1/media/remote/") and casting.json()["subtitles"] == "burn"
     async with httpx.AsyncClient(transport=client._transport, base_url="https://portal.test") as device:
         fetched = await device.get(remote_path)
@@ -234,3 +239,25 @@ async def test_continue_follows_the_servers_own_continue_watching(
     fake.resume.clear()  # « Back to zero » on Plex
     shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
     assert [c["title"] for c in shelf] == ["A book"]
+
+
+async def test_where_the_end_credits_begin(app: FastAPI, media: MediaHarness) -> None:
+    """#101: a play is finished at its end credits — the first credits marker past the middle (an opening
+    one does not end anything), asked once per title; none when the server marks none."""
+    object_id, fake = await _film(media)
+    fake.markers = (
+        StreamMarker(kind="credits", start_s=30.0, end_s=90.0),  # opening credits
+        StreamMarker(kind="intro", start_s=100.0, end_s=160.0),
+        StreamMarker(kind="credits", start_s=5800.0, end_s=5990.0),
+        StreamMarker(kind="credits", start_s=5600.0, end_s=5780.0),
+    )
+    film = UUID(object_id)
+    assert await media.module.credits_start(film) == 5600.0
+    asked = len(fake.calls)
+    assert await media.module.credits_start(film) == 5600.0 and len(fake.calls) == asked  # remembered
+    assert fake.calls[-1] == (None, "playable", "m1")  # the service's own account
+
+    media.module.player.credits.clear()
+    fake.markers = ()
+    assert await media.module.credits_start(film) is None
+    assert await media.module.credits_start(uuid4()) is None  # nothing plays it

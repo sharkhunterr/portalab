@@ -1126,6 +1126,22 @@ for key, kind, payload, en, fr, about_en, about_fr, icon in (
      "Given for a hundred visits.", "Offert pour cent visites.", "user"),
     ("bg_night_owl", "profile_background", {"background": "starfield"}, "Night owl background",
      "Fond Oiseau de nuit", "A secret achievement's starry sky.", "Le ciel étoilé d'un succès secret.", "moon"),
+    # #103: the portal's player, casting, books, music and boosters
+    ("title_front_row", "title", {"label": "Front row", "style": "gold"}, "Title: Front row",
+     "Titre : Premier rang", "Given for a film watched to the end in the portal.",
+     "Offert pour un film vu jusqu'au bout dans le portail.", "film"),
+    ("badge_big_screen", "badge", {"label": "Big screen", "icon": "cast", "style": "shimmer"}, "Big screen badge",
+     "Badge Grand écran", "Given for a title cast to a TV.", "Offert pour un titre envoyé sur la télé.", "cast"),
+    ("title_projectionist", "title", {"label": "Projectionist", "style": "flame"}, "Title: Projectionist",
+     "Titre : Projectionniste", "Given for 25 titles cast to a TV.", "Offert pour 25 titres envoyés sur la télé.",
+     "tv"),
+    ("badge_bookworm", "badge", {"label": "Bookworm", "icon": "library", "style": "gold"}, "Bookworm badge",
+     "Badge Rat de bibliothèque", "Given for ten books finished.", "Offert pour dix livres terminés.", "library"),
+    ("title_music_lover", "title", {"label": "Music lover", "style": "shimmer"}, "Title: Music lover",
+     "Titre : Mélomane", "Given for fifty songs.", "Offert pour cinquante chansons.", "music"),
+    ("badge_lucky_hand", "badge", {"label": "Lucky hand", "icon": "dices", "style": "rainbow"}, "Lucky hand badge",
+     "Badge Main heureuse", "Given for a legendary card drawn from a booster.",
+     "Offert pour une carte légendaire tirée d'un booster.", "dices"),
 ):  # fmt: skip
     _p(key, kind, None, "legendary", en, fr, about_en, about_fr, payload, collection="rewards", icon=icon,
        reward_only=True)  # fmt: skip

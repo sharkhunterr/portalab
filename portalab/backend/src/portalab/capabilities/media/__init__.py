@@ -47,6 +47,8 @@ CALENDAR = "media.calendar"
 METADATA = "media.metadata"
 DOWNLOADS = "media.downloads"
 ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one title (Radarr, Sonarr)
+# #103: the name the portal's own player gives itself to a media server — its sessions there are the portal's
+PORTAL_PLAYER = "Portalab"
 DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
 ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
 STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder

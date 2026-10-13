@@ -82,7 +82,7 @@ async def test_listen_as_the_account_the_library_keeps(
     )
     assert done.status_code == 204
     finished = [p for name, p, _ in await media.events("media.playback") if name == "media.playback_finished"]
-    assert finished and finished[0]["percent"] == 1.0
+    assert finished and finished[0]["percent"] == 1.0 and finished[0]["via"] == "portal"  # #103
 
     # a listening ticket opens nothing else, and is nobody else's
     assert (await client.get(f"/api/v1/media/read/{ticket}/file/11.epub")).status_code == 404

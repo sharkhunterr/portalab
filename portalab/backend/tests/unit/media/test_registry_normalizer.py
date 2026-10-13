@@ -69,6 +69,12 @@ def test_normalizer() -> None:
     assert on_end(89, 100, 0.9) == "media.playback_abandoned"
     assert on_end(100, 100, None) == "media.playback_abandoned"  # games: explicit ending only
     assert on_end(50, None, 0.9) == "media.playback_abandoned"
+    # #101: where the media server marks the end credits, they decide — not the threshold
+    assert on_end(7790, 8700, 0.9, 8136) == "media.playback_abandoned"  # 89.5 %: six minutes before them
+    assert on_end(8110, 8700, 0.9, 8136) == "media.playback_finished"  # stopped as they begin
+    assert on_end(5500, 6000, 0.9, 5300) == "media.playback_finished"  # long credits: 91.7 % is the end
+    assert on_end(100, 100, None, 80) == "media.playback_abandoned"  # explicit-only kinds still never
+    assert on_end(95, 100, 0.9, 100) == "media.playback_finished"  # a marker at the very end is no clue
 
 
 def test_helpers() -> None:

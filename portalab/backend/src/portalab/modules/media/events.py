@@ -2,7 +2,8 @@
 
 Catalog: ``media.added|updated|removed|availability_changed|merged|split``. Playback (subject = the linked
 user, private): ``media.playback_started|progressed|paused|finished|abandoned|error`` deduplicated by
-``(session, state_seq)`` (``finished`` once per session), ``media.resume_available``. Requests:
+``(session, state_seq)`` (``finished`` once per session; ``via`` the portal's own player or reader, #103),
+``media.resume_available``, ``media.cast_started`` (#103: sent to a casting device). Requests:
 ``media.request_created|updated|available`` deduplicated by ``(request, state)``."""
 
 from typing import Literal
@@ -39,6 +40,15 @@ class Playback(BaseModel):
     percent: float | None = None
     occurred_at: str
     watched_s: float | None = None  # #94: the time actually watched, listened to or read in this sitting
+    via: Literal["portal"] | None = None  # #103: played in the portal (its player, its reader)
+
+
+class CastStarted(BaseModel):
+    """#103: the portal's player sent a title to a casting device (Chromecast, AirPlay)."""
+
+    object: str
+    kind: str
+    session: str
 
 
 class ResumeAvailable(BaseModel):
@@ -102,13 +112,26 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                 retention_class="business",
                 visibility_class="private",
                 # #94: a sitting's minutes count whether it finished or not; finishing earns a bonus
-                rewardable=frozenset({"kind", "percent", "duration_s", "position_s", "watched_s"})
+                rewardable=frozenset({"kind", "percent", "duration_s", "position_s", "watched_s", "via"})
                 if name in ("media.playback_finished", "media.playback_abandoned")
                 else frozenset(),
-                aggregatable=frozenset({"kind", "percent"}),
+                aggregatable=frozenset({"kind", "percent", "via"}),
                 automatable=name in ("media.playback_started", "media.playback_finished"),
             )
         )
+    add(
+        EventType(
+            name="media.cast_started",
+            owner=OWNER,
+            schema=CastStarted,
+            open_payload=False,
+            dedup_fields=("session",),
+            retention_class="business",
+            visibility_class="private",
+            rewardable=frozenset({"kind"}),
+            aggregatable=frozenset({"kind"}),
+        )
+    )
     add(
         EventType(
             name="media.resume_available",

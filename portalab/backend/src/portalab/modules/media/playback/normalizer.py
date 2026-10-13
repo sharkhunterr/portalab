@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from portalab.capabilities.media import SourcePlayback
 
 ACTIVE = ("playing", "paused", "buffering")
+CREDITS_LEEWAY_S = 30.0  # a position is read every few seconds: stopping as the credits begin still counts
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,9 +43,24 @@ def on_update(
     return Decision(None, state)
 
 
-def on_end(max_position: float, duration: float | None, threshold: float | None) -> str:
-    """``finished`` at/above the kind's threshold (explicit-only kinds never finish from a position)."""
-    share = percent(max_position, duration)
-    if threshold is not None and share is not None and share >= threshold:
+def reached_end(
+    position: float, duration: float | None, threshold: float | None, credits: float | None = None
+) -> bool:
+    """#101: the play reached its end — its end credits when the media server knows where they begin (a film
+    stopped minutes before them is not finished, however long the credits), else the kind's threshold;
+    explicit-only kinds (no threshold) never finish from a position."""
+    if threshold is None:
+        return False
+    if credits is not None and credits > 0 and (not duration or credits < duration):
+        return position >= credits - CREDITS_LEEWAY_S
+    share = percent(position, duration)
+    return share is not None and share >= threshold
+
+
+def on_end(
+    max_position: float, duration: float | None, threshold: float | None, credits: float | None = None
+) -> str:
+    """``finished`` once the end is reached (``reached_end``), else ``abandoned``."""
+    if reached_end(max_position, duration, threshold, credits):
         return "media.playback_finished"
     return "media.playback_abandoned"

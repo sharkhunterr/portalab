@@ -12,7 +12,7 @@ Using an item of the reserve takes one out and grants the product, which activat
 (a ticket — a film in 4K, a community project — then waits for its form, as in « My purchases »)."""
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -30,7 +30,14 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.activation.service import LIVE, Activation
 from portalab.modules.marketplace.availability.service import Availability
-from portalab.modules.marketplace.boosters import Booster, booster_of, draw, on_sale, refund_of
+from portalab.modules.marketplace.boosters import (
+    RARITIES,
+    Booster,
+    booster_of,
+    draw,
+    on_sale,
+    refund_of,
+)
 from portalab.modules.marketplace.eligibility.service import Eligibility
 from portalab.modules.marketplace.models import (
     BoosterOpening,
@@ -298,6 +305,7 @@ class Openings:
                 )
                 session.add(opening)
                 await session.flush()
+                await self._opened(session, actor, user, booster.key, opening, drawn, now)
                 for index, card in enumerate(drawn):
                     if card.outcome == "reserve":
                         await self._stock(session, user, card.product.id, 1)
@@ -334,6 +342,36 @@ class Openings:
         for ownership_id in granted:
             await self.activation.activate(ownership_id)
         return opening, drawn
+
+    async def _opened(
+        self,
+        session: AsyncSession,
+        actor: Principal,
+        user: UUID,
+        booster: str,
+        opening: BoosterOpening,
+        drawn: list[Drawn],
+        now: datetime,
+    ) -> None:
+        """#103: a booster opened — what it held (its rarest card, how many new) is the member's event."""
+        rarities = [card.product.rarity for card in drawn if card.product.rarity in RARITIES]
+        best = max(rarities, key=RARITIES.index, default="common")
+        await self.events.publish(
+            session,
+            "marketplace.booster_opened",
+            {
+                "booster": booster,
+                "opening": str(opening.id),
+                "cards": len(drawn),
+                "new": sum(1 for card in drawn if card.outcome == "new"),
+                "best": best,
+                "price": opening.price,
+            },
+            occurred_at=now,
+            actor=actor,
+            subject=SubjectRef("user", str(user)),
+            dedup_key=f"marketplace.booster_opened:{opening.id}",
+        )
 
     async def _credit(self, user: UUID, amount: int, booster: str, opening: str) -> None:
         """The duplicates' Coins of an offered booster (no spend to refund): credited by the economy."""

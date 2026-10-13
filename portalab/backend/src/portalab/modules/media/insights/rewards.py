@@ -1,12 +1,15 @@
 """#94 — a play the live watch missed still counts: when a service's history (Plex, Tautulli, Grimmory…)
-records a member's play, ``media.playback_finished`` (at the kind's threshold) or
-``media.playback_abandoned`` (stopped before, with the minutes watched) is published for it — the events
-the progression rules, quests and the play streak listen to — unless the live watch saw that play end.
+records a member's play, ``media.playback_finished`` (its end reached: the end credits when the media
+server marks them, else the kind's threshold — #101) or ``media.playback_abandoned`` (stopped before, with
+the minutes watched) is published for it — the events the progression rules, quests and the play streak
+listen to — unless the live watch followed that play to its end: its verdict stands then, finished or not
+(#101: a history rounds its percentages — 89.5 % read as 90 — and its minutes were the live watch's too).
 Only recent plays (``WINDOW``): an old history imported later never turns into XP, the progression stays
 the one the portal lived."""
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import timedelta
+from uuid import UUID
 
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,12 +17,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import Activity, PlaybackSession
+from portalab.modules.media.models import Activity, PlaybackSession, UserLink
 from portalab.modules.media.observability import metrics
-from portalab.modules.media.playback.normalizer import percent
+from portalab.modules.media.playback.normalizer import percent, reached_end
 
 WINDOW = timedelta(hours=48)
 NEARBY = timedelta(hours=6)  # a live session this close to the play is the same play
+ALONGSIDE = timedelta(minutes=10)  # #101: a live session followed to its stop during the play is that play
 EVENT = "media.playback_finished"
 PARTIAL = "media.playback_abandoned"  # #94: a play stopped before its end still counts its minutes
 MIN_WATCHED = 60.0
@@ -32,20 +36,35 @@ class HistoryRewards:
         events: EventPublisher,
         threshold: Callable[[str], float | None],
         *,
+        credits: Callable[[UUID], Awaitable[float | None]] | None = None,
         clock: Clock | None = None,
     ) -> None:
         self.database = database
         self.events = events
         self.threshold = threshold
+        self.credits = credits
         self.clock = clock
 
-    def _finished(self, kind: str, share: float | None) -> bool:
-        threshold = self.threshold(kind)
-        return threshold is not None and share is not None and share >= threshold
+    async def _credits(self, object_id: UUID | None) -> float | None:
+        if self.credits is None or object_id is None:
+            return None
+        try:
+            return await self.credits(object_id)
+        except Exception:
+            return None
+
+    def _finished(
+        self, kind: str, share: float | None, duration: float | None, credits: float | None
+    ) -> bool:
+        if share is None:
+            return False
+        if not duration:  # a share alone: the kind's threshold decides
+            return reached_end(share, 1.0, self.threshold(kind))
+        return reached_end(share * duration, duration, self.threshold(kind), credits)
 
     async def run(self) -> int:
-        """Publish the recent plays of linked members the live watch missed: ``finished`` at the kind's
-        threshold, else ``abandoned`` with the minutes watched."""
+        """Publish the recent plays of linked members the live watch missed: ``finished`` once their end
+        is reached, else ``abandoned`` with the minutes watched."""
         now = utc_now(self.clock)
         published = 0
         async with self.database.unit_of_work() as uow:
@@ -66,11 +85,12 @@ class HistoryRewards:
             )
             for row in rows:
                 share = row.progress if row.progress is not None else percent(row.watched_s, row.duration_s)
-                finished = self._finished(row.kind, share)
+                credits = await self._credits(row.object_id) if row.duration_s else None
+                finished = self._finished(row.kind, share, row.duration_s, credits)
                 if not finished and (row.stopped_at is None or row.watched_s < MIN_WATCHED):
                     continue  # still playing, or too short to count
                 row.rewarded_at = now  # looked at once: published now, or the live watch did
-                if await self._seen_live(session, row, finished):
+                if await self._seen_live(session, row, credits):
                     continue
                 at = row.stopped_at or row.started_at
                 event = EVENT if finished else PARTIAL
@@ -100,16 +120,28 @@ class HistoryRewards:
             metrics.increment("media.playback.finished_from_history", published)
         return published
 
-    async def _seen_live(self, session: AsyncSession, row: Activity, finished: bool) -> bool:
-        """The live watch followed this play to its end (it published ``finished`` then, or, for a play
-        stopped early, its ``abandoned``)."""
+    async def _seen_live(self, session: AsyncSession, row: Activity, credits: float | None) -> bool:
+        """The live watch followed this play: it finished it within ``NEARBY``, or it followed it to its
+        stop (its session ran alongside and ended normally) — it published that play's event already.
+        Only a session that ended once its account was linked published anything (#102: a link attributes
+        the account's past sessions to the member afterwards, silently — their plays count from history)."""
         start = row.started_at - NEARBY
         end = (row.stopped_at or row.started_at) + NEARBY
+        began, stopped = row.started_at - ALONGSIDE, (row.stopped_at or row.started_at) + ALONGSIDE
         lives = (
             await session.execute(
-                select(PlaybackSession).where(
+                select(PlaybackSession)
+                .join(
+                    UserLink,
+                    and_(
+                        UserLink.service_id == PlaybackSession.service_id,
+                        UserLink.user_id == PlaybackSession.user_id,
+                    ),
+                )
+                .where(
                     PlaybackSession.user_id == row.user_id,
                     PlaybackSession.ended.is_(True),
+                    UserLink.created_at <= PlaybackSession.updated_at,
                     and_(PlaybackSession.updated_at >= start, PlaybackSession.started_at <= end),
                     PlaybackSession.object_id == row.object_id
                     if row.object_id
@@ -117,4 +149,8 @@ class HistoryRewards:
                 )
             )
         ).scalars()
-        return any(self._finished(live.kind, percent(live.max_position_s, live.duration_s)) for live in lives)
+        return any(
+            reached_end(live.max_position_s, live.duration_s, self.threshold(live.kind), credits)
+            or (live.state == "stopped" and live.started_at <= stopped and live.updated_at >= began)
+            for live in lives
+        )

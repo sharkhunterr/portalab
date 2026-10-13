@@ -38,6 +38,7 @@ from portalab.capabilities.media import (
     SourcePlayback,
     SourceRequest,
     StreamBody,
+    StreamMarker,
     StreamOptions,
     StreamStart,
     StreamTrack,
@@ -249,6 +250,7 @@ class FakeStreaming:
     cues: list[SubtitleCue] = field(
         default_factory=lambda: [SubtitleCue(1.0, 2.5, "Hello"), SubtitleCue(300.0, 302.0, "Later")]
     )
+    markers: tuple[StreamMarker, ...] = ()  # #101: the film's intro and credits markers
 
     def channel(self, external_user_id: str | None) -> "FakeChannel":
         return FakeChannel(self, external_user_id)
@@ -284,6 +286,7 @@ class FakeChannel:
             duration_s=6000.0,
             resume_s=60.0,
             versions=(version,),
+            markers=self.owner.markers,
         )
 
     async def start(self, external_id: str, options: StreamOptions, session: str) -> StreamStart:

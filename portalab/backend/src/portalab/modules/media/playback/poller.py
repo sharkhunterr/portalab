@@ -3,7 +3,8 @@ normalizes sessions into ``media.playback_sessions`` and publishes throttled pla
 
 * cadence adapts: every ``pollActiveSeconds`` while something plays, else every ``pollIdleSeconds``;
 * a session missing from the next answer (or reported ``stopped``) ends: ``finished`` when the furthest
-  position reached the kind's threshold, else ``abandoned`` — ``finished`` once per session;
+  position reached the end credits (#101: as the media server marks them, else the kind's threshold),
+  else ``abandoned`` — ``finished`` once per session;
 * a source that stops answering marks its sessions ``stale``; after ``staleTimeoutSeconds`` they are
   ``interrupted`` with ``media.playback_error`` (never ``finished``);
 * activity of accounts without a verified link is stored as unlinked and never attributed or published;
@@ -11,7 +12,7 @@ normalizes sessions into ``media.playback_sessions`` and publishes throttled pla
 """
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -19,7 +20,13 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from portalab.capabilities.media import PLAYBACK, SourceHistoryItem, SourcePlayback, unwrap
+from portalab.capabilities.media import (
+    PLAYBACK,
+    PORTAL_PLAYER,
+    SourceHistoryItem,
+    SourcePlayback,
+    unwrap,
+)
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, SubjectRef
@@ -44,6 +51,7 @@ class PlaybackPoller:
         config: Callable[[], MediaConfig],
         threshold: Callable[[str], float | None],
         *,
+        credits: Callable[[UUID], Awaitable[float | None]] | None = None,
         clock: Clock | None = None,
     ) -> None:
         self.database = database
@@ -52,6 +60,7 @@ class PlaybackPoller:
         self.links = links
         self.config = config
         self.threshold = threshold
+        self.credits = credits
         self.clock = clock
         self.last_poll: dict[str, datetime] = {}
         self.history_since: dict[str, datetime] = {}
@@ -154,6 +163,8 @@ class PlaybackPoller:
         watched = self._watched(row, now)
         if watched is not None:
             payload["watched_s"] = watched
+        if row.device == PORTAL_PLAYER:
+            payload["via"] = "portal"  # #103: played with the portal's own player (or cast from it)
         dedup = (
             f"media.playback_finished:{row.session_key}"
             if name == "media.playback_finished"
@@ -243,8 +254,18 @@ class PlaybackPoller:
                 row.last_event_at = now
                 await self._publish(session, row, decision.event, now)
 
+    async def _credits(self, object_id: UUID | None) -> float | None:
+        """#101: where the title's end credits begin, when its media server marks them."""
+        if self.credits is None or object_id is None:
+            return None
+        try:
+            return await self.credits(object_id)
+        except Exception:
+            return None
+
     async def _finish(self, session: AsyncSession, row: PlaybackSession, now: datetime) -> None:
-        name = on_end(row.max_position_s, row.duration_s, self.threshold(row.kind))
+        credits = await self._credits(row.object_id)
+        name = on_end(row.max_position_s, row.duration_s, self.threshold(row.kind), credits)
         row.state, row.ended, row.state_seq, row.last_event_at = "stopped", True, row.state_seq + 1, now
         await self._publish(session, row, name, now)
 
@@ -333,7 +354,8 @@ class PlaybackPoller:
                 )
                 uow.session.add(row)
                 await uow.session.flush()
-                name = on_end(item.position_s, item.duration_s, self.threshold(item.kind))
+                credits = await self._credits(object_id)
+                name = on_end(item.position_s, item.duration_s, self.threshold(item.kind), credits)
                 if name == "media.playback_abandoned":
                     name = "media.playback_progressed"
                 await self._publish(uow.session, row, name, item.occurred_at)

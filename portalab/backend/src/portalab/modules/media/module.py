@@ -218,11 +218,20 @@ class MediaModule:
         self.links = UserLinkService(database, capabilities, clock=clock)
         self.accounts = AccountMatching(database, capabilities, clock=clock)
         self.poller = PlaybackPoller(
-            database, events, capabilities, self.links, lambda: self.config, self.threshold, clock=clock
+            database,
+            events,
+            capabilities,
+            self.links,
+            lambda: self.config,
+            self.threshold,
+            credits=self.credits_start,  # #101: a play is finished at its end credits
+            clock=clock,
         )
         self.history = HistoryProjection(database, events, clock=clock)
         # #94: a finished play the live watch missed (seen in a service's history) still counts
-        self.history_rewards = HistoryRewards(database, events, self.threshold, clock=clock)
+        self.history_rewards = HistoryRewards(
+            database, events, self.threshold, credits=self.credits_start, clock=clock
+        )
         self.quota = RequestQuota(database, lambda: self.config, clock=clock)
         self.requests = Requests(database, events, capabilities, self.quota, self.links, clock=clock)
         self.request_sink = RequestSink(self.requests)
@@ -264,7 +273,12 @@ class MediaModule:
         self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(
-            database, capabilities, lambda: self.config, player_key or os.urandom(32), clock=clock
+            database,
+            capabilities,
+            lambda: self.config,
+            player_key or os.urandom(32),
+            events=events,  # #103: a title cast to a TV is the member's event
+            clock=clock,
         )
         # #20, #21: listening and reading in the portal (their tickets: another key of the same secret)
         self.books = BookService(
@@ -313,6 +327,10 @@ class MediaModule:
                 if isinstance(ctx, LocaleContext) and ctx.language:
                     return str(ctx.language)
         return await self.language()
+
+    async def credits_start(self, object_id: UUID) -> float | None:
+        """#101: where a title's end credits begin (the player asks its media server)."""
+        return await self.player.credits_start(object_id)
 
     def threshold(self, kind: str) -> float | None:
         if kind in self.config.thresholds:

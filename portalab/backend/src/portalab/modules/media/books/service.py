@@ -480,6 +480,7 @@ class BookService:
                 "percent": round(percent, 4),
                 "occurred_at": now.isoformat(),
                 **({"watched_s": round(watched, 1)} if watched is not None else {}),
+                "via": "portal",  # #103: read or listened to in the portal
             }
             await self.events.publish(
                 session,

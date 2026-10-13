@@ -105,6 +105,12 @@ async def test_opening_a_booster(mk: MkHarness, client: AsyncClient) -> None:
 
     history = (await client.get("/api/v1/marketplace/boosters/openings")).json()
     assert [h["id"] for h in history] == [second["opening"]["id"], opened["opening"]["id"]]
+    # #103: each opening is the member's event (their achievements): its cards, the new ones, the rarest
+    events = await mk.events("marketplace.booster_opened")
+    assert [(e["opening"], e["cards"], e["new"], e["best"], e["price"]) for e in events] == [
+        (opened["opening"]["id"], 5, 4, "epic", 450),
+        (second["opening"]["id"], 5, 0, "epic", 450),
+    ]
     assert history[0]["names"]["en"] == "Booster Cosmos" and len(history[0]["cards"]) == 5
     assert (await client.post("/api/v1/marketplace/boosters/nothing/open")).status_code == 404
     sealed = await client.post("/api/v1/marketplace/boosters/booster_cosmos/open", params={"sealed": "true"})
