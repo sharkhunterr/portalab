@@ -4606,6 +4606,47 @@
         "title": "DeletionStatus",
         "type": "object"
       },
+      "DetailDayOut": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "contribution": {
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "levels": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Levels",
+            "type": "array"
+          },
+          "spent_coins": {
+            "title": "Spent Coins",
+            "type": "integer"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "xp",
+          "coins",
+          "contribution",
+          "spent_coins",
+          "levels"
+        ],
+        "title": "DetailDayOut",
+        "type": "object"
+      },
       "DiscoverIn": {
         "additionalProperties": false,
         "properties": {
@@ -9319,6 +9360,70 @@
         "title": "MediaSplitIn",
         "type": "object"
       },
+      "MemberDetailOut": {
+        "properties": {
+          "coins": {
+            "$ref": "#/components/schemas/ValueDetailOut"
+          },
+          "contribution": {
+            "$ref": "#/components/schemas/ValueDetailOut"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DetailDayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "level_ups": {
+            "items": {
+              "$ref": "#/components/schemas/LevelUpOut"
+            },
+            "title": "Level Ups",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "start_level": {
+            "title": "Start Level",
+            "type": "integer"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "xp": {
+            "$ref": "#/components/schemas/ValueDetailOut"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "level",
+          "start_level",
+          "xp",
+          "coins",
+          "contribution",
+          "level_ups",
+          "days"
+        ],
+        "title": "MemberDetailOut",
+        "type": "object"
+      },
       "MemberPointOut": {
         "properties": {
           "day": {
@@ -9475,6 +9580,22 @@
           "points"
         ],
         "title": "MemberSeriesOut",
+        "type": "object"
+      },
+      "MembersDetailOut": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberDetailOut"
+            },
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "members"
+        ],
+        "title": "MembersDetailOut",
         "type": "object"
       },
       "MembersProgressOut": {
@@ -16759,6 +16880,29 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "ValueDetailOut": {
+        "properties": {
+          "balance": {
+            "title": "Balance",
+            "type": "integer"
+          },
+          "gained": {
+            "title": "Gained",
+            "type": "integer"
+          },
+          "spent": {
+            "title": "Spent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "balance",
+          "gained",
+          "spent"
+        ],
+        "title": "ValueDetailOut",
+        "type": "object"
+      },
       "VerificationTokenOut": {
         "properties": {
           "expires_at": {
@@ -21365,6 +21509,69 @@
           }
         },
         "summary": "Members Progress",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/members/details": {
+      "get": {
+        "description": "#106: each member's detail over the period \u2014 XP, Coins and Contribution held, gained and spent, the\nlevels reached and when \u2014 in all and day by day; the most advanced first (or one member).",
+        "operationId": "members_details_api_v1_admin_gamification_members_details_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "member",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembersDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Members Details",
         "tags": [
           "gamification-admin"
         ]

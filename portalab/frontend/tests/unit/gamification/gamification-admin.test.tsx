@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
@@ -63,6 +63,24 @@ const MEMBERS = [
   },
 ];
 
+// issue 106: their detail — held, gained, spent, the levels reached
+const DETAILS = [
+  {
+    user_id: "u1",
+    name: "Noémie",
+    level: 2,
+    start_level: 1,
+    xp: { balance: 120, gained: 100, spent: 0 },
+    coins: { balance: 22, gained: 25, spent: 3 },
+    contribution: { balance: 1, gained: 1, spent: 0 },
+    level_ups: [{ level: 2, at: "2026-10-13T18:00:00Z", day: "2026-10-13" }],
+    days: [
+      { day: "2026-10-12", xp: 20, coins: 5, contribution: 0, spent_coins: 0, levels: [] },
+      { day: "2026-10-13", xp: 80, coins: 20, contribution: 1, spent_coins: 3, levels: [2] },
+    ],
+  },
+];
+
 function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
@@ -95,6 +113,8 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
         return json(200, { version: 1, definition: { base: 100, exponent: 1.5 }, preview: [] });
       case "/api/v1/admin/gamification/event-types":
         return json(200, TYPES);
+      case "/api/v1/admin/gamification/members/details":
+        return json(200, { members: DETAILS });
       case "/api/v1/admin/gamification/members":
         return json(200, { value: "xp", members: MEMBERS });
       case "/api/v1/admin/gamification/progress":
@@ -212,5 +232,20 @@ describe("gamification administration", () => {
       "XP",
     ]);
     expect(mine.querySelectorAll("tbody tr")).toHaveLength(1);
+  });
+
+  it("details every member's XP, levels, Coins and Contribution, or one member's day by day", async () => {
+    serve([]);
+    show("/admin/gamification");
+    const table = await screen.findByRole("table", { name: "Detail by member" });
+    expect(table.textContent).toContain("1 → 2 (+1 level)");
+    expect(table.textContent).toContain("+25−3· 22 held");
+    fireEvent.click(within(table).getByRole("button", { name: "Noémie" }));
+    const mine = await screen.findByRole("table", { name: "Detail of Noémie" });
+    const rows = Array.from(mine.querySelectorAll("tbody tr")).map((tr) => tr.textContent);
+    expect(rows[0]).toContain("level 2");
+    expect(rows[0]).toContain("−3");
+    expect(rows).toHaveLength(2);
+    expect(screen.getByText("Now: level 2 · 120 XP · 22 Coins · 1 Contribution.")).toBeTruthy();
   });
 });

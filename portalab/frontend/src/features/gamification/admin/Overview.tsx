@@ -22,6 +22,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useRules, useVerify, type Value } from "../api";
 import { SOURCES } from "../progression/GainSources";
 import { AnomalyQueue } from "./AnomalyQueue";
+import { MemberDetails } from "./MemberDetails";
 import { useLevelRewards, useMembersProgress, useProgress, useStreak, VALUES } from "./tuning";
 
 const PERIODS = [7, 30, 90, 365];
@@ -355,6 +356,7 @@ export function Overview() {
           </table>
         ) : null}
       </AdminSection>
+      <MemberDetails days={days} member={member} onMember={setMember} />
       <div className="admin-grid">
         <AdminSection icon="trophy" title={t("gamification:admin.overview.top")}>
           <ol className="gam-leaders">

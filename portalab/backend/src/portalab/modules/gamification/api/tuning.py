@@ -537,3 +537,128 @@ async def my_timeline(
         await module.levels.curve(),
     )
     return MyTimelineOut.model_validate(result)
+
+
+class ValueDetailOut(BaseModel):
+    balance: int  # held now
+    gained: int  # over the period
+    spent: int  # spent over the period (the shop), as a positive number — a withdrawal corrects the gains
+
+
+class DetailDayOut(BaseModel):
+    day: str
+    xp: int
+    coins: int
+    contribution: int
+    spent_coins: int
+    levels: list[int]  # the levels reached that day
+
+
+class MemberDetailOut(BaseModel):
+    user_id: UUID
+    name: str | None
+    level: int
+    start_level: int  # at the start of the period
+    xp: ValueDetailOut
+    coins: ValueDetailOut
+    contribution: ValueDetailOut
+    level_ups: list[LevelUpOut]
+    days: list[DetailDayOut]
+
+
+class MembersDetailOut(BaseModel):
+    members: list[MemberDetailOut]
+
+
+@router.get("/admin/gamification/members/details", response_model=MembersDetailOut)
+async def members_details(
+    _: Manager,
+    module: Module,
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+    member: UUID | None = None,
+) -> MembersDetailOut:
+    """#106: each member's detail over the period — XP, Coins and Contribution held, gained and spent, the
+    levels reached and when — in all and day by day; the most advanced first (or one member)."""
+    zone = module.config.timezone or "UTC"
+    since = since_days(utc_now(module.clock), days)
+    day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
+    curve = await module.levels.curve()
+    async with module.database.session() as session:
+        query = select(LedgerTransaction.user_id, LedgerTransaction.value, func.sum(LedgerTransaction.delta))
+        if member is not None:
+            query = query.where(LedgerTransaction.user_id == member)
+        totals = (
+            await session.execute(query.group_by(LedgerTransaction.user_id, LedgerTransaction.value))
+        ).all()
+        balances: dict[UUID, dict[str, int]] = {}
+        for user, value, amount in totals:
+            balances.setdefault(user, {})[value] = int(amount or 0)
+        ids = sorted(balances, key=lambda u: -balances[u].get("xp", 0))[:MEMBERS_SHOWN]
+        taken = (
+            await session.execute(
+                select(
+                    LedgerTransaction.user_id, LedgerTransaction.value, day, func.sum(LedgerTransaction.delta)
+                )
+                .where(
+                    LedgerTransaction.user_id.in_(ids),
+                    LedgerTransaction.delta < 0,
+                    LedgerTransaction.kind != "correction",  # a correction lowers the gain itself
+                    LedgerTransaction.occurred_at >= since,
+                )
+                .group_by(LedgerTransaction.user_id, LedgerTransaction.value, day)
+            )
+        ).all()
+    spent: dict[UUID, dict[str, dict[str, int]]] = {}
+    for user, value, when, amount in taken:
+        spent.setdefault(user, {}).setdefault(value, {})[when.isoformat()] = -int(amount or 0)
+    directory = module.capabilities.system_providers(DIRECTORY)
+    out: list[MemberDetailOut] = []
+    for user_id in ids:
+        name = None
+        if directory:
+            try:
+                summary = await directory[0].provider.get_user_summary(user_id)
+                name = summary.display_name if summary else None
+            except Exception:
+                name = None
+        line = await gain_timeline(module.database, user_id, since, zone, curve)
+        mine = spent.get(user_id, {})
+        reached: dict[str, list[int]] = {}
+        for up in line["level_ups"]:
+            reached.setdefault(up["day"], []).append(up["level"])
+        gained = {v: sum(d[v] for d in line["days"]) for v in ("xp", "coins", "contribution")}
+        dates = sorted(
+            {d["day"] for d in line["days"]} | {d for v in mine.values() for d in v} | set(reached)
+        )
+        by_day = {d["day"]: d for d in line["days"]}
+        held = balances.get(user_id, {})
+
+        values = {
+            v: ValueDetailOut(balance=held.get(v, 0), gained=gained[v], spent=sum(mine.get(v, {}).values()))
+            for v in ("xp", "coins", "contribution")
+        }
+
+        out.append(
+            MemberDetailOut(
+                user_id=user_id,
+                name=name,
+                level=curve.level_for(max(0, held.get("xp", 0))),
+                start_level=int(line["start_level"]),
+                xp=values["xp"],
+                coins=values["coins"],
+                contribution=values["contribution"],
+                level_ups=[LevelUpOut.model_validate(up) for up in line["level_ups"]],
+                days=[
+                    DetailDayOut(
+                        day=d,
+                        xp=by_day.get(d, {}).get("xp", 0),
+                        coins=by_day.get(d, {}).get("coins", 0),
+                        contribution=by_day.get(d, {}).get("contribution", 0),
+                        spent_coins=mine.get("coins", {}).get(d, 0),
+                        levels=reached.get(d, []),
+                    )
+                    for d in dates
+                ],
+            )
+        )
+    return MembersDetailOut(members=out)

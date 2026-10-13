@@ -14,6 +14,7 @@ export type LevelReward = components["schemas"]["LevelReward"];
 export type LevelRewards = components["schemas"]["LevelRewardsOut"];
 export type Progress = components["schemas"]["ProgressOut"];
 export type MembersProgress = components["schemas"]["MembersProgressOut"];
+export type MemberDetail = components["schemas"]["MemberDetailOut"];
 
 export const VALUES: Value[] = ["xp", "coins", "contribution"];
 const KEY = ["gamification", "admin"] as const;
@@ -173,6 +174,19 @@ export function useMembersProgress(value: Value, days: number) {
           params: { query: { value, days } },
         })
       ).data as MembersProgress,
+  });
+}
+
+/** Issue 106: each member's XP, levels, Coins and Contribution over the period, in all and day by day. */
+export function useMembersDetails(days: number) {
+  return useQuery({
+    queryKey: [...KEY, "members-details", days],
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/admin/gamification/members/details", {
+          params: { query: { days } },
+        })
+      ).data?.members ?? ([] as MemberDetail[]),
   });
 }
 

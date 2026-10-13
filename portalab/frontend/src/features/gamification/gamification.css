@@ -1580,3 +1580,23 @@
   inline-size: 5rem;
   block-size: 5rem;
 }
+
+/* issue 106: a value's gain, what was spent, and what is held */
+.gam-detail {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.gam-detail__spent {
+  color: var(--state-error-fg, var(--color-text-muted));
+}
+
+.gam-detail__summary {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) 0;
+  color: var(--color-text-muted);
+}

@@ -1103,6 +1103,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/members/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Members Details
+         * @description #106: each member's detail over the period — XP, Coins and Contribution held, gained and spent, the
+         *     levels reached and when — in all and day by day; the most advanced first (or one member).
+         */
+        get: operations["members_details_api_v1_admin_gamification_members_details_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/pace": {
         parameters: {
             query?: never;
@@ -10593,6 +10614,21 @@ export interface components {
             /** State */
             state: string;
         };
+        /** DetailDayOut */
+        DetailDayOut: {
+            /** Coins */
+            coins: number;
+            /** Contribution */
+            contribution: number;
+            /** Day */
+            day: string;
+            /** Levels */
+            levels: number[];
+            /** Spent Coins */
+            spent_coins: number;
+            /** Xp */
+            xp: number;
+        };
         /** DiscoverIn */
         DiscoverIn: {
             /** Targets */
@@ -12264,6 +12300,27 @@ export interface components {
              */
             merge: string;
         };
+        /** MemberDetailOut */
+        MemberDetailOut: {
+            coins: components["schemas"]["ValueDetailOut"];
+            contribution: components["schemas"]["ValueDetailOut"];
+            /** Days */
+            days: components["schemas"]["DetailDayOut"][];
+            /** Level */
+            level: number;
+            /** Level Ups */
+            level_ups: components["schemas"]["LevelUpOut"][];
+            /** Name */
+            name: string | null;
+            /** Start Level */
+            start_level: number;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            xp: components["schemas"]["ValueDetailOut"];
+        };
         /** MemberPointOut */
         MemberPointOut: {
             /** Day */
@@ -12320,6 +12377,11 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+        };
+        /** MembersDetailOut */
+        MembersDetailOut: {
+            /** Members */
+            members: components["schemas"]["MemberDetailOut"][];
         };
         /** MembersProgressOut */
         MembersProgressOut: {
@@ -14905,6 +14967,15 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** ValueDetailOut */
+        ValueDetailOut: {
+            /** Balance */
+            balance: number;
+            /** Gained */
+            gained: number;
+            /** Spent */
+            spent: number;
         };
         /** VerificationTokenOut */
         VerificationTokenOut: {
@@ -17680,6 +17751,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MembersProgressOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_details_api_v1_admin_gamification_members_details_get: {
+        parameters: {
+            query?: {
+                days?: number;
+                member?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembersDetailOut"];
                 };
             };
             /** @description Validation Error */

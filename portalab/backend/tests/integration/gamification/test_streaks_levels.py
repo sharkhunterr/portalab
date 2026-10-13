@@ -113,9 +113,31 @@ async def test_tuning_api(gm: GamHarness, client: AsyncClient) -> None:
     one = await client.get("/api/v1/admin/gamification/members", params={"member": str(gm.people["boss"])})
     assert [m["user_id"] for m in one.json()["members"]] == [str(gm.people["boss"])]
 
+    # #106: each member's detail — held, gained, spent, the levels reached and when, day by day
+    for _ in range(4):
+        await gm.emit(gm.people["ursula"])  # 100 XP: level 2
+    taken = await client.post(
+        "/api/v1/admin/gamification/manual-withdrawals",
+        json={"user_id": str(gm.people["ursula"]), "value": "coins", "amount": 3, "reason": "test"},
+    )
+    assert taken.status_code in (200, 201), taken.text
+    details = (await client.get("/api/v1/admin/gamification/members/details?days=30")).json()["members"]
+    assert details[0]["user_id"] == str(gm.people["ursula"])  # the most advanced first
+    mine = details[0]
+    assert mine["xp"] == {"balance": 100, "gained": 100, "spent": 0}
+    assert mine["coins"] == {"balance": 22, "gained": 22, "spent": 0}  # a withdrawal corrects the gains
+    assert mine["start_level"] == 1 and mine["level"] == 2 and [u["level"] for u in mine["level_ups"]] == [2]
+    [today] = mine["days"]
+    assert today["xp"] == 100 and today["coins"] == 22 and today["levels"] == [2]
+    alone = await client.get(
+        "/api/v1/admin/gamification/members/details", params={"member": str(gm.people["boss"])}
+    )
+    assert [m["user_id"] for m in alone.json()["members"]] == [str(gm.people["boss"])]
+
     await login(client, "ursula")
     assert (await client.get("/api/v1/admin/gamification/streak")).status_code == 403
     assert (await client.get("/api/v1/admin/gamification/members")).status_code == 403
+    assert (await client.get("/api/v1/admin/gamification/members/details")).status_code == 403
 
 
 def test_split_bonus() -> None:
