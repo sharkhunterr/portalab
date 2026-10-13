@@ -34,17 +34,18 @@
 }
 
 /* long lists of animated previews (the shop, the pickers): what is far off screen is not rendered at all
-   — neither laid out, painted nor animated — until it comes near */
+   — neither laid out, painted nor animated — until it comes near. It clips the box's children: a rarity
+   tag straddling a card's top edge sits beside the card, not in it (#99) */
 .product-card,
 .theme-card,
 .ambient-row,
-.looks-grid__item {
+.looks-grid__item > :is(button, .looks-grid__locked) {
   content-visibility: auto;
   contain-intrinsic-size: auto 16rem;
 }
 .ambient-row {
   contain-intrinsic-size: auto 5rem;
 }
-.looks-grid__item {
+.looks-grid__item > :is(button, .looks-grid__locked) {
   contain-intrinsic-size: auto 8rem;
 }

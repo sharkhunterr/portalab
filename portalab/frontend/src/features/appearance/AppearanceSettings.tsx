@@ -155,7 +155,11 @@ function ThemeGallery({
             p.headerPosition === "bottom" ? ` · ${appearanceStrings.footerHeader}` : ""
           }`;
           return (
-            <li key={theme.key}>
+            <li key={theme.key} className="theme-gallery__item">
+              {/* #99: beside the card, which clips its children while off screen */}
+              <RarityTag
+                rarity={rarities.get(theme.key) ?? (theme.family ? rarities.get(theme.family) : undefined)}
+              />
               <button
                 type="button"
                 className="theme-card"
@@ -165,9 +169,6 @@ function ThemeGallery({
                 }
                 onClick={() => onChoose(theme)}
               >
-                <RarityTag
-                  rarity={rarities.get(theme.key) ?? (theme.family ? rarities.get(theme.family) : undefined)}
-                />
                 <ThemeMiniature theme={theme} />
                 <span className="theme-card__name">
                   {name}

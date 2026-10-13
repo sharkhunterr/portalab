@@ -671,14 +671,15 @@
 ) {
   border-color: color-mix(in srgb, var(--rarity) 75%, var(--color-border));
 }
-:is(.looks__style, .palettes__item, .level-badges__item, .theme-card)[data-rarity] {
+:is(.looks__style, .palettes__item, .level-badges__item, .theme-card)[data-rarity],
+.theme-gallery__item {
   position: relative;
 }
 :is(.looks__style, .looks__chip, .palettes__item, .level-badges__item, .theme-card)[data-rarity="legendary"] {
   box-shadow: 0 0 12px color-mix(in srgb, var(--rarity) 30%, transparent);
 }
 
-:is(.looks__style, .palettes__item, .level-badges__item, .theme-card) > .rarity-tag {
+:is(.looks__style, .palettes__item, .level-badges__item, .theme-gallery__item) > .rarity-tag {
   position: absolute;
   inset-block-start: -0.55rem;
   inset-inline-end: var(--space-2);
