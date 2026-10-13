@@ -314,6 +314,15 @@ class GrimmoryConnector(HttpConnector):
             )
         )
 
+    async def _audiobook_length(self, service: ServiceHandle, book_id: str) -> float | None:
+        """The whole audiobook's length, every file together (``/api/v1/audiobooks/{id}/info``)."""
+        try:
+            info = await self.get_json(service, f"/api/v1/audiobooks/{book_id}/info")
+        except (ConnectionError, InvalidPayload):
+            return None
+        total = info.get("durationMs") if isinstance(info, Mapping) else None
+        return round(float(total) / 1000, 1) if isinstance(total, int | float) and total > 0 else None
+
     async def sync(
         self, ctx: SyncContext, cursor: Mapping[str, Any] | None
     ) -> AsyncIterator[SourceRecord | SyncProgress]:
@@ -325,6 +334,11 @@ class GrimmoryConnector(HttpConnector):
             if mapped is None:
                 continue
             external_id, kind, payload = mapped
+            if kind == "audiobook":
+                # #92: an audiobook in several files — Grimmory's metadata tells the first file's length only
+                total = await self._audiobook_length(ctx.service, external_id)
+                if total:
+                    payload["duration_s"] = total
             observed = parse_time(book.get("addedOn") or book.get("addedAt"))
             yield self.record(ctx.service, external_id, kind, payload, observed)
             count += 1

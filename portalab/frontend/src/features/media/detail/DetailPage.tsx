@@ -8,7 +8,6 @@ import {
   imageUrl,
   MediaError,
   type MediaSection,
-  personPath,
   useMediaDetail,
   useRequestActions,
   useSection,
@@ -22,6 +21,7 @@ import { RequestDialog } from "../discover/RequestDialog";
 import { useMeasures } from "../insights/api";
 import { openBook, useListen } from "../listen/store";
 import { usePlayerInfo, useResetResume } from "../player/api";
+import { BookView } from "./BookView";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
@@ -61,77 +61,6 @@ function clock(seconds: number): string {
 
 function list(value: unknown): Data[] {
   return Array.isArray(value) ? (value as Data[]) : [];
-}
-
-/** A book's or an audiobook's facts (027, Grimmory): authors, series, publisher, pages, length… */
-function BookFacts({ data }: { data: Data }) {
-  const t = useT();
-  const format = useFormat();
-  const names = (value: unknown) => (Array.isArray(value) ? (value as string[]) : []);
-  const narrators = names(data.narrators);
-  // #92: the authors and the narrators told apart (an older sync knows only « people »)
-  const authors = names(data.authors).length
-    ? names(data.authors)
-    : names(data.people).filter((name) => !narrators.includes(name));
-  const hours = data.duration_s ? Number(data.duration_s) / 3600 : 0;
-  const linked = (list: string[]) => (
-    <>
-      {list.map((name, index) => (
-        <span key={name}>
-          {index ? ", " : ""}
-          <Link to={personPath(name)}>{name}</Link>
-        </span>
-      ))}
-    </>
-  );
-  const rows = [
-    authors.length ? { key: "authors", value: linked(authors) } : null,
-    narrators.length ? { key: "narrators", value: linked(narrators) } : null,
-    data.rating
-      ? { key: "readersRating", value: `★ ${format.number(Math.round(Number(data.rating) * 10) / 10)} / 10` }
-      : null,
-    data.series
-      ? {
-          key: "series",
-          value: data.series_position
-            ? t("media:facts.seriesAt", {
-                series: String(data.series),
-                position: String(data.series_position),
-              })
-            : String(data.series),
-        }
-      : null,
-    data.publisher ? { key: "publisher", value: String(data.publisher) } : null,
-    data.released
-      ? { key: "released", value: format.date(`${String(data.released)}T12:00:00Z`, "long") }
-      : null,
-    data.pages ? { key: "pages", value: t("media:facts.pageCount", { count: Number(data.pages) }) } : null,
-    hours ? { key: "length", value: t("media:facts.hours", { hours: Math.round(hours * 10) / 10 }) } : null,
-    data.language ? { key: "language", value: String(data.language).toUpperCase() } : null,
-    data.isbn ? { key: "isbn", value: String(data.isbn) } : null,
-    data.asin ? { key: "asin", value: String(data.asin) } : null,
-  ].filter((row) => row !== null);
-  const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
-  if (!rows.length && !tags.length) return null;
-  return (
-    <>
-      <dl className="media-facts">
-        {rows.map((row) => (
-          <div key={row.key}>
-            <dt>{t(`media:facts.${row.key}`)}</dt>
-            <dd>{row.value}</dd>
-          </div>
-        ))}
-      </dl>
-      {tags.length ? (
-        <ul className="media-enriched__chips" aria-label={t("media:facts.tags")}>
-          {tags.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
-      ) : null}
-    </>
-  );
 }
 
 const BOOKS = ["book", "audiobook"];
@@ -375,8 +304,9 @@ function SectionBody({
       return (
         <>
           {/* the enriched details already tell the story: no second summary (027) */}
-          {data.overview && !enriched ? <p>{String(data.overview)}</p> : null}
-          {BOOKS.includes(String(data.kind)) ? <BookFacts data={data} /> : null}
+          {data.overview && !enriched && !BOOKS.includes(String(data.kind)) ? (
+            <p>{String(data.overview)}</p>
+          ) : null}
           {data.kind === "game" ? <GameFacts data={data} /> : null}
           {list(data.children).length ? (
             <>
@@ -541,10 +471,9 @@ function hasContent(name: string, data: Data, enriched = false): boolean {
   switch (name) {
     case "info":
       return (
-        (Boolean(data.overview) && !enriched) ||
+        // #92: a book's summary and facts are laid out like a film's (BookView), above the sections
+        (Boolean(data.overview) && !enriched && !BOOKS.includes(String(data.kind))) ||
         list(data.children).length > 0 ||
-        (BOOKS.includes(String(data.kind)) &&
-          Boolean(data.people || data.series || data.publisher || data.pages)) ||
         (data.kind === "game" && Boolean(data.platform || data.publisher || data.people || data.released))
       );
     case "history":
@@ -893,6 +822,7 @@ export function DetailPage() {
     Boolean(seerrKind) && !metadata.data && !metadata.isPending,
   );
   const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
+  const info = useSection(objectId, "info").data?.data as Data | undefined;
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;
@@ -904,6 +834,15 @@ export function DetailPage() {
   const details =
     metadata.data ?? (fallback ? normalize({ ...fallback.metadata, title: media.title }) : undefined);
   const enriched = Boolean(details);
+  // #92: a book's head tells its length and readers' rating, as a film's does (its genres come below)
+  const bookFacts =
+    BOOKS.includes(media.kind) && info
+      ? [
+          info.duration_s ? measures.duration(Number(info.duration_s)) : null,
+          info.pages ? t("media:facts.pageCount", { count: Number(info.pages) }) : null,
+          info.rating ? `★ ${format.number(Math.round(Number(info.rating) * 10) / 10)}` : null,
+        ].filter((fact) => fact !== null)
+      : [];
   return (
     <article aria-labelledby={headingId} className="media-detail">
       {/* #4: the same head as a title to ask for — backdrop, poster, facts, badges, actions */}
@@ -922,9 +861,12 @@ export function DetailPage() {
           metadata.data?.vote_average
             ? `★ ${format.number(Math.round(metadata.data.vote_average * 10) / 10)}`
             : null,
-          !enriched && media.genres.length
-            ? media.genres.filter((g) => g !== media.platform).join(", ")
-            : null,
+          bookFacts.length
+            ? null
+            : !enriched && media.genres.length
+              ? media.genres.filter((g) => g !== media.platform).join(", ")
+              : null,
+          ...bookFacts,
         ]}
         badges={<TitleBadges media={media} />}
         primary={
@@ -937,7 +879,13 @@ export function DetailPage() {
       />
       <LeavingNotice objectId={media.id} />
       <RequestJourney objectId={media.id} />
-      {metadata.data ? <Enrichment objectId={media.id} /> : details ? <EnrichedView data={details} /> : null}
+      {metadata.data ? (
+        <Enrichment objectId={media.id} />
+      ) : details ? (
+        <EnrichedView data={details} />
+      ) : BOOKS.includes(media.kind) ? (
+        <BookView objectId={media.id} genres={media.genres} />
+      ) : null}
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

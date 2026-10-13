@@ -624,6 +624,7 @@ a.media-card__link:focus-visible .media-card__frame {
   gap: var(--space-2);
 }
 .media-enriched__pairs dt {
+  flex: none; /* a label stays whole (« Studios » was cut into « Stu / dio / s ») */
   color: var(--color-text-muted);
 }
 .media-enriched__pairs dd {
