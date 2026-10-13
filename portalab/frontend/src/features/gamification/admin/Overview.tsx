@@ -21,6 +21,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useRules, useVerify, type Value } from "../api";
 import { SOURCES } from "../progression/GainSources";
+import { AnomalyQueue } from "./AnomalyQueue";
 import { useLevelRewards, useMembersProgress, useProgress, useStreak, VALUES } from "./tuning";
 
 const PERIODS = [7, 30, 90, 365];
@@ -48,7 +49,7 @@ const compact = (value: number) =>
  * by day, stacked by kind as on a member's own progression page; each one's running balance; and every
  * member side by side, their gains stacked by kind.
  */
-export function Overview({ onOpen }: { onOpen: (tab: string) => void }) {
+export function Overview() {
   const t = useT();
   const format = useFormat();
   const tableId = useId();
@@ -411,11 +412,10 @@ export function Overview({ onOpen }: { onOpen: (tab: string) => void }) {
             {" · "}
             <Link to="/admin/campaigns">{t("gamification:admin.overview.campaigns")}</Link>
             {" · "}
-            <button type="button" className="ds-link" onClick={() => onOpen("economy")}>
-              {t("gamification:admin.tabs.economy")}
-            </button>
+            <Link to="/admin/marketplace/members">{t("gamification:admin.overview.balances")}</Link>
           </p>
         </AdminSection>
+        <AnomalyQueue />
       </div>
     </>
   );

@@ -157,21 +157,6 @@ export function usePublishCurve() {
   });
 }
 
-export interface ManualGrant {
-  user_id: string;
-  value: Value;
-  amount: number;
-  reason: string;
-  confirmation?: string;
-}
-
-export function useManualGrant() {
-  return useMutation({
-    mutationFn: async (body: ManualGrant) =>
-      (await api.POST("/api/v1/admin/gamification/manual-grants", { body })).data,
-  });
-}
-
 export function useAnomalies() {
   return useQuery({
     queryKey: [...KEY, "anomalies"],

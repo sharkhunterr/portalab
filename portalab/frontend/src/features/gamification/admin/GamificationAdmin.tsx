@@ -1,29 +1,19 @@
 import { useSearchParams } from "react-router";
-import { AdminGrid, AdminPage, AdminTabs } from "../../../design-system/admin/AdminKit";
+import { AdminPage, AdminTabs } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { AchievementsPanel, QuestsPanel } from "./AchievementsPanel";
 import { ActionRules } from "./ActionRules";
-import { AnomalyQueue } from "./AnomalyQueue";
 import { LevelsPanel } from "./LevelsPanel";
-import { ManualGrant } from "./ManualGrant";
 import { Overview } from "./Overview";
 import { ProgressionTuner } from "./ProgressionTuner";
 import { StreakPanel } from "./StreakPanel";
 import "../gamification.css";
 
 const MODE_KEY = "portalab.gamification.mode";
-const SIMPLE = ["overview", "progression", "levels", "streak", "achievements", "quests", "economy"];
-const DETAILED = [
-  "overview",
-  "progression",
-  "actions",
-  "levels",
-  "streak",
-  "achievements",
-  "quests",
-  "economy",
-];
+// issue 105: no « economy » tab — a member's balances are given and taken in the shop's console
+const SIMPLE = ["overview", "progression", "levels", "streak", "achievements", "quests"];
+const DETAILED = ["overview", "progression", "actions", "levels", "streak", "achievements", "quests"];
 
 function storedMode(): "simple" | "detailed" {
   try {
@@ -36,7 +26,7 @@ function storedMode(): "simple" | "detailed" {
 /**
  * ``/admin/gamification`` (spec 013; 027 redesign): two ways to tune the economy — **simple** (shape the
  * progression curve: one pace for every gain, level rewards, streaks) or **detailed** (also the XP of each
- * action and the level formula) — plus the overview curves, achievements, quests and economy tools.
+ * action and the level formula) — plus the overview (curves, anomalies), achievements and quests.
  */
 export default function GamificationAdmin() {
   const t = useT();
@@ -89,7 +79,7 @@ export default function GamificationAdmin() {
         />
       }
     >
-      {tab === "overview" ? <Overview onOpen={(next) => go({ tab: next })} /> : null}
+      {tab === "overview" ? <Overview /> : null}
       {tab === "progression" ? (
         <>
           <ProgressionTuner />
@@ -105,12 +95,6 @@ export default function GamificationAdmin() {
       {tab === "streak" ? <StreakPanel /> : null}
       {tab === "achievements" ? <AchievementsPanel /> : null}
       {tab === "quests" ? <QuestsPanel /> : null}
-      {tab === "economy" ? (
-        <AdminGrid>
-          <ManualGrant />
-          <AnomalyQueue />
-        </AdminGrid>
-      ) : null}
     </AdminPage>
   );
 }

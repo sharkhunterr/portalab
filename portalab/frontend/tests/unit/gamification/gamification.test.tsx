@@ -20,7 +20,6 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 
 import { AchievementGrid } from "../../../src/features/gamification/achievements/Grid";
 import { AnomalyQueue } from "../../../src/features/gamification/admin/AnomalyQueue";
-import { ManualGrant } from "../../../src/features/gamification/admin/ManualGrant";
 import ProgressionPage from "../../../src/features/gamification/progression/ProgressionPage";
 import { json } from "../../support/fake-api";
 
@@ -113,30 +112,6 @@ describe("gamification", () => {
     expect(screen.getByText("Locked")).toBeTruthy();
     expect(screen.getByText("2 / 5")).toBeTruthy();
     expect(screen.getByText("Hidden achievement")).toBeTruthy();
-  });
-
-  it("confirms large manual grants", async () => {
-    const bodies: Array<Record<string, unknown>> = [];
-    fake.handler = async (request) => {
-      const body = (await request.json()) as Record<string, unknown>;
-      bodies.push(body);
-      return body.confirmation
-        ? json(200, { transaction: { id: "t" } })
-        : json(409, {
-            code: "authz.confirmation_required",
-            title: "Confirmation required",
-            confirmation: "tok",
-          });
-    };
-    show(<ManualGrant />);
-    fireEvent.change(screen.getByLabelText("User id"), { target: { value: "u1" } });
-    fireEvent.change(screen.getByLabelText("Amount"), { target: { value: "5000" } });
-    fireEvent.change(screen.getByLabelText("Reason"), { target: { value: "Event prize" } });
-    fireEvent.click(screen.getByRole("button", { name: "Grant" }));
-    expect(await screen.findByText("This amount needs a confirmation. Grant anyway?")).toBeTruthy();
-    fireEvent.click(screen.getAllByRole("button", { name: "Grant" })[1] as HTMLElement);
-    expect(await screen.findByRole("status")).toBeTruthy();
-    expect(bodies[1]).toMatchObject({ amount: 5000, confirmation: "tok" });
   });
 
   it("requires a reason for anomaly decisions", async () => {
