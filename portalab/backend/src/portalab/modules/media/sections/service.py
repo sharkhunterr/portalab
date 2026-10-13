@@ -126,6 +126,9 @@ class Sections:
             # 027: what a book or an audiobook's page tells (Grimmory): authors and narrator, series,
             # publisher, publication date
             "people",
+            "authors",  # #92: told apart from the narrators
+            "narrators",
+            "rating",
             "series",
             "series_position",
             "publisher",
@@ -134,8 +137,9 @@ class Sections:
             "platform",  # 027: a game's console (RomM)
         )
         data = {k: view.effective.get(k) for k in keep if view.effective.get(k) not in (None, "", [])}
-        if view.ids.get("isbn"):
-            data["isbn"] = view.ids["isbn"]
+        for scheme in ("isbn", "asin"):  # #92: an audiobook's ASIN too
+            if view.ids.get(scheme):
+                data[scheme] = view.ids[scheme]
         data.update(
             kind=view.kind,
             parent_id=str(view.parent_id) if view.parent_id else None,

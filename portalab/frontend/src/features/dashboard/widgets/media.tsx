@@ -158,11 +158,23 @@ const KIND_ICON: Record<string, string> = {
 };
 
 /** « Continue » (027): what I am in the middle of — poster, title, episode or author, a progress bar. */
-/** #20, #21: a book or an audiobook resumes straight from its card — the audiobook in the portal's bar,
- * the book in the reader (a page of its own, so a full load); anything else opens its page. */
-function Resume({ card, src, body }: { card: Card; src: string | null; body: ReactNode }) {
+/** #20, #21: a card opens its title's page; with the widget set to « resume » (#92), a book or an
+ * audiobook resumes straight from it — the audiobook in the portal's bar, the book in the reader (a page
+ * of its own, so a full load). */
+function Resume({
+  card,
+  src,
+  body,
+  resume,
+}: {
+  card: Card;
+  src: string | null;
+  body: ReactNode;
+  resume: boolean;
+}) {
   const t = useT();
   const id = card.id ?? /^\/media\/([0-9a-f-]{36})$/.exec(card.route ?? "")?.[1];
+  if (!resume) return card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>;
   if (id && card.kind === "audiobook") {
     return (
       <button
@@ -192,6 +204,7 @@ function Continue({ payload, config, compact }: WidgetProps) {
   const items = compact ? all.slice(0, 1) : all;
   // 027 (#31): « ambient » (bought in the shop) — each poster casts its own colours around it
   const ambient = (config ?? {}).style === "ambient";
+  const resume = (config ?? {}).open === "resume"; // #92: by default a card opens its title's page
   return (
     <ul
       className="widget-continue"
@@ -246,7 +259,7 @@ function Continue({ payload, config, compact }: WidgetProps) {
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may share a title
           <li key={`${card.id ?? card.title}-${index}`}>
-            <Resume card={card} src={card.image_id ?? null} body={body} />
+            <Resume card={card} src={card.image_id ?? null} body={body} resume={resume} />
           </li>
         );
       })}

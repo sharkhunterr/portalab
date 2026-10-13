@@ -8,6 +8,7 @@ import {
   imageUrl,
   MediaError,
   type MediaSection,
+  personPath,
   useMediaDetail,
   useRequestActions,
   useSection,
@@ -66,10 +67,29 @@ function list(value: unknown): Data[] {
 function BookFacts({ data }: { data: Data }) {
   const t = useT();
   const format = useFormat();
-  const people = Array.isArray(data.people) ? (data.people as string[]) : [];
+  const names = (value: unknown) => (Array.isArray(value) ? (value as string[]) : []);
+  const narrators = names(data.narrators);
+  // #92: the authors and the narrators told apart (an older sync knows only « people »)
+  const authors = names(data.authors).length
+    ? names(data.authors)
+    : names(data.people).filter((name) => !narrators.includes(name));
   const hours = data.duration_s ? Number(data.duration_s) / 3600 : 0;
+  const linked = (list: string[]) => (
+    <>
+      {list.map((name, index) => (
+        <span key={name}>
+          {index ? ", " : ""}
+          <Link to={personPath(name)}>{name}</Link>
+        </span>
+      ))}
+    </>
+  );
   const rows = [
-    people.length ? { key: "authors", value: people.join(", ") } : null,
+    authors.length ? { key: "authors", value: linked(authors) } : null,
+    narrators.length ? { key: "narrators", value: linked(narrators) } : null,
+    data.rating
+      ? { key: "readersRating", value: `★ ${format.number(Math.round(Number(data.rating) * 10) / 10)} / 10` }
+      : null,
     data.series
       ? {
           key: "series",
@@ -89,6 +109,7 @@ function BookFacts({ data }: { data: Data }) {
     hours ? { key: "length", value: t("media:facts.hours", { hours: Math.round(hours * 10) / 10 }) } : null,
     data.language ? { key: "language", value: String(data.language).toUpperCase() } : null,
     data.isbn ? { key: "isbn", value: String(data.isbn) } : null,
+    data.asin ? { key: "asin", value: String(data.asin) } : null,
   ].filter((row) => row !== null);
   const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
   if (!rows.length && !tags.length) return null;

@@ -69,7 +69,19 @@ REQUEST_STATES: tuple[str, ...] = (
     "failed",
     "cancelled",
 )
-ID_SCHEMES = ("tmdb", "imdb", "tvdb", "isbn", "igdb", "musicbrainz", "anilist", "openlibrary")
+ID_SCHEMES = (
+    "tmdb",
+    "imdb",
+    "tvdb",
+    "isbn",
+    "igdb",
+    "musicbrainz",
+    "anilist",
+    "openlibrary",
+    "asin",  # #92: books and audiobooks (Audible, Amazon), Hardcover, Goodreads
+    "hardcover",
+    "goodreads",
+)
 
 
 class SourceUnavailable(Exception):
@@ -118,6 +130,7 @@ class LibraryPayload(BaseModel):
     authors: list[str] = Field(default_factory=list, max_length=20)
     narrators: list[str] = Field(default_factory=list, max_length=10)
     directors: list[str] = Field(default_factory=list, max_length=10)
+    rating: float | None = Field(default=None, ge=0, le=10)  # #92: the readers' or viewers' rating, out of 10
     language: str | None = Field(default=None, max_length=16)
     duration_s: float | None = Field(default=None, ge=0)
     pages: int | None = Field(default=None, ge=0)

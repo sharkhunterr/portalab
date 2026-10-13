@@ -46,6 +46,13 @@ CONTINUE = with_styles(  # 027 (#31): « ambient » — the title's poster as a 
         _definition("media.continue", MEDIA_READ, ("media.playback_paused", "media.playback_finished")),
         component_id="media.continue",  # 027: posters with a progress bar
         refresh=Refresh(),
+        # #92: a click opens the title's page (the default), or resumes a book or an audiobook right away
+        config_schema={
+            "type": "object",
+            "properties": {"open": {"type": "string", "enum": ["page", "resume"]}},
+            "additionalProperties": False,
+        },
+        config_defaults={"open": "page"},
     ),
     "ambient",
 )

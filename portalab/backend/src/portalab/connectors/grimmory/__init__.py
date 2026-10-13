@@ -97,6 +97,23 @@ def _names(values: Any) -> list[str]:
     return out
 
 
+def _duration(meta: Mapping[str, Any]) -> float | None:
+    """An audiobook's length in seconds (``audiobookMetadata.durationSeconds``)."""
+    audio = meta.get("audiobookMetadata")
+    seconds = audio.get("durationSeconds") if isinstance(audio, Mapping) else meta.get("audiobookDuration")
+    return float(seconds) if isinstance(seconds, int | float) and seconds > 0 else None
+
+
+def _rating(meta: Mapping[str, Any]) -> float | None:
+    """#92: the readers' rating out of 10 — Grimmory's own, else Audible's, Hardcover's, Goodreads',
+    Amazon's (all out of 5)."""
+    for field in ("rating", "audibleRating", "hardcoverRating", "goodreadsRating", "amazonRating"):
+        value = meta.get(field)
+        if isinstance(value, int | float) and 0 < value <= 5:
+            return round(float(value) * 2, 1)
+    return None
+
+
 def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
     """A Grimmory book as ``(external id, kind, LibraryPayload)``; ``None`` without id or title."""
     meta = _meta(book)
@@ -112,8 +129,15 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
     if "isbn" not in ids and "isbn10" in ids:
         ids["isbn"] = ids["isbn10"]
     ids.pop("isbn10", None)
-    if meta.get("openLibraryId"):
-        ids["openlibrary"] = str(meta["openLibraryId"])[:200]
+    for scheme, field in (
+        ("openlibrary", "openlibraryId"),
+        ("asin", "asin"),  # #92: an audiobook's Audible id
+        ("hardcover", "hardcoverId"),
+        ("goodreads", "goodreadsId"),
+    ):
+        value = meta.get(field) or (meta.get("openLibraryId") if field == "openlibraryId" else None)
+        if value and " " not in str(value).strip():
+            ids[scheme] = str(value).strip()[:200]
     authors = _names(meta.get("authors"))
     narrators = _names([meta["narrator"]]) if meta.get("narrator") else []
     people = authors + narrators
@@ -131,7 +155,8 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
         "narrators": narrators[:10],
         "language": (str(meta.get("language"))[:16] if meta.get("language") else None),
         "pages": int(meta["pageCount"]) if str(meta.get("pageCount") or "").isdigit() else None,
-        "duration_s": float(meta["audiobookDuration"]) if meta.get("audiobookDuration") else None,
+        "duration_s": _duration(meta),
+        "rating": _rating(meta),
         # an audiobook's cover is served apart (027): ``a-<id>`` names it
         "image": f"a-{book['id']}" if kind_of(book) == "audiobook" else str(book["id"]),
         "series": (str(meta.get("seriesName"))[:200] if meta.get("seriesName") else None),
@@ -283,7 +308,8 @@ class GrimmoryConnector(HttpConnector):
                 service,
                 "GET",
                 "/api/v1/books",
-                params={"stripForListView": "false"},
+                # #92: the descriptions too (Grimmory leaves them out of its list otherwise)
+                params={"stripForListView": "false", "withDescription": "true"},
                 max_bytes=LIBRARY_LISTING_BYTES,
             )
         )

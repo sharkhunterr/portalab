@@ -26,6 +26,7 @@ FIELDS = (
     "authors",  # #92: books — who wrote it, who reads it; films — who directed it
     "narrators",
     "directors",
+    "rating",  # #92: the readers' rating (Grimmory), out of 10
     "language",
     "duration_s",
     "pages",

@@ -86,3 +86,30 @@ def test_seerr_camel_case_is_the_same_person() -> None:
 def test_names_compare_without_case_accents_or_apostrophes() -> None:
     assert same_name(f"Chris O{RSQ}Dowd") == same_name("chris o'dowd") == "chris o dowd"
     assert same_name("Michèle Laroque") == "michele laroque"
+
+
+def test_a_grimmory_audiobook_tells_everything_it_knows() -> None:
+    """#92: the description, the narrator apart from the authors, the length, the readers' rating and the
+    Audible id — Grimmory has them all (its list carries descriptions only when asked)."""
+    from portalab.connectors.grimmory import map_book
+
+    _, kind, payload = map_book(
+        {
+            "id": 1245,
+            "primaryFile": {"bookType": "AUDIOBOOK"},
+            "metadata": {
+                "title": "Alien - La sortie des profondeurs",
+                "description": "Un vaisseau minier…",
+                "authors": ["Tim Lebbon", "Dirk Maggs"],
+                "narrator": "Jean Dupont",
+                "asin": "B06XXXXXX1",
+                "audibleRating": 4.3,
+                "audiobookMetadata": {"durationSeconds": 21600},
+            },
+        }
+    ) or (None, None, {})
+    assert kind == "audiobook"
+    assert payload["overview"] == "Un vaisseau minier…"
+    assert payload["authors"] == ["Tim Lebbon", "Dirk Maggs"] and payload["narrators"] == ["Jean Dupont"]
+    assert payload["duration_s"] == 21600.0 and payload["rating"] == 8.6
+    assert payload["ids"] == {"asin": "B06XXXXXX1"}

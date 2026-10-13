@@ -35,7 +35,19 @@ from portalab.modules.media.models import (
     SourceItem,
 )
 
-SCHEME_ORDER = ("tmdb", "imdb", "tvdb", "igdb", "isbn", "musicbrainz", "anilist", "openlibrary")
+SCHEME_ORDER = (
+    "tmdb",
+    "imdb",
+    "tvdb",
+    "igdb",
+    "isbn",
+    "asin",
+    "musicbrainz",
+    "anilist",
+    "openlibrary",
+    "hardcover",
+    "goodreads",
+)
 
 
 class MediaNotFound(NotFound):
