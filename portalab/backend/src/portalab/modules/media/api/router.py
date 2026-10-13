@@ -93,6 +93,7 @@ class MediaCard(BaseModel):
     image_id: UUID | None = None
     at: str | None = None  # 027: when it was added or released (« new » / « released » shelves)
     episode: str | None = None  # 027: « S02E05 » when a new episode brought the series up
+    requested: bool = False  # #92: not available yet, a request for it in progress (its poster says so)
 
 
 class MediaPage(BaseModel):
@@ -226,6 +227,26 @@ class MediaOverridesIn(BaseModel):
     fields: dict[str, Any] = Field(default_factory=dict)  # value None removes the override
 
 
+async def _asked(module: MediaModule, cards: list[MediaCard]) -> list[MediaCard]:
+    """#92: the cards of titles not available yet that someone asked for — « Requested » on their poster,
+    the same badge on every page."""
+    waiting = [card.id for card in cards if not card.available]
+    if not waiting:
+        return cards
+    async with module.database.session() as session:
+        asked = set(
+            (
+                await session.execute(
+                    select(MediaRequest.object_id).where(
+                        MediaRequest.object_id.in_(waiting),
+                        MediaRequest.state.in_(("pending", "approved", "processing")),
+                    )
+                )
+            ).scalars()
+        )
+    return [card.model_copy(update={"requested": True}) if card.id in asked else card for card in cards]
+
+
 def _card(row: MediaObject, image: UUID | None = None) -> MediaCard:
     return MediaCard(
         id=row.id, kind=row.kind, title=row.title, year=row.year, available=row.available, image_id=image
@@ -279,7 +300,9 @@ async def browse(
     rows, next_cursor = await module.catalog.browse(
         principal, kind=kind, genre=genre, year=year, availability=availability, q=q, cursor=cursor
     )
-    return MediaPage(items=[_card(row, image) for row, image in rows], next_cursor=next_cursor)
+    return MediaPage(
+        items=await _asked(module, [_card(row, image) for row, image in rows]), next_cursor=next_cursor
+    )
 
 
 @router.get("/media/discovery/{shelf}", response_model=MediaShelf)
@@ -295,11 +318,14 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
             _card(r, images.get(r.id)).model_copy(update={"at": note.at, "episode": note.episode})
             for r, note in recents
         ]
-        return MediaShelf(shelf=shelf, items=items, next_action=None if items else "browse")
+        return MediaShelf(
+            shelf=shelf, items=await _asked(module, items), next_action=None if items else "browse"
+        )
     rows, next_action = await module.discovery.shelf(shelf, principal)
     async with module.database.session() as session:
         images = await module.catalog._images(session, [r.id for r in rows])
-    return MediaShelf(shelf=shelf, items=[_card(r, images.get(r.id)) for r in rows], next_action=next_action)
+    cards = await _asked(module, [_card(r, images.get(r.id)) for r in rows])
+    return MediaShelf(shelf=shelf, items=cards, next_action=next_action)
 
 
 @router.get("/media/images/{image_id}")

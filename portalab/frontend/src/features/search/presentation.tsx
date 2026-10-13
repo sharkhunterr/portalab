@@ -26,7 +26,21 @@ export const KIND_ICONS: Record<string, string> = {
   service: "server",
   campaign: "star",
   request: "plus", // #4: titles to ask for
+  person: "user", // #92: actors, directors, authors, narrators
 };
+
+/** #92: a person's roles in words and how many titles — « Réalisation · Interprétation · 12 titres ». */
+export function rolesOf(t: ReturnType<typeof useT>, item: Faceted): string {
+  const facets = item.facets ?? {};
+  const roles = (facets.roles ?? "").split(",").filter(Boolean);
+  const titles = Number(facets.titles ?? 0);
+  return [
+    ...roles.map((role) => t(`search:role.${role}`)),
+    titles ? t("search:person.titles", { count: titles }) : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
 
 /** #67: media results told apart by type — films, series, books, audiobooks, games, music… */
 export function mediaGroup(type: string | undefined): { key: string; label: string; icon: string } | null {
@@ -91,7 +105,11 @@ function stateLabel(t: ReturnType<typeof useT>, value: string): string {
 /** #67: a facet value in words — a media or product type, a state — or the value itself when unknown. */
 export function valueLabel(t: ReturnType<typeof useT>, key: string, value: string): string {
   const tries =
-    key === "type" ? [`search:mediaKind.${value}`, `marketplace:type.${value}`] : [`search:badge.${value}`];
+    key === "type" || key === "subtype"
+      ? [`search:mediaKind.${value}`, `marketplace:type.${value}`]
+      : key === "role"
+        ? [`search:role.${value}`]
+        : [`search:badge.${value}`];
   for (const id of tries) {
     const label = t(id);
     if (label !== id && label !== id.split(":").slice(1).join(":")) return label;

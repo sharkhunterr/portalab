@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { personPath } from "../api";
 import { useMeasures } from "../insights/api";
 
 /**
@@ -265,10 +267,13 @@ export function EnrichedView({ data }: { data: Metadata }) {
               const src = metadataImage(person.image, "w185");
               return (
                 <li key={`${person.name}-${person.role ?? ""}`}>
-                  <span className="media-enriched__portrait">
-                    {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="user" size={28} />}
-                  </span>
-                  <strong>{person.name}</strong>
+                  {/* #92: their page — every title of theirs in the library */}
+                  <Link className="media-enriched__person" to={personPath(person.name)}>
+                    <span className="media-enriched__portrait">
+                      {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="user" size={28} />}
+                    </span>
+                    <strong>{person.name}</strong>
+                  </Link>
                   {person.role ? <span className="media-muted">{person.role}</span> : null}
                 </li>
               );
@@ -284,7 +289,9 @@ export function EnrichedView({ data }: { data: Metadata }) {
               {crew.slice(0, 8).map((person) => (
                 <div key={`${person.name}-${person.role ?? ""}`}>
                   <dt>{person.role ? job(t, person.role) : ""}</dt>
-                  <dd>{person.name}</dd>
+                  <dd>
+                    <Link to={personPath(person.name)}>{person.name}</Link>
+                  </dd>
                 </div>
               ))}
             </dl>

@@ -27,7 +27,16 @@ const askable = (season: RequestableSeason) => season.status === "unknown";
  * by default), 4K when wanted, what it takes of my quota (#3) — then a confirmation, and the request joins
  * « My requests ». A title someone already asked for says so instead.
  */
-export function RequestDialog({ target, trigger }: { target: RequestTarget; trigger: ReactElement }) {
+export function RequestDialog({
+  target,
+  trigger,
+  onDone,
+}: {
+  target: RequestTarget;
+  trigger: ReactElement;
+  /** #92: told once the request is sent (a person's page shows the title asked for) */
+  onDone?: () => void;
+}) {
   const t = useT();
   const formId = useId();
   const client = useQueryClient();
@@ -56,6 +65,7 @@ export function RequestDialog({ target, trigger }: { target: RequestTarget; trig
         onSettled: () => {
           void client.invalidateQueries({ queryKey: ["media", "quota"] });
           void client.invalidateQueries({ queryKey: ["media", "discover"] });
+          onDone?.();
         },
       },
     );

@@ -351,6 +351,87 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.search-poster__frame {
+  display: block;
+  box-shadow: none;
+}
+.search-poster__credit {
+  overflow: hidden;
+  color: var(--color-accent-text, var(--color-accent));
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.search-poster__credit:hover {
+  text-decoration: underline;
+}
+/* #92: the people — round portraits in a row of their own */
+.search-people {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 7rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.search-person {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: center;
+  min-inline-size: 0;
+  text-align: center;
+}
+.search-person .search-poster__meta {
+  max-inline-size: 100%;
+  white-space: normal;
+}
+.search-person__link {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  max-inline-size: 100%;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.search-person__portrait {
+  display: grid;
+  place-items: center;
+  inline-size: 5.5rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--color-accent) 22%, var(--color-surface-raised)),
+    var(--color-surface-raised)
+  );
+  color: var(--color-text-muted);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--motion-duration-fast, 120ms) ease-out;
+}
+.search-person__portrait img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.search-person__link:hover .search-person__portrait {
+  transform: translateY(-2px);
+}
+.search-person__name {
+  max-inline-size: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-person__portrait {
+    transition: none;
+  }
+}
 
 /* the analysis is visually distinct from real results (FR-005) */
 .search-assist {

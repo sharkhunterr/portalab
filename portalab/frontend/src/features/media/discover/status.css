@@ -1,0 +1,30 @@
+/* #92: a title's standing on its poster — « ✓ Available », « Requested », « You asked for it » — the same
+   badge on every page (library, discovery, search, a person's page) */
+.discover-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.discover-status[data-status="available"] {
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-surface));
+  color: var(--color-accent-contrast);
+}
+.discover-status:is([data-status="mine"], [data-status="asked"], [data-status="pending"]) {
+  background: color-mix(in srgb, var(--color-accent-alt) 80%, var(--color-surface));
+  color: var(--color-accent-contrast);
+}
+.discover-card__badge {
+  position: absolute;
+  inset-block-start: 0.4rem;
+  inset-inline-end: 0.4rem;
+}
+.media-card__frame:has(> .discover-card__badge) {
+  position: relative;
+}

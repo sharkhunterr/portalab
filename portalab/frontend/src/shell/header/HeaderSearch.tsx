@@ -13,6 +13,7 @@ import {
   KIND_ICONS,
   mediaGroup,
   ResultBadges,
+  rolesOf,
 } from "../../features/search/presentation";
 import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../nav/NavigationProvider";
@@ -48,6 +49,8 @@ interface Option {
   badges?: Badge[] | undefined;
   /** #67: the icon of its group's separator */
   groupIcon?: string | undefined;
+  /** #92: a person's portrait, drawn round */
+  round?: true | undefined;
 }
 
 let focusHandler: ((query: string) => void) | null = null;
@@ -187,14 +190,17 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
         groupIcon: byType?.icon ?? KIND_ICONS[item.kind] ?? "search",
         icon: byType?.icon ?? KIND_ICONS[item.kind] ?? "search",
         title: item.title,
-        detail: detailOf(item),
+        detail: detailOf(t, item),
         route: item.url_ref,
         image:
           item.kind === "media" && item.facets?.image
             ? `/api/v1/media/images/${item.facets.image}`
             : item.kind === "request" && item.facets?.poster // #4: a title to ask for (TMDB's poster)
               ? (metadataImage(item.facets.poster, "w92") ?? undefined)
-              : undefined,
+              : item.kind === "person" && item.facets?.portrait // #92: an actor's, an author's portrait
+                ? (metadataImage(item.facets.portrait, "w92") ?? undefined)
+                : undefined,
+        round: item.kind === "person" || undefined,
         badges: badgesOf(t, item),
       });
     }
@@ -354,7 +360,13 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
                   onKeyDown={() => undefined}
                 >
                   {option.image ? (
-                    <img className="header-search__poster" src={option.image} alt="" loading="lazy" />
+                    <img
+                      className="header-search__poster"
+                      data-round={option.round}
+                      src={option.image}
+                      alt=""
+                      loading="lazy"
+                    />
                   ) : (
                     <span className="header-search__icon" aria-hidden="true">
                       <Icon name={option.icon} size={16} />
@@ -421,10 +433,14 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
   );
 }
 
-function detailOf(item: Suggestion): string | undefined {
+function detailOf(t: ReturnType<typeof useT>, item: Suggestion): string | undefined {
   const facets = item.facets ?? {};
+  if (item.kind === "person") return rolesOf(t, item) || undefined; // #92: « Réalisation · 12 titres »
   if (item.kind === "media") {
-    const parts = [facets.year ?? null, facets.genres ?? null].filter(Boolean);
+    const credit = facets.person // #92: whom the query found — « De Robin Hobb »
+      ? t(`search:credit.${facets.role ?? "credit"}`, { name: facets.person })
+      : null;
+    const parts = [credit, facets.year ?? null, facets.genres ?? null].filter(Boolean);
     if (parts.length) return parts.join(" · ");
   }
   return item.snippet?.trim() || undefined;

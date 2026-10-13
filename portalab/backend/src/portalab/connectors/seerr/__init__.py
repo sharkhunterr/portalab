@@ -20,7 +20,7 @@ from collections.abc import AsyncIterator, Mapping, Sequence
 from dataclasses import replace
 from typing import Any
 
-from portalab.capabilities.connector_http import ConnectorHttpError
+from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import (
     CapabilityBinding,
     ServiceHandle,
@@ -31,9 +31,11 @@ from portalab.capabilities.connector_sdk import (
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
+    PEOPLE,
     REQUEST_DISCOVERY,
     REQUEST_QUOTAS,
     REQUESTS,
+    PersonRecord,
     QuotaAccount,
     QuotaLimits,
     QuotaWindow,
@@ -51,6 +53,7 @@ from portalab.capabilities.media import (
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
+from portalab.connectors.tmdb.people import IMAGE_PATH, map_person, same_name, snake
 
 PAGE = 100
 # request.status: 1 pending, 2 approved, 3 declined (4 failed, 5 completed in recent versions);
@@ -306,6 +309,7 @@ class SeerrConnector(HttpConnector):
         binding(ACCOUNTS),
         binding(REQUEST_QUOTAS),
         binding(REQUEST_DISCOVERY),
+        binding(PEOPLE),
     )
     status_path = "/api/v1/settings/main"
     public_path = "/api/v1/status"
@@ -386,6 +390,8 @@ class SeerrConnector(HttpConnector):
             return _Accounts(self, service)
         if capability == REQUEST_QUOTAS:
             return _Quotas(self, service)
+        if capability == PEOPLE:
+            return _People(self, service)
         if capability == REQUEST_DISCOVERY:
             return _Discovery(self, service)
         return None
@@ -636,3 +642,57 @@ class _Discovery:
         except (ConnectionError, InvalidPayload, ProviderAuthError):
             return False
         return any(isinstance(s, Mapping) and s.get("is4k") for s in servers or [])
+
+
+class _People:
+    """#92: a person as Seerr serves them (TMDB's, camel-cased): biography, birth, every title of theirs.
+    Portraits come from TMDB's public image server, fetched by the portal (browsers never call it)."""
+
+    IMAGES = "https://image.tmdb.org"
+    SIZES = frozenset({"w92", "w185", "h632", "original"})
+
+    def __init__(self, connector: SeerrConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None:
+        person_id = str(ids.get("tmdb") or "")
+        if not person_id.isdigit():
+            found = await self.connector.get_json(
+                self.service, "/api/v1/search", query=" ".join(name.split())[:100], page=1, language=language
+            )
+            wanted = same_name(name)
+            results = (found or {}).get("results") if isinstance(found, Mapping) else None
+            matches = [
+                r
+                for r in results or []
+                if isinstance(r, Mapping)
+                and r.get("mediaType") == "person"
+                and same_name(r.get("name")) == wanted
+            ]
+            if not matches:
+                return None
+            person_id = str(matches[0]["id"])
+        document = await self.connector.get_json(
+            self.service, f"/api/v1/person/{safe_id(person_id)}", language=language
+        )
+        if not isinstance(document, Mapping) or not document.get("id"):
+            return None
+        credits = await self.connector.get_json(
+            self.service, f"/api/v1/person/{safe_id(person_id)}/combined_credits", language=language
+        )
+        merged = dict(snake(document))
+        merged["combined_credits"] = snake(credits) if isinstance(credits, Mapping) else {}
+        merged["external_ids"] = {"imdb_id": document.get("imdbId")}
+        return map_person(merged)
+
+    async def portrait(self, ref: str, size: str) -> bytes:
+        if not IMAGE_PATH.fullmatch(ref) or size not in self.SIZES:
+            raise InvalidPayload("unexpected image reference")
+        client = ConnectorHttpClient(self.IMAGES, timeout_seconds=15, max_response_bytes=8 * 1024 * 1024)
+        try:
+            response = await client.get(f"/t/p/{size}{ref}")
+        except ConnectorHttpError as exc:
+            raise ConnectionError(str(exc)) from exc
+        if response.status_code >= 400:
+            raise ConnectionError(f"TMDB images answered HTTP {response.status_code}")
+        return response.content

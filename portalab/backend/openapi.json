@@ -5583,6 +5583,134 @@
         "title": "FieldUpdateBody",
         "type": "object"
       },
+      "FilmCreditOut": {
+        "properties": {
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "image_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "object_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Object Id"
+          },
+          "poster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poster"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "requested",
+              "unavailable",
+              "missing"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tmdb_id": {
+            "title": "Tmdb Id",
+            "type": "string"
+          },
+          "votes": {
+            "title": "Votes",
+            "type": "integer"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "tmdb_id",
+          "kind",
+          "title",
+          "year",
+          "role",
+          "department",
+          "poster",
+          "image_id",
+          "rating",
+          "votes",
+          "status",
+          "object_id",
+          "route"
+        ],
+        "title": "FilmCreditOut",
+        "type": "object"
+      },
       "GrantIn": {
         "additionalProperties": false,
         "properties": {
@@ -8089,6 +8217,11 @@
             "title": "Kind",
             "type": "string"
           },
+          "requested": {
+            "default": false,
+            "title": "Requested",
+            "type": "boolean"
+          },
           "title": {
             "title": "Title",
             "type": "string"
@@ -8262,6 +8395,11 @@
               }
             ],
             "title": "Position"
+          },
+          "requested": {
+            "default": false,
+            "title": "Requested",
+            "type": "boolean"
           },
           "sections": {
             "items": {
@@ -10516,6 +10654,220 @@
           "enabled"
         ],
         "title": "PermissionOut",
+        "type": "object"
+      },
+      "PersonCreditOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MediaCard"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "items"
+        ],
+        "title": "PersonCreditOut",
+        "type": "object"
+      },
+      "PersonOut": {
+        "properties": {
+          "askable": {
+            "default": false,
+            "title": "Askable",
+            "type": "boolean"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Counts",
+            "type": "object"
+          },
+          "credits": {
+            "items": {
+              "$ref": "#/components/schemas/PersonCreditOut"
+            },
+            "title": "Credits",
+            "type": "array"
+          },
+          "filmography": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FilmCreditOut"
+            },
+            "title": "Filmography",
+            "type": "array"
+          },
+          "known_for": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FilmCreditOut"
+            },
+            "title": "Known For",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "portrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonProfileOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "sources": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "titles": {
+            "title": "Titles",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "portrait",
+          "roles",
+          "titles",
+          "credits"
+        ],
+        "title": "PersonOut",
+        "type": "object"
+      },
+      "PersonProfileOut": {
+        "properties": {
+          "also_known_as": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Also Known As",
+            "type": "array"
+          },
+          "biography": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Biography"
+          },
+          "birthday": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birthday"
+          },
+          "deathday": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deathday"
+          },
+          "imdb": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imdb"
+          },
+          "known_for": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Known For"
+          },
+          "place_of_birth": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place Of Birth"
+          },
+          "popularity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Popularity"
+          }
+        },
+        "required": [
+          "biography",
+          "birthday",
+          "deathday",
+          "place_of_birth",
+          "known_for",
+          "popularity",
+          "also_known_as",
+          "imdb"
+        ],
+        "title": "PersonProfileOut",
         "type": "object"
       },
       "PlaceOut": {
@@ -35634,6 +35986,115 @@
           }
         },
         "summary": "Metadata Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/person": {
+      "get": {
+        "operationId": "person_api_v1_media_person_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Person",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/person/portrait": {
+      "get": {
+        "description": "A person's portrait from the service that has it (TMDB, Seerr, Jellyfin, Grimmory), through the\nportal: browsers never call the services.",
+        "operationId": "person_portrait_api_v1_media_person_portrait_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "service",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Service",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_./-]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": "h632",
+              "pattern": "^(w185|h632)$",
+              "title": "Size",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Person Portrait",
         "tags": [
           "media"
         ]

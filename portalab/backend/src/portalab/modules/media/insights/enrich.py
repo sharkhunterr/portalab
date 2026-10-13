@@ -14,7 +14,7 @@ from uuid import UUID
 from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.media import METADATA, MetadataRecord, unwrap
+from portalab.capabilities.media import METADATA, PEOPLE, MetadataRecord, unwrap
 from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
@@ -290,9 +290,20 @@ class MetadataEnricher:
         poster: str | None = (await self.brief(kind, ids, title, year))["poster"]
         return poster
 
+    def _tmdb_images(self) -> tuple[str, Any] | None:
+        """#92: without a metadata provider, TMDB's images through a service serving TMDB's people (Seerr)."""
+        try:
+            registrations = self.capabilities.system_providers(PEOPLE)
+        except Exception:
+            return None
+        for registration in registrations:
+            if (registration.metadata or {}).get("connector") in ("tmdb", "seerr"):
+                return registration.instance_ref, registration.provider
+        return None
+
     async def image(self, ref: str, size: str) -> bytes:
         """A provider image, fetched once then served from the blob store (or memory without one)."""
-        found = self.provider()
+        found = self.provider() or self._tmdb_images()
         if found is None:
             raise LookupError("no metadata provider")
         key = (ref, size)
@@ -301,7 +312,8 @@ class MetadataEnricher:
                 return await self.blobs.get(self._images[key])
             except Exception:
                 self._images.pop(key, None)
-        data: bytes = unwrap(await asyncio.wait_for(found[1].fetch_image(ref, size), timeout=TIMEOUT))
+        fetch = getattr(found[1], "fetch_image", None) or found[1].portrait
+        data: bytes = unwrap(await asyncio.wait_for(fetch(ref, size), timeout=TIMEOUT))
         if self.blobs is not None:
             stored = await self.blobs.put("media-metadata", data, content_type="image/jpeg")
             if len(self._images) > 5000:

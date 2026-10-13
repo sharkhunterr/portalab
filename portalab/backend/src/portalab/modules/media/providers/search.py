@@ -1,13 +1,15 @@
-"""Search integration (T028; 008 SDK): ``SearchProvider(kind="media")`` with ``type``, ``genre``, ``year``
-and ``availability`` facets, scoped by ``media.read`` at the source, plus the ``media:`` / ``tmdb:``…
-``ObjectResolver`` and the palette actions ``media.open`` / ``media.request``."""
+"""Search integration (T028; 008 SDK): ``SearchProvider(kind="media")`` with ``subtype`` (#92: film,
+series, book, audiobook…), ``genre``, ``year`` and ``availability`` facets, scoped by ``media.read`` at the
+source, plus the ``media:`` / ``tmdb:``… ``ObjectResolver`` and the palette actions ``media.open`` /
+``media.request``."""
 
 import time
 from collections.abc import Sequence
 from typing import Any
+from urllib.parse import quote
 from uuid import UUID
 
-from sqlalchemy import and_, case, func, select
+from sqlalchemy import Select, case, func, select
 
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.search import (
@@ -21,7 +23,17 @@ from portalab.capabilities.search import (
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor, snippet
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
+from portalab.modules.media.matching import (
+    credited,
+    fold,
+    matching,
+    metadata_people,
+    relevance,
+    series_order,
+    words,
+)
 from portalab.modules.media.models import MediaObject, MediaRequest, ObjectTag
+from portalab.modules.media.people import ROLES, People
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 
 # #67: among equally relevant titles, the order of the kinds (films and series before books and tracks)
@@ -48,15 +60,18 @@ class MediaSearchProvider:
 
     def facets(self) -> Sequence[FacetDef]:
         return (
-            FacetDef("type", "search.facet.type"),
+            FacetDef("subtype", "search.facet.subtype"),
             FacetDef("genre", "search.facet.genre", kind="text"),
             FacetDef("year", "search.facet.year", kind="text"),
             FacetDef("availability", "search.facet.availability", values=("available", "unavailable")),
         )
 
-    async def _extras(self, rows: Sequence[MediaObject]) -> dict[UUID, dict[str, str]]:
+    async def _extras(
+        self, rows: Sequence[MediaObject], query_words: Sequence[str] = ()
+    ) -> dict[UUID, dict[str, str]]:
         """#67: what a result shows beside its title — the poster, the first genres and the title's state
-        (available, requested — a request in progress — or not available)."""
+        (available, requested — a request in progress — or not available); #92: and who, among its people,
+        the query found (``person`` and its ``role``: « by Robin Hobb », « with Chris O'Dowd »)."""
         from portalab.modules.media.providers.insight_widgets import posters
 
         ids = [row.id for row in rows]
@@ -81,6 +96,7 @@ class MediaSearchProvider:
                     )
                 ).scalars()
             )
+            provider_people = await metadata_people(session, ids) if query_words else {}
         genres: dict[UUID, list[str]] = {}
         for object_id, value in tags:
             genres.setdefault(object_id, []).append(str(value))
@@ -92,6 +108,9 @@ class MediaSearchProvider:
                 extra["image"] = str(images[row.id])
             if genres.get(row.id):
                 extra["genres"] = ", ".join(sorted(genres[row.id])[:3])
+            found = credited(row, query_words, provider_people.get(row.id, ())) if query_words else None
+            if found:
+                extra["person"], extra["role"] = found
             out[row.id] = extra
         return out
 
@@ -124,10 +143,50 @@ class MediaSearchProvider:
         started = time.perf_counter()
         if not await self.authorizer.is_allowed(principal, MEDIA_READ):
             return ProviderResult()
+        query_words = words(query.text)
+        stmt = self._filtered(query, query_words)
+        offset = decode_cursor(cursor)
+        async with self.query.database.session() as session:
+            rows = (
+                (
+                    await session.execute(
+                        stmt.order_by(*self._relevance(query_words, fold(query.text)))
+                        .offset(offset)
+                        .limit(limit + 1)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            # #92: the counts cover every match (not the first page alone); a subtype's own count ignores
+            # the subtype chosen, so the others stay offered
+            counted = self._filtered(query, query_words, subtype=False).subquery()
+            by_kind = (
+                await session.execute(select(counted.c.kind, func.count()).group_by(counted.c.kind))
+            ).all()
+            by_state = (
+                await session.execute(select(counted.c.available, func.count()).group_by(counted.c.available))
+            ).all()
+        facets: dict[str, dict[str, int]] = {
+            "subtype": {str(kind): int(count) for kind, count in by_kind},
+            "availability": {
+                "available" if available else "unavailable": int(count) for available, count in by_state
+            },
+        }
+        extras = await self._extras(rows[:limit], query_words)
+        return ProviderResult(
+            items=[self._item(row, query, 1.0, extras.get(row.id)) for row in rows[:limit]],
+            next_cursor=encode_cursor(offset + limit) if len(rows) > limit else None,
+            facets=facets,
+            took_ms=int((time.perf_counter() - started) * 1000),
+        )
+
+    @staticmethod
+    def _filtered(query: ParsedQuery, query_words: Sequence[str], *, subtype: bool = True) -> Select[Any]:
         stmt = select(MediaObject).where(MediaObject.status == "active")
         filters = query.filters
-        if filters.get("type"):
-            stmt = stmt.where(MediaObject.kind.in_(filters["type"]))
+        if subtype and filters.get("subtype"):
+            stmt = stmt.where(MediaObject.kind.in_(filters["subtype"]))
         if filters.get("availability"):
             wanted = set(filters["availability"])
             if wanted == {"available"} or wanted == {"unavailable"}:
@@ -143,40 +202,19 @@ class MediaSearchProvider:
                     )
                 )
             )
-        if query.terms:
-            stmt = stmt.where(and_(*(MediaObject.sort_title.ilike(f"%{t}%") for t in query.terms[:8])))
-        offset = decode_cursor(cursor)
-        async with self.query.database.session() as session:
-            rows = (
-                (
-                    await session.execute(
-                        stmt.order_by(*self._relevance(query)).offset(offset).limit(limit + 1)
-                    )
-                )
-                .scalars()
-                .all()
-            )
-        facets: dict[str, dict[str, int]] = {"type": {}, "availability": {}}
-        for row in rows[:limit]:
-            facets["type"][row.kind] = facets["type"].get(row.kind, 0) + 1
-            state = "available" if row.available else "unavailable"
-            facets["availability"][state] = facets["availability"].get(state, 0) + 1
-        extras = await self._extras(rows[:limit])
-        return ProviderResult(
-            items=[self._item(row, query, 1.0, extras.get(row.id)) for row in rows[:limit]],
-            next_cursor=encode_cursor(offset + limit) if len(rows) > limit else None,
-            facets=facets,
-            took_ms=int((time.perf_counter() - started) * 1000),
-        )
+        if query_words:
+            stmt = stmt.where(matching(query_words))
+        return stmt
 
     async def suggestions(
         self, query: ParsedQuery, principal: Principal, *, per_type: int = 2
     ) -> Sequence[SearchItem]:
         """#67: the header's suggestions — the most relevant titles of *each* type (films, games, books…),
         not the first page alone (four games and six films filled it before any book)."""
-        if not query.terms or not await self.authorizer.is_allowed(principal, MEDIA_READ):
+        query_words = words(query.text)
+        if not query_words or not await self.authorizer.is_allowed(principal, MEDIA_READ):
             return []
-        order = self._relevance(query)
+        order = self._relevance(query_words, fold(query.text))
         ranked = (
             select(
                 MediaObject.id.label("id"),
@@ -184,7 +222,7 @@ class MediaSearchProvider:
                 order[0].label("tier"),
             )
             .where(MediaObject.status == "active")
-            .where(and_(*(MediaObject.sort_title.ilike(f"%{t}%") for t in query.terms[:8])))
+            .where(matching(query_words))
             .subquery()
         )
         async with self.query.database.session() as session:
@@ -205,30 +243,23 @@ class MediaSearchProvider:
             }
         best = sorted(picked, key=lambda p: (p.place, p.tier))  # each type's best first, by relevance
         objects = [rows[p.id] for p in best if p.id in rows]
-        extras = await self._extras(objects)
+        extras = await self._extras(objects, query_words)
         return [self._item(row, query, 1.0, extras.get(row.id)) for row in objects]
 
     @staticmethod
-    def _relevance(query: ParsedQuery) -> list[Any]:
+    def _relevance(query_words: Sequence[str], phrase: str = "") -> list[Any]:
         """#67: the most relevant first — the exact title, a title starting with the words, a word of the
-        title starting with them, then the rest; then films and series before books…; then A to Z. (Sorting
-        A to Z alone put « 095 [An +001] Star Wars… » books before every « Star Wars » film.)"""
+        title starting with them, the words all in the title; #92: then the words all found elsewhere (its
+        series, its people), then a close spelling; then films and series before books…; then a series in
+        its order; then A to Z. (Sorting A to Z alone put « 095 [An +001] Star Wars… » books before every
+        « Star Wars » film.)"""
         kind_rank = case(
             *((MediaObject.kind == kind, index) for index, kind in enumerate(KIND_ORDER)),
             else_=len(KIND_ORDER),
         )
-        text = " ".join(query.terms).strip().lower()
-        if not text:
+        if not query_words:
             return [kind_rank, MediaObject.sort_title]
-        title = func.lower(MediaObject.title)
-        safe = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-        tier = case(
-            (title == text, 0),
-            (title.like(f"{safe}%", escape="\\"), 1),
-            (title.like(f"% {safe}%", escape="\\"), 2),
-            else_=3,
-        )
-        return [tier, kind_rank, MediaObject.sort_title]
+        return [relevance(query_words, phrase), kind_rank, *series_order(), MediaObject.sort_title]
 
     async def hydrate(self, ids: Sequence[str], principal: Principal) -> Sequence[SearchItem]:
         if not await self.authorizer.is_allowed(principal, MEDIA_READ):
@@ -254,6 +285,65 @@ class MediaSearchProvider:
         empty = ParsedQuery(text="", normalized="", terms=())
         extras = await self._extras(rows)
         return [self._item(row, empty, extra=extras.get(row.id)) for row in rows]
+
+
+class PeopleSearchProvider:
+    """#92: the people behind the library's titles — actors, directors, writers, authors, narrators — each
+    opening their page of titles; a section of its own in the search and its suggestions."""
+
+    kind = "person"
+    label_key = "search.kind.person"
+    required_permission = MEDIA_READ
+
+    def __init__(self, people: People, authorizer: Authorizer) -> None:
+        self.people = people
+        self.authorizer = authorizer
+
+    def facets(self) -> Sequence[FacetDef]:
+        return (FacetDef("role", "search.facet.role", values=ROLES),)
+
+    async def search(
+        self, query: ParsedQuery, principal: Principal, ctx: LocaleContext, *, limit: int, cursor: str | None
+    ) -> ProviderResult:
+        started = time.perf_counter()
+        if not await self.authorizer.is_allowed(principal, MEDIA_READ):
+            return ProviderResult()
+        offset = decode_cursor(cursor)
+        hits = await self.people.find(
+            words(query.text),
+            fold(query.text),
+            limit=limit + 1,
+            offset=offset,
+            roles=query.filters.get("role") or (),
+        )
+        counts: dict[str, int] = {}
+        for hit in hits[:limit]:
+            for role in hit.roles:
+                counts[role] = counts.get(role, 0) + 1
+        return ProviderResult(
+            items=[
+                SearchItem(
+                    kind=self.kind,
+                    id=hit.name,
+                    title=hit.name,
+                    url_ref=f"/media/people/{quote(hit.name, safe='')}",
+                    snippet=(),
+                    score=1.0,
+                    facets={
+                        "roles": ",".join(hit.roles),
+                        "titles": str(hit.titles),
+                        **({"portrait": hit.portrait} if hit.portrait else {}),
+                    },
+                )
+                for hit in hits[:limit]
+            ],
+            next_cursor=encode_cursor(offset + limit) if len(hits) > limit else None,
+            facets={"role": counts},
+            took_ms=int((time.perf_counter() - started) * 1000),
+        )
+
+    async def hydrate(self, ids: Sequence[str], principal: Principal) -> Sequence[SearchItem]:
+        return []  # found by name each time
 
 
 class MediaResolver:
@@ -285,7 +375,8 @@ class RequestableSearchProvider:
         self.language = language
 
     def facets(self) -> Sequence[FacetDef]:
-        return (FacetDef("type", "search.facet.type", values=("movie", "series")),)
+        # #92: the media subtypes — a book or a game chosen leaves nothing to ask for here
+        return (FacetDef("subtype", "search.facet.subtype"),)
 
     async def _found(
         self, query: ParsedQuery, principal: Principal, limit: int, language: str | None = None
@@ -296,7 +387,7 @@ class RequestableSearchProvider:
         if not await self.authorizer.is_allowed(principal, MEDIA_REQUEST):
             return []
         cards = await self.catalog.search(query.text, user, language or await self.language())
-        wanted = set(query.filters.get("type") or ())
+        wanted = set(query.filters.get("subtype") or ())
         items = []
         for card in cards:
             if card["status"] == "available" or (wanted and card["kind"] not in wanted):

@@ -14,8 +14,9 @@ from portalab.capabilities.media_core import MediaSummary
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
-from portalab.modules.media.common import normalize_title, strong_ids
+from portalab.modules.media.common import strong_ids
 from portalab.modules.media.identity.resolver import MediaNotFound, live_object
+from portalab.modules.media.matching import matching, words
 from portalab.modules.media.models import ExternalId, Image, MediaObject, ObjectTag
 from portalab.modules.media.permissions import MEDIA_MANAGE, MEDIA_READ
 
@@ -93,10 +94,8 @@ class CatalogQuery:
                     )
                 )
             )
-        if q:
-            words = normalize_title(q).split()[:8]
-            if words:
-                stmt = stmt.where(and_(*(MediaObject.sort_title.ilike(f"%{w}%") for w in words)))
+        if q and (found := words(q)):
+            stmt = stmt.where(matching(found))  # #92: its people and series too, typos forgiven
         offset = decode_cursor(cursor)
         limit = max(1, min(limit, 100))
         stmt = stmt.order_by(MediaObject.sort_title, MediaObject.id).offset(offset).limit(limit + 1)

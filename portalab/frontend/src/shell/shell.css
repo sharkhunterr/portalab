@@ -1570,6 +1570,13 @@
   object-fit: cover;
   box-shadow: var(--shadow-1);
 }
+.header-search__poster[data-round] {
+  /* #92: a person's portrait */
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  border-radius: 50%;
+  object-position: top;
+}
 .result-badges {
   display: flex;
   flex-wrap: wrap;

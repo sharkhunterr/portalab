@@ -23,6 +23,9 @@ FIELDS = (
     "year",
     "genres",
     "people",
+    "authors",  # #92: books — who wrote it, who reads it; films — who directed it
+    "narrators",
+    "directors",
     "language",
     "duration_s",
     "pages",

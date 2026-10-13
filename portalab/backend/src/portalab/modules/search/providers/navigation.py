@@ -64,9 +64,10 @@ class NavigationProvider:
             )
             if not query.normalized:
                 continue
-            hits = sum(1 for term in query.terms if term in haystack)
-            if hits:
-                scored.append((hits / max(1, len(query.terms)), entry))
+            # #92: every word of the query (a lone letter — the « o » of « O'Dowd » — only when alone)
+            terms = [term for term in query.terms if len(term) > 1] or list(query.terms)
+            if terms and all(term in haystack for term in terms):
+                scored.append((1.0, entry))
         scored.sort(key=lambda pair: (-pair[0], pair[1].order_hint, pair[1].key))
         offset = decode_cursor(cursor)
         page = scored[offset : offset + limit]

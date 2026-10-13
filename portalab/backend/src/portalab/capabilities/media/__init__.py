@@ -55,6 +55,7 @@ READING = "media.reading"  # #21: books read in the portal (EPUB, PDF, comic boo
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
+PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
 ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
@@ -113,6 +114,10 @@ class LibraryPayload(BaseModel):
     overview: str | None = Field(default=None, max_length=5000)
     genres: list[str] = Field(default_factory=list, max_length=30)
     people: list[str] = Field(default_factory=list, max_length=50)
+    # #92: who wrote a book, who reads it, who directed a film — found by the search, named in its results
+    authors: list[str] = Field(default_factory=list, max_length=20)
+    narrators: list[str] = Field(default_factory=list, max_length=10)
+    directors: list[str] = Field(default_factory=list, max_length=10)
     language: str | None = Field(default=None, max_length=16)
     duration_s: float | None = Field(default=None, ge=0)
     pages: int | None = Field(default=None, ge=0)
@@ -601,6 +606,51 @@ class MetadataRecord:
     posters: Sequence[str] = ()
 
 
+@dataclass(frozen=True, slots=True)
+class PersonCredit:
+    """#92 — one title of a person's filmography, as the metadata provider knows it."""
+
+    tmdb_id: str
+    kind: Literal["movie", "series"]
+    title: str
+    year: int | None = None
+    role: str | None = None  # the character, or the job (« Director »)
+    department: str = "cast"  # cast, directing, writing…
+    poster: str | None = None
+    popularity: float = 0.0
+    vote_average: float | None = None
+    vote_count: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class PersonRecord:
+    """#92 — what a metadata provider knows about a person: their biography, birth, what they are known
+    for, how popular they are, and every title they took part in."""
+
+    ids: Mapping[str, str]
+    name: str
+    biography: str | None = None
+    birthday: str | None = None  # ISO date
+    deathday: str | None = None
+    place_of_birth: str | None = None
+    known_for: str | None = None  # their main department (Acting, Directing, Writing…)
+    portrait: str | None = None  # the service's own reference, fetched back through ``portrait``
+    popularity: float | None = None
+    also_known_as: Sequence[str] = ()
+    credits: Sequence[PersonCredit] = ()
+
+
+@runtime_checkable
+class PeopleProvider(Protocol):
+    """#92 — what a service knows of a person (TMDB, Seerr: biography and filmography; Jellyfin: biography
+    and portrait; Grimmory: an author's description and photo). Found by the ids the portal knows of them
+    (``tmdb``…) or, failing that, by name; ``portrait`` returns the image of a ``PersonRecord.portrait``."""
+
+    async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None: ...
+
+    async def portrait(self, ref: str, size: str) -> bytes: ...
+
+
 @runtime_checkable
 class MetadataProvider(Protocol):
     async def lookup(
@@ -987,6 +1037,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
+    _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

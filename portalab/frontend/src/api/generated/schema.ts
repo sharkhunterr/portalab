@@ -6590,6 +6590,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/person": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Person */
+        get: operations["person_api_v1_media_person_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/person/portrait": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Person Portrait
+         * @description A person's portrait from the service that has it (TMDB, Seerr, Jellyfin, Grimmory), through the
+         *     portal: browsers never call the services.
+         */
+        get: operations["person_portrait_api_v1_media_person_portrait_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/player/{ticket}/image": {
         parameters: {
             query?: never;
@@ -10683,6 +10721,38 @@ export interface components {
              */
             visibility: "public" | "community" | "leaderboard" | "private";
         };
+        /** FilmCreditOut */
+        FilmCreditOut: {
+            /** Department */
+            department: string;
+            /** Image Id */
+            image_id: string | null;
+            /** Kind */
+            kind: string;
+            /** Object Id */
+            object_id: string | null;
+            /** Poster */
+            poster: string | null;
+            /** Rating */
+            rating: number | null;
+            /** Role */
+            role: string | null;
+            /** Route */
+            route: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "requested" | "unavailable" | "missing";
+            /** Title */
+            title: string;
+            /** Tmdb Id */
+            tmdb_id: string;
+            /** Votes */
+            votes: number;
+            /** Year */
+            year: number | null;
+        };
         /** GrantIn */
         GrantIn: {
             /**
@@ -11558,6 +11628,11 @@ export interface components {
             image_id?: string | null;
             /** Kind */
             kind: string;
+            /**
+             * Requested
+             * @default false
+             */
+            requested: boolean;
             /** Title */
             title: string;
             /** Year */
@@ -11615,6 +11690,11 @@ export interface components {
             platform?: string | null;
             /** Position */
             position: number | null;
+            /**
+             * Requested
+             * @default false
+             */
+            requested: boolean;
             /** Sections */
             sections: string[];
             /** Status */
@@ -12477,6 +12557,73 @@ export interface components {
             sensitive: boolean;
             /** User Grantable */
             user_grantable: boolean;
+        };
+        /** PersonCreditOut */
+        PersonCreditOut: {
+            /** Items */
+            items: components["schemas"]["MediaCard"][];
+            /** Role */
+            role: string;
+        };
+        /** PersonOut */
+        PersonOut: {
+            /**
+             * Askable
+             * @default false
+             */
+            askable: boolean;
+            /**
+             * Counts
+             * @default {}
+             */
+            counts: {
+                [key: string]: number;
+            };
+            /** Credits */
+            credits: components["schemas"]["PersonCreditOut"][];
+            /**
+             * Filmography
+             * @default []
+             */
+            filmography: components["schemas"]["FilmCreditOut"][];
+            /**
+             * Known For
+             * @default []
+             */
+            known_for: components["schemas"]["FilmCreditOut"][];
+            /** Name */
+            name: string;
+            /** Portrait */
+            portrait: string | null;
+            profile?: components["schemas"]["PersonProfileOut"] | null;
+            /** Roles */
+            roles: string[];
+            /**
+             * Sources
+             * @default []
+             */
+            sources: string[];
+            /** Titles */
+            titles: number;
+        };
+        /** PersonProfileOut */
+        PersonProfileOut: {
+            /** Also Known As */
+            also_known_as: string[];
+            /** Biography */
+            biography: string | null;
+            /** Birthday */
+            birthday: string | null;
+            /** Deathday */
+            deathday: string | null;
+            /** Imdb */
+            imdb: string | null;
+            /** Known For */
+            known_for: string | null;
+            /** Place Of Birth */
+            place_of_birth: string | null;
+            /** Popularity */
+            popularity: number | null;
         };
         /** PlaceOut */
         PlaceOut: {
@@ -27652,6 +27799,70 @@ export interface operations {
     metadata_image_api_v1_media_metadata_images_get: {
         parameters: {
             query: {
+                ref: string;
+                size?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_api_v1_media_person_get: {
+        parameters: {
+            query: {
+                name: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_portrait_api_v1_media_person_portrait_get: {
+        parameters: {
+            query: {
+                service: string;
                 ref: string;
                 size?: string;
             };

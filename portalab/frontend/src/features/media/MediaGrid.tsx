@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { imageUrl, type MediaCard } from "./api";
+import { PosterBadge } from "./discover/StatusBadge";
 
 export const KIND_ICONS: Record<string, string> = {
   movie: "film",
@@ -51,19 +52,14 @@ export function MediaGrid({
           <Link to={`/media/${item.id}`} className="media-card__link">
             <span className="media-card__frame">
               <Poster src={imageUrl(item.image_id)} kind={item.kind} />
-              {!item.available ? (
-                <span className="media-card__flag" aria-hidden="true">
-                  {t("media:detail.unavailable")}
-                </span>
-              ) : null}
+              <PosterBadge status={item.available ? "available" : item.requested ? "requested" : null} />
             </span>
             <span className="media-card__title">{item.title}</span>
           </Link>
           {note?.(item) ? <span className="media-card__note">{note(item)}</span> : null}
           <span className="media-card__meta">
             {t(`media:kind.${item.kind}`)}
-            {item.year ? ` · ${item.year}` : ""} ·{" "}
-            {item.available ? t("media:detail.available") : t("media:detail.unavailable")}
+            {item.year ? ` · ${item.year}` : ""}
           </span>
         </li>
       ))}

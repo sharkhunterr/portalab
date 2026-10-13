@@ -1,32 +1,7 @@
 /* #4: asking for a title — its page, the shelves' cards and their state; #3: my quota */
 
-.discover-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.1rem 0.5rem;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  color: var(--color-text);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  white-space: nowrap;
-}
-.discover-status[data-status="available"] {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-surface));
-  color: var(--color-accent-contrast);
-}
-.discover-status:is([data-status="mine"], [data-status="asked"], [data-status="pending"]) {
-  background: color-mix(in srgb, var(--color-accent-alt) 80%, var(--color-surface));
-  color: var(--color-accent-contrast);
-}
 .discover-card .media-card__frame {
   position: relative;
-}
-.discover-card__badge {
-  position: absolute;
-  inset-block-start: 0.4rem;
-  inset-inline-end: 0.4rem;
 }
 .discover-card[data-status="available"] .media-card__poster {
   opacity: 0.75;

@@ -12,6 +12,7 @@ Authentication uses an API key created in *Dashboard → API Keys*, sent as
 from collections.abc import AsyncIterator, Mapping, Sequence
 from datetime import datetime
 from typing import Any
+from urllib.parse import quote
 
 from portalab.capabilities.connector_sdk import (
     CapabilityBinding,
@@ -25,7 +26,9 @@ from portalab.capabilities.media import (
     ACCOUNTS,
     ITEM_LINKS,
     LIBRARY,
+    PEOPLE,
     PLAYBACK,
+    PersonRecord,
     ServiceAccount,
     SourceHistoryItem,
     SourcePlayback,
@@ -80,6 +83,7 @@ class JellyfinConnector(HttpConnector):
         binding(HEALTH_PROBE),
         binding(ACCOUNTS),
         binding(ITEM_LINKS),
+        binding(PEOPLE),
     )
     status_path = "/System/Info"
     public_path = "/System/Info/Public"
@@ -134,6 +138,11 @@ class JellyfinConnector(HttpConnector):
                     "overview": (item.get("Overview") or "")[:5000] or None,
                     "genres": list(item.get("Genres") or [])[:30],
                     "people": [p.get("Name") for p in item.get("People") or [] if p.get("Name")][:50],
+                    "directors": [  # #92: found by its director too
+                        p.get("Name")
+                        for p in item.get("People") or []
+                        if p.get("Name") and p.get("Type") == "Director"
+                    ][:10],
                     "duration_s": _seconds(item.get("RunTimeTicks")),
                     "image": item_id if (item.get("ImageTags") or {}).get("Primary") else None,
                     "resolution": resolution_of(item.get("Height")),  # 027: the file's frame height
@@ -155,6 +164,8 @@ class JellyfinConnector(HttpConnector):
             return _Accounts(self, service)
         if capability == ITEM_LINKS:
             return _Links(self, service)
+        if capability == PEOPLE:
+            return _People(self, service)
         return None
 
 
@@ -184,6 +195,42 @@ class _Library:
     async def fetch_image(self, ref: str) -> bytes:
         return await self.connector.get_bytes(
             self.service, f"/Items/{safe_id(ref)}/Images/Primary", maxWidth=600, quality=85
+        )
+
+
+class _People:
+    """#92: a person as Jellyfin knows them (from its own metadata providers): biography, birth and death,
+    birthplace, portrait — found by name."""
+
+    def __init__(self, connector: JellyfinConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None:
+        text = " ".join(name.split())[:200]
+        if not text:
+            return None
+        try:
+            item = await self.connector.get_json(self.service, f"/Persons/{quote(text, safe='')}")
+        except (ConnectionError, InvalidPayload):
+            return None  # nobody by that name on this server
+        if not isinstance(item, Mapping) or not item.get("Id"):
+            return None
+        known = {str(k).lower(): str(v) for k, v in (item.get("ProviderIds") or {}).items() if v}
+        places = [str(p) for p in item.get("ProductionLocations") or [] if p]
+        return PersonRecord(
+            ids={k: known[k][:40] for k in ("tmdb", "imdb") if k in known},
+            name=str(item.get("Name") or text)[:200],
+            biography=(str(item.get("Overview") or "")[:6000]) or None,
+            birthday=str(item["PremiereDate"])[:10] if item.get("PremiereDate") else None,
+            deathday=str(item["EndDate"])[:10] if item.get("EndDate") else None,
+            place_of_birth=places[0][:200] if places else None,
+            portrait=safe_id(item["Id"]) if (item.get("ImageTags") or {}).get("Primary") else None,
+        )
+
+    async def portrait(self, ref: str, size: str) -> bytes:
+        width = 185 if size in ("w92", "w185") else 632
+        return await self.connector.get_bytes(
+            self.service, f"/Items/{safe_id(ref)}/Images/Primary", maxWidth=width, quality=85
         )
 
 

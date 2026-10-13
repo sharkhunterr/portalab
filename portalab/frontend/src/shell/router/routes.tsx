@@ -41,6 +41,7 @@ const MediaReader = lazy(() => import("../../features/media/reader/ReaderPage"))
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
 const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverPage"));
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
+const MediaPerson = lazy(() => import("../../features/media/people/PersonPage"));
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
@@ -220,6 +221,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               path: "discover/:kind/:tmdb",
               element: <MediaDiscoverTitle />,
               handle: h({ crumb: "Ask for a title", requiredPermission: "media.request" }),
+            },
+            {
+              // #92: an actor's, a director's, an author's, a narrator's page
+              path: "people/:name",
+              element: <MediaPerson />,
+              handle: h({ crumb: "Person" }),
             },
             {
               path: ":objectId",

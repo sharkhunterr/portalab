@@ -4,10 +4,12 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { personPath } from "../../media/api";
 import { metadataImage } from "../../media/detail/Enrichment";
+import { PosterBadge } from "../../media/discover/StatusBadge";
 import { Poster } from "../../media/MediaGrid";
 import { type GroupOut, type ItemOut, kindKey, runSearch, type SearchParams } from "../api";
-import { badgesOf, mediaGroup, ResultBadges, SourceIcon } from "../presentation";
+import { badgesOf, mediaGroup, ResultBadges, rolesOf, SourceIcon } from "../presentation";
 
 /**
  * One result group (spec 008 T017): its own functional state (an unavailable source never hides the
@@ -52,7 +54,11 @@ function Result({ item }: { item: ItemOut }) {
 function PosterResult({ item }: { item: ItemOut }) {
   const t = useT();
   const image = item.facets?.image;
-  const badges = badgesOf(t, item).slice(1); // the type is the section's own heading
+  // the type is the section's own heading; the standing is on the poster, as everywhere (#92)
+  const status = item.facets?.status;
+  const badges = badgesOf(t, item)
+    .slice(1)
+    .filter((badge) => !status || badge.label !== badgesOf(t, { kind: "", facets: { status } })[0]?.label);
   // #4: a title to ask for carries TMDB's poster
   const src = image
     ? `/api/v1/media/images/${image}`
@@ -62,11 +68,37 @@ function PosterResult({ item }: { item: ItemOut }) {
   return (
     <li className="search-poster">
       <Link to={item.url_ref} className="search-poster__link">
-        <Poster src={src} kind={item.facets?.type ?? "movie"} />
+        <span className="media-card__frame search-poster__frame">
+          <Poster src={src} kind={item.facets?.type ?? "movie"} />
+          <PosterBadge status={status} />
+        </span>
         <span className="search-poster__title">{item.title}</span>
       </Link>
       <ResultBadges badges={badges} />
+      {item.facets?.person ? (
+        // #92: whom the query found — « by Robin Hobb », « with Chris O'Dowd » — and their page
+        <Link className="search-poster__credit" to={personPath(item.facets.person)}>
+          {t(`search:credit.${item.facets.role ?? "credit"}`, { name: item.facets.person })}
+        </Link>
+      ) : null}
       {item.facets?.genres ? <span className="search-poster__meta">{item.facets.genres}</span> : null}
+    </li>
+  );
+}
+
+/** #92: a person — their portrait (or an icon), name, roles and how many titles — opening their page. */
+function PersonResult({ item }: { item: ItemOut }) {
+  const t = useT();
+  const portrait = metadataImage(item.facets?.portrait, "w185");
+  return (
+    <li className="search-person">
+      <Link to={item.url_ref} className="search-person__link">
+        <span className="search-person__portrait" aria-hidden="true">
+          {portrait ? <img src={portrait} alt="" loading="lazy" /> : <Icon name="user" size={30} />}
+        </span>
+        <span className="search-person__name">{item.title}</span>
+      </Link>
+      <span className="search-poster__meta">{rolesOf(t, item)}</span>
     </li>
   );
 }
@@ -144,7 +176,13 @@ export function ResultGroup({ group, params }: { group: GroupOut; params: Search
                   <span className="search-group__count">{section.items.length}</span>
                 </h4>
               ) : null}
-              {group.kind === "media" || group.kind === "request" ? (
+              {group.kind === "person" ? (
+                <ul className="search-people">
+                  {section.items.map((item) => (
+                    <PersonResult key={`${item.kind}:${item.id}`} item={item} />
+                  ))}
+                </ul>
+              ) : group.kind === "media" || group.kind === "request" ? (
                 <ul className="search-posters">
                   {section.items.map((item) => (
                     <PosterResult key={`${item.kind}:${item.id}`} item={item} />

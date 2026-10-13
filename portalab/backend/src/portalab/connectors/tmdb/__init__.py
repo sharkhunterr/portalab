@@ -21,12 +21,18 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import METADATA, MetadataPerson, MetadataRecord
+from portalab.capabilities.media import (
+    METADATA,
+    PEOPLE,
+    MetadataPerson,
+    MetadataRecord,
+    PersonRecord,
+)
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
+from portalab.connectors.tmdb.people import IMAGE_PATH, image_ref, map_person, same_name
 
 IMAGE_HOST = "https://image.tmdb.org"
-IMAGE_PATH = re.compile(r"^/[A-Za-z0-9_-]{1,64}\.(jpg|jpeg|png|svg)$")
 SIZES = frozenset({"w92", "w154", "w185", "w300", "w342", "w500", "w780", "w1280", "h632", "original"})
 CAST = 20
 CREW_JOBS = ("Director", "Screenplay", "Writer", "Original Music Composer", "Producer", "Creator")
@@ -48,10 +54,6 @@ class TmdbConfig(BaseConfig):
         title="Language",
         description="e.g. fr-FR; empty = the portal's language.",
     )
-
-
-def image_ref(path: Any) -> str | None:
-    return path if isinstance(path, str) and IMAGE_PATH.fullmatch(path) else None
 
 
 def _names(values: Any, key: str = "name") -> list[str]:
@@ -198,7 +200,11 @@ class TmdbConnector(HttpConnector):
     category = "metadata"
     config_schema: type[BaseModel] = TmdbConfig
     secret_fields: frozenset[str] = frozenset({"api_key"})
-    provides: Sequence[CapabilityBinding] = (binding(METADATA, driven=True), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (
+        binding(METADATA, driven=True),
+        binding(PEOPLE),
+        binding(HEALTH_PROBE),
+    )
     status_path = "/3/configuration"
     public_path = None
 
@@ -221,7 +227,7 @@ class TmdbConnector(HttpConnector):
         return "TMDB"
 
     def provider(self, capability: str, service: ServiceHandle) -> Any:
-        if capability == METADATA:
+        if capability in (METADATA, PEOPLE):
             return _Metadata(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
@@ -303,6 +309,43 @@ class _Metadata:
         if document is None:
             return None
         return map_document(document, kind, country=lang.split("-")[-1])
+
+    async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None:
+        """#92: a person by their TMDB id, else by name — biography in the portal's language (else in
+        English), every title of theirs."""
+        lang = self._language(language)
+        person_id = str(ids.get("tmdb") or "")
+        if not person_id.isdigit():
+            found = await self.connector.get_json(
+                self.service, "/3/search/person", query=name[:200], language=lang, include_adult="false"
+            )
+            wanted = same_name(name)
+            matches = [
+                r
+                for r in (found or {}).get("results") or []
+                if isinstance(r, Mapping) and same_name(r.get("name")) == wanted
+            ]
+            if not matches:
+                return None
+            person_id = str(matches[0]["id"])
+        document = await self.connector.get_json(
+            self.service,
+            f"/3/person/{int(person_id)}",
+            language=lang,
+            append_to_response="combined_credits,external_ids",
+        )
+        if not isinstance(document, Mapping) or not document.get("id"):
+            return None
+        if not document.get("biography") and not lang.startswith("en"):
+            english = await self.connector.get_json(
+                self.service, f"/3/person/{int(person_id)}", language="en-US"
+            )
+            if isinstance(english, Mapping) and english.get("biography"):
+                document = {**document, "biography": english["biography"]}
+        return map_person(document)
+
+    async def portrait(self, ref: str, size: str) -> bytes:
+        return await self.fetch_image(ref, size)
 
     async def fetch_image(self, ref: str, size: str) -> bytes:
         if not IMAGE_PATH.fullmatch(ref) or size not in SIZES:

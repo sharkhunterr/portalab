@@ -71,6 +71,27 @@ export function useMediaDetail(id: string) {
   });
 }
 
+export type Person = components["schemas"]["PersonOut"];
+
+/** #92: a person's page — an actor's, a director's, an author's, a narrator's titles in the library. */
+export function personPath(name: string): string {
+  return `/media/people/${encodeURIComponent(name)}`;
+}
+
+export function usePerson(name: string) {
+  return useQuery({
+    queryKey: [...KEY, "person", name],
+    retry: false,
+    queryFn: async () => {
+      const { data, error, response } = await api.GET("/api/v1/media/person", {
+        params: { query: { name } },
+      });
+      if (!data) fail(error, response);
+      return data;
+    },
+  });
+}
+
 export function useSection(id: string, name: string) {
   return useQuery({
     queryKey: [...KEY, "section", id, name],

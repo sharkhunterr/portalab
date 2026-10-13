@@ -35,8 +35,10 @@ from portalab.capabilities.media import (
     AUDIO,
     ITEM_LINKS,
     LIBRARY,
+    PEOPLE,
     READING,
     ActivityPage,
+    PersonRecord,
     ServiceAccount,
     SourceActivity,
 )
@@ -112,9 +114,9 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
     ids.pop("isbn10", None)
     if meta.get("openLibraryId"):
         ids["openlibrary"] = str(meta["openLibraryId"])[:200]
-    people = _names(meta.get("authors"))
-    if meta.get("narrator"):
-        people += _names([meta["narrator"]])
+    authors = _names(meta.get("authors"))
+    narrators = _names([meta["narrator"]]) if meta.get("narrator") else []
+    people = authors + narrators
     subtitle = meta.get("subtitle")
     payload = {
         "title": str(title)[:500],
@@ -125,6 +127,8 @@ def map_book(book: Mapping[str, Any]) -> tuple[str, str, dict[str, Any]] | None:
         "overview": (str(meta.get("description") or "")[:5000]) or None,
         "genres": _names(meta.get("categories"))[:30],
         "people": people[:50],
+        "authors": authors[:20],  # #92: who wrote it and who reads it, told apart (« by … », « read by … »)
+        "narrators": narrators[:10],
         "language": (str(meta.get("language"))[:16] if meta.get("language") else None),
         "pages": int(meta["pageCount"]) if str(meta.get("pageCount") or "").isdigit() else None,
         "duration_s": float(meta["audiobookDuration"]) if meta.get("audiobookDuration") else None,
@@ -191,6 +195,7 @@ class GrimmoryConnector(HttpConnector):
         binding(ITEM_LINKS),
         binding(AUDIO),
         binding(READING),
+        binding(PEOPLE),
     )
     status_path = "/api/v1/libraries"
     public_path = "/api/v1/healthcheck"
@@ -329,6 +334,8 @@ class GrimmoryConnector(HttpConnector):
             return _Links()
         if capability == AUDIO:
             return Listening(self, service)
+        if capability == PEOPLE:
+            return _Authors(self, service)
         if capability == READING:
             return Reading(self, service)
         return None
@@ -423,3 +430,38 @@ class _Accounts:
             for u in users
             if u.get("id") is not None
         ]
+
+
+class _Authors:
+    """#92: an author as Grimmory knows them — their description and photo — found by name."""
+
+    def __init__(self, connector: GrimmoryConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None:
+        text = " ".join(name.split())[:200]
+        if not text:
+            return None
+        try:
+            author = await self.connector.get_json(self.service, "/api/v1/authors/by-name", name=text)
+        except (ConnectionError, InvalidPayload):
+            return None  # no author by that name
+        if not isinstance(author, Mapping) or author.get("id") is None:
+            return None
+        ref = safe_id(author["id"])
+        try:  # a photo only when Grimmory has one (it answers 404 otherwise)
+            photo = bool(
+                await self.connector.get_bytes(self.service, f"/api/v1/media/author/{ref}/thumbnail")
+            )
+        except (ConnectionError, InvalidPayload):
+            photo = False
+        return PersonRecord(
+            ids={"grimmory": str(author["id"])[:40]},
+            name=str(author.get("name") or text)[:200],
+            biography=(str(author.get("description") or "")[:6000]) or None,
+            known_for="Writing",
+            portrait=ref if photo else None,
+        )
+
+    async def portrait(self, ref: str, size: str) -> bytes:
+        return await self.connector.get_bytes(self.service, f"/api/v1/media/author/{safe_id(ref)}/photo")

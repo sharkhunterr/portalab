@@ -14,6 +14,7 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -21,7 +22,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from portalab.core.db import TZDateTime, schema_metadata
 from portalab.core.ids import new_id
-from portalab.core.privacy_registry import pii
+from portalab.core.privacy_registry import not_personal, pii
 
 # ``user_id`` columns reference ``identity.users(id)`` through foreign keys created in the migration only.
 
@@ -36,6 +37,12 @@ class MediaObject(MediaBase):
         CheckConstraint("status IN ('active', 'hidden', 'merged')", name="status"),
         Index("ix_objects_kind_title", "kind", "sort_title"),
         Index("ix_objects_parent", "parent_id", "position"),
+        Index(
+            "ix_objects_search_text",
+            "search_text",
+            postgresql_using="gin",
+            postgresql_ops={"search_text": "gin_trgm_ops"},
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
@@ -47,6 +54,8 @@ class MediaObject(MediaBase):
     year: Mapped[int | None] = mapped_column(Integer)
     available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     effective: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    # #92: what the search reads — computed by the database from the title, its series and its people
+    search_text: Mapped[str] = mapped_column(Text, nullable=False, server_default="", default="")
     field_provenance: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     status: Mapped[str] = mapped_column(String(10), nullable=False)
     merged_into: Mapped[UUID | None] = mapped_column(ForeignKey("media.objects.id"))
@@ -109,6 +118,39 @@ class ObjectTag(MediaBase):
     object_id: Mapped[UUID] = mapped_column(ForeignKey("media.objects.id"), primary_key=True)
     tag_kind: Mapped[str] = mapped_column(String(10), primary_key=True)
     value: Mapped[str] = mapped_column(String(120), primary_key=True)
+
+
+class Credit(MediaBase):
+    """#92 — who is behind a title and as what (``author``, ``narrator``, ``director``, ``writer``,
+    ``creator``, ``cast``, ``artist``), from the library's fields (``library``) and the metadata provider's
+    people (``metadata``, with a portrait); written by the database itself (migration media_0008)."""
+
+    __tablename__ = "credits"
+    __table_args__ = (
+        CheckConstraint("source IN ('library', 'metadata')", name="source"),
+        Index("ix_credits_name", "name"),
+        Index(
+            "ix_credits_folded",
+            "folded",
+            postgresql_using="gin",
+            postgresql_ops={"folded": "gin_trgm_ops"},
+        ),
+    )
+
+    object_id: Mapped[UUID] = mapped_column(
+        ForeignKey("media.objects.id", ondelete="CASCADE"), primary_key=True
+    )
+    source: Mapped[str] = mapped_column(String(8), primary_key=True)
+    name: Mapped[str] = mapped_column(
+        String(200),
+        primary_key=True,
+        info=not_personal("a public credit of a published work (cast, director, author), not a member"),
+    )
+    role: Mapped[str] = mapped_column(String(10), primary_key=True)
+    image: Mapped[str | None] = mapped_column(String(300))
+    folded: Mapped[str] = mapped_column(Text, nullable=False)  # ``media.search_fold(name)``
+    position: Mapped[int] = mapped_column(Integer, nullable=False)  # the billing order
+    ref: Mapped[str | None] = mapped_column(String(40))  # the person's id at the provider (TMDB)
 
 
 class MatchCandidate(MediaBase):

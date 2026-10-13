@@ -299,8 +299,10 @@ describe("catalog and requests", () => {
       });
     };
     renderAt("/media/browse", [{ path: "/media/browse", element: <CatalogPage /> }]);
-    expect(await screen.findByRole("link", { name: "Arrival" })).toBeTruthy();
-    expect(screen.getByText(/Movie · 2016 · Available/)).toBeTruthy();
+    // #92: its standing is on the poster, inside the link (« Available Arrival »)
+    expect(await screen.findByRole("link", { name: /Arrival/ })).toBeTruthy();
+    expect(screen.getByText(/Movie · 2016/)).toBeTruthy();
+    expect(document.querySelector('.discover-status[data-status="available"]')).toBeTruthy(); // its poster badge
     fireEvent.change(screen.getByLabelText("Search titles"), { target: { value: "arr" } });
     fireEvent.change(screen.getByLabelText("Availability"), { target: { value: "available" } });
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));

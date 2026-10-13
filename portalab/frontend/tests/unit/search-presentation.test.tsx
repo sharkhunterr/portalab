@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { badgesOf, KIND_ICONS } from "../../src/features/search/presentation";
+import { badgesOf, KIND_ICONS, rolesOf, valueLabel } from "../../src/features/search/presentation";
 
 // #67 — a result's type and state as badges: words first (translated, or the raw value when unknown),
 // the tone only underlining them; every source has its icon.
@@ -27,5 +27,16 @@ describe("search result badges", () => {
     for (const kind of ["media", "wiki", "news", "tickets", "product", "member", "services"]) {
       expect(KIND_ICONS[kind]).toBeTruthy();
     }
+  });
+
+  it("#92: tells a person's roles and titles, and names subtypes and roles in filters", () => {
+    const tc = ((key: string, values?: { count?: number }) =>
+      values?.count !== undefined ? `${key}=${values.count}` : key) as never;
+    const person = { kind: "person", facets: { roles: "director,cast", titles: "12" } };
+    expect(rolesOf(tc, person)).toBe("search:role.director · search:role.cast · search:person.titles=12");
+    expect(KIND_ICONS.person).toBe("user");
+    const named = ((key: string) => `«${key}»`) as never;
+    expect(valueLabel(named, "subtype", "audiobook")).toBe("«search:mediaKind.audiobook»");
+    expect(valueLabel(named, "role", "narrator")).toBe("«search:role.narrator»");
   });
 });

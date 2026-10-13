@@ -86,6 +86,7 @@ from portalab.modules.media.links.service import UserLinkService
 from portalab.modules.media.models import MatchCandidate, PlaybackSession, SourceItem
 from portalab.modules.media.observability import log, metrics
 from portalab.modules.media.participant import MediaParticipant
+from portalab.modules.media.people import People, Profiles
 from portalab.modules.media.playback.poller import JOB as POLL_JOB
 from portalab.modules.media.playback.poller import PlaybackPoller
 from portalab.modules.media.player.service import PlayerService
@@ -126,6 +127,7 @@ from portalab.modules.media.providers.search import (
     ACTIONS,
     MediaResolver,
     MediaSearchProvider,
+    PeopleSearchProvider,
     RequestableSearchProvider,
 )
 from portalab.modules.media.providers.summary import MediaChanges
@@ -221,6 +223,8 @@ class MediaModule:
         self.request_sink = RequestSink(self.requests)
         self.catalog = CatalogQuery(database, authorizer)
         self.catalog_port = CatalogPort(self.catalog)
+        self.people = People(database)  # #92: the people behind the titles
+        self.profiles = Profiles(capabilities)  # #92: what the services know of them
         self.availability = AvailabilityService(database, capabilities, clock=clock)
         self.sections = Sections(
             database,
@@ -411,6 +415,8 @@ class MediaModule:
             self.search.register(
                 RequestableSearchProvider(self.requestable, self.authorizer, self.language), owner=OWNER
             )
+        if self.search.provider("person") is None:  # #92: actors, directors, authors… a section of their own
+            self.search.register(PeopleSearchProvider(self.people, self.authorizer), owner=OWNER)
         if self.search.provider("media") is None:
             self.search.register(MediaSearchProvider(self.catalog, self.authorizer), owner=OWNER)
             self.search.register_resolver(MediaResolver(self.catalog_port), owner=OWNER)

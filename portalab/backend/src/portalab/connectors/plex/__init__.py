@@ -177,6 +177,10 @@ class PlexConnector(HttpConnector):
                             "overview": (item.get("summary") or "")[:5000] or None,
                             "genres": [g.get("tag") for g in item.get("Genre") or [] if g.get("tag")][:30],
                             "people": [r.get("tag") for r in item.get("Role") or [] if r.get("tag")][:50],
+                            # #92: found by its director too
+                            "directors": [d.get("tag") for d in item.get("Director") or [] if d.get("tag")][
+                                :10
+                            ],
                             "duration_s": _seconds(item.get("duration")),
                             "image": key if item.get("thumb") else None,
                             # 027: release (or air) date, for « Recent releases »
