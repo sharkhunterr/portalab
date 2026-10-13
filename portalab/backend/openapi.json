@@ -9378,6 +9378,66 @@
         "title": "MemberPositionOut",
         "type": "object"
       },
+      "MemberProgressOut": {
+        "properties": {
+          "balance": {
+            "title": "Balance",
+            "type": "integer"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/SourceDayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "gained": {
+            "title": "Gained",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/MemberPointOut"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "balance",
+          "gained",
+          "sources",
+          "days",
+          "points"
+        ],
+        "title": "MemberProgressOut",
+        "type": "object"
+      },
       "MemberSeriesOut": {
         "properties": {
           "gained": {
@@ -9415,6 +9475,27 @@
           "points"
         ],
         "title": "MemberSeriesOut",
+        "type": "object"
+      },
+      "MembersProgressOut": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberProgressOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "members"
+        ],
+        "title": "MembersProgressOut",
         "type": "object"
       },
       "ModuleCascadeIn": {
@@ -21206,6 +21287,84 @@
           }
         },
         "summary": "Manual Withdrawal",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/members": {
+      "get": {
+        "description": "#104: every member's progression over the period (or one member's) \u2014 their gains by kind, day by day,\nand their running balance \u2014 to compare them, or follow one; the most advanced first.",
+        "operationId": "members_progress_api_v1_admin_gamification_members_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "value",
+            "required": false,
+            "schema": {
+              "default": "xp",
+              "enum": [
+                "xp",
+                "coins",
+                "contribution"
+              ],
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "member",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembersProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Members Progress",
         "tags": [
           "gamification-admin"
         ]

@@ -15,7 +15,7 @@ from portalab.core.db import Database
 from portalab.modules.gamification.models import LedgerTransaction, RewardRule
 
 GAINS = ("grant", "manual", "refund", "correction")
-QUESTS = {"quest", "daily", "challenge"}
+QUESTS = {"quest", "daily", "challenge", "discovery"}  # #104: discovery missions are quests too
 ACTIONS = (
     ("media.", "media"),
     ("marketplace.", "shop"),

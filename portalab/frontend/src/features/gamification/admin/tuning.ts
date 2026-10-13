@@ -13,6 +13,7 @@ export type StreakConfig = Required<components["schemas"]["StreakConfig"]>;
 export type LevelReward = components["schemas"]["LevelReward"];
 export type LevelRewards = components["schemas"]["LevelRewardsOut"];
 export type Progress = components["schemas"]["ProgressOut"];
+export type MembersProgress = components["schemas"]["MembersProgressOut"];
 
 export const VALUES: Value[] = ["xp", "coins", "contribution"];
 const KEY = ["gamification", "admin"] as const;
@@ -159,6 +160,19 @@ export function useProgress(value: Value, days: number) {
           params: { query: { value, days, top: 5 } },
         })
       ).data as Progress,
+  });
+}
+
+/** Issue 104: every member's progression over the period — gains by kind, day by day, running balance. */
+export function useMembersProgress(value: Value, days: number) {
+  return useQuery({
+    queryKey: [...KEY, "members", value, days],
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/admin/gamification/members", {
+          params: { query: { value, days } },
+        })
+      ).data as MembersProgress,
   });
 }
 

@@ -3,7 +3,7 @@ be rewarded (event types and their rewardable attributes), play streaks, level r
 progress over time (daily gains, the members who progress most, where the gains come from)."""
 
 import types
-from datetime import date, timedelta
+from datetime import UTC, date, timedelta
 from typing import Annotated, Any, Literal, Union, get_args, get_origin
 from uuid import UUID
 
@@ -407,6 +407,100 @@ async def my_sources(
         module.config.timezone or "UTC",
     )
     return MySourcesOut.model_validate(result)
+
+
+class MemberProgressOut(BaseModel):
+    user_id: UUID
+    name: str | None
+    balance: int  # what the member holds now
+    gained: int  # gained over the period
+    sources: list[SourceOut]  # the period's gains by kind (plays, quests, achievements, bonuses…)
+    days: list[SourceDayOut]  # and day by day
+    points: list[MemberPointOut]  # the running balance, day by day
+
+
+class MembersProgressOut(BaseModel):
+    value: str
+    members: list[MemberProgressOut]
+
+
+MEMBERS_SHOWN = 50
+
+
+@router.get("/admin/gamification/members", response_model=MembersProgressOut)
+async def members_progress(
+    _: Manager,
+    module: Module,
+    value: Literal["xp", "coins", "contribution"] = "xp",
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+    member: UUID | None = None,
+) -> MembersProgressOut:
+    """#104: every member's progression over the period (or one member's) — their gains by kind, day by day,
+    and their running balance — to compare them, or follow one; the most advanced first."""
+    zone = module.config.timezone or "UTC"
+    since = since_days(utc_now(module.clock), days)
+    day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
+    of_value = LedgerTransaction.value == value
+    async with module.database.session() as session:
+        query = select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta)).where(of_value)
+        if member is not None:
+            query = query.where(LedgerTransaction.user_id == member)
+        balances = (
+            await session.execute(
+                query.group_by(LedgerTransaction.user_id)
+                .order_by(func.sum(LedgerTransaction.delta).desc())
+                .limit(MEMBERS_SHOWN)
+            )
+        ).all()
+        ids = [user for user, _ in balances]
+        theirs = (of_value, LedgerTransaction.user_id.in_(ids))
+        before: dict[UUID, int] = {
+            user: int(amount or 0)
+            for user, amount in (
+                await session.execute(
+                    select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta))
+                    .where(*theirs, LedgerTransaction.occurred_at < since)
+                    .group_by(LedgerTransaction.user_id)
+                )
+            ).all()
+        }
+        moves = (
+            await session.execute(
+                select(LedgerTransaction.user_id, day, func.sum(LedgerTransaction.delta))
+                .where(*theirs, LedgerTransaction.occurred_at >= since)
+                .group_by(LedgerTransaction.user_id, day)
+                .order_by(day)
+            )
+        ).all()
+    directory = module.capabilities.system_providers(DIRECTORY)
+    members: list[MemberProgressOut] = []
+    for user_id, balance in balances:
+        name = None
+        if directory:
+            try:
+                summary = await directory[0].provider.get_user_summary(user_id)
+                name = summary.display_name if summary else None
+            except Exception:
+                name = None
+        gains = await gain_sources(module.database, user_id, value, since, zone)
+        running = int(before.get(user_id) or 0)
+        points = [MemberPointOut(day=since.astimezone(UTC).date().isoformat(), total=running)]
+        for owner, when, delta in moves:
+            if owner == user_id:
+                running += int(delta or 0)
+                points.append(MemberPointOut(day=when.isoformat(), total=running))
+        members.append(
+            MemberProgressOut(
+                user_id=user_id,
+                name=name,
+                balance=int(balance or 0),
+                gained=int(gains["total"]),
+                sources=[SourceOut.model_validate(x) for x in gains["sources"]],
+                days=[SourceDayOut.model_validate(x) for x in gains["days"]],
+                points=points,
+            )
+        )
+    return MembersProgressOut(value=value, members=members)
 
 
 class TimelineDayOut(BaseModel):

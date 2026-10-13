@@ -497,6 +497,22 @@
   white-space: nowrap;
 }
 
+.gam-sources__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gam-sources__name > span {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gam-sources__name svg {
+  flex: none;
+}
+
 .gam-sources__bar {
   flex: 2;
   block-size: 0.5rem;

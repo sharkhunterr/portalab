@@ -1082,6 +1082,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Members Progress
+         * @description #104: every member's progression over the period (or one member's) — their gains by kind, day by day,
+         *     and their running balance — to compare them, or follow one; the most advanced first.
+         */
+        get: operations["members_progress_api_v1_admin_gamification_members_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/pace": {
         parameters: {
             query?: never;
@@ -12266,6 +12287,26 @@ export interface components {
             /** Xp */
             xp: number;
         };
+        /** MemberProgressOut */
+        MemberProgressOut: {
+            /** Balance */
+            balance: number;
+            /** Days */
+            days: components["schemas"]["SourceDayOut"][];
+            /** Gained */
+            gained: number;
+            /** Name */
+            name: string | null;
+            /** Points */
+            points: components["schemas"]["MemberPointOut"][];
+            /** Sources */
+            sources: components["schemas"]["SourceOut"][];
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
         /** MemberSeriesOut */
         MemberSeriesOut: {
             /** Gained */
@@ -12279,6 +12320,13 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+        };
+        /** MembersProgressOut */
+        MembersProgressOut: {
+            /** Members */
+            members: components["schemas"]["MemberProgressOut"][];
+            /** Value */
+            value: string;
         };
         /** ModuleCascadeIn */
         ModuleCascadeIn: {
@@ -17599,6 +17647,39 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_progress_api_v1_admin_gamification_members_get: {
+        parameters: {
+            query?: {
+                value?: "xp" | "coins" | "contribution";
+                days?: number;
+                member?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembersProgressOut"];
                 };
             };
             /** @description Validation Error */

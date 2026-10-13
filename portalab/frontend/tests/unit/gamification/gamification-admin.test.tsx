@@ -32,6 +32,37 @@ const TYPES = [
   { name: "ticket.created", owner: "module:support", fields: [] },
 ];
 
+// issue 104: two members, their gains by kind, day by day
+const MEMBERS = [
+  {
+    user_id: "u1",
+    name: "Noémie",
+    balance: 60,
+    gained: 45,
+    sources: [
+      { source: "media", amount: 30 },
+      { source: "achievements", amount: 15 },
+    ],
+    days: [{ day: "2026-10-13", amounts: { media: 30, achievements: 15 } }],
+    points: [
+      { day: "2026-09-13", total: 15 },
+      { day: "2026-10-13", total: 60 },
+    ],
+  },
+  {
+    user_id: "u2",
+    name: "Admin",
+    balance: 40,
+    gained: 20,
+    sources: [{ source: "quests", amount: 20 }],
+    days: [{ day: "2026-10-12", amounts: { quests: 20 } }],
+    points: [
+      { day: "2026-09-13", total: 20 },
+      { day: "2026-10-12", total: 40 },
+    ],
+  },
+];
+
 function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
@@ -64,6 +95,12 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
         return json(200, { version: 1, definition: { base: 100, exponent: 1.5 }, preview: [] });
       case "/api/v1/admin/gamification/event-types":
         return json(200, TYPES);
+      case "/api/v1/admin/gamification/members":
+        return json(200, { value: "xp", members: MEMBERS });
+      case "/api/v1/admin/gamification/progress":
+        return json(200, { value: "xp", days: [], members: [], sources: [] });
+      case "/api/v1/admin/gamification/level-rewards":
+        return json(200, { rewards: [], levels: [] });
       case "/api/v1/admin/gamification/rules":
         return json(200, []);
       case "/api/v1/admin/gamification/streak":
@@ -145,5 +182,35 @@ describe("gamification administration", () => {
         { days: 5, multiplier: 2 },
       ],
     });
+  });
+
+  it("shows what made every member gain, or one of them", async () => {
+    serve([]);
+    show("/admin/gamification");
+    const member = await screen.findByRole("combobox", { name: "Member" });
+    await screen.findByRole("option", { name: "All members (2)" });
+    fireEvent.click(screen.getByRole("button", { name: /Show table/ }));
+    const table = await screen.findByRole("table", { name: "How members progress" });
+    const heads = Array.from(table.querySelectorAll("th")).map((th) => th.textContent);
+    expect(heads).toEqual([
+      "Day",
+      "Plays (films, series, books)",
+      "Quests and objectives",
+      "Achievements",
+      "XP",
+    ]);
+    expect(table.querySelectorAll("tbody tr")).toHaveLength(2);
+    expect(screen.getByText("Running XP of every member")).toBeTruthy();
+
+    fireEvent.change(member, { target: { value: "u1" } });
+    await waitFor(() => expect(screen.getByText("Running XP of Noémie")).toBeTruthy());
+    const mine = screen.getByRole("table", { name: "How members progress" });
+    expect(Array.from(mine.querySelectorAll("th")).map((th) => th.textContent)).toEqual([
+      "Day",
+      "Plays (films, series, books)",
+      "Achievements",
+      "XP",
+    ]);
+    expect(mine.querySelectorAll("tbody tr")).toHaveLength(1);
   });
 });

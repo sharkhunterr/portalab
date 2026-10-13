@@ -101,8 +101,21 @@ async def test_tuning_api(gm: GamHarness, client: AsyncClient) -> None:
     assert progress["members"][0]["gained"] == 20 and progress["members"][0]["points"][-1]["total"] == 20
     assert progress["sources"] == [{"source": "played", "amount": 20}]
 
+    # #104: each member's progression — by kind of gain, day by day, and their running balance; one of them
+    await gm.emit(gm.people["boss"])
+    members = (await client.get("/api/v1/admin/gamification/members?days=30")).json()["members"]
+    ursula = next(m for m in members if m["user_id"] == str(gm.people["ursula"]))
+    assert ursula["balance"] == 20 and ursula["gained"] == 20
+    assert ursula["sources"] == [{"source": "media", "amount": 20}]  # a play
+    assert sum(sum(d["amounts"].values()) for d in ursula["days"]) == 20
+    assert ursula["points"][0]["total"] == 0 and ursula["points"][-1]["total"] == 20
+    assert {m["user_id"] for m in members} == {str(gm.people["ursula"]), str(gm.people["boss"])}
+    one = await client.get("/api/v1/admin/gamification/members", params={"member": str(gm.people["boss"])})
+    assert [m["user_id"] for m in one.json()["members"]] == [str(gm.people["boss"])]
+
     await login(client, "ursula")
     assert (await client.get("/api/v1/admin/gamification/streak")).status_code == 403
+    assert (await client.get("/api/v1/admin/gamification/members")).status_code == 403
 
 
 def test_split_bonus() -> None:
