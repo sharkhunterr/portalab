@@ -6145,6 +6145,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/notifications/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk
+         * @description #112: mark read, archive, bring back from the archive or delete several notifications — mine only
+         *     (another member's ids are ignored); how many changed.
+         */
+        post: operations["bulk_api_v1_me_notifications_bulk_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/notifications/read-all": {
         parameters: {
             query?: never;
@@ -9845,6 +9866,19 @@ export interface components {
              * @enum {string}
              */
             tone: "info" | "success" | "warning" | "critical";
+        };
+        /**
+         * BulkIn
+         * @description #112: one action on several of my notifications at once (the panel's selection).
+         */
+        BulkIn: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "read" | "archive" | "unarchive" | "delete";
+            /** Ids */
+            ids: string[];
         };
         /** CalendarItemOut */
         CalendarItemOut: {
@@ -27692,6 +27726,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NotificationPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bulk_api_v1_me_notifications_bulk_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
                 };
             };
             /** @description Validation Error */

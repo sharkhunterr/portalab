@@ -1,8 +1,8 @@
 """010 T005/T009/T011/T014/T017 — the producer deduplicates per (source, dedup_key) and resolves the audience
 under the caller's authority; the center lists important items first with unread counts, read, read-all,
-archive and delete, owner-only; text is rendered in each recipient's language; repeats about one subject are
-coalesced (critical never); a muted portal channel is suppressed while e-mail is unaffected; a content-free
-live ping is published."""
+archive and delete (several at once too, #112), owner-only; text is rendered in each recipient's language;
+repeats about one subject are coalesced (critical never); a muted portal channel is suppressed while e-mail
+is unaffected; a content-free live ping is published."""
 
 from uuid import UUID
 
@@ -66,13 +66,27 @@ async def test_center(app: FastAPI, client: httpx.AsyncClient, notify: NotifyHar
     assert (await client.post(f"/api/v1/me/notifications/{one}/archive")).json()["archived"] is True
     assert len((await client.get("/api/v1/me/notifications")).json()["items"]) == 2
     assert (await client.post("/api/v1/me/notifications/read-all")).json() == {"read": 2}
+    others = [i["id"] for i in (await client.get("/api/v1/me/notifications")).json()["items"]]
     await login(client, "sam")
     for method, path in (
         ("POST", f"/api/v1/me/notifications/{one}/read"),
         ("DELETE", f"/api/v1/me/notifications/{one}"),
     ):
         assert (await client.request(method, path)).status_code == 404  # never another user's item
+    # #112: several at once — never another member's
+    assert (
+        await client.post("/api/v1/me/notifications/bulk", json={"ids": others, "action": "delete"})
+    ).json() == {"done": 0}
     await login(client, "alex")
+    bulk = "/api/v1/me/notifications/bulk"
+    assert (await client.post(bulk, json={"ids": others, "action": "archive"})).json() == {"done": 2}
+    assert (await client.get("/api/v1/me/notifications")).json()["items"] == []
+    archived = (await client.get("/api/v1/me/notifications", params={"archived": True})).json()["items"]
+    assert len(archived) == 3
+    assert (await client.post(bulk, json={"ids": others, "action": "unarchive"})).json() == {"done": 2}
+    assert len((await client.get("/api/v1/me/notifications")).json()["items"]) == 2
+    assert (await client.post(bulk, json={"ids": others, "action": "delete"})).json() == {"done": 2}
+    assert (await client.post(bulk, json={"ids": [], "action": "read"})).status_code == 422
     assert (await client.delete(f"/api/v1/me/notifications/{one}")).status_code == 204
     async with notify.database.session() as session:
         pings = (

@@ -13,6 +13,7 @@ const ROUTES = join(SRC, "shell", "router", "routes.tsx");
 /** Routed modules that are not pages of their own (redirects, error pages rendered by the shell). */
 const EXEMPT = new Set([
   "pages/NotAvailablePage",
+  "features/notifications/bell/OpenNotifications", // issue 112: opens the bell's panel over the page one came from
   "features/media/player/PlayerPage", // 027 (#2): the video player covers the whole window, no page chrome
   "features/media/reader/ReaderPage", // #21: the book reader covers the whole window, no page chrome
 ]);

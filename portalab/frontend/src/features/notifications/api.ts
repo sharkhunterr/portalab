@@ -15,6 +15,7 @@ export interface CenterFilter {
 }
 
 const KEY = ["notifications"] as const;
+export type BulkAction = "read" | "archive" | "unarchive" | "delete";
 
 export function useNotifications(filter: CenterFilter, enabled = true) {
   return useInfiniteQuery({
@@ -81,7 +82,13 @@ export function useNotificationActions() {
     mutationFn: () => api.POST("/api/v1/me/notifications/read-all"),
     onSettled: settle,
   });
-  return { read, archive, remove, readAll };
+  /** issue 112: one action on several notifications at once (the panel's selection) */
+  const bulk = useMutation({
+    mutationFn: (body: { ids: string[]; action: BulkAction }) =>
+      api.POST("/api/v1/me/notifications/bulk", { body }),
+    onSettled: settle,
+  });
+  return { read, archive, remove, readAll, bulk };
 }
 
 export function usePreferences() {

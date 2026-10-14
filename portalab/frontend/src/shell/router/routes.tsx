@@ -29,7 +29,7 @@ const IncidentConsole = lazy(() => import("../../features/support/incidents/Inci
 const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
 const Wrapped = lazy(() => import("../../features/statistics/wrapped/WrappedStory"));
 const StatisticsAdmin = lazy(() => import("../../features/statistics/admin/DefinitionsAdmin"));
-const Notifications = lazy(() => import("../../features/notifications/center/NotificationCenter"));
+const Notifications = lazy(() => import("../../features/notifications/bell/OpenNotifications")); // issue 112
 const NotificationSettings = lazy(
   () => import("../../features/notifications/preferences/NotificationPreferences"),
 );

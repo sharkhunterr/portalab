@@ -267,6 +267,42 @@ async def read_all(principal: User, module: Module) -> dict[str, int]:
     return {"read": await module.fanout.mark_read(principal.user_id, None)}
 
 
+class BulkIn(BaseModel):
+    """#112: one action on several of my notifications at once (the panel's selection)."""
+
+    model_config = ConfigDict(extra="forbid")
+    ids: list[UUID] = Field(min_length=1, max_length=500)
+    action: Literal["read", "archive", "unarchive", "delete"]
+
+
+@router.post("/me/notifications/bulk")
+async def bulk(principal: User, body: BulkIn, module: Module) -> dict[str, int]:
+    """#112: mark read, archive, bring back from the archive or delete several notifications — mine only
+    (another member's ids are ignored); how many changed."""
+    assert principal.user_id is not None
+    user = principal.user_id
+    if body.action == "read":
+        return {"done": await module.fanout.mark_read(user, body.ids)}
+    mine = and_(Notification.user_id == user, Notification.id.in_(body.ids))
+    now = utc_now(module.clock)
+    async with module.database.unit_of_work() as uow:
+        if body.action == "delete":
+            result = await uow.session.execute(delete(Notification).where(mine))
+        elif body.action == "archive":
+            result = await uow.session.execute(
+                update(Notification)
+                .where(mine, Notification.archived_at.is_(None))
+                .values(archived_at=now, read_at=func.coalesce(Notification.read_at, now))
+            )
+        else:
+            result = await uow.session.execute(
+                update(Notification)
+                .where(mine, Notification.archived_at.is_not(None))
+                .values(archived_at=None)
+            )
+    return {"done": int(getattr(result, "rowcount", 0) or 0)}
+
+
 @router.post("/me/notifications/{notification_id}/read", response_model=NotificationOut)
 async def read_one(principal: User, notification_id: UUID, module: Module) -> NotificationOut:
     assert principal.user_id is not None

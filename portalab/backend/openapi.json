@@ -2416,6 +2416,38 @@
         "title": "BroadcastIn",
         "type": "object"
       },
+      "BulkIn": {
+        "additionalProperties": false,
+        "description": "#112: one action on several of my notifications at once (the panel's selection).",
+        "properties": {
+          "action": {
+            "enum": [
+              "read",
+              "archive",
+              "unarchive",
+              "delete"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids",
+          "action"
+        ],
+        "title": "BulkIn",
+        "type": "object"
+      },
       "CalendarItemOut": {
         "properties": {
           "all_day": {
@@ -36063,6 +36095,52 @@
           }
         },
         "summary": "My Notifications",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/me/notifications/bulk": {
+      "post": {
+        "description": "#112: mark read, archive, bring back from the archive or delete several notifications \u2014 mine only\n(another member's ids are ignored); how many changed.",
+        "operationId": "bulk_api_v1_me_notifications_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Bulk Api V1 Me Notifications Bulk Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Bulk",
         "tags": [
           "notifications"
         ]

@@ -54,7 +54,7 @@ export function DialogActions({ children }: { children: ReactNode }) {
   if (!slot) return <>{children}</>;
   const submit = (event: MouseEvent<HTMLSpanElement>) => {
     const button = (event.target as HTMLElement).closest("button");
-    if (!button || button.type !== "submit" || button.form) return;
+    if (button?.type !== "submit" || button.form) return;
     const form = marker.current?.closest("form");
     if (!form) return;
     event.preventDefault();

@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
-// 010 T013/T016 — the center lists items with kind/priority as text, reads/archives/deletes and marks all
-// as read; preferences show mandatory channels checked, explained and not editable, and save per channel.
+// 010 T013/T016 — the bell's panel (issue 112: the only place) lists items with their kind as text, reads,
+// archives (and brings back), deletes — one or several at once — and marks all as read; preferences show mandatory channels checked, explained and not editable, and save per channel.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -17,7 +17,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { NotificationCenter } from "../../../src/features/notifications/center/NotificationCenter";
+import { NotificationPanel } from "../../../src/features/notifications/bell/NotificationPanel";
 import { NotificationPreferences } from "../../../src/features/notifications/preferences/NotificationPreferences";
 import { json } from "../../support/fake-api";
 
@@ -46,8 +46,8 @@ function wrap(children: ReactNode) {
   );
 }
 
-describe("notification center", () => {
-  it("shows kind and priority as text, and acts on items", async () => {
+describe("notification panel", () => {
+  it("shows kind as text, and acts on each item: read, archive, delete", async () => {
     const calls: string[] = [];
     fake.handler = (request) => {
       const url = new URL(request.url);
@@ -64,12 +64,10 @@ describe("notification center", () => {
         unread: 1,
       });
     };
-    wrap(<NotificationCenter />);
+    wrap(<NotificationPanel open onOpenChange={() => {}} />);
     const alert = (await screen.findByText("Service down")).closest("li") as HTMLElement;
     expect(within(alert).getByText("Alert")).toBeTruthy();
-    expect(within(alert).getByText("Critical")).toBeTruthy();
     expect(within(alert).getByText("×3")).toBeTruthy();
-    expect(screen.getByText("1 unread notification")).toBeTruthy();
     fireEvent.click(within(alert).getByRole("button", { name: "Mark as read: Service down" }));
     fireEvent.click(within(alert).getByRole("button", { name: "Archive: Service down" }));
     fireEvent.click(within(alert).getByRole("button", { name: "Delete: Service down" }));
@@ -82,21 +80,52 @@ describe("notification center", () => {
         "POST /api/v1/me/notifications/read-all",
       ]),
     );
+    // issue 112: no other page to go to
+    expect(screen.queryByText("See every notification")).toBeNull();
   });
 
-  it("filters alerts and unread items", async () => {
+  it("filters, shows the archive, and acts on several at once", async () => {
     const queries: string[] = [];
-    fake.handler = (request) => {
-      queries.push(new URL(request.url).search);
-      return json(200, { items: [], next_cursor: null, unread: 0 });
+    const bulk: unknown[] = [];
+    fake.handler = async (request) => {
+      const url = new URL(request.url);
+      if (request.method === "POST") {
+        bulk.push(await request.json());
+        return json(200, { done: 2 });
+      }
+      queries.push(url.search);
+      const archived = url.searchParams.get("archived") === "true";
+      return json(200, {
+        items: archived
+          ? [item("z", { archived: true, read: true, title: "Old one" })]
+          : [item("a"), item("b")],
+        next_cursor: null,
+        unread: 2,
+      });
     };
-    wrap(<NotificationCenter />);
-    expect(await screen.findByText("You have no notifications.")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Alerts" }));
+    wrap(<NotificationPanel open onOpenChange={() => {}} />);
+    await screen.findByText("Item a");
+    fireEvent.click(screen.getByRole("tab", { name: "Alerts" }));
     await waitFor(() => expect(queries.some((q) => q.includes("kind=alert"))).toBe(true));
-    fireEvent.click(screen.getByRole("button", { name: "Unread" }));
-    await waitFor(() => expect(queries.some((q) => q.includes("unread=true"))).toBe(true));
-    expect(screen.getByRole("button", { name: "Unread" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("tab", { name: /^All/ }));
+    await screen.findByText("Item a");
+    // select: both, then archive them in one go; delete asks to be confirmed
+    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select all" }));
+    expect(screen.getByText("2 selected")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Archive" }));
+    await waitFor(() => expect(bulk).toEqual([{ ids: ["a", "b"], action: "archive" }]));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select: Item a" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    expect(bulk).toHaveLength(1); // not yet
+    fireEvent.click(screen.getByRole("button", { name: "Delete 1 notification?" }));
+    await waitFor(() => expect(bulk.at(-1)).toEqual({ ids: ["a"], action: "delete" }));
+    // the archive: brought back from there
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Archived" }));
+    const old = (await screen.findByText("Old one")).closest("li") as HTMLElement;
+    fireEvent.click(within(old).getByRole("button", { name: "Unarchive: Old one" }));
+    await waitFor(() => expect(bulk.at(-1)).toEqual({ ids: ["z"], action: "unarchive" }));
   });
 });
 
