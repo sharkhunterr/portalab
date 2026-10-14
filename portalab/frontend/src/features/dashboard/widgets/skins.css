@@ -1340,7 +1340,10 @@
   margin: 0;
   padding: 0;
   overflow-x: auto;
+  /* issue 113: sideways only — a session taller than the block never scrolls up and down inside it */
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   list-style: none;
@@ -1355,6 +1358,8 @@
 }
 .widget-playing__track > li {
   min-inline-size: 0;
+  min-block-size: 0;
+  overflow: hidden;
   scroll-snap-align: start;
 }
 .widget-playing__track > li > :is(a, span) {
@@ -1362,6 +1367,7 @@
   align-items: center;
   gap: var(--space-3);
   block-size: 100%;
+  overflow: hidden;
   padding: var(--space-2);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-text) 4%, transparent);
