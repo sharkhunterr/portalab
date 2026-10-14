@@ -16,20 +16,21 @@ type Streak = components["schemas"]["MyStreakOut"];
 
 // each source keeps its colour and icon everywhere (theme tokens; the legend names it, never colour alone)
 export const SOURCES: Record<string, { color: string; icon: string }> = {
-  media: { color: "var(--cal-movie)", icon: "play" },
-  quests: { color: "var(--cal-event)", icon: "target" },
-  streak: { color: "var(--rarity-legendary)", icon: "flame" },
-  campaigns: { color: "var(--cal-campaign)", icon: "star" },
-  achievements: { color: "var(--rarity-epic)", icon: "trophy" },
-  shop: { color: "var(--cal-book)", icon: "shop" },
-  support: { color: "var(--cal-series)", icon: "lifebuoy" },
-  visits: { color: "var(--color-accent-alt)", icon: "home" },
-  levels: { color: "var(--rarity-rare)", icon: "gift" },
-  pace: { color: "var(--color-accent)", icon: "trending" },
-  boost: { color: "var(--rarity-epic)", icon: "rocket" }, // #55: a boost bought in the shop
-  activity: { color: "var(--cal-news)", icon: "zap" },
-  other: { color: "var(--cal-other)", icon: "sparkles" },
-  admin: { color: "var(--cal-other)", icon: "shield" }, // issue 107: given or taken back by an administrator
+  // issue 125: one colour each — the chart series' hues, so two sources never look alike side by side
+  media: { color: "var(--chart-3)", icon: "play" },
+  quests: { color: "var(--chart-8)", icon: "target" },
+  streak: { color: "var(--chart-2)", icon: "flame" },
+  campaigns: { color: "var(--chart-9)", icon: "star" },
+  achievements: { color: "var(--chart-5)", icon: "trophy" },
+  shop: { color: "var(--chart-6)", icon: "shop" },
+  support: { color: "var(--chart-4)", icon: "lifebuoy" },
+  visits: { color: "var(--chart-10)", icon: "home" },
+  levels: { color: "var(--chart-7)", icon: "gift" },
+  pace: { color: "var(--chart-1)", icon: "trending" },
+  boost: { color: "color-mix(in oklab, var(--chart-5) 58%, white)", icon: "rocket" }, // #55: bought in the shop
+  activity: { color: "color-mix(in oklab, var(--chart-8) 58%, white)", icon: "zap" },
+  other: { color: "var(--cal-maintenance)", icon: "sparkles" },
+  admin: { color: "color-mix(in oklab, var(--cal-maintenance) 60%, black)", icon: "shield" }, // issue 107
 };
 const PERIODS = [7, 30, 90, 365];
 const VALUES: Value[] = ["xp", "coins"];

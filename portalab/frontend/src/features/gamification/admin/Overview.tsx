@@ -1,18 +1,7 @@
 import { useId, useState } from "react";
 import { Link } from "react-router";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { AdminSection, AdminStats, AdminTabs, AdminToolbar } from "../../../design-system/admin/AdminKit";
+import { BarsChart, LinesChart, paletteColor } from "../../../design-system/charts/Charts";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
@@ -27,23 +16,10 @@ import { Operations } from "./Operations";
 import { useLevelRewards, useMembersProgress, useProgress, useStreak, VALUES } from "./tuning";
 
 const PERIODS = [7, 30, 90, 365];
-// series colours come from the theme's tokens; the dash pattern keeps them apart without colour
-const SERIES = [
-  "var(--color-accent)",
-  "var(--color-accent-alt)",
-  "var(--cal-series)",
-  "var(--cal-book)",
-  "var(--cal-event)",
-];
-const DASHES = ["", "6 3", "2 3", "8 3 2 3", "1 4"];
 
 function shortDay(day: string): string {
   return day.slice(5);
 }
-
-/** Axis ticks: 1.2k, 500k, 3M — never cut. */
-const compact = (value: number) =>
-  new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
 
 /**
  * Overview (027): how members progress — with the key figures of the economy (rules in force, streak,
@@ -109,9 +85,6 @@ export function Overview() {
   const memberKeys = [...new Set(all.flatMap((m) => m.sources.map((s) => s.source)))];
   const active = (rules.data ?? []).filter((r) => r.status === "active").length;
   const unit = t(`gamification:value.${value}`);
-  const tooltip = {
-    contentStyle: { background: "var(--color-surface-raised)", border: "1px solid var(--color-border)" },
-  };
   const leaders = [...shown].sort((a, b) => b.gained - a.gained).slice(0, 10);
   return (
     <>
@@ -212,31 +185,15 @@ export function Overview() {
             <figure className="gam-chart">
               <figcaption>{t("gamification:admin.overview.daily", { unit })}</figcaption>
               <div aria-hidden="true">
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={daily}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                    <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                    <YAxis
-                      stroke="var(--color-text-muted)"
-                      fontSize={12}
-                      width={48}
-                      tickFormatter={compact}
-                    />
-                    <Tooltip {...tooltip} />
-                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                    {keys.map((key, index) => (
-                      <Bar
-                        key={key}
-                        dataKey={key}
-                        name={label(key)}
-                        stackId="gains"
-                        fill={SOURCES[key]?.color ?? "var(--cal-other)"}
-                        radius={index === keys.length - 1 ? [4, 4, 0, 0] : 0}
-                        isAnimationActive={false}
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarsChart
+                  data={daily}
+                  x="day"
+                  stacked
+                  height={260}
+                  legend
+                  format={format.number}
+                  series={keys.map((key) => ({ key, label: label(key), color: SOURCES[key]?.color }))}
+                />
               </div>
             </figure>
             <figure className="gam-chart">
@@ -249,73 +206,34 @@ export function Overview() {
                   : t("gamification:admin.overview.runningAll", { unit })}
               </figcaption>
               <div aria-hidden="true">
-                <ResponsiveContainer width="100%" height={260}>
-                  <LineChart data={running}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                    <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                    <YAxis
-                      stroke="var(--color-text-muted)"
-                      fontSize={12}
-                      width={56}
-                      tickFormatter={compact}
-                    />
-                    <Tooltip {...tooltip} />
-                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                    {shown.map((m) => {
-                      const index = all.indexOf(m);
-                      return (
-                        <Line
-                          key={m.user_id}
-                          type="monotone"
-                          dataKey={m.user_id}
-                          name={nameOf(m)}
-                          stroke={SERIES[index % SERIES.length] ?? "var(--color-accent)"}
-                          strokeDasharray={DASHES[Math.floor(index / SERIES.length) % DASHES.length] ?? ""}
-                          strokeWidth={2}
-                          dot={false}
-                          connectNulls
-                          isAnimationActive={false}
-                        />
-                      );
-                    })}
-                  </LineChart>
-                </ResponsiveContainer>
+                <LinesChart
+                  data={running}
+                  x="day"
+                  height={260}
+                  legend
+                  format={format.number}
+                  series={shown.map((m) => ({
+                    key: m.user_id,
+                    label: nameOf(m),
+                    color: paletteColor(all.indexOf(m)), // issue 125: one hue (then shade) per member
+                  }))}
+                />
               </div>
             </figure>
             {!member && perMember.length ? (
               <figure className="gam-chart gam-chart--wide">
                 <figcaption>{t("gamification:admin.overview.perMember", { unit })}</figcaption>
                 <div aria-hidden="true">
-                  <ResponsiveContainer width="100%" height={Math.max(160, perMember.length * 36 + 60)}>
-                    <BarChart data={perMember} layout="vertical" margin={{ left: 8, right: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
-                      <XAxis
-                        type="number"
-                        stroke="var(--color-text-muted)"
-                        fontSize={12}
-                        tickFormatter={compact}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        stroke="var(--color-text-muted)"
-                        fontSize={12}
-                        width={110}
-                      />
-                      <Tooltip {...tooltip} />
-                      <Legend wrapperStyle={{ fontSize: 12 }} />
-                      {memberKeys.map((key) => (
-                        <Bar
-                          key={key}
-                          dataKey={key}
-                          name={label(key)}
-                          stackId="member"
-                          fill={SOURCES[key]?.color ?? "var(--cal-other)"}
-                          isAnimationActive={false}
-                        />
-                      ))}
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <BarsChart
+                    data={perMember}
+                    x="name"
+                    stacked
+                    horizontal
+                    legend
+                    height={Math.max(160, perMember.length * 36 + 60)}
+                    format={format.number}
+                    series={memberKeys.map((key) => ({ key, label: label(key), color: SOURCES[key]?.color }))}
+                  />
                 </div>
               </figure>
             ) : null}

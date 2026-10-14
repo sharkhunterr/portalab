@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
-import { DonutChart, HeatmapChart } from "../../src/design-system/charts/Charts";
+import { DonutChart, HeatmapChart, paletteColor } from "../../src/design-system/charts/Charts";
 import {
   DumbbellChart,
   MirrorBars,
@@ -57,5 +57,30 @@ describe("chart kit", () => {
       </MemoryRouter>,
     );
     expect(document.querySelectorAll(".admin-section").length).toBeGreaterThanOrEqual(21);
+  });
+
+  it("tells thirty series apart, then singles one out from the legend (issue 125)", () => {
+    const colors = Array.from({ length: 30 }, (_, index) => paletteColor(index));
+    expect(new Set(colors).size).toBe(30);
+    expect(paletteColor(30)).toBe(paletteColor(0));
+    render(
+      <StackedProgress
+        label="Gains"
+        items={[
+          { label: "Plays", value: 6 },
+          { label: "Quests", value: 3 },
+        ]}
+      />,
+    );
+    const plays = screen.getByRole("button", { name: "Plays" });
+    fireEvent.click(plays);
+    expect(plays.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: "Quests" }).closest("li")?.hasAttribute("data-faded")).toBe(
+      true,
+    );
+    fireEvent.click(plays); // again: every part comes back
+    expect(screen.getByRole("button", { name: "Quests" }).closest("li")?.hasAttribute("data-faded")).toBe(
+      false,
+    );
   });
 });

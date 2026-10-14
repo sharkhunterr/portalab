@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useId } from "react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -29,22 +29,49 @@ import "./charts.css";
  * stacked), lines and areas, a donut with its total, a gauge, a sparkline, a heatmap and a radar. Colours
  * come from the theme's tokens (``PALETTE``), numbers from the caller's ``format``; the look (axes, grid,
  * tooltips, legends) from ``charts.css``. A chart never carries meaning alone: each page says the same in
- * words or offers the table beside it.
+ * words or offers the table beside it. Issue 125: a click on a legend entry singles that series out (the
+ * others fade), a second click brings them all back.
  */
-export const PALETTE = [
-  "var(--color-accent)",
-  "var(--color-accent-alt)",
-  "var(--rarity-epic)",
-  "var(--state-available-fg, var(--cal-series))",
-  "var(--cal-book)",
-  "var(--rarity-legendary)",
-  "var(--cal-event)",
-  "var(--color-text-muted)",
-];
+export const PALETTE = Array.from({ length: 10 }, (_, index) => `var(--chart-${index + 1})`);
 const DASHES = ["", "6 3", "2 3", "8 3 2 3"];
 
+/** Issue 125: ten hues, then the same lighter, then darker — thirty series told apart before one repeats. */
 export function paletteColor(index: number): string {
-  return PALETTE[index % PALETTE.length] ?? "var(--color-accent)";
+  const base = PALETTE[index % PALETTE.length] ?? "var(--color-accent)";
+  const tier = Math.floor(index / PALETTE.length) % 3;
+  if (tier === 1) return `color-mix(in oklab, ${base} 58%, white)`;
+  if (tier === 2) return `color-mix(in oklab, ${base} 62%, black)`;
+  return base;
+}
+
+/** Issue 125: the series a legend click singled out, and the click itself (again: all come back). */
+export function useFocus(): [string | null, (key: string) => void] {
+  const [active, setActive] = useState<string | null>(null);
+  return [active, (key) => setActive((current) => (current === key ? null : key))];
+}
+
+const FADED = 0.15;
+/** Whether a series fades behind the one singled out. */
+export const fades = (active: string | null, key: string) => active !== null && active !== key;
+
+/** A legend whose entries single a series out (rendered in place: the chart finds its ``Legend``). */
+function focusLegend(active: string | null, pick: (key: string) => void) {
+  return (
+    <Legend
+      onClick={(entry) => {
+        const key = (entry as { dataKey?: unknown }).dataKey;
+        if (key !== undefined && key !== null) pick(String(key));
+      }}
+      formatter={(value, entry) => (
+        <span
+          className="ds-chart-pick"
+          data-faded={fades(active, String((entry as { dataKey?: unknown }).dataKey)) || undefined}
+        >
+          {value}
+        </span>
+      )}
+    />
+  );
 }
 
 export type Datum = Record<string, string | number | null | undefined>;
@@ -98,6 +125,7 @@ export function BarsChart({
   grid = true,
 }: Common & { data: Datum[]; x: string; series: ChartSeries[]; stacked?: boolean; horizontal?: boolean }) {
   const last = series.length - 1;
+  const [active, pick] = useFocus();
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart
@@ -130,7 +158,7 @@ export function BarsChart({
           </>
         )}
         {tooltip(format, xFormat)}
-        {legend ? <Legend /> : null}
+        {legend ? focusLegend(active, pick) : null}
         {series.map((s, index) => {
           const top = !stacked || index === last;
           const radius: [number, number, number, number] = horizontal
@@ -147,6 +175,7 @@ export function BarsChart({
               name={s.label}
               {...(stacked ? { stackId: "stack" } : {})}
               fill={s.color ?? paletteColor(index)}
+              fillOpacity={fades(active, s.key) ? FADED : 1}
               radius={radius}
               maxBarSize={42}
               isAnimationActive={false}
@@ -184,6 +213,7 @@ export function LinesChart({
 }) {
   const id = useId().replace(/:/g, "");
   const Chart = area ? AreaChart : LineChart;
+  const [active, pick] = useFocus();
   return (
     <ResponsiveContainer width="100%" height={height}>
       <Chart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
@@ -201,7 +231,7 @@ export function LinesChart({
         <XAxis dataKey={x} minTickGap={24} hide={!xAxis} {...(xFormat ? { tickFormatter: xFormat } : {})} />
         <YAxis width={44} tickFormatter={compact} hide={!yAxis} />
         {tooltip(format, xFormat)}
-        {legend ? <Legend /> : null}
+        {legend ? focusLegend(active, pick) : null}
         {children}
         {series.map((s, index) =>
           area ? (
@@ -213,6 +243,8 @@ export function LinesChart({
               stroke={s.color ?? paletteColor(index)}
               strokeWidth={2}
               strokeDasharray={s.dashed ? "6 3" : ""}
+              strokeOpacity={fades(active, s.key) ? FADED : 1}
+              fillOpacity={fades(active, s.key) ? FADED : 1}
               fill={`url(#${id}-${index})`}
               isAnimationActive={false}
             />
@@ -223,7 +255,8 @@ export function LinesChart({
               dataKey={s.key}
               name={s.label}
               stroke={s.color ?? paletteColor(index)}
-              strokeWidth={2.2}
+              strokeWidth={active === s.key ? 3 : 2.2}
+              strokeOpacity={fades(active, s.key) ? FADED : 1}
               strokeDasharray={s.dashed ? (DASHES[index % DASHES.length] ?? "") : ""}
               dot={false}
               activeDot={{ r: 4 }}
@@ -257,6 +290,7 @@ export function DonutChart({
   format?: ((value: number) => string) | undefined;
 }) {
   const sum = items.reduce((all, item) => all + item.value, 0);
+  const [active, pick] = useFocus();
   return (
     <div className="ds-donut">
       <div
@@ -277,7 +311,11 @@ export function DonutChart({
               isAnimationActive={false}
             >
               {items.map((item, index) => (
-                <Cell key={item.label} fill={item.color ?? paletteColor(index)} />
+                <Cell
+                  key={item.label}
+                  fill={item.color ?? paletteColor(index)}
+                  fillOpacity={fades(active, item.label) ? FADED : 1}
+                />
               ))}
             </Pie>
             <Tooltip formatter={(value, name) => [format(Number(value)), name]} />
@@ -290,9 +328,16 @@ export function DonutChart({
       </div>
       <ul className="ds-donut__legend">
         {items.map((item, index) => (
-          <li key={item.label}>
-            <span className="ds-donut__dot" style={{ background: item.color ?? paletteColor(index) }} />
-            <span>{item.label}</span>
+          <li key={item.label} data-faded={fades(active, item.label) || undefined}>
+            <button
+              type="button"
+              className="ds-chart-pick"
+              aria-pressed={active === item.label}
+              onClick={() => pick(item.label)}
+            >
+              <span className="ds-donut__dot" style={{ background: item.color ?? paletteColor(index) }} />
+              <span>{item.label}</span>
+            </button>
             <strong>{format(item.value)}</strong>
             <small>{sum ? Math.round((item.value / sum) * 100) : 0} %</small>
           </li>
@@ -488,13 +533,14 @@ export function RadarProfile({
     axis,
     ...Object.fromEntries(series.map((s) => [s.label, s.values[index] ?? 0])),
   }));
+  const [active, pick] = useFocus();
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RadarChart data={data} outerRadius="72%">
         <PolarGrid />
         <PolarAngleAxis dataKey="axis" />
         <Tooltip formatter={(value, name) => [format(Number(value)), name]} />
-        {series.length > 1 ? <Legend /> : null}
+        {series.length > 1 ? focusLegend(active, pick) : null}
         {series.map((s, index) => (
           <Radar
             key={s.label}
@@ -502,7 +548,8 @@ export function RadarProfile({
             name={s.label}
             stroke={s.color ?? paletteColor(index)}
             fill={s.color ?? paletteColor(index)}
-            fillOpacity={0.22}
+            fillOpacity={fades(active, s.label) ? 0.04 : 0.22}
+            strokeOpacity={fades(active, s.label) ? FADED : 1}
             strokeWidth={2}
             isAnimationActive={false}
           />

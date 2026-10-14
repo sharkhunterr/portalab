@@ -557,3 +557,37 @@
 .recharts-surface:focus:not(:focus-visible) {
   outline: none;
 }
+
+/* issue 125: a legend entry singles its series out — the others fade until it is clicked again */
+.ds-chart-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: opacity var(--motion-duration-fast);
+}
+
+.ds-chart-pick[data-faded],
+[data-faded] > .ds-chart-pick,
+li[data-faded] {
+  opacity: 0.45;
+}
+
+.ds-chart-pick[aria-pressed="true"] {
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.ds-chart-pick:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.recharts-legend-item {
+  cursor: pointer;
+}

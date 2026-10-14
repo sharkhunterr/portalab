@@ -1,6 +1,6 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Funnel, FunnelChart, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { paletteColor, type Slice } from "./Charts";
+import { fades, paletteColor, type Slice, useFocus } from "./Charts";
 import "./charts.css";
 
 /**
@@ -15,6 +15,28 @@ function wedge(cx: number, cy: number, inner: number, outer: number, start: numb
   const large = end - start > Math.PI ? 1 : 0;
   return `M${p(inner, start)}L${p(outer, start)}A${outer},${outer} 0 ${large},1 ${p(outer, end)}L${p(inner, end)}A${inner},${inner} 0 ${large},0 ${p(inner, start)}Z`;
 }
+
+/** Issue 125: a legend entry that singles its part out (the others fade); again, all come back. */
+function Pick({
+  name,
+  active,
+  pick,
+  children,
+}: {
+  name: string;
+  active: string | null;
+  pick: (key: string) => void;
+  children: ReactNode;
+}) {
+  return (
+    <button type="button" className="ds-chart-pick" aria-pressed={active === name} onClick={() => pick(name)}>
+      {children}
+    </button>
+  );
+}
+
+const dim = (active: string | null, name: string): CSSProperties | undefined =>
+  fades(active, name) ? { opacity: 0.15 } : undefined;
 
 /** A polar wheel — when things happen: 24 hours as a clock, 7 days around a week; deeper means more. */
 export function PolarWheel({
@@ -93,6 +115,7 @@ export function RingsChart({
 }) {
   const cx = size / 2;
   const width = Math.min(16, (size * 0.36) / Math.max(1, items.length) - 4);
+  const [active, pick] = useFocus();
   return (
     <div className="ds-rings">
       <svg viewBox={`0 0 ${size} ${size}`} role="img" aria-label={items.map((i) => i.label).join(", ")}>
@@ -102,7 +125,7 @@ export function RingsChart({
           const circumference = 2 * Math.PI * r;
           const color = item.color ?? paletteColor(index);
           return (
-            <g key={item.label} transform={`rotate(-90 ${cx} ${cx})`}>
+            <g key={item.label} transform={`rotate(-90 ${cx} ${cx})`} style={dim(active, item.label)}>
               <circle cx={cx} cy={cx} r={r} className="ds-ring__track" strokeWidth={width} />
               <circle
                 cx={cx}
@@ -121,12 +144,14 @@ export function RingsChart({
       </svg>
       <ul className="ds-chart-legend">
         {items.map((item, index) => (
-          <li key={item.label}>
-            <span
-              className="ds-chart-legend__dot"
-              style={{ background: item.color ?? paletteColor(index) }}
-            />
-            {item.label}
+          <li key={item.label} data-faded={fades(active, item.label) || undefined}>
+            <Pick name={item.label} active={active} pick={pick}>
+              <span
+                className="ds-chart-legend__dot"
+                style={{ background: item.color ?? paletteColor(index) }}
+              />
+              {item.label}
+            </Pick>
             <strong>{Math.round((item.value / (item.max ?? 100)) * 100)} %</strong>
           </li>
         ))}
@@ -152,6 +177,7 @@ export function StackedProgress({
 }) {
   const sum = items.reduce((all, item) => all + item.value, 0);
   const whole = Math.max(total ?? sum, 1);
+  const [active, pick] = useFocus();
   return (
     <div className="ds-stacked" data-vertical={vertical || undefined}>
       <div className="ds-stacked__bar" role="img" aria-label={label}>
@@ -163,18 +189,21 @@ export function StackedProgress({
             style={{
               [vertical ? "blockSize" : "inlineSize"]: `${(item.value / whole) * 100}%`,
               background: item.color ?? paletteColor(index),
+              ...dim(active, item.label),
             }}
           />
         ))}
       </div>
       <ul className="ds-chart-legend">
         {items.map((item, index) => (
-          <li key={item.label}>
-            <span
-              className="ds-chart-legend__dot"
-              style={{ background: item.color ?? paletteColor(index) }}
-            />
-            {item.label}
+          <li key={item.label} data-faded={fades(active, item.label) || undefined}>
+            <Pick name={item.label} active={active} pick={pick}>
+              <span
+                className="ds-chart-legend__dot"
+                style={{ background: item.color ?? paletteColor(index) }}
+              />
+              {item.label}
+            </Pick>
             <strong>{format(item.value)}</strong>
           </li>
         ))}
@@ -197,6 +226,7 @@ export function StackedColumns({
 }) {
   const max = Math.max(1, ...groups.map((g) => g.items.reduce((a, i) => a + i.value, 0)));
   const names = groups[0]?.items.map((i) => i.label) ?? [];
+  const [active, pick] = useFocus();
   return (
     <div className="ds-columns">
       <div className="ds-columns__plot" role="img" aria-label={label} style={{ blockSize: height }}>
@@ -210,6 +240,7 @@ export function StackedColumns({
                   style={{
                     blockSize: `${(item.value / max) * 100}%`,
                     background: item.color ?? paletteColor(index),
+                    ...dim(active, item.label),
                   }}
                 />
               ))}
@@ -220,9 +251,11 @@ export function StackedColumns({
       </div>
       <ul className="ds-chart-legend">
         {names.map((name, index) => (
-          <li key={name}>
-            <span className="ds-chart-legend__dot" style={{ background: paletteColor(index) }} />
-            {name}
+          <li key={name} data-faded={fades(active, name) || undefined}>
+            <Pick name={name} active={active} pick={pick}>
+              <span className="ds-chart-legend__dot" style={{ background: paletteColor(index) }} />
+              {name}
+            </Pick>
           </li>
         ))}
       </ul>
