@@ -96,7 +96,7 @@
   "admin.levels.add": "Ajouter un palier",
   "admin.levels.empty": "Aucun palier récompensé pour l'instant.",
   "admin.levels.from": "dès {xp} XP",
-  "admin.levels.hint": "Ce qu'un membre reçoit en atteignant un niveau (Coins, Contribution, un produit offert) et ce que le palier débloque dans la boutique.",
+  "admin.levels.hint": "Ce qu'un membre reçoit en atteignant un niveau (XP, Coins, un peu de Contribution, un produit offert) et ce que le palier débloque dans la boutique.",
   "admin.levels.label": "Nom du palier",
   "admin.levels.labelExample": "Bronze, Argent, Or…",
   "admin.levels.level": "Niveau",

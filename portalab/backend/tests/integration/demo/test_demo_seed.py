@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 from sqlalchemy import text
 
+from portalab.app import demo_economy
 from portalab.app.demo_seed import MEMBERS, PRODUCTS, seed_demo
 from portalab.app.demo_shop import SHOP
 from portalab.app.wiring import wire_platform
@@ -76,6 +77,22 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
             text("SELECT count(*) FROM gamification.streak_days WHERE user_id = :u"), {"u": admin}
         )
     assert written == 0 and streak == 0
+
+    # #108: the curve and the tiers the demo is tuned for — level 50 in about three years, a tier every few
+    # levels; #109: a visit rewarded once a day
+    curve = await platform.gamification.levels.curve()
+    assert (curve.base, curve.exponent) == (100, 1.9)
+    tiers = platform.gamification.config.level_rewards
+    assert len(tiers) == len(demo_economy.LEVEL_REWARDS) and tiers[-1]["level"] == 50
+    async with database.session() as session:
+        sign_in = await session.scalar(
+            text("SELECT count(*) FROM gamification.reward_rules WHERE event_type = 'user.signed_in'")
+        )
+        visit = await session.scalar(
+            text("SELECT definition FROM gamification.quests WHERE key = 'daily_visit' ORDER BY version DESC")
+        )
+    assert sign_in == 0  # a sign-in earns nothing by itself: the daily visit does, once a day
+    assert {(r["value"], r["amount"]) for r in visit["rewards"]} == {("xp", 5), ("coins", 5)}
 
     lines = users_file.read_text(encoding="utf-8").splitlines()
     assert [line.split("\t")[0] for line in lines] == [login for login, _ in MEMBERS]

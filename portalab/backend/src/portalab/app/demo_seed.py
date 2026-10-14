@@ -33,7 +33,9 @@ from portalab.core.logging import get_logger
 from portalab.core.time import utc_now
 from portalab.modules.administration.firstrun.service import WizardRequest
 from portalab.modules.gamification.achievements.definition import parse_achievement
+from portalab.modules.gamification.quests.definition import parse_quest
 from portalab.modules.gamification.rules.definition import RuleDefinition
+from portalab.modules.gamification.streaks.level_rewards import LevelReward
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.services.common import SYSTEM
 from portalab.modules.identity.services.credentials import set_password
@@ -43,6 +45,9 @@ from portalab.modules.wiki.pages import PageInput
 log = get_logger("portalab.demo")
 
 MEMBERS = (("alice", "Alice Martin"), ("bruno", "Bruno Lefèvre"), ("chloe", "Chloé Dubois"))
+
+# #108/#109: a visit counts once a day — the daily visit's completion, however many times one signs in
+VISITS = demo_economy.visits
 
 ACHIEVEMENTS: dict[str, dict[str, Any]] = {
     "first_steps": {
@@ -56,9 +61,9 @@ ACHIEVEMENTS: dict[str, dict[str, Any]] = {
     "regular": {
         "category": "service_usage",
         "label": "Regular",
-        "description": "Sign in on ten different occasions.",
+        "description": "Drop by the portal on ten different days.",
         "icon": "calendar",
-        "criteria": [{"kind": "event_count", "event_type": "user.signed_in", "count": 10}],
+        "criteria": VISITS(10),
         "rewards": [{"value": "xp", "amount": 50}],
     },
     "saver": {
@@ -160,8 +165,8 @@ ACHIEVEMENTS |= {
          _count("achievement.unlocked", 10), [{"value": "coins", "amount": 75}]),
         ("year_in_review", "content", "Year in review", "Open your yearly recap.", "sparkles",
          _count("statistics.wrapped_generated", 1), [{"value": "xp", "amount": 30}]),
-        ("loyal", "service_usage", "Loyal", "Sign in on a hundred occasions.", "heart",
-         _count("user.signed_in", 100), [{"value": "coins", "amount": 120}]),
+        ("loyal", "service_usage", "Loyal", "Drop by the portal on a hundred days.", "heart",
+         VISITS(100), [{"value": "coins", "amount": 120}]),
         ("level_10", "progression", "Double digits", "Reach level 10.", "medal",
          [{"kind": "level_at_least", "level": 10}], [{"value": "coins", "amount": 100}]),
         ("level_20", "progression", "Living legend", "Reach level 20.", "crown",
@@ -221,6 +226,33 @@ ACHIEVEMENTS |= {
     )
 }  # fmt: skip
 
+# #108: the long run — levels 30 to 50 (reached in about three years), big XP totals, years of films and
+# visits; Coins mostly, a little Contribution, and looks of their own
+ACHIEVEMENTS |= {
+    key: {"category": category, "label": label, "description": about, "icon": icon, "criteria": criteria,
+          "rewards": rewards}
+    for key, category, label, about, icon, criteria, rewards in (
+        ("level_30", "progression", "Seasoned", "Reach level 30.", "medal",
+         [{"kind": "level_at_least", "level": 30}], [{"value": "coins", "amount": 400}]),
+        ("level_40", "progression", "Elder", "Reach level 40.", "mountain",
+         [{"kind": "level_at_least", "level": 40}],
+         [{"value": "coins", "amount": 600}, {"value": "contribution", "amount": 2}]),
+        ("level_50", "progression", "Legend of the portal", "Reach level 50, the highest.", "crown",
+         [{"kind": "level_at_least", "level": 50}],
+         [{"value": "coins", "amount": 1000}, {"value": "contribution", "amount": 5}]),
+        ("xp_50000", "progression", "Fifty thousand", "Earn 50,000 XP.", "zap",
+         [{"kind": "value_at_least", "value": "xp", "amount": 50000}], [{"value": "coins", "amount": 300}]),
+        ("xp_100000", "progression", "Hundred thousand", "Earn 100,000 XP.", "flame",
+         [{"kind": "value_at_least", "value": "xp", "amount": 100000}], [{"value": "coins", "amount": 500}]),
+        ("cinephile_500", "service_usage", "Five hundred screenings", "Finish 500 films or episodes.",
+         "clapperboard", _count(FINISHED, 500), [{"value": "coins", "amount": 300}]),
+        ("thousand_nights", "service_usage", "A thousand nights", "Finish 1,000 films or episodes.", "moon",
+         _count(FINISHED, 1000), [{"value": "coins", "amount": 600}, {"value": "contribution", "amount": 2}]),
+        ("faithful", "service_usage", "Faithful", "Drop by the portal on 365 days.", "calendar",
+         VISITS(365), [{"value": "coins", "amount": 250}]),
+    )
+}  # fmt: skip
+
 # 027: what some achievements unlock — cosmetics in their spirit, most of them exclusive (out of sale)
 ACHIEVEMENTS["completionist"] = {
     "category": "purchase",
@@ -268,11 +300,65 @@ UNLOCKS: dict[str, list[dict[str, str]]] = {
     "surprise_pack": [_unlock("booster_discovery", "booster", "Discovery booster")],
     "pack_addict": [_unlock("booster_prestige", "booster", "Prestige HD booster")],
     "lucky_hand": [_unlock("badge_lucky_hand", "badge", "Lucky hand")],
+    # #108
+    "level_30": [_unlock("title_seasoned", "title", "Seasoned")],
+    "level_40": [_unlock("badge_elder", "badge", "Elder")],
+    "level_50": [
+        _unlock("badge_portal_legend", "badge", "Legend"),
+        _unlock("title_portal_legend", "title", "Legend of the portal"),
+    ],
+    "xp_100000": [_unlock("title_hundred_thousand", "title", "Hundred thousand")],
+    "cinephile_500": [_unlock("title_five_hundred", "title", "Five hundred screenings")],
+    "thousand_nights": [_unlock("badge_thousand_nights", "badge", "A thousand nights")],
+    "faithful": [_unlock("frame_faithful", "avatar_frame", "Faithful orbit frame")],
 }  # fmt: skip
 for key, unlocks in UNLOCKS.items():
     ACHIEVEMENTS[key] = {**ACHIEVEMENTS[key], "unlocks": unlocks}
 
 QUESTS: dict[str, dict[str, Any]] = {
+    "daily_visit": {
+        "kind": "daily",
+        "label": "Daily visit",
+        "description": "Drop by the portal today.",
+        "icon": "home",
+        "period": "day",
+        "steps": [{"kind": "event_count", "event_type": "user.signed_in", "count": 1}],
+        "rewards": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 5}],  # #109: once a day
+    },
+    "weekly_regular": {
+        "kind": "daily",
+        "label": "Weekly regular",
+        "description": "Drop by on three days this week.",
+        "icon": "calendar",
+        "period": "week",
+        "steps": VISITS(3),
+        "rewards": [{"value": "xp", "amount": 30}],
+    },
+    "explorer": {
+        "kind": "quest",
+        "label": "Explorer",
+        "description": "Come back on five days to discover everything.",
+        "icon": "compass",
+        "steps": VISITS(5),
+        "rewards": [{"value": "xp", "amount": 80}, {"value": "coins", "amount": 20}],
+    },
+}
+
+RULES: dict[str, dict[str, Any]] = {}
+# #109: a visit earns its XP through the daily visit (once a day); the former sign-in bonus (each sign-in,
+# then capped to a day) is retired where it is still as the demo published it
+RETIRED_RULES: dict[str, list[dict[str, Any]]] = {
+    "sign_in_bonus": [
+        {"event_type": "user.signed_in", "grants": [{"value": "xp", "amount": 5}]},
+        {
+            "event_type": "user.signed_in",
+            "grants": [{"value": "xp", "amount": 5}],
+            "limits": {"caps": [{"value": "xp", "period": "day", "max_amount": 5}]},
+        },
+    ],
+}
+# the quests as the demo published them before (#109): given a new version where nobody changed them
+FORMER_QUESTS: dict[str, dict[str, Any]] = {
     "daily_visit": {
         "kind": "daily",
         "label": "Daily visit",
@@ -299,10 +385,6 @@ QUESTS: dict[str, dict[str, Any]] = {
         "steps": [{"kind": "event_count", "event_type": "user.signed_in", "count": 5}],
         "rewards": [{"value": "xp", "amount": 80}, {"value": "coins", "amount": 20}],
     },
-}
-
-RULES: dict[str, dict[str, Any]] = {
-    "sign_in_bonus": {"event_type": "user.signed_in", "grants": [{"value": "xp", "amount": 5}]},
 }
 
 
@@ -510,7 +592,7 @@ class DemoSeeder:
             await gamification.achievements.save(self.admin, key, raw)  # new definition or new version
             made += 1
         for key, raw in QUESTS.items():
-            if await self._scalar("SELECT 1 FROM gamification.quests WHERE key = :k LIMIT 1", k=key):
+            if await self._quest_kept(key, FORMER_QUESTS.get(key)):
                 continue
             await gamification.quests.save(self.admin, key, raw)
             made += 1
@@ -520,6 +602,15 @@ class DemoSeeder:
             rule = await gamification.rules.save(self.admin, key, raw)
             await gamification.rules.publish(self.admin, key, rule.version)
             made += 1
+        for key, formers in RETIRED_RULES.items():
+            stored = await self._scalar(
+                "SELECT definition FROM gamification.reward_rules WHERE key = :k AND status = 'active' "
+                "ORDER BY version DESC LIMIT 1",
+                k=key,
+            )
+            if any(_unchanged(stored, former) for former in formers):
+                await gamification.rules.retire(self.admin, key)
+                made += 1
         return f"{made} definitions created"
 
     async def _access_permissions(self) -> None:
@@ -674,12 +765,22 @@ class DemoSeeder:
                     self.admin, "economy.streak", demo_economy.STREAK, reason="demo economy"
                 )
                 settings += 1
-            if not gamification.config.level_rewards:
+            if not gamification.config.level_rewards or _same_tiers(
+                gamification.config.level_rewards, demo_economy.FORMER_LEVEL_REWARDS
+            ):
                 await writer[0].provider.set_global(
                     self.admin, "economy.levelRewards", demo_economy.LEVEL_REWARDS, reason="demo economy"
                 )
                 settings += 1
             await gamification.refresh_config()
+        # #108: the curve the demo is tuned for, unless an administrator chose another than the default
+        curve = await gamification.levels.curve()
+        if (curve.base, curve.exponent) == (
+            demo_economy.FORMER_CURVE["base"],
+            demo_economy.FORMER_CURVE["exponent"],
+        ):
+            await gamification.levels.publish(demo_economy.CURVE)
+            settings += 1
         return f"{made} rules, {retired} retired, {settings} settings"
 
     async def _retire_rules(self, gamification: Any) -> int:
@@ -718,11 +819,25 @@ class DemoSeeder:
             await campaigns.reconciler.run()
         return f"{made} campaigns created"
 
+    async def _quest_kept(self, key: str, former: dict[str, Any] | None) -> bool:
+        """A quest stays as it is — unless it is still the one the demo published before (#109)."""
+        stored = await self._scalar(
+            "SELECT definition FROM gamification.quests WHERE key = :k ORDER BY version DESC LIMIT 1", k=key
+        )
+        if stored is None:
+            return False
+        try:
+            return former is None or parse_quest(stored) != parse_quest(former)
+        except ValueError:
+            return True
+
     async def year_quests(self) -> str:
         gamification = self.platform.gamification
         made = 0
-        for key, raw in demo_economy.quests(utc_now().date()).items():
-            if await self._scalar("SELECT 1 FROM gamification.quests WHERE key = :k LIMIT 1", k=key):
+        today = utc_now().date()
+        formers = demo_economy.former_quests(today)
+        for key, raw in demo_economy.quests(today).items():
+            if await self._quest_kept(key, formers.get(key)):
                 continue
             await gamification.quests.save(self.admin, key, raw)
             made += 1
@@ -829,3 +944,24 @@ class DemoSeeder:
 
 async def seed_demo(platform: Platform, *, users_file: Path | None = None) -> SeedReport:
     return await DemoSeeder(platform, users_file=users_file).run()
+
+
+def _same_tiers(current: Any, former: list[dict[str, Any]]) -> bool:
+    """#108: the level tiers are still the ones the demo set before (nobody changed them)."""
+    try:
+        tiers = [LevelReward.model_validate(t) for t in current]
+        return tiers == [LevelReward.model_validate(t) for t in former]
+    except (TypeError, ValueError):
+        return False
+
+
+def _unchanged(stored: Any, former: dict[str, Any] | None) -> bool:
+    """#109: a stored rule is still the one the demo published before (nobody changed it)."""
+    if former is None or not isinstance(stored, dict):
+        return False
+    try:
+        return RuleDefinition.model_validate({**stored, "label": ""}) == RuleDefinition.model_validate(
+            {**former, "label": ""}
+        )
+    except ValueError:
+        return False

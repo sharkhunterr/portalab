@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from portalab.app.demo_economy import LEVEL_REWARDS
 from portalab.capabilities.themes import UNIVERSE_THEMES
 from portalab.modules.ui import themes as themes_package
 
@@ -1142,6 +1143,25 @@ for key, kind, payload, en, fr, about_en, about_fr, icon in (
     ("badge_lucky_hand", "badge", {"label": "Lucky hand", "icon": "dices", "style": "rainbow"}, "Lucky hand badge",
      "Badge Main heureuse", "Given for a legendary card drawn from a booster.",
      "Offert pour une carte légendaire tirée d'un booster.", "dices"),
+    # #108: the long run — high levels, big totals, years of films
+    ("title_seasoned", "title", {"label": "Seasoned", "style": "shimmer"}, "Title: Seasoned",
+     "Titre : Chevronné", "Given at level 30.", "Offert au niveau 30.", "medal"),
+    ("badge_elder", "badge", {"label": "Elder", "icon": "mountain", "style": "gold"}, "Elder badge",
+     "Badge Ancien", "Given at level 40.", "Offert au niveau 40.", "mountain"),
+    ("title_portal_legend", "title", {"label": "Legend of the portal", "style": "rainbow"},
+     "Title: Legend of the portal", "Titre : Légende du portail", "Given at level 50, the highest.",
+     "Offert au niveau 50, le plus haut.", "crown"),
+    ("badge_portal_legend", "badge", {"label": "Legend", "icon": "crown", "style": "rainbow"}, "Legend badge",
+     "Badge Légende", "Given at level 50, the highest.", "Offert au niveau 50, le plus haut.", "crown"),
+    ("title_five_hundred", "title", {"label": "Five hundred screenings", "style": "gold"},
+     "Title: Five hundred screenings", "Titre : Cinq cents séances", "Given for 500 films and episodes.", "Offert pour 500 films et épisodes.", "clapperboard"),
+    ("badge_thousand_nights", "badge", {"label": "A thousand nights", "icon": "moon", "style": "shimmer"},
+     "A thousand nights badge", "Badge Mille et une nuits", "Given for 1,000 films and episodes.",
+     "Offert pour 1 000 films et épisodes.", "moon"),
+    ("frame_faithful", "avatar_frame", {"frame": "orbit"}, "Faithful orbit frame", "Cadre orbital de la constance",
+     "Given for 365 visits.", "Offert pour 365 visites.", "user"),
+    ("title_hundred_thousand", "title", {"label": "Hundred thousand", "style": "flame"},
+     "Title: Hundred thousand", "Titre : Cent mille", "Given for 100,000 XP.", "Offert pour 100 000 XP.", "zap"),
 ):  # fmt: skip
     _p(key, kind, None, "legendary", en, fr, about_en, about_fr, payload, collection="rewards", icon=icon,
        reward_only=True)  # fmt: skip
@@ -3412,3 +3432,74 @@ def definition(product: Product) -> dict[str, Any]:
         **({"repeatable": True} if product["repeatable"] else {}),
         "version": version,
     }
+
+
+# --------------------------------------------------------------------------------- levels (#108)
+# The level a product needs, spread over the whole curve (level 50 in about three years at a film every
+# other day). Only a fifth of what is sold needs a level — the rarest looks, the dearest boosters and what
+# serves (accesses, widgets, statistics, services, boosts, which keep the level given them); the rest is
+# bought with Coins alone. Legendary looks unlock on the great tiers only (10, 20, 30, 40, 50); epic ones
+# over the whole curve, a tier level (Argent II, Or I…) unlocking about three times what a level in
+# between does, a great tier five times. Within a rarity the products keep their order: the level they
+# were given here, then their price.
+GATED_SHARE = 1 / 5
+GREAT_TIERS = (10, 20, 30, 40, 50)
+EPIC_BAND = (3, 49)
+BOOSTER_LEVELS = {"booster_prestige": 15, "booster_legend": 30}  # the others are for everyone
+# the Nova universe — handy on a phone — is offered whole at the first tier worth it (Bronze II, level 5)
+# and is usable from there: a legendary pack early on, to make members want to go further
+EARLY = {"ultimate_nova": 5, "pack_nova": 5, "theme_nova": 5}
+USEFUL = {
+    "access",
+    "service_access",
+    "widget",
+    "statistic",
+    "media_rescue",
+    "special_request",
+    "streak_freeze",
+    "xp_boost",
+    "project_launch",
+    "profile_backdrop",
+}
+TIERS = {tier["level"] for tier in LEVEL_REWARDS}
+
+
+def level_weight(level: int) -> int:
+    return 5 if level in GREAT_TIERS else 3 if level in TIERS else 1
+
+
+def _take(products: list[Product], slots: list[int]) -> None:
+    """The products, in order, take the slots evenly (a level present several times takes more)."""
+    last = max(1, len(products) - 1)
+    for rank, product in enumerate(products):
+        product["level"] = slots[round(rank * (len(slots) - 1) / last)]
+
+
+def _spread_levels(products: list[Product]) -> None:
+    sold = [p for p in products if not p["reward_only"] and p["key"] not in RETIRED]
+    for product in sold:
+        if product["type"] == "booster":
+            product["level"] = BOOSTER_LEVELS.get(product["key"])
+        elif product["type"] in USEFUL and product["level"] and product["rarity"] == "legendary":
+            product["level"] = next(t for t in GREAT_TIERS if t >= product["level"])  # a great tier too
+    kept = sum(1 for p in sold if p["level"] and (p["type"] in USEFUL or p["type"] == "booster"))
+    looks = [p for p in sold if p["type"] not in USEFUL and p["type"] != "booster"]
+    order = {p["key"]: (p["level"] or 0, p["price"] or 0, p["key"]) for p in looks}
+    looks = [p for p in looks if p["key"] not in EARLY]
+    legendary = [p for p in looks if p["rarity"] == "legendary"]
+    epic = sorted((p for p in looks if p["rarity"] == "epic"), key=lambda p: (-(p["price"] or 0), p["key"]))
+    epic = epic[: max(0, round(len(sold) * GATED_SHARE) - kept - len(EARLY) - len(legendary))]
+    gated = {p["key"] for p in legendary + epic}
+    for product in looks:
+        if product["key"] not in gated:
+            product["level"] = None
+    _take(sorted(legendary, key=lambda p: order[p["key"]]), list(GREAT_TIERS))
+    low, high = EPIC_BAND
+    slots = [level for level in range(low, high + 1) for _ in range(level_weight(level))]
+    _take(sorted(epic, key=lambda p: order[p["key"]]), slots)
+    for product in sold:
+        if product["key"] in EARLY:
+            product["level"] = EARLY[product["key"]]
+
+
+_spread_levels(SHOP)

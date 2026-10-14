@@ -58,7 +58,7 @@ async def test_pace_multiplies_every_rule(gm: GamHarness, client: AsyncClient) -
 async def test_level_rewards_once(gm: GamHarness) -> None:
     gm.module.config = replace(
         gm.module.config,
-        level_rewards=[{"level": 2, "coins": 10}, {"level": 3, "contribution": 5, "coins": 1}],
+        level_rewards=[{"level": 2, "coins": 10}, {"level": 3, "contribution": 5, "coins": 1, "xp": 7}],
     )
     user = gm.people["ursula"]
     curve = await gm.module.levels.curve()
@@ -68,6 +68,7 @@ async def test_level_rewards_once(gm: GamHarness) -> None:
     await gm.dispatch()
     assert await gm.balance(user, "coins") == 11
     assert await gm.balance(user, "contribution") == 5
+    assert await gm.balance(user) == curve.threshold(3) + 7  # #108: a tier may give a little XP too
     assert await gm.module.level_rewards.give(user, 3, gm.clock.now()) == 0  # never twice
 
 

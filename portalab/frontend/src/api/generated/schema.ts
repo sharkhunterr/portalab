@@ -11491,6 +11491,11 @@ export interface components {
             level: number;
             /** Product */
             product?: string | null;
+            /**
+             * Xp
+             * @default 0
+             */
+            xp: number;
         };
         /** LevelRewardsIn */
         LevelRewardsIn: {

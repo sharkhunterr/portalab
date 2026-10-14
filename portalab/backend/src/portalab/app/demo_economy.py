@@ -107,7 +107,79 @@ RETIRED_RULES: dict[str, dict[str, Any]] = {
     },
 }
 
+# #108: the level curve — level 50 in about three years at a film every other day (one more at the weekend)
+# and the admin's habits: level 10 in about seven weeks, 20 in half a year, 30 in fourteen months, 40 in two
+# years (the default, 1.5, reached 50 in eight months and left nothing to aim for)
+CURVE: dict[str, Any] = {"kind": "power", "base": 100, "exponent": 1.9}
+FORMER_CURVE: dict[str, Any] = {"kind": "power", "base": 100, "exponent": 1.5}
+
+# #108: a tier every three or four levels — Bronze, Argent, Or, Platine and Diamant in steps (I, II, III),
+# then Légende. Bronze II offers the whole Nova universe (a legendary pack, handy on a phone) at level 5.
+# Each round ten is a great tier, the third step of its metal: a booster offered, rarer and
+# rarer (Reserve, Cosmos, Prestige, then Legendary), and the shop's legendary looks unlock there only.
+# A little XP towards the next level (none at the last), Coins, and now and then a little Contribution;
+# an administrator adds, removes or renames them freely
 LEVEL_REWARDS: list[dict[str, Any]] = [
+    {"level": 3, "label": "Bronze I", "xp": 20, "coins": 50, "contribution": 0, "product": None},
+    {"level": 5, "label": "Bronze II", "xp": 30, "coins": 75, "contribution": 0, "product": "ultimate_nova"},
+    {
+        "level": 10,
+        "label": "Bronze III",
+        "xp": 60,
+        "coins": 150,
+        "contribution": 1,
+        "product": "booster_reserve",
+    },
+    {
+        "level": 13,
+        "label": "Argent I",
+        "xp": 70,
+        "coins": 200,
+        "contribution": 0,
+        "product": "badge_binge_watcher",
+    },
+    {"level": 16, "label": "Argent II", "xp": 80, "coins": 250, "contribution": 0, "product": None},
+    {
+        "level": 20,
+        "label": "Argent III",
+        "xp": 120,
+        "coins": 400,
+        "contribution": 1,
+        "product": "booster_cosmos",
+    },
+    {
+        "level": 23,
+        "label": "Or I",
+        "xp": 140,
+        "coins": 450,
+        "contribution": 0,
+        "product": "badge_golden_cinephile",
+    },
+    {"level": 26, "label": "Or II", "xp": 170, "coins": 500, "contribution": 0, "product": None},
+    {
+        "level": 30,
+        "label": "Or III",
+        "xp": 200,
+        "coins": 700,
+        "contribution": 2,
+        "product": "booster_prestige",
+    },
+    {"level": 33, "label": "Platine I", "xp": 230, "coins": 750, "contribution": 0, "product": None},
+    {"level": 36, "label": "Platine II", "xp": 260, "coins": 800, "contribution": 0, "product": None},
+    {
+        "level": 40,
+        "label": "Platine III",
+        "xp": 300,
+        "coins": 1000,
+        "contribution": 2,
+        "product": "booster_legend",
+    },
+    {"level": 43, "label": "Diamant I", "xp": 340, "coins": 1100, "contribution": 0, "product": None},
+    {"level": 46, "label": "Diamant II", "xp": 380, "coins": 1300, "contribution": 0, "product": None},
+    {"level": 50, "label": "Légende", "xp": 0, "coins": 2000, "contribution": 5, "product": "booster_legend"},
+]
+# the tiers the demo set before (#108): replaced where they were left as they were
+FORMER_LEVEL_REWARDS: list[dict[str, Any]] = [
     {"level": 5, "label": "Bronze", "coins": 100, "contribution": 0, "product": None},
     {"level": 10, "label": "Argent", "coins": 250, "contribution": 5, "product": "badge_binge_watcher"},
     {"level": 20, "label": "Or", "coins": 500, "contribution": 10, "product": "badge_golden_cinephile"},
@@ -275,6 +347,24 @@ def _count(event: str, count: int) -> list[dict[str, Any]]:
     return [{"kind": "event_count", "event_type": event, "count": count}]
 
 
+def former_quests(today: date) -> dict[str, dict[str, Any]]:
+    """#109: the quests as the demo published them before — given a new version where nobody changed them."""
+    weekly = quests(today)["weekly_regular_visits"]
+    return {
+        "weekly_regular_visits": {
+            **weekly,
+            "description": "Passez sur le portail quatre fois.",
+            "steps": _count("user.signed_in", 4),
+        }
+    }
+
+
+def visits(days: int) -> list[dict[str, Any]]:
+    """#109: days one dropped by — the daily visit's completions (once a day, however many sign-ins)."""
+    daily = [{"field": "quest", "op": "eq", "value": "daily_visit"}]
+    return [{"kind": "event_count", "event_type": "quest.completed", "filter": daily, "count": days}]
+
+
 def quests(today: date) -> dict[str, dict[str, Any]]:
     """Daily, weekly and monthly objectives for the twelve months ahead, plus one per season."""
     year = (_at(today.replace(month=1, day=1)), _at(date(today.year + 2, 1, 1)))
@@ -336,8 +426,8 @@ def quests(today: date) -> dict[str, dict[str, Any]]:
             "window": span,
             "icon": "calendar",
             "label": "Habitué de la semaine",
-            "description": "Passez sur le portail quatre fois.",
-            "steps": _count("user.signed_in", 4),
+            "description": "Passez sur le portail quatre jours.",
+            "steps": visits(4),
             "rewards": [{"value": "coins", "amount": 20}],
         },
         "monthly_cinephile": {

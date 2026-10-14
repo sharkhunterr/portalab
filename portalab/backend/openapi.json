@@ -7019,6 +7019,13 @@
               }
             ],
             "title": "Product"
+          },
+          "xp": {
+            "default": 0,
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Xp",
+            "type": "integer"
           }
         },
         "required": [

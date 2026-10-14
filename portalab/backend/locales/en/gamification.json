@@ -96,7 +96,7 @@
   "admin.levels.add": "Add a tier",
   "admin.levels.empty": "No rewarded tier yet.",
   "admin.levels.from": "from {xp} XP",
-  "admin.levels.hint": "What a member receives on reaching a level (Coins, Contribution, a product offered) and what the tier unlocks in the shop.",
+  "admin.levels.hint": "What a member receives on reaching a level (XP, Coins, a little Contribution, a product offered) and what the tier unlocks in the shop.",
   "admin.levels.label": "Tier name",
   "admin.levels.labelExample": "Bronze, Silver, Gold…",
   "admin.levels.level": "Level",

@@ -90,9 +90,11 @@ class RewardPipeline:
 
     async def process(self, envelope: Envelope) -> Outcome:
         outcome = Outcome()
-        if envelope.type in OWN_TYPES:
-            return outcome
-        rules = await self.rules.in_force(envelope.type, envelope.occurred_at)
+        # the engine's own events (a quest completed, an achievement unlocked…) never feed a rule — a grant
+        # would come back as an event — but achievements and quests may count them (#108: « complete five
+        # quests », « drop by on three days »); each completes once a period, so the chain ends
+        own = envelope.type in OWN_TYPES
+        rules = [] if own else await self.rules.in_force(envelope.type, envelope.occurred_at)
         if (
             not rules
             and not await self.achievements.tracks(envelope.type, envelope.occurred_at)

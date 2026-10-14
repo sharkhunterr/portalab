@@ -160,7 +160,7 @@ export function LevelsPanel({ detailed = true }: { detailed?: boolean }) {
               const last = sorted.at(-1)?.level ?? 0;
               setTiers([
                 ...sorted,
-                { level: last ? last + 5 : 5, coins: 0, contribution: 0, product: null, label: "" },
+                { level: last ? last + 5 : 5, xp: 0, coins: 0, contribution: 0, product: null, label: "" },
               ]);
             }}
           >
@@ -204,6 +204,13 @@ export function LevelsPanel({ detailed = true }: { detailed?: boolean }) {
                       value={tier.label ?? ""}
                       placeholder={t("gamification:admin.levels.labelExample")}
                       onChange={(e) => patch(index, { label: e.target.value })}
+                    />
+                    <TextField
+                      label="XP"
+                      type="number"
+                      min={0}
+                      value={String(tier.xp ?? 0)}
+                      onChange={(e) => patch(index, { xp: Number(e.target.value) })}
                     />
                     <TextField
                       label={t("gamification:value.coins")}

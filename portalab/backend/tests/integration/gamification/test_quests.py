@@ -175,3 +175,40 @@ async def test_challenge_window_and_campaign_quests(gm: GamHarness) -> None:
             text("SELECT count(*) FROM gamification.quest_progress WHERE user_id = :u"), {"u": user}
         )
     assert left == 0
+
+
+async def test_completions_count_for_other_quests_and_achievements(gm: GamHarness) -> None:
+    """#108: the engine's own events count — « drop by on three days » counts the daily visit's
+    completions (once a day however many visits), and « complete two quests » the completions too."""
+    await gm.module.quests.save(SYSTEM, "visit", quest("daily", period="day"))
+    visits = {"field": "quest", "op": "eq", "value": "visit"}
+    await gm.module.quests.save(
+        SYSTEM,
+        "regular",
+        quest(
+            "quest",
+            steps=[{"kind": "event_count", "event_type": "quest.completed", "count": 3, "filter": [visits]}],
+        ),
+    )
+    await gm.module.achievements.save(
+        SYSTEM,
+        "runner",
+        {
+            "label": "Runner",
+            "category": "progression",
+            "criteria": [{"kind": "event_count", "event_type": "quest.completed", "count": 2}],
+            "rewards": [{"value": "coins", "amount": 7}],
+        },
+    )
+    gm.clock.advance(timedelta(minutes=1))
+    user = gm.people["ursula"]
+    for day in range(3):
+        await gm.emit(user, at=gm.clock.now() + timedelta(days=day, hours=1))
+        await gm.emit(user, at=gm.clock.now() + timedelta(days=day, hours=2))  # a second visit that day
+    done = await completions(gm)
+    assert [q for q, _ in done].count("visit") == 3 and ("regular", "once") in done
+    async with gm.database.session() as session:
+        unlocked = await session.scalar(
+            text("SELECT count(*) FROM gamification.user_achievements WHERE achievement_key = 'runner'")
+        )
+    assert unlocked == 1

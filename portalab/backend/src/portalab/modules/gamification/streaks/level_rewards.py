@@ -24,6 +24,7 @@ OWNER = "module:gamification"
 class LevelReward(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     level: int = Field(ge=2, le=1000)
+    xp: int = Field(default=0, ge=0, le=1_000_000)  # #108: a little XP on top, towards the next level
     coins: int = Field(default=0, ge=0, le=1_000_000)
     contribution: int = Field(default=0, ge=0, le=1_000_000)
     product: str | None = Field(default=None, max_length=96)
@@ -67,7 +68,11 @@ class LevelRewards:
         for tier in parse_rewards(self.config().level_rewards):
             if tier.level > level:
                 break
-            for value, amount in (("coins", tier.coins), ("contribution", tier.contribution)):
+            for value, amount in (
+                ("xp", tier.xp),
+                ("coins", tier.coins),
+                ("contribution", tier.contribution),
+            ):
                 if amount <= 0:
                     continue
                 async with self.database.unit_of_work() as uow:
