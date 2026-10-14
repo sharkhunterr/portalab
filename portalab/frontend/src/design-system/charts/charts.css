@@ -551,3 +551,9 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+/* a tap on a chart draws no white frame (keyboard focus keeps its ring) */
+.recharts-wrapper :focus:not(:focus-visible),
+.recharts-surface:focus:not(:focus-visible) {
+  outline: none;
+}

@@ -3,7 +3,7 @@ incrementally, tied to the catalog (episodes count for their series), attributed
 linked accounts (even linked afterwards), de-duplicated when Tautulli reports the plays Plex reports too,
 aggregated per day, and served — mine, or the server's anonymously — with erasure on account deletion."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 import httpx
@@ -614,3 +614,66 @@ async def test_a_richest_source_that_stopped_receiving_plays_is_flagged(
     async with media.database.session() as session:
         counted = sorted((a.priority, a.counted) for a in (await session.execute(select(Activity))).scalars())
     assert counted == [(10, False), (10, True), (20, True)]  # the play Tautulli has, and the one it missed
+
+
+async def test_titles_marked_watched_in_bulk_are_no_plays(media: MediaHarness, clock: FixedClock) -> None:
+    """#119: Plex dates every title marked watched, with no length of its own — three hundred films « seen »
+    in a minute. Such dated-only entries minutes from one another are set aside (no time, no play); one
+    standing alone, songs, and plays with a length of their own keep counting. With Tautulli recording
+    around it, a dated entry it did not see is no play either."""
+    from uuid import uuid4
+
+    now = clock.now()
+    plex = media.service(1, "plex")
+
+    def row(title: str, at: datetime, kind: str = "movie", stopped: datetime | None = None) -> Activity:
+        return Activity(
+            service_id=plex.service_id,
+            ref=str(uuid4()),
+            family="plex",
+            priority=10,
+            counted=True,
+            external_user_id="1",
+            kind=kind,
+            title=title,
+            ids={},
+            started_at=at,
+            stopped_at=stopped or at,  # a date only, as Plex's history gives it
+            watched_s=7200.0,
+            received_at=now,
+        )
+
+    start = now - timedelta(days=300)
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                *(row(f"Marked {i}", start + timedelta(seconds=5 * i)) for i in range(4)),
+                row("Watched alone", start + timedelta(hours=6)),
+                row("Watched next", start + timedelta(hours=9)),
+                row("Song 1", start + timedelta(days=1), kind="track"),
+                row("Song 2", start + timedelta(days=1, minutes=3), kind="track"),
+                row("Long play", start + timedelta(days=2), stopped=start + timedelta(days=2, hours=2)),
+                row("Next to it", start + timedelta(days=2, minutes=1)),
+                # Tautulli was recording that evening and saw another film, not this one: marked, not watched
+                row("Marked one", start + timedelta(days=5)),
+                row(
+                    "Tautulli's",
+                    start + timedelta(days=5, hours=3),
+                    stopped=start + timedelta(days=5, hours=5),
+                ),
+            ]
+        )
+        richer = (
+            await uow.session.execute(select(Activity).where(Activity.title == "Tautulli's"))
+        ).scalar_one()
+        richer.priority, richer.service_id = 20, media.service(2, "tautulli").service_id
+    await media.module.ingestor.dedup("plex")
+    async with media.database.session() as session:
+        counted = {a.title: a.counted for a in (await session.execute(select(Activity))).scalars()}
+    assert [counted[f"Marked {i}"] for i in range(4)] == [False] * 4
+    assert counted["Watched alone"] and counted["Watched next"]
+    assert counted["Song 1"] and counted["Song 2"]
+    assert counted["Long play"] and counted["Next to it"]  # a single dated entry beside a real play
+    assert counted["Marked one"] is False and counted["Tautulli's"]
+    # no richer source around it (Tautulli not running yet): the lone dated entries keep counting
+    assert counted["Watched alone"]

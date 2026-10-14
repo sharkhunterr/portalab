@@ -96,6 +96,13 @@ async def attribute(session: AsyncSession, service_id: UUID, external_user_id: s
 
 SAME_PLAY_BEFORE = timedelta(hours=12)  # a richer row starts at most this long before the same play's row
 BEHIND_AFTER = timedelta(hours=6)  # a richest source this far behind its family no longer receives plays
+# #119: history entries with no length of their own (a date only) this close to another one of the same
+# account were marked watched in bulk, not watched — a film or an episode cannot be seen in less
+BULK_MARK = timedelta(minutes=5)
+LONG_KINDS = ("movie", "episode")
+# #119: a richer source (Tautulli) that recorded plays this close to a dated-only entry was running then —
+# had the entry been a play, it would have recorded it too
+RICHER_RUNNING = timedelta(hours=12)
 
 
 class _Resolver:
@@ -490,7 +497,9 @@ class ActivityIngestor:
         the same item (its id, the catalog object, or its title within its series), the same member when
         both rows are attributed, and a start within the richer row's session (an hour before it, up to
         three hours after it ended — Plex dates a play when it is marked watched). A play the richer source
-        missed (Tautulli down, not running yet) keeps counting."""
+        missed (Tautulli down, not running yet) keeps counting. #119: a title marked watched is no play —
+        a date and no length, minutes from another one (marked in bulk), or while the richer source was
+        recording other plays around it but not this one: set aside too."""
         richer = aliased(Activity)
         same_play = (
             select(literal(1))
@@ -514,6 +523,36 @@ class ActivityIngestor:
             )
             .exists()
         )
+        # #119: a date with no length, minutes from another one of the same account: marked watched in bulk
+        other = aliased(Activity)
+        dated_only = and_(Activity.stopped_at == Activity.started_at, Activity.kind.in_(LONG_KINDS))
+        bulk_mark = and_(
+            dated_only,
+            select(literal(1))
+            .where(
+                other.service_id == Activity.service_id,
+                other.external_user_id == Activity.external_user_id,
+                other.id != Activity.id,
+                other.stopped_at == other.started_at,
+                other.kind.in_(LONG_KINDS),
+                other.started_at.between(Activity.started_at - BULK_MARK, Activity.started_at + BULK_MARK),
+            )
+            .exists(),
+        )
+        running = aliased(Activity)
+        richer_missed_it = and_(
+            Activity.stopped_at == Activity.started_at,
+            select(literal(1))
+            .where(
+                running.family == Activity.family,
+                running.priority > Activity.priority,
+                running.started_at.between(
+                    Activity.started_at - RICHER_RUNNING, Activity.started_at + RICHER_RUNNING
+                ),
+            )
+            .exists(),
+        )
+        set_aside = or_(same_play, bulk_mark, richer_missed_it)
         async with self.database.unit_of_work() as uow:
             session = uow.session
             changed = (
@@ -522,11 +561,11 @@ class ActivityIngestor:
                     .where(
                         Activity.family == family,
                         or_(
-                            and_(same_play, Activity.counted.is_(True)),
-                            and_(~same_play, Activity.counted.is_(False)),
+                            and_(set_aside, Activity.counted.is_(True)),
+                            and_(~set_aside, Activity.counted.is_(False)),
                         ),
                     )
-                    .values(counted=~same_play)
+                    .values(counted=~set_aside)
                     .returning(Activity.started_at)
                     .execution_options(synchronize_session=False)
                 )
