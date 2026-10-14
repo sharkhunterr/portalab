@@ -15,14 +15,15 @@ async def test_visibility_and_ledger_access(gm: GamHarness, client: AsyncClient)
     await gm.rule("listen", RULE)
     user = gm.people["ursula"]
     await gm.emit(user)
+    preferences = gm.module.capabilities.system_providers("privacy.visibility_preference")
+    provider = next(p.provider for p in preferences if p.instance_ref == "gamification")
+    await provider.set_preference(user, "progression", None, "private")  # issue 120: the default is shown
     await login(client, "ulrich")
     assert (await client.get(f"/api/v1/users/{user}/progression")).status_code == 404
     await login(client, "boss")
     assert (
         await client.get(f"/api/v1/users/{user}/progression")
     ).status_code == 404  # a permission is not consent
-    preferences = gm.module.capabilities.system_providers("privacy.visibility_preference")
-    provider = next(p.provider for p in preferences if p.instance_ref == "gamification")
     await provider.set_preference(user, "progression", None, "community")
     await login(client, "ulrich")
     shown = await client.get(f"/api/v1/users/{user}/progression")

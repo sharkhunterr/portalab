@@ -15,11 +15,14 @@ import {
   type RankRow,
 } from "../../gamification/leaderboards/Leaderboard";
 
+/** Who stands on the podium: the first three entries placed 1 to 3 (issue 120: ex aequo share a place). */
+const podiumOf = (rows: RankRow[]) => rows.filter((r) => r.rank <= 3).slice(0, 3);
+
 /** The first three on steps (027): second, first, third — avatar, name and score. */
 export function Podium({ rows }: { rows: RankRow[] }) {
   const t = useT();
   const format = useFormat();
-  const top = rows.filter((r) => r.rank <= 3).slice(0, 3);
+  const top = podiumOf(rows);
   if (!top.length) return null;
   const order = [top[1], top[0], top[2]].filter((r): r is RankRow => Boolean(r));
   return (
@@ -137,7 +140,8 @@ export function LeaderboardPage() {
           <Podium rows={board.data.entries} />
           <Leaderboard
             caption={`${heading} — ${t(`community:leaderboards.metric.${current}`)}`}
-            rows={board.data.entries.filter((row) => row.rank > 3)} // #66: the others, under the podium
+            // #66: the others, under the podium — every one of them, whatever place they share
+            rows={board.data.entries.slice(podiumOf(board.data.entries).length)}
             me={board.data.me}
             profileLinks
           />

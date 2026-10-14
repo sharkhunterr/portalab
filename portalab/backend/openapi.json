@@ -3410,6 +3410,11 @@
             ],
             "title": "Actor Name"
           },
+          "anonymous": {
+            "default": false,
+            "title": "Anonymous",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",

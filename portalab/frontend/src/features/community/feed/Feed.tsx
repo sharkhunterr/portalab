@@ -7,7 +7,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useFeed } from "../api";
-import { FEED_ICONS, FeedText } from "./FeedText";
+import { actorAvatar, FEED_ICONS, FeedText } from "./FeedText";
 
 /** ``/community/feed`` (spec 012 T010; 027 redesign): a timeline grouped by day — who, what (an icon per
  * kind) and when — as an accessible list. */
@@ -53,7 +53,7 @@ export function Feed() {
                   <Avatar
                     name={item.actor_name ?? ""}
                     userId={item.actor_id}
-                    src={`/api/v1/users/${item.actor_id}/avatar`}
+                    src={actorAvatar(item)}
                     size="sm"
                     decorative
                   />
@@ -66,6 +66,7 @@ export function Feed() {
                     kind={item.kind}
                     actorId={item.actor_id}
                     actorName={item.actor_name}
+                    anonymous={item.anonymous}
                     params={item.params as Record<string, unknown>}
                   />
                 </span>

@@ -12,7 +12,7 @@ import { Leaderboard } from "../../gamification/leaderboards/Leaderboard";
 import type { QuestItem } from "../../gamification/quests/QuestList";
 import { useFeed } from "../api";
 import { DiscoveryHome } from "../discovery/DiscoveryHome";
-import { FEED_ICONS, FeedText } from "../feed/FeedText";
+import { actorAvatar, FEED_ICONS, FeedText } from "../feed/FeedText";
 import { Podium } from "../leaderboards/LeaderboardPage";
 
 function Panel({
@@ -191,7 +191,7 @@ function ActivityPanel() {
             <Avatar
               name={item.actor_name ?? ""}
               userId={item.actor_id}
-              src={`/api/v1/users/${item.actor_id}/avatar`}
+              src={actorAvatar(item)}
               size="sm"
               decorative
             />
@@ -203,6 +203,7 @@ function ActivityPanel() {
                 kind={item.kind}
                 actorId={item.actor_id}
                 actorName={item.actor_name}
+                anonymous={item.anonymous}
                 params={item.params ?? {}}
               />
             </span>

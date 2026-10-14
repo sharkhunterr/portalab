@@ -5,7 +5,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { WidgetHeaderAction } from "../dashboard/frame/actions";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
-import { FEED_ICONS, FeedText } from "./feed/FeedText";
+import { actorAvatar, FEED_ICONS, FeedText } from "./feed/FeedText";
 import "./community.css";
 
 interface ActivityItem {
@@ -13,6 +13,7 @@ interface ActivityItem {
   kind?: string;
   actor_id: string;
   actor_name: string | null;
+  anonymous?: boolean;
   params: Record<string, unknown>;
   occurred_at?: string;
 }
@@ -23,7 +24,7 @@ function Who({ item }: { item: ActivityItem }) {
       <Avatar
         name={item.actor_name ?? ""}
         userId={item.actor_id}
-        src={`/api/v1/users/${item.actor_id}/avatar`}
+        src={actorAvatar(item)}
         size="sm"
         decorative
       />
@@ -50,6 +51,7 @@ function ActivityWidget({ payload, compact }: WidgetProps) {
       kind={item.kind ?? ""}
       actorId={item.actor_id}
       actorName={item.actor_name}
+      anonymous={item.anonymous}
       params={item.params}
     />
   );

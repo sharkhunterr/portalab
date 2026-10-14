@@ -55,6 +55,7 @@ class ActivityWidget:
                         "id": str(i.id),
                         "actor_id": str(i.actor_id),
                         "actor_name": i.actor_name,
+                        "anonymous": i.anonymous,  # issue 120
                         "text_key": i.text_key,
                         "kind": i.kind,  # 027: what the widget names it by (as the feed does)
                         "params": i.params,

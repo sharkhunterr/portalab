@@ -61,6 +61,7 @@ class CommunityFeedItemOut(BaseModel):
     id: UUID
     actor_id: UUID
     actor_name: str | None
+    anonymous: bool = False  # issue 120: the actor keeps their progression to themselves
     kind: str
     text_key: str
     params: dict[str, Any]
@@ -160,6 +161,7 @@ async def feed(
                 id=i.id,
                 actor_id=i.actor_id,
                 actor_name=i.actor_name,
+                anonymous=i.anonymous,
                 kind=i.kind,
                 text_key=i.text_key,
                 params=i.params,

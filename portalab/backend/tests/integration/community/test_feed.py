@@ -1,7 +1,7 @@
 """012 T009 — activity feed: allow-listed events project once (redelivery idempotent on
 ``source_event_id``); private event types and Private actors never enter; a visibility change takes effect at
 read time; entries reference their source and carry a localization key (no like/reaction/comment fields);
-retention purge; erased with the actor."""
+retention purge; erased with the actor; an anonymous actor (issue 120) shows without name or profile."""
 
 from datetime import timedelta
 
@@ -48,10 +48,21 @@ async def test_projection_and_read_time_visibility(co: CoHarness, client: AsyncC
     assert await co.module.projector.project(envelope_of(stored, dict(stored.payload))) is False
     assert await count(co) == 2
 
+    # issue 120: an anonymous actor stays in the feed — no name, and no id leading to the profile
+    await co.prefer("ursula", "progression", "private")
+    hidden = (await client.get("/api/v1/community/feed")).json()["items"]
+    assert [(i["actor_name"], i["anonymous"]) for i in hidden] == [(None, True), (None, True)]
+    assert str(co.people["ursula"]) not in {i["actor_id"] for i in hidden}
+    assert len({i["actor_id"] for i in hidden}) == 2  # not one stand-in that would tie entries together
+    await co.prefer("ursula", "progression", "community")
+
     await co.prefer("ursula", "community_activity", "private")
     assert (await client.get("/api/v1/community/feed")).json()["items"] == []
     await login(client, "ursula")  # the actor still sees their own entries
     assert len((await client.get("/api/v1/community/feed")).json()["items"]) == 2
+    await co.prefer("ursula", "progression", "private")  # and their own name, anonymous or not
+    mine = (await client.get("/api/v1/community/feed")).json()["items"]
+    assert {(i["actor_name"], i["anonymous"]) for i in mine} == {("Ursula", False)}
 
 
 async def test_pagination_retention_and_erasure(co: CoHarness, client: AsyncClient) -> None:

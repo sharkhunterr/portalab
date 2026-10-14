@@ -12,22 +12,29 @@ export const FEED_ICONS: Record<string, string> = {
   "project.created": "lightbulb",
 };
 
+/** The avatar of a feed entry's actor — none for an anonymous one (issue 120): the initials' « ? » only. */
+export const actorAvatar = (item: { actor_id: string; anonymous?: boolean | null }) =>
+  item.anonymous ? null : `/api/v1/users/${item.actor_id}/avatar`;
+
 /** One feed entry as localized text (026): the stored key and parameters, the actor linking to the profile;
- * an achievement is named by its label (027), never by its technical key. */
+ * an achievement is named by its label (027), never by its technical key. An anonymous actor (issue 120)
+ * is « an anonymous member », with no link. */
 export function FeedText({
   kind,
   actorId,
   actorName,
+  anonymous,
   params,
 }: {
   kind: string;
   actorId: string;
   actorName: string | null | undefined;
+  anonymous?: boolean | null | undefined;
   params: Record<string, unknown>;
 }) {
   const t = useT();
   const achievements = useAchievements();
-  const actor = actorName ?? t("community:feed.someone");
+  const actor = anonymous ? t("community:feed.anonymous") : (actorName ?? t("community:feed.someone"));
   const key = KNOWN.has(kind) ? `community:feed.${kind}` : "community:feed.generic";
   const values = Object.fromEntries(
     Object.entries(params).filter(([, v]) => typeof v === "string" || typeof v === "number"),
@@ -42,7 +49,11 @@ export function FeedText({
   return (
     <span>
       {before}
-      <Link to={`/community/members/${actorId}`}>{actor}</Link>
+      {anonymous ? (
+        <span className="community-anonymous">{actor}</span>
+      ) : (
+        <Link to={`/community/members/${actorId}`}>{actor}</Link>
+      )}
       {after ?? ""}
     </span>
   );

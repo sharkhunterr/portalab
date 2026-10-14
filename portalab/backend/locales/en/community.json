@@ -47,6 +47,7 @@
   "events.saved": "Event saved.",
   "events.title": "Community events",
   "feed.achievement.unlocked": "{actor} unlocked the achievement {achievement}",
+  "feed.anonymous": "An anonymous member",
   "feed.empty": "No community activity yet.",
   "feed.emptyAction": "Discover the community",
   "feed.generic": "{actor} took part in the community",

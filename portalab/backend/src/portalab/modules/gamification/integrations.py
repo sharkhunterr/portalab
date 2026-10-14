@@ -32,10 +32,11 @@ from portalab.modules.gamification.progression.service import ProgressionService
 OWNER = "module:gamification"
 PROGRESSION = "progression"
 
+# issue 120: every member is shown in the community by default; « anonymous » (private) is their choice
 register_datum_class(
     PROGRESSION,
     owner=OWNER,
-    default_level="private",
+    default_level="community",
     classification="activity",
     description="My level, XP, Contribution, Coins and achievements",
 )

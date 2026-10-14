@@ -87,6 +87,7 @@ async def test_views(co: CoHarness, client: AsyncClient) -> None:
     assert mine["items"][2]["progress"] == [{"current": 3, "target": 10}]
 
     ulrich = co.people["ulrich"]
+    await co.prefer("ulrich", "progression", "private")  # issue 120: the default is « community »
     assert (
         await client.get("/api/v1/community/achievements", params={"member": str(ulrich)})
     ).status_code == 404

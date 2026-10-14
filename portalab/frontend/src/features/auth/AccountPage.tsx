@@ -11,6 +11,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../state/regions";
 import { SettingsCard, SettingsPage } from "../account/SettingsKit";
 import { MemberProfile } from "../community/profile/ProfilePage";
+import { CommunityPresence } from "./CommunityPresence";
 import { FormMessage } from "./FormMessage";
 import { authStrings } from "./strings";
 import { ME_KEY, type Me } from "./useAuth";
@@ -40,6 +41,7 @@ function AccountView({ me }: { me: Me }) {
   return (
     <SettingsPage icon="user" title={t("account:title")} lead={t("account:lead")}>
       <MemberProfile memberId={me.id} heading={2} />
+      <CommunityPresence />
       <SettingsCard icon="compass" title={t("account:links.title")} hint={t("account:links.hint")}>
         <ul className="account-links">
           {LINKS.map((link) => (

@@ -1,13 +1,15 @@
 """Feed reads (T010; US2): entries newest first, each re-checked **at read time** against the actor's
-current ``community_activity`` visibility — an actor turning Private disappears at once. Keyset cursor
-over ``(occurred_at, id)``; retention purge and erasure with the actor."""
+current ``community_activity`` visibility — an actor turning Private disappears at once. Issue 120: an
+actor who keeps their progression to themselves (anonymous) stays in the feed without name, avatar or
+profile — the same rule as the leaderboard. Keyset cursor over ``(occurred_at, id)``; retention purge and
+erasure with the actor."""
 
 import base64
 import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
-from uuid import UUID
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from sqlalchemy import and_, delete, or_, select
 
@@ -19,6 +21,12 @@ from portalab.modules.community.models import FeedEntry
 from portalab.modules.community.preferences import ACTIVITY, shown
 
 MAX_SCANS = 6
+PROGRESSION = "progression"  # owned by gamification (013): « public » or « anonymous » in the community
+
+
+def anonymous_actor(entry: UUID) -> UUID:
+    """Issue 120: what stands for an anonymous actor — tied to the entry, never to the member."""
+    return uuid5(NAMESPACE_URL, f"portalab:feed:{entry}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +40,7 @@ class FeedItem:
     subject_ref: str | None
     source_event_id: UUID
     occurred_at: datetime
+    anonymous: bool = False
 
 
 def encode(at: datetime, entry: UUID) -> str:
@@ -76,6 +85,8 @@ class FeedService:
         limit = max(1, min(limit, 50))
         position = decode(cursor)
         allowed: dict[UUID, bool] = {}
+        named: dict[UUID, bool] = {}
+        me = viewer.acting_for or viewer.user_id
         items: list[FeedItem] = []
         for _ in range(MAX_SCANS):
             statement = select(FeedEntry).order_by(FeedEntry.occurred_at.desc(), FeedEntry.id.desc())
@@ -103,17 +114,23 @@ class FeedService:
                     )
                 if not allowed[row.actor_user_id]:
                     continue
+                if row.actor_user_id not in named:
+                    named[row.actor_user_id] = row.actor_user_id == me or await shown(
+                        self.visibility, viewer, row.actor_user_id, PROGRESSION, True
+                    )
+                hidden = not named[row.actor_user_id]
                 items.append(
                     FeedItem(
                         row.id,
-                        row.actor_user_id,
-                        await self.names(row.actor_user_id),
+                        anonymous_actor(row.id) if hidden else row.actor_user_id,
+                        None if hidden else await self.names(row.actor_user_id),
                         row.kind,
                         row.text_key,
                         dict(row.params),
                         row.subject_ref,
                         row.source_event_id,
                         row.occurred_at,
+                        hidden,
                     )
                 )
                 if len(items) == limit:

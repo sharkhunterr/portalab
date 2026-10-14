@@ -5,10 +5,12 @@ and filtered **at read time** by each member's 021 ``progression`` visibility on
   ``all`` (balances) and ``month``/``week`` (earned in the window: grants, manual grants and corrections);
   ``level`` is all-time only;
 * only active accounts are ranked (tombstoned and suspended accounts never appear);
-* ties: earliest attainment first (the ledger sequence or unlock time that reached the score), then id;
+* issue 120: ties broken by the member's other values (XP, Contribution, Coins), then shared (ex aequo);
 * #66: a member this viewer may not see keeps their place as an anonymous entry — no name, no avatar, no
   profile, an id tied to the place and never to them; the viewer always gets their own position;
-* #66: each entry tells the places gained or lost against the board of 24 hours before."""
+* #66: each entry tells the places gained or lost against the board of 24 hours before;
+* issue 120: every active member is on the board, even with nothing earned yet — after the others, with
+  the score of a beginner."""
 
 from collections.abc import Sequence
 from datetime import datetime, timedelta
@@ -25,6 +27,7 @@ from portalab.capabilities.economy import (
     LeaderboardView,
 )
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
+from portalab.capabilities.identity_directory import MEMBERS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -43,6 +46,14 @@ from portalab.modules.gamification.observability import metrics
 
 DATUM = "progression"
 EARNED = ("grant", "manual", "correction")
+# issue 120: what breaks a tie on each board, in order — then the places are shared
+TIES: dict[str, tuple[str, ...]] = {
+    "xp": ("contribution", "coins"),
+    "level": ("xp", "contribution", "coins"),
+    "contribution": ("xp", "coins"),
+    "coins": ("xp", "contribution"),
+    "achievements": ("xp", "contribution", "coins"),
+}
 MAX_ENTRIES = 5000
 MOVES_SINCE = timedelta(hours=24)  # #66: places gained or lost since a day
 
@@ -90,96 +101,96 @@ class LeaderboardService:
         directory = providers[0].provider
         return {u for u in users if await directory.is_active_account(u)}
 
-    async def _rows(self, metric: str, start: datetime | None) -> list[tuple[UUID, int, Any]]:
-        """``(user, score, attainment)`` with a positive score."""
+    async def _members(self) -> list[UUID]:
+        """Issue 120: every active member, by name — those who earned nothing yet are ranked too."""
+        providers = self.capabilities.system_providers(MEMBERS)
+        if not providers:
+            return []
+        listing = providers[0].provider
+        members: list[UUID] = []
+        offset: int | None = 0
+        while offset is not None and len(members) < MAX_ENTRIES:
+            page = await listing.active_members(offset=offset, limit=200)
+            members.extend(entry.id for entry in page.items)
+            offset = page.next_offset
+        return members
+
+    async def _values(
+        self, value: str, start: datetime | None, until: datetime | None = None
+    ) -> dict[UUID, int]:
+        """Each member's ``value`` (``xp``, ``contribution``, ``coins`` or ``achievements``): the balance
+        (all time, now), else what the ledger says up to ``until`` — earned in the window for a period."""
         async with self.database.session() as session:
-            if metric == "achievements":
-                statement = select(
-                    UserAchievement.user_id, func.count(), func.max(UserAchievement.unlocked_at)
-                ).group_by(UserAchievement.user_id)
+            if value == "achievements":
+                statement = select(UserAchievement.user_id, func.count()).group_by(UserAchievement.user_id)
                 if start is not None:
                     statement = statement.where(UserAchievement.unlocked_at >= start)
-                return [(u, int(n), at) for u, n, at in (await session.execute(statement)).all()]
-            value = "xp" if metric == "level" else metric
-            if start is None:
-                rows = (
-                    await session.execute(
-                        select(Balance.user_id, Balance.amount, Balance.last_seq).where(
-                            Balance.value == value, Balance.amount > 0
-                        )
-                    )
-                ).all()
-                scored = [(u, int(a), int(seq)) for u, a, seq in rows]
-                if metric == "level":
-                    curve = await self.levels.curve(session)
-                    scored = [(u, curve.level_for(a), seq) for u, a, seq in scored]
-                return scored
-            rows = (
-                await session.execute(
-                    select(
-                        LedgerTransaction.user_id,
-                        func.sum(LedgerTransaction.delta),
-                        func.max(LedgerTransaction.seq),
-                    )
-                    .where(
-                        LedgerTransaction.value == value,
-                        LedgerTransaction.kind.in_(EARNED),
-                        LedgerTransaction.occurred_at >= start,
-                    )
+                if until is not None:
+                    statement = statement.where(UserAchievement.unlocked_at < until)
+            elif start is None and until is None:
+                statement = select(Balance.user_id, Balance.amount).where(Balance.value == value)
+            else:
+                statement = (
+                    select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta))
+                    .where(LedgerTransaction.value == value)
                     .group_by(LedgerTransaction.user_id)
                 )
-            ).all()
-            return [(u, int(total), int(seq)) for u, total, seq in rows if int(total or 0) > 0]
-
-    async def _rows_before(
-        self, metric: str, start: datetime | None, until: datetime
-    ) -> list[tuple[UUID, int]]:
-        """#66: ``(user, score)`` as the board stood at ``until`` (nothing when the period had not begun)."""
-        if start is not None and until <= start:
-            return []
-        async with self.database.session() as session:
-            if metric == "achievements":
-                statement = (
-                    select(UserAchievement.user_id, func.count())
-                    .where(UserAchievement.unlocked_at < until)
-                    .group_by(UserAchievement.user_id)
-                )
+                if until is not None:
+                    statement = statement.where(LedgerTransaction.occurred_at < until)
                 if start is not None:
-                    statement = statement.where(UserAchievement.unlocked_at >= start)
-                return [(u, int(n)) for u, n in (await session.execute(statement)).all()]
-            value = "xp" if metric == "level" else metric
-            statement = (
-                select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta))
-                .where(LedgerTransaction.value == value, LedgerTransaction.occurred_at < until)
-                .group_by(LedgerTransaction.user_id)
-            )
-            if start is not None:
-                statement = statement.where(
-                    LedgerTransaction.kind.in_(EARNED), LedgerTransaction.occurred_at >= start
-                )
-            rows = [(u, int(total or 0)) for u, total in (await session.execute(statement)).all()]
-            if metric == "level":
+                    statement = statement.where(
+                        LedgerTransaction.kind.in_(EARNED), LedgerTransaction.occurred_at >= start
+                    )
+            rows = (await session.execute(statement)).all()
+        return {user: max(0, int(amount or 0)) for user, amount in rows}
+
+    async def _ranking(
+        self, metric: str, start: datetime | None, members: list[UUID], until: datetime | None = None
+    ) -> list[list[Any]]:
+        """``[user, score, rank]``, best first. Issue 120: a tie on the board's value is broken by the
+        member's other values (XP, Contribution, Coins); when all are equal, the places are shared (ex
+        aequo: 1, 2, 2, 4). Every active member is ranked, those with nothing earned after the others."""
+        primary = "xp" if metric == "level" else metric
+        scores = await self._values(primary, start, until)
+        if metric == "level":
+            async with self.database.session() as session:
                 curve = await self.levels.curve(session)
-                rows = [(u, curve.level_for(max(0, a))) for u, a in rows]
-            return [(u, score) for u, score in rows if score > 0]
+            scores = {user: curve.level_for(xp) for user, xp in scores.items()}
+            beginner = curve.level_for(0)
+        else:
+            beginner = 0
+        ties = [await self._values(value, start, until) for value in TIES[metric]]
+        named = {user: index for index, user in enumerate(members)}  # by name among full ties
+        scored = [user for user, score in scores.items() if score > beginner or user in named]
+        active = await self._active([user for user in scored if user not in named])
+        users = [user for user in scored if user in named or user in active]
+        users += [user for user in members if user not in scores]
+
+        def values(user: UUID) -> tuple[int, ...]:
+            return (scores.get(user, beginner), *(tie.get(user, 0) for tie in ties))
+
+        ordered = sorted(
+            users, key=lambda u: (tuple(-v for v in values(u)), named.get(u, len(named)), str(u))
+        )[:MAX_ENTRIES]
+        ranking: list[list[Any]] = []
+        for position, user in enumerate(ordered, 1):
+            same = ranking and values(UUID(ranking[-1][0])) == values(user)
+            ranking.append([str(user), values(user)[0], ranking[-1][2] if same else position])
+        return ranking
 
     async def compute(self, metric: str, period: LeaderboardPeriod) -> LeaderboardSnapshot:
         self._check(metric, period)
         now = utc_now(self.clock)
         start = period_start(period, now, self.config().timezone)
-        rows = await self._rows(metric, start)
-        active = await self._active([u for u, _, _ in rows])
-        ranked = sorted(
-            (r for r in rows if r[0] in active and r[1] > 0), key=lambda r: (-r[1], r[2], str(r[0]))
-        )[:MAX_ENTRIES]
-        entries = [[str(u), score] for u, score, _ in ranked]
-        before = await self._rows_before(metric, start, now - MOVES_SINCE)
-        previous = [
-            [str(u), score]
-            for u, score in sorted((r for r in before if r[0] in active), key=lambda r: (-r[1], str(r[0])))[
-                :MAX_ENTRIES
-            ]
-        ]
+        members = await self._members()
+        entries = await self._ranking(metric, start, members)
+        until = now - MOVES_SINCE
+        previous: list[list[Any]] = []
+        if start is None or until > start:  # #66: the board as it stood a day before
+            previous = await self._ranking(metric, start, members, until)
+            floor = previous[-1][1] if previous else 0
+            if all(score == floor for _user, score, _rank in previous):
+                previous = []  # nothing earned yet then: no move to tell, nobody « new »
         statement = insert(LeaderboardSnapshot).values(
             metric=metric,
             period=period,
@@ -258,20 +269,32 @@ class LeaderboardService:
             return shown[user]
 
         # #66: the ranks of a day before
-        before = {UUID(raw_user): index for index, (raw_user, _s) in enumerate(snapshot.previous or [], 1)}
+        before = {
+            UUID(e[0]): int(e[2]) if len(e) > 2 else i for i, e in enumerate(snapshot.previous or [], 1)
+        }
+        had = {UUID(e[0]): int(e[1]) for e in snapshot.previous or []}
+        # issue 120: the tail tied on the lowest score, unchanged since the day before, does not « move »
+        floor = int(snapshot.entries[-1][1]) if snapshot.entries else 0
         entries: list[LeaderboardEntry] = []
         mine: LeaderboardEntry | None = None
-        for rank, (raw_user, score) in enumerate(snapshot.entries, 1):
-            user = UUID(raw_user)
+        for position, stored in enumerate(snapshot.entries, 1):
+            user, score = UUID(stored[0]), stored[1]
+            rank = int(stored[2]) if len(stored) > 2 else position  # issue 120: ex aequo share a place
             hidden = not await visible(user)  # #66: kept in the ranking, as an anonymous member
             was = before.get(user)
+            # issue 120: a member who had nothing the day before and now has is new on the board too
+            new = bool(before) and (was is None or (had.get(user) == 0 and int(score) > 0))
             entry = LeaderboardEntry(
                 rank,
-                anonymous_id(metric, period, rank) if hidden else user,
+                anonymous_id(metric, period, position) if hidden else user,
                 int(score),
                 user == me,
-                change=(was - rank) if was is not None else None,
-                new=bool(before) and was is None,
+                change=(
+                    (was - rank)
+                    if was is not None and not new and not (int(score) == floor == had.get(user))
+                    else None
+                ),
+                new=new,
                 anonymous=hidden,
             )
             if len(entries) < limit:

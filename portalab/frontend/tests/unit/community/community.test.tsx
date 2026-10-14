@@ -98,6 +98,31 @@ describe("community", () => {
     expect(link.getAttribute("href")).toBe(`/community/members/${MEMBER}`);
     expect(screen.getByText(/unlocked the achievement first-steps/)).toBeTruthy();
   });
+
+  it("names an anonymous actor without a link nor a photo (issue 120)", async () => {
+    fake.handler = () =>
+      json(200, {
+        items: [
+          {
+            id: "e2",
+            actor_id: "01900000-0000-5000-8000-0000000000aa",
+            actor_name: null,
+            anonymous: true,
+            kind: "user.level_up",
+            text_key: "community:feed.user.level_up",
+            params: { level: 4 },
+            subject_ref: null,
+            source_event_id: "s2",
+            occurred_at: "2026-10-01T12:00:00Z",
+          },
+        ],
+        next_cursor: null,
+      });
+    show("/", "/", <Feed />);
+    expect(await screen.findByText("An anonymous member")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "An anonymous member" })).toBeNull();
+    expect(document.querySelector(".community-timeline img")).toBeNull();
+  });
 });
 
 describe("leaderboard table", () => {

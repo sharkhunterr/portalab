@@ -21,9 +21,10 @@ def _entry(item: FeedItem) -> dict[str, Any]:
         "kind": item.kind,
         "actor_id": str(item.actor_id),
         "actor_name": item.actor_name,
+        "anonymous": item.anonymous,  # issue 120: no name, no avatar, no profile behind it
         "text_key": item.text_key,
         "params": item.params,
-        "url": f"/community/members/{item.actor_id}",
+        "url": None if item.anonymous else f"/community/members/{item.actor_id}",
         "occurred_at": item.occurred_at.isoformat(),
     }
 

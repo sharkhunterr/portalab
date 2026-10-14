@@ -10265,6 +10265,11 @@ export interface components {
             /** Actor Name */
             actor_name: string | null;
             /**
+             * Anonymous
+             * @default false
+             */
+            anonymous: boolean;
+            /**
              * Id
              * Format: uuid
              */

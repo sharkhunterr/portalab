@@ -13,6 +13,7 @@ interface ShelfItem {
   kind?: string;
   actor_id?: string;
   actor_name?: string | null;
+  anonymous?: boolean;
   params?: Record<string, unknown>;
 }
 
@@ -92,6 +93,7 @@ function Shelf({ info }: { info: CommunityShelfInfo }) {
                     kind={item.kind}
                     actorId={item.actor_id}
                     actorName={item.actor_name}
+                    anonymous={item.anonymous}
                     params={item.params ?? {}}
                   />
                 </>

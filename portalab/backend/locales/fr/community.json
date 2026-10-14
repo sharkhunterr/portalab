@@ -47,6 +47,7 @@
   "events.saved": "Événement enregistré.",
   "events.title": "Événements de la communauté",
   "feed.achievement.unlocked": "{actor} a débloqué le succès {achievement}",
+  "feed.anonymous": "Un membre anonyme",
   "feed.empty": "Aucune activité pour l'instant.",
   "feed.emptyAction": "Découvrir la communauté",
   "feed.generic": "{actor} a participé à la communauté",
