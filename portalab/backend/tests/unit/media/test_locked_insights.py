@@ -1,6 +1,6 @@
 """027 — Media statistics sold in the shop (``statistic`` products ``media.insights.<name>``): locked for
-members who do not own them, open for owners; nothing locked when the shop sells none, nor for media
-managers (061)."""
+members who do not own them, open for owners; nothing locked when the shop sells none; media managers buy
+them like everyone (issue 115)."""
 
 from types import SimpleNamespace
 from uuid import UUID
@@ -48,4 +48,4 @@ async def test_sold_statistics_are_locked_until_owned() -> None:
     assert await _locked_insights(module, Principal(user_id=OWNER)) == ["box_office"]
     assert await _locked_insights(_module(set()), Principal(user_id=OWNER)) == []
     manager = _module({"media.insights.genres"}, manager=True)
-    assert await _locked_insights(manager, Principal(user_id=UUID(int=1))) == []
+    assert await _locked_insights(manager, Principal(user_id=UUID(int=1))) == ["genres"]

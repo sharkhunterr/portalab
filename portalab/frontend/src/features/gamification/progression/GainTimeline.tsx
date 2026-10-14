@@ -51,7 +51,8 @@ export function fillDays(timeline: Timeline | undefined, days: number, today = n
 /**
  * #62: my progression over time — XP, Coins and Contribution gained day by day as lines (XP on its own
  * axis: it counts far more), the days I reached a level marked on the chart and told as small cards below.
- * Issue 114: ``cumulative``, my XP in all at the end of each day instead — the climb towards the next level.
+ * Issue 114: ``cumulative``, my XP in all at the end of each day instead — the climb towards the next level;
+ * the chart begins the day before my first gain of the period, so the curve fills the width.
  */
 export function GainTimeline({ days, cumulative = false }: { days: number; cumulative?: boolean }) {
   const t = useT();
@@ -71,6 +72,12 @@ export function GainTimeline({ days, cumulative = false }: { days: number; cumul
     }
     return out;
   }, [cumulative, held, daily]);
+  // the empty days before the first gain are left out: the curve stretches over what happened (a week at least)
+  const shown = useMemo(() => {
+    const first = points.findIndex((p) => p.xp || p.coins || p.contribution);
+    if (first <= 0) return points;
+    return points.slice(Math.max(0, Math.min(first - 1, points.length - 8)));
+  }, [points]);
   const lines = cumulative ? [{ key: "total", color: "var(--color-accent)", axis: "xp" } as const] : LINES;
   const ups = timeline?.level_ups ?? [];
   const short = (day: string) => {
@@ -86,7 +93,7 @@ export function GainTimeline({ days, cumulative = false }: { days: number; cumul
         </figcaption>
         <div aria-hidden="true">
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={points} margin={{ top: 16, right: 8, left: 0, bottom: 0 }}>
+            <LineChart data={shown} margin={{ top: 16, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
               <XAxis
                 dataKey="day"
