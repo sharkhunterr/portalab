@@ -134,10 +134,43 @@ async def test_tuning_api(gm: GamHarness, client: AsyncClient) -> None:
     )
     assert [m["user_id"] for m in alone.json()["members"]] == [str(gm.people["boss"])]
 
+    # #107: every operation of every member, the latest first, with the balance and the level after it
+    ops = (await client.get("/api/v1/admin/gamification/operations?days=30")).json()
+    assert ops["next_cursor"] is None and len(ops["items"]) == 6 * 2 + 1  # 6 plays (XP + Coins), a withdrawal
+    assert ops["total"] == 13
+    times = [o["occurred_at"] for o in ops["items"]]
+    assert times == sorted(times, reverse=True)
+    [taken] = [o for o in ops["items"] if o["kind"] == "correction"]
+    assert taken["delta"] == -3 and taken["reason"] == "test" and taken["source"] == "admin"
+    assert taken["level"] is None
+    xp = [o for o in ops["items"] if o["value"] == "xp" and o["user_id"] == str(gm.people["ursula"])]
+    assert [o["balance"] for o in xp] == [100, 80, 60, 40, 20]
+    assert [o["level_up"] for o in xp] == [True, False, False, False, False] and xp[0]["level"] == 2
+    assert xp[0]["source"] == "media" and xp[0]["label"] == "played"
+    seen, cursor = [], None  # page by page, none lost nor repeated
+    while True:
+        page = (
+            await client.get(
+                "/api/v1/admin/gamification/operations",
+                params={"limit": 5, **({"cursor": cursor} if cursor else {})},
+            )
+        ).json()
+        seen += [o["id"] for o in page["items"]]
+        if not (cursor := page["next_cursor"]):
+            break
+    assert seen == [o["id"] for o in ops["items"]]
+    theirs = await client.get(
+        "/api/v1/admin/gamification/operations",
+        params={"member": str(gm.people["boss"]), "value": "coins"},
+    )
+    boss = [(o["name"] is not None, o["delta"], o["balance"]) for o in theirs.json()["items"]]
+    assert boss == [(True, 5, 5)] and theirs.json()["total"] == 1
+
     await login(client, "ursula")
     assert (await client.get("/api/v1/admin/gamification/streak")).status_code == 403
     assert (await client.get("/api/v1/admin/gamification/members")).status_code == 403
     assert (await client.get("/api/v1/admin/gamification/members/details")).status_code == 403
+    assert (await client.get("/api/v1/admin/gamification/operations")).status_code == 403
 
 
 def test_split_bonus() -> None:

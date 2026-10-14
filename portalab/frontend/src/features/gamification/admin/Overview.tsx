@@ -23,6 +23,7 @@ import { useRules, useVerify, type Value } from "../api";
 import { SOURCES } from "../progression/GainSources";
 import { AnomalyQueue } from "./AnomalyQueue";
 import { MemberDetails } from "./MemberDetails";
+import { Operations } from "./Operations";
 import { useLevelRewards, useMembersProgress, useProgress, useStreak, VALUES } from "./tuning";
 
 const PERIODS = [7, 30, 90, 365];
@@ -356,6 +357,12 @@ export function Overview() {
           </table>
         ) : null}
       </AdminSection>
+      <Operations
+        days={days}
+        member={member}
+        memberName={member ? nameOf(all.find((m) => m.user_id === member) ?? { user_id: member }) : null}
+        onMember={setMember}
+      />
       <MemberDetails days={days} member={member} onMember={setMember} />
       <div className="admin-grid">
         <AdminSection icon="trophy" title={t("gamification:admin.overview.top")}>

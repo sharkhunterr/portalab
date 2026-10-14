@@ -3,13 +3,14 @@ be rewarded (event types and their rewardable attributes), play streaks, level r
 progress over time (daily gains, the members who progress most, where the gains come from)."""
 
 import types
-from datetime import UTC, date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Any, Literal, Union, get_args, get_origin
 from uuid import UUID
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Date, cast, distinct, func, select
+from sqlalchemy import Date, cast, distinct, func, literal, select, tuple_
+from sqlalchemy.orm import aliased
 
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
@@ -19,9 +20,9 @@ from portalab.core.errors import Unavailable
 from portalab.core.time import utc_now
 from portalab.modules.gamification.api.me import Me, Module, _me
 from portalab.modules.gamification.events import OWN_TYPES
-from portalab.modules.gamification.models import LedgerTransaction
+from portalab.modules.gamification.models import Achievement, LedgerTransaction, Quest, RewardRule
 from portalab.modules.gamification.permissions import MANAGE
-from portalab.modules.gamification.progression.sources import since_days
+from portalab.modules.gamification.progression.sources import QUESTS, action_of, since_days
 from portalab.modules.gamification.progression.sources import sources as gain_sources
 from portalab.modules.gamification.progression.timeline import timeline as gain_timeline
 from portalab.modules.gamification.settings import SETTINGS
@@ -662,3 +663,174 @@ async def members_details(
             )
         )
     return MembersDetailOut(members=out)
+
+
+class OperationOut(BaseModel):
+    id: UUID
+    occurred_at: datetime
+    user_id: UUID
+    name: str | None
+    value: str
+    delta: int
+    kind: str  # grant, spend, correction, manual…
+    source_kind: str  # reward_rule, quest, achievement, marketplace, manual…
+    source: str  # what made it, as on the progression charts: media, quests, achievements, shop, levels…
+    label: str | None  # the rule's, achievement's or quest's name
+    reason: str | None  # an administrator's justification
+    balance: int  # the member's balance of this value right after
+    level: int | None  # for XP: the level right after
+    level_up: bool  # for XP: a new level was reached
+
+
+class OperationsOut(BaseModel):
+    items: list[OperationOut]
+    next_cursor: str | None
+    total: int  # operations matching the filters over the period
+
+
+OPERATIONS_PAGE = 100
+
+
+def _source(kind: str, source_kind: str, delta: int, event_type: str | None) -> str:
+    if source_kind == "reward_rule":
+        return action_of(event_type)
+    if source_kind in QUESTS:
+        return "quests"
+    if source_kind == "achievement":
+        return "achievements"
+    if source_kind == "level_reward":
+        return "levels"
+    if source_kind == "marketplace" or (delta < 0 and kind in ("spend", "reserve_consume")):
+        return "shop"
+    if source_kind == "manual":
+        return "admin"  # given, taken back or corrected by an administrator
+    return "other"
+
+
+async def _labels(session: Any) -> dict[tuple[str, str], str]:
+    """The latest name of every rule, achievement and quest."""
+    out: dict[tuple[str, str], str] = {}
+    for kind, model in (("rule", RewardRule), ("achievement", Achievement), ("quest", Quest)):
+        rows = (await session.execute(select(model.key, model.definition).order_by(model.version))).all()
+        for key, definition in rows:
+            label = (definition or {}).get("label")
+            if label:
+                out[(kind, key)] = str(label)
+    return out
+
+
+def _label_of(labels: dict[tuple[str, str], str], source_ref: str | None, rule_key: str | None) -> str | None:
+    if rule_key:
+        return labels.get(("rule", rule_key), rule_key)
+    head, _, rest = (source_ref or "").partition(":")
+    if head in ("achievement", "quest"):
+        key = rest.split(":", 1)[0]
+        return labels.get((head, key), key)
+    if head == "level":
+        return rest or None
+    return None
+
+
+@router.get("/admin/gamification/operations", response_model=OperationsOut)
+async def operations(
+    _: Manager,
+    module: Module,
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+    member: UUID | None = None,
+    value: Literal["xp", "coins", "contribution"] | None = None,
+    cursor: str | None = None,
+    limit: Annotated[int, Query(ge=5, le=OPERATIONS_PAGE)] = OPERATIONS_PAGE,
+) -> OperationsOut:
+    """#107: every operation of every member (or one member) over the period, the latest first (by the time
+    it happened: a play rewarded late from a history sits on its day) — what was gained or spent, what made
+    it, the balance after it in that order and, for XP, the level reached."""
+    since = since_days(utc_now(module.clock), days)
+    curve = await module.levels.curve()
+    running = (
+        func.sum(LedgerTransaction.delta)
+        .over(
+            partition_by=(LedgerTransaction.user_id, LedgerTransaction.value),
+            order_by=(LedgerTransaction.occurred_at, LedgerTransaction.seq),
+        )
+        .label("running")
+    )
+    inner = select(LedgerTransaction, running)
+    if member is not None:
+        inner = inner.where(LedgerTransaction.user_id == member)
+    if value is not None:
+        inner = inner.where(LedgerTransaction.value == value)
+    ledger = inner.subquery()
+    row = aliased(LedgerTransaction, ledger)
+    query = select(row, ledger.c.running).where(row.occurred_at >= since)
+    counted = select(func.count()).select_from(ledger).where(ledger.c.occurred_at >= since)
+    after = _cursor(cursor)
+    if after is not None:
+        query = query.where(tuple_(row.occurred_at, row.seq) < tuple_(literal(after[0]), literal(after[1])))
+    async with module.database.session() as session:
+        rows = (
+            await session.execute(query.order_by(row.occurred_at.desc(), row.seq.desc()).limit(limit + 1))
+        ).all()
+        total = int((await session.execute(counted)).scalar_one())
+        labels = await _labels(session)
+        events = {
+            key: event_type
+            for key, event_type in (
+                await session.execute(select(RewardRule.key, RewardRule.event_type))
+            ).all()
+        }
+    more = len(rows) > limit
+    rows = rows[:limit]
+    names = await _names(module, {t.user_id for t, _ in rows})
+    items: list[OperationOut] = []
+    for t, running_after in rows:
+        after_it = int(running_after or 0)
+        level = curve.level_for(max(0, after_it)) if t.value == "xp" else None
+        before = curve.level_for(max(0, after_it - int(t.delta))) if t.value == "xp" else None
+        items.append(
+            OperationOut(
+                id=t.id,
+                occurred_at=t.occurred_at,
+                user_id=t.user_id,
+                name=names.get(t.user_id),
+                value=t.value,
+                delta=int(t.delta),
+                kind=t.kind,
+                source_kind=t.source_kind,
+                source=_source(t.kind, t.source_kind, int(t.delta), events.get(t.rule_key or "")),
+                label=_label_of(labels, t.source_ref, t.rule_key),
+                reason=t.reason,
+                balance=after_it,
+                level=level,
+                level_up=level is not None and before is not None and level > before,
+            )
+        )
+    last = rows[-1][0] if more and rows else None
+    return OperationsOut(
+        items=items,
+        next_cursor=f"{last.occurred_at.isoformat()}|{last.seq}" if last else None,
+        total=total,
+    )
+
+
+def _cursor(cursor: str | None) -> tuple[datetime, int] | None:
+    """A page ends at an operation: its time and its sequence (two at the same time keep their order)."""
+    when, _, seq = (cursor or "").rpartition("|")
+    try:
+        return datetime.fromisoformat(when), int(seq)
+    except ValueError:
+        return None
+
+
+async def _names(module: Any, ids: set[UUID]) -> dict[UUID, str | None]:
+    directory = module.capabilities.system_providers(DIRECTORY)
+    out: dict[UUID, str | None] = {}
+    for user_id in ids:
+        name = None
+        if directory:
+            try:
+                summary = await directory[0].provider.get_user_summary(user_id)
+                name = summary.display_name if summary else None
+            except Exception:
+                name = None
+        out[user_id] = name
+    return out

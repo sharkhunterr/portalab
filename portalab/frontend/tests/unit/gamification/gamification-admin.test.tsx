@@ -81,6 +81,29 @@ const DETAILS = [
   },
 ];
 
+// issue 107: the journal, page by page (27 operations: a page of 25, then 2; the last one a correction)
+function operation(n: number) {
+  const fix = n === 27;
+  return {
+    id: `op${n}`,
+    occurred_at: new Date(Date.UTC(2026, 9, 13, 12, 60 - n)).toISOString(),
+    user_id: "u1",
+    name: "Noémie",
+    value: "xp",
+    delta: fix ? -2 : 10,
+    kind: fix ? "correction" : "grant",
+    source_kind: fix ? "manual" : "achievement",
+    source: fix ? "admin" : "achievements",
+    label: fix ? null : "Popcorn time",
+    reason: fix ? "fix" : null,
+    balance: 300 - n,
+    level: 2,
+    level_up: n === 1,
+  };
+}
+const OPERATIONS = Array.from({ length: 27 }, (_, n) => operation(n + 1));
+const seenCursors: string[] = [];
+
 function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
@@ -98,6 +121,16 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
           definition: body.definition,
         });
       return json(200, {});
+    }
+    if (path === "/api/v1/admin/gamification/operations") {
+      const query = new URL(request.url).searchParams;
+      const cursor = query.get("cursor") ?? "";
+      const limit = Number(query.get("limit"));
+      seenCursors.push(cursor);
+      const from = cursor ? Number(cursor) : 0;
+      const items = OPERATIONS.slice(from, from + limit);
+      const next = from + limit < OPERATIONS.length ? String(from + limit) : null;
+      return json(200, { items, next_cursor: next, total: OPERATIONS.length });
     }
     switch (path) {
       case "/api/v1/admin/gamification/pace":
@@ -247,5 +280,36 @@ describe("gamification administration", () => {
     expect(rows[0]).toContain("−3");
     expect(rows).toHaveLength(2);
     expect(screen.getByText("Now: level 2 · 120 XP · 22 Coins · 1 Contribution.")).toBeTruthy();
+  });
+
+  it("journals every operation in a real table, page by page", async () => {
+    serve([]);
+    show("/admin/gamification");
+    const table = await screen.findByRole("table", { name: "Operations journal" });
+    expect(Array.from(table.querySelectorAll("thead th")).map((th) => th.textContent)).toEqual([
+      "Date",
+      "Member",
+      "Amount",
+      "Source",
+      "Detail",
+      "Balance after",
+      "Level",
+    ]);
+    const first = Array.from(table.querySelectorAll("tbody tr")).map((tr) => tr.textContent);
+    expect(first).toHaveLength(25);
+    expect(first[0]).toContain("+10 XP");
+    expect(first[0]).toContain("Level 2 reached");
+    expect(screen.getByText("1–25 of 27 operations")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await waitFor(() => expect(screen.getByText("26–27 of 27 operations")).toBeTruthy());
+    const second = Array.from(table.querySelectorAll("tbody tr")).map((tr) => tr.textContent);
+    expect(second).toHaveLength(2);
+    expect(second[1]).toContain("-2 XP");
+    expect(second[1]).toContain("Administration");
+    expect(second[1]).toContain("fix");
+    expect(screen.getByText("Page 2 of 2")).toBeTruthy();
+    expect(seenCursors).toContain("25");
+    fireEvent.click(screen.getByRole("button", { name: "Previous" }));
+    await waitFor(() => expect(screen.getByText("1–25 of 27 operations")).toBeTruthy());
   });
 });

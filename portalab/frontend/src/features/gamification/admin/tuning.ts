@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import type { Translate } from "../../../i18n/hooks/useT";
@@ -15,6 +15,8 @@ export type LevelRewards = components["schemas"]["LevelRewardsOut"];
 export type Progress = components["schemas"]["ProgressOut"];
 export type MembersProgress = components["schemas"]["MembersProgressOut"];
 export type MemberDetail = components["schemas"]["MemberDetailOut"];
+export type Operation = components["schemas"]["OperationOut"];
+type Operations = components["schemas"]["OperationsOut"];
 
 export const VALUES: Value[] = ["xp", "coins", "contribution"];
 const KEY = ["gamification", "admin"] as const;
@@ -187,6 +189,34 @@ export function useMembersDetails(days: number) {
           params: { query: { days } },
         })
       ).data?.members ?? ([] as MemberDetail[]),
+  });
+}
+
+/** Issue 107: one page of every member's operations (or one member's), the latest first. */
+export function useOperations(
+  days: number,
+  member: string,
+  value: Value | "",
+  cursor: string | null,
+  limit: number,
+) {
+  return useQuery({
+    queryKey: [...KEY, "operations", days, member, value, cursor, limit],
+    placeholderData: keepPreviousData,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/admin/gamification/operations", {
+          params: {
+            query: {
+              days,
+              limit,
+              ...(member ? { member } : {}),
+              ...(value ? { value } : {}),
+              ...(cursor ? { cursor } : {}),
+            },
+          },
+        })
+      ).data ?? ({ items: [], next_cursor: null, total: 0 } as Operations),
   });
 }
 

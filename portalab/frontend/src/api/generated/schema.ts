@@ -1124,6 +1124,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Operations
+         * @description #107: every operation of every member (or one member) over the period, the latest first (by the time
+         *     it happened: a play rewarded late from a history sits on its day) — what was gained or spent, what made
+         *     it, the balance after it in that order and, for XP, the level reached.
+         */
+        get: operations["operations_api_v1_admin_gamification_operations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/pace": {
         parameters: {
             query?: never;
@@ -12936,6 +12958,55 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** OperationOut */
+        OperationOut: {
+            /** Balance */
+            balance: number;
+            /** Delta */
+            delta: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string | null;
+            /** Level */
+            level: number | null;
+            /** Level Up */
+            level_up: boolean;
+            /** Name */
+            name: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Reason */
+            reason: string | null;
+            /** Source */
+            source: string;
+            /** Source Kind */
+            source_kind: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Value */
+            value: string;
+        };
+        /** OperationsOut */
+        OperationsOut: {
+            /** Items */
+            items: components["schemas"]["OperationOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+            /** Total */
+            total: number;
+        };
         /** OverviewOut */
         OverviewOut: {
             /** Activity */
@@ -17783,6 +17854,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MembersDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    operations_api_v1_admin_gamification_operations_get: {
+        parameters: {
+            query?: {
+                days?: number;
+                member?: string | null;
+                value?: ("xp" | "contribution" | "coins") | null;
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationsOut"];
                 };
             };
             /** @description Validation Error */

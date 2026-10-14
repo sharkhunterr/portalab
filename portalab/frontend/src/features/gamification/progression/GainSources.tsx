@@ -29,6 +29,7 @@ export const SOURCES: Record<string, { color: string; icon: string }> = {
   boost: { color: "var(--rarity-epic)", icon: "rocket" }, // #55: a boost bought in the shop
   activity: { color: "var(--cal-news)", icon: "zap" },
   other: { color: "var(--cal-other)", icon: "sparkles" },
+  admin: { color: "var(--cal-other)", icon: "shield" }, // issue 107: given or taken back by an administrator
 };
 const PERIODS = [7, 30, 90, 365];
 const VALUES: Value[] = ["xp", "coins"];
