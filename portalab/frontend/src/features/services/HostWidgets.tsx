@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { type CSSProperties, useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useId, useState } from "react";
 import {
   Area,
   CartesianGrid,
@@ -601,6 +601,7 @@ const RANGE_MS: Record<string, number> = {
 
 function ChartWidget({ payload, compact, config }: WidgetProps) {
   const t = useT();
+  const gradient = `host-chart-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const format = useFormat();
   const data = payload.data as unknown as ChartData | undefined;
   const key = data ? `${data.service_id}:${data.metrics.join(",")}:${data.range}` : "";
@@ -656,9 +657,18 @@ function ChartWidget({ payload, compact, config }: WidgetProps) {
   const plot = (axes: boolean) => (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart data={rows} margin={{ top: 8, right: 6, bottom: 0, left: 0 }}>
+        {/* issue 117: the chart kit's areas — a soft gradient under each series */}
+        <defs>
+          {data.metrics.map((m) => (
+            <linearGradient key={m} id={`${gradient}-${m}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={COLORS[m] ?? "var(--color-accent)"} stopOpacity={0.4} />
+              <stop offset="100%" stopColor={COLORS[m] ?? "var(--color-accent)"} stopOpacity={0.02} />
+            </linearGradient>
+          ))}
+        </defs>
         {axes ? (
           <>
-            <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid vertical={false} />
             <XAxis
               dataKey="x"
               type="number"
@@ -679,12 +689,6 @@ function ChartWidget({ payload, compact, config }: WidgetProps) {
               tickFormatter={(v: number) => (percentOnly ? `${v}%` : format.number(v))}
             />
             <Tooltip
-              contentStyle={{
-                background: "var(--color-surface-raised)",
-                border: "1px solid var(--color-border)",
-                borderRadius: 8,
-                color: "var(--color-text)",
-              }}
               labelFormatter={(x) => format.dateTime(new Date(Number(x)))}
               formatter={(v, name) => [valueText(String(name), Number(v)), label(String(name))]}
             />
@@ -697,8 +701,7 @@ function ChartWidget({ payload, compact, config }: WidgetProps) {
               type="monotone"
               dataKey={m}
               stroke={COLORS[m] ?? "var(--color-accent)"}
-              fill={COLORS[m] ?? "var(--color-accent)"}
-              fillOpacity={0.15}
+              fill={`url(#${gradient}-${m})`}
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}

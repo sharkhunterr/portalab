@@ -226,15 +226,20 @@
 
 /* « my statistics »: the figures grow with the block, the chart takes the height left */
 .widget-frame__body .widget-media-stats:has(> .widget-media-stats__chart) {
-  grid-template-rows: auto auto minmax(110px, 1fr);
+  grid-template-rows: auto auto minmax(48px, 1fr);
   block-size: 100cqh;
 }
+/* issue 117: the chart takes what is left, however small the block — below 90 px the dates give way */
 .widget-media-stats__chart {
   min-block-size: 0;
+  overflow: hidden;
 }
 .widget-media-stats__chart .recharts-responsive-container {
   block-size: 100% !important;
 }
 .widget-frame__body .widget-media-stats__figures strong {
   font-size: clamp(var(--font-size-xl), calc(0.5rem + 5cqh), 2.6rem);
+}
+.widget-media-stats__plot {
+  block-size: 100%;
 }

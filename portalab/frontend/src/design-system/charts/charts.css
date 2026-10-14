@@ -96,20 +96,32 @@
 
 /* the kit's own shapes (issue 117) --------------------------------------------------------------------- */
 /* donut: the ring with its total in the middle, the parts named beside it */
+/* the kit's shapes follow the room they are given (a widget, a card), not the screen */
+.ds-donut,
+.ds-rings,
+.ds-dumbbell,
+.ds-lollipop,
+.ds-mirror {
+  container-type: inline-size;
+}
 .ds-donut {
   display: grid;
-  grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
+  grid-template-columns: minmax(7rem, 14rem) minmax(0, 1fr);
   gap: var(--space-4);
   align-items: center;
 }
-@media (max-width: 540px) {
-  .ds-donut {
-    grid-template-columns: 1fr;
+@container (max-width: 24rem) {
+  .ds-donut,
+  .ds-rings {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
   }
 }
 .ds-donut__ring {
   position: relative;
+  inline-size: 100%;
   min-inline-size: 0;
+  max-inline-size: 14rem;
 }
 .ds-donut__total {
   position: absolute;
@@ -295,17 +307,12 @@
 
 .ds-rings {
   display: grid;
-  grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+  grid-template-columns: minmax(7rem, 13rem) minmax(0, 1fr);
   gap: var(--space-4);
   align-items: center;
 }
 .ds-rings .ds-chart-legend {
   flex-direction: column;
-}
-@media (max-width: 540px) {
-  .ds-rings {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* stacked progress, lying or standing */
@@ -458,7 +465,7 @@
 }
 .ds-dumbbell__row {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  grid-template-columns: minmax(3.5rem, 6.5rem) minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: center;
 }
@@ -511,7 +518,7 @@
 }
 .ds-lollipop li {
   display: grid;
-  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  grid-template-columns: minmax(3.5rem, 7rem) minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: center;
 }

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { api } from "../../api/client";
+import { LinesChart } from "../../design-system/charts/Charts";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -42,7 +42,6 @@ export function cumulate(days: Sources["days"], today: Date, span = DAYS): { day
 export default function ProgressCurves({ payload }: WidgetProps) {
   const t = useT();
   const format = useFormat();
-  const gradient = `curves-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const [value, setValue] = useState<Value>("xp");
   const level = ((payload.data ?? {}) as { level?: number }).level ?? 1;
   const sources = useQuery({
@@ -80,35 +79,21 @@ export default function ProgressCurves({ payload }: WidgetProps) {
         </span>
       </div>
       <div className="widget-curves__chart" aria-hidden="true">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={points} margin={{ top: 4, right: 2, bottom: 2, left: 2 }}>
-            <defs>
-              <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.5} />
-                <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            {/* no axis: the period is in the head, each day in the tooltip — the curve keeps the room */}
-            <XAxis dataKey="day" hide />
-            <Tooltip
-              formatter={(amount) => [`${format.number(Number(amount))} ${unit}`, ""]}
-              labelFormatter={(day) => format.date(`${String(day)}T12:00:00`, "medium")}
-              contentStyle={{
-                background: "var(--color-surface-raised)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-              }}
-            />
-            <Area
-              type="monotone"
-              dataKey="total"
-              stroke="var(--color-accent)"
-              strokeWidth={2.5}
-              fill={`url(#${gradient})`}
-              isAnimationActive
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {/* no axis: the period is in the head, each day in the tooltip — the curve keeps the room (issue 117:
+            the chart kit's area) */}
+        <LinesChart
+          data={points}
+          x="day"
+          area
+          height="100%"
+          xAxis={false}
+          yAxis={false}
+          grid={false}
+          legend={false}
+          series={[{ key: "total", label: unit }]}
+          xFormat={(day) => format.date(`${day}T12:00:00`, "medium")}
+          format={(amount) => `${format.number(amount)} ${unit}`}
+        />
       </div>
       <ProgressBoosts />
     </div>

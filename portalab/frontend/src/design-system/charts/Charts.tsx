@@ -56,7 +56,12 @@ export interface ChartSeries {
   dashed?: boolean | undefined;
 }
 interface Common {
-  height?: number | undefined;
+  /** a number of pixels, or ``"100%"`` to fill a widget's block */
+  height?: number | "100%" | undefined;
+  /** issue 117: a widget's small chart keeps the room — no Y axis, no X axis, no grid as asked */
+  xAxis?: boolean | undefined;
+  yAxis?: boolean | undefined;
+  grid?: boolean | undefined;
   /** the values as the page says them (« 1 h 20 », « 1 234 XP ») */
   format?: ((value: number) => string) | undefined;
   /** the categories or days on the axis */
@@ -88,6 +93,9 @@ export function BarsChart({
   format = same,
   xFormat,
   legend = series.length > 1,
+  xAxis = true,
+  yAxis = true,
+  grid = true,
 }: Common & { data: Datum[]; x: string; series: ChartSeries[]; stacked?: boolean; horizontal?: boolean }) {
   const last = series.length - 1;
   return (
@@ -98,16 +106,27 @@ export function BarsChart({
         margin={{ top: 8, right: 8, bottom: 0, left: horizontal ? 8 : 0 }}
         barCategoryGap="22%"
       >
-        <CartesianGrid vertical={false} horizontal={!horizontal} />
+        {grid ? <CartesianGrid vertical={false} horizontal={!horizontal} /> : null}
         {horizontal ? (
           <>
-            <XAxis type="number" tickFormatter={compact} />
-            <YAxis type="category" dataKey={x} width={96} {...(xFormat ? { tickFormatter: xFormat } : {})} />
+            <XAxis type="number" tickFormatter={compact} hide={!xAxis} />
+            <YAxis
+              type="category"
+              dataKey={x}
+              width={96}
+              hide={!yAxis}
+              {...(xFormat ? { tickFormatter: xFormat } : {})}
+            />
           </>
         ) : (
           <>
-            <XAxis dataKey={x} minTickGap={16} {...(xFormat ? { tickFormatter: xFormat } : {})} />
-            <YAxis width={44} tickFormatter={compact} />
+            <XAxis
+              dataKey={x}
+              minTickGap={16}
+              hide={!xAxis}
+              {...(xFormat ? { tickFormatter: xFormat } : {})}
+            />
+            <YAxis width={44} tickFormatter={compact} hide={!yAxis} />
           </>
         )}
         {tooltip(format, xFormat)}
@@ -150,6 +169,9 @@ export function LinesChart({
   format = same,
   xFormat,
   legend = series.length > 1,
+  xAxis = true,
+  yAxis = true,
+  grid = true,
   children,
 }: Common & {
   data: Datum[];
@@ -175,9 +197,9 @@ export function LinesChart({
             ))}
           </defs>
         ) : null}
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey={x} minTickGap={24} {...(xFormat ? { tickFormatter: xFormat } : {})} />
-        <YAxis width={44} tickFormatter={compact} />
+        {grid ? <CartesianGrid vertical={false} /> : null}
+        <XAxis dataKey={x} minTickGap={24} hide={!xAxis} {...(xFormat ? { tickFormatter: xFormat } : {})} />
+        <YAxis width={44} tickFormatter={compact} hide={!yAxis} />
         {tooltip(format, xFormat)}
         {legend ? <Legend /> : null}
         {children}
@@ -231,13 +253,16 @@ export function DonutChart({
   items: Slice[];
   total?: string | undefined;
   totalLabel?: string | undefined;
-  height?: number | undefined;
+  height?: number | "100%" | undefined;
   format?: ((value: number) => string) | undefined;
 }) {
   const sum = items.reduce((all, item) => all + item.value, 0);
   return (
     <div className="ds-donut">
-      <div className="ds-donut__ring" style={{ blockSize: height }}>
+      <div
+        className="ds-donut__ring"
+        style={{ blockSize: height, minBlockSize: height === "100%" ? 120 : undefined }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
