@@ -108,9 +108,13 @@ describe("gamification", () => {
         ]}
       />,
     );
-    expect(screen.getByText("Unlocked")).toBeTruthy();
+    expect(screen.getAllByText("Unlocked")).toHaveLength(2); // its group, and its badge
+    expect(screen.getByText("In progress")).toBeTruthy(); // issue 114: the ones started come next
     expect(screen.getByText("Locked")).toBeTruthy();
     expect(screen.getByText("2 / 5")).toBeTruthy();
+    // the others are folded away until asked for
+    expect(screen.queryByText("Hidden achievement")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Show 1 more achievement" }));
     expect(screen.getByText("Hidden achievement")).toBeTruthy();
   });
 

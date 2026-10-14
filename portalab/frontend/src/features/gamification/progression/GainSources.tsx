@@ -68,7 +68,8 @@ export function GainSources() {
   const [value, setValue] = useState<Value>("xp");
   const [days, setDays] = useState(30);
   const [table, setTable] = useState(false);
-  const [mode, setMode] = useState<"sources" | "timeline">("sources"); // #62: by source, or over time
+  // #62: by source, or over time; issue 114: or my XP in all, day after day
+  const [mode, setMode] = useState<"sources" | "timeline" | "total">("sources");
   const data = useSources(value, days).data;
   const streak = useStreak().data;
   const unit = t(`gamification:value.${value}`);
@@ -86,10 +87,11 @@ export function GainSources() {
           <AdminTabs
             label={t("gamification:sources.mode")}
             current={mode}
-            onChange={(next) => setMode(next as "sources" | "timeline")}
+            onChange={(next) => setMode(next as "sources" | "timeline" | "total")}
             tabs={[
               { key: "sources", label: t("gamification:sources.bySource") },
               { key: "timeline", label: t("gamification:sources.overTime") },
+              { key: "total", label: t("gamification:sources.total") },
             ]}
           />
           {mode === "sources" ? (
@@ -134,6 +136,7 @@ export function GainSources() {
         </p>
       ) : null}
       {mode === "timeline" ? <GainTimeline days={days} /> : null}
+      {mode === "total" ? <GainTimeline days={days} cumulative /> : null}
       {mode === "sources" && data && !sources.length ? (
         <p className="admin-muted">{t("gamification:sources.empty")}</p>
       ) : null}

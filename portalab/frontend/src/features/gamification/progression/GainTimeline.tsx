@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -15,6 +16,7 @@ import type { components } from "../../../api/generated/schema";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useProgression } from "../api";
 
 type Timeline = components["schemas"]["MyTimelineOut"];
 
@@ -24,7 +26,8 @@ const SHOWN_LEVEL_UPS = 12; // the latest; the chart marks every one
 const LINES = [
   { key: "xp", color: "var(--color-accent)", axis: "xp" },
   { key: "coins", color: "var(--rarity-legendary)", axis: "other" },
-  { key: "contribution", color: "var(--color-accent-alt)", axis: "other" },
+  // issue 114: green, apart from the Coins' gold
+  { key: "contribution", color: "var(--state-available-fg, var(--cal-series))", axis: "other" },
 ] as const;
 
 export function useTimeline(days: number) {
@@ -48,12 +51,27 @@ export function fillDays(timeline: Timeline | undefined, days: number, today = n
 /**
  * #62: my progression over time — XP, Coins and Contribution gained day by day as lines (XP on its own
  * axis: it counts far more), the days I reached a level marked on the chart and told as small cards below.
+ * Issue 114: ``cumulative``, my XP in all at the end of each day instead — the climb towards the next level.
  */
-export function GainTimeline({ days }: { days: number }) {
+export function GainTimeline({ days, cumulative = false }: { days: number; cumulative?: boolean }) {
   const t = useT();
   const format = useFormat();
   const timeline = useTimeline(days).data;
-  const points = fillDays(timeline, days);
+  const held = useProgression().data?.xp ?? null;
+  const daily = fillDays(timeline, days);
+  // my XP at the end of each day: what I hold now, less what came after that day
+  const points = useMemo(() => {
+    if (!cumulative || held === null) return daily;
+    let after = 0;
+    const out = [...daily];
+    for (let i = out.length - 1; i >= 0; i--) {
+      const day = out[i] as (typeof out)[number];
+      out[i] = { ...day, total: held - after } as typeof day;
+      after += day.xp;
+    }
+    return out;
+  }, [cumulative, held, daily]);
+  const lines = cumulative ? [{ key: "total", color: "var(--color-accent)", axis: "xp" } as const] : LINES;
   const ups = timeline?.level_ups ?? [];
   const short = (day: string) => {
     const { day: d, month } = format.dayMonth(`${day}T12:00:00Z`);
@@ -63,7 +81,9 @@ export function GainTimeline({ days }: { days: number }) {
   return (
     <div className="gain-timeline">
       <figure className="gain-sources__bars">
-        <figcaption>{t("gamification:sources.timeline")}</figcaption>
+        <figcaption>
+          {cumulative ? t("gamification:sources.totalTitle") : t("gamification:sources.timeline")}
+        </figcaption>
         <div aria-hidden="true">
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={points} margin={{ top: 16, right: 8, left: 0, bottom: 0 }}>
@@ -82,14 +102,16 @@ export function GainTimeline({ days }: { days: number }) {
                 width={44}
                 tickFormatter={compact}
               />
-              <YAxis
-                yAxisId="other"
-                orientation="right"
-                stroke="var(--color-text-muted)"
-                fontSize={12}
-                width={40}
-                tickFormatter={compact}
-              />
+              {cumulative ? null : (
+                <YAxis
+                  yAxisId="other"
+                  orientation="right"
+                  stroke="var(--color-text-muted)"
+                  fontSize={12}
+                  width={40}
+                  tickFormatter={compact}
+                />
+              )}
               <Tooltip
                 labelFormatter={(value) => short(String(value))}
                 formatter={(value, name) => [format.number(Number(value)), name]}
@@ -114,13 +136,17 @@ export function GainTimeline({ days }: { days: number }) {
                   }}
                 />
               ))}
-              {LINES.map((line) => (
+              {lines.map((line) => (
                 <Line
                   key={line.key}
                   yAxisId={line.axis}
                   type="monotone"
                   dataKey={line.key}
-                  name={t(`gamification:value.${line.key}`)}
+                  name={
+                    line.key === "total"
+                      ? t("gamification:sources.totalXp")
+                      : t(`gamification:value.${line.key}`)
+                  }
                   stroke={line.color}
                   strokeWidth={line.key === "xp" ? 2.5 : 1.8}
                   dot={false}

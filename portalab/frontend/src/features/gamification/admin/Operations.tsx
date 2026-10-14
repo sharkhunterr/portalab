@@ -20,14 +20,17 @@ const SIZES = [25, 50, 100];
  */
 export function Operations({
   days,
-  member,
-  memberName,
+  member = "",
+  memberName = null,
   onMember,
+  mine = false,
 }: {
   days: number;
-  member: string;
-  memberName: string | null;
-  onMember: (id: string) => void;
+  member?: string;
+  memberName?: string | null;
+  onMember?: (id: string) => void;
+  /** issue 114: the member's own journal on their progression page (no member column) */
+  mine?: boolean;
 }) {
   const t = useT();
   const format = useFormat();
@@ -41,14 +44,16 @@ export function Operations({
   });
   const cursors = pages.filters === filters ? pages.cursors : [null];
   const page = cursors.length - 1;
-  const journal = useOperations(days, member, value, cursors[page] ?? null, size);
+  const journal = useOperations(days, member, value, cursors[page] ?? null, size, mine);
   const rows = journal.data?.items ?? [];
   const total = journal.data?.total ?? 0;
   const next = journal.data?.next_cursor ?? null;
   const go = (to: (string | null)[]) => setPages({ filters, cursors: to });
-  const title = memberName
-    ? t("gamification:admin.operations.oneTitle", { name: memberName })
-    : t("gamification:admin.operations.title");
+  const title = mine
+    ? t("gamification:history.title")
+    : memberName
+      ? t("gamification:admin.operations.oneTitle", { name: memberName })
+      : t("gamification:admin.operations.title");
   const what = (row: Operation) =>
     row.source === "levels" && row.label
       ? t("gamification:admin.details.levelN", { level: row.label })
@@ -64,7 +69,9 @@ export function Operations({
       span="full"
       icon="clock"
       title={title}
-      description={t("gamification:admin.operations.hint", { days })}
+      description={
+        mine ? t("gamification:history.hint", { days }) : t("gamification:admin.operations.hint", { days })
+      }
       actions={
         <SelectField
           label={t("gamification:sources.value")}
@@ -94,7 +101,7 @@ export function Operations({
               <thead>
                 <tr>
                   <th scope="col">{t("gamification:admin.operations.when")}</th>
-                  <th scope="col">{t("gamification:admin.overview.member")}</th>
+                  {mine ? null : <th scope="col">{t("gamification:admin.overview.member")}</th>}
                   <th scope="col" data-align="end">
                     {t("gamification:admin.operations.amount")}
                   </th>
@@ -113,15 +120,17 @@ export function Operations({
                       <span>{format.date(row.occurred_at, "short")}</span>
                       <span className="admin-muted">{format.time(row.occurred_at)}</span>
                     </th>
-                    <td>
-                      {member ? (
-                        nameOf(row)
-                      ) : (
-                        <button type="button" className="ds-link" onClick={() => onMember(row.user_id)}>
-                          {nameOf(row)}
-                        </button>
-                      )}
-                    </td>
+                    {mine ? null : (
+                      <td>
+                        {member || !onMember ? (
+                          nameOf(row)
+                        ) : (
+                          <button type="button" className="ds-link" onClick={() => onMember(row.user_id)}>
+                            {nameOf(row)}
+                          </button>
+                        )}
+                      </td>
+                    )}
                     <td data-align="end">
                       <span className="gam-ops__amount" data-sign={row.delta < 0 ? "minus" : "plus"}>
                         {row.delta > 0 ? "+" : ""}

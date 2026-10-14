@@ -172,6 +172,10 @@ async def test_tuning_api(gm: GamHarness, client: AsyncClient) -> None:
     assert (await client.get("/api/v1/admin/gamification/members")).status_code == 403
     assert (await client.get("/api/v1/admin/gamification/members/details")).status_code == 403
     assert (await client.get("/api/v1/admin/gamification/operations")).status_code == 403
+    # #114: my own journal — the same rows, mine only
+    mine = (await client.get("/api/v1/me/progression/operations", params={"value": "xp"})).json()
+    assert {o["user_id"] for o in mine["items"]} == {str(gm.people["ursula"])}
+    assert [o["balance"] for o in mine["items"]] == [100, 80, 60, 40, 20] and mine["total"] == 5
 
 
 def test_split_bonus() -> None:

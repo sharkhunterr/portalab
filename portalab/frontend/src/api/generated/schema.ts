@@ -6449,6 +6449,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/progression/operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Operations
+         * @description #114: my own journal — the same table as the administration's, mine only.
+         */
+        get: operations["my_operations_api_v1_me_progression_operations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/progression/sources": {
         parameters: {
             query?: never;
@@ -28263,6 +28283,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProgressionOut"];
+                };
+            };
+        };
+    };
+    my_operations_api_v1_me_progression_operations_get: {
+        parameters: {
+            query?: {
+                days?: number;
+                value?: ("xp" | "contribution" | "coins") | null;
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

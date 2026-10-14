@@ -744,6 +744,30 @@ async def operations(
     """#107: every operation of every member (or one member) over the period, the latest first (by the time
     it happened: a play rewarded late from a history sits on its day) — what was gained or spent, what made
     it, the balance after it in that order and, for XP, the level reached."""
+    return await _operations(module, days, member, value, cursor, limit)
+
+
+@router.get("/me/progression/operations", response_model=OperationsOut)
+async def my_operations(
+    principal: Me,
+    module: Module,
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+    value: Literal["xp", "coins", "contribution"] | None = None,
+    cursor: str | None = None,
+    limit: Annotated[int, Query(ge=5, le=OPERATIONS_PAGE)] = OPERATIONS_PAGE,
+) -> OperationsOut:
+    """#114: my own journal — the same table as the administration's, mine only."""
+    return await _operations(module, days, _me(principal), value, cursor, limit)
+
+
+async def _operations(
+    module: Any,
+    days: int,
+    member: UUID | None,
+    value: str | None,
+    cursor: str | None,
+    limit: int,
+) -> OperationsOut:
     since = since_days(utc_now(module.clock), days)
     curve = await module.levels.curve()
     running = (

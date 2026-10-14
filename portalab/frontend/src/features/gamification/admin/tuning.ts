@@ -192,31 +192,32 @@ export function useMembersDetails(days: number) {
   });
 }
 
-/** Issue 107: one page of every member's operations (or one member's), the latest first. */
+/** Issue 107: one page of every member's operations (or one member's), the latest first; issue 114: or mine. */
 export function useOperations(
   days: number,
   member: string,
   value: Value | "",
   cursor: string | null,
   limit: number,
+  mine = false,
 ) {
   return useQuery({
-    queryKey: [...KEY, "operations", days, member, value, cursor, limit],
+    queryKey: [...KEY, "operations", mine, days, member, value, cursor, limit],
     placeholderData: keepPreviousData,
-    queryFn: async () =>
-      (
-        await api.GET("/api/v1/admin/gamification/operations", {
-          params: {
-            query: {
-              days,
-              limit,
-              ...(member ? { member } : {}),
-              ...(value ? { value } : {}),
-              ...(cursor ? { cursor } : {}),
-            },
-          },
-        })
-      ).data ?? ({ items: [], next_cursor: null, total: 0 } as Operations),
+    queryFn: async () => {
+      const query = {
+        days,
+        limit,
+        ...(value ? { value } : {}),
+        ...(cursor ? { cursor } : {}),
+      };
+      const result = mine
+        ? await api.GET("/api/v1/me/progression/operations", { params: { query } })
+        : await api.GET("/api/v1/admin/gamification/operations", {
+            params: { query: { ...query, ...(member ? { member } : {}) } },
+          });
+      return result.data ?? ({ items: [], next_cursor: null, total: 0 } as Operations);
+    },
   });
 }
 

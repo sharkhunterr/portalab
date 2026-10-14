@@ -33,6 +33,95 @@ export function AchievementGrid({ achievements }: { achievements: AchievementVie
       );
     });
   }, [achievements, category, sort]);
+  // issue 114: what I unlocked and what I started first; the others folded away until asked for
+  const [showRest, setShowRest] = useState(false);
+  const started = (a: AchievementView) =>
+    a.state === "locked" && (a.progress ?? []).some((step) => step.current > 0);
+  const groups = [
+    ["unlocked", shown.filter((a) => a.state === "unlocked")],
+    ["started", shown.filter(started)],
+  ] as const;
+  const rest = shown.filter((a) => a.state !== "unlocked" && !started(a));
+  const card = (achievement: AchievementView) => {
+    const rarity = achievement.rarity ?? "common";
+    const share = achievement.unlock_share ?? 0;
+    return (
+      <li
+        key={achievement.key}
+        className="ds-card achievement"
+        data-state={achievement.state}
+        data-rarity={rarity}
+      >
+        <span className="achievement__medal" aria-hidden="true">
+          <Icon name={achievement.state === "hidden" ? "lock" : (achievement.icon ?? "trophy")} size={26} />
+        </span>
+        <div className="achievement__body">
+          {achievement.state === "hidden" ? (
+            <h3>{t("gamification:achievements.hidden")}</h3>
+          ) : (
+            <>
+              <h3>{achievement.label}</h3>
+              {achievement.description ? <p>{achievement.description}</p> : null}
+              {achievement.rewards?.length || achievement.unlocks?.length ? (
+                // 027: what it gives — Coins and co, and for some the cosmetics it unlocks
+                <ul className="achievement__gives" aria-label={t("gamification:achievements.gives")}>
+                  {(achievement.rewards ?? []).map((reward) => (
+                    <li key={reward.value} data-value={reward.value}>
+                      <Icon name={GIVES_ICON[reward.value] ?? "star"} size={12} />+
+                      {format.number(reward.amount)} {t(`gamification:value.${reward.value}`)}
+                    </li>
+                  ))}
+                  {(achievement.unlocks ?? []).map((unlock) => (
+                    <li key={unlock.product} data-unlock>
+                      <Icon name="gift" size={12} />
+                      {unlock.label}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {achievement.category ? (
+                <span className="achievement__category">
+                  {t(`gamification:achievements.category.${achievement.category}`)}
+                </span>
+              ) : null}
+              {achievement.state === "locked"
+                ? (achievement.progress ?? []).map((step, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: criteria are positional
+                    <span key={index} className="achievement__step">
+                      <ProgressBar
+                        value={step.target ? step.current / step.target : 0}
+                        label={t("gamification:achievements.progress", step)}
+                        size="sm"
+                        tone="accent"
+                      />
+                      <span className="gamification-meta">
+                        {t("gamification:achievements.progress", step)}
+                      </span>
+                    </span>
+                  ))
+                : null}
+            </>
+          )}
+        </div>
+        <div className="achievement__meta">
+          {achievement.state === "hidden" ? null : (
+            <span className="ds-badge">{t(`gamification:achievements.${achievement.state}`)}</span>
+          )}
+          <span className="achievement__rarity">{t(`gamification:achievements.rarity.${rarity}`)}</span>
+          <span className="achievement__share">
+            {t("gamification:achievements.share", { share: format.number(share) })}
+          </span>
+          {achievement.unlocked_at ? (
+            <span className="gamification-meta">
+              {t("gamification:achievements.unlockedOn", {
+                date: format.date(achievement.unlocked_at),
+              })}
+            </span>
+          ) : null}
+        </div>
+      </li>
+    );
+  };
   return (
     <section aria-labelledby="gamification-achievements" className="achievements">
       <header className="achievements__head">
@@ -69,91 +158,36 @@ export function AchievementGrid({ achievements }: { achievements: AchievementVie
           </select>
         </label>
       </div>
-      <ul className="gamification-grid achievements__list">
-        {shown.map((achievement) => {
-          const rarity = achievement.rarity ?? "common";
-          const share = achievement.unlock_share ?? 0;
-          return (
-            <li
-              key={achievement.key}
-              className="ds-card achievement"
-              data-state={achievement.state}
-              data-rarity={rarity}
-            >
-              <span className="achievement__medal" aria-hidden="true">
-                <Icon
-                  name={achievement.state === "hidden" ? "lock" : (achievement.icon ?? "trophy")}
-                  size={26}
-                />
-              </span>
-              <div className="achievement__body">
-                {achievement.state === "hidden" ? (
-                  <h3>{t("gamification:achievements.hidden")}</h3>
-                ) : (
-                  <>
-                    <h3>{achievement.label}</h3>
-                    {achievement.description ? <p>{achievement.description}</p> : null}
-                    {achievement.rewards?.length || achievement.unlocks?.length ? (
-                      // 027: what it gives — Coins and co, and for some the cosmetics it unlocks
-                      <ul className="achievement__gives" aria-label={t("gamification:achievements.gives")}>
-                        {(achievement.rewards ?? []).map((reward) => (
-                          <li key={reward.value} data-value={reward.value}>
-                            <Icon name={GIVES_ICON[reward.value] ?? "star"} size={12} />+
-                            {format.number(reward.amount)} {t(`gamification:value.${reward.value}`)}
-                          </li>
-                        ))}
-                        {(achievement.unlocks ?? []).map((unlock) => (
-                          <li key={unlock.product} data-unlock>
-                            <Icon name="gift" size={12} />
-                            {unlock.label}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    {achievement.category ? (
-                      <span className="achievement__category">
-                        {t(`gamification:achievements.category.${achievement.category}`)}
-                      </span>
-                    ) : null}
-                    {achievement.state === "locked"
-                      ? (achievement.progress ?? []).map((step, index) => (
-                          // biome-ignore lint/suspicious/noArrayIndexKey: criteria are positional
-                          <span key={index} className="achievement__step">
-                            <ProgressBar
-                              value={step.target ? step.current / step.target : 0}
-                              label={t("gamification:achievements.progress", step)}
-                              size="sm"
-                              tone="accent"
-                            />
-                            <span className="gamification-meta">
-                              {t("gamification:achievements.progress", step)}
-                            </span>
-                          </span>
-                        ))
-                      : null}
-                  </>
-                )}
-              </div>
-              <div className="achievement__meta">
-                {achievement.state === "hidden" ? null : (
-                  <span className="ds-badge">{t(`gamification:achievements.${achievement.state}`)}</span>
-                )}
-                <span className="achievement__rarity">{t(`gamification:achievements.rarity.${rarity}`)}</span>
-                <span className="achievement__share">
-                  {t("gamification:achievements.share", { share: format.number(share) })}
-                </span>
-                {achievement.unlocked_at ? (
-                  <span className="gamification-meta">
-                    {t("gamification:achievements.unlockedOn", {
-                      date: format.date(achievement.unlocked_at),
-                    })}
-                  </span>
-                ) : null}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      {groups.map(([name, list]) =>
+        list.length ? (
+          <section
+            key={name}
+            className="achievements__group"
+            aria-label={t(`gamification:achievements.group.${name}`)}
+          >
+            <h3 className="achievements__group-title">
+              {t(`gamification:achievements.group.${name}`)} <span>{list.length}</span>
+            </h3>
+            <ul className="gamification-grid achievements__list">{list.map(card)}</ul>
+          </section>
+        ) : null,
+      )}
+      {rest.length ? (
+        <section className="achievements__group" aria-label={t("gamification:achievements.group.other")}>
+          <button
+            type="button"
+            className="achievements__more"
+            aria-expanded={showRest}
+            onClick={() => setShowRest(!showRest)}
+          >
+            <Icon name={showRest ? "chevron-up" : "chevron-down"} size={16} />
+            {showRest
+              ? t("gamification:achievements.hideOthers")
+              : t("gamification:achievements.showOthers", { count: rest.length })}
+          </button>
+          {showRest ? <ul className="gamification-grid achievements__list">{rest.map(card)}</ul> : null}
+        </section>
+      ) : null}
     </section>
   );
 }
