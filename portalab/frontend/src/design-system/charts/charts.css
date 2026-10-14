@@ -1,0 +1,95 @@
+/* Issue 117: every chart of the portal in one modern look, whatever page draws it — axes without lines or
+   tick marks, quiet labels in tabular figures, a light horizontal grid only, a soft hover band, rounded
+   tooltips that float above the page, and legends as small pills. CSS outranks the SVG attributes the
+   charts pass, so each chart keeps its own colours and data. */
+.recharts-wrapper {
+  font-family: inherit;
+}
+
+/* axes: no line, no tick mark — the labels alone, small and muted */
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+  display: none;
+}
+.recharts-cartesian-axis-tick-value,
+.recharts-polar-angle-axis-tick-value,
+.recharts-polar-radius-axis-tick-value {
+  fill: var(--color-text-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+.recharts-label {
+  fill: var(--color-text-muted);
+  font-size: 11px;
+}
+
+/* the grid: faint horizontal guides, no vertical ones */
+.recharts-cartesian-grid-horizontal line {
+  stroke: color-mix(in srgb, var(--color-border) 55%, transparent);
+  stroke-dasharray: 0;
+}
+.recharts-cartesian-grid-vertical line {
+  display: none;
+}
+.recharts-polar-grid-angle line,
+.recharts-polar-grid-concentric path,
+.recharts-polar-grid-concentric polygon {
+  stroke: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+/* hovering: a soft band (bars) or a thin guide (lines) */
+.recharts-tooltip-cursor {
+  fill: color-mix(in srgb, var(--color-text) 6%, transparent);
+  stroke: color-mix(in srgb, var(--color-text) 25%, transparent);
+  stroke-dasharray: 3 4;
+}
+.recharts-active-dot circle,
+.recharts-dot.recharts-line-dot {
+  stroke: var(--color-surface);
+  stroke-width: 2px;
+}
+
+/* tooltips: a rounded card floating above the page */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  padding: 0.55rem 0.75rem !important;
+  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent) !important;
+  border-radius: var(--radius-md) !important;
+  background: color-mix(in srgb, var(--color-surface-raised) 92%, transparent) !important;
+  box-shadow: 0 0.6rem 1.6rem color-mix(in srgb, var(--color-text) 14%, transparent);
+  backdrop-filter: blur(8px);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+.recharts-default-tooltip .recharts-tooltip-label {
+  margin-block-end: 0.3rem !important;
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold, 600);
+}
+.recharts-default-tooltip .recharts-tooltip-item {
+  padding: 0.05rem 0 !important;
+}
+
+/* legends: small pills, the colour in a dot */
+.recharts-default-legend {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.5rem;
+}
+.recharts-default-legend .recharts-legend-item {
+  display: inline-flex !important;
+  align-items: center;
+  margin: 0 !important;
+  padding: 0.1rem 0.55rem 0.1rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  font-size: var(--font-size-xs);
+}
+.recharts-legend-item .recharts-surface {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+}
+.recharts-legend-item-text {
+  color: var(--color-text-muted) !important;
+}
