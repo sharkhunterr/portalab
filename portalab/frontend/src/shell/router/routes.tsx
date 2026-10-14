@@ -81,6 +81,7 @@ const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
 const Reserve = lazy(() => import("../../features/marketplace/reserve/ReservePage"));
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
 const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStudio"));
+const ChartGallery = lazy(() => import("../../features/appearance/charts/ChartGallery")); // issue 117
 const MembersAdmin = lazy(() => import("../../features/admin/members/MembersAdmin"));
 const AnnouncementsAdmin = lazy(() => import("../../features/admin/communication/AnnouncementsAdmin"));
 const WikiAdmin = lazy(() => import("../../features/wiki/WikiAdmin"));
@@ -372,6 +373,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Marketplace" }),
             })),
             { path: "themes", element: <ThemeStudio />, handle: h({ crumb: "Theme studio" }) },
+            { path: "charts", element: <ChartGallery />, handle: h({ crumb: "Charts" }) },
             { path: "members", element: <MembersAdmin />, handle: h({ crumb: "Members" }) },
             { path: "announcements", element: <AnnouncementsAdmin />, handle: h({ crumb: "Announcements" }) },
             { path: "terms", element: <TermsAdmin />, handle: h({ crumb: "Terms of use" }) },

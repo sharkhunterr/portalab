@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useRef, useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { usePreferences } from "../../../design-system/a11y/PreferencesProvider";
 import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
@@ -195,6 +196,13 @@ export default function ThemeStudio() {
       icon="palette"
       title={t("admin:studio.title")}
       description={t("admin:studio.subtitle")}
+      secondary={
+        // issue 117: the charts in this theme
+        <Link to="/admin/charts" className="ds-button ds-button--secondary">
+          <Icon name="chart" size={16} />
+          {t("admin:charts.open")}
+        </Link>
+      }
       primary={
         base ? (
           <Button onClick={() => startFrom(base)}>

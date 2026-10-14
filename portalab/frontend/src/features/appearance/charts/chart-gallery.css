@@ -1,0 +1,24 @@
+/* issue 117: the sparklines of the chart gallery, each beside its name */
+.chart-gallery__sparks {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.chart-gallery__spark {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+
+.chart-gallery__stacks {
+  display: grid;
+  gap: var(--space-5, 1.5rem);
+}
+
+.chart-gallery__waffles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+}
