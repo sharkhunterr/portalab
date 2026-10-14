@@ -4,8 +4,9 @@ policy ∩ preference, where
 * a channel is on by default when the category lists it in ``default_channels``;
 * the user's choice (``notifications.preferences[category][channel]``) applies only when the category is
   ``user_mutable`` and not locked by the admin category policy — the choice itself is never deleted;
-* mandatory channels (category declaration or policy) cannot be turned off; critical **alerts** bypass
-  mutes on the **portal** channel only (never e-mail opt-out, never sound-off);
+* mandatory channels (category declaration or policy) cannot be turned off; critical **alerts** reach the
+  **portal** of a category off by default or locked (never e-mail, never sound-off) — issue 124: never against
+  the member's own choice, a category they turned off stays off;
 * a channel disabled by policy is suppressed with reason ``policy``.
 """
 
@@ -52,7 +53,8 @@ def decide(
             continue
         default = channel in category.default_channels
         wanted = default if locked or channel not in chosen else bool(chosen[channel])
-        if not wanted and channel == "portal" and kind == "alert" and priority == "critical":
+        own = not locked and channel in chosen  # issue 124: the member said no — that is final
+        if not wanted and not own and channel == "portal" and kind == "alert" and priority == "critical":
             out[channel] = ChannelDecision(channel, True, locked=locked)  # critical alerts reach the portal
             continue
         out[channel] = ChannelDecision(channel, wanted, None if wanted else "preference", locked=locked)

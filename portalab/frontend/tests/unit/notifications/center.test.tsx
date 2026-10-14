@@ -168,4 +168,40 @@ describe("notification preferences", () => {
     await waitFor(() => expect(bodies).toEqual([{ preferences: { "system.maintenance": { email: true } } }]));
     expect(await screen.findByText("Preferences saved.")).toBeTruthy();
   });
+
+  it("shows an outage once and sets both its categories (issue 124)", async () => {
+    const bodies: unknown[] = [];
+    const channel = (enabled: boolean) => ({ enabled, mandatory: false, locked: false });
+    const prefs = {
+      digest: "off",
+      categories: [
+        {
+          key: "system.health",
+          label_key: "notifications:category.health",
+          user_mutable: true,
+          channels: { portal: channel(true), email: channel(false) },
+        },
+        {
+          key: "system.health_email",
+          label_key: "notifications:category.healthEmail",
+          user_mutable: true,
+          channels: { portal: channel(true), email: channel(true) },
+        },
+      ],
+    };
+    fake.handler = async (request) => {
+      if (request.method === "PUT") bodies.push(await request.json());
+      return json(200, prefs);
+    };
+    wrap(<NotificationPreferences />);
+    const email = await screen.findByRole("checkbox", { name: "Service outages: By e-mail" });
+    expect((email as HTMLInputElement).checked).toBe(true); // what the e-mail companion does
+    expect(screen.queryByText("Service outages (e-mail)")).toBeNull();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Service outages: In the portal" }));
+    await waitFor(() =>
+      expect(bodies).toEqual([
+        { preferences: { "system.health": { portal: false }, "system.health_email": { portal: false } } },
+      ]),
+    );
+  });
 });

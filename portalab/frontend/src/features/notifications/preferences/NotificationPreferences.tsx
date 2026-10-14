@@ -13,7 +13,9 @@ import "../notifications.css";
  * Notification preferences (spec 010 T016; #46 redrawn like the other « My account » tabs): one card per
  * theme (account, media, community…), a switch per channel; a channel required by the category or by the
  * administrator is shown on and explained (``PolicyField``), never silently disabled; a category the
- * administrator locked is read-only; the e-mail digest in a card of its own.
+ * administrator locked is read-only; the e-mail digest in a card of its own. Issue 124: a category and its
+ * « e-mail » companion (the same thing, sent by e-mail too when the administrator's rule says so) are one
+ * line — its switches set both.
  */
 const CHANNELS = ["portal", "email"] as const;
 type Category = Preferences["categories"][number];
@@ -29,6 +31,22 @@ const GROUPS: ReadonlyArray<{ key: string; icon: string; prefixes: readonly stri
   { key: "support", icon: "lifebuoy", prefixes: ["support", "system"] },
   { key: "admin", icon: "settings", prefixes: ["automations", "plugins"] },
 ];
+
+/** Issue 124: the category a companion is shown with — one line for the member, two keys behind it. */
+const COMPANIONS: Record<string, string> = {
+  "system.health": "system.health_email",
+  "communications.broadcast": "communications.announcement_email",
+};
+const SHOWN_WITH = new Set(Object.values(COMPANIONS));
+
+/** The line of a category with its companion: portal as the category says, e-mail as the companion does. */
+function merged(category: Category, all: readonly Category[]): { line: Category; keys: string[] } {
+  const companion = all.find((c) => c.key === COMPANIONS[category.key]);
+  if (!companion) return { line: category, keys: [category.key] };
+  const email = companion.channels.email ?? category.channels.email;
+  const channels = email ? { ...category.channels, email } : category.channels;
+  return { line: { ...category, channels }, keys: [category.key, companion.key] };
+}
 
 function groupOf(category: Category): string {
   const prefix = category.key.split(".")[0] ?? "";
@@ -95,7 +113,10 @@ export function NotificationPreferences() {
   const submit = (body: Parameters<typeof save.mutate>[0]) =>
     save.mutate(body, { onSuccess: () => setSaved(true), onError: () => setSaved(false) });
   const groups = [...GROUPS, { key: "other", icon: "bell", prefixes: [] }]
-    .map((group) => ({ ...group, items: data.categories.filter((c) => groupOf(c) === group.key) }))
+    .map((group) => ({
+      ...group,
+      items: data.categories.filter((c) => groupOf(c) === group.key && !SHOWN_WITH.has(c.key)),
+    }))
     .filter((group) => group.items.length);
   const heads = (
     <span className="notif-matrix__head" aria-hidden="true">
@@ -122,13 +143,20 @@ export function NotificationPreferences() {
             aside={heads}
           >
             <ul className="settings-list">
-              {group.items.map((category) => (
-                <Line
-                  key={category.key}
-                  category={category}
-                  onToggle={(channel, on) => submit({ preferences: { [category.key]: { [channel]: on } } })}
-                />
-              ))}
+              {group.items.map((category) => {
+                const { line, keys } = merged(category, data.categories);
+                return (
+                  <Line
+                    key={category.key}
+                    category={line}
+                    onToggle={(channel, on) =>
+                      submit({
+                        preferences: Object.fromEntries(keys.map((key) => [key, { [channel]: on }])),
+                      })
+                    }
+                  />
+                );
+              })}
             </ul>
           </SettingsCard>
         ))}

@@ -1,6 +1,7 @@
 """010 T004/T010/T015/T031 — categories: declared, validated, owner-tagged (plugin categories namespaced and
 never mandatory); preferences: policy ∩ preference per channel, mandatory channels cannot be disabled,
-critical alerts bypass portal mutes only, the stored choice is kept when the policy relaxes; alerts need
+critical alerts reach the portal of a category off by default — never against the member's own choice
+(issue 124) —, the stored choice is kept when the policy relaxes; alerts need
 priority ≥ high."""
 
 import pytest
@@ -58,7 +59,10 @@ def test_preferences_matrix() -> None:
     critical = decide(
         MEDIA, {"media.new": {"portal": False, "email": False}}, {}, kind="alert", priority="critical"
     )
-    assert critical["portal"].enabled and not critical["email"].enabled  # bypass on the portal only
+    assert not critical["portal"].enabled and not critical["email"].enabled  # issue 124: my choice holds
+    quiet = CategoryDef("media.quiet", "module:media", "l", default_channels=("email",))
+    unasked = decide(quiet, {}, {}, kind="alert", priority="critical")
+    assert unasked["portal"].enabled and unasked["email"].enabled  # off by default: critical reaches it
     with pytest.raises(MandatoryChannel):
         validate_update({"account.security": SECURITY}, {}, {"account.security": {"portal": False}})
     validate_update({"media.new": MEDIA}, {}, {"media.new": {"portal": False}})
