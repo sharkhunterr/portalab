@@ -1,0 +1,22 @@
+{
+  "title": "Parity check over: take the banner down",
+  "description": "When the server's parity check ends, the banner shown for it is taken down.",
+  "definition": {
+    "name": "Parity check over: take the banner down",
+    "trigger": {
+      "kind": "event",
+      "event_type": "service.signal_changed",
+      "filter": [
+        {"field": "signal", "op": "eq", "value": "infrastructure.parity_running"},
+        {"field": "value", "op": "eq", "value": false}
+      ]
+    },
+    "steps": [
+      {
+        "id": "end",
+        "action": "announcement.end",
+        "params": {"tag": "parity-${event.service_id}"}
+      }
+    ]
+  }
+}

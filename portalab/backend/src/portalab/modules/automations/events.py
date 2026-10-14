@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from portalab.capabilities.events import EventType, EventTypeRegistry
 
 OWNER = "module:automations"
+SIGNAL_CHANGED = "service.signal_changed"
 
 
 class AutomationRef(BaseModel):
@@ -24,6 +25,17 @@ class ApprovalRef(BaseModel):
 class Triggered(BaseModel):
     automation: str
     payload: str | None = None
+
+
+class SignalChanged(BaseModel):
+    """Issue 122: a service's watched data changed (see ``capabilities.service_signals``)."""
+
+    service_id: str
+    service_label: str | None = None
+    signal: str  # « infrastructure.parity_running »
+    label: str | None = None
+    value: bool | int | float | str | None = None
+    previous: bool | int | float | str | None = None
 
 
 def register_event_types(registry: EventTypeRegistry) -> None:
@@ -50,3 +62,19 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     automatable=automatable,
                 )
             )
+    if registry.get(SIGNAL_CHANGED) is None:
+        registry.register(
+            EventType(
+                name=SIGNAL_CHANGED,
+                owner=OWNER,
+                schema=SignalChanged,
+                open_payload=False,
+                retention_class="technical",
+                visibility_class="restricted",
+                automatable=True,
+                description=(
+                    "A service's data changed — a parity check started or ended, plays under way, "
+                    "container updates… (signal, value, previous, service)."
+                ),
+            )
+        )

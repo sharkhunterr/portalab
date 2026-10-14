@@ -48,6 +48,7 @@ from portalab.capabilities.record_sink import SinkRegistry, default_sinks
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
 from portalab.capabilities.search import SearchRegistry, default_search
+from portalab.capabilities.service_signals import default_signals
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.blobstore import BlobStore
@@ -158,6 +159,7 @@ from portalab.modules.media.settings import (
     priority_key,
     threshold_key,
 )
+from portalab.modules.media.signals import register_media_signals
 from portalab.modules.media.sink.library import CatalogWriter, LibrarySink
 
 OWNER = "module:media"
@@ -359,6 +361,7 @@ class MediaModule:
 
     # --- registration ----------------------------------------------------------------------------------
     def register(self) -> None:
+        register_media_signals(default_signals)  # issue 122: the plays under way, for automations
         if not any(p.instance_ref == "media" for p in self.capabilities.system_providers(ATTENTION)):
             # #98: what waits for an administrator here — a badge on the navigation
             self.capabilities.provide(

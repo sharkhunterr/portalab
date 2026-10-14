@@ -46,7 +46,7 @@ from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock, utc_now
 from portalab.modules.notifications import permissions as _permissions  # noqa: F401 — declares permissions
-from portalab.modules.notifications.automation import register_action
+from portalab.modules.notifications.automation import register_action, register_banner_actions
 from portalab.modules.notifications.channels.email import EMAIL_JOB, EmailChannel, EmailVerificationChannel
 from portalab.modules.notifications.events import register_event_types
 from portalab.modules.notifications.fanout.service import FanOut
@@ -199,6 +199,7 @@ class NotificationsModule:
             if self.consumers.get(consumer.name) is None:
                 self.consumers.register(consumer)
         register_action(lambda request, principal: self.send(request, caller=principal), self.actions)
+        register_banner_actions(self.database, self.clock, self.actions)  # issue 122
         self.observables.declare(
             ObservedComponent(
                 "notifications",

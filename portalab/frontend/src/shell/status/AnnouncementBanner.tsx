@@ -40,7 +40,7 @@ export function AnnouncementBanner() {
   const banners = useQuery({
     queryKey: ["announcements", "banners"],
     retry: false,
-    refetchInterval: 5 * 60_000,
+    refetchInterval: 60_000, // issue 122: an automation's banner comes and goes with what it announces
     queryFn: async () => {
       const data = (await api.GET("/api/v1/announcements/banners")).data;
       return (Array.isArray(data) ? data : []) as unknown as Banner[];

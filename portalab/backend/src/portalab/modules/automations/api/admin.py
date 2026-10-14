@@ -210,6 +210,11 @@ async def catalog(_: Reader, module: Module) -> dict[str, Any]:
             "event_descriptions": {
                 t.name: t.description for t in module.event_types.all() if t.automatable and t.description
             },
+            # issue 122: the service data ``service.signal_changed`` tells about
+            "signals": [
+                {"key": s.key, "label": s.label, "description": s.description, "kind": s.kind}
+                for s in module.signals.registry.all()
+            ],
         },
         "conditions": [
             {"key": leaf.key, "description": leaf.description, "params": dict(leaf.params_schema)}
@@ -229,6 +234,12 @@ async def catalog(_: Reader, module: Module) -> dict[str, Any]:
             for a in module.actions.all()
         ],
     }
+
+
+@router.get("/admin/automations/signals")
+async def signals(_: Reader, module: Module) -> list[dict[str, Any]]:
+    """Issue 122: every service signal as it stands now, per service — what an automation can react to."""
+    return await module.signals.current()
 
 
 @router.get("/admin/automations/templates")

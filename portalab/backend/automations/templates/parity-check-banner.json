@@ -1,0 +1,27 @@
+{
+  "title": "Parity check: show a banner",
+  "description": "While a server checks its parity, a banner tells the members the server may be slower (pair it with « Parity check over: take the banner down »).",
+  "definition": {
+    "name": "Parity check: show a banner",
+    "trigger": {
+      "kind": "event",
+      "event_type": "service.signal_changed",
+      "filter": [
+        {"field": "signal", "op": "eq", "value": "infrastructure.parity_running"},
+        {"field": "value", "op": "eq", "value": true}
+      ]
+    },
+    "steps": [
+      {
+        "id": "banner",
+        "action": "announcement.banner",
+        "params": {
+          "tag": "parity-${event.service_id}",
+          "title": "Parity check under way on ${event.service_label}",
+          "body": "The server may be slower until it is over.",
+          "tone": "warning"
+        }
+      }
+    ]
+  }
+}

@@ -165,3 +165,16 @@ class DedupWindow(AutomationsBase):
     )
     dedup_key: Mapped[str] = mapped_column(String(200), primary_key=True)
     expires_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class SignalValue(AutomationsBase):
+    """Issue 122: the last value seen of a watched service signal — a change publishes
+    ``service.signal_changed``."""
+
+    __tablename__ = "signal_values"
+
+    service_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    signal: Mapped[str] = mapped_column(String(128), primary_key=True)
+    value: Mapped[Any] = mapped_column(JSONB, nullable=True)
+    seen_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    changed_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

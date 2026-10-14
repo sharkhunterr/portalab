@@ -39,7 +39,7 @@ from portalab.modules.automations.actions import register_engine_actions
 from portalab.modules.automations.approvals.service import Approvals
 from portalab.modules.automations.definitions.service import Definitions
 from portalab.modules.automations.evaluator.evaluator import Evaluator
-from portalab.modules.automations.events import register_event_types
+from portalab.modules.automations.events import SIGNAL_CHANGED, register_event_types
 from portalab.modules.automations.gate.gate import Gate
 from portalab.modules.automations.history.service import History
 from portalab.modules.automations.identity.guard import IdentityGuard
@@ -49,6 +49,7 @@ from portalab.modules.automations.registries.conditions import register_builtin
 from portalab.modules.automations.runner.runner import Runner
 from portalab.modules.automations.scheduler.scheduler import Scheduler
 from portalab.modules.automations.settings import SETTINGS, AutomationsConfig
+from portalab.modules.automations.signals import SignalWatcher
 from portalab.modules.automations.suspender.suspender import Suspender
 from portalab.modules.automations.triggers.consumer import CONSUMER, Triggers
 
@@ -99,6 +100,7 @@ class AutomationsModule:
         )
         self.gate = Gate(config)
         self.triggers = Triggers(database, self.gate, self.runner, event_types, config, clock=clock)
+        self.signals = SignalWatcher(database, events, capabilities, self._listened, clock=clock)  # issue 122
         self.scheduler = Scheduler(database, self.triggers, clock=clock)
         self.approvals = Approvals(database, self.runner, audit, events, clock=clock)
         self.definitions = Definitions(
@@ -144,7 +146,16 @@ class AutomationsModule:
         if not self.capabilities.system_providers(AUTOMATION_STATUS):  # feeds Observability's component
             self.capabilities.provide(AUTOMATION_STATUS, self, instance_ref="automations", owner=OWNER)
 
+    async def _listened(self) -> bool:
+        """Issue 122: the service signals are read only while an automation reacts to them."""
+        return any(
+            item.definition.trigger.event_type == SIGNAL_CHANGED for item in await self.triggers.live()
+        )
+
     def register_jobs(self, jobs: JobRegistry) -> list[Any]:
+        async def watch() -> None:
+            await self.signals.run()
+
         async def schedule() -> None:
             await self.scheduler.run()
 
@@ -164,6 +175,9 @@ class AutomationsModule:
             ),
             register_periodic(
                 jobs, self.database, "automations.purge", timedelta(hours=6), purge, owner=OWNER
+            ),
+            register_periodic(  # issue 122: a service's data, watched for the automations
+                jobs, self.database, "automations.signal_watch", timedelta(minutes=1), watch, owner=OWNER
             ),
         ]
 

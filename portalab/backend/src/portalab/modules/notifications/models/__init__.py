@@ -159,6 +159,7 @@ class Announcement(NotifyBase):
     __table_args__ = (
         CheckConstraint("tone IN ('info', 'success', 'warning', 'critical')", name="tone"),
         Index("ix_announcements_banner", "banner", "banner_until"),
+        Index("ix_announcements_tag", "tag"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
@@ -175,3 +176,4 @@ class Announcement(NotifyBase):
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     ended_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    tag: Mapped[str | None] = mapped_column(String(64))  # issue 122: what an automation names its banner by

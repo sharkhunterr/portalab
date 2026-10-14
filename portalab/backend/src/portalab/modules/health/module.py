@@ -8,6 +8,7 @@ from portalab.capabilities.administration import AdminSurface, default_admin_sur
 from portalab.capabilities.content import default_calendar_sources
 from portalab.capabilities.health import INFRA_HISTORY, SERVICE_STATE
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.service_signals import default_signals
 from portalab.core.audit_port import AuditSink
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
@@ -22,6 +23,7 @@ from portalab.modules.health.detail.history import HistoryQuery
 from portalab.modules.health.detail.incidents import IncidentLinkService
 from portalab.modules.health.infra.hosts import HostService
 from portalab.modules.health.infra.service import InfraHistoryService, InfraMetricsService
+from portalab.modules.health.infra.signals import register_host_signals
 from portalab.modules.health.maintenance.service import END_JOB, START_JOB, MaintenanceService
 from portalab.modules.health.operations.service import OperationsService
 from portalab.modules.health.permissions import SERVICES_READ
@@ -81,6 +83,7 @@ class HealthModule:
             AdminSurface("health", "admin.surface.health", "/services", SERVICES_READ, OWNER)
         )
         register_targets(lambda: self.config)
+        register_host_signals(self.hosts, default_signals)  # issue 122: a server's data, for automations
         if default_calendar_sources.get("maintenance") is None:  # spec 011: maintenance in the calendar
             default_calendar_sources.register(
                 MaintenanceCalendarSource(self.database, clock=self.state.clock), owner=OWNER

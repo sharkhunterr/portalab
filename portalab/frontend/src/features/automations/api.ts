@@ -64,6 +64,8 @@ export interface Catalog {
     /** 027: what each event carries — filters and ${event.<field>} variables */
     event_fields?: Record<string, string[]>;
     event_descriptions?: Record<string, string>;
+    /** Issue 122: the service data ``service.signal_changed`` tells about */
+    signals?: Array<{ key: string; label: string; description: string; kind: "bool" | "number" | "text" }>;
   };
   conditions: Array<{ key: string; description: string; params: Record<string, string> }>;
   actions: Array<{
@@ -105,6 +107,26 @@ export function useCatalog() {
     queryKey: [...KEY, "catalog"],
     staleTime: 5 * 60_000,
     queryFn: async () => (await api.GET("/api/v1/admin/automations/catalog")).data as unknown as Catalog,
+  });
+}
+
+/** Issue 122: every service signal as it stands now, per service (asked while one is chosen). */
+export interface SignalNow {
+  signal: string;
+  label: string;
+  kind: string;
+  service_id: string;
+  service_label: string | null;
+  value: boolean | number | string | null;
+}
+
+export function useSignals(enabled: boolean) {
+  return useQuery({
+    queryKey: [...KEY, "signals"],
+    enabled,
+    staleTime: 30_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/admin/automations/signals")).data ?? []) as unknown as SignalNow[],
   });
 }
 

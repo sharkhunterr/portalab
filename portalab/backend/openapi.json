@@ -19132,6 +19132,33 @@
         ]
       }
     },
+    "/api/v1/admin/automations/signals": {
+      "get": {
+        "description": "Issue 122: every service signal as it stands now, per service \u2014 what an automation can react to.",
+        "operationId": "signals_api_v1_admin_automations_signals_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Signals Api V1 Admin Automations Signals Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Signals",
+        "tags": [
+          "automations"
+        ]
+      }
+    },
     "/api/v1/admin/automations/templates": {
       "get": {
         "operationId": "templates_api_v1_admin_automations_templates_get",

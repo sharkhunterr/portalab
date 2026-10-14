@@ -5,7 +5,14 @@ import { CheckboxField, SelectField, TextField } from "../../../design-system/co
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
-import { type Catalog, type Definition, useAutomationAdmin, useCatalog } from "../api";
+import {
+  type Catalog,
+  type Definition,
+  type SignalNow,
+  useAutomationAdmin,
+  useCatalog,
+  useSignals,
+} from "../api";
 import { ACTION_ICONS, actionLabel, conditionLabel, eventLabel, paramLabel, TRIGGER_ICONS } from "../labels";
 import {
   type Draft,
@@ -276,6 +283,17 @@ function TriggerEditor({
   const events = catalog?.triggers.events ?? [];
   const fields = catalog?.triggers.event_fields?.[trigger.event_type ?? ""] ?? [];
   const schedule = trigger.schedule ?? { frequency: "daily" as const, time: "09:00" };
+  // issue 122: a service's data — its signals and services to choose from, and what they say now
+  const watching = trigger.event_type === SIGNAL_CHANGED;
+  const now = useSignals(watching).data ?? [];
+  const choices: Record<string, Array<{ value: string; label: string }>> = watching
+    ? {
+        signal: (catalog?.triggers.signals ?? []).map((s) => ({ value: s.key, label: s.label || s.key })),
+        service_id: [...new Map(now.map((n) => [n.service_id, n.service_label ?? n.service_id]))].map(
+          ([value, label]) => ({ value, label }),
+        ),
+      }
+    : {};
   return (
     <div className="automation-lane">
       <fieldset className="automation-kinds">
@@ -347,8 +365,10 @@ function TriggerEditor({
           <FiltersEditor
             filters={draft.filters}
             fields={fields}
+            choices={choices}
             onChange={(filters) => onChange({ filters })}
           />
+          {watching && now.length ? <SignalsNow signals={now} /> : null}
         </>
       ) : null}
       {trigger.kind === "recurring" ? (
@@ -425,13 +445,38 @@ function groupEvents(events: string[]): Array<[string, string[]]> {
 
 const OPS: FilterDraft["op"][] = ["eq", "ne", "in", "gt", "gte", "lt", "lte", "contains"];
 
+const SIGNAL_CHANGED = "service.signal_changed";
+
+/** Issue 122: what each service's signals say now — to write a filter that matches them. */
+function SignalsNow({ signals }: { signals: SignalNow[] }) {
+  const t = useT();
+  return (
+    <details className="automation-sub automation-signals">
+      <summary>{t("automations:editor.signalsNow")}</summary>
+      <ul>
+        {signals.map((s) => (
+          <li key={`${s.service_id}:${s.signal}`}>
+            <span>
+              {s.service_label ?? s.service_id} · {s.label || s.signal}
+            </span>
+            <code>{s.value === null ? "—" : String(s.value)}</code>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 function FiltersEditor({
   filters,
   fields,
+  choices = {},
   onChange,
 }: {
   filters: FilterDraft[];
   fields: string[];
+  /** Issue 122: a field whose values are known (a signal, a service) is chosen from a list. */
+  choices?: Record<string, Array<{ value: string; label: string }>>;
   onChange: (filters: FilterDraft[]) => void;
 }) {
   const t = useT();
@@ -470,14 +515,36 @@ function FiltersEditor({
               </option>
             ))}
           </SelectField>
-          <TextField
-            label={t("automations:editor.value")}
-            hint={filter.op === "in" ? t("automations:editor.listHint") : undefined}
-            value={filter.value}
-            onChange={(e) =>
-              onChange(filters.map((f, i) => (i === index ? { ...f, value: e.target.value } : f)))
-            }
-          />
+          {choices[filter.field]?.length && filter.op !== "in" ? (
+            <SelectField
+              label={t("automations:editor.value")}
+              value={filter.value}
+              onChange={(e) =>
+                onChange(filters.map((f, i) => (i === index ? { ...f, value: e.target.value } : f)))
+              }
+            >
+              <option value="" />
+              {[
+                ...(choices[filter.field] ?? []),
+                ...(filter.value && !choices[filter.field]?.some((c) => c.value === filter.value)
+                  ? [{ value: filter.value, label: filter.value }]
+                  : []),
+              ].map((choice) => (
+                <option key={choice.value} value={choice.value}>
+                  {choice.label}
+                </option>
+              ))}
+            </SelectField>
+          ) : (
+            <TextField
+              label={t("automations:editor.value")}
+              hint={filter.op === "in" ? t("automations:editor.listHint") : undefined}
+              value={filter.value}
+              onChange={(e) =>
+                onChange(filters.map((f, i) => (i === index ? { ...f, value: e.target.value } : f)))
+              }
+            />
+          )}
           <Button
             type="button"
             variant="ghost"

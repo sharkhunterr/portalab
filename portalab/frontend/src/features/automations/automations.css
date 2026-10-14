@@ -621,3 +621,25 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* issue 122: what the services' signals say now */
+.automation-signals ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.automation-signals li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.automation-signals summary {
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
