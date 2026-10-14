@@ -117,7 +117,7 @@ describe("compact widgets", () => {
     expect(screen.getByRole("link", { name: "Title 2" }).getAttribute("href")).toBe("/media/i2");
   });
 
-  it("statistics: the headline, the context and the trend", () => {
+  it("statistics: every figure in a line, the headline first, the trend last", () => {
     const data = {
       scope: "me",
       period: "30d",
@@ -128,8 +128,11 @@ describe("compact widgets", () => {
       top_works: [],
     };
     show("media.stats", data, { compact: true });
-    expect(document.querySelector(".compact-line strong")?.textContent).toBe("10");
+    // issue 118: the three figures in a row (the width decides how many stay), the trend at the end
+    const figures = Array.from(document.querySelectorAll(".widget-media-stats-line__figure strong"));
+    expect(figures.map((f) => f.textContent)).toEqual(["10", "1 hr", "3"]);
     expect(document.querySelector(".widget-media-stats__trend")?.getAttribute("data-trend")).toBe("down");
+    expect(document.querySelector(".widget-media-stats-line")?.getAttribute("href")).toBe("/media/insights");
   });
 
   it("the calendar: this week, today marked", () => {

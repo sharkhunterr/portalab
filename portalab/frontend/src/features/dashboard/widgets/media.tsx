@@ -282,6 +282,12 @@ interface StatsData {
 }
 
 const MediaStatsChart = lazy(() => import("./MediaStatsChart"));
+// issue 118: the one-row form's trend, from the chart kit (loaded with it, out of the dashboard's bundle)
+const StatsSpark = lazy(() =>
+  import("../../../design-system/charts/Charts").then((kit) => ({
+    default: ({ values }: { values: number[] }) => <kit.Sparkline values={values} label="" height={28} />,
+  })),
+);
 
 /** « My statistics » (027): configurable — whose, period, category, metric and chart. */
 function Stats({ payload, compact }: WidgetProps) {
@@ -303,41 +309,60 @@ function Stats({ payload, compact }: WidgetProps) {
   ]
     .filter(Boolean)
     .join(" · ");
-  if (compact)
-    // 027 (#36): the headline, the other figures, the trend
+  const second =
+    metric === "time" ? format.number(data.totals.plays) : measures.duration(data.totals.seconds);
+  const secondLabel = t(metric === "time" ? "media:insights.stat.plays" : "media:insights.stat.time");
+  const firstLabel = t(metric === "time" ? "media:insights.stat.time" : "media:insights.stat.plays");
+  const trendFigure =
+    trend !== null ? (
+      <span className="widget-media-stats__trend" data-trend={trend >= 0 ? "up" : "down"}>
+        <Icon name={trend >= 0 ? "arrow-up" : "arrow-down"} size={14} />
+        {format.percent(Math.abs(trend))}
+      </span>
+    ) : null;
+  if (compact) {
+    // 027 (#36), issue 118: one row — every figure in a line, as many as the width holds (the headline
+    // first, the trend last), and a sparkline where there is room
+    const values = (data.timeline ?? []).map((p) => (metric === "time" ? p.seconds : p.plays));
     return (
-      <CompactLine
-        to="/media/insights"
-        icon="chart"
-        title={headline}
-        detail={`${context} · ${
-          metric === "time"
-            ? t("media:insights.plays", { count: data.totals.plays })
-            : measures.duration(data.totals.seconds)
-        }`}
-        end={
-          trend !== null ? (
-            <span className="widget-media-stats__trend" data-trend={trend >= 0 ? "up" : "down"}>
-              <Icon name={trend >= 0 ? "arrow-up" : "arrow-down"} size={14} />
-              {format.percent(Math.abs(trend))}
-            </span>
-          ) : null
-        }
-      />
+      <Link className="widget-media-stats-line" to="/media/insights" aria-label={context}>
+        <span className="compact-line__icon" aria-hidden="true">
+          <Icon name="chart" size={16} />
+        </span>
+        <span className="widget-media-stats-line__figure" data-rank="1">
+          <strong>{headline}</strong>
+          <small>{firstLabel}</small>
+        </span>
+        <span className="widget-media-stats-line__figure" data-rank="2">
+          <strong>{second}</strong>
+          <small>{secondLabel}</small>
+        </span>
+        <span className="widget-media-stats-line__figure" data-rank="3">
+          <strong>{format.number(data.totals.works)}</strong>
+          <small>{t("media:insights.stat.works")}</small>
+        </span>
+        {values.length > 1 ? (
+          <span className="widget-media-stats-line__spark" aria-hidden="true">
+            <Suspense fallback={null}>
+              <StatsSpark values={values} />
+            </Suspense>
+          </span>
+        ) : null}
+        {trendFigure}
+      </Link>
     );
+  }
   return (
     <div className="widget-media-stats">
       <p className="widget-media-stats__context">{context}</p>
       <div className="widget-media-stats__figures">
-        <p>
+        <p data-main>
           <strong>{headline}</strong>
-          <span>{t(metric === "time" ? "media:insights.stat.time" : "media:insights.stat.plays")}</span>
+          <span>{firstLabel}</span>
         </p>
         <p>
-          <strong>
-            {metric === "time" ? format.number(data.totals.plays) : measures.duration(data.totals.seconds)}
-          </strong>
-          <span>{t(metric === "time" ? "media:insights.stat.plays" : "media:insights.stat.time")}</span>
+          <strong>{second}</strong>
+          <span>{secondLabel}</span>
         </p>
         <p>
           <strong>{format.number(data.totals.works)}</strong>

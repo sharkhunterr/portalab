@@ -732,24 +732,41 @@
   display: grid;
   gap: var(--space-3);
 }
+/* issue 118: the figures as tiles across the whole width, their size following the block */
 .widget-media-stats__figures {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3) var(--space-5, 1.5rem);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: var(--space-2);
 }
 .widget-media-stats__figures p {
   display: grid;
+  align-content: center;
+  gap: 0.1rem;
+  min-inline-size: 0;
   margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+.widget-media-stats__figures p[data-main] {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
 }
 .widget-media-stats__figures strong {
   display: inline-flex;
   align-items: center;
   gap: 0.15rem;
+  overflow: hidden;
   font-size: var(--font-size-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 .widget-media-stats__figures span {
-  font-size: var(--font-size-sm);
+  overflow: hidden;
   color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .widget-media-stats__figures [data-trend="up"] strong {
   color: var(--color-accent);
