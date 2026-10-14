@@ -6651,7 +6651,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Browse */
+        /**
+         * Browse
+         * @description The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields
+         *     (author, narrator, director, platform, publisher, series, language), what I have already watched, read
+         *     or played — and the order; with how many titles match in all.
+         */
         get: operations["browse_api_v1_media_get"];
         put?: never;
         post?: never;
@@ -6733,6 +6738,26 @@ export interface paths {
         };
         /** Discovery */
         get: operations["discovery_api_v1_media_discovery__shelf__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Facets
+         * @description #111: what the catalog's filters offer for a kind — genres, years, people, platforms…
+         */
+        get: operations["facets_api_v1_media_facets_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -12114,6 +12139,50 @@ export interface components {
             /** Year */
             year: number | null;
         };
+        /** MediaFacets */
+        MediaFacets: {
+            /**
+             * Authors
+             * @default []
+             */
+            authors: string[];
+            /**
+             * Directors
+             * @default []
+             */
+            directors: string[];
+            /** Genres */
+            genres: string[];
+            /**
+             * Languages
+             * @default []
+             */
+            languages: string[];
+            /**
+             * Narrators
+             * @default []
+             */
+            narrators: string[];
+            /**
+             * Platforms
+             * @default []
+             */
+            platforms: string[];
+            /**
+             * Publishers
+             * @default []
+             */
+            publishers: string[];
+            /**
+             * Series
+             * @default []
+             */
+            series: string[];
+            /** Years */
+            years: {
+                [key: string]: number | null;
+            };
+        };
         /** MediaHistoryOut */
         MediaHistoryOut: {
             /** Completed */
@@ -12236,6 +12305,8 @@ export interface components {
             items: components["schemas"]["MediaCard"][];
             /** Next Cursor */
             next_cursor: string | null;
+            /** Total */
+            total?: number | null;
         };
         /** MediaRequestIn */
         MediaRequestIn: {
@@ -28500,6 +28571,17 @@ export interface operations {
                 availability?: ("available" | "unavailable") | null;
                 q?: string | null;
                 cursor?: string | null;
+                year_from?: number | null;
+                year_to?: number | null;
+                author?: string | null;
+                narrator?: string | null;
+                director?: string | null;
+                platform?: string | null;
+                publisher?: string | null;
+                series?: string | null;
+                language?: string | null;
+                seen?: ("unseen" | "started" | "finished") | null;
+                sort?: "title" | "added" | "year";
             };
             header?: never;
             path?: never;
@@ -28646,6 +28728,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaShelf"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    facets_api_v1_media_facets_get: {
+        parameters: {
+            query?: {
+                kind?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaFacets"];
                 };
             };
             /** @description Validation Error */

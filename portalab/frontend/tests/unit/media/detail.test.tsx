@@ -250,6 +250,18 @@ describe("catalog and requests", () => {
         return json(200, {
           items: [{ id: ID, kind: "movie", title: "Arrival", year: 2016, available: true, image_id: null }],
           next_cursor: null,
+          total: 1,
+        });
+      }
+      if (url.pathname === "/api/v1/media/facets") {
+        const book = url.searchParams.get("kind") === "book";
+        return json(200, {
+          years: { min: 1950, max: 2016 },
+          genres: ["Science fiction"],
+          authors: book ? ["Ted Chiang", "Frank Herbert"] : [],
+          languages: book ? ["fr", "en"] : [],
+          series: [],
+          publishers: [],
         });
       }
       if (request.method === "POST") return json(200, { id: "r1", state: "cancelled" });
@@ -303,12 +315,25 @@ describe("catalog and requests", () => {
     expect(await screen.findByRole("link", { name: /Arrival/ })).toBeTruthy();
     expect(screen.getByText(/Movie · 2016/)).toBeTruthy();
     expect(document.querySelector('.discover-status[data-status="available"]')).toBeTruthy(); // its poster badge
+    expect(screen.getByText("1 title")).toBeTruthy(); // issue 111: how many match
+    // issue 111: applied as one types or chooses (no button), the active ones as chips to remove
     fireEvent.change(screen.getByLabelText("Search titles"), { target: { value: "arr" } });
     fireEvent.change(screen.getByLabelText("Availability"), { target: { value: "available" } });
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     await waitFor(() =>
       expect(queries.some((q) => q.includes("q=arr") && q.includes("availability=available"))).toBe(true),
     );
+    fireEvent.click(screen.getByRole("button", { name: "Books" }));
+    await waitFor(() => expect(queries.some((q) => q.includes("kind=book"))).toBe(true));
+    // the kind's own fields: a book's author (suggested), its language (a list, named in words)
+    const author = await screen.findByLabelText("Author");
+    expect(await screen.findByRole("option", { name: "French" })).toBeTruthy();
+    fireEvent.change(author, { target: { value: "Ted Chiang" } });
+    await waitFor(() => expect(queries.some((q) => /author=Ted(\+|%20)Chiang/.test(q))).toBe(true));
+    fireEvent.change(screen.getByLabelText("Already seen"), { target: { value: "unseen" } });
+    await waitFor(() => expect(queries.some((q) => q.includes("seen=unseen"))).toBe(true));
+    fireEvent.click(screen.getByRole("button", { name: "Remove the filter Author : Ted Chiang" }));
+    await waitFor(() => expect(queries.at(-1)).not.toContain("author="));
+    expect(queries.at(-1)).toContain("seen=unseen");
     // the overview's card: the count, where they stand, the quota and the bought requests (#3)
     renderAt("/media/requests", [{ path: "/media/requests", element: <RequestsPage /> }]);
     expect(await screen.findByText(/1 request bought in the shop/)).toBeTruthy();

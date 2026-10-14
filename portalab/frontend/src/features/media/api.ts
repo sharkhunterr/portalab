@@ -18,7 +18,20 @@ export interface CatalogFilters {
   genre?: string;
   year?: number;
   availability?: "available" | "unavailable";
+  /** issue 111: a span of years, each kind's own fields, what I already watched, read or played, the order */
+  year_from?: number;
+  year_to?: number;
+  author?: string;
+  narrator?: string;
+  director?: string;
+  platform?: string;
+  publisher?: string;
+  series?: string;
+  language?: string;
+  seen?: "unseen" | "started" | "finished";
+  sort?: "title" | "added" | "year";
 }
+export type CatalogFacets = components["schemas"]["MediaFacets"];
 
 const KEY = ["media"] as const;
 
@@ -42,14 +55,25 @@ export function useCatalogPage(filters: CatalogFilters) {
       const { data, error, response } = await api.GET("/api/v1/media", {
         params: {
           query: {
-            ...(filters.q ? { q: filters.q } : {}),
-            ...(filters.kind ? { kind: filters.kind } : {}),
-            ...(filters.genre ? { genre: filters.genre } : {}),
-            ...(filters.year ? { year: filters.year } : {}),
-            ...(filters.availability ? { availability: filters.availability } : {}),
+            ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined && v !== "")),
             ...(pageParam ? { cursor: pageParam } : {}),
           },
         },
+      });
+      if (!data) fail(error, response);
+      return data;
+    },
+  });
+}
+
+/** Issue 111: what the catalog's filters offer for a kind — genres, years, people, platforms… */
+export function useCatalogFacets(kind: string | undefined) {
+  return useQuery({
+    queryKey: [...KEY, "facets", kind ?? ""],
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const { data, error, response } = await api.GET("/api/v1/media/facets", {
+        params: { query: kind ? { kind } : {} },
       });
       if (!data) fail(error, response);
       return data;

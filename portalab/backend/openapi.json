@@ -8843,6 +8843,93 @@
         "title": "MediaDetail",
         "type": "object"
       },
+      "MediaFacets": {
+        "properties": {
+          "authors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Authors",
+            "type": "array"
+          },
+          "directors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Directors",
+            "type": "array"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Genres",
+            "type": "array"
+          },
+          "languages": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Languages",
+            "type": "array"
+          },
+          "narrators": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Narrators",
+            "type": "array"
+          },
+          "platforms": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Platforms",
+            "type": "array"
+          },
+          "publishers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Publishers",
+            "type": "array"
+          },
+          "series": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "years": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Years",
+            "type": "object"
+          }
+        },
+        "required": [
+          "years",
+          "genres"
+        ],
+        "title": "MediaFacets",
+        "type": "object"
+      },
       "MediaHistoryOut": {
         "properties": {
           "completed": {
@@ -9112,6 +9199,17 @@
               }
             ],
             "title": "Next Cursor"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
           }
         },
         "required": [
@@ -37029,6 +37127,7 @@
     },
     "/api/v1/media": {
       "get": {
+        "description": "The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields\n(author, narrator, director, platform, publisher, series, language), what I have already watched, read\nor played \u2014 and the order; with how many titles match in all.",
         "operationId": "browse_api_v1_media_get",
         "parameters": [
           {
@@ -37135,6 +37234,197 @@
                 }
               ],
               "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2200,
+                  "minimum": 1800,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2200,
+                  "minimum": 1800,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "author",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Author"
+            }
+          },
+          {
+            "in": "query",
+            "name": "narrator",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Narrator"
+            }
+          },
+          {
+            "in": "query",
+            "name": "director",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Director"
+            }
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Platform"
+            }
+          },
+          {
+            "in": "query",
+            "name": "publisher",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Publisher"
+            }
+          },
+          {
+            "in": "query",
+            "name": "series",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Series"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Language"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seen",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "unseen",
+                    "started",
+                    "finished"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Seen"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "title",
+              "enum": [
+                "title",
+                "added",
+                "year"
+              ],
+              "title": "Sort",
+              "type": "string"
             }
           }
         ],
@@ -37364,6 +37654,57 @@
           }
         },
         "summary": "Discovery",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/facets": {
+      "get": {
+        "description": "#111: what the catalog's filters offer for a kind \u2014 genres, years, people, platforms\u2026",
+        "operationId": "facets_api_v1_media_facets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFacets"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Facets",
         "tags": [
           "media"
         ]

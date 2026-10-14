@@ -1,0 +1,142 @@
+/* issue 111: the catalog — a search and the order, the kinds as chips, the filters of the kind (folded
+   away on a phone), the active ones as chips to remove */
+.catalog {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.catalog__search {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.catalog__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem);
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.catalog__toggle {
+  display: none;
+}
+
+.catalog__kinds {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.catalog__kind {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium, 500);
+  cursor: pointer;
+}
+
+.catalog__kind[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.catalog__kind:focus-visible,
+.catalog__chip:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.catalog__filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border-radius: var(--radius-lg, var(--radius-md));
+  background: color-mix(in srgb, var(--color-surface-raised) 70%, transparent);
+}
+
+.catalog__years {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.catalog__active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.catalog__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: 100%;
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-surface-raised));
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.catalog__clear {
+  font-size: var(--font-size-sm);
+}
+
+.catalog__empty {
+  color: var(--color-text-muted);
+}
+
+.catalog__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+/* a phone: the order beside the button that unfolds the filters */
+@media (max-width: 720px) {
+  .catalog__bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .catalog__bar > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .catalog__toggle {
+    display: inline-flex;
+  }
+
+  .catalog__filters {
+    display: none;
+    grid-template-columns: 1fr;
+  }
+
+  .catalog__filters[data-open] {
+    display: grid;
+  }
+}

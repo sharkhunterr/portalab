@@ -22,7 +22,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import Conflict, Forbidden, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
-from portalab.modules.media.catalog import ObjectView
+from portalab.modules.media.catalog import ObjectView, Refine
 from portalab.modules.media.discovery.shelves import SHELVES
 from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
@@ -99,6 +99,7 @@ class MediaCard(BaseModel):
 class MediaPage(BaseModel):
     items: list[MediaCard]
     next_cursor: str | None
+    total: int | None = None  # #111: how many titles match the filters in all
 
 
 class MediaDetail(MediaCard):
@@ -296,13 +297,72 @@ async def browse(
     availability: Literal["available", "unavailable"] | None = None,
     q: Annotated[str | None, Query(max_length=200)] = None,
     cursor: Annotated[str | None, Query(max_length=64)] = None,
+    year_from: Annotated[int | None, Query(ge=1800, le=2200)] = None,
+    year_to: Annotated[int | None, Query(ge=1800, le=2200)] = None,
+    author: Annotated[str | None, Query(max_length=200)] = None,
+    narrator: Annotated[str | None, Query(max_length=200)] = None,
+    director: Annotated[str | None, Query(max_length=200)] = None,
+    platform: Annotated[str | None, Query(max_length=200)] = None,
+    publisher: Annotated[str | None, Query(max_length=200)] = None,
+    series: Annotated[str | None, Query(max_length=200)] = None,
+    language: Annotated[str | None, Query(max_length=40)] = None,
+    seen: Literal["unseen", "started", "finished"] | None = None,
+    sort: Literal["title", "added", "year"] = "title",
 ) -> MediaPage:
-    rows, next_cursor = await module.catalog.browse(
-        principal, kind=kind, genre=genre, year=year, availability=availability, q=q, cursor=cursor
+    """The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields
+    (author, narrator, director, platform, publisher, series, language), what I have already watched, read
+    or played — and the order; with how many titles match in all."""
+    named = {
+        "author": author,
+        "narrator": narrator,
+        "director": director,
+        "platform": platform,
+        "publisher": publisher,
+        "series": series,
+        "language": language,
+    }
+    refine = Refine(
+        year_from=year_from,
+        year_to=year_to,
+        fields={k: v for k, v in named.items() if v},
+        seen=seen,
+        sort=sort,
+    )
+    rows, next_cursor, total = await module.catalog.search(
+        principal,
+        kind=kind,
+        genre=genre,
+        year=year,
+        availability=availability,
+        q=q,
+        cursor=cursor,
+        refine=refine,
     )
     return MediaPage(
-        items=await _asked(module, [_card(row, image) for row, image in rows]), next_cursor=next_cursor
+        items=await _asked(module, [_card(row, image) for row, image in rows]),
+        next_cursor=next_cursor,
+        total=total,
     )
+
+
+class MediaFacets(BaseModel):
+    years: dict[str, int | None]
+    genres: list[str]
+    directors: list[str] = []
+    authors: list[str] = []
+    narrators: list[str] = []
+    series: list[str] = []
+    languages: list[str] = []
+    publishers: list[str] = []
+    platforms: list[str] = []
+
+
+@router.get("/media/facets", response_model=MediaFacets)
+async def facets(
+    principal: Reader, module: Module, kind: Annotated[str | None, Query(max_length=40)] = None
+) -> MediaFacets:
+    """#111: what the catalog's filters offer for a kind — genres, years, people, platforms…"""
+    return MediaFacets.model_validate(await module.catalog.facets(principal, kind))
 
 
 @router.get("/media/discovery/{shelf}", response_model=MediaShelf)
