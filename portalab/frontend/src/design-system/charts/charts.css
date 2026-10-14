@@ -234,7 +234,7 @@
 .ds-track {
   stroke-width: 0.6;
 }
-@keyframes ds-pop {
+@keyframes ds-chart-pop {
   from {
     opacity: 0;
     transform: scale(0.85);
@@ -244,14 +244,14 @@
     transform: none;
   }
 }
-.ds-pop {
+.ds-chart-pop {
   transform-box: fill-box;
   transform-origin: center;
-  animation: ds-pop 0.45s ease-out both;
+  animation: ds-chart-pop 0.45s ease-out both;
   animation-delay: calc(var(--i, 0) * 30ms);
 }
 @media (prefers-reduced-motion: reduce) {
-  .ds-pop,
+  .ds-chart-pop,
   .ds-ring__value {
     animation: none;
     transition: none;
@@ -316,33 +316,33 @@
 }
 
 /* stacked progress, lying or standing */
-.ds-stack {
+.ds-stacked {
   display: grid;
   gap: var(--space-3);
 }
-.ds-stack__bar {
+.ds-stacked__bar {
   display: flex;
   overflow: hidden;
   block-size: 0.9rem;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--color-text) 8%, transparent);
 }
-.ds-stack__part + .ds-stack__part {
+.ds-stacked__part + .ds-stacked__part {
   box-shadow: inset 2px 0 0 var(--color-surface-raised);
 }
-.ds-stack[data-vertical] {
+.ds-stacked[data-vertical] {
   grid-template-columns: auto minmax(0, 1fr);
   align-items: end;
 }
-.ds-stack[data-vertical] .ds-stack__bar {
+.ds-stacked[data-vertical] .ds-stacked__bar {
   flex-direction: column-reverse;
   inline-size: 1.4rem;
   block-size: 11rem;
 }
-.ds-stack[data-vertical] .ds-stack__part + .ds-stack__part {
+.ds-stacked[data-vertical] .ds-stacked__part + .ds-stacked__part {
   box-shadow: inset 0 -2px 0 var(--color-surface-raised);
 }
-.ds-stack[data-vertical] .ds-chart-legend {
+.ds-stacked[data-vertical] .ds-chart-legend {
   flex-direction: column;
 }
 .ds-columns {

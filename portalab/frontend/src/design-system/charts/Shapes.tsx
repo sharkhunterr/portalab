@@ -57,7 +57,7 @@ export function PolarWheel({
           const at = outer + size * 0.07;
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: slots are positional (hours, days)
-            <g key={i} className="ds-pop" style={{ "--i": i } as CSSProperties}>
+            <g key={i} className="ds-chart-pop" style={{ "--i": i } as CSSProperties}>
               <path
                 d={wedge(cx, cy, inner, reach, start, end)}
                 fill={color}
@@ -153,12 +153,12 @@ export function StackedProgress({
   const sum = items.reduce((all, item) => all + item.value, 0);
   const whole = Math.max(total ?? sum, 1);
   return (
-    <div className="ds-stack" data-vertical={vertical || undefined}>
-      <div className="ds-stack__bar" role="img" aria-label={label}>
+    <div className="ds-stacked" data-vertical={vertical || undefined}>
+      <div className="ds-stacked__bar" role="img" aria-label={label}>
         {items.map((item, index) => (
           <span
             key={item.label}
-            className="ds-stack__part"
+            className="ds-stacked__part"
             title={`${item.label} : ${format(item.value)}`}
             style={{
               [vertical ? "blockSize" : "inlineSize"]: `${(item.value / whole) * 100}%`,
