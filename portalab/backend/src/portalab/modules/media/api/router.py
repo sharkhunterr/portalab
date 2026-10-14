@@ -307,6 +307,8 @@ async def browse(
 
 @router.get("/media/discovery/{shelf}", response_model=MediaShelf)
 async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf:
+    if shelf == "leaving":
+        return await _leaving_shelf(module)
     if shelf not in SHELVES:
         raise MediaNotFound("This shelf does not exist.")
     if shelf in ("new", "released"):  # 027: with when it was added or released
@@ -326,6 +328,27 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
         images = await module.catalog._images(session, [r.id for r in rows])
     cards = await _asked(module, [_card(r, images.get(r.id)) for r in rows])
     return MediaShelf(shelf=shelf, items=cards, next_action=next_action)
+
+
+async def _leaving_shelf(module: MediaModule) -> MediaShelf:
+    """#110: what the library's cleanup will delete, the first to go first — a shelf like the others, each
+    title with the day it goes (``at``), none when no cleanup tool is set up."""
+    if not module.cleanup.configured():
+        return MediaShelf(shelf="leaving", items=[], next_action=None)
+    soonest = await module.cleanup.soonest(limit=max(1, min(module.config.discovery_shelf_size, 50)))
+    ids = [UUID(entry["id"]) for entry in soonest]
+    async with module.database.session() as session:
+        rows = {
+            r.id: r
+            for r in (await session.execute(select(MediaObject).where(MediaObject.id.in_(ids)))).scalars()
+        }
+        images = await module.catalog._images(session, ids)
+    items = [
+        _card(rows[i], images.get(i)).model_copy(update={"at": entry["delete_at"]})
+        for i, entry in zip(ids, soonest, strict=True)
+        if i in rows
+    ]
+    return MediaShelf(shelf="leaving", items=await _asked(module, items), next_action=None)
 
 
 @router.get("/media/images/{image_id}")

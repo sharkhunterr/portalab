@@ -3,6 +3,8 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
+import { LeavingBadge } from "../../media/discover/StatusBadge";
+import { PosterStrip } from "./compact";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 import "./downloads.css";
 
@@ -22,16 +24,25 @@ const art = (card: LeavingCard): string | null =>
 
 /**
  * « Leaving soon » (#57): the posters of what the library's cleanup will delete, the first to go first,
- * each with its day — a title's page saves it (with a rescue from the shop).
+ * each with its day — a title's page saves it (with a rescue from the shop). Issue 110: the same cards as
+ * the other rows of posters (the poster, the title, its kind), the day as a badge on the poster like
+ * « Available ».
  */
 function Leaving({ payload, compact }: WidgetProps) {
   const t = useT();
   const format = useFormat();
   const items = ((payload.data ?? {}) as { items?: LeavingCard[] }).items ?? [];
   if (!items.length) return <p className="widget-empty">{t("media:widget.leaving.empty")}</p>;
+  if (compact) {
+    return (
+      <PosterStrip
+        cards={items.map((card) => ({ key: card.id, title: card.title, src: art(card), to: card.route }))}
+      />
+    );
+  }
   return (
-    <ul className="widget-leaving" data-compact={compact || undefined} data-nofit>
-      {(compact ? items.slice(0, 3) : items).map((card) => {
+    <ul className="widget-posters">
+      {items.map((card) => {
         const src = art(card);
         const when = card.delete_at
           ? t("media:widget.leaving.on", {
@@ -40,24 +51,17 @@ function Leaving({ payload, compact }: WidgetProps) {
           : t("media:widget.leaving.someday");
         const body = (
           <>
-            <span className="widget-leaving__poster">
-              {src ? (
-                <img src={src} alt="" loading="lazy" />
-              ) : (
-                <span className="widget-leaving__title">{card.title}</span>
-              )}
-              <span className="widget-leaving__when">
-                <Icon name="trash" size={11} />
-                {when}
-              </span>
+            <span className="widget-posters__art">
+              {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={24} />}
+              {/* a small poster: the badge contracted to its icon, the sentence on hover */}
+              <LeavingBadge label={when} title={when} />
             </span>
-            <span className="visually-hidden">{card.title}</span>
+            <span className="widget-posters__title">{card.title}</span>
+            <span className="widget-posters__meta">{t(`media:kind.${card.kind}`)}</span>
           </>
         );
         return (
-          <li key={card.id} title={`${card.title} — ${when}`}>
-            {card.route ? <Link to={card.route}>{body}</Link> : body}
-          </li>
+          <li key={card.id}>{card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}</li>
         );
       })}
     </ul>

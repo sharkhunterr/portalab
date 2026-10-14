@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
@@ -37,12 +37,15 @@ export function MediaGrid({
   label,
   rail,
   note,
+  badge,
 }: {
   items: MediaCard[];
   label: string;
   rail?: boolean;
   /** 027: a line of its own under the title (when it was added or released, the new episode). */
   note?: ((item: MediaCard) => string | null) | undefined;
+  /** issue 110: the badge on the poster instead of its standing (« leaving in 3 days ») */
+  badge?: ((item: MediaCard) => ReactNode) | undefined;
 }) {
   const t = useT();
   return (
@@ -52,7 +55,11 @@ export function MediaGrid({
           <Link to={`/media/${item.id}`} className="media-card__link">
             <span className="media-card__frame">
               <Poster src={imageUrl(item.image_id)} kind={item.kind} />
-              <PosterBadge status={item.available ? "available" : item.requested ? "requested" : null} />
+              {badge ? (
+                badge(item)
+              ) : (
+                <PosterBadge status={item.available ? "available" : item.requested ? "requested" : null} />
+              )}
             </span>
             <span className="media-card__title">{item.title}</span>
           </Link>

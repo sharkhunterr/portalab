@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { imageUrl, type MediaCard, type ShelfName, useNowPlaying, useShelf } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { DiscoverShelves } from "../discover/DiscoverShelves";
+import { LeavingBadge } from "../discover/StatusBadge";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
 
@@ -103,7 +104,7 @@ function Row({
 }: {
   icon: string;
   title: string;
-  more?: { to: string; label: string };
+  more?: { to: string; label: string } | undefined;
   children: React.ReactNode;
 }) {
   const headingId = useId();
@@ -131,8 +132,18 @@ function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
   const t = useT();
   const format = useFormat();
   const shelf = useShelf(name);
+  // issue 110: the day it goes, as a badge on the poster (like « Available »)
+  const leaving = (item: MediaCard) => (
+    <LeavingBadge
+      label={
+        item.at
+          ? t("media:widget.leaving.on", { when: format.relative((Date.parse(item.at) - Date.now()) / 1000) })
+          : t("media:widget.leaving.someday")
+      }
+    />
+  );
   const note = (item: MediaCard) => {
-    if (!item.at) return null;
+    if (!item.at || name === "leaving") return null;
     const when =
       name === "new"
         ? format.relative((Date.parse(item.at) - Date.now()) / 1000)
@@ -152,9 +163,15 @@ function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
     <Row
       icon={icon}
       title={t(`media:shelf.${name}`)}
-      more={{ to: "/media/browse", label: t("media:home.seeAll") }}
+      more={name === "leaving" ? undefined : { to: "/media/browse", label: t("media:home.seeAll") }}
     >
-      <MediaGrid items={shelf.data.items} label={t(`media:shelf.${name}`)} rail note={note} />
+      <MediaGrid
+        items={shelf.data.items}
+        label={t(`media:shelf.${name}`)}
+        rail
+        note={note}
+        badge={name === "leaving" ? leaving : undefined}
+      />
     </Row>
   );
 }
@@ -244,6 +261,8 @@ export function MediaHome() {
       ) : null}
       <Shelf name="new" icon="sparkles" />
       <Shelf name="released" icon="clapperboard" />
+      {/* issue 110: what the library's cleanup will delete — save one from its page */}
+      <Shelf name="leaving" icon="trash" />
       {lately.length ? (
         <Row
           icon="clock"

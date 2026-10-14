@@ -36,3 +36,15 @@ export function PosterBadge({ status }: { status: string | null | undefined }) {
     </span>
   );
 }
+
+/** Issue 110: on the poster of a title the library's cleanup will delete — when it goes, like « Available ». */
+export function LeavingBadge({ label, title }: { label: string; title?: string | undefined }) {
+  return (
+    <span className="discover-card__badge">
+      <span className="discover-status" data-status="leaving" title={title}>
+        <Icon name="trash" size={12} />
+        <span className="discover-status__text">{label}</span>
+      </span>
+    </span>
+  );
+}

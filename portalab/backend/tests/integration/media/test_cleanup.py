@@ -1,7 +1,7 @@
 """#57 — the cleanup tool's deletions (Maintainerr): a title page says when it goes (a film by the
 server's id, a series through its leaving seasons); a member spends a rescue bought in the shop to save
 it — once per purchase credited, one spent per title, for everyone; the widget lists the first to go;
-rescues are exported and erased with the member."""
+rescues are exported and erased with the member; #110: the media page shows them as a shelf."""
 
 from datetime import UTC, datetime
 from typing import Any
@@ -71,6 +71,9 @@ async def test_leaving_and_rescue(app: FastAPI, client: httpx.AsyncClient, media
     widget = LeavingWidget(media.database, media.module.cleanup)
     cards = (await widget.load(Principal(user_id=people["zoe"]), {}, LocaleContext(locale="en"))).data or {}
     assert [c["title"] for c in cards["items"]] == ["Heat", "Season 1"]  # dated first
+    # #110: the media page's « leaving soon » shelf, like its other shelves — the day each one goes
+    shelf = (await client.get("/api/v1/media/discovery/leaving")).json()
+    assert [(c["title"], c["at"]) for c in shelf["items"]] == [("Heat", GOES.isoformat()), ("Season 1", None)]
 
     # no rescue yet: refused, nothing excluded
     refused = await client.post(f"/api/v1/media/{ids['Heat']}/leaving/keep")

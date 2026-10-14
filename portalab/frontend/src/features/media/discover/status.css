@@ -20,10 +20,25 @@
   background: color-mix(in srgb, var(--color-accent-alt) 80%, var(--color-surface));
   color: var(--color-accent-contrast);
 }
+/* issue 110: leaving the library soon — red, apart from « Available » and « Requested » */
+.discover-status[data-status="leaving"] {
+  max-inline-size: 100%;
+  background: color-mix(in srgb, var(--state-error-fg) 90%, var(--color-surface));
+  color: var(--state-error-bg);
+}
+.discover-status__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.discover-status > svg {
+  flex: none;
+}
 .discover-card__badge {
   position: absolute;
   inset-block-start: 0.4rem;
   inset-inline-end: 0.4rem;
+  max-inline-size: calc(100% - 0.8rem);
+  display: flex;
 }
 .media-card__frame:has(> .discover-card__badge) {
   position: relative;

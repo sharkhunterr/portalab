@@ -5,6 +5,7 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it } from "vitest";
 import "../../../src/features/dashboard/widgets/builtin";
 import "../../../src/features/dashboard/widgets/media";
+import "../../../src/features/dashboard/widgets/leaving";
 import "../../../src/features/dashboard/widgets/discover";
 import "../../../src/features/gamification/widget";
 import "../../../src/features/dashboard/widgets/calendar";
@@ -209,5 +210,41 @@ describe("service status", () => {
   it("on a single row: its name and state", () => {
     show("health.service_status", { item }, { compact: true });
     expect(screen.getByRole("link", { name: /Plex/ }).getAttribute("href")).toBe("/services/s1");
+  });
+
+  it("leaving soon: the cards of the other rows of posters, the day it goes as a badge on the poster", () => {
+    const soon = new Date(Date.now() + 3 * 86_400_000).toISOString();
+    const items = [
+      {
+        id: "a",
+        title: "Heat",
+        kind: "movie",
+        delete_at: soon,
+        collection: "Old",
+        image_id: null,
+        route: "/media/a",
+      },
+      {
+        id: "b",
+        title: "Lost",
+        kind: "season",
+        delete_at: null,
+        collection: "Old",
+        image_id: null,
+        route: null,
+      },
+    ];
+    show("media.leaving", { items });
+    const cards = Array.from(document.querySelectorAll(".widget-posters > li"));
+    expect(cards.map((li) => li.querySelector(".widget-posters__title")?.textContent)).toEqual([
+      "Heat",
+      "Lost",
+    ]);
+    const badge = cards[0]?.querySelector('.discover-status[data-status="leaving"]');
+    expect(badge?.textContent).toContain("in 3 days"); // contracted to its icon on screen, read out whole
+    expect(badge?.getAttribute("title")).toContain("in 3 days");
+    expect(cards[1]?.querySelector(".widget-posters__art")?.textContent).toBe("leaving soon");
+    show("media.leaving", { items }, { compact: true });
+    expect(document.querySelector(".poster-strip")).not.toBeNull();
   });
 });
