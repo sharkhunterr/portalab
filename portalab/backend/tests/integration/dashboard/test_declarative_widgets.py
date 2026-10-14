@@ -14,6 +14,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 
 from portalab.capabilities.dashboard import ENTITLEMENTS
+from portalab.core.db import Database
 from portalab.modules.dashboard.invalidate.bridge import invalidation_consumer
 from portalab.modules.dashboard.registry.plugin_widgets import plugin_state_consumer, register_plugin_widget
 from tests.integration.dashboard.conftest import DashboardHarness
@@ -217,3 +218,41 @@ async def test_a_widget_sold_to_members_is_the_staffs_own(
         "/api/v1/dashboard/widgets", json={"widget_key": "t.staff", "config": {"limit": 9}}
     )
     assert added.status_code == 201, added.text
+
+
+class _OptionShop(_Shop):
+    async def sold(self, kind: str, field: str) -> frozenset[str]:
+        return frozenset({"t.opt:limit=9"} if kind == "widget_option" else set())
+
+
+async def test_a_setting_no_longer_owned_falls_back_to_the_default(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness, database: Database
+) -> None:
+    """Issue 115: a sold setting saved while owned (then refunded, taken back, the account started over)
+    shows and loads as the widget's default — the saved value waits to be owned again."""
+    from portalab.capabilities.themes import COSMETICS
+
+    widget = FakeWidget()
+    dash.registry.register(definition("t.opt"), widget)
+    buyer = await create_user(module_of(app), "buyer")
+    shop = _OptionShop({buyer})
+    dash.full.identity.capabilities.provide(COSMETICS, shop, instance_ref="t", owner="module:marketplace")
+    await login(client, "buyer")
+    added = await client.post(
+        "/api/v1/dashboard/widgets", json={"widget_key": "t.opt", "config": {"limit": 9}}
+    )
+    assert added.status_code == 201, added.text
+
+    def mine(board: dict[str, Any]) -> dict[str, Any]:
+        return next(i for i in board["instances"] if i["widget_key"] == "t.opt")
+
+    assert mine((await client.get("/api/v1/dashboard")).json())["config"]["limit"] == 9
+    shop.owners.clear()  # no longer owned
+    assert mine((await client.get("/api/v1/dashboard")).json())["config"]["limit"] == 5
+    async with database.session() as session:
+        saved = await session.scalar(
+            text("SELECT config->>'limit' FROM dashboard.widget_instances WHERE widget_key = 't.opt'")
+        )
+    assert saved == "9"  # kept for when it is owned again
+    shop.owners.add(buyer)
+    assert mine((await client.get("/api/v1/dashboard")).json())["config"]["limit"] == 9

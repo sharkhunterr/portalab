@@ -204,7 +204,7 @@ MY_SOON = _definition(
     permission=MEDIA_REQUEST,
 )
 # #58: what is coming in — progress, speed, time left; titles only, never who. Like the server widgets
-# (#53): the administrators' (``infrastructure.read``), else bought in the shop with a contribution minimum
+# (#53): bought in the shop with a contribution minimum — by the administrators too (issue 115)
 DOWNLOADS_WIDGET = replace(
     _definition(
         "media.downloads",
@@ -220,7 +220,6 @@ DOWNLOADS_WIDGET = replace(
     ),
     refresh=Refresh(mode="interval", interval_s=30),
     stale_after_s=120,
-    free_with="infrastructure.read",
 )
 # #57: what the cleanup (Maintainerr) will delete soon — each title and its day; every member's
 LEAVING_WIDGET = replace(

@@ -7,7 +7,7 @@ The starter dashboard is applied once, permission- and policy-filtered (idempote
 
 import hashlib
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 from uuid import UUID
 
@@ -206,8 +206,16 @@ class DashboardService:
                 )
                 if row_views
             }
+        # issue 115: a setting no longer owned shows as the default (the saved one waits to be owned again)
+        locked = await self.gateway.locked_options(principal)
+        instances = [
+            replace(i, config=self.gateway.unlocked(i.widget_key, i.config, locked))
+            if locked and any(f"{i.widget_key}:{k}={v}" in locked for k, v in i.config.items())
+            else i
+            for i in overlay.instances
+        ]
         return DashboardView(
-            overlay.instances,
+            instances,
             board.layout_version if board else 0,
             overlay.diagnostics,
             layout_mode=board.layout_mode if board else "shared",

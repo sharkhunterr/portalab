@@ -1,6 +1,6 @@
 """061 — more of the statistics sold: the tabs in depth, the long history, the whole server's view and the
 deeper statistics of « My requests » are refused or left out until bought; the minimum (overview, periods up
-to a year, my requests' funnel) stays free; media managers have everything."""
+to a year, my requests' funnel) stays free; media managers buy them like everyone (issue 115)."""
 
 from contextlib import suppress
 from typing import Any
@@ -74,6 +74,8 @@ async def test_sold_statistics_are_locked_until_bought(
     locked = (await client.get("/api/v1/me/media/insights/locked")).json()["locked"]
     assert "media.insights.history" not in locked and "media.insights.server" in locked
 
-    await login(client, "boss")  # a media manager has every statistic
-    assert (await client.get("/api/v1/me/media/insights/locked")).json()["locked"] == []
+    await login(client, "boss")  # issue 115: a media manager unlocks them like everyone
+    assert "media.insights.server" in (await client.get("/api/v1/me/media/insights/locked")).json()["locked"]
+    assert (await client.get("/api/v1/media/insights?scope=all&period=all")).status_code == 403
+    shop.owned_by[people["boss"]] = frozenset({"media.insights.server", "media.insights.history"})
     assert (await client.get("/api/v1/media/insights?scope=all&period=all")).status_code == 200

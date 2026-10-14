@@ -76,9 +76,10 @@ def _definition(
 
 
 # #53: « Storage » (with the parity) and « Chart » (processor and memory) are every member's; « Server »
-# and « Containers » say much about the machine: the administrators' (``infrastructure.read``), else bought
-# in the shop with a contribution minimum — like the chart's other series
-HOST = _definition("health.host", "cpu", SERVICES_READ, Size(6, 3), {}, free_with=INFRASTRUCTURE_READ)
+# and « Containers » say much about the machine: bought in the shop with a contribution minimum — like the
+# chart's other series. Issue 115: the administrators too (they progress like everyone; the
+# administration's own pages show them the machine)
+HOST = _definition("health.host", "cpu", SERVICES_READ, Size(6, 3), {})
 STORAGE = _definition("health.storage", "database", SERVICES_READ, Size(6, 3), {})
 CONTAINERS = _definition(
     "health.containers",
@@ -86,7 +87,6 @@ CONTAINERS = _definition(
     SERVICES_READ,
     Size(6, 3),
     {"show": {"enum": ["updates", "all", "stopped"]}},
-    free_with=INFRASTRUCTURE_READ,
 )
 
 
@@ -115,7 +115,6 @@ CHART = WidgetDefinition(
     description_key="dashboard:widget.chart.description",
     icon="trending",
     required_permission=SERVICES_READ,
-    free_with=INFRASTRUCTURE_READ,  # the administrators get every series
     config_schema={
         "type": "object",
         "properties": {

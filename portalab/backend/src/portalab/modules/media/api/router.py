@@ -543,12 +543,12 @@ class StatisticLocked(Forbidden):
 
 async def _locked_statistics(module: Any, principal: Principal) -> set[str]:
     """The statistics on sale this member does not own (``media.insights.*``, ``media.requests.*``) —
-    none for media managers."""
+    the administrators' too (issue 115: they unlock them like every member)."""
     try:
         providers = module.capabilities.system_providers(COSMETICS)
     except Exception:
         return set()
-    if not providers or await module.authorizer.is_allowed(principal, MEDIA_MANAGE):
+    if not providers:
         return set()
     shop = providers[0].provider
     sold = {v for v in await shop.sold("statistic", "statistic") if v.startswith("media.")}

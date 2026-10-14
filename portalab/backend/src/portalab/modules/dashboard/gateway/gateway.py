@@ -149,6 +149,21 @@ class WidgetGateway:
         except Exception:
             return sold  # fail closed
 
+    def unlocked(self, key: str, config: Mapping[str, Any], locked: frozenset[str]) -> dict[str, Any]:
+        """Issue 115: a setting the member does not own (any more — refunded, taken back, an account started
+        over) falls back to the widget's default, wherever it was saved; the saved value itself stays, so
+        it comes back once owned again."""
+        widget = self.registry.get(key)
+        defaults = widget.definition.config_defaults if widget is not None else {}
+        out = dict(config)
+        for name, value in config.items():
+            if f"{key}:{name}={value}" in locked:
+                if name in defaults:
+                    out[name] = defaults[name]
+                else:
+                    out.pop(name, None)
+        return out
+
     async def _sold(self, kind: str, field: str) -> frozenset[str]:
         now = time.monotonic()
         cached = self._sold_cache.get((kind, field))
@@ -177,6 +192,9 @@ class WidgetGateway:
             return None
         if not await self.allowed(widget, principal, preview=preview):
             return WidgetPayload("unauthorized")
+        locked = frozenset() if preview else await self.locked_options(principal)
+        if stored_config and locked:
+            stored_config = self.unlocked(key, stored_config, locked)
         config, invalid = resolved_config(widget, stored_config)
         budget = max(0.1, self.config().widget_timeout_ms / 1000)
         started = time.perf_counter()
