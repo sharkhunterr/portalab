@@ -4,7 +4,9 @@
 * ``daily`` — a daily objective (``period: day``; ``week`` for weekly objectives), reset each period;
 * ``challenge`` — a **time-boxed quest**: a ``window`` is required and only events inside it count;
 * ``discovery`` (027) — a new member's first steps (fill the profile, take the tour…): once, no window.
-Steps reuse the achievements' ``event_count`` criterion; rewards go through the ledger."""
+Steps reuse the achievements' ``event_count`` criterion; rewards go through the ledger. ``complete_on``:
+``all`` steps (the default) or ``any`` one of them (issue 121: a first step is done by its guided tour or by
+doing the thing)."""
 
 from collections.abc import Mapping
 from datetime import datetime
@@ -42,6 +44,7 @@ class QuestDefinition(BaseModel):
     period: Period = "none"
     window: Window | None = None
     steps: list[EventCount] = Field(min_length=1, max_length=5)
+    complete_on: Literal["all", "any"] = "all"
     rewards: list[Reward] = Field(default_factory=list, max_length=3)
 
     @model_validator(mode="after")

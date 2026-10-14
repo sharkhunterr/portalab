@@ -56,3 +56,47 @@ async def test_a_mission_is_done_once(gm: GamHarness) -> None:
     raw = {**DISCOVERY["discover_profile"], "period": "week"}
     with pytest.raises(ValidationFailed):
         await gm.module.quests.save(SYSTEM, "weekly_profile", raw)
+
+
+async def test_a_mission_is_done_by_its_tour_or_by_doing_it(gm: GamHarness) -> None:
+    """Issue 121: following a mission's guided tour to its end completes it (and rewards it) as doing the
+    thing does — whichever comes first, once."""
+    await gm.module.quests.ensure_discovery()
+    gm.clock.advance(timedelta(minutes=1))
+    user = gm.people["ursula"]
+
+    async def emit(event_type: str, payload: dict[str, object]) -> None:
+        await gm.module.pipeline.process(gm.envelope(user, payload, event_type=event_type))
+
+    await emit("user.tour_completed", {"tour": "media"})  # a tour without a mission
+    await emit("user.tour_completed", {"tour": "profile"})
+    await emit("user.profile_updated", {})  # done already: nothing more
+    await emit("user.tour_completed", {"tour": "shop"})
+    mine = {q["key"]: q for q in await gm.module.quests.mine(user, kinds=["discovery"])}
+    done = {key for key, quest in mine.items() if quest["completed_at"]}
+    assert done == {"discover_profile", "discover_shop"}
+    assert await gm.balance(user, "xp") == 25 + 30 and await gm.balance(user, "coins") == 10
+
+
+async def test_a_mission_as_shipped_before_is_brought_up_to_date(gm: GamHarness) -> None:
+    """Issue 121: the missions an earlier release created are updated at start — unless an administrator
+    changed them since."""
+    from portalab.modules.gamification.quests.discovery import SUPERSEDED
+
+    await gm.module.quests.save(SYSTEM, "discover_profile", SUPERSEDED["discover_profile"][0])
+    mine = {**SUPERSEDED["discover_dashboard"][0], "label": "Make the dashboard yours"}
+    await gm.module.quests.save(SYSTEM, "discover_dashboard", mine)  # an administrator's own wording
+    assert await gm.module.quests.ensure_discovery() == len(DISCOVERY) - 1
+    assert await gm.module.quests.ensure_discovery() == 0
+    async with gm.database.session() as session:
+        latest = dict(
+            (
+                await session.execute(
+                    text(
+                        "SELECT DISTINCT ON (key) key, definition->>'complete_on' FROM gamification.quests "
+                        "WHERE key IN ('discover_profile', 'discover_dashboard') ORDER BY key, version DESC"
+                    )
+                )
+            ).all()
+        )
+    assert latest == {"discover_profile": "any", "discover_dashboard": "all"}  # the admin's kept

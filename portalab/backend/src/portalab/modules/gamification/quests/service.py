@@ -85,13 +85,21 @@ class Quests:
 
     # --- definitions -------------------------------------------------------------------------------------
     async def ensure_discovery(self) -> int:
-        """027: the discovery missions exist on a fresh portal (a key once used is never created again)."""
-        from portalab.modules.gamification.quests.discovery import DISCOVERY
+        """027: the discovery missions exist on a fresh portal (a key once used is never created again).
+        Issue 121: a mission still as an earlier release shipped it (never changed by an administrator, not
+        retired) is brought to the current definition."""
+        from portalab.modules.gamification.quests.discovery import DISCOVERY, SUPERSEDED
 
         made = 0
         for key, raw in DISCOVERY.items():
             async with self.database.session() as session:
-                if await session.scalar(select(Quest.key).where(Quest.key == key).limit(1)) is not None:
+                latest = await session.scalar(
+                    select(Quest).where(Quest.key == key).order_by(Quest.version.desc()).limit(1)
+                )
+            if latest is not None:
+                stored = parse_quest(latest.definition)
+                shipped = [parse_quest(old) for old in SUPERSEDED.get(key, ())]
+                if latest.status != "active" or stored == parse_quest(raw) or stored not in shipped:
                     continue
             await self.save(Principal(channel="system"), key, raw)
             made += 1
@@ -255,7 +263,8 @@ class Quests:
         for index in hits:
             counts[index] = min(counts[index] + 1, steps[index].count)
         row.counts, row.updated_at = counts, now
-        if any(counts[i] < step.count for i, step in enumerate(steps)):
+        reached = [counts[i] >= step.count for i, step in enumerate(steps)]
+        if not (any(reached) if quest.definition.complete_on == "any" else all(reached)):
             return []
         row.completed_at = at
         return await self._complete(session, user, quest, period, at)

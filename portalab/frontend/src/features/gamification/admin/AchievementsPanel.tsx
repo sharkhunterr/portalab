@@ -594,6 +594,19 @@ function QuestForm({
             {t("gamification:admin.quest.addStep")}
           </Button>
         ) : null}
+        {def.steps.length > 1 ? (
+          <SelectField
+            label={t("gamification:admin.quest.completeOn")}
+            value={def.complete_on ?? "all"}
+            onChange={(e) => patch({ complete_on: e.target.value as "all" | "any" })}
+          >
+            {(["all", "any"] as const).map((mode) => (
+              <option key={mode} value={mode}>
+                {t(`gamification:admin.quest.completeOnModes.${mode}`)}
+              </option>
+            ))}
+          </SelectField>
+        ) : null}
       </fieldset>
       <RewardsEditor rewards={def.rewards ?? []} onChange={(rewards) => patch({ rewards })} />
       {error ? (

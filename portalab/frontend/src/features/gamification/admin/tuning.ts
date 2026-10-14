@@ -96,6 +96,8 @@ export interface QuestDefinition {
   period?: "none" | "day" | "week" | undefined;
   window?: { starts_at: string; ends_at: string } | null | undefined;
   steps: EventCount[];
+  /** Issue 121: done when every step is (``all``, the default) or any one of them. */
+  complete_on?: "all" | "any" | undefined;
   rewards?: Reward[] | undefined;
 }
 

@@ -200,7 +200,14 @@ function TourRun({ tour, onClose }: { tour: TourDef; onClose: () => void }) {
       tour.key === "portal"
         ? completeStep("tour").then(() => completeTour("portal"))
         : completeTour(tour.key);
-    void said.then(() => client.invalidateQueries({ queryKey: MISSIONS_KEY })).catch(() => undefined);
+    // issue 121: the mission is completed by the worker a moment later — asked again once it had the time
+    const refresh = () => void client.invalidateQueries({ queryKey: MISSIONS_KEY });
+    void said
+      .then(() => {
+        refresh();
+        window.setTimeout(refresh, 4000);
+      })
+      .catch(() => undefined);
     onClose();
   }, [client, onClose, seen, setSeen, tour.key]);
 
