@@ -3,6 +3,7 @@ from registered sections, the activity feed projected from events, discovery she
 and community events for the Calendar. A composition layer — it owns no engine (progression, leaderboards,
 quests and funding stay with 013/015)."""
 
+import time
 from dataclasses import replace
 from datetime import timedelta
 from typing import Any
@@ -85,6 +86,9 @@ OWNER = "module:community"
 INSTANCE = "community"
 
 
+LOOK_SECONDS = 60.0  # #127: how long a member's worn frame and name style are kept
+
+
 class CommunityModule:
     def __init__(
         self,
@@ -125,7 +129,8 @@ class CommunityModule:
             database, event_types, self.visibility, lambda: self.config, clock=clock
         )
         self.profiles = ProfileAssembler(sections, self.visibility, authorizer)
-        self.leaderboards = LeaderboardsView(capabilities, self.display_name)
+        self._looks: dict[UUID, tuple[float, dict[str, Any]]] = {}
+        self.leaderboards = LeaderboardsView(capabilities, self.display_name, self.look_of)
         self.achievements = AchievementsView(capabilities, self.visibility)
         self.quests = QuestsView(capabilities)
         config = lambda: self.config  # noqa: E731
@@ -170,7 +175,8 @@ class CommunityModule:
         if self.calendar_sources.get(self.events.kind) is None:
             self.calendar_sources.register(self.events, owner=OWNER)
         if self.widgets.get(ACTIVITY_WIDGET.key) is None:
-            self.widgets.register(ACTIVITY_WIDGET, ActivityWidget(self.feed, self.clock), owner=OWNER)
+            activity = ActivityWidget(self.feed, self.clock, self.look_of)
+            self.widgets.register(ACTIVITY_WIDGET, activity, owner=OWNER)
         if self.widgets.get(PROJECTS_WIDGET.key) is None:
             self.widgets.register(
                 PROJECTS_WIDGET, ProjectsWidget(self.proposals, self.votes, self.clock), owner=OWNER
@@ -242,6 +248,20 @@ class CommunityModule:
             "section_failures": int(snapshot.get("community.section.failed", 0)),
         }
         return CheckResult("ok", "community surfaces respond", facts)
+
+    async def look_of(self, member: UUID) -> dict[str, Any]:
+        """#127: the avatar frame and the name's style a member wears, shown beside them across the
+        community (the leaderboards, the feed, the directory) — kept a minute (lists ask for many)."""
+        now = time.monotonic()
+        kept = self._looks.get(member)
+        if kept is not None and now - kept[0] < LOOK_SECONDS:
+            return kept[1]
+        worn = await self.looks_of(member)
+        look = {"frame": worn.get("frame"), "name": worn.get("name")}
+        if len(self._looks) >= 2000:
+            self._looks.clear()
+        self._looks[member] = (now, look)
+        return look
 
     async def looks_of(self, member: UUID) -> dict[str, Any]:
         """027: what the member wears on their profile (read from the Marketplace's cosmetics)."""

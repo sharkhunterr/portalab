@@ -243,8 +243,9 @@ class Progress:
     extra: Mapping[str, Any] = field(default_factory=dict)
 
 
-LeaderboardPeriod = Literal["all", "month", "week"]
-PERIODS: tuple[LeaderboardPeriod, ...] = ("all", "month", "week")
+# #128: this week, this month, the last six months, this year, the last three years, all time
+LeaderboardPeriod = Literal["all", "month", "week", "6months", "year", "3years"]
+PERIODS: tuple[LeaderboardPeriod, ...] = ("all", "month", "week", "6months", "year", "3years")
 
 
 @dataclass(frozen=True, slots=True)

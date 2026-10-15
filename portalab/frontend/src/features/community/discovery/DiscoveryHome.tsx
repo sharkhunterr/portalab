@@ -1,10 +1,10 @@
 import { Link } from "react-router";
-import { Avatar } from "../../../design-system/components/Avatar";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { type CommunityShelfInfo, useShelf, useShelves } from "../api";
 import { FEED_ICONS, FeedText } from "../feed/FeedText";
+import { MemberAvatar, type MemberLook, MemberName } from "../MemberFace";
 
 interface ShelfItem {
   id: string;
@@ -15,6 +15,7 @@ interface ShelfItem {
   actor_name?: string | null;
   anonymous?: boolean;
   params?: Record<string, unknown>;
+  look?: MemberLook | null;
 }
 
 const SHELF_ICONS: Record<string, string> = {
@@ -68,14 +69,10 @@ function Shelf({ info }: { info: CommunityShelfInfo }) {
           {items.map((item) => (
             <li key={item.id}>
               <Link to={item.url ?? "/community/members"}>
-                <Avatar
-                  name={item.display_name ?? ""}
-                  userId={item.id}
-                  src={`/api/v1/users/${item.id}/avatar`}
-                  size="lg"
-                  decorative
-                />
-                <span>{item.display_name}</span>
+                <MemberAvatar id={item.id} name={item.display_name ?? ""} look={item.look} size="lg" />
+                <span>
+                  <MemberName name={item.display_name ?? ""} look={item.look} />
+                </span>
               </Link>
             </li>
           ))}

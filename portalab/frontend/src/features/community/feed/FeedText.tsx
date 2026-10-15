@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useT } from "../../../i18n/hooks/useT";
 import { useAchievements } from "../../gamification/api";
+import { type MemberLook, MemberName } from "../MemberFace";
 
 const KNOWN = new Set(["achievement.unlocked", "user.level_up", "quest.completed", "project.created"]);
 
@@ -12,10 +13,6 @@ export const FEED_ICONS: Record<string, string> = {
   "project.created": "lightbulb",
 };
 
-/** The avatar of a feed entry's actor — none for an anonymous one (issue 120): the initials' « ? » only. */
-export const actorAvatar = (item: { actor_id: string; anonymous?: boolean | null }) =>
-  item.anonymous ? null : `/api/v1/users/${item.actor_id}/avatar`;
-
 /** One feed entry as localized text (026): the stored key and parameters, the actor linking to the profile;
  * an achievement is named by its label (027), never by its technical key. An anonymous actor (issue 120)
  * is « an anonymous member », with no link. */
@@ -25,12 +22,15 @@ export function FeedText({
   actorName,
   anonymous,
   params,
+  look,
 }: {
   kind: string;
   actorId: string;
   actorName: string | null | undefined;
   anonymous?: boolean | null | undefined;
   params: Record<string, unknown>;
+  /** issue 127: the actor's name style */
+  look?: MemberLook | null | undefined;
 }) {
   const t = useT();
   const achievements = useAchievements();
@@ -52,7 +52,9 @@ export function FeedText({
       {anonymous ? (
         <span className="community-anonymous">{actor}</span>
       ) : (
-        <Link to={`/community/members/${actorId}`}>{actor}</Link>
+        <Link to={`/community/members/${actorId}`}>
+          <MemberName name={actor} look={look} />
+        </Link>
       )}
       {after ?? ""}
     </span>

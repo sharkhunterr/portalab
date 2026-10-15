@@ -1,5 +1,5 @@
 """Where a member's gains come from (027, the progression page): every positive movement of a value over a
-period sorted into sources — what each action gave (by kind of action: media, shop, support, visits…),
+period sorted into sources — what each action gave (plays, requests, shop, support, visits…),
 quests, achievements, level rewards, manual grants — and the **bonuses** on top of the actions' own amounts
 (play streaks, campaigns, the overall pace, boosts bought in the shop), split from each grant's recorded
 modifiers; per day and in all. Own data only."""
@@ -17,6 +17,7 @@ from portalab.modules.gamification.models import LedgerTransaction, RewardRule
 GAINS = ("grant", "manual", "refund", "correction")
 QUESTS = {"quest", "daily", "challenge", "discovery"}  # #104: discovery missions are quests too
 ACTIONS = (
+    ("media.request", "requests"),  # #129: asking for a title is not playing it
     ("media.", "media"),
     ("marketplace.", "shop"),
     ("project.", "shop"),

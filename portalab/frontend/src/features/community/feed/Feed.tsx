@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import { Avatar } from "../../../design-system/components/Avatar";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { EmptyState } from "../../../design-system/components/Placeholders";
@@ -7,7 +6,8 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useFeed } from "../api";
-import { actorAvatar, FEED_ICONS, FeedText } from "./FeedText";
+import { MemberAvatar } from "../MemberFace";
+import { FEED_ICONS, FeedText } from "./FeedText";
 
 /** ``/community/feed`` (spec 012 T010; 027 redesign): a timeline grouped by day — who, what (an icon per
  * kind) and when — as an accessible list. */
@@ -50,12 +50,11 @@ export function Feed() {
             {group.items.map((item) => (
               <li key={item.id} className="community-timeline__item" data-kind={item.kind}>
                 <span className="community-timeline__who">
-                  <Avatar
+                  <MemberAvatar
+                    id={item.actor_id}
                     name={item.actor_name ?? ""}
-                    userId={item.actor_id}
-                    src={actorAvatar(item)}
-                    size="sm"
-                    decorative
+                    look={item.look}
+                    anonymous={item.anonymous}
                   />
                   <span className="community-timeline__icon" aria-hidden="true">
                     <Icon name={FEED_ICONS[item.kind] ?? "activity"} size={11} />
@@ -68,6 +67,7 @@ export function Feed() {
                     actorName={item.actor_name}
                     anonymous={item.anonymous}
                     params={item.params as Record<string, unknown>}
+                    look={item.look}
                   />
                 </span>
                 <time dateTime={item.occurred_at} className="community-meta">

@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import type { LeaderboardPeriod } from "./leaderboards/Leaderboard";
 import type { QuestItem } from "./quests/QuestList";
 
 /** Gamification & economy API hooks (spec 013): progression, history, achievements and administration. */
@@ -197,7 +198,7 @@ export function useVerify() {
 
 export type LeaderboardBoard = components["schemas"]["LeaderboardOut"];
 
-export function useLeaderboard(metric: string, period: "all" | "month" | "week") {
+export function useLeaderboard(metric: string, period: LeaderboardPeriod) {
   return useQuery({
     queryKey: [...KEY, "leaderboard", metric, period],
     queryFn: async () =>

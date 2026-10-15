@@ -18,6 +18,7 @@ type Streak = components["schemas"]["MyStreakOut"];
 export const SOURCES: Record<string, { color: string; icon: string }> = {
   // issue 125: one colour each — the chart series' hues, so two sources never look alike side by side
   media: { color: "var(--chart-3)", icon: "play" },
+  requests: { color: "color-mix(in oklab, var(--chart-6) 55%, white)", icon: "inbox" }, // issue 129
   quests: { color: "var(--chart-8)", icon: "target" },
   streak: { color: "var(--chart-2)", icon: "flame" },
   campaigns: { color: "var(--chart-9)", icon: "star" },

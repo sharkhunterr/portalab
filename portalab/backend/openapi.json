@@ -3424,6 +3424,16 @@
             "title": "Kind",
             "type": "string"
           },
+          "look": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberLookOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "occurred_at": {
             "format": "date-time",
             "title": "Occurred At",
@@ -3592,6 +3602,16 @@
             "format": "date-time",
             "title": "Joined At",
             "type": "string"
+          },
+          "look": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberLookOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -4046,6 +4066,16 @@
               }
             ],
             "title": "Display Name"
+          },
+          "look": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberLookOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "me": {
             "title": "Me",
@@ -5998,6 +6028,78 @@
           "route"
         ],
         "title": "FilmCreditOut",
+        "type": "object"
+      },
+      "FoundOut": {
+        "properties": {
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "country_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Code"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Population"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "latitude",
+          "longitude"
+        ],
+        "title": "FoundOut",
         "type": "object"
       },
       "GrantIn": {
@@ -9566,6 +9668,35 @@
         "title": "MemberDetailOut",
         "type": "object"
       },
+      "MemberLookOut": {
+        "description": "#127: what a member wears beside their name across the community.",
+        "properties": {
+          "frame": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frame"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "MemberLookOut",
+        "type": "object"
+      },
       "MemberPointOut": {
         "properties": {
           "day": {
@@ -11813,6 +11944,11 @@
               }
             ],
             "title": "Name"
+          },
+          "own": {
+            "default": false,
+            "title": "Own",
+            "type": "boolean"
           }
         },
         "required": [
@@ -17267,6 +17403,28 @@
       },
       "WeatherOut": {
         "properties": {
+          "cloud_cover": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cloud Cover"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
           "condition": {
             "anyOf": [
               {
@@ -17278,10 +17436,76 @@
             ],
             "title": "Condition"
           },
+          "feels_like": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feels Like"
+          },
+          "fetched_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fetched At"
+          },
+          "humidity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Humidity"
+          },
+          "intensity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intensity"
+          },
           "is_day": {
             "default": true,
             "title": "Is Day",
             "type": "boolean"
+          },
+          "local_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Local Time"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
           },
           "place": {
             "anyOf": [
@@ -17293,6 +17517,44 @@
               }
             ]
           },
+          "precipitation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precipitation"
+          },
+          "refresh_minutes": {
+            "default": 15,
+            "title": "Refresh Minutes",
+            "type": "integer"
+          },
+          "sunrise": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sunrise"
+          },
+          "sunset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sunset"
+          },
           "temperature": {
             "anyOf": [
               {
@@ -17303,6 +17565,66 @@
               }
             ],
             "title": "Temperature"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visibility"
+          },
+          "wind_direction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Direction"
+          },
+          "wind_gusts": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Gusts"
+          },
+          "wind_speed": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Speed"
+          },
+          "windy": {
+            "default": false,
+            "title": "Windy",
+            "type": "boolean"
           }
         },
         "required": [
@@ -30903,7 +31225,10 @@
               "enum": [
                 "all",
                 "month",
-                "week"
+                "week",
+                "6months",
+                "year",
+                "3years"
               ],
               "title": "Period",
               "type": "string"
@@ -30973,7 +31298,10 @@
               "enum": [
                 "all",
                 "month",
-                "week"
+                "week",
+                "6months",
+                "year",
+                "3years"
               ],
               "title": "Period",
               "type": "string"
@@ -33798,7 +34126,10 @@
               "enum": [
                 "all",
                 "month",
-                "week"
+                "week",
+                "6months",
+                "year",
+                "3years"
               ],
               "title": "Period",
               "type": "string"
@@ -35132,7 +35463,10 @@
               "enum": [
                 "all",
                 "month",
-                "week"
+                "week",
+                "6months",
+                "year",
+                "3years"
               ],
               "title": "Period",
               "type": "string"
@@ -43033,7 +43367,7 @@
     },
     "/api/v1/ui/weather": {
       "get": {
-        "description": "#68, #70: the sky over the member's place (or everyone's default), for the \u00ab live weather \u00bb\nambience \u2014 none until a place is set.",
+        "description": "#68, #70, #88: the sky over the member's place (or everyone's default), for the \u00ab live weather \u00bb\nambience \u2014 none until a place is set.",
         "operationId": "weather_api_v1_ui_weather_get",
         "responses": {
           "200": {
@@ -43087,7 +43421,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/PlaceOut"
+                    "$ref": "#/components/schemas/FoundOut"
                   },
                   "title": "Response Weather Places Api V1 Ui Weather Places Get",
                   "type": "array"

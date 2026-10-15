@@ -50,7 +50,7 @@ export function FramedAvatar({
   name: string;
   userId?: string | undefined;
   src?: string | null | undefined;
-  size?: "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl";
 }) {
   const fx = frame ? FX_FRAMES[frame] : undefined;
   if (fx) {
@@ -63,6 +63,7 @@ export function FramedAvatar({
       <span
         className="avatar-frame"
         data-frame={frame}
+        data-size={size}
         data-fx-frame={fx.shape ?? 0}
         data-fx-cycle={fx.effect === "chrono" || undefined}
         style={style}
@@ -78,7 +79,11 @@ export function FramedAvatar({
     );
   }
   return (
-    <span className="avatar-frame" data-frame={frame && frame !== "none" ? frame : undefined}>
+    <span
+      className="avatar-frame"
+      data-frame={frame && frame !== "none" ? frame : undefined}
+      data-size={size}
+    >
       <Avatar name={name} userId={userId} src={src} size={size} decorative />
     </span>
   );

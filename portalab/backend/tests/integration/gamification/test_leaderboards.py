@@ -121,10 +121,10 @@ async def test_refresh_cadence_and_erasure(gm: GamHarness) -> None:
     await gm.rule("listen", RULE)
     gm.clock.advance(timedelta(minutes=1))
     await gm.emit(gm.people["ursula"])
-    assert await gm.module.leaderboards.refresh() == 10  # 4 metrics x 3 periods, level all-time only
+    assert await gm.module.leaderboards.refresh() == 19  # 3 metrics x 6 periods (#128), level all-time only
     assert await gm.module.leaderboards.refresh() == 0
     gm.clock.advance(timedelta(minutes=gm.module.config.leaderboard_refresh_minutes))
-    assert await gm.module.leaderboards.refresh() == 10
+    assert await gm.module.leaderboards.refresh() == 19
     from portalab.modules.gamification.privacy.participant import GamificationParticipant
 
     participant = GamificationParticipant(

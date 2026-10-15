@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from portalab.capabilities.economy import LeaderboardPeriod
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
-from portalab.modules.community.api.public import Module
+from portalab.modules.community.api.public import MemberLookOut, Module, look_out
 from portalab.modules.community.leaderboards.view import BoardView, RankedMember
 from portalab.modules.community.permissions import READ
 
@@ -28,6 +28,7 @@ class CommunityRankOut(BaseModel):
     change: int | None = None  # #66: places gained (> 0) or lost (< 0) since a day
     new: bool = False
     anonymous: bool = False  # #66: a private member — no name, no avatar, no profile
+    look: MemberLookOut | None = None  # #127: their avatar frame and name style
 
 
 class CommunityLeaderboardOut(BaseModel):
@@ -57,6 +58,7 @@ def rank_out(member: RankedMember) -> CommunityRankOut:
         change=member.change,
         new=member.new,
         anonymous=member.anonymous,
+        look=look_out(member.look),
     )
 
 

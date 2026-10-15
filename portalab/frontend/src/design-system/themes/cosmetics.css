@@ -4058,3 +4058,18 @@
   border-radius: 50%;
   background: #1a1a1a;
 }
+
+/* issue 127: a frame beside a name in a list (the leaderboards, the feed, the directory) — thinner as the
+   avatar is smaller; no frame worn: no room kept for one */
+.avatar-frame[data-size="sm"] {
+  padding: 2px;
+}
+.avatar-frame[data-size="md"] {
+  padding: 3px;
+}
+.avatar-frame[data-size="lg"] {
+  padding: 4px;
+}
+.avatar-frame[data-size]:not([data-frame]) {
+  padding: 0;
+}

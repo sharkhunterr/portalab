@@ -2,18 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
-import { Avatar } from "../../../design-system/components/Avatar";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useActiveCampaigns } from "../../campaigns/api";
-import { Leaderboard } from "../../gamification/leaderboards/Leaderboard";
+import { Leaderboard, PeriodSelect, useLeaderboardPeriod } from "../../gamification/leaderboards/Leaderboard";
 import type { QuestItem } from "../../gamification/quests/QuestList";
 import { useFeed } from "../api";
 import { DiscoveryHome } from "../discovery/DiscoveryHome";
-import { actorAvatar, FEED_ICONS, FeedText } from "../feed/FeedText";
+import { FEED_ICONS, FeedText } from "../feed/FeedText";
 import { Podium } from "../leaderboards/LeaderboardPage";
+import { MemberAvatar } from "../MemberFace";
 
 function Panel({
   icon,
@@ -21,12 +21,15 @@ function Panel({
   more,
   children,
   wide,
+  aside,
 }: {
   icon: string;
   title: string;
   more?: string | undefined;
   children: ReactNode;
   wide?: boolean;
+  /** issue 128: a control beside the title (the leaderboard's period) */
+  aside?: ReactNode;
 }) {
   const t = useT();
   return (
@@ -38,6 +41,7 @@ function Panel({
           </span>
           {title}
         </h3>
+        {aside}
         {more ? (
           <Link to={more} className="community-panel__more">
             {t("community:discovery.more")}
@@ -54,18 +58,25 @@ function Panel({
 function TopPanel() {
   const t = useT();
   const format = useFormat();
+  const [period, setPeriod] = useLeaderboardPeriod();
   const board = useQuery({
-    queryKey: ["community", "leaderboard", "xp", "month"],
+    queryKey: ["community", "leaderboard", "xp", period],
     queryFn: async () =>
       (
         await api.GET("/api/v1/community/leaderboards/{metric}", {
-          params: { path: { metric: "xp" }, query: { period: "month" } },
+          params: { path: { metric: "xp" }, query: { period } },
         })
       ).data,
   });
   const data = board.data;
   return (
-    <Panel icon="medal" title={t("community:overview.leaderboard")} more="/community/leaderboards" wide>
+    <Panel
+      icon="medal"
+      title={t("community:overview.leaderboard")}
+      more="/community/leaderboards"
+      wide
+      aside={<PeriodSelect value={period} onChange={setPeriod} />}
+    >
       {board.isError || data?.state === "unavailable" ? (
         <FunctionalState state="unavailable" label={t("community:leaderboards.unavailable")} />
       ) : null}
@@ -188,12 +199,11 @@ function ActivityPanel() {
       <ol className="community-overview__feed">
         {items.map((item) => (
           <li key={item.id}>
-            <Avatar
+            <MemberAvatar
+              id={item.actor_id}
               name={item.actor_name ?? ""}
-              userId={item.actor_id}
-              src={actorAvatar(item)}
-              size="sm"
-              decorative
+              look={item.look}
+              anonymous={item.anonymous}
             />
             <span className="community-shelf__icon" aria-hidden="true">
               <Icon name={FEED_ICONS[item.kind] ?? "activity"} size={14} />
@@ -205,6 +215,7 @@ function ActivityPanel() {
                 actorName={item.actor_name}
                 anonymous={item.anonymous}
                 params={item.params ?? {}}
+                look={item.look}
               />
             </span>
             <small>{format.relative((new Date(item.occurred_at).getTime() - Date.now()) / 1000)}</small>

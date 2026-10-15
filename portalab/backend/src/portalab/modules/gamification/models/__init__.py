@@ -257,7 +257,9 @@ class LeaderboardSnapshot(GamificationBase):
     visibility is applied at read time, never baked in."""
 
     __tablename__ = "leaderboard_snapshots"
-    __table_args__ = (CheckConstraint("period IN ('all', 'month', 'week')", name="period"),)
+    __table_args__ = (
+        CheckConstraint("period IN ('all', 'month', 'week', '6months', 'year', '3years')", name="period"),
+    )
 
     metric: Mapped[str] = mapped_column(String(32), primary_key=True)
     period: Mapped[str] = mapped_column(String(8), primary_key=True)

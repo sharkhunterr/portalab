@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
-import { Avatar } from "../../../design-system/components/Avatar";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -10,10 +9,11 @@ import { useT } from "../../../i18n/hooks/useT";
 import {
   LEADERBOARD_PERIODS,
   Leaderboard,
-  type LeaderboardPeriod,
   RankMove,
   type RankRow,
+  useLeaderboardPeriod,
 } from "../../gamification/leaderboards/Leaderboard";
+import { MemberAvatar, MemberName } from "../MemberFace";
 
 /** Who stands on the podium: the first three entries placed 1 to 3 (issue 120: ex aequo share a place). */
 const podiumOf = (rows: RankRow[]) => rows.filter((r) => r.rank <= 3).slice(0, 3);
@@ -51,14 +51,15 @@ export function Podium({ rows }: { rows: RankRow[] }) {
               <span className="community-podium__medal" aria-hidden="true">
                 <Icon name={row.rank === 1 ? "crown" : "medal"} size={16} />
               </span>
-              <Avatar
+              <MemberAvatar
+                id={row.user_id}
                 name={row.display_name ?? ""}
-                userId={row.user_id}
-                src={`/api/v1/users/${row.user_id}/avatar`}
+                look={row.look}
                 size={row.rank === 1 ? "xl" : "lg"}
-                decorative
               />
-              <strong>{row.display_name ?? t("gamification:leaderboard.member")}</strong>
+              <strong>
+                <MemberName name={row.display_name ?? t("gamification:leaderboard.member")} look={row.look} />
+              </strong>
               <span className="community-meta">{format.number(row.score)}</span>
               <RankMove row={row} />
             </Link>
@@ -82,7 +83,7 @@ export function LeaderboardPage() {
     queryFn: async () => ((await api.GET("/api/v1/community/leaderboards")).data ?? []) as string[],
   });
   const [metric, setMetric] = useState("xp");
-  const [period, setPeriod] = useState<LeaderboardPeriod>("all");
+  const [period, setPeriod] = useLeaderboardPeriod();
   const available = metrics.data ?? [];
   const current = available.includes(metric) ? metric : (available[0] ?? metric);
   const effectivePeriod = current === "level" ? "all" : period;

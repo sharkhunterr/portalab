@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { Avatar } from "../../../design-system/components/Avatar";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
@@ -8,6 +7,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useMembers } from "../api";
+import { MemberAvatar, MemberName } from "../MemberFace";
 
 /** ``/community/members`` (spec 012 T008; 027 redesign): the active members the viewer may see, as cards
  * with their avatar, searchable by name. */
@@ -47,14 +47,10 @@ export function Directory() {
         {items.map((member) => (
           <li key={member.id}>
             <Link to={`/community/members/${member.id}`} className="community-member">
-              <Avatar
-                name={member.display_name}
-                userId={member.id}
-                src={`/api/v1/users/${member.id}/avatar`}
-                size="lg"
-                decorative
-              />
-              <strong>{member.display_name}</strong>
+              <MemberAvatar id={member.id} name={member.display_name} look={member.look} size="lg" />
+              <strong>
+                <MemberName name={member.display_name} look={member.look} />
+              </strong>
               <span className="community-meta">
                 {t("community:members.joined", { date: format.date(member.joined_at) })}
               </span>

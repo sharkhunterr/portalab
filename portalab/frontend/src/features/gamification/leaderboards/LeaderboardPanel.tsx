@@ -1,14 +1,18 @@
-import { useState } from "react";
 import { SelectField } from "../../../design-system/components/Field";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLeaderboard } from "../api";
-import { LEADERBOARD_PERIODS, Leaderboard, type LeaderboardPeriod } from "./Leaderboard";
+import {
+  LEADERBOARD_PERIODS,
+  Leaderboard,
+  type LeaderboardPeriod,
+  useLeaderboardPeriod,
+} from "./Leaderboard";
 
 /** XP leaderboard on ``/progression`` (spec 013 T037): the viewer's own rank, period selector. */
 export function LeaderboardPanel() {
   const t = useT();
-  const [period, setPeriod] = useState<LeaderboardPeriod>("all");
+  const [period, setPeriod] = useLeaderboardPeriod();
   const board = useLeaderboard("xp", period);
   const caption = t("gamification:leaderboard.title");
   return (

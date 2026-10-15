@@ -1775,3 +1775,40 @@
   font: inherit;
   cursor: pointer;
 }
+
+/* issue 128: a leaderboard's period, as a compact pill list */
+.leaderboard-period {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2rem;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.leaderboard-period select {
+  appearance: none;
+  padding-inline-end: var(--space-4);
+  margin-inline-end: calc(-1 * var(--space-4));
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.leaderboard-period select option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.leaderboard-period > .ds-icon:last-child {
+  pointer-events: none;
+}
+.leaderboard-period:focus-within {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}

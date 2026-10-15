@@ -1,11 +1,11 @@
 import { Link } from "react-router";
-import { Avatar } from "../../design-system/components/Avatar";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { WidgetHeaderAction } from "../dashboard/frame/actions";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
-import { actorAvatar, FEED_ICONS, FeedText } from "./feed/FeedText";
+import { FEED_ICONS, FeedText } from "./feed/FeedText";
+import { MemberAvatar, type MemberLook } from "./MemberFace";
 import "./community.css";
 
 interface ActivityItem {
@@ -14,6 +14,7 @@ interface ActivityItem {
   actor_id: string;
   actor_name: string | null;
   anonymous?: boolean;
+  look?: MemberLook | null;
   params: Record<string, unknown>;
   occurred_at?: string;
 }
@@ -21,12 +22,11 @@ interface ActivityItem {
 function Who({ item }: { item: ActivityItem }) {
   return (
     <span className="widget-activity__who">
-      <Avatar
+      <MemberAvatar
+        id={item.actor_id}
         name={item.actor_name ?? ""}
-        userId={item.actor_id}
-        src={actorAvatar(item)}
-        size="sm"
-        decorative
+        look={item.look}
+        anonymous={item.anonymous}
       />
       <span className="widget-activity__icon" aria-hidden="true">
         <Icon name={FEED_ICONS[item.kind ?? ""] ?? "activity"} size={10} />
@@ -53,6 +53,7 @@ function ActivityWidget({ payload, compact }: WidgetProps) {
       actorName={item.actor_name}
       anonymous={item.anonymous}
       params={item.params}
+      look={item.look}
     />
   );
   const latest = items[0];

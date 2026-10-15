@@ -36,9 +36,10 @@ ACTIVITY_WIDGET = WidgetDefinition(
 
 
 class ActivityWidget:
-    def __init__(self, feed: FeedService, clock: Clock | None = None) -> None:
+    def __init__(self, feed: FeedService, clock: Clock | None = None, looks: Any = None) -> None:
         self.feed = feed
         self.clock = clock
+        self.looks = looks  # #127: async (UUID) -> the frame and name style a member wears
 
     async def load(
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
@@ -56,6 +57,7 @@ class ActivityWidget:
                         "actor_id": str(i.actor_id),
                         "actor_name": i.actor_name,
                         "anonymous": i.anonymous,  # issue 120
+                        "look": None if i.anonymous or self.looks is None else await self.looks(i.actor_id),
                         "text_key": i.text_key,
                         "kind": i.kind,  # 027: what the widget names it by (as the feed does)
                         "params": i.params,

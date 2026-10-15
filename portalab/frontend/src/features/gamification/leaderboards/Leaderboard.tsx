@@ -1,9 +1,10 @@
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Avatar } from "../../../design-system/components/Avatar";
 import { Icon } from "../../../design-system/components/Icon";
 import { type Column, Table } from "../../../design-system/components/Layout";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { MemberAvatar, type MemberLook, MemberName } from "../../community/MemberFace";
 import "../gamification.css";
 
 /** One ranked member as both the 013 and the 012 APIs return it. */
@@ -18,6 +19,8 @@ export interface RankRow {
   new?: boolean;
   /** #66: a member keeping their progression private — no name, avatar nor profile */
   anonymous?: boolean;
+  /** issue 127: the frame and name style the member wears (none when anonymous) */
+  look?: MemberLook | null;
 }
 
 /** #66: places gained, lost or kept since a day — an arrow and the count, said in words for everyone. */
@@ -57,23 +60,82 @@ export function RankWho({ row, link = false }: { row: RankRow; link?: boolean })
     );
   }
   const label = row.display_name ?? t("gamification:leaderboard.member");
-  const text = row.me ? `${label} (${t("gamification:leaderboard.you")})` : label;
+  const text = (
+    <MemberName name={row.me ? `${label} (${t("gamification:leaderboard.you")})` : label} look={row.look} />
+  );
   return (
     <span className="rank-who">
-      <Avatar
-        name={label}
-        userId={row.user_id}
-        src={`/api/v1/users/${row.user_id}/avatar`}
-        size="sm"
-        decorative
-      />
+      <MemberAvatar id={row.user_id} name={label} look={row.look} />
       {link && !row.me ? <Link to={`/community/members/${row.user_id}`}>{text}</Link> : <span>{text}</span>}
     </span>
   );
 }
 
-export const LEADERBOARD_PERIODS = ["all", "month", "week"] as const;
+/** issue 128: from the shortest to all time */
+export const LEADERBOARD_PERIODS = ["week", "month", "6months", "year", "3years", "all"] as const;
 export type LeaderboardPeriod = (typeof LEADERBOARD_PERIODS)[number];
+
+const PERIOD_KEY = "portalab:leaderboard-period";
+const isPeriod = (value: unknown): value is LeaderboardPeriod =>
+  (LEADERBOARD_PERIODS as readonly unknown[]).includes(value);
+
+/** issue 128: the period a member last chose for the leaderboards, remembered on this device (this month by
+ * default) and shared by every board that shows one. */
+export function useLeaderboardPeriod(): [LeaderboardPeriod, (period: LeaderboardPeriod) => void] {
+  const [period, setPeriod] = useState<LeaderboardPeriod>(() => {
+    try {
+      const kept = window.localStorage.getItem(PERIOD_KEY);
+      return isPeriod(kept) ? kept : "month";
+    } catch {
+      return "month";
+    }
+  });
+  const choose = useCallback((next: LeaderboardPeriod) => {
+    setPeriod(next);
+    try {
+      window.localStorage.setItem(PERIOD_KEY, next);
+    } catch {
+      // not remembered: the choice holds for this visit
+    }
+    window.dispatchEvent(new CustomEvent(PERIOD_KEY, { detail: next }));
+  }, []);
+  useEffect(() => {
+    const follow = (event: Event) => {
+      const next = (event as CustomEvent).detail;
+      if (isPeriod(next)) setPeriod(next);
+    };
+    window.addEventListener(PERIOD_KEY, follow);
+    return () => window.removeEventListener(PERIOD_KEY, follow);
+  }, []);
+  return [period, choose];
+}
+
+/** issue 128: the period of a leaderboard, as a compact list (in a panel's header, on a phone). */
+export function PeriodSelect({
+  value,
+  onChange,
+  namespace = "community:leaderboards",
+}: {
+  value: LeaderboardPeriod;
+  onChange: (period: LeaderboardPeriod) => void;
+  namespace?: string;
+}) {
+  const t = useT();
+  return (
+    <label className="leaderboard-period">
+      <Icon name="calendar" size={14} />
+      <span className="visually-hidden">{t(`${namespace}.period`)}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value as LeaderboardPeriod)}>
+        {LEADERBOARD_PERIODS.map((period) => (
+          <option key={period} value={period}>
+            {t(`${namespace}.period.${period}`)}
+          </option>
+        ))}
+      </select>
+      <Icon name="chevron-down" size={14} />
+    </label>
+  );
+}
 
 /**
  * Leaderboard table (spec 013 T037): an accessible table with the viewer's own row highlighted in text and

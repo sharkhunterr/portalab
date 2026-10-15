@@ -8509,7 +8509,7 @@ export interface paths {
         };
         /**
          * Weather
-         * @description #68, #70: the sky over the member's place (or everyone's default), for the « live weather »
+         * @description #68, #70, #88: the sky over the member's place (or everyone's default), for the « live weather »
          *     ambience — none until a place is set.
          */
         get: operations["weather_api_v1_ui_weather_get"];
@@ -10296,6 +10296,7 @@ export interface components {
             id: string;
             /** Kind */
             kind: string;
+            look?: components["schemas"]["MemberLookOut"] | null;
             /**
              * Occurred At
              * Format: date-time
@@ -10357,6 +10358,7 @@ export interface components {
              * Format: date-time
              */
             joined_at: string;
+            look?: components["schemas"]["MemberLookOut"] | null;
         };
         /** CommunityMemberPage */
         CommunityMemberPage: {
@@ -10517,6 +10519,7 @@ export interface components {
             change?: number | null;
             /** Display Name */
             display_name: string | null;
+            look?: components["schemas"]["MemberLookOut"] | null;
             /** Me */
             me: boolean;
             /**
@@ -11207,6 +11210,25 @@ export interface components {
             votes: number;
             /** Year */
             year: number | null;
+        };
+        /** FoundOut */
+        FoundOut: {
+            /** Country */
+            country?: string | null;
+            /** Country Code */
+            country_code?: string | null;
+            /** Label */
+            label: string;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Name */
+            name: string;
+            /** Population */
+            population?: number | null;
+            /** Region */
+            region?: string | null;
         };
         /** GrantIn */
         GrantIn: {
@@ -12498,6 +12520,16 @@ export interface components {
             user_id: string;
             xp: components["schemas"]["ValueDetailOut"];
         };
+        /**
+         * MemberLookOut
+         * @description #127: what a member wears beside their name across the community.
+         */
+        MemberLookOut: {
+            /** Frame */
+            frame?: string | null;
+            /** Name */
+            name?: string | null;
+        };
         /** MemberPointOut */
         MemberPointOut: {
             /** Day */
@@ -13326,6 +13358,11 @@ export interface components {
             longitude: number;
             /** Name */
             name?: string | null;
+            /**
+             * Own
+             * @default false
+             */
+            own: boolean;
         };
         /** PlayableItemOut */
         PlayableItemOut: {
@@ -15234,16 +15271,58 @@ export interface components {
         };
         /** WeatherOut */
         WeatherOut: {
+            /** Cloud Cover */
+            cloud_cover?: number | null;
+            /** Code */
+            code?: number | null;
             /** Condition */
             condition: string | null;
+            /** Feels Like */
+            feels_like?: number | null;
+            /** Fetched At */
+            fetched_at?: string | null;
+            /** Humidity */
+            humidity?: number | null;
+            /** Intensity */
+            intensity?: string | null;
             /**
              * Is Day
              * @default true
              */
             is_day: boolean;
+            /** Local Time */
+            local_time?: string | null;
+            /** Phase */
+            phase?: string | null;
             place?: components["schemas"]["PlaceOut"] | null;
+            /** Precipitation */
+            precipitation?: number | null;
+            /**
+             * Refresh Minutes
+             * @default 15
+             */
+            refresh_minutes: number;
+            /** Sunrise */
+            sunrise?: string | null;
+            /** Sunset */
+            sunset?: string | null;
             /** Temperature */
             temperature?: number | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Visibility */
+            visibility?: number | null;
+            /** Wind Direction */
+            wind_direction?: number | null;
+            /** Wind Gusts */
+            wind_gusts?: number | null;
+            /** Wind Speed */
+            wind_speed?: number | null;
+            /**
+             * Windy
+             * @default false
+             */
+            windy: boolean;
         };
         /** WelcomeOut */
         WelcomeOut: {
@@ -24242,7 +24321,7 @@ export interface operations {
     community_leaderboard_api_v1_community_leaderboards__metric__get: {
         parameters: {
             query?: {
-                period?: "all" | "month" | "week";
+                period?: "all" | "month" | "week" | "6months" | "year" | "3years";
                 limit?: number;
             };
             header?: never;
@@ -24277,7 +24356,7 @@ export interface operations {
         parameters: {
             query?: {
                 metric?: string;
-                period?: "all" | "month" | "week";
+                period?: "all" | "month" | "week" | "6months" | "year" | "3years";
             };
             header?: never;
             path?: never;
@@ -26187,7 +26266,7 @@ export interface operations {
     leaderboard_api_v1_leaderboards__metric__get: {
         parameters: {
             query?: {
-                period?: "all" | "month" | "week";
+                period?: "all" | "month" | "week" | "6months" | "year" | "3years";
                 limit?: number;
             };
             header?: never;
@@ -27096,7 +27175,7 @@ export interface operations {
         parameters: {
             query?: {
                 metric?: string;
-                period?: "all" | "month" | "week";
+                period?: "all" | "month" | "week" | "6months" | "year" | "3years";
             };
             header?: never;
             path?: never;
@@ -32242,7 +32321,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PlaceOut"][];
+                    "application/json": components["schemas"]["FoundOut"][];
                 };
             };
             /** @description Validation Error */

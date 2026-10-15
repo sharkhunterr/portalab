@@ -67,8 +67,8 @@ async def test_delegation_names_and_own_position(co: CoHarness, client: AsyncCli
     assert position == {"metric": "xp", "period": "all", "state": "available", "rank": 2, "score": 20}
     assert (await client.get("/api/v1/community/leaderboards/coins")).status_code == 404
     assert (
-        await client.get("/api/v1/community/leaderboards/xp", params={"period": "year"})
-    ).status_code == 422
+        await client.get("/api/v1/community/leaderboards/xp", params={"period": "decade"})
+    ).status_code == 422  # #128: a period it does not know
 
     fake.down = True
     down = await client.get("/api/v1/community/leaderboards/xp")
@@ -80,3 +80,40 @@ def test_fake_is_a_reader() -> None:
     from portalab.capabilities.economy import LeaderboardReader
 
     assert isinstance(FakeLeaderboards(), LeaderboardReader)
+
+
+class FakeCosmetics:
+    """#127: what each member wears (the Marketplace's cosmetics as Community reads them)."""
+
+    def __init__(self, worn: dict[UUID, dict[str, object]]) -> None:
+        self.worn = worn
+
+    async def sold(self, kind: str, field: str) -> frozenset[str]:
+        return frozenset()
+
+    async def owned(self, user_id: UUID, kind: str, field: str) -> frozenset[str]:
+        return frozenset()
+
+    async def equipped(self, user: UUID) -> dict[str, object]:
+        return self.worn.get(user, {})
+
+
+async def test_each_member_wears_their_frame_and_name_style(co: CoHarness, client: AsyncClient) -> None:
+    from portalab.capabilities.themes import COSMETICS
+
+    await login(client, "ulrich")
+    ursula, boss = co.people["ursula"], co.people["boss"]
+    co.module.capabilities.provide(
+        LEADERBOARDS,
+        FakeLeaderboards([(ursula, 60), (boss, 40)]),
+        instance_ref="fake013",
+        owner="module:test",
+    )
+    worn = {ursula: {"frame": "gold", "name": "wizard", "banner": "dunes"}}
+    co.module.capabilities.provide(
+        COSMETICS, FakeCosmetics(worn), instance_ref="fake027", owner="module:test"
+    )
+    body = (await client.get("/api/v1/community/leaderboards/xp", params={"period": "year"})).json()
+    looks = {e["user_id"]: e["look"] for e in body["entries"]}
+    assert looks[str(ursula)] == {"frame": "gold", "name": "wizard"}  # only what shows beside a name
+    assert looks[str(boss)] == {"frame": None, "name": None}

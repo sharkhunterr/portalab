@@ -31,10 +31,22 @@ Module = Annotated[CommunityModule, Depends(community_module)]
 Reader = Annotated[Principal, require(READ)]
 
 
+class MemberLookOut(BaseModel):
+    """#127: what a member wears beside their name across the community."""
+
+    frame: str | None = None  # the avatar frame
+    name: str | None = None  # the name's style (font and effect)
+
+
+def look_out(look: dict[str, Any] | None) -> MemberLookOut | None:
+    return MemberLookOut(frame=look.get("frame"), name=look.get("name")) if look else None
+
+
 class CommunityMemberOut(BaseModel):
     id: UUID
     display_name: str
     joined_at: datetime
+    look: MemberLookOut | None = None  # #127
 
 
 class CommunityMemberPage(BaseModel):
@@ -62,6 +74,7 @@ class CommunityFeedItemOut(BaseModel):
     actor_id: UUID
     actor_name: str | None
     anonymous: bool = False  # issue 120: the actor keeps their progression to themselves
+    look: MemberLookOut | None = None  # #127: the actor's frame and name style (none when anonymous)
     kind: str
     text_key: str
     params: dict[str, Any]
@@ -107,7 +120,12 @@ async def members(
     page = await module.members.page(principal, query=q, offset=decode_cursor(cursor), limit=limit)
     return CommunityMemberPage(
         items=[
-            CommunityMemberOut(id=m.id, display_name=m.display_name, joined_at=m.joined_at)
+            CommunityMemberOut(
+                id=m.id,
+                display_name=m.display_name,
+                joined_at=m.joined_at,
+                look=look_out(await module.look_of(m.id)),
+            )
             for m in page.items
         ],
         next_cursor=encode_cursor(page.next_offset) if page.next_offset is not None else None,
@@ -162,6 +180,7 @@ async def feed(
                 actor_id=i.actor_id,
                 actor_name=i.actor_name,
                 anonymous=i.anonymous,
+                look=None if i.anonymous else look_out(await module.look_of(i.actor_id)),
                 kind=i.kind,
                 text_key=i.text_key,
                 params=i.params,
@@ -190,6 +209,11 @@ async def shelf(principal: Reader, shelf: str, module: Module) -> CommunityShelf
         raise NotFound("No such shelf.", code="community.shelf_not_found")
     try:
         items = [dict(i) for i in await found.provider(principal, module.config.discovery_shelf_size)]
+        for item in items:  # #127: a member on a shelf wears their frame and name style there too
+            who = item.get("actor_id") or (item.get("id") if item.get("display_name") else None)
+            if who and not item.get("anonymous"):
+                look = await module.look_of(UUID(str(who)))
+                item["look"] = look if any(look.values()) else None
         state = "available" if items else "no-data"
     except Exception:  # a failing shelf degrades alone
         items, state = [], "unavailable"

@@ -27,6 +27,7 @@ class RankedMember:
     change: int | None = None  # #66: places gained (> 0) or lost (< 0) since a day
     new: bool = False
     anonymous: bool = False  # #66: a private member — no name, no avatar, no profile
+    look: dict[str, Any] | None = None  # #127: the frame and name style they wear (none when anonymous)
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,9 +41,10 @@ class BoardView:
 
 
 class LeaderboardsView:
-    def __init__(self, capabilities: CapabilityRegistry, names: Any) -> None:
+    def __init__(self, capabilities: CapabilityRegistry, names: Any, looks: Any = None) -> None:
         self.capabilities = capabilities
         self.names = names  # async (UUID) -> str | None
+        self.looks = looks  # #127: async (UUID) -> {"frame", "name"}
 
     def _reader(self) -> Any | None:
         providers = self.capabilities.system_providers(LEADERBOARDS)
@@ -66,6 +68,7 @@ class LeaderboardsView:
             getattr(entry, "change", None),
             getattr(entry, "new", False),
             anonymous,
+            None if anonymous or self.looks is None else await self.looks(entry.user_id),
         )
 
     async def board(
