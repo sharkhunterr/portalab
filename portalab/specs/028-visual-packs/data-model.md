@@ -1,7 +1,7 @@
 # Data Model: Visual Packs (028)
 
 PostgreSQL, schema `visuals` (new module, migration `visuals_0001`), plus `identity.security_blocks`
-(migration `identity_00NN_security_blocks`), new settings, and a data migration of `ui.themes` sources. UUIDv7
+(migration `identity_security_blocks`), new settings, and a data migration of `ui.themes` sources. UUIDv7
 ids, `timestamptz` UTC. Pack files stay on disk (`DATA_DIR/visuals/store/<pack>/<sha256>/`), immutable.
 
 ## visuals.packs
@@ -156,7 +156,7 @@ Active block = `lifted_at IS NULL AND until > now()`; partial index on `(kind, s
 2. Built-in sync, first run (R7): creates built-in packs/versions/elements, adopts existing products' economy,
    claims looks, enables packs whose products exist; marks `ui.themes` rows of built-in interfaces with
    `source = "visuals:<pack>"`.
-3. `identity_00NN_security_blocks`: table above (no data).
+3. `identity_security_blocks`: table above (no data).
 
 Validation invariants (tests): every product key that existed before is held by exactly one element of a
 built-in pack (`builtin-looks-before.json`); every look key per family is claimed by exactly one live element
