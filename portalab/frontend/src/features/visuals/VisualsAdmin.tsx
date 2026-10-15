@@ -101,12 +101,12 @@ export default function VisualsAdmin() {
                 }
               }}
             >
-              <Icon name="refresh" size={16} /> {t("admin:visuals.scan")}
+              <Icon name="sync" size={16} /> {t("admin:visuals.scan")}
             </Button>
           </div>
           <div className="visuals-source">
             <p className="visuals-source__title">
-              <Icon name="upload" size={16} /> {t("admin:visuals.upload")}
+              <Icon name="inbox" size={16} /> {t("admin:visuals.upload")}
             </p>
             <input
               ref={file}
@@ -357,7 +357,7 @@ function VersionPanel({
   return (
     <AdminSection
       title={t("admin:visuals.version", { pack, version })}
-      icon="clipboard"
+      icon="list"
       description={t("admin:visuals.summary", {
         blocking: summary.blocking,
         warning: summary.warning,
