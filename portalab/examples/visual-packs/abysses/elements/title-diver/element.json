@@ -1,0 +1,22 @@
+{
+  "type": "title",
+  "product": "title_deep_diver_abyss",
+  "names": {
+    "fr": "Titre : Plongeur des abysses",
+    "en": "Title: Abyss diver"
+  },
+  "descriptions": {
+    "fr": "« Plongeur des abysses » sous votre nom.",
+    "en": "« Abyss diver » under your name."
+  },
+  "payload": {
+    "label": "Abyss diver",
+    "style": "water"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  }
+}

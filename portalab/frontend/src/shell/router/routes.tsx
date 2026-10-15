@@ -87,6 +87,7 @@ const AnnouncementsAdmin = lazy(() => import("../../features/admin/communication
 const WikiAdmin = lazy(() => import("../../features/wiki/WikiAdmin"));
 const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
 const VisualsAdmin = lazy(() => import("../../features/visuals/VisualsAdmin")); // issue 1 (POC)
+const SecurityBlocks = lazy(() => import("../../features/security/SecurityBlocks")); // issue 1 (POC)
 const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAdmin"));
 const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
@@ -383,6 +384,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
             { path: "visuals", element: <VisualsAdmin />, handle: h({ crumb: "Visual packs" }) },
+            { path: "security-blocks", element: <SecurityBlocks />, handle: h({ crumb: "Security blocks" }) },
             { path: "modules", element: <ModulesAdmin />, handle: h({ crumb: "Modules" }) },
             {
               path: "community/moderation",

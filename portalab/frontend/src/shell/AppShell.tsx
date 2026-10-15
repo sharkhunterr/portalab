@@ -1,7 +1,9 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate, useNavigationType } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
 import { ExternalVisualsLoader } from "../design-system/themes/external/ExternalVisualsLoader";
+import { externalLook, useExternalRevision } from "../design-system/themes/external/external";
+import { NAV_DESKTOP, NAV_PHONE, NAV_TABLET } from "../design-system/themes/schema";
 import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";
@@ -18,6 +20,7 @@ import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
 import { OrbitNav } from "./nav/OrbitNav";
+import { PackNav, packNavLayout } from "./nav/PackNav";
 import {
   ConsoleNav,
   DockNav,
@@ -57,6 +60,8 @@ import { useShellStrings } from "./strings";
  * breadcrumbs and the page outlet. Only the outlet changes on navigation, and a change of arrangement
  * never remounts it: the page keeps its state. Unknown to anonymous visitors (CD-025).
  */
+const BUILTIN_NAVS = [...new Set([...NAV_DESKTOP, ...NAV_TABLET, ...NAV_PHONE])];
+
 export interface AppShellProps {
   userName: string;
   onSignOut: () => void;
@@ -93,7 +98,20 @@ export function AppShell({
     if (main) main.scrollTop = 0;
   }, [location.pathname]);
   const sections = view.sections;
-  const nav = sidebarCollapsed && arrangement.nav === "sidebar" ? "rail" : arrangement.nav;
+  // issue 1: a navigation an imported pack brings (its own script, sandboxed) — never on a protected surface
+  // (the administration keeps its own), and a built-in one takes over when it fails
+  useExternalRevision();
+  const packNavigation = externalLook("navigation", arrangement.nav);
+  const [packFailed, setPackFailed] = useState<string | null>(null);
+  const protectedSurface = location.pathname.startsWith("/admin");
+  const packNav =
+    packNavigation && !protectedSurface && packFailed !== packNavigation.product ? packNavigation : null;
+  const fallbackNav = arrangement.device === "phone" ? "bottom-bar" : "sidebar";
+  // a navigation no pack brings (yet): the built-in one meanwhile — never a page without navigation
+  const builtin = (BUILTIN_NAVS as readonly string[]).includes(arrangement.nav);
+  const chosen = (packNavigation || !builtin) && !packNav ? fallbackNav : arrangement.nav;
+  const nav = packNav ? "pack" : sidebarCollapsed && chosen === "sidebar" ? "rail" : chosen;
+  const packLayout = packNav ? packNavLayout(packNav) : null;
   const drawerNav = nav === "drawer" || nav === "bottom-bar";
   const [palette, setPalette] = useState<{ open: boolean; query: string }>({ open: false, query: "" });
   const [helpOpen, setHelpOpen] = useState(false);
@@ -154,6 +172,8 @@ export function AppShell({
       <div
         className="shell"
         data-nav={nav}
+        data-pack-nav={packLayout?.position}
+        style={packLayout ? ({ "--pack-nav-size": `${packLayout.size}px` } as CSSProperties) : undefined}
         data-device={arrangement.device}
         data-header-position={arrangement.headerPosition}
         data-listening={listening || undefined}
@@ -195,7 +215,12 @@ export function AppShell({
               <NavContent variant={nav === "rail" ? "rail" : "list"} />
             </nav>
           ) : null}
-          <main id="main-content" tabIndex={-1} className="shell-main ds-reflow">
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="shell-main ds-reflow"
+            data-protected={protectedSurface ? "" : undefined}
+          >
             <div className="shell-content">
               <Breadcrumbs />
               {nav === "terminal" ? null : <HubTabs />}
@@ -216,6 +241,16 @@ export function AppShell({
         {nav === "dpad" ? <DpadNav sections={sections} /> : null}
         {nav === "planisphere" ? <PlanisphereNav sections={sections} /> : null}
         {nav === "system" ? <SystemNav sections={sections} /> : null}
+        {packNav ? (
+          <PackNav
+            element={packNav}
+            sections={sections}
+            unread={header.unread}
+            level={header.progression?.level ?? null}
+            coins={header.progression?.coins ?? null}
+            onFail={() => setPackFailed(packNav.product)}
+          />
+        ) : null}
         {nav === "deck" ? (
           <DeckNav sections={sections} progression={header.progression} unread={header.unread} />
         ) : null}

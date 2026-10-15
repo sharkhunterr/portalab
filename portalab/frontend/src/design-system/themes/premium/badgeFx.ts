@@ -1284,6 +1284,27 @@ function moving(visible: Instance[], limit: number): Set<Instance> {
   return live;
 }
 
+/** issue 1: an imported pack's look that keeps the device behind (a frame far too long to draw, again and
+ * again) is given up — its element keeps its CSS look; every element drawn by it stops. */
+const strikes = new Map<string, number>();
+const GIVEN_UP = new Set<string>();
+const SLOW_MS = 120;
+function watch(instance: Instance, spent: number) {
+  const effect = baseOf(instance.effect);
+  if (spent < SLOW_MS) return;
+  const count = (strikes.get(effect) ?? 0) + 1;
+  strikes.set(effect, count);
+  if (count < 3) return;
+  GIVEN_UP.add(effect);
+  console.warn(`visual pack: « ${effect} » stopped — too slow for this device`);
+  for (const known of [...instances]) {
+    if (baseOf(known.effect) === effect) {
+      known.host.dataset.fxFailed = "true";
+      instances.delete(known);
+    }
+  }
+}
+
 function still(): boolean {
   return reducedMotion() || motionBudget() === "still";
 }
@@ -1301,8 +1322,10 @@ function loop(now: number) {
   const live = frozen ? new Set<Instance>() : moving(visible, liveLooks());
   for (const instance of visible) {
     if (instance.drawn && !live.has(instance)) continue;
+    const begun = performance.now();
     if (!draw(context, instance, time)) instance.host.dataset.fxFailed = "true";
     instance.drawn = true;
+    if (externalFx(baseOf(instance.effect))) watch(instance, performance.now() - begun);
   }
 }
 
@@ -1313,6 +1336,7 @@ export function attachFx(
   options: FxOptions = {},
 ): (() => void) | null {
   if (!(FX_EFFECTS as readonly string[]).includes(baseOf(effect)) && !externalFx(baseOf(effect))) return null;
+  if (GIVEN_UP.has(baseOf(effect))) return null;
   if (!setup()) return null;
   const context = canvas.getContext("2d");
   if (!context) return null;

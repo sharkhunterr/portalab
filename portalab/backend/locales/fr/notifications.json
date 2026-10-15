@@ -729,5 +729,7 @@
   "universe.weather.windGusts": "Vent {speed} km/h, rafales {gusts}",
   "universe.weather.windy": "Venteux",
   "verification.body": "Votre code de confirmation : {token} (valable jusqu’au {expires}).",
-  "verification.subject": "Confirmez votre compte Portalab"
+  "verification.subject": "Confirmez votre compte Portalab",
+  "security.blocked": "Sécurité : {who} bloqué {minutes} min",
+  "security.blocked.body": "Ses requêtes ressemblaient à une intrusion ({reason}) : sa session a été fermée. Le détail est dans le journal d'audit."
 }

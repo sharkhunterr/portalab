@@ -7306,6 +7306,25 @@
         "title": "LevelUpOut",
         "type": "object"
       },
+      "LiftIn": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key"
+          }
+        },
+        "title": "LiftIn",
+        "type": "object"
+      },
       "ListenOut": {
         "properties": {
           "item": {
@@ -28439,6 +28458,72 @@
         "summary": "Admin Status",
         "tags": [
           "search"
+        ]
+      }
+    },
+    "/api/v1/admin/security/blocks": {
+      "get": {
+        "operationId": "blocks_api_v1_admin_security_blocks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Blocks Api V1 Admin Security Blocks Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Blocks",
+        "tags": [
+          "security"
+        ]
+      }
+    },
+    "/api/v1/admin/security/blocks/lift": {
+      "post": {
+        "operationId": "lift_api_v1_admin_security_blocks_lift_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LiftIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Lift Api V1 Admin Security Blocks Lift Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lift",
+        "tags": [
+          "security"
         ]
       }
     },

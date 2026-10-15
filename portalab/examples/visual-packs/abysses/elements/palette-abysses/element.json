@@ -1,0 +1,30 @@
+{
+  "type": "palette",
+  "look": "abysses",
+  "names": {
+    "fr": "Palette abyssale",
+    "en": "Abyssal palette"
+  },
+  "descriptions": {
+    "fr": "Le turquoise et le violet des profondeurs sur n'importe quelle interface.",
+    "en": "The deep's turquoise and violet over any interface."
+  },
+  "palette": {
+    "dark": {
+      "accent": "#2dd4bf",
+      "accentAlt": "#a78bfa",
+      "contrast": "#00211d"
+    },
+    "light": {
+      "accent": "#0f766e",
+      "accentAlt": "#6d28d9",
+      "contrast": "#ffffff"
+    }
+  },
+  "economy": {
+    "price": 240,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  }
+}

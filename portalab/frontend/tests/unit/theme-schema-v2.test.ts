@@ -36,8 +36,11 @@ describe("theme schema v2", () => {
   });
 
   it("refuses an arrangement the portal does not offer, naming the path", () => {
-    const errors = parseTheme({ ...portalab(), layout: { nav: { desktop: "floating" } } }).errors;
+    // issue 1: a navigation may be an imported pack's (any well-formed key — the server checked it exists);
+    // what is not even a key is refused
+    const errors = parseTheme({ ...portalab(), layout: { nav: { desktop: "Floating Nav!" } } }).errors;
     expect(errors.join()).toMatch(/layout\.nav\.desktop/);
+    expect(parseTheme({ ...portalab(), layout: { nav: { desktop: "sonar" } } }).errors).toEqual([]);
     expect(parseTheme({ ...portalab(), layout: { grid: "masonry" } }).errors.length).toBeGreaterThan(0);
     expect(parseTheme({ ...portalab(), sounds: { boom: "asset:x.wav" } }).errors.length).toBeGreaterThan(0);
   });

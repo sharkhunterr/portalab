@@ -893,80 +893,104 @@
           "type": "object",
           "properties": {
             "desktop": {
-              "type": "string",
-              "enum": [
-                "sidebar",
-                "topbar",
-                "rail",
-                "orbit",
-                "dock",
-                "tabs",
-                "launcher",
-                "terminal",
-                "reel",
-                "lights",
-                "vcr",
-                "sheet",
-                "console",
-                "taskbar",
-                "feed",
-                "player",
-                "masthead",
-                "dpad",
-                "planisphere",
-                "system",
-                "deck"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "sidebar",
+                    "topbar",
+                    "rail",
+                    "orbit",
+                    "dock",
+                    "tabs",
+                    "launcher",
+                    "terminal",
+                    "reel",
+                    "lights",
+                    "vcr",
+                    "sheet",
+                    "console",
+                    "taskbar",
+                    "feed",
+                    "player",
+                    "masthead",
+                    "dpad",
+                    "planisphere",
+                    "system",
+                    "deck"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$"
+                }
               ]
             },
             "tablet": {
-              "type": "string",
-              "enum": [
-                "rail",
-                "topbar",
-                "drawer",
-                "orbit",
-                "dock",
-                "tabs",
-                "launcher",
-                "terminal",
-                "reel",
-                "lights",
-                "vcr",
-                "sheet",
-                "console",
-                "taskbar",
-                "feed",
-                "player",
-                "masthead",
-                "dpad",
-                "planisphere",
-                "system",
-                "deck"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "rail",
+                    "topbar",
+                    "drawer",
+                    "orbit",
+                    "dock",
+                    "tabs",
+                    "launcher",
+                    "terminal",
+                    "reel",
+                    "lights",
+                    "vcr",
+                    "sheet",
+                    "console",
+                    "taskbar",
+                    "feed",
+                    "player",
+                    "masthead",
+                    "dpad",
+                    "planisphere",
+                    "system",
+                    "deck"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$"
+                }
               ]
             },
             "phone": {
-              "type": "string",
-              "enum": [
-                "bottom-bar",
-                "drawer",
-                "orbit",
-                "dock",
-                "tabs",
-                "launcher",
-                "terminal",
-                "reel",
-                "lights",
-                "vcr",
-                "sheet",
-                "console",
-                "taskbar",
-                "feed",
-                "player",
-                "masthead",
-                "dpad",
-                "planisphere",
-                "system",
-                "deck"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "bottom-bar",
+                    "drawer",
+                    "orbit",
+                    "dock",
+                    "tabs",
+                    "launcher",
+                    "terminal",
+                    "reel",
+                    "lights",
+                    "vcr",
+                    "sheet",
+                    "console",
+                    "taskbar",
+                    "feed",
+                    "player",
+                    "masthead",
+                    "dpad",
+                    "planisphere",
+                    "system",
+                    "deck"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$"
+                }
               ]
             }
           },

@@ -2813,3 +2813,60 @@ li[data-active] > .shell-player-library__row strong {
 .hub-tabs a .count-badge {
   margin-inline-start: var(--space-1);
 }
+
+/* ---------------------------------------------------------------- issue 1: a navigation a pack brings */
+.shell[data-nav="pack"][data-pack-nav="bottom"] {
+  --frame-bottom: calc(var(--pack-nav-size) + env(safe-area-inset-bottom, 0px));
+}
+.shell[data-nav="pack"][data-pack-nav="top"] .shell-body {
+  padding-block-start: var(--pack-nav-size);
+}
+.shell[data-nav="pack"][data-pack-nav="left"] .shell-body {
+  padding-inline-start: var(--pack-nav-size);
+}
+.shell[data-nav="pack"][data-pack-nav="right"] .shell-body {
+  padding-inline-end: var(--pack-nav-size);
+}
+.pack-nav {
+  position: fixed;
+  z-index: 40;
+}
+.pack-nav__frame {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+.pack-nav[data-position="bottom"] {
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: calc(var(--pack-nav-size) + env(safe-area-inset-bottom, 0px));
+}
+.pack-nav[data-position="top"] {
+  inset-inline: 0;
+  inset-block-start: var(--frame-top);
+  block-size: var(--pack-nav-size);
+}
+.pack-nav[data-position="left"],
+.pack-nav[data-position="right"] {
+  inset-block: var(--frame-top) var(--frame-bottom);
+  inline-size: var(--pack-nav-size);
+}
+.pack-nav[data-position="left"] {
+  inset-inline-start: 0;
+}
+.pack-nav[data-position="right"] {
+  inset-inline-end: 0;
+}
+.pack-nav[data-position="floating"] {
+  inset-block-end: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  inset-inline-end: var(--space-4);
+  inline-size: var(--pack-nav-size);
+  block-size: var(--pack-nav-size);
+}
+/* open: it covers the screen (its own close comes back to its place) */
+.pack-nav[data-expanded] {
+  inset: 0;
+  z-index: 70;
+  inline-size: auto;
+  block-size: auto;
+}

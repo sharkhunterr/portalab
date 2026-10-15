@@ -34,6 +34,8 @@ export function runShader(
   canvas: HTMLCanvasElement,
   fragment: string,
   uniforms?: Uniforms,
+  /** issue 1: an imported pack's shader — stopped (the CSS ambience instead) if it keeps the device behind */
+  guarded = false,
 ): (() => void) | null {
   const gl = canvas.getContext("webgl", {
     alpha: true,
@@ -101,6 +103,12 @@ export function runShader(
     if (gap > interval * 1.6 && gap < 1000) late += 1;
     if (frames >= 60) {
       if (late > 20 && level < SCALES.length - 1) level += 1;
+      else if (guarded && late > 30 && level === SCALES.length - 1) {
+        // already at its fewest pixels and still far behind: it is given up, the page breathes again
+        cancelAnimationFrame(frame);
+        canvas.dispatchEvent(new Event("webglcontextlost", { bubbles: true, cancelable: true }));
+        return;
+      }
       frames = 0;
       late = 0;
     }

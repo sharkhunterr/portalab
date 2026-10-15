@@ -102,6 +102,7 @@ export function Dialog({
         <DialogPrimitive.Content
           className={variant === "drawer" ? "ds-drawer" : "ds-dialog"}
           data-size={variant === "drawer" ? undefined : size}
+          data-protected="" // issue 1: what a member confirms here is never restyled by an imported interface
         >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
           {description ? (

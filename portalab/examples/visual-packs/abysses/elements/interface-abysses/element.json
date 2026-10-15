@@ -1,0 +1,26 @@
+{
+  "type": "theme",
+  "look": "abysses",
+  "names": {
+    "fr": "Interface Abysses",
+    "en": "Abysses interface"
+  },
+  "descriptions": {
+    "fr": "Une interface des grands fonds : bleu abyssal et turquoise bioluminescent, titres arrondis, une navigation en sonar qui lui est propre, la fosse océanique en fond animé, et le vocabulaire d'un sous-marin (le poste de plongée, la salle des hublots, la cale…).",
+    "en": "A deep-sea interface: abyssal blue and bioluminescent turquoise, rounded headings, a sonar navigation of its own, the ocean trench as an animated background, and a submarine's words (the dive station, the porthole room, the hold…)."
+  },
+  "render": {
+    "kind": "theme",
+    "file": "interface.json",
+    "css": [
+      "interface.css"
+    ]
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "themes",
+    "icon": "palette"
+  }
+}

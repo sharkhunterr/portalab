@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "../../../api/client";
-import { type ExternalElement, installElements } from "./external";
+import { type ExternalElement, installElements, uninstallScope } from "./external";
 
 export const ACTIVE_VISUALS_KEY = ["visuals", "active"] as const;
 
@@ -25,5 +25,6 @@ export function ExternalVisualsLoader() {
   useEffect(() => {
     if (active.data) void installElements(active.data.elements, "live");
   }, [stamp]);
+  useEffect(() => () => uninstallScope("live"), []);
   return null;
 }

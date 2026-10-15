@@ -1,0 +1,23 @@
+{
+  "type": "badge",
+  "product": "badge_lanternfish",
+  "names": {
+    "fr": "Badge Poisson-lanterne",
+    "en": "Lanternfish badge"
+  },
+  "descriptions": {
+    "fr": "Un petit poisson-lanterne qui luit sur votre profil.",
+    "en": "A small lanternfish glowing on your profile."
+  },
+  "payload": {
+    "label": "Lanternfish",
+    "icon": "shell",
+    "style": "pulse"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  }
+}

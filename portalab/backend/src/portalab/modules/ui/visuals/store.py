@@ -91,7 +91,14 @@ def read_zip(data: bytes, subdir: str = "") -> Files:
 
 
 def read_folder(folder: Path) -> Files:
-    files = [p for p in folder.rglob("*") if p.is_file() and not p.name.startswith(".")]
+    # a link inside a dropped folder is never followed (it could point anywhere on the server)
+    files = [
+        p
+        for p in folder.rglob("*")
+        if p.is_file()
+        and not p.name.startswith(".")
+        and not any(q.is_symlink() for q in (p, *p.relative_to(folder).parents) if q != Path())
+    ]
     _check([(p.relative_to(folder).as_posix(), p.stat().st_size) for p in files])
     root = _root_of([p.relative_to(folder).as_posix() for p in files])
     base = folder / root if root else folder
@@ -154,8 +161,13 @@ class Store:
 
     def file(self, pack: str, sha: str, name: str) -> Path | None:
         """A stored file (``None`` when outside the version's folder or missing)."""
-        base = self.folder(pack, sha).resolve()
-        path = (base / name).resolve()
+        if "\0" in name or "\0" in pack or "\0" in sha:
+            return None
+        try:
+            base = self.folder(pack, sha).resolve()
+            path = (base / name).resolve()
+        except (OSError, ValueError):
+            return None
         if base not in path.parents or not path.is_file():
             return None
         return path

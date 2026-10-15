@@ -249,7 +249,7 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
           COZY_SHADERS[layers.shader] ??
           WARM_SHADERS[layers.shader] ??
           COSMOS_SHADERS[layers.shader]);
-    const stop = runShader(next(), source as string, uniforms);
+    const stop = runShader(next(), source as string, uniforms, Boolean(imported));
     if (!stop) return null;
     stops.push(stop);
   }

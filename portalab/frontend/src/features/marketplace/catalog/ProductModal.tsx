@@ -30,7 +30,9 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
       footer={
         <>
           <TryOn product={data} />
-          <PurchaseBar product={data} />
+          <div data-protected="">
+            <PurchaseBar product={data} />
+          </div>
         </>
       }
     >

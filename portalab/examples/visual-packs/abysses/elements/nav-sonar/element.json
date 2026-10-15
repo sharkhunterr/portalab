@@ -1,0 +1,10 @@
+{
+  "type": "navigation",
+  "look": "sonar",
+  "names": { "fr": "Navigation sonar", "en": "Sonar navigation" },
+  "descriptions": {
+    "fr": "Une barre de sonar en bas de l'écran ; ouverte, elle balaie les profondeurs : chaque rubrique est un écho, ses pages remontent comme des bulles.",
+    "en": "A sonar bar at the bottom of the screen; open, it sweeps the depths: each section is an echo, its pages rise like bubbles."
+  },
+  "render": { "kind": "js", "file": "sonar.js", "nav": { "position": "bottom", "size": 76, "expands": true } }
+}

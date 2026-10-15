@@ -1,0 +1,22 @@
+/* the pack's own font, next to this sheet (OFL-1.1, see OFL.txt) */
+@font-face {
+  font-family: "Abysses Righteous";
+  src: url("Righteous.woff2") format("woff2");
+  font-display: swap;
+}
+.name-style[data-name="abyssglow"] {
+  font-family: "Abysses Righteous", Righteous, sans-serif;
+  color: #ccfbf1;
+  text-shadow: 0 0 0.35rem #2dd4bf, 0 0 0.9rem #0ea5e9aa;
+  animation: abysses-glow 3.2s ease-in-out infinite;
+}
+@keyframes abysses-glow {
+  50% {
+    text-shadow: 0 0 0.6rem #5eead4, 0 0 1.4rem #a78bfaaa;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-style[data-name="abyssglow"] {
+    animation: none;
+  }
+}

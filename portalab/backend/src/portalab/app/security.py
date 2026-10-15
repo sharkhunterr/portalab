@@ -5,6 +5,7 @@ so modules can use them; this module adds the app-wide :func:`enforce_default_de
 route declaring neither, and re-exports the dependencies for the composition root.
 """
 
+import asyncio
 import hashlib
 import json
 import threading
@@ -16,6 +17,7 @@ from typing import Any
 from fastapi import Request
 from fastapi.routing import APIRoute
 
+from portalab.app.intrusion import IntrusionGuard, weigh
 from portalab.core.authorization import (
     PUBLIC_MARKER,
     AnonymousResolver,
@@ -44,8 +46,19 @@ __all__ = [
 ]
 
 
+class SecurityBlocked(Forbidden):
+    default_code = "security.blocked"
+    default_title = "Blocked after suspicious requests"
+
+
 async def enforce_default_deny(request: Request) -> None:
-    """App-wide dependency: refuse any route that declares neither ``public`` nor a permission."""
+    """App-wide dependency: refuse any route that declares neither ``public`` nor a permission — and
+    (issue 1) every request of a member whose account the intrusion guard blocked."""
+    guard: IntrusionGuard | None = request.app.state._state.get("intrusion_guard")
+    if guard is not None and guard.any_user_blocked() and SESSION_COOKIE_NAME in request.cookies:
+        principal = await current_principal(request)
+        if principal.user_id is not None and guard.user_blocked(str(principal.user_id)) is not None:
+            raise SecurityBlocked("Your account is blocked for a while after suspicious requests.")
     route = request.scope.get("route")
     if isinstance(route, APIRoute) and route_access(route) is None:
         principal = await current_principal(request)
@@ -123,6 +136,7 @@ EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # namespace): counting them would rate-limit a member who simply reloads a few pages (027).
 EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/",)
 SESSION_COOKIE_NAME = "__Host-portalab_session"
+_ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until done)
 
 
 class SlidingWindowLimiter:
@@ -185,8 +199,10 @@ class SecurityMiddleware:
         per_ip_per_minute: int,
         per_user_per_minute: int,
         clock: Callable[[], float] = time.monotonic,
+        guard: IntrusionGuard | None = None,
     ) -> None:
         self.app = app
+        self.guard = guard  # issue 1: who probes what they may not reach is blocked
         self.max_body_bytes = max_body_bytes
         self.per_ip = SlidingWindowLimiter(per_ip_per_minute, clock=clock)
         self.per_user = SlidingWindowLimiter(per_user_per_minute, clock=clock)
@@ -199,8 +215,27 @@ class SecurityMiddleware:
         exempt = path in EXEMPT_PATHS or (
             scope.get("method") == "GET" and path.startswith(EXEMPT_GET_PREFIXES)
         )
+        client = scope.get("client") or ("unknown", 0)
+        keys = [f"ip:{client[0]}"]
+        if (session_hash := _session_key(scope)) is not None:
+            keys.append(f"session:{session_hash}")
+        if self.guard is not None and path.startswith("/api/"):
+            # a signed-in member answers for their own session (and account, checked once they are known);
+            # an address is held against requests without one — the members sharing it are never shut out
+            left = self.guard.blocked(
+                [k for k in keys if k.startswith("session:")] if len(keys) > 1 else keys
+            )
+            if left is not None:
+                retry = str(max(1, int(left + 0.999))).encode()
+                await _problem(
+                    send,
+                    403,
+                    "security.blocked",
+                    "Blocked after suspicious requests",
+                    [(b"retry-after", retry)],
+                )
+                return
         if path.startswith("/api/") and not exempt:
-            client = scope.get("client") or ("unknown", 0)
             wait = self.per_ip.hit(f"ip:{client[0]}")
             session = _session_key(scope)
             if wait is None and session is not None:
@@ -230,11 +265,13 @@ class SecurityMiddleware:
             return message
 
         started = False
+        status = 0
 
         async def secured_send(message: Message) -> None:
-            nonlocal started
+            nonlocal started, status
             if message["type"] == "http.response.start":
                 started = True
+                status = int(message.get("status", 0))
                 existing = {name.lower() for name, _ in message.get("headers", [])}
                 message["headers"] = [
                     *message.get("headers", []),
@@ -245,3 +282,15 @@ class SecurityMiddleware:
         await self.app(scope, limited_receive, secured_send)
         if too_large and not started:
             await _problem(send, 413, "request.too_large", "Request body too large", [])
+        if self.guard is not None and path.startswith("/api/"):
+            raw = scope.get("raw_path") or path.encode()
+            query = (scope.get("query_string") or b"").decode("latin-1")
+            verdict = weigh(raw.decode("latin-1"), query, status)
+            if verdict is not None:
+                for block in self.guard.strike(keys, verdict[0], verdict[1], raw.decode("latin-1")):
+                    app_state = getattr(scope.get("app"), "state", None)
+                    alert = app_state._state.get("security_alert") if app_state is not None else None
+                    if alert is not None:
+                        task = asyncio.create_task(alert({**block.__dict__, "keys": keys}))
+                        _ALERTS.add(task)
+                        task.add_done_callback(_ALERTS.discard)

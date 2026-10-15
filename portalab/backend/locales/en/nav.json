@@ -30,6 +30,7 @@
   "nav.admin.privacy": "Privacy policies",
   "nav.admin.projects": "Community projects",
   "nav.admin.roles": "Roles & permissions",
+  "nav.admin.securityBlocks": "Security blocks",
   "nav.admin.services": "Manage services",
   "nav.admin.shop_boosters": "Boosters",
   "nav.admin.shop_catalog": "Catalogue",
@@ -40,6 +41,7 @@
   "nav.admin.support": "Support settings",
   "nav.admin.terms": "Terms of use",
   "nav.admin.themes": "Theme studio",
+  "nav.admin.visuals": "Visual packs",
   "nav.admin.wiki": "Wiki",
   "nav.appearance": "Appearance",
   "nav.calendar": "Calendar",
@@ -100,6 +102,5 @@
   "nav.topic.extensions": "Extensions",
   "nav.topic.services": "Services & monitoring",
   "nav.topic.system": "System",
-  "nav.wiki": "Wiki",
-  "nav.admin.visuals": "Visual packs"
+  "nav.wiki": "Wiki"
 }

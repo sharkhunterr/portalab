@@ -1,0 +1,28 @@
+{
+  "type": "level_up",
+  "look": "abysses",
+  "names": {
+    "fr": "Remontée bioluminescente",
+    "en": "Bioluminescent rise"
+  },
+  "descriptions": {
+    "fr": "Dans le noir des abysses, des méduses lumineuses remontent en pulsant, un banc de bulles éclate en anneau et votre nouveau niveau apparaît.",
+    "en": "In the dark of the deep, glowing jellyfish rise pulsing, a shoal of bubbles bursts into a ring and your new level appears."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "scene.glsl",
+    "css": [
+      "card.css"
+    ],
+    "stage": true,
+    "reveal": 2.6
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

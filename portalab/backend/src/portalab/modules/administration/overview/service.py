@@ -62,7 +62,10 @@ class ControlCenter:
         panels = list(await asyncio.gather(*(self._panel(reg, principal) for reg in registrations)))
         actions: list[RequiredAction] = []
         for registration in self.capabilities.system_providers(REQUIRED_ACTION_CAPABILITY):
-            if not await self._allowed(principal, registration.metadata.get("permission")):
+            # issue 134: what the administration must do is the administrators' — a provider saying no
+            # permission shows nothing (closed by default), never everything to everyone
+            permission = registration.metadata.get("permission")
+            if permission is None or not await self._allowed(principal, permission):
                 continue
             try:
                 actions.extend(await asyncio.wait_for(registration.provider.items(principal), self.timeout))

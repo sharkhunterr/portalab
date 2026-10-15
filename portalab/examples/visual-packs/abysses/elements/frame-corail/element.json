@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "look": "corail",
+  "names": {
+    "fr": "Cadre corail",
+    "en": "Coral frame"
+  },
+  "descriptions": {
+    "fr": "Un anneau de corail qui respire, rose et turquoise.",
+    "en": "A breathing coral ring, pink and turquoise."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "corail.css"
+    ]
+  },
+  "economy": {
+    "price": 420,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  }
+}

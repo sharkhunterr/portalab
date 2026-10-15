@@ -30,7 +30,10 @@ export type NavVariant =
   | "dpad"
   | "planisphere"
   | "system"
-  | "deck";
+  | "deck"
+  // issue 1: a navigation an imported pack brings (``"pack"`` once drawn), named by its look
+  | "pack"
+  | (string & {});
 
 export interface Arrangement {
   device: DeviceClass;

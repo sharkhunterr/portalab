@@ -10,7 +10,7 @@ products off sale (their owners keep them) and stops serving its files (each loo
 
 import asyncio
 import json
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,7 +23,7 @@ from portalab.core.errors import Conflict, NotFound, Unavailable, ValidationFail
 from portalab.modules.ui.themes.definition import PACK_LOOKS
 from portalab.modules.ui.visuals.analysis import analyse, looks_of
 from portalab.modules.ui.visuals.github import GitHub, GitHubError, parse_address
-from portalab.modules.ui.visuals.manifest import LOOK_FIELD, ManifestError, parse_pack, version_key
+from portalab.modules.ui.visuals.manifest import LOOK_FIELD, NOT_SOLD, ManifestError, parse_pack, version_key
 from portalab.modules.ui.visuals.store import Files, PackageError, Store, read_source, read_zip
 
 ECONOMY_FIELDS = ("price", "rarity", "level", "supply", "collection", "icon")
@@ -71,8 +71,10 @@ class VisualPacks:
         *,
         github: GitHub | None = None,
         themes: Any | None = None,
+        audit: Callable[[Principal | None, str, dict[str, Any]], Awaitable[None]] | None = None,
         clock: Callable[[], str] = _now,
     ) -> None:
+        self.audit = audit  # every action on a pack, in Portalab's audit log (sensitive)
         self.store = Store(root)
         self.themes = themes  # the interfaces' registry (``ThemeService``)
         self.capabilities = capabilities
@@ -144,6 +146,10 @@ class VisualPacks:
                 products[element["product"]] = pack
         return looks, products
 
+    async def _audited(self, actor: Principal | None, action: str, **context: Any) -> None:
+        if self.audit is not None:
+            await self.audit(actor, f"visuals.{action}", context)
+
     # --- import ------------------------------------------------------------------------------------------
     def _import(self, files: Files, source: dict[str, Any]) -> Imported:
         raw = files.get("pack.json")
@@ -181,7 +187,7 @@ class VisualPacks:
         }
         return Imported(pack.id, pack.version, sha, True)
 
-    async def scan(self) -> dict[str, Any]:
+    async def scan(self, actor: Principal | None = None) -> dict[str, Any]:
         """The inbox read again: every folder and zip there, new ones (or new versions) analysed."""
         async with self._lock:
             found: list[dict[str, Any]] = []
@@ -193,9 +199,11 @@ class VisualPacks:
                 except (PackageError, VisualPackError, Conflict) as error:
                     found.append({"source": path.name, "error": str(error)})
             self._save()
-            return {"found": found}
+        fresh = [f"{f['pack']}@{f['version']}" for f in found if f.get("new")]
+        await self._audited(actor, "scanned", imported=fresh)
+        return {"found": found}
 
-    async def upload(self, filename: str, data: bytes) -> Imported:
+    async def upload(self, filename: str, data: bytes, actor: Principal | None = None) -> Imported:
         """A zip sent from the administration: kept in the inbox (``uploads/``), then imported."""
         async with self._lock:
             try:
@@ -208,9 +216,10 @@ class VisualPacks:
             (uploads / (safe if safe.endswith(".zip") else f"{safe}.zip")).write_bytes(data)
             imported = self._import(files, {"kind": "upload", "path": safe})
             self._save()
-            return imported
+        await self._audited(actor, "uploaded", pack=imported.pack, version=imported.version, sha=imported.sha)
+        return imported
 
-    async def from_github(self, url: str) -> Imported:
+    async def from_github(self, url: str, actor: Principal | None = None) -> Imported:
         """A pack on GitHub: the version it offers is downloaded, kept in the inbox and imported."""
         try:
             repository = parse_address(url)
@@ -231,7 +240,10 @@ class VisualPacks:
                 "checked_at": self.clock(),
             }
             self._save()
-            return imported
+        await self._audited(
+            actor, "downloaded", pack=imported.pack, version=imported.version, sha=imported.sha, url=url
+        )
+        return imported
 
     async def check_updates(self) -> list[dict[str, Any]]:
         """For each pack from GitHub: the version it offers now, and whether it is newer than ours."""
@@ -363,13 +375,16 @@ class VisualPacks:
             previous = {d: dict(v) for d, v in (entry.get("decision") or {}).get("economy", {}).items()}
             for element in report["elements"]:
                 await self._interface(actor, pack, entry, element, enabled=True)
+                if element["type"] in NOT_SOLD:  # a navigation: an interface wears it, nobody buys it
+                    continue
                 decided = {**previous.get(element["product"], {}), **decisions.get(element["product"], {})}
                 outcomes[element["product"]] = await writer.publish(actor, self.product_of(element, decided))
                 previous[element["product"]] = decided
             holder = self._pack(pack)
             old = holder.get("current")
             if old and old != version:
-                gone = {e["product"] for e in holder["versions"][old]["report"]["elements"]} - set(outcomes)
+                former = holder["versions"][old]["report"]["elements"]
+                gone = {e["product"] for e in former if e["type"] not in NOT_SOLD} - set(outcomes)
                 for key in gone:  # an element the new version no longer has leaves the shop
                     await writer.withdraw(actor, key)
             entry["status"] = "approved"
@@ -383,9 +398,20 @@ class VisualPacks:
             holder["enabled"] = True
             self._save()
             self.refresh_looks()
-            return {"pack": pack, "version": version, "products": outcomes}
+        await self._audited(
+            actor,
+            "approved",
+            pack=pack,
+            version=version,
+            sha=entry["sha"],
+            script=bool(report["summary"]["script"]),
+            economy=previous,
+        )
+        return {"pack": pack, "version": version, "products": outcomes}
 
-    async def reject(self, pack: str, version: str, reason: str | None = None) -> None:
+    async def reject(
+        self, pack: str, version: str, reason: str | None = None, actor: Principal | None = None
+    ) -> None:
         async with self._lock:
             entry = self._version(pack, version)
             if self._pack(pack).get("current") == version:
@@ -393,6 +419,7 @@ class VisualPacks:
             entry["status"] = "rejected"
             entry["decision"] = {"at": self.clock(), "reason": (reason or "")[:500]}
             self._save()
+        await self._audited(actor, "rejected", pack=pack, version=version, reason=(reason or "")[:500])
 
     async def switch(self, actor: Principal, pack: str, enabled: bool) -> None:
         """Off: its products leave the shop (owners keep them), its files are no longer served. On: back."""
@@ -406,6 +433,8 @@ class VisualPacks:
             economy = (version.get("decision") or {}).get("economy", {})
             for element in version["report"]["elements"]:
                 await self._interface(actor, pack, version, element, enabled=enabled)
+                if element["type"] in NOT_SOLD:
+                    continue
                 if enabled:
                     product = self.product_of(element, economy.get(element["product"], {}))
                     await writer.publish(actor, product)
@@ -414,12 +443,14 @@ class VisualPacks:
             holder["enabled"] = enabled
             self._save()
             self.refresh_looks()
+        await self._audited(actor, "switched_on" if enabled else "switched_off", pack=pack, version=current)
 
     async def rollback(self, actor: Principal, pack: str, version: str) -> dict[str, Any]:
         """Back to a version validated before, with the economy decided then."""
         entry = self._version(pack, version)
         if entry.get("status") != "approved":
             raise Conflict("Only a version validated before can be rolled back to.")
+        await self._audited(actor, "rolled_back", pack=pack, version=version)
         return await self.approve(actor, pack, version, {}, accept_script=True)
 
     # --- reading -------------------------------------------------------------------------------------------
@@ -492,6 +523,7 @@ class VisualPacks:
                     "duration": render.get("duration"),
                     "palette": element.get("palette"),
                     "preview": f"{folder}/{element['preview']}" if element.get("preview") else None,
+                    "nav": render.get("nav"),
                 }
             )
         return out

@@ -131,6 +131,8 @@ class ObservabilityModule:
             ObservabilityRequiredActions(self.overview),
             instance_ref="observability",
             owner=OWNER,
+            # the server's own errors and slowness: never shown to members (issue 134)
+            metadata={"permission": OBSERVABILITY_READ},
         )
         self.capabilities.provide(
             ERASURE_CAPABILITY, ObservabilityErasure(self.database), instance_ref="observability", owner=OWNER

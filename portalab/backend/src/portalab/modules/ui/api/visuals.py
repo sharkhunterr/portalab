@@ -12,15 +12,17 @@ from dataclasses import asdict
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from portalab.core.authorization import require
+from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.modules.ui.api.router import ui_module
 from portalab.modules.ui.module import UiModule
 from portalab.modules.ui.permissions import APPEARANCE_MANAGE
+from portalab.modules.ui.visuals.sandbox import DOCUMENT
+from portalab.modules.ui.visuals.sandbox import HEADERS as SANDBOX_HEADERS
 from portalab.modules.ui.visuals.service import VisualPacks
 
 router = APIRouter(prefix="/api/v1", tags=["ui"])
@@ -38,14 +40,28 @@ def visual_packs(module: Annotated[UiModule, Depends(ui_module)]) -> VisualPacks
 Packs = Annotated[VisualPacks, Depends(visual_packs)]
 
 
+# a pack's file opened on its own (an SVG, a page someone links to) runs nothing and reaches nothing: a
+# sandboxed document of an opaque origin; read by Portalab only (never by another site)
+FILE_HEADERS = {
+    "Cache-Control": "private, max-age=31536000, immutable",  # its folder is its fingerprint: never changes
+    "Content-Security-Policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; sandbox",
+    "Cross-Origin-Resource-Policy": "same-origin",
+    "X-Content-Type-Options": "nosniff",
+}
+
+
 def _file(path: Any) -> FileResponse:
     if path is None:
         raise NotFound("This file is not available.", code="ui.visual_file_not_found")
     kind = TYPES.get(path.suffix.lower()) or mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-    # a version's files never change (their folder is their fingerprint)
-    return FileResponse(
-        path, media_type=kind, headers={"Cache-Control": "private, max-age=31536000, immutable"}
-    )
+    return FileResponse(path, media_type=kind, headers=FILE_HEADERS)
+
+
+@router.get("/visuals/sandbox", include_in_schema=False)
+@public
+async def sandbox() -> HTMLResponse:
+    """The page a pack's script runs in (framed by the interface, sandboxed): public — it holds nothing."""
+    return HTMLResponse(DOCUMENT, headers=SANDBOX_HEADERS)
 
 
 @router.get("/visuals/active")
@@ -69,8 +85,8 @@ async def listing(_: Manager, packs: Packs) -> dict[str, Any]:
 
 
 @router.post("/admin/visuals/scan")
-async def scan(_: Manager, packs: Packs) -> dict[str, Any]:
-    return await packs.scan()
+async def scan(principal: Manager, packs: Packs) -> dict[str, Any]:
+    return await packs.scan(principal)
 
 
 @router.post(
@@ -81,13 +97,13 @@ async def scan(_: Manager, packs: Packs) -> dict[str, Any]:
     },
 )
 async def upload(
-    _: Manager, packs: Packs, request: Request, filename: Annotated[str, Query(max_length=120)]
+    principal: Manager, packs: Packs, request: Request, filename: Annotated[str, Query(max_length=120)]
 ) -> dict[str, Any]:
     """A raw ``application/zip`` body (no multipart)."""
     body = await request.body()
     if not body:
         raise ValidationFailed("Send a .zip pack.", code="ui.visual_pack_invalid")
-    return asdict(await packs.upload(filename, body))
+    return asdict(await packs.upload(filename, body, principal))
 
 
 class GitHubIn(BaseModel):
@@ -96,8 +112,8 @@ class GitHubIn(BaseModel):
 
 
 @router.post("/admin/visuals/github", status_code=201)
-async def github(_: Manager, packs: Packs, body: GitHubIn) -> dict[str, Any]:
-    return asdict(await packs.from_github(body.url))
+async def github(principal: Manager, packs: Packs, body: GitHubIn) -> dict[str, Any]:
+    return asdict(await packs.from_github(body.url, principal))
 
 
 @router.post("/admin/visuals/updates")
@@ -140,8 +156,8 @@ class RejectIn(BaseModel):
 
 
 @router.post("/admin/visuals/{pack}/{version}/reject", status_code=204)
-async def reject(_: Manager, packs: Packs, pack: str, version: str, body: RejectIn) -> None:
-    await packs.reject(pack, version, body.reason)
+async def reject(principal: Manager, packs: Packs, pack: str, version: str, body: RejectIn) -> None:
+    await packs.reject(pack, version, body.reason, principal)
 
 
 class SwitchIn(BaseModel):

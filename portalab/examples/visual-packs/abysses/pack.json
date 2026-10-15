@@ -1,0 +1,12 @@
+{
+  "format": 1,
+  "id": "abysses",
+  "version": "1.0.0",
+  "names": { "fr": "Abysses — les grands fonds", "en": "Abysses — the deep sea" },
+  "descriptions": {
+    "fr": "Les grands fonds marins : une interface avec sa propre navigation en sonar, des méduses lumineuses en passage de niveau, des bulles, une fosse océanique en fond animé, des cadres, un nom bioluminescent, une palette, un titre, un badge — et son pack de thème et son booster.",
+    "en": "The deep sea: an interface with its own sonar navigation, glowing jellyfish as a level-up, bubbles, an ocean trench as an animated background, frames, a bioluminescent name, a palette, a title, a badge — with its theme pack and booster."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0 (code) · OFL-1.1 (Righteous)"
+}

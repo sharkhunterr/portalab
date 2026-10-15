@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "key": "abysses",
+  "name": "Abysses",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#020b16",
+    "surfaceRaised": "#06182a",
+    "text": "#e0f7ff",
+    "textMuted": "#8fb4c8",
+    "border": "#123048",
+    "accent": "#2dd4bf",
+    "accentContrast": "#00211d",
+    "focus": "#fbbf24",
+    "accentAlt": "#a78bfa",
+    "rarity": {
+      "common": "#8fb4c8",
+      "rare": "#38bdf8",
+      "epic": "#c4b5fd",
+      "legendary": "#fbbf24"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, \"Plus Jakarta Sans Variable\", sans-serif",
+    "headingFamily": "Righteous, \"Abysses Righteous\", sans-serif",
+    "headingCase": "none",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.7,
+    "md": 1.3
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "bulles",
+    "fastMs": 180,
+    "normalMs": 380,
+    "levelUp": "abysses"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "sonar",
+      "tablet": "sonar",
+      "phone": "sonar"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "glass",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "search": "telescope"
+    }
+  },
+  "background": {
+    "fallback": "#020b16",
+    "pattern": "none",
+    "ambient": "trench"
+  },
+  "sounds": {
+    "notification": "asset:magic/notification.wav",
+    "alert": "asset:magic/alert.wav",
+    "success": "asset:magic/success.wav",
+    "reward": "asset:magic/reward.wav",
+    "levelUp": "asset:magic/level-up.wav",
+    "ui": "asset:magic/ui.wav"
+  },
+  "notification": {
+    "style": "glass",
+    "animation": "fade"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le poste de plongée",
+      "nav:nav.section.home": "Le poste de plongée",
+      "dashboard:title": "Le poste de plongée",
+      "nav:nav.section.media": "La salle des hublots",
+      "nav:nav.media": "La salle des hublots",
+      "media:home.title": "La salle des hublots",
+      "nav:nav.section.community": "L'équipage",
+      "nav:nav.community": "L'équipage",
+      "community:title": "L'équipage",
+      "nav:nav.section.marketplace": "La cale",
+      "nav:nav.marketplace": "La cale",
+      "marketplace:catalog.title": "La cale",
+      "nav:nav.section.support": "Le caisson de secours",
+      "nav:nav.support": "Le caisson de secours",
+      "gamification:value.coins": "Perles"
+    },
+    "en": {
+      "nav:nav.home": "The dive station",
+      "nav:nav.section.home": "The dive station",
+      "dashboard:title": "The dive station",
+      "nav:nav.section.media": "The porthole room",
+      "nav:nav.media": "The porthole room",
+      "media:home.title": "The porthole room",
+      "nav:nav.section.community": "The crew",
+      "nav:nav.community": "The crew",
+      "community:title": "The crew",
+      "nav:nav.section.marketplace": "The hold",
+      "nav:nav.marketplace": "The hold",
+      "marketplace:catalog.title": "The hold",
+      "nav:nav.section.support": "The rescue chamber",
+      "nav:nav.support": "The rescue chamber",
+      "gamification:value.coins": "Pearls"
+    }
+  }
+}

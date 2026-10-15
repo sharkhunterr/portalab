@@ -729,5 +729,7 @@
   "universe.weather.windGusts": "Wind {speed} km/h, gusts {gusts}",
   "universe.weather.windy": "Windy",
   "verification.body": "Your confirmation code: {token} (valid until {expires}).",
-  "verification.subject": "Confirm your Portalab account"
+  "verification.subject": "Confirm your Portalab account",
+  "security.blocked": "Security: {who} blocked for {minutes} min",
+  "security.blocked.body": "Their requests looked like an intrusion ({reason}): their session was signed out. The details are in the audit log."
 }

@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "look": "bulles",
+  "names": {
+    "fr": "Bulles des profondeurs",
+    "en": "Bubbles from the deep"
+  },
+  "descriptions": {
+    "fr": "Un panache de bulles remonte de la récompense en vacillant, attrapant la lumière.",
+    "en": "A plume of bubbles wobbles up from the reward, catching the light."
+  },
+  "render": {
+    "kind": "js",
+    "file": "bulles.js",
+    "duration": 3.0
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "epic",
+    "level": 8,
+    "collection": "celebrations",
+    "icon": "party"
+  }
+}

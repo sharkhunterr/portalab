@@ -218,9 +218,9 @@ const stateStyle = z.strictObject({
 const layoutSchema = z.strictObject({
   nav: z
     .strictObject({
-      desktop: z.enum(NAV_DESKTOP).optional(),
-      tablet: z.enum(NAV_TABLET).optional(),
-      phone: z.enum(NAV_PHONE).optional(),
+      desktop: openLook(NAV_DESKTOP).optional(),
+      tablet: openLook(NAV_TABLET).optional(),
+      phone: openLook(NAV_PHONE).optional(),
     })
     .optional(),
   header: z.enum(HEADER_STYLES).optional(),

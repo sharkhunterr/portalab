@@ -1,0 +1,11 @@
+/* the level's card as a porthole's glass (only this look's card) */
+.levelup[data-look="abysses"] .levelup__card {
+  border: 1px solid #2dd4bf88;
+  background: radial-gradient(circle at 50% 0%, #0b2f45f2, #031321f2 70%);
+  color: #e0f7ff;
+  box-shadow: 0 0 2.6rem #2dd4bf44, inset 0 0 1.4rem #0ea5e933;
+}
+.levelup[data-look="abysses"] .levelup__title {
+  color: #5eead4;
+  text-shadow: 0 0 0.9rem #2dd4bfaa;
+}

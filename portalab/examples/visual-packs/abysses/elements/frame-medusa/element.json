@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "medusa",
+  "names": {
+    "fr": "Cadre méduse",
+    "en": "Jellyfish frame"
+  },
+  "descriptions": {
+    "fr": "Une ombrelle lumineuse dont les tentacules ondulent autour de votre avatar.",
+    "en": "A glowing bell whose tentacles sway round your avatar."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "medusa.glsl",
+    "shape": 0,
+    "radius": "50%"
+  },
+  "economy": {
+    "price": 1250,
+    "rarity": "epic",
+    "level": 13,
+    "collection": "profile",
+    "icon": "user"
+  }
+}

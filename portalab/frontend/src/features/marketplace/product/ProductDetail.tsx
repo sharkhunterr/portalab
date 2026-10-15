@@ -38,7 +38,9 @@ export function ProductDetail() {
       <ProductSheet product={data} />
       <div className="product-page__actions">
         <TryOn product={data} />
-        <PurchaseBar product={data} />
+        <div data-protected="">
+          <PurchaseBar product={data} />
+        </div>
       </div>
     </div>
   );

@@ -37,7 +37,11 @@ TYPES: dict[str, tuple[frozenset[str], str]] = {
     # an interface: its definition (``theme.json``: colours, fonts, layout, navigation, vocabulary, the
     # looks it wears) and stylesheets of its own
     "theme": (frozenset({"theme"}), "theme"),
+    # a navigation of its own, for interfaces: a script drawing it in a sandbox (never sold on its own)
+    "navigation": (frozenset({"js"}), "nav"),
 }
+# what is not a shop product: an interface wears it
+NOT_SOLD = frozenset({"navigation"})
 # the payload field naming the look, per type (packs, boosters: their own payload)
 LOOK_FIELD = {
     "level_up": "animation",
@@ -72,6 +76,16 @@ class Texts(BaseModel):
     en: str = Field(default="", max_length=400)
 
 
+class NavLayout(BaseModel):
+    """Where a navigation sits, said before its script runs (Portalab keeps its room): a bar along an edge,
+    a floating button, its size; ``expands``: it may cover the screen while open."""
+
+    model_config = ConfigDict(extra="forbid")
+    position: Literal["top", "bottom", "left", "right", "floating"] = "bottom"
+    size: int = Field(default=72, ge=40, le=320)  # CSS pixels (the bar's height or width, the button's side)
+    expands: bool = False
+
+
 class Render(BaseModel):
     model_config = ConfigDict(extra="forbid")
     kind: RenderKind = "none"
@@ -82,6 +96,7 @@ class Render(BaseModel):
     radius: str | None = Field(default=None, max_length=12)
     reveal: float | None = Field(default=None, ge=0, le=20)  # level-up: when the card shows (seconds)
     duration: float | None = Field(default=None, ge=0.5, le=30)  # how long it plays (seconds)
+    nav: NavLayout | None = None  # a navigation's place
 
 
 class Economy(BaseModel):

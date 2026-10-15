@@ -1,0 +1,10 @@
+/* issue 1: a pack's script, in its sandbox (an iframe) — transparent, borderless, decorative ones not
+   clickable */
+iframe[data-sandboxed] {
+  border: 0;
+  background: transparent;
+  color-scheme: normal;
+}
+iframe[data-sandboxed][aria-hidden="true"] {
+  pointer-events: none;
+}

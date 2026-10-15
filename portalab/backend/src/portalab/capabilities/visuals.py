@@ -30,6 +30,13 @@ from portalab.core.authz_port import Principal
 
 CATALOG_WRITER = "marketplace.catalog_writer"
 
+# the navigations the interface draws itself (an imported interface may bring its own: element ``navigation``)
+NAVIGATIONS: tuple[str, ...] = (
+    "sidebar", "topbar", "rail", "drawer", "bottom-bar", "orbit", "dock", "tabs", "launcher", "terminal",
+    "reel", "lights", "vcr", "sheet", "console", "taskbar", "feed", "player", "masthead", "dpad",
+    "planisphere", "system", "deck",
+)  # fmt: skip
+
 # each look type: the product type selling it, the payload field naming the look, its built-in looks
 LOOK_TYPES: dict[str, tuple[str, tuple[str, ...]]] = {
     "avatar_frame": ("frame", AVATAR_FRAMES),
@@ -45,6 +52,8 @@ LOOK_TYPES: dict[str, tuple[str, tuple[str, ...]]] = {
     "palette": ("palette", PALETTES),
     "badge": ("style", BADGE_STYLES),
     "title": ("style", BADGE_STYLES),
+    # issue 1: not sold on its own — an interface wears it
+    "navigation": ("nav", NAVIGATIONS),
 }
 
 

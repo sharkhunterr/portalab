@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "look": "trench",
+  "names": {
+    "fr": "Fosse océanique",
+    "en": "Ocean trench"
+  },
+  "descriptions": {
+    "fr": "La lumière qui ne descend plus, des particules qui flottent, des méduses lointaines qui pulsent dans le bleu profond.",
+    "en": "The light that no longer reaches, drifting particles, distant jellyfish pulsing in the deep blue."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "trench.glsl"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 11,
+    "collection": "ambients",
+    "icon": "telescope"
+  }
+}

@@ -13,12 +13,15 @@ from typing import Any
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response
 
 import portalab
 from portalab.app.composition import BACKEND_DIR
 from portalab.app.health import router as health_router
+from portalab.app.intrusion import IntrusionGuard
+from portalab.app.intrusion import router as intrusion_router
 from portalab.app.migrations import expected_heads
 from portalab.app.security import PrincipalResolver, SecurityMiddleware, enforce_default_deny, enforce_terms
 from portalab.app.spa import SPAStaticFiles, spa_directory
@@ -26,9 +29,11 @@ from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
 from portalab.app.wiring import DeferredAuthorizer, wire_identity, wire_platform
 from portalab.capabilities.catalog import new_registry
+from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, WithPermission
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import authorization_scope
-from portalab.core.authz_port import Authorizer
+from portalab.core.authz_port import Authorizer, Principal, ResourceRef
 from portalab.core.db import Database
 from portalab.core.errors import (
     PROBLEM_CONTENT_TYPE,
@@ -123,6 +128,83 @@ def _problem_response(problem: dict[str, Any]) -> JSONResponse:
     return JSONResponse(problem, status_code=int(problem["status"]), media_type=PROBLEM_CONTENT_TYPE)
 
 
+def guard_of(app: FastAPI) -> IntrusionGuard:
+    """issue 1: the application's one intrusion guard (made the first time it is asked for)."""
+    guard: IntrusionGuard = app.state._state.setdefault("intrusion_guard", IntrusionGuard())
+    return guard
+
+
+def security_alert(
+    db: Database, platform: Any, guard: IntrusionGuard
+) -> Callable[[dict[str, Any]], Awaitable[None]]:
+    """issue 1: a session or an address just blocked — the session signed out, the audit log written, the
+    holders of ``security.manage`` alerted (never fails the request that tripped it)."""
+
+    async def alert(block: dict[str, Any]) -> None:
+        try:
+            session_hash = next((k.split(":", 1)[1] for k in block["keys"] if k.startswith("session:")), None)
+            address = next((k.split(":", 1)[1] for k in block["keys"] if k.startswith("ip:")), "?")
+            user_id, login = None, None
+            async with db.unit_of_work() as uow:
+                if session_hash:
+                    row = (
+                        await uow.session.execute(
+                            text(
+                                "SELECT s.user_id, u.login FROM identity.sessions s JOIN identity.users u "
+                                "ON u.id = s.user_id WHERE s.token_hash = :h"
+                            ),
+                            {"h": session_hash},
+                        )
+                    ).first()
+                    if row is not None:
+                        user_id, login = row[0], row[1]
+                        # every session of theirs signed out, and the account itself blocked for a while
+                        await uow.session.execute(
+                            text(
+                                "UPDATE identity.sessions SET revoked_at = now(), "
+                                "revoke_reason = 'suspended' WHERE user_id = :u AND revoked_at IS NULL"
+                            ),
+                            {"u": user_id},
+                        )
+                        guard.block_user(str(user_id), login or str(user_id))
+                await platform.authz.audit.record(
+                    uow.session,
+                    AuditRecord(
+                        action="security.blocked",
+                        actor=Principal(user_id=user_id, channel="user") if user_id else None,
+                        resource=ResourceRef(block["key"].split(":", 1)[0], address),
+                        decision="deny",
+                        result="failure",
+                        context={
+                            "key": block["key"].split(":", 1)[0],
+                            "address": address,
+                            "reason": block["reason"],
+                            "points": block["points"],
+                            "paths": block["paths"],
+                        },
+                        sensitive=True,
+                    ),
+                )
+            providers = platform.notifications.capabilities.system_providers(NOTIFY)
+            if providers:
+                await providers[0].provider.send(
+                    CommunicationRequest(
+                        category="system.health",
+                        template_key="notifications:security.blocked",
+                        audience=WithPermission("security.manage"),
+                        dedup_key=f"security-block:{block['key']}:{int(block['until'])}",
+                        kind="alert",
+                        priority="critical",
+                        params={"who": login or address, "reason": block["reason"], "minutes": 15},
+                        action_url="/admin/audit",
+                    )
+                )
+        except Exception:
+            log.exception("security alert failed")
+
+    return alert
+
+
 def create_app(
     settings: BootstrapSettings | None = None,
     *,
@@ -208,6 +290,7 @@ def create_app(
         app.state.identity_module = platform.identity
         if isinstance(app.state.authorizer, DeferredAuthorizer):
             app.state.authorizer.target = platform.authz.engine
+        app.state.security_alert = security_alert(db, platform, guard_of(app))
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -355,14 +438,17 @@ def create_app(
         return _problem_response(problem)
 
     security = security_config or SecurityConfig()
+    # issue 1: who probes what they may not reach is blocked (and the administrators told)
     app.add_middleware(
         SecurityMiddleware,
         max_body_bytes=security.max_body_bytes,
         per_ip_per_minute=security.rate_limit_per_ip_per_minute,
         per_user_per_minute=security.rate_limit_per_user_per_minute,
+        guard=guard_of(app),
     )
     app.include_router(health_router)
     app.include_router(stream_router)
+    app.include_router(intrusion_router)
     for router in [
         *identity_routers(),
         *authz_routers(),

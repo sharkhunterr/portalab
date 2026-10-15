@@ -1,0 +1,34 @@
+{
+  "type": "bundle",
+  "product": "ultimate_abysses",
+  "names": {
+    "fr": "Pack de thème Abysses",
+    "en": "Abysses theme pack"
+  },
+  "descriptions": {
+    "fr": "Tout l'univers Abysses : son interface et sa navigation sonar, la remontée bioluminescente, les bulles, la fosse océanique, les cadres corail et méduse, la lueur des abysses, la palette, le titre et le badge.",
+    "en": "The whole Abysses universe: its interface and its sonar navigation, the bioluminescent rise, the bubbles, the ocean trench, the coral and jellyfish frames, the abyssal glow, the palette, the title and the badge."
+  },
+  "payload": {
+    "products": [
+      "theme_abysses",
+      "levelup_abysses",
+      "effect_bulles",
+      "ambient_trench",
+      "frame_corail",
+      "frame_medusa",
+      "name_abyssglow",
+      "palette_abysses",
+      "title_deep_diver_abyss",
+      "badge_lanternfish"
+    ]
+  },
+  "economy": {
+    "price": 5400,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ultimate",
+    "icon": "crown",
+    "supply": 10
+  }
+}

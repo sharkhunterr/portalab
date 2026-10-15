@@ -30,6 +30,7 @@
   "nav.admin.privacy": "Politiques de confidentialité",
   "nav.admin.projects": "Projets de la communauté",
   "nav.admin.roles": "Rôles et permissions",
+  "nav.admin.securityBlocks": "Blocages de sécurité",
   "nav.admin.services": "Gérer les services",
   "nav.admin.shop_boosters": "Boosters",
   "nav.admin.shop_catalog": "Catalogue",
@@ -40,6 +41,7 @@
   "nav.admin.support": "Réglages du support",
   "nav.admin.terms": "Conditions d'utilisation",
   "nav.admin.themes": "Studio de thèmes",
+  "nav.admin.visuals": "Packs visuels",
   "nav.admin.wiki": "Wiki",
   "nav.appearance": "Apparence",
   "nav.calendar": "Calendrier",
@@ -100,6 +102,5 @@
   "nav.topic.extensions": "Extensions",
   "nav.topic.services": "Services & supervision",
   "nav.topic.system": "Système",
-  "nav.wiki": "Wiki",
-  "nav.admin.visuals": "Packs visuels"
+  "nav.wiki": "Wiki"
 }

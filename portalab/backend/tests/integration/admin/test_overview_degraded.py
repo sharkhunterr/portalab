@@ -93,3 +93,17 @@ async def test_overview(app: FastAPI, client: httpx.AsyncClient, full: FullPlatf
         mine = (await plain.get("/api/v1/admin/overview")).json()
     assert {panel["panel"] for panel in mine["panels"]} == {"slow", "broken", "public"}
     assert mine["required_actions"] == []
+
+
+async def test_required_actions_without_a_permission_reach_nobody(
+    app: FastAPI, client: httpx.AsyncClient, full: FullPlatform
+) -> None:
+    """issue 134: a provider declaring no permission (the server's own errors…) is never shown to a member —
+    closed by default, rather than open to everyone."""
+    full.identity.capabilities.provide(
+        REQUIRED_ACTION_CAPABILITY, Actions(), instance_ref="test.open", owner="test", metadata={}
+    )
+    await create_user(module_of(app), "member")
+    await login(client, "member")
+    mine = (await client.get("/api/v1/admin/overview")).json()
+    assert mine["required_actions"] == []

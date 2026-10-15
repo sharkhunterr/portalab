@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "look": "abyssglow",
+  "names": {
+    "fr": "Lueur des abysses",
+    "en": "Abyssal glow"
+  },
+  "descriptions": {
+    "fr": "Votre nom en lettres arrondies, une lueur bioluminescente qui pulse.",
+    "en": "Your name in rounded letters, a pulsing bioluminescent glow."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "name.css"
+    ]
+  },
+  "economy": {
+    "price": 360,
+    "rarity": "rare",
+    "collection": "names",
+    "icon": "feather"
+  }
+}

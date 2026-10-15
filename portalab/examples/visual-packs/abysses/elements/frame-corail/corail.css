@@ -1,0 +1,17 @@
+/* a coral ring breathing round the avatar */
+.avatar-frame[data-frame="corail"] {
+  background: radial-gradient(circle, #04131f 60%, transparent 61%), conic-gradient(#fb7185, #2dd4bf, #f472b6, #22d3ee, #fb7185);
+  box-shadow: 0 0 1rem #fb718566;
+  animation: abysses-corail 4.5s ease-in-out infinite;
+}
+@keyframes abysses-corail {
+  50% {
+    box-shadow: 0 0 1.6rem #2dd4bf88;
+    filter: saturate(1.4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame[data-frame="corail"] {
+    animation: none;
+  }
+}

@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
-import { type ExternalElement, mountScript, type ScriptContext } from "./external";
+import type { ExternalElement } from "./external";
+import { runSandbox } from "./sandbox";
+import "./external.css";
 
 /**
- * issue 1: an imported look drawn by its own script — its module mounted into this element when it shows,
- * stopped when it leaves. Decorative: hidden from assistive technologies, no pointer events (its CSS).
+ * issue 1: an imported look drawn by its own script (a level-up, a celebration) — always in a sandbox (an
+ * iframe of an opaque origin: no account, no network, no page of Portalab's), never in this page. Decorative:
+ * hidden from assistive technologies, never focused, no pointer events.
  */
 export function ExternalScript({
   element,
@@ -11,29 +14,33 @@ export function ExternalScript({
   className,
 }: {
   element: ExternalElement;
-  context: Omit<ScriptContext, "asset" | "type" | "look">;
+  context: { reducedMotion: boolean; level?: number; text?: string };
   className?: string;
 }) {
-  const host = useRef<HTMLSpanElement>(null);
+  const frame = useRef<HTMLIFrameElement>(null);
   const { reducedMotion, level, text } = context;
   useEffect(() => {
-    const target = host.current;
+    const target = frame.current;
     if (!target) return;
-    let stop: (() => void) | null = null;
-    let cancelled = false;
-    void mountScript(element, target, {
+    const sandbox = runSandbox(target, element, {
+      type: element.type,
+      look: element.look,
       reducedMotion,
       ...(level === undefined ? {} : { level }),
       ...(text === undefined ? {} : { text }),
-    }).then((done) => {
-      if (cancelled) done?.();
-      else stop = done;
     });
-    return () => {
-      cancelled = true;
-      stop?.();
-      target.replaceChildren();
-    };
+    return () => sandbox.stop();
   }, [element, reducedMotion, level, text]);
-  return <span ref={host} className={className} data-external={element.product} aria-hidden="true" />;
+  return (
+    <iframe
+      ref={frame}
+      className={className}
+      data-sandboxed=""
+      data-external={element.product}
+      sandbox="allow-scripts"
+      title={element.names.en || element.product}
+      aria-hidden="true"
+      tabIndex={-1}
+    />
+  );
 }

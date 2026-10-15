@@ -28,6 +28,7 @@ from portalab.modules.ui.settings import BUILTIN_KEYS
 from portalab.modules.ui.themes.definition import PACK_LOOKS, floor_report, validate_definition
 from portalab.modules.ui.visuals.manifest import (
     LOOK_FIELD,
+    NOT_SOLD,
     PAYLOAD_FIELDS,
     RARITIES,
     TYPES,
@@ -46,6 +47,9 @@ USUAL_PRICES = {"common": (50, 700), "rare": (300, 1200), "epic": (600, 2500), "
 NETWORK = re.compile(r"\b(fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\b")
 STORAGE = re.compile(r"\b(document\.cookie|localStorage|sessionStorage|indexedDB)\b")
 DYNAMIC = re.compile(r"\beval\s*\(|\bnew\s+Function\s*\(")
+# an interface renames its navigation, its pages' titles and the value names (never an action, a price, a
+# warning: what a member confirms stays Portalab's words)
+VOCABULARY = re.compile(r"nav:nav\.[\w.]+|[a-z]+:([\w.]+\.)?title|gamification:value\.\w+")
 GLSL_RESERVED = re.compile(r"\b(?:float|vec[234]|int)\s+(out|in|input|output|sample|filter|active)\b")
 
 
@@ -202,7 +206,10 @@ def _element(
         _js(report, key, source)
     if kind == "theme" and main is not None:
         _theme(report, key, element, source, own_looks)
-    _economy(report, key, element)
+    if element.type not in NOT_SOLD:
+        _economy(report, key, element)
+    if element.type == "navigation" and element.render.nav is None:
+        report.add("info", "nav.default_layout", key)
     extra = sorted(set(element.payload) - PAYLOAD_FIELDS.get(element.type, frozenset()))
     if extra:
         report.add("blocking", "payload.fields", key, fields=extra)
@@ -232,33 +239,90 @@ def _element(
     )
 
 
-def _scoped(selector: str, look: str) -> bool:
-    return f'"{look}"' in selector or f"'{look}'" in selector or f"={look}]" in selector
+def _step(char: str) -> int:
+    return 1 if char in "([" else -1 if char in ")]" else 0
+
+
+def selectors_of(text: str) -> list[str]:
+    """The selectors of a stylesheet (comments, keyframes and font faces left out; the rules inside
+    @media/@supports/@container/@layer kept), each one alone (commas inside parentheses respected)."""
+    body = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    body = re.sub(
+        r"@(font-face|(-webkit-)?keyframes|property|counter-style)[^{]*\{(?:[^{}]|\{[^{}]*\})*\}", "", body
+    )
+    body = re.sub(r"@[\w-]+[^{};]*\{", "", body)  # the opening of the other at-rules
+    out: list[str] = []
+    for block in re.findall(r"([^{};]+)\{", body):
+        depth, start = 0, 0
+        for index, char in enumerate(block):
+            depth += _step(char)
+            if char == "," and depth == 0:
+                out.append(block[start:index].strip())
+                start = index + 1
+        out.append(block[start:].strip())
+    return [s for s in out if s]
+
+
+ESCAPES = re.compile(r"[~+]|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b")
+
+
+def _first_compound(selector: str) -> str:
+    depth = 0
+    for index, char in enumerate(selector):
+        depth += _step(char)
+        if depth == 0 and (char.isspace() or char in ">~+"):
+            return selector[:index]
+    return selector
+
+
+def look_selector_ok(selector: str, look: str) -> bool:
+    """A look styles its own element only: its hook (``[data-…="<look>"]``) on the selector's first part, then
+    only what is inside it (no sibling combinator, no :has(), never the document's root)."""
+    hook = re.search(
+        r"\[data-[\w-]+=(?:\""
+        + re.escape(look)
+        + r"\"|'"
+        + re.escape(look)
+        + r"'|"
+        + re.escape(look)
+        + r")\]",
+        _first_compound(selector),
+    )
+    return bool(hook) and not ESCAPES.search(selector)
+
+
+def interface_selector_ok(selector: str, key: str) -> bool:
+    """An interface styles the whole interface — under its own key, never a protected surface (the
+    interface adds that exclusion when it loads the sheet)."""
+    first = _first_compound(selector)
+    return bool(
+        re.fullmatch(
+            r"(?::root|html)?\[data-theme=(?:\"" + re.escape(key) + r"\"|'" + re.escape(key) + r"')\]", first
+        )
+    )
 
 
 def _css(report: Report, key: str, element: Element, name: str, text: str) -> None:
     if re.search(r"@import\b", text):
-        report.add("warning", "css.import", key, file=name)
+        report.add("blocking", "css.import", key, file=name)
     for address in re.findall(r"url\(\s*['\"]?([^'\")]+)", text):
-        if re.match(r"^(https?:)?//", address.strip()):
-            report.add("warning", "css.external_url", key, file=name, url=address.strip()[:120])
+        if re.match(r"^((https?|ftp|javascript|file):|//)", address.strip(), re.I):
+            report.add("blocking", "css.external_url", key, file=name, url=address.strip()[:120])
     if re.search(r"position\s*:\s*fixed", text):
         report.add("info", "css.fixed", key, file=name)
     if not element.look:
         return
-    body = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
-    body = re.sub(r"@(font-face|keyframes|-webkit-keyframes)[^{]*\{(?:[^{}]|\{[^{}]*\})*\}", "", body)
-    body = re.sub(r"@[\w-]+[^{};]*\{", "", body)  # the opening of the other at-rules (@media, @supports…)
-    loose = [
-        selector.strip()
-        for block in re.findall(r"([^{}@]+)\{", body)
-        for selector in block.split(",")
-        if selector.strip()
-        and not re.fullmatch(r"(from|to|\d+%)", selector.strip())
-        and not _scoped(selector, element.look)
-    ]
+    selectors = [s for s in selectors_of(text) if not re.fullmatch(r"(from|to|[\d.]+%)(\s*,\s*[\d.]+%)*", s)]
+    if element.type == "theme":
+        loose = [s for s in selectors if not interface_selector_ok(s, element.look)]
+        if loose:
+            report.add(
+                "blocking", "css.interface_scope", key, file=name, look=element.look, selectors=loose[:3]
+            )
+        return
+    loose = [s for s in selectors if not look_selector_ok(s, element.look)]
     if loose:
-        report.add("warning", "css.unscoped", key, file=name, look=element.look, selectors=loose[:3])
+        report.add("blocking", "css.unscoped", key, file=name, look=element.look, selectors=loose[:3])
 
 
 def _glsl(report: Report, key: str, element: Element, source: str) -> None:
@@ -278,19 +342,23 @@ def _glsl(report: Report, key: str, element: Element, source: str) -> None:
 
 
 def _js(report: Report, key: str, source: str) -> None:
-    report.add("warning", "js.script", key)
+    """A script runs in a sandbox (no account, no network, no page of Portalab): what it would try beyond is
+    noted — it will be refused there."""
+    report.add("info", "js.sandboxed", key)
     if not re.search(r"\bexport\s+default\b", source):
         report.add("blocking", "js.no_export", key)
+    if re.search(r"^\s*import\s.+\sfrom\s|^\s*import\s*['\"]", source, re.M):
+        report.add("blocking", "js.static_import", key)
     if NETWORK.search(source):
-        report.add("warning", "js.network", key, calls=sorted(set(NETWORK.findall(source))))
+        report.add("info", "js.network", key, calls=sorted(set(NETWORK.findall(source))))
     if "/api/" in source:
-        report.add("warning", "js.portal_api", key)
+        report.add("info", "js.portal_api", key)
     if STORAGE.search(source):
-        report.add("warning", "js.storage", key, uses=sorted(set(STORAGE.findall(source))))
+        report.add("info", "js.storage", key, uses=sorted(set(STORAGE.findall(source))))
     if DYNAMIC.search(source):
         report.add("warning", "js.dynamic_code", key)
-    if re.search(r"\bimport\s*\(?\s*['\"]https?:", source):
-        report.add("warning", "js.remote_import", key)
+    if len(source) > 400_000:
+        report.add("warning", "js.large", key, size=len(source))
 
 
 def _theme(
@@ -317,8 +385,13 @@ def _theme(
         report.add("blocking", "look.builtin", key, look=theme.key)
     floor = floor_report(theme)
     if not floor["ok"]:
-        violations: list[Any] = list(floor.get("violations") or [])  # type: ignore[call-overload]
+        found: Any = floor.get("violations") or []
+        violations: list[Any] = list(found)
         report.add("blocking", "theme.floor", key, violations=[str(v) for v in violations][:4])
+    words = (document.get("vocabulary") or {}).values()
+    foreign = sorted({k for language in words for k in language if not VOCABULARY.fullmatch(k)})
+    if foreign:
+        report.add("blocking", "theme.vocabulary", key, keys=foreign[:5])
     navigation = document.get("layout", {}).get("nav", {})
     if navigation:
         report.add("info", "theme.nav", key, nav=sorted(set(navigation.values())))

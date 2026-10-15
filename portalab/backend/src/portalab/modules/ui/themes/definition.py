@@ -608,86 +608,83 @@ class Motion(_Closed):
     )
 
 
+NAV_DESKTOP = Literal[
+    "sidebar",
+    "topbar",
+    "rail",
+    "orbit",
+    "dock",
+    "tabs",
+    "launcher",
+    "terminal",
+    "reel",
+    "lights",
+    "vcr",
+    "sheet",
+    "console",
+    "taskbar",
+    "feed",
+    "player",
+    "masthead",
+    "dpad",
+    "planisphere",
+    "system",
+    "deck",
+]
+NAV_TABLET = Literal[
+    "rail",
+    "topbar",
+    "drawer",
+    "orbit",
+    "dock",
+    "tabs",
+    "launcher",
+    "terminal",
+    "reel",
+    "lights",
+    "vcr",
+    "sheet",
+    "console",
+    "taskbar",
+    "feed",
+    "player",
+    "masthead",
+    "dpad",
+    "planisphere",
+    "system",
+    "deck",
+]
+NAV_PHONE = Literal[
+    "bottom-bar",
+    "drawer",
+    "orbit",
+    "dock",
+    "tabs",
+    "launcher",
+    "terminal",
+    "reel",
+    "lights",
+    "vcr",
+    "sheet",
+    "console",
+    "taskbar",
+    "feed",
+    "player",
+    "masthead",
+    "dpad",
+    "planisphere",
+    "system",
+    "deck",
+]
+
+
 class Nav(_Closed):
     # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel;
-    # #89: a desktop's taskbar, a social feed, a music player, a newspaper's masthead, a console's d-pad
-    desktop: (
-        Literal[
-            "sidebar",
-            "topbar",
-            "rail",
-            "orbit",
-            "dock",
-            "tabs",
-            "launcher",
-            "terminal",
-            "reel",
-            "lights",
-            "vcr",
-            "sheet",
-            "console",
-            "taskbar",
-            "feed",
-            "player",
-            "masthead",
-            "dpad",
-            "planisphere",
-            "system",
-            "deck",
-        ]
-        | None
-    ) = None
-    tablet: (
-        Literal[
-            "rail",
-            "topbar",
-            "drawer",
-            "orbit",
-            "dock",
-            "tabs",
-            "launcher",
-            "terminal",
-            "reel",
-            "lights",
-            "vcr",
-            "sheet",
-            "console",
-            "taskbar",
-            "feed",
-            "player",
-            "masthead",
-            "dpad",
-            "planisphere",
-            "system",
-            "deck",
-        ]
-        | None
-    ) = None
-    phone: (
-        Literal[
-            "bottom-bar",
-            "drawer",
-            "orbit",
-            "dock",
-            "tabs",
-            "launcher",
-            "terminal",
-            "reel",
-            "lights",
-            "vcr",
-            "sheet",
-            "console",
-            "taskbar",
-            "feed",
-            "player",
-            "masthead",
-            "dpad",
-            "planisphere",
-            "system",
-            "deck",
-        ]
-        | None
-    ) = None
+    # #89: a desktop's taskbar, a social feed, a music player, a newspaper's masthead, a console's d-pad;
+    # issue 1: or a navigation an imported pack brings (its own script, in a sandbox)
+    desktop: Annotated[str, _open(NAV_DESKTOP, "navigation")] | None = None
+    tablet: Annotated[str, _open(NAV_TABLET, "navigation")] | None = None
+    phone: Annotated[str, _open(NAV_PHONE, "navigation")] | None = None
 
 
 class Layout(_Closed):

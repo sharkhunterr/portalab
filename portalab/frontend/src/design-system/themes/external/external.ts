@@ -1,17 +1,18 @@
 import { useSyncExternalStore } from "react";
 import { parseTheme, type ThemeDefinition } from "../schema";
+import { guardedSheet } from "./cssGuard";
 
 /**
  * issue 1 (POC): the looks of imported visual packs — their animations in their own files, loaded at run
  * time, never in Portalab's code. Each element is drawn by its kind:
  *
- * - ``css``: its stylesheets are linked into the page; they style the interface's hooks (``data-frame``,
- *   ``data-name``, ``data-look``, ``data-effect``…) like the built-in looks (fonts declared in them, with
- *   addresses relative to the sheet);
+ * - ``css``: its stylesheets are read, guarded (``cssGuard``: a look styles its own element only, an interface
+ *   never a protected surface) and adopted by the document; they style the interface's hooks (``data-frame``,
+ *   ``data-name``, ``data-look``, ``data-effect``…) like the built-in looks;
  * - ``glsl``: its fragment is registered with the GPU looks (``badgeFx``: a shape or a whole stage, same
  *   contract as the built-in effects) or, for an ambience, run as a full-screen shader after ``COMMON``;
- * - ``js``: its module is imported when the look shows; its default export is called with the element to draw
- *   into and the moment's context, and returns what stops it (the administrator accepted it runs scripts);
+ * - ``js``: its module runs in a sandbox (``sandbox.ts``: an iframe of an opaque origin — no account, no
+ *   network, no page of Portalab's), never in this page;
  * - ``theme``: an interface — its definition is served by the interfaces' registry, its stylesheets linked;
  * - ``none``: packs, boosters, palettes (their colours come with the element), titles and badges.
  *
@@ -47,22 +48,6 @@ export interface ExternalFx {
   stage: boolean;
   ambient: boolean;
 }
-
-/** What a script look receives when it is mounted. */
-export interface ScriptContext {
-  type: string;
-  look: string;
-  /** a level-up's new level, a celebration's text */
-  level?: number;
-  text?: string;
-  reducedMotion: boolean;
-  /** the address of one of the element's own files (``assets("spark.png")``) */
-  asset: (path: string) => string;
-}
-type Mount = (
-  host: HTMLElement,
-  context: ScriptContext,
-) => (() => void) | { destroy: () => void } | undefined;
 
 const scopes: Record<Scope, Map<string, ExternalElement>> = { live: new Map(), preview: new Map() };
 const shaders = new Map<string, ExternalFx>();
@@ -115,15 +100,17 @@ export function useExternalRevision(): number {
   );
 }
 
-function link(url: string, scope: Scope) {
-  if (typeof document === "undefined") return;
-  if (document.head.querySelector(`link[data-visual="${scope}"][href="${CSS.escape(url)}"]`)) return;
-  const element = document.createElement("link");
-  element.rel = "stylesheet";
-  element.href = url;
-  element.dataset.visual = scope;
-  document.head.append(element);
+// the packs' stylesheets, guarded (``cssGuard``) and adopted by the document — never linked as they are
+const sheets: Record<Scope, CSSStyleSheet[]> = { live: [], preview: [] };
+
+function adopt() {
+  if (typeof document === "undefined" || !("adoptedStyleSheets" in document)) return;
+  const ours = new Set([...sheets.live, ...sheets.preview]);
+  const others = document.adoptedStyleSheets.filter((sheet) => !ours.has(sheet) && !retired.has(sheet));
+  document.adoptedStyleSheets = [...others, ...sheets.live, ...sheets.preview];
+  retired.clear();
 }
+const retired = new Set<CSSStyleSheet>();
 
 async function text(url: string): Promise<string | null> {
   try {
@@ -138,9 +125,14 @@ async function text(url: string): Promise<string | null> {
 export async function installElements(list: ExternalElement[], scope: Scope): Promise<void> {
   uninstallScope(scope, false);
   const next = new Map<string, ExternalElement>();
+  const built: CSSStyleSheet[] = [];
   await Promise.all(
     list.map(async (element) => {
-      for (const sheet of element.css) link(sheet, scope);
+      for (const url of element.css) {
+        const css = await text(url);
+        const sheet = css === null ? null : guardedSheet(css, url, element);
+        if (sheet) built.push(sheet);
+      }
       if (element.kind === "glsl" && element.file) {
         const body = await text(element.file);
         if (body !== null) {
@@ -157,13 +149,15 @@ export async function installElements(list: ExternalElement[], scope: Scope): Pr
     }),
   );
   scopes[scope] = next;
+  sheets[scope] = built;
+  adopt();
   notify();
 }
 
 export function uninstallScope(scope: Scope, announce = true): void {
-  if (typeof document !== "undefined") {
-    for (const element of document.head.querySelectorAll(`link[data-visual="${scope}"]`)) element.remove();
-  }
+  for (const sheet of sheets[scope]) retired.add(sheet);
+  sheets[scope] = [];
+  adopt();
   scopes[scope] = new Map();
   if (announce) notify();
 }
@@ -171,32 +165,6 @@ export function uninstallScope(scope: Scope, announce = true): void {
 /** An imported interface's definition (to preview or try it before it is published). */
 export function externalTheme(key: string | null | undefined): ThemeDefinition | undefined {
   return key && externalLook("theme", key) ? interfaces.get(key) : undefined;
-}
-
-/** Mounts a script look into ``host``; returns what stops it (nothing when it could not start). */
-export async function mountScript(
-  element: ExternalElement,
-  host: HTMLElement,
-  context: Omit<ScriptContext, "asset" | "type" | "look">,
-): Promise<(() => void) | null> {
-  if (!element.file || !element.look) return null;
-  try {
-    const module = (await import(/* @vite-ignore */ element.file)) as { default?: Mount };
-    if (typeof module.default !== "function") return null;
-    const base = element.file.slice(0, element.file.lastIndexOf("/") + 1);
-    const stop = module.default(host, {
-      ...context,
-      type: element.type,
-      look: element.look,
-      asset: (path: string) => base + path.replace(/^\.?\//, ""),
-    });
-    if (typeof stop === "function") return stop;
-    if (stop && typeof stop.destroy === "function") return () => stop.destroy();
-    return () => undefined;
-  } catch (error) {
-    console.warn("visual pack script:", element.product, error);
-    return null;
-  }
 }
 
 // the catalog key naming each type's looks (the interface's pickers read their names there)

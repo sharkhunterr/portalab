@@ -31,6 +31,7 @@ PUBLIC = {
     "/api/v1/auth/oidc/start",
     "/api/v1/auth/oidc/callback",
     "/api/v1/terms",  # 027: the terms of use in force (the sign-in page links them)
+    "/api/v1/visuals/sandbox",  # issue 1: the empty page a pack's script runs in (sandboxed, holds nothing)
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check
@@ -73,6 +74,9 @@ async def test_anonymous_gets_401_everywhere(app: FastAPI, client: httpx.AsyncCl
 
 
 async def test_plain_user_matrix(app: FastAPI, client: httpx.AsyncClient) -> None:
+    # issue 1: this test knocks on every route a member may not open — on purpose; the intrusion guard (which
+    # would block such a member) is tested on its own (tests/unit/app/test_intrusion_guard.py)
+    app.state.intrusion_guard.enabled = False
     await create_user(module_of(app), "plain")
     assert (await login(client, "plain")).status_code == 200
     for method, path, permission in _protected(app):

@@ -632,7 +632,8 @@
   /* rivets along the top and the bottom of the hull plates */
   background:
     radial-gradient(circle, #c9d4e399 0.07rem, transparent 0.09rem) 0.4rem 0.1rem / 1.6rem 0.4rem repeat-x,
-    radial-gradient(circle, #c9d4e366 0.07rem, transparent 0.09rem) 0.4rem calc(100% - 0.1rem) / 1.6rem 0.4rem repeat-x,
+    radial-gradient(circle, #c9d4e366 0.07rem, transparent 0.09rem) 0.4rem calc(100% - 0.1rem) / 1.6rem 0.4rem
+    repeat-x,
     linear-gradient(180deg, #4a5668 0%, #2b3442 12%, #1a212c 55%, #11161e 100%);
   border-block: 1px solid #6f7f96;
   box-shadow:
