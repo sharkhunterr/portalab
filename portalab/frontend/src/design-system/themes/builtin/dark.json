@@ -11,7 +11,13 @@
     "border": "#3a404c",
     "accent": "#8fb0ff",
     "accentContrast": "#0b1020",
-    "focus": "#8fb0ff"
+    "focus": "#8fb0ff",
+    "rarity": {
+      "common": "#b4bac6",
+      "rare": "#5fb4ff",
+      "epic": "#c792ff",
+      "legendary": "#ffc861"
+    }
   },
   "states": {
     "loading": {

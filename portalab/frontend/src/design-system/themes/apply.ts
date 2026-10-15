@@ -41,6 +41,12 @@ export interface Effective {
 
 type BaseColor = Exclude<keyof ThemeDefinition["colors"], "accentAlt" | "rarity">;
 
+/** issue 132: rarity colours readable on a light or a dark surface (at least 4.5:1), each its own hue. */
+const RARITY_FALLBACK: Record<"light" | "dark", Record<(typeof RARITIES)[number], string>> = {
+  light: { common: "#5b6477", rare: "#1660c9", epic: "#8436cc", legendary: "#a35f00" },
+  dark: { common: "#b4bac6", rare: "#5fb4ff", epic: "#c792ff", legendary: "#ffc861" },
+};
+
 const COLOR_VARS: Record<BaseColor, string> = {
   surface: "--color-surface",
   surfaceRaised: "--color-surface-raised",
@@ -223,8 +229,10 @@ export function applyToDocument(
     root.style.setProperty("--color-accent-alt", palette.accentAlt);
     root.style.setProperty("--color-accent-contrast", palette.contrast);
   }
+  // issue 132: a theme without rarity colours gets distinct ones for its scheme — never its accent for all four
+  const fallback = theme.colorScheme === "light" ? RARITY_FALLBACK.light : RARITY_FALLBACK.dark;
   for (const rarity of RARITIES) {
-    root.style.setProperty(`--rarity-${rarity}`, theme.colors.rarity?.[rarity] ?? theme.colors.accent);
+    root.style.setProperty(`--rarity-${rarity}`, theme.colors.rarity?.[rarity] ?? fallback[rarity]);
   }
   for (const state of FUNCTIONAL_STATES) {
     root.style.setProperty(`--state-${state}-fg`, theme.states[state].fg);
