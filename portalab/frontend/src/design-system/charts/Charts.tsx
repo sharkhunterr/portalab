@@ -4,6 +4,7 @@ import {
   AreaChart,
   Bar,
   BarChart,
+  BarStack,
   CartesianGrid,
   Cell,
   Legend,
@@ -124,8 +125,20 @@ export function BarsChart({
   yAxis = true,
   grid = true,
 }: Common & { data: Datum[]; x: string; series: ChartSeries[]; stacked?: boolean; horizontal?: boolean }) {
-  const last = series.length - 1;
   const [active, pick] = useFocus();
+  const round: [number, number, number, number] = horizontal ? [0, 6, 6, 0] : [6, 6, 0, 0];
+  const bars = series.map((s, index) => (
+    <Bar
+      key={s.key}
+      dataKey={s.key}
+      name={s.label}
+      fill={s.color ?? paletteColor(index)}
+      fillOpacity={fades(active, s.key) ? FADED : 1}
+      radius={stacked ? 0 : round}
+      maxBarSize={42}
+      isAnimationActive={false}
+    />
+  ));
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart
@@ -159,29 +172,12 @@ export function BarsChart({
         )}
         {tooltip(format, xFormat)}
         {legend ? focusLegend(active, pick) : null}
-        {series.map((s, index) => {
-          const top = !stacked || index === last;
-          const radius: [number, number, number, number] = horizontal
-            ? top
-              ? [0, 6, 6, 0]
-              : [0, 0, 0, 0]
-            : top
-              ? [6, 6, 0, 0]
-              : [0, 0, 0, 0];
-          return (
-            <Bar
-              key={s.key}
-              dataKey={s.key}
-              name={s.label}
-              {...(stacked ? { stackId: "stack" } : {})}
-              fill={s.color ?? paletteColor(index)}
-              fillOpacity={fades(active, s.key) ? FADED : 1}
-              radius={radius}
-              maxBarSize={42}
-              isAnimationActive={false}
-            />
-          );
-        })}
+        {stacked ? (
+          // issue 125: the whole stack's end is round, however thin its last part
+          <BarStack radius={round}>{bars}</BarStack>
+        ) : (
+          bars
+        )}
       </BarChart>
     </ResponsiveContainer>
   );
