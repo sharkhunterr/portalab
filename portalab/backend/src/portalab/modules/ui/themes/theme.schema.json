@@ -796,7 +796,9 @@
             "coinpop",
             "flowerpower",
             "seashells",
-            "songbirds"
+            "songbirds",
+            "starshower",
+            "bigbang"
           ]
         },
         "levelUp": {
@@ -857,7 +859,9 @@
             "flagpole",
             "jukeboxdrop",
             "sandcastle",
-            "fullbloom"
+            "fullbloom",
+            "hyperjump",
+            "constellate"
           ]
         }
       },
@@ -889,7 +893,9 @@
                 "feed",
                 "player",
                 "masthead",
-                "dpad"
+                "dpad",
+                "planisphere",
+                "system"
               ]
             },
             "tablet": {
@@ -912,7 +918,9 @@
                 "feed",
                 "player",
                 "masthead",
-                "dpad"
+                "dpad",
+                "planisphere",
+                "system"
               ]
             },
             "phone": {
@@ -934,7 +942,9 @@
                 "feed",
                 "player",
                 "masthead",
-                "dpad"
+                "dpad",
+                "planisphere",
+                "system"
               ]
             }
           },
@@ -1183,7 +1193,18 @@
             "spincoins",
             "groovywaves",
             "beachballs",
-            "dandelion"
+            "dandelion",
+            "orion",
+            "crab",
+            "helix",
+            "pillars",
+            "cliffs",
+            "solarsystem",
+            "saturnrise",
+            "perseids",
+            "constellations",
+            "milkyway",
+            "greatcomet"
           ]
         }
       },
@@ -1316,7 +1337,15 @@
             "bricks",
             "jukebox",
             "beachtowel",
-            "seedpacket"
+            "seedpacket",
+            "stellar",
+            "orrery",
+            "starmap",
+            "comet",
+            "ringworld",
+            "pulsar",
+            "totality",
+            "meteor"
           ]
         },
         "animation": {
@@ -1380,7 +1409,10 @@
             "jumpin",
             "funkwalk",
             "surfin",
-            "sprout"
+            "sprout",
+            "shootingstar",
+            "nebulabloom",
+            "eclipsed"
           ]
         }
       },

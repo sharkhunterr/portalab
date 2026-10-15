@@ -8,6 +8,7 @@ from typing import Annotated, Any
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Header, Path, Query
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from portalab.core.time import utc_now
@@ -181,6 +182,8 @@ async def reserve(principal: Reader, module: Module) -> list[dict[str, Any]]:
             "needs_configuration": version.config_required,
             # a sealed booster: opened, not used
             "booster": product.type == "booster",
+            # #131: a level pass: used on an item waiting for its level
+            "early_unlock": product.type == "early_unlock",
         }
         for product, version, quantity in items
     ]
@@ -197,3 +200,16 @@ async def use(
     for its form in « My purchases »)."""
     row = await module.openings.use(principal, key, idempotency_key or str(uuid4()))
     return {"ownership": str(row.id), "product": key, "state": row.state}
+
+
+class EarlyUnlockIn(BaseModel):
+    target: Annotated[str, Field(min_length=1, max_length=96)]
+
+
+@router.post("/marketplace/reserve/{key}/unlock", status_code=201)
+async def unlock_early(
+    principal: Buyer, module: Module, key: Annotated[str, KEY], body: EarlyUnlockIn
+) -> dict[str, Any]:
+    """#131: spend a level pass of my reserve on an item I hold but may not wear yet — usable at once."""
+    row = await module.openings.unlock_early(principal, key, body.target)
+    return {"ownership": str(row.id), "product": body.target, "state": row.state}

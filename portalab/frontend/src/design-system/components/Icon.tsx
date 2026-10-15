@@ -242,6 +242,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useTheme } from "../themes/ThemeProvider";
+import { ZODIAC_ICONS } from "./constellationIcons";
 
 /**
  * ``Icon`` (spec 027 R15): declarations (navigation, widgets, sections, themes) reference icons by a
@@ -431,6 +432,8 @@ export const ICONS: Record<string, LucideIcon> = {
   thermometer: Thermometer,
   "map-pin": MapPin,
   locate: LocateFixed,
+  // issue 130: the constellations of the zodiac
+  ...ZODIAC_ICONS,
   lightning: CloudLightning,
   droplets: Droplets,
   wind: Wind,

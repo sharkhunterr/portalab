@@ -241,6 +241,15 @@ NOTIFICATION_STYLES = Literal[
     "jukebox",
     "beachtowel",
     "seedpacket",
+    # #130: the cosmos
+    "stellar",
+    "orrery",
+    "starmap",
+    "comet",
+    "ringworld",
+    "pulsar",
+    "totality",
+    "meteor",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -303,6 +312,10 @@ NOTIFICATION_ANIMATIONS = Literal[
     "funkwalk",
     "surfin",
     "sprout",
+    # #130: the cosmos
+    "shootingstar",
+    "nebulabloom",
+    "eclipsed",
 ]
 AMBIENTS = Literal[
     "none",
@@ -415,6 +428,18 @@ AMBIENTS = Literal[
     "groovywaves",
     "beachballs",
     "dandelion",
+    # #130: the cosmos
+    "orion",
+    "crab",
+    "helix",
+    "pillars",
+    "cliffs",
+    "solarsystem",
+    "saturnrise",
+    "perseids",
+    "constellations",
+    "milkyway",
+    "greatcomet",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -472,6 +497,9 @@ CELEBRATIONS = Literal[
     "flowerpower",
     "seashells",
     "songbirds",
+    # #130: the cosmos
+    "starshower",
+    "bigbang",
 ]
 PATTERNS = Literal[
     "none",
@@ -526,6 +554,7 @@ LEVEL_UPS = Literal[
     "encore", "finale", "extraedition",
     "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
     "jukeboxdrop", "sandcastle", "fullbloom",
+    "hyperjump", "constellate",  # #130: the cosmos
 ]  # fmt: skip
 
 
@@ -560,6 +589,8 @@ class Nav(_Closed):
             "player",
             "masthead",
             "dpad",
+            "planisphere",
+            "system",
         ]
         | None
     ) = None
@@ -583,6 +614,8 @@ class Nav(_Closed):
             "player",
             "masthead",
             "dpad",
+            "planisphere",
+            "system",
         ]
         | None
     ) = None
@@ -605,6 +638,8 @@ class Nav(_Closed):
             "player",
             "masthead",
             "dpad",
+            "planisphere",
+            "system",
         ]
         | None
     ) = None

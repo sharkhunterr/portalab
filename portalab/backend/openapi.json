@@ -4814,6 +4814,21 @@
         "title": "DryRunIn",
         "type": "object"
       },
+      "EarlyUnlockIn": {
+        "properties": {
+          "target": {
+            "maxLength": 96,
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "title": "EarlyUnlockIn",
+        "type": "object"
+      },
       "EconomyDayOut": {
         "properties": {
           "coins_earned": {
@@ -34747,6 +34762,62 @@
           }
         },
         "summary": "Reserve",
+        "tags": [
+          "marketplace-boosters"
+        ]
+      }
+    },
+    "/api/v1/marketplace/reserve/{key}/unlock": {
+      "post": {
+        "description": "#131: spend a level pass of my reserve on an item I hold but may not wear yet \u2014 usable at once.",
+        "operationId": "unlock_early_api_v1_marketplace_reserve__key__unlock_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,96}$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EarlyUnlockIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Unlock Early Api V1 Marketplace Reserve  Key  Unlock Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unlock Early",
         "tags": [
           "marketplace-boosters"
         ]

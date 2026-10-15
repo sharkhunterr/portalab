@@ -3,6 +3,7 @@
  * use (latin subsets, regular and bold). Only @font-face rules here — a face downloads when first used.
  */
 import "@fontsource/anton/latin-400.css";
+import "@fontsource/audiowide/latin-400.css"; // issue 130: the cosmos
 import "@fontsource/bangers/latin-400.css";
 import "@fontsource/caveat/latin-400.css";
 import "@fontsource/caveat/latin-700.css";
@@ -27,6 +28,7 @@ import "@fontsource/im-fell-english/latin-400.css";
 import "@fontsource/jetbrains-mono/latin-400.css";
 import "@fontsource/jetbrains-mono/latin-700.css";
 import "@fontsource/luckiest-guy/latin-400.css";
+import "@fontsource/megrim/latin-400.css"; // issue 130: constellations
 import "@fontsource/michroma/latin-400.css";
 import "@fontsource/monoton/latin-400.css";
 import "@fontsource/mountains-of-christmas/latin-400.css";

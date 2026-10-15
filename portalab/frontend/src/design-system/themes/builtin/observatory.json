@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 2,
+  "key": "observatory",
+  "name": "Observatoire",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#0b1226",
+    "surfaceRaised": "#141d3a",
+    "text": "#ecf0ff",
+    "textMuted": "#a9b4d8",
+    "border": "#2c3a66",
+    "accent": "#e2b45a",
+    "accentContrast": "#1a1203",
+    "focus": "#9fd0ff",
+    "accentAlt": "#8fb8ff",
+    "rarity": {
+      "common": "#a9b4d8",
+      "rare": "#6fb8ff",
+      "epic": "#c792ff",
+      "legendary": "#f2c661"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, \"EB Garamond\", sans-serif",
+    "headingFamily": "\"Cinzel Decorative\", Cinzel, serif",
+    "headingCase": "none",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.4,
+    "md": 0.9
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "starshower",
+    "fastMs": 160,
+    "normalMs": 340,
+    "levelUp": "constellate"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "planisphere",
+      "tablet": "planisphere",
+      "phone": "planisphere"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "elevated",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "telescope",
+      "film": "film",
+      "media": "film",
+      "compass": "compass",
+      "users": "users",
+      "shop": "store",
+      "trophy": "star",
+      "search": "search",
+      "newspaper": "radio",
+      "book": "book",
+      "calendar": "moon",
+      "chart": "chart"
+    }
+  },
+  "background": {
+    "fallback": "#0b1226",
+    "pattern": "none",
+    "ambient": "constellations"
+  },
+  "sounds": {
+    "notification": "asset:magic/notification.wav",
+    "alert": "asset:magic/alert.wav",
+    "success": "asset:magic/success.wav",
+    "reward": "asset:magic/reward.wav",
+    "levelUp": "asset:magic/level-up.wav",
+    "ui": "asset:magic/ui.wav"
+  },
+  "notification": {
+    "style": "starmap",
+    "animation": "shootingstar"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "La coupole",
+      "nav:nav.section.home": "La coupole",
+      "dashboard:title": "La coupole",
+      "nav:nav.media": "Le planétarium",
+      "nav:nav.section.media": "Le planétarium",
+      "media:home.title": "Le planétarium",
+      "nav:nav.media_requests": "Mes requêtes d'observation",
+      "nav:nav.media_insights": "Mon journal d'observation",
+      "media:insights.title": "Mon journal d'observation",
+      "nav:nav.section.content": "La bibliothèque",
+      "nav:nav.news": "Le bulletin astronomique",
+      "news:title": "Le bulletin astronomique",
+      "nav:nav.wiki": "Les cartes du ciel",
+      "wiki:title": "Les cartes du ciel",
+      "nav:nav.search": "Pointer le télescope",
+      "search:title": "Pointer le télescope",
+      "nav:nav.calendar": "Les éphémérides",
+      "calendar:title": "Les éphémérides",
+      "nav:nav.services": "Les instruments",
+      "nav:nav.section.services": "Les instruments",
+      "nav:nav.statistics": "Les relevés",
+      "statistics:title": "Les relevés",
+      "nav:nav.community": "Les astronomes",
+      "nav:nav.section.community": "Les astronomes",
+      "community:title": "Les astronomes",
+      "nav:nav.progression": "Ma constellation",
+      "gamification:progression.title": "Ma constellation",
+      "nav:nav.campaigns": "Les nuits d'observation",
+      "campaigns:page.title": "Les nuits d'observation",
+      "nav:nav.marketplace": "La boutique de l'observatoire",
+      "nav:nav.section.marketplace": "La boutique de l'observatoire",
+      "marketplace:catalog.title": "La boutique de l'observatoire",
+      "nav:nav.projects": "Les instruments à financer",
+      "marketplace:projects.title": "Les instruments à financer",
+      "marketplace:owned.title": "Ma collection d'étoiles",
+      "nav:nav.support": "Le poste de garde",
+      "nav:nav.section.support": "Le poste de garde",
+      "nav:nav.incidents": "Les nuits nuageuses",
+      "support:incident.title": "Les nuits nuageuses",
+      "nav:nav.feedback": "Un mot au directeur",
+      "support:feedback.title": "Un mot au directeur",
+      "gamification:value.coins": "Pièces d'or",
+      "gamification:value.xp": "Lumière"
+    },
+    "en": {
+      "nav:nav.home": "The dome",
+      "nav:nav.section.home": "The dome",
+      "dashboard:title": "The dome",
+      "nav:nav.media": "The planetarium",
+      "nav:nav.section.media": "The planetarium",
+      "media:home.title": "The planetarium",
+      "nav:nav.media_requests": "My observing requests",
+      "nav:nav.media_insights": "My observing log",
+      "media:insights.title": "My observing log",
+      "nav:nav.section.content": "The library",
+      "nav:nav.news": "The astronomical bulletin",
+      "news:title": "The astronomical bulletin",
+      "nav:nav.wiki": "The star charts",
+      "wiki:title": "The star charts",
+      "nav:nav.search": "Point the telescope",
+      "search:title": "Point the telescope",
+      "nav:nav.calendar": "The ephemerides",
+      "calendar:title": "The ephemerides",
+      "nav:nav.services": "The instruments",
+      "nav:nav.section.services": "The instruments",
+      "nav:nav.statistics": "The readings",
+      "statistics:title": "The readings",
+      "nav:nav.community": "The astronomers",
+      "nav:nav.section.community": "The astronomers",
+      "community:title": "The astronomers",
+      "nav:nav.progression": "My constellation",
+      "gamification:progression.title": "My constellation",
+      "nav:nav.campaigns": "Observing nights",
+      "campaigns:page.title": "Observing nights",
+      "nav:nav.marketplace": "The observatory shop",
+      "nav:nav.section.marketplace": "The observatory shop",
+      "marketplace:catalog.title": "The observatory shop",
+      "nav:nav.projects": "Instruments to fund",
+      "marketplace:projects.title": "Instruments to fund",
+      "marketplace:owned.title": "My star collection",
+      "nav:nav.support": "The night desk",
+      "nav:nav.section.support": "The night desk",
+      "nav:nav.incidents": "Cloudy nights",
+      "support:incident.title": "Cloudy nights",
+      "nav:nav.feedback": "A word to the director",
+      "support:feedback.title": "A word to the director",
+      "gamification:value.coins": "Gold coins",
+      "gamification:value.xp": "Starlight"
+    }
+  }
+}

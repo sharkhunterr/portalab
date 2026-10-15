@@ -94,4 +94,5 @@ def test_levels_spread_over_the_whole_curve() -> None:
     assert {p["key"]: p["level"] for p in sold if p["type"] == "booster" and p["level"]} == {
         "booster_prestige": 15,
         "booster_legend": 30,
+        "booster_celestial": 5,  # #130: the cosmos' own
     }

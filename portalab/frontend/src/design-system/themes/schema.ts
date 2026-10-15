@@ -75,6 +75,8 @@ export const NAV_DESKTOP = [
   "player",
   "masthead",
   "dpad",
+  "planisphere", // issue 130: the observatory
+  "system", // issue 130: the space station
 ] as const;
 export const NAV_TABLET = [
   "rail",
@@ -95,6 +97,8 @@ export const NAV_TABLET = [
   "player",
   "masthead",
   "dpad",
+  "planisphere", // issue 130: the observatory
+  "system", // issue 130: the space station
 ] as const;
 export const NAV_PHONE = [
   "bottom-bar",
@@ -114,6 +118,8 @@ export const NAV_PHONE = [
   "player",
   "masthead",
   "dpad",
+  "planisphere", // issue 130: the observatory
+  "system", // issue 130: the space station
 ] as const;
 export const HEADER_STYLES = ["full", "compact", "centered"] as const;
 export const HEADER_POSITIONS = ["top", "bottom"] as const;

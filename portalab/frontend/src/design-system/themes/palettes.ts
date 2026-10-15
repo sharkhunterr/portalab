@@ -229,6 +229,15 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#c8a2ff", accentAlt: "#8fdc8f", contrast: "#1e0a3a" },
     light: { accent: "#6b3fb0", accentAlt: "#2f7a3a", contrast: "#ffffff" },
   },
+  // issue 130: the cosmos — Orion's magenta, the blue of deep space
+  orionpink: {
+    dark: { accent: "#ff5fa2", accentAlt: "#9d8cff", contrast: "#2a0818" },
+    light: { accent: "#b0215f", accentAlt: "#5a3fc0", contrast: "#ffffff" },
+  },
+  deepspace: {
+    dark: { accent: "#5fb4ff", accentAlt: "#5ef0d8", contrast: "#04142a" },
+    light: { accent: "#1559a8", accentAlt: "#0b7a6a", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

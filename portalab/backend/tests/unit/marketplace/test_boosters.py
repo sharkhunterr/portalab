@@ -7,6 +7,7 @@ import random
 from datetime import date
 
 from portalab.modules.marketplace.boosters import (
+    HD_PACKS,
     RARITIES,
     SEASONS,
     booster_info,
@@ -84,3 +85,12 @@ def test_seasons() -> None:
             <= 1
         )
         assert len(current) <= 1
+
+
+def test_a_collection_booster_draws_from_its_packs_only() -> None:
+    """#130: a booster may name the packs it draws from (the Celestial booster: the cosmos' packs)."""
+    celestial = booster_of("c", {"en": "C"}, 500, {"packs": ["pack_astro", "pack_hd_nebulae", 7, ""]})
+    assert celestial.packs == ("pack_astro", "pack_hd_nebulae") and celestial.pool == "looks"
+    assert booster_of("h", {}, 1, {"pool": "hd"}).packs == HD_PACKS  # the Prestige HD booster, as before
+    assert booster_of("p", {}, 1, {}).packs == ()
+    assert booster_info("c", {"en": "C"}, 500, {"packs": ["pack_zodiac"]}, None)["packs"] == ["pack_zodiac"]

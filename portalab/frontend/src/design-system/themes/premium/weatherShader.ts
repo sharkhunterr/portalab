@@ -5,7 +5,7 @@ import { COMMON } from "./shaders";
  * the clouds broke into facets with a seam down the middle) — the cells' coordinates folded to small
  * numbers before hashing, a hash that never multiplies them by large factors.
  */
-const BASE = COMMON.replace(
+export const SAFE_COMMON = COMMON.replace(
   /float hash\(vec2 p\) \{[\s\S]*?\n\}/,
   `float hash(vec2 p) {
   p = mod(p, 289.0);
@@ -22,7 +22,7 @@ const BASE = COMMON.replace(
  * grains settling at the bottom, bouncing hail, lightning lighting the clouds, gusts of wind, frost creeping
  * on the edges when it freezes. Premultiplied over the page, light enough to read through.
  */
-export const WEATHER = `${BASE}
+export const WEATHER = `${SAFE_COMMON}
 uniform float u_light;
 uniform float u_glow;
 uniform float u_dawn;

@@ -27,7 +27,9 @@ export type NavVariant =
   | "feed"
   | "player"
   | "masthead"
-  | "dpad";
+  | "dpad"
+  | "planisphere"
+  | "system";
 
 export interface Arrangement {
   device: DeviceClass;

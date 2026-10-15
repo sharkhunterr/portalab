@@ -21,6 +21,8 @@ BUILTIN_THEMES = Path(themes_package.__file__).parent / "builtin"
 SHOP: list[Product] = []
 # 027: products taken out of the shop — archived (no longer sold, their option no longer offered)
 RETIRED: tuple[str, ...] = (
+    "ambient_cometpass",  # #130: renamed « greatcomet » (a key holding « pass » reads as a secret)
+    "banner_live_cometpass",
     "opt_style_upcoming_flip",
     "widget_server_playing",  # free again: it replaced « now playing »
     "widget_calendar",  # free: the calendar is part of every dashboard
@@ -1415,6 +1417,16 @@ THEME_TEXT |= {
                 "Un jardin au printemps : des verts frais et du rose, une liane sur le côté avec une feuille par rubrique, des aigrettes de pissenlit qui flottent, des notifications en sachets de graines qui poussent."),
 }  # fmt: skip
 THEME_RARITY |= {"funky": ("epic", 900, 6), "beach": ("rare", 600, 3), "blossom": ("rare", 600, 3)}
+# #130: the cosmos' interfaces
+THEME_TEXT |= {
+    "observatory": ("Observatory", "Observatoire",
+                    "A night at the observatory: navy and brass, a round star chart that turns to choose your section — each a constellation, each page a star — constellations drawing themselves behind, shooting-star notifications.",
+                    "Une nuit à l'observatoire : bleu nuit et laiton, une carte du ciel ronde qui tourne pour choisir sa rubrique — chacune une constellation, chaque page une étoile —, des constellations qui se dessinent derrière, des notifications en étoiles filantes."),
+    "spacestation": ("Space station", "Station spatiale",
+                     "Aboard a space station: cyan readouts on black, your sections as planets on their orbit — open one and its pages go round it like moons — the solar system turning behind, a jump to hyperspace at every level.",
+                     "À bord d'une station spatiale : des écrans cyan sur fond noir, vos rubriques en planètes sur leur orbite — ouvrez-en une et ses pages tournent autour comme des lunes —, le système solaire qui tourne derrière, un saut dans l'hyperespace à chaque niveau."),
+}  # fmt: skip
+THEME_RARITY |= {"observatory": ("legendary", 1500, 10), "spacestation": ("legendary", 1500, 10)}
 
 # 027: an interface (the « theme » product) is its colours, fonts, layout, navigation and words; its sold
 # looks (animated background, notifications, celebration, level-up) come with its theme pack
@@ -1450,6 +1462,12 @@ _p("rescue_3", "media_rescue", 1500, "epic", "Three rescues", "Trois sauvetages"
    "Three titles saved from the cleanup, whenever you need them — cheaper than one by one.",
    "Trois titres sauvés du nettoyage, quand vous en avez besoin — moins cher qu'un par un.",
    {"count": 3}, collection="essentials", icon="shield", level=8, limit=(1, 30), repeatable=True)  # fmt: skip
+
+# #131: a pass for one item won early (a booster, a gift) and still waiting for its level — dear and rare
+_p("early_unlock", "early_unlock", 2500, "epic", "Level pass", "Passe-droit",
+   "Use it from your reserve on an item you hold but may not wear yet for want of a level: it is yours to wear at once. 25 copies, one a month per member.",
+   "À utiliser depuis votre réserve sur un élément que vous possédez mais ne pouvez pas encore porter faute de niveau : il est à vous tout de suite. 25 exemplaires, un par mois et par membre.",
+   {}, collection="essentials", icon="key", supply=25, limit=(1, 30), repeatable=True)  # fmt: skip
 
 # #54/#55: perks for the play streak and the gains — consumed, bought again and again (within limits)
 _p("streak_freeze_1", "streak_freeze", 120, "common", "Streak freeze", "Gel de série",
@@ -2662,6 +2680,309 @@ UNIVERSE_ROWS: dict[str, tuple[tuple[Any, ...], ...]] = {
          "Un arbre se couvre de fleurs, ses pétales tourbillonnent autour de votre nouveau niveau."),
     ),
 }  # fmt: skip
+# --------------------------------------------------------------------------------- the cosmos (#130)
+# Nebulae (Orion, the Crab, the Helix, the Pillars of Creation, Carina's cliffs), planets, comets, shooting
+# stars and constellations: ambiences and animated banners, frames, level badges, notifications, a
+# celebration and level-ups drawn by the graphics chip; name styles in faces of their own (no aura), palettes,
+# banners, titles and badges — the twelve constellations of the zodiac among them. Their packs, their
+# booster, two interfaces (an observatory, a space station) and a few given by achievements and levels.
+COSMOS_HD: list[str] = []
+COSMOS_KEYS: list[str] = []
+
+
+COSMOS_LEGENDARY = {
+    "ambient_orion", "ambient_pillars", "frame_ringedworld", "levelup_hyperjump", "level_totality", "effect_bigbang",
+    "frame_polaris", "badge_supernova", "title_night_watcher", "title_star_sailor",
+}  # fmt: skip
+
+
+def _cosmos(key: str, kind: str, price: int | None, rarity: str, en: str, fr: str, about_en: str, about_fr: str,
+            payload: dict[str, Any], *, collection: str, icon: str, hd: bool = True, reward: bool = False) -> None:  # fmt: skip
+    _p(key, kind, None if reward else price, "legendary" if key in COSMOS_LEGENDARY else rarity, en, fr, about_en,
+       about_fr, payload, collection=collection, icon=icon, reward_only=reward)  # fmt: skip
+    COSMOS_KEYS.append(key)
+    if hd:
+        COSMOS_HD.append(key)
+
+
+COSMOS_AMBIENTS = {  # key: names, what it shows, rarity, price
+    "orion": ("Orion Nebula", "Nébuleuse d'Orion", "legendary", 1700,
+              "M42: billowing clouds of magenta and crimson round a white-hot heart where young stars blaze, violet and blue wings, dark bays of dust — folding slowly.",
+              "M42 : des nuages magenta et cramoisis autour d'un cœur blanc où brillent de jeunes étoiles, des ailes violettes et bleues, des baies de poussière — qui se replient lentement."),
+    "crab": ("Crab Nebula", "Nébuleuse du Crabe", "epic", 1400,
+             "What a star left when it blew up: a web of orange and red filaments round a ghostly cyan glow, its pulsar flickering in the middle.",
+             "Ce qu'a laissé une étoile en explosant : une toile de filaments orange et rouges autour d'une lueur cyan, son pulsar qui scintille au milieu."),
+    "helix": ("Helix Nebula", "Nébuleuse de l'Hélice", "epic", 1400,
+              "The « eye of God »: a ring of teal gas streaked with cometary knots round a red ring and a deep blue heart, turning slowly.",
+              "L'« œil de Dieu » : un anneau de gaz turquoise strié de nœuds cométaires autour d'un anneau rouge et d'un cœur bleu profond, qui tourne lentement."),
+    "pillars": ("Pillars of Creation", "Piliers de la création", "legendary", 1800,
+                "Towering columns of golden-brown dust against a blue field of stars, their tops lit and evaporating, stars with six spikes.",
+                "Des colonnes de poussière dorée dressées sur un champ d'étoiles bleu, leurs sommets éclairés qui s'évaporent, des étoiles à six aigrettes."),
+    "cliffs": ("Cosmic Cliffs", "Falaises cosmiques", "epic", 1300,
+               "Carina's ridge of orange dust like a mountain range, steam rising from its crest into a blue sky of glowing gas.",
+               "La crête de poussière orangée de la Carène comme une chaîne de montagnes, de la vapeur qui s'élève de sa crête dans un ciel de gaz bleu."),
+    "solarsystem": ("Solar system", "Système solaire", "epic", 1300,
+                    "The sun glowing on the side, six planets on their tilted orbits, the asteroid belt and a ringed giant.",
+                    "Le soleil qui rayonne sur le côté, six planètes sur leurs orbites inclinées, la ceinture d'astéroïdes et une géante à anneaux."),
+    "saturnrise": ("Ringed giant", "Géante aux anneaux", "epic", 1200,
+                   "A ringed giant rising in a corner: banded clouds turning, rings with their gap, little moons going round.",
+                   "Une géante aux anneaux qui se lève dans un coin : des nuages en bandes qui tournent, des anneaux et leur division, de petites lunes qui tournent."),
+    "perseids": ("Perseids", "Perséides", "rare", 950,
+                 "A summer night over the hills, shooting stars streaking from their radiant, now and then a fireball.",
+                 "Une nuit d'été au-dessus des collines, des étoiles filantes qui jaillissent de leur radiant, parfois un bolide."),
+    "constellations": ("Constellations", "Constellations", "epic", 1100,
+                       "Orion, Cassiopeia, the Plough, the Swan, the Lion and the Scorpion drawing themselves in turn, star after star.",
+                       "Orion, Cassiopée, la Grande Ourse, le Cygne, le Lion et le Scorpion qui se dessinent tour à tour, étoile après étoile."),
+    "milkyway": ("Milky Way", "Voie lactée", "epic", 1300,
+                 "A band of countless stars across the sky, its glowing core and dark lanes of dust, over the mountains.",
+                 "Une bande d'innombrables étoiles à travers le ciel, son cœur lumineux et ses traînées de poussière, au-dessus des montagnes."),
+    "greatcomet": ("Great comet", "Grande comète", "rare", 900,
+                  "A great comet crossing the sky, its curved golden dust tail and its straight blue ion tail.",
+                  "Une grande comète qui traverse le ciel, sa queue de poussière dorée et courbe, sa queue d'ions bleue et droite."),
+}  # fmt: skip
+for _k, (_en, _fr, _rarity, _price, _aen, _afr) in COSMOS_AMBIENTS.items():
+    _cosmos(f"ambient_{_k}", "ambient", _price, _rarity, f"{_en} ambience", f"Ambiance {_fr}", _aen, _afr,
+            {"ambient": _k}, collection="ambients", icon="telescope")  # fmt: skip
+    _banner = {"legendary": 1500, "epic": 1100}.get(_rarity, 850)  # the banner as rare as its ambience
+    _cosmos(f"banner_live_{_k}", "profile_banner", _banner, "epic" if _banner >= 1000 else "rare", f"{_en} animated banner", f"Bannière animée {_fr}",
+            f"{_en} in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+            f"{_fr} dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs.",
+            {"banner": f"live-{_k}"}, collection="profile", icon="image")  # fmt: skip
+
+COSMOS_EFFECTS = {  # GPU effect: names, then what the frame, the level badge and the notifications show
+    "stellar": ("Nebula", "Nébuleuse", "nebulaveil", "Glowing gas, pink and teal, folding round", "Du gaz lumineux, rose et turquoise, qui se replie autour"),
+    "orrery": ("Orrery", "Planétaire", "orrery", "Planets going round on their orbits, a little sun in the middle", "Des planètes qui tournent sur leurs orbites, un petit soleil au milieu"),
+    "starmap": ("Star chart", "Carte du ciel", "starchart", "A constellation drawing itself on a star chart", "Une constellation qui se dessine sur une carte du ciel"),
+    "comet": ("Comet", "Comète", "cometring", "A comet going round, its tails streaming behind", "Une comète qui fait le tour, ses queues derrière elle"),
+    "ringworld": ("Ringed planet", "Planète à anneaux", "ringedworld", "A ringed planet, its banded clouds turning", "Une planète à anneaux, ses nuages en bandes qui tournent"),
+    "pulsar": ("Pulsar", "Pulsar", "pulsar", "A pulsar's beams sweeping round like a lighthouse", "Les faisceaux d'un pulsar qui balaient comme un phare"),
+    "totality": ("Total eclipse", "Éclipse totale", "eclipse", "The corona of a total eclipse, the diamond ring flashing", "La couronne d'une éclipse totale, l'anneau de diamant qui étincelle"),
+    "meteor": ("Shooting stars", "Étoiles filantes", "meteorite", "Shooting stars streaking across a night sky", "Des étoiles filantes qui traversent un ciel nocturne"),
+}  # fmt: skip
+HD_TEXT = ("drawn by the graphics chip", "dessiné par la puce graphique")
+# the price of each look (frame, level badge, notifications): its rarity follows (rare from 600, epic from 1000;
+# the legendary ones are named below)
+COSMOS_PRICES = {
+    "stellar": (1300, 1600, 1200), "orrery": (1200, 1500, 1000), "starmap": (900, 1400, 850), "comet": (850, 1300, 800),
+    "ringworld": (1600, 1700, 1100), "pulsar": (1100, 1500, 900), "totality": (1400, 1900, 1200), "meteor": (750, 1000, 700),
+}  # fmt: skip
+
+
+def _tier(price: int) -> str:
+    return "epic" if price >= 1000 else "rare" if price >= 600 else "common"
+
+
+for _fx, (_en, _fr, _frame, _aen, _afr) in COSMOS_EFFECTS.items():
+    _fp, _lp, _np = COSMOS_PRICES[_fx]
+    _cosmos(f"frame_{_frame}", "avatar_frame", _fp, _tier(_fp), f"{_en} frame", f"Cadre {_fr.lower()}",
+            f"{_aen} your avatar, {HD_TEXT[0]}.", f"{_afr} de votre avatar, {HD_TEXT[1]}.", {"frame": _frame},
+            collection="profile", icon="user")  # fmt: skip
+    _cosmos(f"level_{_fx}", "level_badge", _lp, _tier(_lp), f"{_en} level badge", f"Badge de niveau {_fr.lower()}",
+            f"Your level inside: {_aen.lower()}, {HD_TEXT[0]}.", f"Votre niveau au cœur : {_afr.lower()}, {HD_TEXT[1]}.",
+            {"style": _fx}, collection="levels", icon="trophy")  # fmt: skip
+    _cosmos(f"notif_{_fx}", "notification_style", _np, _tier(_np), f"{_en} notifications", f"Notifications {_fr.lower()}",
+            f"Notifications in a shape of their own: {_aen.lower()}, {HD_TEXT[0]}.",
+            f"Des notifications à la forme bien à elles : {_afr.lower()}, {HD_TEXT[1]}.", {"style": _fx},
+            collection="looks", icon="bell")  # fmt: skip
+for _k, _price, _en, _fr, _aen, _afr in (
+    ("shootingstar", 750, "Shooting star", "Étoile filante", "Notifications streaking in like a shooting star.", "Des notifications qui arrivent comme une étoile filante."),
+    ("nebulabloom", 1000, "Nebula bloom", "Éclosion de nébuleuse", "Notifications blooming out of a cloud of glowing gas.", "Des notifications qui éclosent d'un nuage de gaz lumineux."),
+    ("eclipsed", 900, "Eclipse", "Éclipse", "Notifications appearing as the moon slides off the sun, the corona flaring.", "Des notifications qui apparaissent quand la lune quitte le soleil, la couronne qui flamboie."),
+):  # fmt: skip
+    _cosmos(f"notif_{_k}", "notification_animation", _price, _tier(_price), f"{_en} notification animation",
+            f"Animation de notification {_fr.lower()}", _aen, _afr, {"animation": _k}, collection="looks", icon="bell-ring")  # fmt: skip
+for _k, _price, _en, _fr, _aen, _afr in (
+    ("starshower", 1100, "Meteor storm", "Pluie d'étoiles filantes", "Dozens of shooting stars streaking out of the reward, fireballs flaring green and gold.", "Des dizaines d'étoiles filantes qui jaillissent de la récompense, des bolides verts et dorés."),
+    ("bigbang", 1600, "Big Bang", "Big Bang", "A point of light, a blinding flash, a ball of fire cooling into the cosmic web and its first galaxies.", "Un point de lumière, un éclair aveuglant, une boule de feu qui refroidit en toile cosmique et ses premières galaxies."),
+):  # fmt: skip
+    _cosmos(f"effect_{_k}", "effect", _price, _tier(_price), f"{_en} celebration", f"Célébration {_fr}", _aen, _afr,
+            {"effect": _k}, collection="celebrations", icon="party")  # fmt: skip
+for _k, _en, _fr, _price, _rarity, _aen, _afr in (
+    ("hyperjump", "Hyperspace jump", "Saut dans l'hyperespace", 2000, "legendary",
+     "The stars stretch into streaks, a tunnel of light rushes past — a flash — and you come out before a nebula in bloom, at your new level.",
+     "Les étoiles s'étirent en traînées, un tunnel de lumière défile — un éclair — et vous arrivez devant une nébuleuse en fleur, à votre nouveau niveau."),
+    ("constellate", "A constellation is born", "Naissance d'une constellation", 1500, "epic",
+     "Stars light up one by one round your new level and join into a crown of stars.",
+     "Des étoiles s'allument une à une autour de votre nouveau niveau et se relient en couronne d'étoiles."),
+):  # fmt: skip
+    _cosmos(f"levelup_{_k}", "level_up", _price, _rarity, f"{_en} level-up", f"Passage de niveau {_fr.lower()}", _aen,
+            _afr, {"animation": _k}, collection="levels", icon="trophy")  # fmt: skip
+
+# not drawn by the GPU: faces of their own, colours, banners, titles and badges
+for _k, _en, _fr, _price, _aen, _afr in (
+    ("spaceage", "Space age", "ère spatiale", 350, "A name in rounded space-age letters, silver turning to sky blue, glowing softly.",
+     "Un nom en lettres arrondies de l'ère spatiale, l'argent qui vire au bleu ciel, d'un éclat doux."),
+    ("starlines", "Star lines", "lignes d'étoiles", 650, "A name drawn in fine lines like a constellation's, a star twinkling at its end.",
+     "Un nom tracé en traits fins comme ceux d'une constellation, une étoile qui scintille au bout."),
+    ("staratlas", "Star atlas", "atlas céleste", 300, "A name engraved in gold like the title of an old star atlas.",
+     "Un nom gravé à l'or comme le titre d'un vieil atlas céleste."),
+):  # fmt: skip
+    _cosmos(f"name_{_k}", "name_style", _price, "common", f"{_en} name style", f"Style de nom {_fr}", _aen, _afr,
+            {"style": _k}, collection="names", icon="feather", hd=False)  # fmt: skip
+    SHOP[-1]["rarity"] = _tier(_price)
+for _k, _en, _fr, _aen, _afr in (
+    ("orionpink", "Orion pink", "Rose d'Orion", "Orion's magenta and violet over the theme.", "Le magenta et le violet d'Orion sur le thème."),
+    ("deepspace", "Deep space", "Espace lointain", "The blue and teal of deep space over the theme.", "Le bleu et le turquoise de l'espace lointain sur le thème."),
+):  # fmt: skip
+    _cosmos(f"palette_{_k}", "palette", 200, "common", f"{_en} palette", f"Palette {_fr.lower()}", _aen, _afr,
+            {"palette": _k}, collection="palettes", icon="palette", hd=False)  # fmt: skip
+for _k, _en, _fr, _aen, _afr in (
+    ("starchart", "Star chart", "Carte du ciel", "A navy star chart, its grid and two constellations drawn.", "Une carte du ciel bleu nuit, sa grille et deux constellations tracées."),
+    ("orbits", "Orbits", "Orbites", "A sun and its planets on their orbits.", "Un soleil et ses planètes sur leurs orbites."),
+):  # fmt: skip
+    _cosmos(f"banner_{_k}", "profile_banner", 300, "common", f"{_en} banner", f"Bannière {_fr.lower()}", _aen, _afr,
+            {"banner": _k}, collection="profile", icon="image", hd=False)  # fmt: skip
+for _label, _fr, _style, _price in (
+    ("Astronomer", "Titre : Astronome", "starmap", 650), ("Comet chaser", "Titre : Chasseur de comètes", "comet", 450),
+    ("Event horizon", "Titre : Horizon des événements", "totality", 1100), ("Cosmonaut", "Titre : Cosmonaute", "orrery", 700),
+):  # fmt: skip
+    _cosmos(f"title_{_label.lower().replace(' ', '_')}", "title", _price, _tier(_price), f"Title: {_label}", _fr,
+            f"« {_label} » under your name, {HD_TEXT[0]}.", f"« {_label} » sous votre nom, {HD_TEXT[1]}.",
+            {"label": _label, "style": _style}, collection="titles", icon="trophy")  # fmt: skip
+for _label, _fr, _icon, _style, _price in (
+    ("Telescope", "Badge Télescope", "telescope", "stellar", 650), ("Ringed planet", "Badge Planète à anneaux", "orbit", "ringworld", 700),
+    ("Pulsar", "Badge Pulsar", "radio", "pulsar", 450), ("Meteorite", "Badge Météorite", "sparkle", "meteor", 350),
+):  # fmt: skip
+    _cosmos(f"badge_{_label.lower().replace(' ', '_')}", "badge", _price, _tier(_price), f"{_label} badge", _fr,
+            f"A « {_label} » badge on your profile, {HD_TEXT[0]}.", f"Un badge « {_label} » sur votre profil, {HD_TEXT[1]}.",
+            {"label": _label, "icon": _icon, "style": _style}, collection="badges", icon="star")  # fmt: skip
+ZODIAC = (
+    ("aries", "Aries", "Bélier"), ("taurus", "Taurus", "Taureau"), ("gemini", "Gemini", "Gémeaux"), ("cancer", "Cancer", "Cancer"),
+    ("leo", "Leo", "Lion"), ("virgo", "Virgo", "Vierge"), ("libra", "Libra", "Balance"), ("scorpio", "Scorpio", "Scorpion"),
+    ("sagittarius", "Sagittarius", "Sagittaire"), ("capricorn", "Capricorn", "Capricorne"), ("aquarius", "Aquarius", "Verseau"),
+    ("pisces", "Pisces", "Poissons"),
+)  # fmt: skip
+for _sign, _en, _fr in ZODIAC:
+    _cosmos(f"badge_zodiac_{_sign}", "badge", 300, "common", f"{_en} badge", f"Badge {_fr}",
+            f"The constellation of {_en}, its stars joined, on your profile — {HD_TEXT[0]}.",
+            f"La constellation du {_fr}, ses étoiles reliées, sur votre profil — {HD_TEXT[1]}.",
+            {"label": _en, "icon": f"zodiac-{_sign}", "style": "starmap"}, collection="badges", icon="star")  # fmt: skip
+
+# given, never sold: an achievement's or a level's (see the demo achievements and the level rewards)
+for _key, _kind, _payload, _en, _fr, _aen, _afr, _icon in (
+    ("frame_polaris", "avatar_frame", {"frame": "polaris"}, "Polaris frame", "Cadre étoile polaire",
+     "A star chart in the shape of the North Star round your avatar. Given at level 40.", "Une carte du ciel en forme d'étoile polaire autour de votre avatar. Offert au niveau 40.", "user"),
+    ("title_night_watcher", "title", {"label": "Night watcher", "style": "starmap"}, "Title: Night watcher", "Titre : Veilleur de nuit",
+     "Given by a secret achievement of the night.", "Offert par un succès secret de la nuit.", "moon"),
+    ("title_star_sailor", "title", {"label": "Star sailor", "style": "comet"}, "Title: Star sailor", "Titre : Navigateur des étoiles",
+     "Given at level 26 (Or II).", "Offert au niveau 26 (Or II).", "rocket"),
+    ("badge_supernova", "badge", {"label": "Supernova", "icon": "sparkles", "style": "stellar"}, "Supernova badge", "Badge Supernova",
+     "Given at level 46 (Diamant II).", "Offert au niveau 46 (Diamant II).", "sparkles"),
+):  # fmt: skip
+    _cosmos(
+        _key,
+        _kind,
+        None,
+        "legendary",
+        _en,
+        _fr,
+        _aen,
+        _afr,
+        _payload,
+        collection="rewards",
+        icon=_icon,
+        reward=True,
+    )
+
+# the packs: everything that is not drawn by the GPU, then three HD packs (the Prestige HD booster draws from
+# them too), the zodiac — and a booster drawing only from these
+_ZODIAC_KEYS = [f"badge_zodiac_{sign}" for sign, _, _ in ZODIAC]
+_SOLD = [
+    key
+    for key in COSMOS_KEYS
+    if key not in ("frame_polaris", "title_night_watcher", "title_star_sailor", "badge_supernova")
+]
+_NEBULAE = ("orion", "crab", "helix", "pillars", "cliffs")
+_PLANETS = ("solarsystem", "saturnrise")
+COSMOS_PACKS = (
+    ("pack_astro", "Astronomy pack", "Pack Astronomie", "telescope",
+     "The cosmos' name styles, palettes and banners together.",
+     "Les styles de nom, palettes et bannières du cosmos réunis.",
+     [k for k in _SOLD if k not in COSMOS_HD]),
+    ("pack_hd_nebulae", "Nebulae HD pack", "Pack Nébuleuses HD", "sparkles",
+     "Orion, the Crab, the Helix, the Pillars of Creation and Carina's cliffs — behind the portal and in your banner — with the nebula frame, level badge and notifications.",
+     "Orion, le Crabe, l'Hélice, les Piliers de la création et les falaises de la Carène — derrière le portail et dans votre bannière — avec le cadre, le badge de niveau et les notifications nébuleuse.",
+     [*(f"ambient_{k}" for k in _NEBULAE), *(f"banner_live_{k}" for k in _NEBULAE), "frame_nebulaveil", "level_stellar",
+      "notif_stellar", "notif_nebulabloom", "badge_telescope"]),
+    ("pack_hd_planets", "Planets HD pack", "Pack Planètes HD", "orbit",
+     "The solar system and the ringed giant, their animated banners, the orrery and ringed-world frames, level badges and notifications.",
+     "Le système solaire et la géante aux anneaux, leurs bannières animées, les cadres planétaire et monde aux anneaux, leurs badges de niveau et notifications.",
+     [*(f"ambient_{k}" for k in _PLANETS), *(f"banner_live_{k}" for k in _PLANETS), "frame_orrery", "frame_ringedworld",
+      "level_orrery", "level_ringworld", "notif_orrery", "notif_ringworld", "badge_ringed_planet", "title_cosmonaut"]),
+    ("pack_hd_stars", "Stars HD pack", "Pack Étoiles HD", "star",
+     "Shooting stars, constellations and the Milky Way: ambiences, banners, frames, level badges, notifications, the meteor storm and a constellation's birth.",
+     "Étoiles filantes, constellations et Voie lactée : ambiances, bannières, cadres, badges de niveau, notifications, la pluie d'étoiles filantes et la naissance d'une constellation.",
+     [*(f"ambient_{k}" for k in ("perseids", "constellations", "milkyway")),
+      *(f"banner_live_{k}" for k in ("perseids", "constellations", "milkyway")),
+      "frame_starchart", "frame_meteorite", "level_starmap", "level_meteor", "notif_starmap", "notif_meteor",
+      "notif_shootingstar", "effect_starshower", "levelup_constellate", "badge_meteorite", "title_astronomer"]),
+    ("pack_hd_comets", "Comets and eclipses HD pack", "Pack Comètes et éclipses HD", "moon",
+     "The great comet, pulsars and the total eclipse: an ambience, a banner, frames, level badges, notifications, the Big Bang and the hyperspace jump.",
+     "La grande comète, les pulsars et l'éclipse totale : une ambiance, une bannière, des cadres, des badges de niveau, des notifications, le Big Bang et le saut dans l'hyperespace.",
+     ["ambient_greatcomet", "banner_live_greatcomet", "frame_cometring", "frame_pulsar", "frame_eclipse", "level_comet",
+      "level_pulsar", "level_totality", "notif_comet", "notif_pulsar", "notif_totality", "notif_eclipsed", "effect_bigbang",
+      "levelup_hyperjump", "badge_pulsar", "title_comet_chaser", "title_event_horizon"]),
+    ("pack_zodiac", "Zodiac pack", "Pack Zodiaque", "zodiac-leo",
+     "The twelve constellations of the zodiac as badges, drawn by the graphics chip.",
+     "Les douze constellations du zodiaque en badges, dessinées par la puce graphique.",
+     _ZODIAC_KEYS),
+)  # fmt: skip
+for _key, _en, _fr, _icon, _aen, _afr, _held in COSMOS_PACKS:
+    _p(
+        _key,
+        "bundle",
+        None,
+        "epic",
+        _en,
+        _fr,
+        _aen,
+        _afr,
+        {"products": list(_held)},
+        collection="packs",
+        icon=_icon,
+    )
+_p("booster_celestial", "booster", 500, "epic", "Celestial booster", "Booster Céleste",
+   "Five looks of the cosmos drawn at random — nebulae, planets, comets, constellations, the zodiac… at least one rare.",
+   "Cinq looks du cosmos tirés au hasard — nébuleuses, planètes, comètes, constellations, zodiaque… dont au moins un rare.",
+   {"pool": "looks", "packs": [k for k, *_ in COSMOS_PACKS], "cards": 5, "odds": {"common": 50, "rare": 32, "epic": 15, "legendary": 3},
+    "guarantee": "rare", "look": "celestial"}, collection="boosters", icon="sparkles", repeatable=True)  # fmt: skip
+
+# the level each one needs, set here rather than spread: the legendary ones on the great tiers, the epic ones
+# along the curve, the rare ones early, the common ones for everyone; a pack asks the highest of what it holds
+COSMOS_LEVELS: dict[str, int | None] = {
+    # legendary
+    "ambient_orion": 20, "ambient_pillars": 30, "frame_ringedworld": 40, "levelup_hyperjump": 40, "level_totality": 30,
+    "effect_bigbang": 20,
+    # epic
+    "ambient_crab": 12, "ambient_helix": 14, "ambient_cliffs": 16, "ambient_solarsystem": 6, "ambient_saturnrise": 9,
+    "ambient_milkyway": 8, "ambient_constellations": 5,
+    "banner_live_orion": 18, "banner_live_pillars": 25, "banner_live_crab": 11, "banner_live_helix": 13,
+    "banner_live_cliffs": 15, "banner_live_solarsystem": 7, "banner_live_saturnrise": 10, "banner_live_milkyway": 9,
+    "banner_live_constellations": 6,
+    "frame_nebulaveil": 15, "frame_orrery": 11, "frame_pulsar": 13, "frame_eclipse": 22,
+    "level_stellar": 21, "level_orrery": 17, "level_starmap": 12, "level_comet": 10, "level_ringworld": 44,
+    "level_pulsar": 19, "level_meteor": 7,
+    "notif_stellar": 9, "notif_orrery": 8, "notif_ringworld": 13, "notif_totality": 16, "notif_nebulabloom": 11,
+    "effect_starshower": 10, "levelup_constellate": 23, "title_event_horizon": 15,
+    # rare
+    "ambient_perseids": 4, "ambient_greatcomet": 3, "banner_live_perseids": 3, "banner_live_greatcomet": 2,
+    "frame_starchart": 6, "frame_cometring": 5, "frame_meteorite": 3,
+    "notif_starmap": 4, "notif_comet": 3, "notif_pulsar": 6, "notif_meteor": 2, "notif_shootingstar": 3, "notif_eclipsed": 7,
+    "name_starlines": 4, "title_astronomer": 5, "title_cosmonaut": 8, "badge_telescope": 6, "badge_ringed_planet": 7,
+    "booster_celestial": 5,
+}  # fmt: skip
+for _key in COSMOS_KEYS:
+    COSMOS_LEVELS.setdefault(_key, None)  # the common ones: for everyone
+for _key, *_text, _held in COSMOS_PACKS:
+    _most = max((COSMOS_LEVELS.get(k) or 0 for k in _held), default=0)
+    # an HD pack is legendary (its worth): it unlocks on the great tier at or above what it holds
+    COSMOS_LEVELS[_key] = (
+        next(t for t in (10, 20, 30, 40, 50) if t >= _most)
+        if _key.startswith("pack_hd_") and _most
+        else _most or None
+    )
+
+
 UNIVERSE_MADE: dict[str, list[str]] = {theme: _looks(rows)[0] for theme, rows in UNIVERSE_ROWS.items()}
 _SLOTS = ("banner_", "frame_", "name_", "notif_", "effect_", "ambient_", "badge_", "title_")
 
@@ -2689,6 +3010,16 @@ for _theme, _made in UNIVERSE_MADE.items():
         _row[7],
     )
     UNIVERSE_EXTRAS[_theme] = tuple(key for key in _made if key not in _row)
+
+# #130: the cosmos' interfaces and what their theme packs hold
+UNIVERSES["observatory"] = ("banner_starchart", "frame_starchart", "name_staratlas", "notif_starmap",
+                            "effect_starshower", "ambient_constellations", "badge_telescope", "title_astronomer")  # fmt: skip
+UNIVERSE_EXTRAS["observatory"] = ("banner_live_constellations", "level_starmap", "palette_orionpink", "name_starlines",
+                                  "badge_zodiac_leo", "badge_zodiac_scorpio")  # fmt: skip
+UNIVERSES["spacestation"] = ("banner_orbits", "frame_orrery", "name_spaceage", "notif_orrery", "effect_bigbang",
+                             "ambient_solarsystem", "badge_ringed_planet", "title_cosmonaut")  # fmt: skip
+UNIVERSE_EXTRAS["spacestation"] = ("banner_live_solarsystem", "level_orrery", "palette_deepspace", "badge_pulsar",
+                                   "title_comet_chaser")  # fmt: skip
 
 
 # 027 (#30): each universe's dashboard looks — its theme pack includes them (and the widget a look needs)
@@ -3351,6 +3682,8 @@ LEGENDARY = {
     "level_chrono", "notif_chrono", "frame_chronogate", "levelup_timeportal", "pack_hd_time_portal",
     "notif_warp", "effect_timerift", "effect_nova", "effect_rebirth", "name_namegold", "name_namechrono",
     *SEASONAL_LEGENDARY,
+    # #130: the cosmos' flagships
+    *COSMOS_LEGENDARY,
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY and product["type"] != "booster":
@@ -3450,6 +3783,7 @@ BOOSTER_LEVELS = {"booster_prestige": 15, "booster_legend": 30}  # the others ar
 # and is usable from there: a legendary pack early on, to make members want to go further
 EARLY = {"ultimate_nova": 5, "pack_nova": 5, "theme_nova": 5}
 USEFUL = {
+    "early_unlock",  # #131: for everyone (it is how one gets round a level)
     "access",
     "service_access",
     "widget",
@@ -3485,10 +3819,14 @@ def _spread_levels(products: list[Product]) -> None:
     kept = sum(1 for p in sold if p["level"] and (p["type"] in USEFUL or p["type"] == "booster"))
     looks = [p for p in sold if p["type"] not in USEFUL and p["type"] != "booster"]
     order = {p["key"]: (p["level"] or 0, p["price"] or 0, p["key"]) for p in looks}
-    looks = [p for p in looks if p["key"] not in EARLY]
+    fixed = {**EARLY, **COSMOS_LEVELS}  # #130: the cosmos sets its own
+    looks = [p for p in looks if p["key"] not in fixed]
     legendary = [p for p in looks if p["rarity"] == "legendary"]
     epic = sorted((p for p in looks if p["rarity"] == "epic"), key=lambda p: (-(p["price"] or 0), p["key"]))
-    epic = epic[: max(0, round(len(sold) * GATED_SHARE) - kept - len(EARLY) - len(legendary))]
+    gated_fixed = sum(
+        1 for p in sold if fixed.get(p["key"]) and p["type"] not in USEFUL and p["type"] != "booster"
+    )
+    epic = epic[: max(0, round(len(sold) * GATED_SHARE) - kept - gated_fixed - len(legendary))]
     gated = {p["key"] for p in legendary + epic}
     for product in looks:
         if product["key"] not in gated:
@@ -3498,8 +3836,17 @@ def _spread_levels(products: list[Product]) -> None:
     slots = [level for level in range(low, high + 1) for _ in range(level_weight(level))]
     _take(sorted(epic, key=lambda p: order[p["key"]]), slots)
     for product in sold:
-        if product["key"] in EARLY:
-            product["level"] = EARLY[product["key"]]
+        if product["key"] in fixed:
+            product["level"] = fixed[product["key"]]
+
+
+# #130: the cosmos' interfaces at the first great tier, their theme packs at the great tier at or above what
+# they hold (never a way round a level)
+for _theme in ("observatory", "spacestation"):
+    COSMOS_LEVELS[f"theme_{_theme}"] = THEME_RARITY[_theme][2]
+    _held = next(p for p in SHOP if p["key"] == f"ultimate_{_theme}")["payload"]["products"]
+    _most = max((COSMOS_LEVELS.get(k) or 0 for k in _held), default=0)
+    COSMOS_LEVELS[f"ultimate_{_theme}"] = next(t for t in GREAT_TIERS if t >= _most)
 
 
 _spread_levels(SHOP)

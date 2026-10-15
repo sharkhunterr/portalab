@@ -32,6 +32,15 @@ export const FX_LEVEL_BADGES: Record<string, string> = {
   spectre: "spectre",
   tinsel: "tinsel",
   verdant: "verdant",
+  // issue 130: the cosmos
+  stellar: "stellar",
+  orrery: "orrery",
+  starmap: "starmap",
+  comet: "comet",
+  ringworld: "ringworld",
+  pulsar: "pulsar",
+  totality: "totality",
+  meteor: "meteor",
 };
 
 /** notification styles, and the styles of titles and badges (same keys: each effect's own name) */
@@ -53,6 +62,15 @@ export const FX_STYLES: Record<string, string> = {
   aurora: "aurora",
   plasma: "plasma",
   chrono: "chrono",
+  // issue 130: the cosmos
+  stellar: "stellar",
+  orrery: "orrery",
+  starmap: "starmap",
+  comet: "comet",
+  ringworld: "ringworld",
+  pulsar: "pulsar",
+  totality: "totality",
+  meteor: "meteor",
 };
 
 /** #78: notifications drawn by the GPU need not be rectangles — the shape each style draws itself in */
@@ -74,6 +92,15 @@ export const FX_NOTIFICATION_SHAPES: Record<string, number> = {
   aurora: 8,
   plasma: 0,
   chrono: 6,
+  // issue 130: the cosmos
+  stellar: 8,
+  orrery: 0,
+  starmap: 6,
+  comet: 7,
+  ringworld: 0,
+  pulsar: 6,
+  totality: 0,
+  meteor: 7,
 };
 /** #78: name styles drawn by the GPU — an aura around the name (its letters stay its own) */
 export const FX_NAMES: Record<string, string> = {
@@ -106,6 +133,10 @@ export const FX_NOTIFICATION_ANIMATIONS: Record<string, string> = {
   petalfall: "sakura",
   eclipse: "shadow",
   warp: "chrono",
+  // issue 130: the cosmos
+  shootingstar: "meteor",
+  nebulabloom: "stellar",
+  eclipsed: "totality",
 };
 
 /** #78: reward celebrations drawn by the GPU over the whole screen (and from when in their timeline) */
@@ -118,6 +149,9 @@ export const FX_CELEBRATIONS: Record<string, { effect: string; from: number }> =
   skyveil: { effect: "aurorasky", from: 0.9 },
   arcana: { effect: "arcanum", from: 0.5 },
   timerift: { effect: "timeportal", from: 0.8 },
+  // issue 130: the cosmos
+  starshower: { effect: "meteorstorm", from: 0.2 },
+  bigbang: { effect: "bigbang", from: 0 },
 };
 
 /** avatar frames, each in a shape of its own */
@@ -145,6 +179,16 @@ export const FX_FRAMES: Record<string, FxSpec> = {
   amour: { effect: "amour", shape: 0, radius: "50%" },
   verdant: { effect: "verdant", shape: 1 },
   sunburst: { effect: "sunburst", shape: 0, radius: "50%" },
+  // issue 130: the cosmos
+  nebulaveil: { effect: "stellar", shape: 0, radius: "50%" },
+  orrery: { effect: "orrery", shape: 0, radius: "50%" },
+  starchart: { effect: "starmap", shape: 1 },
+  cometring: { effect: "comet", shape: 0, radius: "50%" },
+  ringedworld: { effect: "ringworld", shape: 0, radius: "50%" },
+  pulsar: { effect: "pulsar", shape: 2 },
+  eclipse: { effect: "totality", shape: 0, radius: "50%" },
+  meteorite: { effect: "meteor", shape: 3 },
+  polaris: { effect: "starmap", shape: 4 },
 };
 
 /** full-stage level-up moments */
@@ -158,6 +202,8 @@ export const FX_LEVEL_UPS: ReadonlySet<string> = new Set([
   "sakurastorm",
   "aurorasky",
   "timeportal",
+  "hyperjump", // issue 130
+  "constellate",
 ]);
 
 /** the shop products drawn by the GPU (a pack holding one shows it too) */
@@ -311,6 +357,84 @@ export const FX_PRODUCTS: ReadonlySet<string> = new Set([
   "name_nameplasma",
   "name_nameaurora",
   "name_namechrono",
+  // issue 130: the cosmos
+  "ambient_orion",
+  "banner_live_orion",
+  "ambient_crab",
+  "banner_live_crab",
+  "ambient_helix",
+  "banner_live_helix",
+  "ambient_pillars",
+  "banner_live_pillars",
+  "ambient_cliffs",
+  "banner_live_cliffs",
+  "ambient_solarsystem",
+  "banner_live_solarsystem",
+  "ambient_saturnrise",
+  "banner_live_saturnrise",
+  "ambient_perseids",
+  "banner_live_perseids",
+  "ambient_constellations",
+  "banner_live_constellations",
+  "ambient_milkyway",
+  "banner_live_milkyway",
+  "ambient_greatcomet",
+  "banner_live_greatcomet",
+  "frame_nebulaveil",
+  "level_stellar",
+  "notif_stellar",
+  "frame_orrery",
+  "level_orrery",
+  "notif_orrery",
+  "frame_starchart",
+  "level_starmap",
+  "notif_starmap",
+  "frame_cometring",
+  "level_comet",
+  "notif_comet",
+  "frame_ringedworld",
+  "level_ringworld",
+  "notif_ringworld",
+  "frame_pulsar",
+  "level_pulsar",
+  "notif_pulsar",
+  "frame_eclipse",
+  "level_totality",
+  "notif_totality",
+  "frame_meteorite",
+  "level_meteor",
+  "notif_meteor",
+  "notif_shootingstar",
+  "notif_nebulabloom",
+  "notif_eclipsed",
+  "effect_starshower",
+  "effect_bigbang",
+  "levelup_hyperjump",
+  "levelup_constellate",
+  "title_astronomer",
+  "title_comet_chaser",
+  "title_event_horizon",
+  "title_cosmonaut",
+  "badge_telescope",
+  "badge_ringed_planet",
+  "badge_pulsar",
+  "badge_meteorite",
+  "badge_zodiac_aries",
+  "badge_zodiac_taurus",
+  "badge_zodiac_gemini",
+  "badge_zodiac_cancer",
+  "badge_zodiac_leo",
+  "badge_zodiac_virgo",
+  "badge_zodiac_libra",
+  "badge_zodiac_scorpio",
+  "badge_zodiac_sagittarius",
+  "badge_zodiac_capricorn",
+  "badge_zodiac_aquarius",
+  "badge_zodiac_pisces",
+  "frame_polaris",
+  "title_night_watcher",
+  "title_star_sailor",
+  "badge_supernova",
 ]);
 
 /** CSS clip of an avatar inside a shaped frame. */

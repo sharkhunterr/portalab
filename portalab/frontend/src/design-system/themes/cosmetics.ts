@@ -121,6 +121,20 @@ export const BANNER_KEYS = [
   "live-groovywaves",
   "live-beachballs",
   "live-dandelion",
+  // issue 130: the cosmos
+  "starchart",
+  "orbits",
+  "live-orion",
+  "live-crab",
+  "live-helix",
+  "live-pillars",
+  "live-cliffs",
+  "live-solarsystem",
+  "live-saturnrise",
+  "live-perseids",
+  "live-constellations",
+  "live-milkyway",
+  "live-greatcomet",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -204,6 +218,16 @@ export const FRAME_KEYS = [
   "retroarc",
   "parasol",
   "flowerwreath",
+  // issue 130: the cosmos
+  "nebulaveil",
+  "orrery",
+  "starchart",
+  "cometring",
+  "ringedworld",
+  "pulsar",
+  "eclipse",
+  "meteorite",
+  "polaris",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -280,4 +304,8 @@ export const NAME_KEYS = [
   "funkadelic",
   "surfwave",
   "watercolour",
+  // issue 130: the cosmos
+  "spaceage",
+  "starlines",
+  "staratlas",
 ] as const;

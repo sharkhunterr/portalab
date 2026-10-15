@@ -279,7 +279,10 @@ UNLOCKS: dict[str, list[dict[str, str]]] = {
     "big_spender": [_unlock("title_big_spender", "title", "Big spender")],
     "achievement_hunter": [_unlock("badge_achievement_hunter", "badge", "Achievement hunter")],
     "loyal": [_unlock("frame_loyal", "avatar_frame", "Loyal golden frame")],
-    "night_owl": [_unlock("banner_live_starfield", "profile_banner", "Animated starry banner")],  # #79
+    "night_owl": [
+        _unlock("banner_live_starfield", "profile_banner", "Animated starry banner"),  # #79
+        _unlock("title_night_watcher", "title", "Night watcher"),  # #130
+    ],
     "level_20": [
         _unlock("level_crown", "level_badge", "Crowned level badge"),
         _unlock("title_living_legend", "title", "Living legend"),
@@ -302,7 +305,10 @@ UNLOCKS: dict[str, list[dict[str, str]]] = {
     "lucky_hand": [_unlock("badge_lucky_hand", "badge", "Lucky hand")],
     # #108
     "level_30": [_unlock("title_seasoned", "title", "Seasoned")],
-    "level_40": [_unlock("badge_elder", "badge", "Elder")],
+    "level_40": [
+        _unlock("badge_elder", "badge", "Elder"),
+        _unlock("frame_polaris", "avatar_frame", "Polaris frame"),  # #130
+    ],
     "level_50": [
         _unlock("badge_portal_legend", "badge", "Legend"),
         _unlock("title_portal_legend", "title", "Legend of the portal"),
@@ -765,8 +771,9 @@ class DemoSeeder:
                     self.admin, "economy.streak", demo_economy.STREAK, reason="demo economy"
                 )
                 settings += 1
-            if not gamification.config.level_rewards or _same_tiers(
-                gamification.config.level_rewards, demo_economy.FORMER_LEVEL_REWARDS
+            if not gamification.config.level_rewards or any(
+                _same_tiers(gamification.config.level_rewards, former)
+                for former in (demo_economy.FORMER_LEVEL_REWARDS, demo_economy.PREVIOUS_LEVEL_REWARDS)
             ):
                 await writer[0].provider.set_global(
                     self.admin, "economy.levelRewards", demo_economy.LEVEL_REWARDS, reason="demo economy"

@@ -37,6 +37,7 @@ import minimal from "./minimal.json";
 import neowave from "./neowave.json";
 import nostromo from "./nostromo.json";
 import nova from "./nova.json";
+import observatory from "./observatory.json";
 import orbit from "./orbit.json";
 import platformer from "./platformer.json";
 import plex from "./plex.json";
@@ -45,6 +46,7 @@ import portalabDark from "./portalab-dark.json";
 import portalabLight from "./portalab-light.json";
 import sincity from "./sincity.json";
 import social from "./social.json";
+import spacestation from "./spacestation.json";
 import studio from "./studio.json";
 import upsidedown from "./upsidedown.json";
 import vhs from "./vhs.json";
@@ -103,6 +105,8 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   funky,
   beach,
   blossom,
+  observatory, // issue 130: the cosmos
+  spacestation,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

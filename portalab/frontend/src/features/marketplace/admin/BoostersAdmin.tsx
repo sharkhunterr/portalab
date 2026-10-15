@@ -27,6 +27,7 @@ const LOOKS = [
   "summer",
   "halloween",
   "winter",
+  "celestial",
 ] as const;
 
 interface Draft {
@@ -101,6 +102,7 @@ function BoosterSettings({
                     refunds: Object.fromEntries(RARITIES.map((r) => [r, whole(value.refunds[r] ?? "0")])),
                     look: value.look,
                     ...(value.season ? { season: value.season } : {}),
+                    ...(info.packs?.length ? { packs: info.packs } : {}), // issue 130: kept as it is
                     ...(whole(value.perMember) ? { per_member: whole(value.perMember) } : {}),
                   },
                 },

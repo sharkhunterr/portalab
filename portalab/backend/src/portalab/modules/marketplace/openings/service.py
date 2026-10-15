@@ -72,6 +72,20 @@ class OpenIt(Conflict):
     default_title = "A booster is opened"
 
 
+class NotAnUnlock(Conflict):
+    default_code = "marketplace.not_an_early_unlock"
+    default_title = "Not a level pass"
+
+
+class NothingWaiting(Conflict):
+    default_code = "marketplace.nothing_waiting"
+    default_title = "Nothing waiting for a level"
+
+
+# #131: what a level pass never opens — an interface, a pack, a booster, another pass
+PASS_EXCLUDED = frozenset({"theme", "bundle", "booster", "early_unlock"})
+
+
 @dataclass(frozen=True, slots=True)
 class Drawn:
     product: Product
@@ -505,6 +519,62 @@ class Openings:
             unlocked += 1
         return unlocked
 
+    async def unlock_early(self, actor: Principal, pass_key: str, target_key: str) -> Ownership:
+        """#131: spend a level pass of the reserve on an item the member holds but may not wear yet (won in a
+        booster, offered): it becomes theirs to use at once. Never on an interface, a pack, a booster; one
+        pass, one item; no Coins nor XP move (the pass was paid when bought)."""
+        user = actor.acting_for or actor.user_id
+        if user is None or not await self._active(user):
+            raise Forbidden(
+                "Only active accounts can use their reserve.", code="marketplace.not_active_account"
+            )
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            ticket = await session.scalar(select(Product).where(Product.key == pass_key))
+            if ticket is None or ticket.type != "early_unlock":
+                raise NotAnUnlock("This is not a level pass.")
+            target = await session.scalar(select(Product).where(Product.key == target_key))
+            if target is None or target.type in PASS_EXCLUDED:
+                raise NothingWaiting("A level pass opens a look waiting for its level, nothing else.")
+            row = await session.scalar(
+                select(Ownership)
+                .where(
+                    Ownership.user_id == user,
+                    Ownership.product_id == target.id,
+                    Ownership.state == "locked",
+                )
+                .order_by(Ownership.acquired_at)
+                .limit(1)
+                .with_for_update()
+            )
+            if row is None:
+                raise NothingWaiting("You hold nothing of this waiting for a level.")
+            item = await session.get(ReserveItem, (user, ticket.id), with_for_update=True)
+            if item is None or item.quantity <= 0:
+                raise NothingInReserve("You have no level pass in your reserve.")
+            now = utc_now(self.clock)
+            item.quantity -= 1
+            item.updated_at = now
+            version = await session.get(ProductVersion, (target.id, row.product_version))
+            row.state = (
+                "needs_configuration"
+                if version is not None and version.config_required
+                else "activation_failed"
+            )
+            ownership_id = row.id
+            await self.events.publish(
+                session,
+                "marketplace.unlock",
+                {"product": target.key, "ownership": str(ownership_id), "price": 0},
+                occurred_at=now,
+                actor=actor,
+                subject=SubjectRef("user", str(user)),
+                dedup_key=f"marketplace.unlock:pass:{ownership_id}",
+            )
+        metrics.increment("marketplace.early_unlock_used")
+        log.info("level pass used", extra={"fields": {"product": target_key[:60]}})
+        return await self.activation.activate(ownership_id)
+
     async def unlock_all(self) -> int:
         async with self.database.session() as session:
             users = list(
@@ -552,6 +622,8 @@ class Openings:
                     raise ProductNotFound("This product does not exist.")
                 if product.type == "booster":
                     raise OpenIt("A booster in the reserve is opened, not used.")
+                if product.type == "early_unlock":
+                    raise NotAnUnlock("A level pass is used on an item waiting for its level.")
                 item = await session.get(ReserveItem, (user, product.id), with_for_update=True)
                 if item is None or item.quantity <= 0:
                     raise NothingInReserve("You have none of these in your reserve.")

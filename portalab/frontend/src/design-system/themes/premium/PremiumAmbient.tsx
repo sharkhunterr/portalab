@@ -72,6 +72,18 @@ const LAYERS: Record<string, Layers> = {
   impasto: { shader: "impasto" },
   paintribbon: { shader: "paintribbon" },
   weathersky: { shader: "weathersky" }, // #88: « live weather », its numbers from the report
+  // issue 130: the cosmos
+  orion: { shader: "orion" },
+  crab: { shader: "crab" },
+  helix: { shader: "helix" },
+  pillars: { shader: "pillars" },
+  cliffs: { shader: "cliffs" },
+  solarsystem: { shader: "solarsystem" },
+  saturnrise: { shader: "saturnrise" },
+  perseids: { shader: "perseids" },
+  constellations: { shader: "constellations" },
+  milkyway: { shader: "milkyway" },
+  greatcomet: { shader: "greatcomet" },
 };
 
 /** The CSS ambience standing in for each premium one. */
@@ -131,6 +143,18 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   impasto: "aurora",
   paintribbon: "aurora",
   weathersky: "skyclouds",
+  // issue 130: the cosmos
+  orion: "starfield",
+  crab: "starfield",
+  helix: "starfield",
+  pillars: "starfield",
+  cliffs: "starfield",
+  solarsystem: "starfield",
+  saturnrise: "starfield",
+  perseids: "starfield",
+  constellations: "starfield",
+  milkyway: "starfield",
+  greatcomet: "starfield",
 };
 
 export function isPremiumAmbient(kind: string): boolean {
@@ -184,17 +208,22 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
   let index = 0;
   const next = () => canvases[index++] as HTMLCanvasElement;
   if (layers.shader) {
-    const [{ runShader }, { SHADERS }, { COZY_SHADERS }, { WARM_SHADERS }, { WEATHER }] = await Promise.all([
-      import("./shaderRunner"),
-      import("./shaders"),
-      import("./cozyShaders"),
-      import("./warmShaders"),
-      import("./weatherShader"),
-    ]);
+    const [{ runShader }, { SHADERS }, { COZY_SHADERS }, { WARM_SHADERS }, { WEATHER }, { COSMOS_SHADERS }] =
+      await Promise.all([
+        import("./shaderRunner"),
+        import("./shaders"),
+        import("./cozyShaders"),
+        import("./warmShaders"),
+        import("./weatherShader"),
+        import("./cosmosShaders"),
+      ]);
     const source =
       layers.shader === "weathersky"
         ? WEATHER
-        : (SHADERS[layers.shader] ?? COZY_SHADERS[layers.shader] ?? WARM_SHADERS[layers.shader]);
+        : (SHADERS[layers.shader] ??
+          COZY_SHADERS[layers.shader] ??
+          WARM_SHADERS[layers.shader] ??
+          COSMOS_SHADERS[layers.shader]);
     const stop = runShader(next(), source as string, uniforms);
     if (!stop) return null;
     stops.push(stop);

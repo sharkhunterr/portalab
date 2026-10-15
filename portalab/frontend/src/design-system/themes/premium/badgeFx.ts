@@ -12,6 +12,7 @@
  */
 
 import { frameInterval, liveLooks, motionBudget } from "../../motion/budget";
+import { COSMOS_BADGE_EFFECTS, COSMOS_EFFECTS, COSMOS_STAGE_EFFECTS } from "./cosmosFx";
 
 export const FX_EFFECTS = [
   "blaze",
@@ -51,6 +52,9 @@ export const FX_EFFECTS = [
   "mist",
   // a legendary card's moment on that stage
   "radiance",
+  // issue 130: the cosmos
+  ...COSMOS_BADGE_EFFECTS,
+  ...COSMOS_STAGE_EFFECTS,
 ] as const;
 export type FxBadge = (typeof FX_EFFECTS)[number];
 const FULL_STAGE = new Set<string>([
@@ -65,6 +69,7 @@ const FULL_STAGE = new Set<string>([
   "timeportal",
   "mist",
   "radiance",
+  ...COSMOS_STAGE_EFFECTS,
 ]);
 
 // high precision where the device has it: in medium precision (many phones by default) fast-moving noise
@@ -185,6 +190,7 @@ void main() {
 `;
 
 const EFFECTS: Record<FxBadge, string> = {
+  ...COSMOS_EFFECTS, // issue 130
   // living flames rising all around the badge, taller above it, over a body of glowing embers
   blaze: `
   vec2 q = vec2(p.x * 1.5, p.y * 1.1 - t * 2.4);
@@ -1126,6 +1132,12 @@ function baseOf(effect: string): FxBadge {
   return (effect.startsWith("burst:") ? effect.slice(6) : effect) as FxBadge;
 }
 
+/** The fragment shader an effect is drawn with (also read by tests and previews). */
+export function fxFragment(effect: string): string {
+  const base = baseOf(effect);
+  return `${HEAD}${MAIN_OPEN}${EFFECTS[base]}${FULL_STAGE.has(base) ? CLOSE_FULL : CLOSE}`;
+}
+
 function compile(context: WebGLRenderingContext, effect: FxBadge): Program | null {
   if (programs.has(effect)) return programs.get(effect) ?? null;
   const make = (type: number, source: string) => {
@@ -1140,10 +1152,7 @@ function compile(context: WebGLRenderingContext, effect: FxBadge): Program | nul
     return shader;
   };
   const vertex = make(context.VERTEX_SHADER, VERTEX);
-  const fragment = make(
-    context.FRAGMENT_SHADER,
-    `${HEAD}${MAIN_OPEN}${EFFECTS[baseOf(effect)]}${FULL_STAGE.has(effect) ? CLOSE_FULL : CLOSE}`,
-  );
+  const fragment = make(context.FRAGMENT_SHADER, fxFragment(effect));
   const program = context.createProgram();
   let made: Program | null = null;
   if (vertex && fragment && program) {

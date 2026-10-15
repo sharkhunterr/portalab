@@ -116,6 +116,15 @@ const BADGE_STYLES = [
   "aurora",
   "plasma",
   "chrono",
+  // issue 130: the cosmos
+  "stellar",
+  "orrery",
+  "starmap",
+  "comet",
+  "ringworld",
+  "pulsar",
+  "totality",
+  "meteor",
 ];
 const ICON_NAMES = Object.keys(ICONS).sort();
 

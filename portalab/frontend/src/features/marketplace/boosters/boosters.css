@@ -60,6 +60,12 @@
   --pack-a: var(--booster-pumpkin);
   --pack-b: var(--booster-epic);
 }
+/* issue 130: the Celestial booster — a nebula's magenta and the blue of deep space */
+[data-theme-pack="celestial"] {
+  --pack-glow: var(--booster-sky);
+  --pack-a: var(--booster-magenta);
+  --pack-b: var(--booster-sky);
+}
 [data-theme-pack="winter"] {
   --pack-glow: var(--booster-light);
   --pack-a: var(--booster-holly);

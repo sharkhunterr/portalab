@@ -16,6 +16,8 @@ export interface BoosterInfo {
   /** what comes out of it: looks for the collection, or items for the reserve */
   kind: "looks" | "reserve";
   season: string | null;
+  /** issue 130: the packs it draws from (a collection's booster) */
+  packs?: string[];
   /** a season's: the last day it is on sale */
   until: string | null;
   per_member: number | null;
@@ -85,6 +87,8 @@ export interface ReserveEntry {
   needs_configuration: boolean;
   /** a sealed booster: opened, not used */
   booster: boolean;
+  /** issue 131: a level pass, used on an item waiting for its level */
+  early_unlock?: boolean;
 }
 
 const KEY = ["marketplace"] as const;
@@ -149,6 +153,26 @@ export function useUseReserve() {
     onSettled: () => {
       void client.invalidateQueries({ queryKey: KEY });
       void client.invalidateQueries({ queryKey: ["gamification"] });
+    },
+  });
+}
+
+/** issue 131: spend a level pass on an item I hold that waits for its level — wearable at once. */
+export function useEarlyUnlock() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ key, target }: { key: string; target: string }) => {
+      const { data, error } = await api.POST("/api/v1/marketplace/reserve/{key}/unlock", {
+        params: { path: { key } },
+        body: { target },
+      });
+      if (error) throw error;
+      return data as unknown as { ownership: string; product: string; state: string };
+    },
+    onSettled: () => {
+      void client.invalidateQueries({ queryKey: KEY });
+      void client.invalidateQueries({ queryKey: ["ui", "notification-looks"] });
+      void client.invalidateQueries({ queryKey: ["marketplace", "profile-looks"] });
     },
   });
 }

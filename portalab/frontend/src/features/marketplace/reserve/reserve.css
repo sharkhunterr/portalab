@@ -74,3 +74,46 @@
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
 }
+
+/* issue 131: a level pass — the items waiting for their level, one button each */
+.reserve-pass {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reserve-pass li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.reserve-pass__name {
+  display: grid;
+  gap: 2px;
+}
+.reserve-pass__name small {
+  color: var(--color-text-muted);
+}
+.reserve-waiting {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg, var(--radius-md));
+}
+.reserve-waiting h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg, 1.125rem);
+}
+.reserve-waiting__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+}

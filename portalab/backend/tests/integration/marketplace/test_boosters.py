@@ -276,3 +276,45 @@ async def test_a_look_waiting_for_its_level_is_listed_locked_with_its_level(
     assert "waiting" not in levels["classic"]
     [badge] = await mk.module.looks.owned_items(user, "badge")
     assert badge["key"] == "night_owl" and badge["waiting"] == {"level": 7}
+
+
+async def test_a_early_unlock_unlocks_an_item_waiting_for_its_level(
+    mk: MkHarness, client: AsyncClient
+) -> None:
+    """#131 — a level pass, bought, waits in the reserve; spent on an item the member holds but may not wear
+    yet, it makes it theirs at once — one pass, one item; never on what is not waiting, nor a pack."""
+    level = [{"kind": "min_level", "level": 30}]
+    await look(mk, "night_owl", "common", conditions=level)
+    await look(mk, "early_bird", "common", conditions=level)
+    await booster(mk, "booster_looks", 100, cards=2)
+    body = {**product_def("early_unlock", "early_unlock", price_coins=2500, payload={}), "repeatable": True}
+    await mk.module.catalog.create(mk.p("boss"), body)
+    await mk.module.catalog.move(mk.p("boss"), "early_unlock", "available")
+    await mk.coins("ursula", 3000)
+    await login(client, "ursula")
+    await client.post("/api/v1/marketplace/boosters/booster_looks/open")
+    bought = await client.post(
+        "/api/v1/marketplace/products/early_unlock/acquire", headers={"Idempotency-Key": "p"}
+    )
+    assert bought.status_code in (200, 201), bought.text
+    reserve = {i["product"]["key"]: i for i in (await client.get("/api/v1/marketplace/reserve")).json()}
+    assert reserve["early_unlock"]["quantity"] == 1 and reserve["early_unlock"]["early_unlock"] is True
+    # used like any other item: refused — it is spent on an item
+    plain = await client.post("/api/v1/marketplace/reserve/early_unlock/use")
+    assert plain.status_code == 409 and plain.json()["code"] == "marketplace.not_an_early_unlock"
+    nothing = await client.post(
+        "/api/v1/marketplace/reserve/early_unlock/unlock", json={"target": "booster_looks"}
+    )
+    assert nothing.status_code == 409 and nothing.json()["code"] == "marketplace.nothing_waiting"
+
+    used = await client.post("/api/v1/marketplace/reserve/early_unlock/unlock", json={"target": "night_owl"})
+    assert used.status_code == 201 and used.json()["state"] == "active"
+    states = {
+        r["product_key"]: r["state"] for r in (await client.get("/api/v1/me/marketplace/purchases")).json()
+    }
+    assert states["night_owl"] == "active" and states["early_bird"] == "locked"  # one pass, one item
+    again = await client.post(
+        "/api/v1/marketplace/reserve/early_unlock/unlock", json={"target": "early_bird"}
+    )
+    assert again.status_code == 409 and again.json()["code"] == "marketplace.reserve_empty"
+    assert await mk.balance("ursula") == 3000 - 100 - 2500  # no Coins moved by the pass itself

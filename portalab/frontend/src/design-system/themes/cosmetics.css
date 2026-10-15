@@ -4073,3 +4073,102 @@
 .avatar-frame[data-size]:not([data-frame]) {
   padding: 0;
 }
+
+/* issue 130: the cosmos — name styles in faces of their own (no GPU aura), two banners drawn in CSS */
+.name-style[data-name="spaceage"] {
+  font-family: Audiowide, Orbitron, sans-serif;
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #ffffff 0%, #cfe6ff 45%, #6fb8ff 55%, #e8f4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.35em rgb(95 180 255 / 0.55));
+}
+.name-style[data-name="starlines"] {
+  position: relative;
+  font-family: Megrim, Michroma, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: #eaf3ff;
+  text-shadow:
+    0 0 0.25em #9fd0ff,
+    0 0 0.6em rgb(120 160 255 / 0.6);
+}
+.name-style[data-name="starlines"]::after {
+  content: "✦";
+  position: absolute;
+  inset-block-start: -0.35em;
+  inset-inline-end: -0.7em;
+  font-size: 0.55em;
+  color: #fff6d8;
+  text-shadow: 0 0 0.5em #ffe9a0;
+  animation: cosmos-twinkle 2.4s ease-in-out infinite;
+}
+.name-style[data-name="staratlas"] {
+  font-family: "Cinzel Decorative", Cinzel, serif;
+  font-weight: 700;
+  color: #f2d48a;
+  text-shadow:
+    0 1px 0 #6b4a12,
+    0 -1px 0 #fff3cf,
+    0 0 0.5em rgb(242 212 138 / 0.4);
+}
+@keyframes cosmos-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7) rotate(25deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-style[data-name="starlines"]::after {
+    animation: none;
+  }
+}
+.profile-banner[data-banner="starchart"] {
+  background:
+    radial-gradient(1.5px 1.5px at 18% 32%, #fff 99%, transparent),
+    radial-gradient(2px 2px at 34% 58%, #fff6d8 99%, transparent),
+    radial-gradient(1.5px 1.5px at 52% 24%, #fff 99%, transparent),
+    radial-gradient(2px 2px at 71% 46%, #dfeaff 99%, transparent),
+    radial-gradient(1.5px 1.5px at 86% 28%, #fff 99%, transparent),
+    linear-gradient(28deg, transparent 49.6%, rgb(140 190 255 / 0.55) 50%, transparent 50.4%) 18% 32% / 16%
+    26% no-repeat,
+    linear-gradient(-34deg, transparent 49.6%, rgb(140 190 255 / 0.55) 50%, transparent 50.4%) 34% 24% / 18%
+    34% no-repeat,
+    repeating-radial-gradient(circle at 50% 160%, transparent 0 3.6rem, rgb(120 160 230 / 0.22) 3.6rem 3.7rem),
+    repeating-linear-gradient(90deg, transparent 0 4rem, rgb(120 160 230 / 0.16) 4rem 4.08rem),
+    radial-gradient(ellipse at 50% 120%, #1d3a7a, #0a1430 70%);
+}
+.profile-banner[data-banner="orbits"] {
+  background:
+    radial-gradient(
+      circle at 22% 50%,
+      #fff3c4 0 1.1rem,
+      #ffb347 1.3rem,
+      rgb(255 160 60 / 0.25) 2.6rem,
+      transparent 4rem
+    ),
+    radial-gradient(circle at 45% 34%, #6fa8ff 0 0.35rem, transparent 0.4rem),
+    radial-gradient(circle at 63% 70%, #ff7a5c 0 0.3rem, transparent 0.35rem),
+    radial-gradient(circle at 84% 40%, #e8d29a 0 0.55rem, transparent 0.6rem),
+    radial-gradient(ellipse 25% 38% at 22% 50%, transparent 97%, rgb(160 190 255 / 0.4) 98%, transparent 100%),
+    radial-gradient(
+      ellipse 45% 62% at 22% 50%,
+      transparent 98.5%,
+      rgb(160 190 255 / 0.32) 99%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 66% 88% at 22% 50%,
+      transparent 98.8%,
+      rgb(160 190 255 / 0.26) 99.2%,
+      transparent 100%
+    ),
+    radial-gradient(1px 1px at 12% 20%, #fff 99%, transparent) 0 0 / 3.1rem 2.3rem,
+    linear-gradient(160deg, #0b0f2a, #161040 60%, #090b1c);
+}

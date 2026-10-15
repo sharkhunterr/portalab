@@ -40,6 +40,7 @@ NOT_REFUNDABLE = frozenset(
         "xp_boost",
         "media_rescue",
         "booster",
+        "early_unlock",  # #131
     }
 )
 
@@ -347,6 +348,11 @@ class BoosterHandler(Owned):
         return ActivationResult("active")
 
 
+class EarlyUnlockHandler(BoosterHandler):
+    """``early_unlock`` (#131): bought, it goes into the member's reserve — to be spent later on an item they
+    hold but may not wear yet for want of a level. Dear and limited (its copies, its purchase limit)."""
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
@@ -395,6 +401,8 @@ def register_builtin_types(
         ("media_rescue", RescueHandler(capabilities), ("count",)),
         # #81: a sealed booster, to open from the reserve
         ("booster", BoosterHandler(booster_seal), PAYLOAD_FIELDS),
+        # #131: a pass opening an item waiting for its level, kept in the reserve
+        ("early_unlock", EarlyUnlockHandler(booster_seal), ()),
     ):
         if registry.get(key) is None:
             registry.register(

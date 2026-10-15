@@ -5439,6 +5439,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/reserve/{key}/unlock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unlock Early
+         * @description #131: spend a level pass of my reserve on an item I hold but may not wear yet — usable at once.
+         */
+        post: operations["unlock_early_api_v1_marketplace_reserve__key__unlock_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/reserve/{key}/use": {
         parameters: {
             query?: never;
@@ -10788,6 +10808,11 @@ export interface components {
             subject_id?: string | null;
             /** Subject Type */
             subject_type?: string | null;
+        };
+        /** EarlyUnlockIn */
+        EarlyUnlockIn: {
+            /** Target */
+            target: string;
         };
         /** EconomyDayOut */
         EconomyDayOut: {
@@ -26662,6 +26687,43 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     }[];
+                };
+            };
+        };
+    };
+    unlock_early_api_v1_marketplace_reserve__key__unlock_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EarlyUnlockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
