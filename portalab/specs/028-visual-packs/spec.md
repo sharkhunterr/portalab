@@ -56,12 +56,23 @@ underlying data (`009` and the owning modules). It chooses no technology.
 - Q: What may packs do with widgets? → A: restyle existing widgets and bring new widgets, fed by Portalab
   through declared data contracts (never calling the portal themselves).
 - Q: Method? → A: full Spec Kit (specify, clarify, plan, tasks), the proof of concept as the starting point.
+- Q: When a new release of Portalab changes its built-in packs, what happens? → A: existing built-in packs
+  are updated with the release (a « what changed » note in the administration); a new built-in pack arrives
+  disabled and the administrator enables it if they want.
+- Q: Which permission manages packs (import, test, validate, switch off, remove)? → A: a permission reserved
+  to the Admin, never delegated to a role, since packs may hold code.
+- Q: What does the intrusion guard do when a session of the Admin crosses the threshold? → A: the Admin is
+  blocked like anyone else; an intervention on the server's own console lifts any block easily (the Admin's
+  included).
+- Q: Can a pack (and its files) be removed for good? → A: a pack some member owns a product of is only
+  archived (switched off, its files and versions kept, can be enabled again); it can be removed for good only
+  once no member owns any of its products; versions never published can be purged at any time.
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - An administrator imports a pack through a guided, visual workflow (Priority: P1)
+### User Story 1 - The Admin imports a pack through a guided, visual workflow (Priority: P1)
 
-An administrator receives a pack (a folder dropped in the portal's inbox, a file uploaded from the
+The Admin (the only one allowed to manage packs, FR-014a) receives a pack (a folder dropped in the portal's inbox, a file uploaded from the
 administration, or the address of a repository). The portal walks them through six visible steps —
 **Import** (the pack read, its files stored apart under their fingerprint), **Analysis** (what it holds, its
 format, its looks and their conflicts, its economy), **Security** (what its stylesheets and scripts would try
@@ -273,8 +284,9 @@ analysis reports no blocking finding; it imports and publishes.
 
 ### Edge Cases
 
-- A member owns a product whose pack was removed for good: the product stays theirs, shown with its name;
-  its look falls back to a default; the administrator is warned before removing a pack with owners.
+- The administrator asks to remove a pack some member owns a product of: it is archived instead (switched
+  off, files and versions kept), the number of owners shown; the product stays theirs, shown with its name,
+  its look falling back to a default; enabling the pack again gives the looks back.
 - Two packs bring the same look key: the second is blocked at Analysis unless the administrator explicitly
   decides it replaces the first (never silently).
 - A pack replaces a built-in look (declared `replaces`): validated only with an explicit decision; rolling
@@ -290,9 +302,9 @@ analysis reports no blocking finding; it imports and publishes.
 - A pack archive lies about its sizes, holds paths leaving its folder, links or files of forbidden kinds: it
   is refused before anything is stored.
 - A repository address redirects elsewhere or answers too much: the import stops, nothing is stored.
-- An administrator is the one probing forbidden addresses: the intrusion guard treats them like any member
-  (their own refusals are rare); a block on an administrator can be lifted by another holder of the security
-  permission, or ends by itself.
+- The Admin is the one crossing the threshold (or a stolen Admin session): the Admin is blocked like anyone
+  else (sessions signed out, account refused); the block ends by itself or is lifted from the server's console
+  (FR-040a) — never left without a way back.
 - Many members share one network address: an address is only blocked for requests without a session.
 - The intrusion guard restarts: blocks in force must survive a restart of the portal.
 
@@ -327,6 +339,9 @@ analysis reports no blocking finding; it imports and publishes.
   other built-in pack like an imported one.
 - **FR-008**: The portal's code MUST NOT hold looks outside these packs once migrated (renderers and contracts
   only), so that adding, changing or removing a look never requires a release.
+- **FR-008a**: When a release of the portal changes its built-in packs, the existing ones MUST be updated with
+  the release (keys, owners and the administrator's enable/disable choices kept) and the administration MUST
+  show what changed; a built-in pack new in that release MUST arrive disabled.
 
 **Registry and lifecycle**
 
@@ -342,8 +357,16 @@ analysis reports no blocking finding; it imports and publishes.
   with the economy decided then.
 - **FR-013**: An element a newer version no longer holds MUST leave the shop when that version is published;
   its owners MUST keep it.
+- **FR-013a**: Removing a pack some member owns a product of MUST archive it instead (switched off, its files
+  and versions kept, enabled again at will); a pack MUST be removable for good (files and versions deleted)
+  only once no member owns any of its products; a version never published MUST be purgeable at any time; the
+  socle MUST be neither archived nor removed.
 - **FR-014**: Every action on a pack (import, analysis, test, decision, publication, refusal, switch, rollback,
-  removal) MUST be recorded in the audit log with who did it.
+  archiving, removal, purge) MUST be recorded in the audit log with who did it.
+- **FR-014a**: Managing packs — importing, testing, reviewing, validating, refusing, enabling or disabling
+  (built-in packs included), switching off, rolling back, removing — MUST require a permission reserved to the
+  Admin that can never be granted to a role; every other member, administrators of other areas included, MUST
+  be refused.
 
 **Import workflow**
 
@@ -429,6 +452,9 @@ analysis reports no blocking finding; it imports and publishes.
 - **FR-040**: Blocks MUST be recorded in the audit log, MUST alert the holders of the security permission,
   MUST be listed with their reason and remaining time in the administration, MUST be liftable by those
   holders, and MUST survive a restart.
+- **FR-040a**: Anyone with access to the server's own console MUST be able to list and lift any block — the
+  Admin's included — with a single local command, without signing in to the portal; the command MUST be
+  recorded in the audit log.
 - **FR-041**: Thresholds, window and block duration MUST have safe defaults and be adjustable by the
   administrator.
 
@@ -439,8 +465,8 @@ analysis reports no blocking finding; it imports and publishes.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Pack**: an identity, its source (built-in, inbox, upload, repository), whether it is the socle, enabled or
-  switched off, its current version, the version a repository offers.
+- **Pack**: an identity, its source (built-in, inbox, upload, repository), whether it is the socle, its state
+  (enabled, switched off, archived), its current version, the version a repository offers.
 - **Pack version**: a version number, a fingerprint, its stored files, its analysis findings, its test
   measures, its state (pending, published, refused, superseded) and the decision made (who, when, economy,
   confirmations).
@@ -488,8 +514,8 @@ analysis reports no blocking finding; it imports and publishes.
   depth), never trusting its content.
 - The economy (prices, rarities, levels, the spread of levels over the curve) keeps the portal's own rules;
   the analysis reports deviations as warnings, the administrator decides.
-- Built-in packs are maintained with the portal (shipped with each release, updated by migration), unlike
-  imported packs updated by administrators.
+- Built-in packs are maintained with the portal: shipped with each release and updated with it (FR-008a),
+  unlike imported packs, which change only through the import workflow.
 - Self-registration stays as configured today: when closed, its route answers nothing; when open, it is one
   of the single-purpose routes of FR-036.
 - Fingerprints identify versions; signing packs is out of scope, as are a public pack marketplace and
