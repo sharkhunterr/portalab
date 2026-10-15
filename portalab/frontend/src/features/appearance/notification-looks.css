@@ -373,8 +373,7 @@
   justify-content: space-between;
   gap: var(--space-2);
 }
-.ambient-chooser__head h4,
-.ambient-chooser__weather h4 {
+.ambient-chooser__head h4 {
   margin: 0;
 }
 .ambient-chooser__filters {
@@ -563,60 +562,286 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
-.weather-place {
-  display: grid;
-  gap: var(--space-2);
-}
-.weather-place__current {
-  display: flex;
+/* #88: the « live weather » row — the sky it follows, a settings button opening its window */
+.ambient-row__weather {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  font-weight: var(--font-weight-bold);
+  gap: 4px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
-.weather-place__temp {
+.ambient-row__settings {
+  flex: none;
   color: var(--color-text-muted);
 }
-.weather-place__search {
+.ambient-row__settings:hover {
+  color: var(--color-accent);
+}
+
+/* #88: every weather to preview, as chips (the live sky first) */
+.weather-skies {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.weather-skies legend {
+  margin-block-end: var(--space-2);
+  padding: 0;
+  font-weight: var(--font-weight-bold);
+}
+.weather-skies__row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
-.weather-place__search input {
-  flex: 1 1 12rem;
-  min-inline-size: 0;
-  padding: var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
+.weather-skies__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 2rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
   color: var(--color-text);
   font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
 }
-.weather-place__found {
+.weather-skies__chip:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, var(--glass-border));
+}
+.weather-skies__chip[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  font-weight: var(--font-weight-semibold);
+}
+.weather-skies__chip:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* #70, #88: the place the weather comes from, the sky there now, another place */
+.weather-place {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-3);
+}
+.weather-now {
+  --sky: var(--color-accent);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--sky) 35%, var(--glass-border));
+  border-radius: var(--radius-lg, var(--radius-md));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--sky) 20%, var(--color-surface)),
+    color-mix(in srgb, var(--sky) 4%, var(--color-surface))
+  );
+}
+.weather-now[data-phase="day"] {
+  --sky: var(--weather-day);
+}
+.weather-now[data-phase="night"] {
+  --sky: var(--weather-night);
+}
+.weather-now[data-phase="dawn"] {
+  --sky: var(--weather-dawn);
+}
+.weather-now[data-phase="dusk"] {
+  --sky: var(--weather-dusk);
+}
+.weather-now[data-empty] {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+}
+.weather-now[data-empty] p {
+  margin: 0;
+}
+.weather-now__sky {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.weather-now__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sky) 25%, transparent);
+  color: color-mix(in srgb, var(--sky) 55%, var(--color-text));
+}
+.weather-now__temp {
+  font-size: 2.25rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.weather-now__what {
+  display: grid;
+  gap: 4px;
+  min-inline-size: 0;
+}
+.weather-now__what strong {
+  font-size: var(--font-size-lg, 1.125rem);
+}
+.weather-now__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.weather-now__tag {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--sky) 22%, transparent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.weather-now__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
-.weather-place__found button,
-.weather-place__reset {
+.weather-now__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.weather-now__place {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--glass-border);
+}
+.weather-now__place > .ds-icon {
+  flex: none;
+  margin-block-start: 2px;
+  color: var(--sky);
+}
+.weather-now__place > span {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.weather-now__where {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.weather-place__change {
+  display: grid;
+  gap: var(--space-2);
+}
+.weather-place__change h5 {
+  margin: 0;
+  font-size: var(--font-size-md, 1rem);
+}
+.weather-place__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 2.75rem;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  color: var(--color-text-muted);
+}
+.weather-place__search:focus-within {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+.weather-place__search input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  outline: none;
+}
+.weather-place__found {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-bg, var(--color-surface-raised));
+  list-style: none;
+}
+.weather-place__found button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  inline-size: 100%;
+  min-block-size: 2.75rem;
   padding: var(--space-1) var(--space-2);
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-accent);
+  color: var(--color-text);
   font: inherit;
   text-align: start;
   cursor: pointer;
 }
-.weather-place__found button:hover {
-  background: var(--color-surface-raised);
+.weather-place__found button:hover,
+.weather-place__found button:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  outline: none;
+}
+.weather-place__flag {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+}
+.weather-place__found-text {
+  flex: 1;
+  display: grid;
+  min-inline-size: 0;
+}
+.weather-place__found-text span {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.weather-place__people {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+.weather-place__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 .weather-place__note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+.weather-place__note--done {
+  color: var(--color-success, var(--color-accent));
 }
 .ambient-chooser__filters {
   margin: 0;
@@ -732,4 +957,17 @@
 .theme-card[aria-pressed="true"] {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
+}
+fieldset.weather-skies__row {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.weather-now__fresh {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }

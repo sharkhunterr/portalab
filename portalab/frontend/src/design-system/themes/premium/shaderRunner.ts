@@ -2,8 +2,11 @@
  * #68: a full-screen fragment shader drawn on a canvas, made to stay light — drawn at the screen's
  * resolution (lowered on its own when the device struggles), at 30 frames a second at most, the resolution lowered on its
  * own when frames come late, and nothing at all while the tab is hidden. Returns ``null`` when WebGL is not
- * there (the caller falls back to the CSS ambience) and a ``stop`` function otherwise.
+ * there (the caller falls back to the CSS ambience) and a ``stop`` function otherwise. ``uniforms`` (#88), when
+ * given, is asked each frame for the scene's own numbers (``u_<name>``).
  */
+
+export type Uniforms = () => Readonly<Record<string, number>>;
 
 import { frameInterval, motionBudget } from "../../motion/budget";
 
@@ -27,7 +30,11 @@ function compile(gl: WebGLRenderingContext, type: number, source: string): WebGL
   return shader;
 }
 
-export function runShader(canvas: HTMLCanvasElement, fragment: string): (() => void) | null {
+export function runShader(
+  canvas: HTMLCanvasElement,
+  fragment: string,
+  uniforms?: Uniforms,
+): (() => void) | null {
   const gl = canvas.getContext("webgl", {
     alpha: true,
     premultipliedAlpha: true,
@@ -56,6 +63,11 @@ export function runShader(canvas: HTMLCanvasElement, fragment: string): (() => v
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
   const uResolution = gl.getUniformLocation(program, "u_res");
   const uTime = gl.getUniformLocation(program, "u_time");
+  const located = new Map<string, WebGLUniformLocation | null>();
+  const where = (name: string) => {
+    if (!located.has(name)) located.set(name, gl.getUniformLocation(program, `u_${name}`));
+    return located.get(name) ?? null;
+  };
 
   let level = 0;
   let late = 0;
@@ -95,6 +107,7 @@ export function runShader(canvas: HTMLCanvasElement, fragment: string): (() => v
     size();
     gl.uniform2f(uResolution, canvas.width, canvas.height);
     gl.uniform1f(uTime, ((now - started) / 1000) % 3600);
+    if (uniforms) for (const [name, value] of Object.entries(uniforms())) gl.uniform1f(where(name), value);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
   frame = requestAnimationFrame(draw);

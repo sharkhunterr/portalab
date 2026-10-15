@@ -5,15 +5,19 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
 import { AmbientLayer } from "../../design-system/themes/AmbientLayer";
+import { WeatherAmbient } from "../../design-system/themes/premium/WeatherAmbient";
+import { CONDITIONS, type WeatherReport } from "../../design-system/themes/premium/weatherScene";
 import { useT } from "../../i18n/hooks/useT";
 import { HdTag, isHdAmbient } from "./Rarity";
-import { WeatherPlace } from "./WeatherPlace";
+import { placeParts, useWeather, WeatherPlace, weatherIcon } from "./WeatherPlace";
 import { type Waiting, WaitingTag } from "./waiting";
 
 /**
  * #71: the ambiences a member may wear, as a plain list — no animation runs in it (dozens of live previews
  * slowed the page down). Each shows its name and its rarity, first the rarest; « Preview » opens it in a
- * window — playing, with its details — and « Apply » wears it at once, there or from the list.
+ * window — playing, with its details — and « Apply » wears it at once, there or from the list. #88: « live
+ * weather » shows the sky it follows on its row, and its settings button opens the window where the place is
+ * chosen and every weather can be previewed.
  */
 export interface AmbientChoice {
   key: string;
@@ -43,6 +47,7 @@ export function AmbientChooser({
   const { preferences, setPreference } = usePreferences();
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<string | null>(null);
+  const [sky, setSky] = useState<WeatherReport | null>(null); // #88: a weather previewed in the window
   const byKey = useMemo(() => new Map(choices.map((c) => [c.key, c])), [choices]);
   const name = useCallback(
     (key: string) =>
@@ -128,12 +133,28 @@ export function AmbientChooser({
                       : t(`notifications:universe.rarity.${rarity}`)}
                   </span>
                   {isHdAmbient(key) ? <HdTag /> : null}
-                  <span className="ambient-row__preview">
-                    <Icon name="eye" size={14} />
-                    {t("notifications:universe.preview")}
-                  </span>
+                  {key === "weather" ? (
+                    <WeatherSummary />
+                  ) : (
+                    <span className="ambient-row__preview">
+                      <Icon name="eye" size={14} />
+                      {t("notifications:universe.preview")}
+                    </span>
+                  )}
                 </span>
               </button>
+              {key === "weather" ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ambient-row__settings"
+                  aria-label={t("notifications:universe.weather.settings")}
+                  title={t("notifications:universe.weather.settings")}
+                  onClick={() => setOpen(key)}
+                >
+                  <Icon name="settings" size={18} />
+                </Button>
+              ) : null}
               {choice?.waiting ? (
                 <WaitingTag waiting={choice.waiting} />
               ) : active ? (
@@ -150,17 +171,14 @@ export function AmbientChooser({
           );
         })}
       </ul>
-      {current === "weather" ? (
-        <section className="ambient-chooser__weather" aria-label={t("notifications:universe.weather.title")}>
-          <h4>{t("notifications:universe.weather.title")}</h4>
-          <WeatherPlace />
-        </section>
-      ) : null}
       <Dialog
         trigger={<span hidden />}
         open={open !== null}
         onOpenChange={(next) => {
-          if (!next) setOpen(null);
+          if (!next) {
+            setOpen(null);
+            setSky(null);
+          }
         }}
         title={open ? name(open) : ""}
         closeLabel={t("notifications:universe.close")}
@@ -189,8 +207,22 @@ export function AmbientChooser({
         {open ? (
           <div className="ambient-detail" data-rarity={open === "theme" ? "theme" : rarityOf(opened)}>
             <div className="ambient-detail__stage">
-              <AmbientLayer kind={openedKind as Ambient} contained />
+              {openedKind === "weather" ? (
+                <WeatherAmbient
+                  contained
+                  report={sky ?? undefined}
+                  fallback={(kind) => <AmbientLayer kind={kind as Ambient} contained />}
+                />
+              ) : (
+                <AmbientLayer kind={openedKind as Ambient} contained />
+              )}
             </div>
+            {openedKind === "weather" ? (
+              <>
+                <WeatherSkies sky={sky} onSky={setSky} />
+                <WeatherPlace />
+              </>
+            ) : null}
             <div className="ambient-detail__facts">
               <span className="ambient-detail__tags">
                 <span className="ambient-detail__rarity">
@@ -217,10 +249,98 @@ export function AmbientChooser({
               </p>
               <p className="ambient-detail__note">{t("notifications:universe.motionNote")}</p>
             </div>
-            {openedKind === "weather" ? <WeatherPlace /> : null}
           </div>
         ) : null}
       </Dialog>
     </div>
+  );
+}
+
+/** #88: on the « live weather » row, the sky it follows now — its icon, the temperature, the town. */
+function WeatherSummary() {
+  const t = useT();
+  const weather = useWeather().data;
+  if (!weather?.place) {
+    return <span className="ambient-row__preview">{t("notifications:universe.weather.noPlace")}</span>;
+  }
+  const [town] = placeParts(weather.place.name);
+  return (
+    <span className="ambient-row__weather">
+      <Icon name={weatherIcon(weather)} size={14} />
+      {typeof weather.temperature === "number" ? `${Math.round(weather.temperature)}° · ` : null}
+      {town}
+    </span>
+  );
+}
+
+const PHASES = ["dawn", "day", "dusk", "night"] as const;
+
+/** #88: every weather the ambience draws, to see each one in the window (the live sky by default). */
+function WeatherSkies({
+  sky,
+  onSky,
+}: {
+  sky: WeatherReport | null;
+  onSky: (sky: WeatherReport | null) => void;
+}) {
+  const t = useT();
+  const phase = sky?.phase ?? "day";
+  const pick = (condition: string, at: string = phase) =>
+    onSky({
+      condition,
+      phase: at,
+      is_day: at !== "night",
+      intensity: "moderate",
+    });
+  return (
+    <fieldset className="weather-skies">
+      <legend>{t("notifications:universe.weather.previewAll")}</legend>
+      <div className="weather-skies__row">
+        <button
+          type="button"
+          className="weather-skies__chip"
+          aria-pressed={sky === null}
+          onClick={() => onSky(null)}
+        >
+          <Icon name="map-pin" size={14} />
+          {t("notifications:universe.weather.live")}
+        </button>
+        {CONDITIONS.map((condition) => (
+          <button
+            key={condition}
+            type="button"
+            className="weather-skies__chip"
+            aria-pressed={sky?.condition === condition}
+            onClick={() => pick(condition)}
+          >
+            <Icon name={weatherIcon({ condition, phase, is_day: phase !== "night" })} size={14} />
+            {t(`notifications:universe.weather.sky.${condition}`)}
+          </button>
+        ))}
+      </div>
+      {sky ? (
+        <fieldset className="weather-skies__row">
+          <legend className="visually-hidden">{t("notifications:universe.weather.hour")}</legend>
+          {PHASES.map((at) => (
+            <button
+              key={at}
+              type="button"
+              className="weather-skies__chip"
+              aria-pressed={phase === at}
+              onClick={() => pick(sky.condition ?? "clear", at)}
+            >
+              <Icon
+                name={at === "dawn" ? "sunrise" : at === "dusk" ? "sunset" : at === "night" ? "moon" : "sun"}
+                size={14}
+              />
+              {t(`notifications:universe.weather.phase.${at}`)}
+            </button>
+          ))}
+        </fieldset>
+      ) : null}
+      <p className="weather-place__note">
+        {sky ? t("notifications:universe.weather.previewNote") : t("notifications:universe.weather.liveNote")}
+      </p>
+    </fieldset>
   );
 }

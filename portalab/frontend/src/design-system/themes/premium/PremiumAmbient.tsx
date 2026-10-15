@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { liveAmbiences } from "../../motion/budget";
+import type { Uniforms } from "./shaderRunner";
 
 /**
  * #68: the premium ambiences — drawn by the GPU in layers: a shader (flames, clouds and rain, dust
@@ -70,6 +71,7 @@ const LAYERS: Record<string, Layers> = {
   lavalamp: { shader: "lavalamp" },
   impasto: { shader: "impasto" },
   paintribbon: { shader: "paintribbon" },
+  weathersky: { shader: "weathersky" }, // #88: « live weather », its numbers from the report
 };
 
 /** The CSS ambience standing in for each premium one. */
@@ -128,6 +130,7 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   lavalamp: "bubbles",
   impasto: "aurora",
   paintribbon: "aurora",
+  weathersky: "skyclouds",
 };
 
 export function isPremiumAmbient(kind: string): boolean {
@@ -173,7 +176,7 @@ function flows(layers: Layers): string[] {
   return layers.flow === undefined ? [] : Array.isArray(layers.flow) ? layers.flow : [layers.flow];
 }
 
-async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLElement) {
+async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLElement, uniforms?: Uniforms) {
   const stops: Array<() => void> = [];
   const stopAll = () => {
     for (const stop of stops) stop();
@@ -181,14 +184,18 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
   let index = 0;
   const next = () => canvases[index++] as HTMLCanvasElement;
   if (layers.shader) {
-    const [{ runShader }, { SHADERS }, { COZY_SHADERS }, { WARM_SHADERS }] = await Promise.all([
+    const [{ runShader }, { SHADERS }, { COZY_SHADERS }, { WARM_SHADERS }, { WEATHER }] = await Promise.all([
       import("./shaderRunner"),
       import("./shaders"),
       import("./cozyShaders"),
       import("./warmShaders"),
+      import("./weatherShader"),
     ]);
-    const source = SHADERS[layers.shader] ?? COZY_SHADERS[layers.shader] ?? WARM_SHADERS[layers.shader];
-    const stop = runShader(next(), source as string);
+    const source =
+      layers.shader === "weathersky"
+        ? WEATHER
+        : (SHADERS[layers.shader] ?? COZY_SHADERS[layers.shader] ?? WARM_SHADERS[layers.shader]);
+    const stop = runShader(next(), source as string, uniforms);
     if (!stop) return null;
     stops.push(stop);
   }
@@ -218,10 +225,13 @@ export function PremiumAmbient({
   kind,
   contained,
   fallback,
+  uniforms,
 }: {
   kind: string;
   contained: boolean;
   fallback: ReactNode;
+  /** #88: the scene's numbers, asked each frame (a stable function) */
+  uniforms?: Uniforms;
 }) {
   const layers = LAYERS[kind] ?? {};
   const canvasCount = [layers.shader, layers.mesh].filter(Boolean).length + flows(layers).length;
@@ -286,7 +296,7 @@ export function PremiumAmbient({
     let cancelled = false;
     (async () => {
       try {
-        const started = await start(layers, canvases.current, host.current as HTMLElement);
+        const started = await start(layers, canvases.current, host.current as HTMLElement, uniforms);
         if (cancelled) started?.();
         else if (started) stop = started;
         else setFailed(true);

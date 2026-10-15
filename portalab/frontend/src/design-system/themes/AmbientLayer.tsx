@@ -110,8 +110,13 @@ export const AmbientLayer = memo(function AmbientLayer({
   contained?: boolean;
 }) {
   if (kind === "weather") {
-    // #68: the ambience of the sky outside
-    return <WeatherAmbient render={(sky) => <AmbientLayer kind={sky as Ambient} contained={contained} />} />;
+    // #68, #88: the sky outside, drawn from the weather report
+    return (
+      <WeatherAmbient
+        contained={contained}
+        fallback={(sky) => <AmbientLayer kind={sky as Ambient} contained={contained} />}
+      />
+    );
   }
   if (isPremiumAmbient(kind)) {
     // #68: drawn on a canvas (shader or particles); the CSS ambience stands in when it cannot be

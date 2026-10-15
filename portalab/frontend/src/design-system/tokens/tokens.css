@@ -178,6 +178,12 @@ body {
   --radius-xl: 1.5rem;
   --radius-pill: 999px;
 
+  /* #88: the light of the hour on the weather card */
+  --weather-day: #4f8fe8;
+  --weather-night: #5b5fc7;
+  --weather-dawn: #f08a9a;
+  --weather-dusk: #f0904a;
+
   --shadow-1: 0 1px 2px rgb(0 0 0 / 0.18), 0 1px 1px rgb(0 0 0 / 0.08);
   --shadow-2: 0 6px 16px rgb(0 0 0 / 0.22), 0 2px 4px rgb(0 0 0 / 0.12);
   --shadow-3: 0 18px 40px rgb(0 0 0 / 0.32), 0 6px 12px rgb(0 0 0 / 0.16);
