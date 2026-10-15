@@ -4354,3 +4354,95 @@ h3,
     transform: none;
   }
 }
+
+/* issue 130, second wave: a radio transmission and mission control's panel; lift-off and an orbit */
+.ds-notifications[data-style="transmission"] .ds-notification {
+  --color-text: #d8fff0;
+  --color-text-muted: #8fd9bf;
+  border: 1px solid #2fe0a8;
+  border-radius: 0.4rem;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 3px, #2fe0a80d 3px 4px),
+    linear-gradient(180deg, #04150f, #062419);
+  color: #d8fff0;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  box-shadow: 0 0 1rem #2fe0a844;
+}
+.ds-notifications[data-style="transmission"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="transmission"] .ds-notification__icon {
+  background: #2fe0a822;
+  color: #2fe0a8;
+}
+.ds-notifications[data-style="transmission"] .ds-notification__title::before {
+  content: "◉ RX · ";
+  color: #2fe0a8;
+}
+.ds-notifications[data-style="transmission"] .ds-notification__timer {
+  background: #2fe0a8;
+}
+.ds-notifications[data-style="missioncontrol"] .ds-notification {
+  --color-text: #fff2e0;
+  --color-text-muted: #f0c89a;
+  border: 2px solid #ffb000;
+  border-radius: 0.2rem 1rem 0.2rem 1rem;
+  background:
+    linear-gradient(90deg, #ffb000 0 0.35rem, transparent 0.35rem), linear-gradient(180deg, #1c1608, #120e05);
+  color: #fff2e0;
+  font-family: "Chakra Petch", Rajdhani, sans-serif;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 1.2rem #ffb00044;
+}
+.ds-notifications[data-style="missioncontrol"] .ds-notification::before {
+  display: none;
+}
+.ds-notifications[data-style="missioncontrol"] .ds-notification__title {
+  color: #ffb000;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.ds-notifications[data-style="missioncontrol"] .ds-notification__timer {
+  background: #ffb000;
+}
+.ds-notifications[data-animation="liftoff"] .ds-notification {
+  animation-name: universe-notify-liftoff;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes universe-notify-liftoff {
+  0% {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(100%) translateX(-2px);
+  }
+  25% {
+    transform: translateY(100%) translateX(2px);
+  }
+  35% {
+    transform: translateY(95%) translateX(-1px);
+  }
+  100% {
+    transform: none;
+  }
+}
+.ds-notifications[data-animation="orbitin"] .ds-notification {
+  transform-origin: -40% 50%;
+  animation-name: universe-notify-orbitin;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+@keyframes universe-notify-orbitin {
+  0% {
+    opacity: 0;
+    transform: rotate(-70deg) scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

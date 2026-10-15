@@ -1057,6 +1057,10 @@ for value, en, fr, rarity, price, level, about_en, about_fr in (
     ("timeportal", "Time portal", "Portail temporel", "legendary", 1800, 12,
      "A triangular portal draws itself, tears open on the vortex of time, flashes and closes again.",
      "Un portail triangulaire se trace, s'ouvre sur le vortex du temps, éclate de lumière et se referme."),
+    # #133: the Upside Down's gate
+    ("rift", "The Gate", "La brèche", "legendary", 1800, 12,
+     "The lights flicker, a red rift tears the wall open, its membrane pulsing — you step into it and come out in the Upside Down, ash drifting up, red lightning overhead, at your new level.",
+     "Les lumières vacillent, une brèche rouge déchire le mur, sa membrane palpite — vous y entrez et ressortez dans le monde à l'envers, des cendres qui montent, des éclairs rouges au-dessus, à votre nouveau niveau."),
 ):  # fmt: skip
     _p(f"levelup_{value}", "level_up", price, rarity, f"{en} level-up", f"Passage de niveau {fr.lower()}",
        about_en, about_fr, {"animation": value}, collection="levels", icon="trophy", level=level)  # fmt: skip
@@ -1427,6 +1431,12 @@ THEME_TEXT |= {
                      "À bord d'une station spatiale : des écrans cyan sur fond noir, vos rubriques en planètes sur leur orbite — ouvrez-en une et ses pages tournent autour comme des lunes —, le système solaire qui tourne derrière, un saut dans l'hyperespace à chaque niveau."),
 }  # fmt: skip
 THEME_RARITY |= {"observatory": ("legendary", 1500, 10), "spacestation": ("legendary", 1500, 10)}
+THEME_TEXT |= {
+    "starship": ("Starship", "Vaisseau spatial",
+                 "In command of a starship: steel and amber, the ship seen from the side along the bottom of the screen — its engines burning, one compartment per section, the energy gauge and the comms light — asteroids drifting past, mission-control notifications that lift off.",
+                 "Aux commandes d'un vaisseau spatial : acier et ambre, le vaisseau vu de profil en bas de l'écran — ses moteurs allumés, un compartiment par rubrique, la jauge d'énergie et le voyant des communications —, des astéroïdes qui défilent, des notifications du contrôle de mission qui décollent."),
+}  # fmt: skip
+THEME_RARITY |= {"starship": ("legendary", 1600, 20)}
 
 # 027: an interface (the « theme » product) is its colours, fonts, layout, navigation and words; its sold
 # looks (animated background, notifications, celebration, level-up) come with its theme pack
@@ -1952,7 +1962,7 @@ UNIVERSE_EXTRAS = {
     "heroes": ("level_kapow", "notif_kapow", "levelup_comic", "levelup_hero"), "neowave": ("level_vhs", "ambient_vhs", "levelup_synthwave"),
     "disco": ("level_hologram", "notif_jelly", "levelup_disco"), "cyberpunk": ("level_neon", "notif_vhs", "levelup_arcade", "levelup_glitch"),
     "sincity": ("level_melt", "notif_filmwipe", "notif_noir", "levelup_noir"), "plex": ("level_neon", "notif_iris", "levelup_spotlight"),
-    "upsidedown": ("level_upsidedown", "level_veins", "level_lights", "notif_flipup", "levelup_upsidedown",
+    "upsidedown": ("level_upsidedown", "level_veins", "level_lights", "notif_flipup", "levelup_upsidedown", "levelup_rift",
                    "banner_hawkins", "frame_lights", "bg_upsidedown", "ambient_veins", "palette_hawkins",
                    "badge_upside_survivor", "badge_party", "badge_walkie", "title_mouth_breather", "title_hawkins_hero"),
     "middleearth": ("level_onering", "level_eye", "level_mithril", "notif_onering", "notif_balrog", "notif_eye",
@@ -2894,7 +2904,7 @@ _SOLD = [
 ]
 _NEBULAE = ("orion", "crab", "helix", "pillars", "cliffs")
 _PLANETS = ("solarsystem", "saturnrise")
-COSMOS_PACKS = (
+COSMOS_PACKS: tuple[tuple[str, str, str, str, str, str, list[str]], ...] = (
     ("pack_astro", "Astronomy pack", "Pack Astronomie", "telescope",
      "The cosmos' name styles, palettes and banners together.",
      "Les styles de nom, palettes et bannières du cosmos réunis.",
@@ -2947,6 +2957,148 @@ _p("booster_celestial", "booster", 500, "epic", "Celestial booster", "Booster C�
    {"pool": "looks", "packs": [k for k, *_ in COSMOS_PACKS], "cards": 5, "odds": {"common": 50, "rare": 32, "epic": 15, "legendary": 3},
     "guarantee": "rare", "look": "celestial"}, collection="boosters", icon="sparkles", repeatable=True)  # fmt: skip
 
+# #130, the second wave: the sun, the moon, asteroids, the Big Bang, rockets and their crews — many light looks
+# (drawn in CSS) for everyone and for the boosters, a few more drawn by the graphics chip
+WAVE2: list[str] = []
+
+
+def _wave2(key: str, kind: str, price: int, en: str, fr: str, about_en: str, about_fr: str, payload: dict[str, Any],
+           *, collection: str, icon: str, hd: bool = False) -> None:  # fmt: skip
+    _cosmos(
+        key,
+        kind,
+        price,
+        _tier(price),
+        en,
+        fr,
+        about_en,
+        about_fr,
+        payload,
+        collection=collection,
+        icon=icon,
+        hd=hd,
+    )
+    WAVE2.append(key)
+
+
+for _k, _en, _fr, _price, _rarity, _aen, _afr in (
+    ("solarflare", "Solar flare", "Éruption solaire", 1700, "legendary",
+     "The sun up close: its boiling surface, dark spots, prominences arching off its edge, a flare now and then.",
+     "Le soleil de tout près : sa surface en ébullition, ses taches, des protubérances qui jaillissent de son bord, parfois une éruption."),
+    ("moonrise", "Moonrise", "Lever de lune", 950, "rare",
+     "A full moon rising over a calm sea, its silver path trembling on the water, thin clouds drifting.",
+     "Une pleine lune qui se lève sur une mer calme, son chemin d'argent qui tremble sur l'eau, de fins nuages qui passent."),
+    ("asteroids", "Asteroid belt", "Ceinture d'astéroïdes", 900, "rare",
+     "Rocks of every size tumbling past in three depths, lit by a far sun, dust glittering between them.",
+     "Des rochers de toutes tailles qui tournoient sur trois plans, éclairés par un soleil lointain, de la poussière qui scintille."),
+):  # fmt: skip
+    _wave2(f"ambient_{_k}", "ambient", _price, f"{_en} ambience", f"Ambiance {_fr.lower()}", _aen, _afr, {"ambient": _k},
+           collection="ambients", icon="telescope", hd=True)  # fmt: skip
+    SHOP[-1]["rarity"] = _rarity
+    _wave2(f"banner_live_{_k}", "profile_banner", 1100 if _rarity == "legendary" else 850, f"{_en} animated banner",
+           f"Bannière animée {_fr.lower()}", f"{_en} in your profile's banner, {HD_TEXT[0]}.",
+           f"{_fr} dans la bannière de votre profil, {HD_TEXT[1]}.", {"banner": f"live-{_k}"}, collection="profile",
+           icon="image", hd=True)  # fmt: skip
+for _fx, _frame, _en, _fr, _prices, _aen, _afr in (
+    ("solar", "heliosphere", "Sun", "Soleil", (1300, 1600, 1100), "The sun's boiling surface, its corona and its prominences", "La surface en ébullition du soleil, sa couronne et ses protubérances"),
+    ("lunar", "lunarhalo", "Moon", "Lune", (1200, 1500, 1000), "The moon's seas and craters, its phases sweeping across", "Les mers et les cratères de la lune, ses phases qui défilent"),
+):  # fmt: skip
+    _wave2(f"frame_{_frame}", "avatar_frame", _prices[0], f"{_en} frame", f"Cadre {_fr.lower()}", f"{_aen} round your avatar, {HD_TEXT[0]}.",
+           f"{_afr} autour de votre avatar, {HD_TEXT[1]}.", {"frame": _frame}, collection="profile", icon="user", hd=True)  # fmt: skip
+    _wave2(f"level_{_fx}", "level_badge", _prices[1], f"{_en} level badge", f"Badge de niveau {_fr.lower()}",
+           f"Your level inside: {_aen.lower()}, {HD_TEXT[0]}.", f"Votre niveau au cœur : {_afr.lower()}, {HD_TEXT[1]}.",
+           {"style": _fx}, collection="levels", icon="trophy", hd=True)  # fmt: skip
+    _wave2(f"notif_{_fx}", "notification_style", _prices[2], f"{_en} notifications", f"Notifications {_fr.lower()}",
+           f"Notifications drawn as {_aen.lower()}, {HD_TEXT[0]}.", f"Des notifications dessinées comme {_afr.lower()}, {HD_TEXT[1]}.",
+           {"style": _fx}, collection="looks", icon="bell", hd=True)  # fmt: skip
+for _kind, _k, _price, _en, _fr, _aen, _afr, _icon, _coll, _fld in (
+    ("avatar_frame", "crescent", 650, "Crescent moon frame", "Cadre croissant de lune", "Your avatar lit on one side like a crescent moon.", "Votre avatar éclairé d'un côté comme un croissant de lune.", "user", "profile", "frame"),
+    ("avatar_frame", "sunrays", 650, "Sun rays frame", "Cadre rayons de soleil", "Golden rays turning slowly round your avatar.", "Des rayons dorés qui tournent lentement autour de votre avatar.", "user", "profile", "frame"),
+    ("avatar_frame", "asteroidring", 600, "Asteroid ring frame", "Cadre anneau d'astéroïdes", "Rocks going round your avatar.", "Des rochers qui tournent autour de votre avatar.", "user", "profile", "frame"),
+    ("avatar_frame", "saturnring", 700, "Saturn's ring frame", "Cadre anneau de Saturne", "Your avatar as a ringed planet.", "Votre avatar en planète à anneaux.", "user", "profile", "frame"),
+    ("profile_banner", "lunarsurface", 300, "Lunar surface banner", "Bannière surface lunaire", "Grey dunes and craters under a black sky, the moon high.", "Des dunes grises et des cratères sous un ciel noir.", "image", "profile", "banner"),
+    ("profile_banner", "earthrise", 350, "Earthrise banner", "Bannière lever de Terre", "The blue Earth rising over the moon's horizon.", "La Terre bleue qui se lève sur l'horizon de la lune.", "image", "profile", "banner"),
+    ("profile_banner", "asteroidfield", 300, "Asteroid field banner", "Bannière champ d'astéroïdes", "Rocks floating in the dark.", "Des rochers qui flottent dans le noir.", "image", "profile", "banner"),
+    ("profile_banner", "launchpad", 300, "Launch pad banner", "Bannière pas de tir", "A tower on its pad at dusk, the flames of a launch below.", "Une tour sur son pas de tir au crépuscule, les flammes d'un lancement en bas.", "image", "profile", "banner"),
+    ("level_badge", "moonphase", 650, "Moon phase level badge", "Badge de niveau phase de lune", "Your level beside a crescent moon.", "Votre niveau à côté d'un croissant de lune.", "trophy", "levels", "style"),
+    ("level_badge", "sunbadge", 650, "Sunny level badge", "Badge de niveau soleil", "Your level on a glowing sun.", "Votre niveau sur un soleil rayonnant.", "trophy", "levels", "style"),
+    ("level_badge", "rocketbadge", 600, "Rocket level badge", "Badge de niveau fusée", "Your level on a rocket's hull, its engine lit.", "Votre niveau sur la coque d'une fusée, moteur allumé.", "trophy", "levels", "style"),
+    ("notification_style", "transmission", 600, "Transmission notifications", "Notifications transmission", "Notifications coming in as a radio transmission, green on black.", "Des notifications qui arrivent en transmission radio, vert sur noir.", "bell", "looks", "style"),
+    ("notification_style", "missioncontrol", 650, "Mission control notifications", "Notifications contrôle de mission", "Notifications on mission control's amber screens.", "Des notifications sur les écrans ambrés du contrôle de mission.", "bell", "looks", "style"),
+    ("notification_animation", "liftoff", 500, "Lift-off notification animation", "Animation de notification décollage", "Notifications shaking on the pad, then lifting off.", "Des notifications qui tremblent sur le pas de tir puis décollent.", "bell-ring", "looks", "animation"),
+    ("notification_animation", "orbitin", 550, "Into orbit notification animation", "Animation de notification mise en orbite", "Notifications swinging in on an orbit.", "Des notifications qui arrivent en suivant une orbite.", "bell-ring", "looks", "animation"),
+    ("effect", "comets", 300, "Comets celebration", "Célébration comètes", "Little comets streaking out of the reward.", "De petites comètes qui jaillissent de la récompense.", "party", "celebrations", "effect"),
+    ("effect", "planets", 350, "Planets celebration", "Célébration planètes", "Little planets, a ringed one among them, bursting out.", "De petites planètes, dont une à anneaux, qui jaillissent.", "party", "celebrations", "effect"),
+    ("name_style", "lunarsilver", 350, "Lunar silver name style", "Style de nom argent lunaire", "A name in silver, wide space-age letters.", "Un nom en argent, en larges lettres de l'ère spatiale.", "feather", "names", "style"),
+    ("name_style", "solarfire", 400, "Solar fire name style", "Style de nom feu solaire", "A name burning like the sun, yellow to red.", "Un nom qui brûle comme le soleil, du jaune au rouge.", "feather", "names", "style"),
+    ("name_style", "bigbang", 650, "Big Bang name style", "Style de nom Big Bang", "A name swelling with every colour of the first light.", "Un nom qui enfle de toutes les couleurs de la première lumière.", "feather", "names", "style"),
+    ("palette", "solarflare", 200, "Solar flare palette", "Palette éruption solaire", "The sun's orange and fire over the theme.", "L'orange et le feu du soleil sur le thème.", "palette", "palettes", "palette"),
+    ("palette", "lunar", 200, "Lunar palette", "Palette lunaire", "The moon's silver and blue over the theme.", "L'argent et le bleu de la lune sur le thème.", "palette", "palettes", "palette"),
+    ("palette", "nebulateal", 200, "Teal nebula palette", "Palette nébuleuse turquoise", "A nebula's teal and violet over the theme.", "Le turquoise et le violet d'une nébuleuse sur le thème.", "palette", "palettes", "palette"),
+):  # fmt: skip
+    _prefix = {"avatar_frame": "frame", "profile_banner": "banner", "level_badge": "level", "notification_style": "notif",
+               "notification_animation": "notif", "effect": "effect", "name_style": "name", "palette": "palette"}[_kind]  # fmt: skip
+    _wave2(f"{_prefix}_{_k}", _kind, _price, _en, _fr, _aen, _afr, {_fld: _k}, collection=_coll, icon=_icon)
+for _label, _fr, _icon, _style, _price, _gpu in (
+    ("Moonwalker", "Badge Marcheur lunaire", "moon", "float", 250, False), ("Sun chaser", "Badge Chasseur de soleil", "sun", "pulse", 250, False),
+    ("Asteroid miner", "Badge Mineur d'astéroïdes", "gem", "shimmer", 300, False), ("Big Bang", "Badge Big Bang", "sparkles", "rainbow", 450, False),
+    ("Space cadet", "Badge Cadet de l'espace", "rocket", "shimmer", 200, False), ("Starship captain", "Badge Capitaine de vaisseau", "crown", "gold", 650, False),
+    ("Navigator", "Badge Navigateur", "compass", "spin", 250, False), ("Ship engineer", "Badge Ingénieur de bord", "wrench", "pulse", 250, False),
+    ("Satellite", "Badge Satellite", "satellite", "spin", 300, False), ("Red planet", "Badge Planète rouge", "orbit", "pulse", 300, False),
+    ("Solar wind", "Badge Vent solaire", "wind", "float", 250, False), ("Lunar module", "Badge Module lunaire", "package", "shimmer", 300, False),
+    ("First contact", "Badge Premier contact", "radio", "neon", 450, False), ("Stardust", "Badge Poussière d'étoiles", "sparkle", "float", 200, False),
+    ("Moon base", "Badge Base lunaire", "home", "frost", 350, False), ("Sunspot", "Badge Tache solaire", "sun", "solar", 700, True),
+    ("Full moon", "Badge Pleine lune", "moon", "lunar", 700, True),
+):  # fmt: skip
+    _wave2(f"badge_{_label.lower().replace(' ', '_')}", "badge", _price, f"{_label} badge", _fr,
+           f"A « {_label} » badge on your profile{', ' + HD_TEXT[0] if _gpu else ''}.",
+           f"Un badge « {_label} » sur votre profil{', ' + HD_TEXT[1] if _gpu else ''}.",
+           {"label": _label, "icon": _icon, "style": _style}, collection="badges", icon="star", hd=_gpu)  # fmt: skip
+for _label, _fr, _style, _price, _gpu in (
+    ("Moonwalker", "Titre : Marcheur lunaire", "float", 200, False), ("Sun worshipper", "Titre : Adorateur du soleil", "gold", 250, False),
+    ("Asteroid miner", "Titre : Mineur d'astéroïdes", "shimmer", 250, False), ("Space cadet", "Titre : Cadet de l'espace", "pulse", 150, False),
+    ("Starship captain", "Titre : Capitaine de vaisseau", "gold", 600, False), ("Ground control", "Titre : Contrôle au sol", "neon", 300, False),
+    ("Light-year traveller", "Titre : Voyageur des années-lumière", "rainbow", 450, False), ("Mission specialist", "Titre : Spécialiste de mission", "shimmer", 300, False),
+    ("Orbit master", "Titre : Maître des orbites", "frost", 300, False), ("Big Bang theorist", "Titre : Théoricien du Big Bang", "rainbow", 500, False),
+    ("Child of the Sun", "Titre : Enfant du Soleil", "solar", 800, True), ("Moonchild", "Titre : Enfant de la Lune", "lunar", 800, True),
+):  # fmt: skip
+    _wave2(f"title_{_label.lower().replace(' ', '_').replace('-', '_')}", "title", _price, f"Title: {_label}", _fr,
+           f"« {_label} » under your name{', ' + HD_TEXT[0] if _gpu else ''}.",
+           f"« {_label} » sous votre nom{', ' + HD_TEXT[1] if _gpu else ''}.",
+           {"label": _label, "style": _style}, collection="titles", icon="trophy", hd=_gpu)  # fmt: skip
+COSMOS_LEGENDARY.add("ambient_solarflare")
+SHOP[[p["key"] for p in SHOP].index("ambient_solarflare")]["rarity"] = "legendary"
+WAVE2_PACKS = (
+    ("pack_hd_sunmoon", "Sun and Moon HD pack", "Pack Soleil et Lune HD", "sun",
+     "The solar flare and the moonrise, the asteroid belt — behind the portal and in your banner — with the sun's and the moon's frames, level badges and notifications.",
+     "L'éruption solaire et le lever de lune, la ceinture d'astéroïdes — derrière le portail et dans votre bannière — avec les cadres, badges de niveau et notifications du soleil et de la lune.",
+     [k for k in WAVE2 if k in COSMOS_HD and not k.startswith(("badge_", "title_"))]),
+    ("pack_spacecrew", "Space crew pack", "Pack Équipage", "rocket",
+     "The crew's badges and titles: moonwalker, captain, navigator, engineer, first contact…",
+     "Les badges et titres de l'équipage : marcheur lunaire, capitaine, navigateur, ingénieur, premier contact…",
+     [k for k in WAVE2 if k not in COSMOS_HD and k.startswith(("badge_", "title_"))]),
+    ("pack_sunmoon", "Sun and Moon pack", "Pack Soleil et Lune", "moon",
+     "The sun's and the moon's frames, banners, level badges, notifications, celebrations, name styles and palettes.",
+     "Les cadres, bannières, badges de niveau, notifications, célébrations, styles de nom et palettes du soleil et de la lune.",
+     [k for k in WAVE2 if k not in COSMOS_HD and not k.startswith(("badge_", "title_"))]),
+)  # fmt: skip
+for _key, _en, _fr, _icon, _aen, _afr, _held in WAVE2_PACKS:
+    _p(
+        _key,
+        "bundle",
+        None,
+        "epic",
+        _en,
+        _fr,
+        _aen,
+        _afr,
+        {"products": list(_held)},
+        collection="packs",
+        icon=_icon,
+    )
+COSMOS_PACKS = (*COSMOS_PACKS, *WAVE2_PACKS)
+next(p for p in SHOP if p["key"] == "booster_celestial")["payload"]["packs"] = [k for k, *_ in COSMOS_PACKS]
+
 # the level each one needs, set here rather than spread: the legendary ones on the great tiers, the epic ones
 # along the curve, the rare ones early, the common ones for everyone; a pack asks the highest of what it holds
 COSMOS_LEVELS: dict[str, int | None] = {
@@ -2959,17 +3111,26 @@ COSMOS_LEVELS: dict[str, int | None] = {
     "banner_live_orion": 18, "banner_live_pillars": 25, "banner_live_crab": 11, "banner_live_helix": 13,
     "banner_live_cliffs": 15, "banner_live_solarsystem": 7, "banner_live_saturnrise": 10, "banner_live_milkyway": 9,
     "banner_live_constellations": 6,
-    "frame_nebulaveil": 15, "frame_orrery": 11, "frame_pulsar": 13, "frame_eclipse": 22,
-    "level_stellar": 21, "level_orrery": 17, "level_starmap": 12, "level_comet": 10, "level_ringworld": 44,
+    "frame_nebulaveil": 15, "frame_orrery": 11, "frame_pulsar": 13, "frame_eclipse": 31,
+    "level_stellar": 47, "level_orrery": 24, "level_starmap": 12, "level_comet": 10, "level_ringworld": 44,
     "level_pulsar": 19, "level_meteor": 7,
     "notif_stellar": 9, "notif_orrery": 8, "notif_ringworld": 13, "notif_totality": 16, "notif_nebulabloom": 11,
-    "effect_starshower": 10, "levelup_constellate": 23, "title_event_horizon": 15,
+    "effect_starshower": 10, "levelup_constellate": 29, "title_event_horizon": 15,
     # rare
     "ambient_perseids": 4, "ambient_greatcomet": 3, "banner_live_perseids": 3, "banner_live_greatcomet": 2,
     "frame_starchart": 6, "frame_cometring": 5, "frame_meteorite": 3,
     "notif_starmap": 4, "notif_comet": 3, "notif_pulsar": 6, "notif_meteor": 2, "notif_shootingstar": 3, "notif_eclipsed": 7,
     "name_starlines": 4, "title_astronomer": 5, "title_cosmonaut": 8, "badge_telescope": 6, "badge_ringed_planet": 7,
     "booster_celestial": 5,
+}  # fmt: skip
+COSMOS_LEVELS |= {  # the second wave
+    "ambient_solarflare": 30, "banner_live_solarflare": 21, "ambient_moonrise": 4, "banner_live_moonrise": 3,
+    "ambient_asteroids": 3, "banner_live_asteroids": 2,
+    "frame_heliosphere": 28, "level_solar": 35, "notif_solar": 12, "frame_lunarhalo": 14, "level_lunar": 42,
+    "notif_lunar": 9, "frame_crescent": 4, "frame_sunrays": 5, "frame_asteroidring": 3, "frame_saturnring": 6,
+    "level_moonphase": 5, "level_sunbadge": 6, "level_rocketbadge": 4, "notif_transmission": 3, "notif_missioncontrol": 4,
+    "name_bigbang": 6, "badge_starship_captain": 34, "title_starship_captain": 38, "badge_sunspot": 22, "badge_full_moon": 27,
+    "title_child_of_the_sun": 48, "title_moonchild": 39,
 }  # fmt: skip
 for _key in COSMOS_KEYS:
     COSMOS_LEVELS.setdefault(_key, None)  # the common ones: for everyone
@@ -3020,6 +3181,10 @@ UNIVERSES["spacestation"] = ("banner_orbits", "frame_orrery", "name_spaceage", "
                              "ambient_solarsystem", "badge_ringed_planet", "title_cosmonaut")  # fmt: skip
 UNIVERSE_EXTRAS["spacestation"] = ("banner_live_solarsystem", "level_orrery", "palette_deepspace", "badge_pulsar",
                                    "title_comet_chaser")  # fmt: skip
+UNIVERSES["starship"] = ("banner_launchpad", "frame_asteroidring", "name_lunarsilver", "notif_missioncontrol",
+                         "effect_comets", "ambient_asteroids", "badge_starship_captain", "title_starship_captain")  # fmt: skip
+UNIVERSE_EXTRAS["starship"] = ("banner_live_asteroids", "level_rocketbadge", "badge_navigator", "badge_ship_engineer",
+                               "title_mission_specialist", "title_ground_control")  # fmt: skip
 
 
 # 027 (#30): each universe's dashboard looks — its theme pack includes them (and the widget a look needs)
@@ -3356,7 +3521,7 @@ for key, en, fr, about_en, about_fr, contents, rarity, level in (
      ["frame_pyre", "frame_tesla", "frame_abyssal", "frame_obsidian", "frame_frostcrown", "frame_starlit", "frame_regalia", "frame_biohazard", "frame_prism", "frame_sigil", "frame_mainframe", "frame_hanami", "frame_wraith", "frame_sweetie", "frame_borealis", "frame_corona", "frame_chronogate"], "epic", 10),
     ("pack_hd_level_ups", "HD level-ups pack", "Pack Passages de niveau HD",
      "Every full-stage level-up drawn by the graphics chip.", "Tous les passages de niveau plein écran dessinés par la puce graphique.",
-     ["levelup_phoenix", "levelup_thunderstrike", "levelup_tidalwave", "levelup_supernova", "levelup_goldrush", "levelup_arcanum", "levelup_sakurastorm", "levelup_aurorasky", "levelup_timeportal"], "epic", 10),
+     ["levelup_phoenix", "levelup_thunderstrike", "levelup_tidalwave", "levelup_supernova", "levelup_goldrush", "levelup_arcanum", "levelup_sakurastorm", "levelup_aurorasky", "levelup_timeportal", "levelup_rift"], "epic", 10),
     ("pack_hd_titles", "HD titles and badges pack", "Pack Titres et badges HD",
      "Every title and badge drawn by the graphics chip.", "Tous les titres et badges dessinés par la puce graphique.",
      ["title_firebrand", "title_stormcaller", "title_deep_diver", "title_volcano_heart", "title_frostborn", "title_stargazer", "title_golden_one", "title_mad_scientist", "title_netrunner", "title_runemaster", "title_root_access", "title_spring_spirit", "title_shadow_walker", "title_sugar_rush", "title_northern_light", "title_plasma_core", "badge_phoenix_feather", "badge_thunderbolt", "badge_trident", "badge_lava_stone", "badge_snowflake", "badge_comet", "badge_golden_crown", "badge_radioactive", "badge_chrome_chip", "badge_grimoire", "badge_backdoor", "badge_blossom", "badge_watcher", "badge_lollipop", "badge_north_star", "badge_atom", "title_time_traveller", "badge_hourglass"], "epic", 10),
@@ -3684,6 +3849,7 @@ LEGENDARY = {
     *SEASONAL_LEGENDARY,
     # #130: the cosmos' flagships
     *COSMOS_LEGENDARY,
+    "levelup_rift",  # #133: the Upside Down's gate
 }  # fmt: skip
 for product in SHOP:
     if product["rarity"] == "legendary" and product["key"] not in LEGENDARY and product["type"] != "booster":
@@ -3842,11 +4008,17 @@ def _spread_levels(products: list[Product]) -> None:
 
 # #130: the cosmos' interfaces at the first great tier, their theme packs at the great tier at or above what
 # they hold (never a way round a level)
-for _theme in ("observatory", "spacestation"):
+for _theme in ("observatory", "spacestation", "starship"):
     COSMOS_LEVELS[f"theme_{_theme}"] = THEME_RARITY[_theme][2]
     _held = next(p for p in SHOP if p["key"] == f"ultimate_{_theme}")["payload"]["products"]
     _most = max((COSMOS_LEVELS.get(k) or 0 for k in _held), default=0)
     COSMOS_LEVELS[f"ultimate_{_theme}"] = next(t for t in GREAT_TIERS if t >= _most)
+
+# a cosmos pack that came out legendary (its worth) unlocks on a great tier, at or above what it holds
+for _key, *_text, _inside in COSMOS_PACKS:
+    _pack = next(p for p in SHOP if p["key"] == _key)
+    if _pack["rarity"] == "legendary":
+        COSMOS_LEVELS[_key] = next(t for t in GREAT_TIERS if t >= (COSMOS_LEVELS.get(_key) or 1))
 
 
 _spread_levels(SHOP)

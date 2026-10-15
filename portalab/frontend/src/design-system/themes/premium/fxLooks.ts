@@ -41,6 +41,8 @@ export const FX_LEVEL_BADGES: Record<string, string> = {
   pulsar: "pulsar",
   totality: "totality",
   meteor: "meteor",
+  solar: "solar",
+  lunar: "lunar",
 };
 
 /** notification styles, and the styles of titles and badges (same keys: each effect's own name) */
@@ -71,6 +73,8 @@ export const FX_STYLES: Record<string, string> = {
   pulsar: "pulsar",
   totality: "totality",
   meteor: "meteor",
+  solar: "solar",
+  lunar: "lunar",
 };
 
 /** #78: notifications drawn by the GPU need not be rectangles — the shape each style draws itself in */
@@ -101,6 +105,8 @@ export const FX_NOTIFICATION_SHAPES: Record<string, number> = {
   pulsar: 6,
   totality: 0,
   meteor: 7,
+  solar: 8,
+  lunar: 0,
 };
 /** #78: name styles drawn by the GPU — an aura around the name (its letters stay its own) */
 export const FX_NAMES: Record<string, string> = {
@@ -189,6 +195,8 @@ export const FX_FRAMES: Record<string, FxSpec> = {
   eclipse: { effect: "totality", shape: 0, radius: "50%" },
   meteorite: { effect: "meteor", shape: 3 },
   polaris: { effect: "starmap", shape: 4 },
+  heliosphere: { effect: "solar", shape: 0, radius: "50%" },
+  lunarhalo: { effect: "lunar", shape: 0, radius: "50%" },
 };
 
 /** full-stage level-up moments */
@@ -204,6 +212,7 @@ export const FX_LEVEL_UPS: ReadonlySet<string> = new Set([
   "timeportal",
   "hyperjump", // issue 130
   "constellate",
+  "rift", // issue 133
 ]);
 
 /** the shop products drawn by the GPU (a pack holding one shows it too) */
@@ -435,6 +444,24 @@ export const FX_PRODUCTS: ReadonlySet<string> = new Set([
   "title_night_watcher",
   "title_star_sailor",
   "badge_supernova",
+  "levelup_rift", // issue 133
+  // issue 130: the second wave — the sun and the moon
+  "ambient_solarflare",
+  "banner_live_solarflare",
+  "ambient_moonrise",
+  "banner_live_moonrise",
+  "ambient_asteroids",
+  "banner_live_asteroids",
+  "frame_heliosphere",
+  "level_solar",
+  "notif_solar",
+  "frame_lunarhalo",
+  "level_lunar",
+  "notif_lunar",
+  "badge_sunspot",
+  "badge_full_moon",
+  "title_child_of_the_sun",
+  "title_moonchild",
 ]);
 
 /** CSS clip of an avatar inside a shaped frame. */

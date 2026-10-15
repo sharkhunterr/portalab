@@ -3207,3 +3207,42 @@
   font-family: Caveat, "Comic Neue", cursive;
   font-size: 2.4rem;
 }
+
+/* issue 133, the Gate: the card only shows once one has stepped through the rift (the miniature at once) */
+.levelup[data-look="rift"] .levelup__card {
+  --color-text: #e5e7eb;
+  --color-text-muted: #a3aab8;
+  border: 1px solid #dc262699;
+  background: linear-gradient(180deg, #0d1118f2, #160a0ef2);
+  color: #e5e7eb;
+  box-shadow:
+    0 0 2.4rem #b91c1c55,
+    inset 0 0 1.6rem #7f1d1d40;
+}
+.levelup[data-look="rift"]:not([data-mini]) .levelup__card {
+  animation: levelup-emerge 1s cubic-bezier(0.2, 0.8, 0.2, 1) 3s both;
+}
+/* the shop's picture plays the moment over and over (every 7 s): the card comes back each time through */
+.levelup[data-look="rift"][data-mini] .levelup__card {
+  animation: levelup-rift-loop 7s linear infinite;
+}
+@keyframes levelup-rift-loop {
+  0%,
+  42% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  50%,
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
+  100% {
+    opacity: 0;
+  }
+}
+.levelup[data-look="rift"] .levelup__title {
+  color: #f87171;
+  text-shadow: 0 0 0.8rem #dc2626aa;
+}

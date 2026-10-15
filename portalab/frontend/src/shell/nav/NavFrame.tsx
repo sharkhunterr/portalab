@@ -29,7 +29,8 @@ export type NavVariant =
   | "masthead"
   | "dpad"
   | "planisphere"
-  | "system";
+  | "system"
+  | "deck";
 
 export interface Arrangement {
   device: DeviceClass;

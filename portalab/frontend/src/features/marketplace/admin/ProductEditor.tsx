@@ -125,6 +125,8 @@ const BADGE_STYLES = [
   "pulsar",
   "totality",
   "meteor",
+  "solar",
+  "lunar",
 ];
 const ICON_NAMES = Object.keys(ICONS).sort();
 

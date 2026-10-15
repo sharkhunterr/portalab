@@ -559,7 +559,7 @@ void main() {
 
 /** A great comet passing: its glowing head crossing the sky over a minute, the curved golden dust tail
  * and the straight blue ion tail streaming away from the sun, stars behind. */
-const COMETPASS = `${SAFE_COMMON}${STARS}
+const GREATCOMET = `${SAFE_COMMON}${STARS}
 void main() {
   vec2 uv;
   vec2 p = coords(uv);
@@ -587,6 +587,136 @@ void main() {
   gl_FragColor = o;
 }`;
 
+/** The sun up close: its boiling surface in a corner, granules and dark spots, prominences arching off the
+ * limb and falling back, loops of plasma, now and then a flare brightening it all. */
+const SOLARFLARE = `${SAFE_COMMON}${STARS}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = mod(u_time, 600.0);
+  float aspect = u_res.x / u_res.y;
+  vec2 ctr = vec2(1.05 * aspect, -0.25);
+  float R = 0.85;
+  vec2 c = p - ctr;
+  float r = length(c);
+  float ang = atan(c.y, c.x);
+  vec4 o = vec4(0.0);
+  o = over(o, vec3(1.0, 0.97, 0.9), starfield(p, 80.0, t, 0.02) * smoothstep(R + 0.3, R + 0.6, r));
+  // the corona, streaming
+  float streams = fbm4(vec2(ang * 6.0, r * 2.0 - t * 0.05));
+  o = over(o, vec3(1.0, 0.6, 0.2), exp(-(r - R) * 4.0) * step(R, r) * (0.35 + 0.35 * streams));
+  // prominences: arcs of plasma rising off the limb and falling back
+  for (int i = 0; i < 4; i++) {
+    float fi = float(i);
+    float a0 = 1.75 + fi * 0.32 + 0.05 * sin(t * 0.1 + fi);
+    float span = 0.18 + 0.08 * hash(vec2(fi, 3.0));
+    float h = (0.12 + 0.12 * hash(vec2(fi, 4.0))) * (0.75 + 0.25 * sin(t * 0.2 + fi * 2.0));
+    float x = (ang - a0) / span;
+    float arc = R + h * sqrt(max(0.0, 1.0 - x * x));
+    float flow = fbm4(vec2(ang * 30.0 - t * 0.6 * (mod(fi, 2.0) * 2.0 - 1.0), r * 20.0));
+    float prom = smoothstep(0.03, 0.0, abs(r - arc)) * step(abs(x), 1.0) * (0.5 + 0.5 * flow);
+    o = over(o, mix(vec3(1.0, 0.35, 0.1), vec3(1.0, 0.75, 0.35), flow), prom * 0.9);
+  }
+  // the surface: granules boiling, spots, darker at the limb
+  vec2 q = c * 6.0;
+  vec2 w = vec2(fbm4(q + t * 0.05), fbm4(q + 4.0 - t * 0.04));
+  float gran = fbm(q * 1.5 + w * 1.5 + t * 0.03);
+  float cells = 1.0 - smoothstep(0.0, 0.4, abs(fbm4(q * 3.0 + w * 2.0 + t * 0.08) - 0.5));
+  vec3 surf = mix(vec3(0.95, 0.45, 0.08), vec3(1.0, 0.85, 0.45), gran);
+  surf = mix(surf, vec3(1.0, 0.95, 0.75), cells * 0.3);
+  float spots = smoothstep(0.72, 0.8, fbm4(c * 3.0 + 9.0));
+  surf = mix(surf, vec3(0.25, 0.08, 0.02), spots * 0.8);
+  float limb = sqrt(max(0.0, 1.0 - (r / R) * (r / R)));
+  surf *= 0.55 + 0.6 * limb;
+  float flare = exp(-abs(mod(t, 23.0) - 4.0) * 1.5);
+  surf += vec3(1.0, 0.9, 0.7) * flare * 0.35 * limb;
+  o = over(o, surf, smoothstep(R + 0.004, R - 0.004, r));
+  o = over(o, vec3(1.0, 0.7, 0.3), exp(-abs(r - R) * 60.0) * 0.6);
+  gl_FragColor = o;
+}`;
+
+/** A full moon rising over a calm sea: its grey seas and bright craters, a halo in the haze, its silver
+ * path trembling on the water, thin clouds drifting across. */
+const MOONRISE = `${SAFE_COMMON}${STARS}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = mod(u_time, 600.0);
+  float aspect = u_res.x / u_res.y;
+  float horizon = 0.3;
+  float rise = 0.62 + 0.04 * sin(t * 0.01);
+  vec2 mc = vec2(0.62 * aspect, rise);
+  float R = 0.16;
+  vec2 m = (p - mc) / R;
+  float r = length(m);
+  vec4 o = vec4(0.0);
+  o = over(o, vec3(0.08, 0.12, 0.25), 0.35 * smoothstep(horizon, 1.0, uv.y));
+  o = over(o, vec3(1.0, 0.97, 0.9), starfield(p, 80.0, t, 0.03) * smoothstep(horizon + 0.1, 0.6, uv.y) * smoothstep(0.6, 2.5, r));
+  o = over(o, vec3(0.75, 0.82, 1.0), exp(-max(r - 1.0, 0.0) * 1.2) * 0.35 * step(1.0, r) * step(horizon, uv.y));
+  // the moon: seas, highlands, craters with their rays
+  float seas = smoothstep(0.45, 0.65, fbm(m * 1.6 + 3.0));
+  vec3 moon = mix(vec3(0.92, 0.91, 0.86), vec3(0.55, 0.56, 0.6), seas);
+  for (int i = 0; i < 6; i++) {
+    float fi = float(i);
+    vec2 cc = vec2(hash(vec2(fi, 1.0)) - 0.5, hash(vec2(fi, 2.0)) - 0.5) * 1.4;
+    float cr = 0.06 + 0.1 * hash(vec2(fi, 3.0));
+    float d = length(m - cc);
+    moon *= 1.0 - 0.12 * smoothstep(cr, cr * 0.6, d) + 0.07 * smoothstep(0.03, 0.0, abs(d - cr)) * step(0.0, (m - cc).x + (m - cc).y);
+  }
+  moon *= 0.85 + 0.15 * fbm4(m * 8.0);
+  moon *= 0.75 + 0.25 * sqrt(max(0.0, 1.0 - r * r));
+  float above = step(horizon, uv.y);
+  o = over(o, moon, smoothstep(1.02, 0.98, r) * above);
+  // thin clouds drifting across it
+  float cloud = smoothstep(0.5, 0.75, fbm4(vec2(p.x * 2.0 - t * 0.02, p.y * 9.0))) * smoothstep(horizon, horizon + 0.2, uv.y) * smoothstep(0.9, 0.5, uv.y);
+  o = over(o, vec3(0.35, 0.38, 0.5), cloud * 0.45);
+  // the sea and the moon's path on it
+  float sea = step(uv.y, horizon);
+  o = over(o, vec3(0.02, 0.04, 0.09), sea * 0.85);
+  float waves = noise(vec2(p.x * 40.0, (horizon - uv.y) * 160.0 / (horizon - uv.y + 0.05) - t * 2.0));
+  float path = smoothstep(0.22 + (horizon - uv.y) * 0.6, 0.0, abs(p.x - mc.x)) * sea;
+  o = over(o, vec3(0.9, 0.93, 1.0), path * smoothstep(0.55, 0.85, waves) * 0.9);
+  o = over(o, vec3(0.7, 0.75, 0.9), smoothstep(0.004, 0.0, abs(uv.y - horizon)) * 0.4);
+  gl_FragColor = o;
+}`;
+
+/** An asteroid belt: rocks of every size tumbling past in three depths, lit on one side by a far sun, dust
+ * glittering between them. */
+const ASTEROIDS = `${SAFE_COMMON}${STARS}
+void main() {
+  vec2 uv;
+  vec2 p = coords(uv);
+  float t = mod(u_time, 600.0);
+  float aspect = u_res.x / u_res.y;
+  vec4 o = vec4(0.0);
+  o = over(o, vec3(1.0, 0.97, 0.9), starfield(p, 90.0, t, 0.03));
+  vec2 sun = vec2(-0.2, 0.9);
+  o = over(o, vec3(1.0, 0.85, 0.6), exp(-length(p - sun) * 2.5) * 0.25);
+  for (int k = 0; k < 3; k++) {
+    float fk = float(k);
+    float scale = 3.0 + fk * 3.5;
+    vec2 g = p * scale + vec2(t * (0.03 + fk * 0.03), sin(t * 0.02 + fk) * 0.3);
+    vec2 id = floor(g);
+    vec2 f = fract(g) - 0.5;
+    float h = hash(id + fk * 7.0);
+    if (h < 0.78 - fk * 0.06) continue;
+    vec2 at = (vec2(hash(id + 1.3), hash(id + 2.7)) - 0.5) * 0.5;
+    vec2 d = f - at;
+    float spin = t * (0.3 + hash(id + 4.0)) + h * 6.0;
+    d = mat2(cos(spin), -sin(spin), sin(spin), cos(spin)) * d;
+    float size = 0.08 + 0.3 * pow(hash(id + 5.0), 2.0);
+    float lump = size * (0.75 + 0.45 * fbm4(normalize(d + 1e-4) * 2.0 + h * 10.0));
+    float body = smoothstep(lump, lump - 0.02, length(d));
+    vec2 toSun = normalize(sun - p);
+    float lit = clamp(dot(normalize(d + 1e-4), mat2(cos(spin), -sin(spin), sin(spin), cos(spin)) * toSun) * 0.8 + 0.35, 0.0, 1.0);
+    vec3 rock = mix(vec3(0.2, 0.18, 0.17), vec3(0.62, 0.56, 0.5), lit) * (0.75 + 0.35 * fbm4(d * 18.0 + h));
+    rock *= 0.6 + 0.4 * (fk / 2.0);
+    o = over(o, rock, body * (0.75 + fk * 0.1));
+  }
+  o = over(o, vec3(1.0, 0.9, 0.75), starfield(p + vec2(t * 0.02, 0.0), 140.0, t * 2.0, 0.03) * 0.5);  // glittering dust
+  gl_FragColor = o;
+}`;
+
 export const COSMOS_SHADERS: Record<string, string> = {
   orion: ORION,
   crab: CRAB,
@@ -598,5 +728,9 @@ export const COSMOS_SHADERS: Record<string, string> = {
   perseids: PERSEIDS,
   constellations: CONSTELLATIONS,
   milkyway: MILKYWAY,
-  greatcomet: COMETPASS,
+  greatcomet: GREATCOMET,
+  // the second wave: the sun, the moon, the asteroids
+  solarflare: SOLARFLARE,
+  moonrise: MOONRISE,
+  asteroids: ASTEROIDS,
 };

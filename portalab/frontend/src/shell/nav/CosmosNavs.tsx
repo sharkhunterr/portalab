@@ -1,6 +1,9 @@
 import { type CSSProperties, type KeyboardEvent, useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
+import { levelProgress } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
+import type { Progression } from "../../features/gamification/api";
+import { useT } from "../../i18n/hooks/useT";
 import { useShellStrings } from "../strings";
 import type { NavSection } from "./NavigationProvider";
 import {
@@ -14,7 +17,7 @@ import {
 import "../../design-system/themes/cosmos-navs.css";
 
 /**
- * issue 130: the two navigations of the cosmos.
+ * issue 130: the navigations of the cosmos (the third, the starship's deck plan, further down).
  *
  * - **Planisphere** (the Observatory): a round star chart that turns. Each section is a constellation on its
  *   rim — as many stars as it has pages — and turning the chart brings one into the window at the top, its
@@ -220,6 +223,140 @@ export function PlanisphereNav({ sections }: { sections: readonly NavSection[] }
         ) : null}
       </button>
     </div>
+  );
+}
+
+/** How many cells the starship's energy gauge has. */
+const CELLS = 10;
+
+/**
+ * issue 130: the third interface of the cosmos — **Deck plan** (the Starship). The ship seen from the side
+ * along the bottom of the screen: its engines burning at the stern, a HUD (the energy gauge — the level's XP —
+ * and the comms light, lit while messages wait), then one compartment per section, numbered like the decks,
+ * up to the bow. A compartment with several pages opens its stations on a console screen above the hull.
+ * Arrows move from compartment to compartment, Escape closes the console.
+ */
+export function DeckNav({
+  sections,
+  progression,
+  unread,
+}: {
+  sections: readonly NavSection[];
+  progression: Progression | null;
+  unread: number | null;
+}) {
+  const t = useT();
+  const strings = useShellStrings();
+  const { current, isActive } = useCurrent(sections);
+  const { open, setOpen, root } = useOpenSection();
+  const openedIndex = sections.findIndex((s) => s.key === open);
+  const opened = sections[openedIndex];
+  const ratio = progression
+    ? levelProgress(progression.xp, progression.level_floor, progression.next_level_at ?? null)
+    : null;
+  const lit = ratio === null ? 0 : Math.round(ratio * CELLS);
+  const code = (index: number) => String(index + 1).padStart(2, "0");
+  return (
+    <nav className="deck" aria-label={strings.mainNav} ref={root as React.RefObject<HTMLElement>}>
+      {opened ? (
+        <div className="deck__console">
+          <p className="deck__title">
+            <span className="deck__code">{t("shell:deck.deck", { n: code(openedIndex) })}</span>
+            {strings.label(opened.label_key)}
+          </p>
+          <DestinationList
+            section={opened}
+            currentKey={current?.key}
+            className="deck__stations"
+            onPick={() => setOpen(null)}
+          />
+        </div>
+      ) : null}
+      <div className="deck__ship">
+        <span className="deck__engines" aria-hidden="true">
+          <span className="deck__flame" />
+          <span className="deck__flame" />
+        </span>
+        <div className="deck__hud">
+          {progression && ratio !== null ? (
+            <Link
+              to="/progression"
+              className="deck__gauge"
+              aria-label={t("shell:deck.energyLabel", {
+                level: progression.level,
+                percent: Math.round(ratio * 100),
+              })}
+            >
+              <span className="deck__gauge-name" aria-hidden="true">
+                {t("shell:deck.energy")}
+              </span>
+              <span className="deck__cells" aria-hidden="true">
+                {Array.from({ length: CELLS }, (_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the gauge's fixed cells
+                  <span key={i} data-lit={i < lit || undefined} />
+                ))}
+              </span>
+            </Link>
+          ) : null}
+          <Link
+            to="/notifications"
+            className="deck__comms"
+            data-live={unread ? true : undefined}
+            aria-label={unread ? t("shell:deck.commsWaiting", { count: unread }) : t("shell:deck.comms")}
+          >
+            <Icon name="radio" size={16} />
+            {unread ? <span className="deck__comms-count">{unread > 99 ? "99+" : unread}</span> : null}
+          </Link>
+        </div>
+        {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: arrows move along the hull */}
+        <ol className="deck__rooms" onKeyDown={(event) => moveFocus(event)}>
+          {sections.map((s, index) => {
+            const label = strings.label(s.label_key);
+            const first = destinationsOf(s, undefined)[0];
+            const body = (
+              <>
+                <span className="deck__room-code" aria-hidden="true">
+                  {code(index)}
+                </span>
+                <span className="deck__room-light" aria-hidden="true" />
+                <Icon name={s.icon ?? first?.icon ?? "rocket"} size={18} />
+                <span className="deck__room-name">{label}</span>
+              </>
+            );
+            return (
+              <li key={s.key}>
+                {orbited(s) ? (
+                  <button
+                    type="button"
+                    className="deck__room"
+                    data-nav-item
+                    data-active={isActive(s) || undefined}
+                    aria-expanded={open === s.key}
+                    onClick={() => setOpen(open === s.key ? null : s.key)}
+                  >
+                    {body}
+                  </button>
+                ) : (
+                  <NavLink
+                    to={first?.route ?? "/"}
+                    end={first?.route === "/"}
+                    className="deck__room"
+                    data-nav-item
+                    data-active={isActive(s) || undefined}
+                    aria-current={isActive(s) ? "page" : undefined}
+                  >
+                    {body}
+                  </NavLink>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        <span className="deck__bow" aria-hidden="true">
+          <span className="deck__window" />
+        </span>
+      </div>
+    </nav>
   );
 }
 

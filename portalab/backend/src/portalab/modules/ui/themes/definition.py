@@ -250,6 +250,10 @@ NOTIFICATION_STYLES = Literal[
     "pulsar",
     "totality",
     "meteor",
+    "solar",
+    "lunar",
+    "transmission",
+    "missioncontrol",
 ]
 NOTIFICATION_ANIMATIONS = Literal[
     "slide",
@@ -316,6 +320,8 @@ NOTIFICATION_ANIMATIONS = Literal[
     "shootingstar",
     "nebulabloom",
     "eclipsed",
+    "liftoff",
+    "orbitin",
 ]
 AMBIENTS = Literal[
     "none",
@@ -440,6 +446,9 @@ AMBIENTS = Literal[
     "constellations",
     "milkyway",
     "greatcomet",
+    "solarflare",
+    "moonrise",
+    "asteroids",
 ]
 CELEBRATIONS = Literal[
     "none",
@@ -500,6 +509,8 @@ CELEBRATIONS = Literal[
     # #130: the cosmos
     "starshower",
     "bigbang",
+    "comets",
+    "planets",
 ]
 PATTERNS = Literal[
     "none",
@@ -555,6 +566,7 @@ LEVEL_UPS = Literal[
     "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
     "jukeboxdrop", "sandcastle", "fullbloom",
     "hyperjump", "constellate",  # #130: the cosmos
+    "rift",  # #133: the Upside Down's gate
 ]  # fmt: skip
 
 
@@ -591,6 +603,7 @@ class Nav(_Closed):
             "dpad",
             "planisphere",
             "system",
+            "deck",
         ]
         | None
     ) = None
@@ -616,6 +629,7 @@ class Nav(_Closed):
             "dpad",
             "planisphere",
             "system",
+            "deck",
         ]
         | None
     ) = None
@@ -640,6 +654,7 @@ class Nav(_Closed):
             "dpad",
             "planisphere",
             "system",
+            "deck",
         ]
         | None
     ) = None

@@ -123,6 +123,9 @@ const EFFECTS: Record<string, { count: number; icon?: string; layer: "badge" | "
   flowerpower: { count: 14, layer: "badge" },
   seashells: { count: 14, layer: "badge" },
   songbirds: { count: 10, layer: "screen" },
+  // issue 130: the cosmos
+  comets: { count: 12, layer: "badge" },
+  planets: { count: 12, layer: "badge" },
 };
 const GRID = 12; // assemble: the bubble is built from a 12 × 4 grid of pixels
 

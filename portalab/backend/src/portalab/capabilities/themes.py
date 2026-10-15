@@ -83,6 +83,9 @@ PROFILE_BANNERS: tuple[str, ...] = (
     "starchart", "orbits", "live-orion", "live-crab", "live-helix", "live-pillars", "live-cliffs",
     "live-solarsystem", "live-saturnrise", "live-perseids", "live-constellations", "live-milkyway",
     "live-greatcomet",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "lunarsurface", "earthrise", "asteroidfield", "launchpad", "live-solarflare", "live-moonrise",
+    "live-asteroids",
 )  # fmt: skip
 AVATAR_FRAMES: tuple[str, ...] = (
     "none", "simple", "gold", "neon", "flames", "frost", "rainbow", "pixel",
@@ -111,6 +114,8 @@ AVATAR_FRAMES: tuple[str, ...] = (
     # #130: the cosmos
     "nebulaveil", "orrery", "starchart", "cometring", "ringedworld", "pulsar", "eclipse", "meteorite",
     "polaris",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "crescent", "sunrays", "asteroidring", "saturnring", "heliosphere", "lunarhalo",
 )  # fmt: skip
 PALETTES: tuple[str, ...] = (
     "theme", "ocean", "forest", "sunset", "candy", "royal", "ember", "matrix",
@@ -133,6 +138,8 @@ PALETTES: tuple[str, ...] = (
     "seventies", "sandbar", "lilac",
     # #130: the cosmos
     "orionpink", "deepspace",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "solarflare", "lunar", "nebulateal",
 )  # fmt: skip
 # animated layers: behind the whole portal (ambient preference, theme default) or a profile (background)
 AMBIENTS: tuple[str, ...] = (
@@ -170,6 +177,8 @@ AMBIENTS: tuple[str, ...] = (
     # #130: the cosmos
     "orion", "crab", "helix", "pillars", "cliffs", "solarsystem", "saturnrise", "perseids",
     "constellations", "milkyway", "greatcomet",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "solarflare", "moonrise", "asteroids",
 )  # fmt: skip
 CELEBRATIONS: tuple[str, ...] = (
     "none", "sparkle", "confetti", "glow", "snow", "bats", "pixels", "hearts", "stars", "coins", "lightning",
@@ -193,6 +202,8 @@ CELEBRATIONS: tuple[str, ...] = (
     "flowerpower", "seashells", "songbirds",
     # #130: the cosmos
     "starshower", "bigbang",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "comets", "planets",
 )  # fmt: skip
 NOTIFICATION_STYLES: tuple[str, ...] = (
     "toast", "banner", "pill", "minimal", "glass", "neon", "comic", "terminal", "parchment", "hologram",
@@ -220,6 +231,8 @@ NOTIFICATION_STYLES: tuple[str, ...] = (
     "jukebox", "beachtowel", "seedpacket",
     # #130: the cosmos
     "stellar", "orrery", "starmap", "comet", "ringworld", "pulsar", "totality", "meteor",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "solar", "lunar", "transmission", "missioncontrol",
 )  # fmt: skip
 NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "slide", "fade", "pop", "zoom", "bounce", "flip", "swing", "glitch", "drop", "spiral", "slam",
@@ -245,6 +258,8 @@ NOTIFICATION_ANIMATIONS: tuple[str, ...] = (
     "funkwalk", "surfin", "sprout",
     # #130: the cosmos
     "shootingstar", "nebulabloom", "eclipsed",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "liftoff", "orbitin",
 )  # fmt: skip
 # the name shown big on a profile: a font and an effect (Steam-like « titles »)
 NAME_STYLES: tuple[str, ...] = (
@@ -272,6 +287,8 @@ NAME_STYLES: tuple[str, ...] = (
     "funkadelic", "surfwave", "watercolour",
     # #130: the cosmos
     "spaceage", "starlines", "staratlas",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "lunarsilver", "solarfire", "bigbang",
 )  # fmt: skip
 # animated badges and titles (payload ``style`` of ``badge``/``title`` products)
 BADGE_STYLES: tuple[str, ...] = (
@@ -286,6 +303,8 @@ BADGE_STYLES: tuple[str, ...] = (
     "chrono",  # #78: the time portal
     # #130: the cosmos
     "stellar", "orrery", "starmap", "comet", "ringworld", "pulsar", "totality", "meteor",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "solar", "lunar",
 )  # fmt: skip
 # 027: the look of the level badge (the « XP badge » in the header, the navigation and on the profile, seen
 # by everyone): ``classic`` is free and changes with the level (a new rank every ten levels)
@@ -314,6 +333,8 @@ LEVEL_BADGES: tuple[str, ...] = (
     "eighttrack", "flipflop", "ladybug",
     # #130: the cosmos
     "stellar", "orrery", "starmap", "comet", "ringworld", "pulsar", "totality", "meteor",
+    # #130: the second wave — the sun, the moon, asteroids, rockets
+    "moonphase", "sunbadge", "rocketbadge", "solar", "lunar",
 )  # fmt: skip
 # 027: how a level-up is shown (the full-screen moment with what was won and unlocked); ``classic`` is free
 LEVEL_UPS: tuple[str, ...] = (
@@ -339,6 +360,8 @@ LEVEL_UPS: tuple[str, ...] = (
     "jukeboxdrop", "sandcastle", "fullbloom",
     # #130: the cosmos
     "hyperjump", "constellate",
+    # #133: the Upside Down's gate
+    "rift",
 )  # fmt: skip
 UNIVERSE_THEMES: tuple[str, ...] = (
     "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
@@ -357,7 +380,7 @@ UNIVERSE_THEMES: tuple[str, ...] = (
     # #89: funk, the beach, spring
     "funky", "beach", "blossom",
     # #130: the cosmos
-    "observatory", "spacestation",
+    "observatory", "spacestation", "starship",
 )  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),

@@ -238,6 +238,19 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
     dark: { accent: "#5fb4ff", accentAlt: "#5ef0d8", contrast: "#04142a" },
     light: { accent: "#1559a8", accentAlt: "#0b7a6a", contrast: "#ffffff" },
   },
+  // the second wave: the sun's fire, the moon's silver, a teal nebula
+  solarflare: {
+    dark: { accent: "#ffb347", accentAlt: "#ff6a2a", contrast: "#2a1000" },
+    light: { accent: "#b45309", accentAlt: "#c2410c", contrast: "#ffffff" },
+  },
+  lunar: {
+    dark: { accent: "#cfd8e8", accentAlt: "#8fa8d8", contrast: "#10162a" },
+    light: { accent: "#4a5570", accentAlt: "#2f4f8a", contrast: "#ffffff" },
+  },
+  nebulateal: {
+    dark: { accent: "#3fe0d0", accentAlt: "#b48cff", contrast: "#022a28" },
+    light: { accent: "#0b7a70", accentAlt: "#6b3fb0", contrast: "#ffffff" },
+  },
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {

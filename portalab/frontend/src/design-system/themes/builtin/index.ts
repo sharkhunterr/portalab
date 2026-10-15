@@ -47,6 +47,7 @@ import portalabLight from "./portalab-light.json";
 import sincity from "./sincity.json";
 import social from "./social.json";
 import spacestation from "./spacestation.json";
+import starship from "./starship.json";
 import studio from "./studio.json";
 import upsidedown from "./upsidedown.json";
 import vhs from "./vhs.json";
@@ -107,6 +108,7 @@ export const BUILTIN_THEMES: readonly ThemeDefinition[] = [
   blossom,
   observatory, // issue 130: the cosmos
   spacestation,
+  starship,
 ] as ThemeDefinition[];
 /** The default theme family (027 R8) and its default member. */
 export const DEFAULT_FAMILY = "portalab";

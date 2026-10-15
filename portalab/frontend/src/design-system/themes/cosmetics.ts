@@ -135,6 +135,14 @@ export const BANNER_KEYS = [
   "live-constellations",
   "live-milkyway",
   "live-greatcomet",
+  // issue 130: the second wave
+  "lunarsurface",
+  "earthrise",
+  "asteroidfield",
+  "launchpad",
+  "live-solarflare",
+  "live-moonrise",
+  "live-asteroids",
 ] as const;
 export const FRAME_KEYS = [
   "none",
@@ -228,6 +236,13 @@ export const FRAME_KEYS = [
   "eclipse",
   "meteorite",
   "polaris",
+  // issue 130: the second wave
+  "crescent",
+  "sunrays",
+  "asteroidring",
+  "saturnring",
+  "heliosphere",
+  "lunarhalo",
 ] as const;
 export const NAME_KEYS = [
   "none",
@@ -308,4 +323,8 @@ export const NAME_KEYS = [
   "spaceage",
   "starlines",
   "staratlas",
+  // issue 130: the second wave
+  "lunarsilver",
+  "solarfire",
+  "bigbang",
 ] as const;

@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 2,
+  "key": "starship",
+  "name": "Vaisseau spatial",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#080b10",
+    "surfaceRaised": "#121821",
+    "text": "#eef2f7",
+    "textMuted": "#9aa7b8",
+    "border": "#2b3542",
+    "accent": "#ffb000",
+    "accentContrast": "#1f1400",
+    "focus": "#4fd1ff",
+    "accentAlt": "#4fd1ff",
+    "rarity": {
+      "common": "#9aa7b8",
+      "rare": "#4fd1ff",
+      "epic": "#c08bff",
+      "legendary": "#ffb000"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Chakra Petch\", Rajdhani, sans-serif",
+    "headingFamily": "\"Chakra Petch\", Orbitron, sans-serif",
+    "headingCase": "uppercase",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.15,
+    "md": 0.3
+  },
+  "motion": {
+    "profile": "lively",
+    "celebration": "comets",
+    "fastMs": 120,
+    "normalMs": 260,
+    "levelUp": "hyperjump"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "deck",
+      "tablet": "deck",
+      "phone": "deck"
+    },
+    "header": "compact",
+    "headerPosition": "top",
+    "cards": "outlined",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "rocket",
+      "film": "film",
+      "media": "tv",
+      "compass": "compass",
+      "users": "users",
+      "shop": "package",
+      "trophy": "trophy",
+      "search": "satellite",
+      "newspaper": "radio",
+      "book": "book",
+      "calendar": "calendar",
+      "chart": "gauge"
+    }
+  },
+  "background": {
+    "fallback": "#080b10",
+    "pattern": "none",
+    "ambient": "asteroids"
+  },
+  "sounds": {
+    "notification": "asset:scifi/notification.wav",
+    "alert": "asset:scifi/alert.wav",
+    "success": "asset:scifi/success.wav",
+    "reward": "asset:scifi/reward.wav",
+    "levelUp": "asset:scifi/level-up.wav",
+    "ui": "asset:scifi/ui.wav"
+  },
+  "notification": {
+    "style": "missioncontrol",
+    "animation": "liftoff"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "La passerelle",
+      "nav:nav.section.home": "La passerelle",
+      "dashboard:title": "La passerelle",
+      "nav:nav.media": "Le carré des loisirs",
+      "nav:nav.section.media": "Le carré des loisirs",
+      "media:home.title": "Le carré des loisirs",
+      "nav:nav.media_requests": "Mes demandes de ravitaillement",
+      "nav:nav.media_insights": "Mon journal de bord",
+      "media:insights.title": "Mon journal de bord",
+      "nav:nav.section.content": "La bibliothèque de bord",
+      "nav:nav.news": "Le canal de bord",
+      "news:title": "Le canal de bord",
+      "nav:nav.wiki": "Le manuel technique",
+      "wiki:title": "Le manuel technique",
+      "nav:nav.search": "Radar",
+      "search:title": "Radar",
+      "nav:nav.calendar": "Le plan de vol",
+      "calendar:title": "Le plan de vol",
+      "nav:nav.services": "La salle des machines",
+      "nav:nav.section.services": "La salle des machines",
+      "nav:nav.statistics": "Les capteurs",
+      "statistics:title": "Les capteurs",
+      "nav:nav.community": "Les quartiers de l'équipage",
+      "nav:nav.section.community": "Les quartiers de l'équipage",
+      "community:title": "Les quartiers de l'équipage",
+      "nav:nav.progression": "Mon grade",
+      "gamification:progression.title": "Mon grade",
+      "nav:nav.campaigns": "Les ordres de mission",
+      "campaigns:page.title": "Les ordres de mission",
+      "nav:nav.marketplace": "L'intendance",
+      "nav:nav.section.marketplace": "L'intendance",
+      "marketplace:catalog.title": "L'intendance",
+      "nav:nav.projects": "Les améliorations du vaisseau",
+      "marketplace:projects.title": "Les améliorations du vaisseau",
+      "marketplace:owned.title": "Mon casier",
+      "nav:nav.support": "L'atelier de réparation",
+      "nav:nav.section.support": "L'atelier de réparation",
+      "nav:nav.incidents": "Les alertes de bord",
+      "support:incident.title": "Les alertes de bord",
+      "nav:nav.feedback": "Un rapport au capitaine",
+      "support:feedback.title": "Un rapport au capitaine",
+      "gamification:value.coins": "Crédits",
+      "gamification:value.xp": "Énergie"
+    },
+    "en": {
+      "nav:nav.home": "The bridge",
+      "nav:nav.section.home": "The bridge",
+      "dashboard:title": "The bridge",
+      "nav:nav.media": "The rec room",
+      "nav:nav.section.media": "The rec room",
+      "media:home.title": "The rec room",
+      "nav:nav.media_requests": "My supply requests",
+      "nav:nav.media_insights": "My ship's log",
+      "media:insights.title": "My ship's log",
+      "nav:nav.section.content": "The ship's library",
+      "nav:nav.news": "Shipwide channel",
+      "news:title": "Shipwide channel",
+      "nav:nav.wiki": "The technical manual",
+      "wiki:title": "The technical manual",
+      "nav:nav.search": "Radar",
+      "search:title": "Radar",
+      "nav:nav.calendar": "The flight plan",
+      "calendar:title": "The flight plan",
+      "nav:nav.services": "Engineering",
+      "nav:nav.section.services": "Engineering",
+      "nav:nav.statistics": "Sensors",
+      "statistics:title": "Sensors",
+      "nav:nav.community": "Crew quarters",
+      "nav:nav.section.community": "Crew quarters",
+      "community:title": "Crew quarters",
+      "nav:nav.progression": "My rank",
+      "gamification:progression.title": "My rank",
+      "nav:nav.campaigns": "Mission orders",
+      "campaigns:page.title": "Mission orders",
+      "nav:nav.marketplace": "The quartermaster",
+      "nav:nav.section.marketplace": "The quartermaster",
+      "marketplace:catalog.title": "The quartermaster",
+      "nav:nav.projects": "Ship upgrades",
+      "marketplace:projects.title": "Ship upgrades",
+      "marketplace:owned.title": "My locker",
+      "nav:nav.support": "The repair bay",
+      "nav:nav.section.support": "The repair bay",
+      "nav:nav.incidents": "Ship alerts",
+      "support:incident.title": "Ship alerts",
+      "nav:nav.feedback": "A report to the captain",
+      "support:feedback.title": "A report to the captain",
+      "gamification:value.coins": "Credits",
+      "gamification:value.xp": "Energy"
+    }
+  }
+}

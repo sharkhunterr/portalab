@@ -4172,3 +4172,159 @@
     radial-gradient(1px 1px at 12% 20%, #fff 99%, transparent) 0 0 / 3.1rem 2.3rem,
     linear-gradient(160deg, #0b0f2a, #161040 60%, #090b1c);
 }
+
+/* issue 130, second wave: the moon, the sun, asteroids, rockets — drawn in CSS (light, for everyone) */
+.avatar-frame[data-frame="crescent"] {
+  background: radial-gradient(circle at 18% 50%, #fffbe8 0 30%, #e8e0c0 48%, #4a4f66 72%, #2a2e40);
+  box-shadow: -0.3rem 0 1rem #fdf6d855;
+}
+.avatar-frame[data-frame="sunrays"] {
+  background:
+    radial-gradient(circle, #ffd35c 0 58%, transparent 60%),
+    repeating-conic-gradient(#ffb347 0 6deg, transparent 6deg 15deg);
+  box-shadow: 0 0 1.2rem #ffb34788;
+  animation: cosmetics-spin 40s linear infinite;
+}
+.avatar-frame[data-frame="sunrays"] > * {
+  animation: cosmetics-spin 40s linear infinite reverse;
+}
+.avatar-frame[data-frame="asteroidring"] {
+  background:
+    radial-gradient(circle at 15% 30%, #8a7f74 0 7%, transparent 8%),
+    radial-gradient(circle at 85% 25%, #6e655c 0 6%, transparent 7%),
+    radial-gradient(circle at 90% 75%, #9a8e82 0 8%, transparent 9%),
+    radial-gradient(circle at 20% 85%, #7a7066 0 6%, transparent 7%),
+    radial-gradient(circle at 50% 5%, #8a7f74 0 5%, transparent 6%),
+    radial-gradient(circle, transparent 60%, #3a342e 61% 66%, transparent 67%);
+  animation: cosmetics-spin 30s linear infinite;
+}
+.avatar-frame[data-frame="asteroidring"] > * {
+  animation: cosmetics-spin 30s linear infinite reverse;
+}
+.avatar-frame[data-frame="saturnring"] {
+  overflow: visible;
+  background: radial-gradient(circle, #e8c98a 0 62%, transparent 63%);
+}
+.avatar-frame[data-frame="saturnring"]::after {
+  content: "";
+  position: absolute;
+  inset: 30% -22%;
+  border: 0.35rem solid #e8d6a8;
+  border-block-start-color: transparent;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #b0956066;
+  transform: rotate(-18deg);
+  pointer-events: none;
+}
+.profile-banner[data-banner="lunarsurface"] {
+  background:
+    radial-gradient(circle at 70% 25%, #f2f4f8 0 2.4rem, #c6cad3 2.6rem, transparent 2.7rem),
+    radial-gradient(ellipse 18% 10% at 20% 85%, #6d717a, transparent 70%),
+    radial-gradient(ellipse 12% 7% at 55% 92%, #747882, transparent 70%),
+    radial-gradient(ellipse 140% 55% at 50% 120%, #a4a8b2 0 60%, #8a8e98 70%, transparent 71%),
+    radial-gradient(1px 1px at 12% 20%, #fff 99%, transparent) 0 0 / 2.6rem 2.1rem,
+    linear-gradient(180deg, #05070f, #0d1222);
+}
+.profile-banner[data-banner="earthrise"] {
+  background:
+    radial-gradient(circle at 60% 45%, transparent 0 2.6rem, #0000 2.6rem),
+    radial-gradient(circle at 62% 42%, #6fb3ff 0 1.2rem, #2a6fd6 1.9rem, #1d3f8a 2.5rem, transparent 2.6rem),
+    radial-gradient(ellipse 140% 50% at 50% 125%, #b7bac2 0 60%, #8e929b 70%, transparent 71%),
+    radial-gradient(1px 1px at 20% 30%, #fff 99%, transparent) 0 0 / 3rem 2.4rem,
+    linear-gradient(180deg, #02040b, #0b1020);
+}
+.profile-banner[data-banner="asteroidfield"] {
+  background:
+    radial-gradient(ellipse 1.6rem 1.2rem at 15% 40%, #7a6f64 60%, transparent 62%),
+    radial-gradient(ellipse 0.9rem 0.7rem at 35% 70%, #8c8176 60%, transparent 62%),
+    radial-gradient(ellipse 2.2rem 1.6rem at 60% 30%, #6b625a 60%, transparent 62%),
+    radial-gradient(ellipse 0.7rem 0.6rem at 78% 75%, #9a8e82 60%, transparent 62%),
+    radial-gradient(ellipse 1.2rem 0.9rem at 90% 35%, #7f746a 60%, transparent 62%),
+    radial-gradient(1px 1px at 30% 20%, #fff 99%, transparent) 0 0 / 2.5rem 2rem,
+    linear-gradient(160deg, #0a0c16, #161321);
+}
+.profile-banner[data-banner="launchpad"] {
+  background:
+    linear-gradient(90deg, transparent 47%, #c9ced8 47% 53%, transparent 53%) 0 100% / 100% 70% no-repeat,
+    radial-gradient(ellipse 30% 18% at 50% 100%, #ffb347, #ff6a2a 50%, transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 0.6rem, #ff6a2a33 0.6rem 0.7rem) 0 100% / 100% 30%
+    no-repeat,
+    linear-gradient(180deg, #0c1a3a, #2a3e72 60%, #3a2a40);
+}
+.name-style[data-name="lunarsilver"] {
+  font-family: Michroma, Orbitron, sans-serif;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, #ffffff 0%, #c9d2e0 50%, #8b96a8 52%, #e9eef6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.3em rgb(200 215 240 / 0.5));
+}
+.name-style[data-name="solarfire"] {
+  font-family: Audiowide, Orbitron, sans-serif;
+  background: linear-gradient(180deg, #fff3b0, #ffb347 45%, #ff5a1f 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.35em rgb(255 140 40 / 0.7));
+}
+.name-style[data-name="bigbang"] {
+  font-family: Orbitron, Audiowide, sans-serif;
+  font-weight: 800;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #fff 0%,
+    #ffe066 18%,
+    #ff5fa2 45%,
+    #8a5cff 70%,
+    #2fd0ff 100%
+  );
+  background-size: 160% 160%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: cosmos-bang 6s ease-in-out infinite;
+}
+@keyframes cosmos-bang {
+  50% {
+    background-size: 220% 220%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-style[data-name="bigbang"],
+  .avatar-frame[data-frame="sunrays"],
+  .avatar-frame[data-frame="sunrays"] > *,
+  .avatar-frame[data-frame="asteroidring"],
+  .avatar-frame[data-frame="asteroidring"] > * {
+    animation: none;
+  }
+}
+:is(:root[data-level-badge="moonphase"] .ds-level:not([data-look]), .ds-level[data-look="moonphase"]) {
+  padding-inline: 1.5rem 0.6rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 0.75rem 50%, #f2f0e6 0 0.5rem, transparent 0.52rem),
+    radial-gradient(circle at 0.95rem 45%, #10162a 0 0.45rem, transparent 0.47rem),
+    linear-gradient(180deg, #1c2440, #10162a);
+  color: #e6ecff;
+  box-shadow: inset 0 0 0 1px #8fa0d066;
+}
+:is(:root[data-level-badge="sunbadge"] .ds-level:not([data-look]), .ds-level[data-look="sunbadge"]) {
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 120%, #fff3b0, #ffb347 55%, #ff6a2a);
+  color: #4a1800;
+  font-weight: 800;
+  box-shadow:
+    0 0 0.6rem #ffb34799,
+    inset 0 -2px 0 #c2410c66;
+}
+:is(:root[data-level-badge="rocketbadge"] .ds-level:not([data-look]), .ds-level[data-look="rocketbadge"]) {
+  padding-inline: 0.6rem 0.9rem;
+  border-radius: 999px 0.4rem 0.4rem 999px;
+  background: linear-gradient(90deg, #e9edf5, #c3c9d6);
+  color: #1b2333;
+  font-weight: 800;
+  box-shadow:
+    0.45rem 0 0 -0.1rem #ff5a3c,
+    0.75rem 0 0.6rem -0.2rem #ffb347;
+}

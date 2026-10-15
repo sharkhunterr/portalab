@@ -1640,3 +1640,40 @@
   font-family: Caveat, "Comic Neue", cursive;
   box-shadow: 0 0 16px #7cc46a;
 }
+
+/* ---------------------------------------------------------------- issue 130: the cosmos */
+/* comets: little comets streaking out of the reward, their tails behind them */
+[data-effect="comets"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 2.2rem;
+  block-size: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #9fd0ff 70%, #ffffff);
+  box-shadow: 0 0 0.5rem #9fd0ff;
+  animation-name: fx-burst;
+}
+[data-effect="comets"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #1d3f8a, #6fb3ff);
+  color: #ffffff;
+  box-shadow: 0 0 1rem #6fb3ff88;
+}
+/* planets: little planets, a ringed one among them, bursting out */
+[data-effect="planets"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe0a0, #ff8a5c 55%, #7a2e1c);
+  animation-name: fx-burst;
+}
+[data-effect="planets"] .celebration-fx:nth-child(3n) {
+  background: radial-gradient(circle at 35% 30%, #c8f0ff, #3f8ad6 55%, #12305a);
+}
+[data-effect="planets"] .celebration-fx:nth-child(4n) {
+  box-shadow: 0 0 0 0.12rem #e8d6a8;
+  background: radial-gradient(circle at 35% 30%, #fff1c8, #e8c98a 55%, #8a6a30);
+}
+[data-effect="planets"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #2a1a40, #8a5cff);
+  color: #ffffff;
+}

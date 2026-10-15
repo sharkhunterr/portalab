@@ -84,6 +84,9 @@ const LAYERS: Record<string, Layers> = {
   constellations: { shader: "constellations" },
   milkyway: { shader: "milkyway" },
   greatcomet: { shader: "greatcomet" },
+  solarflare: { shader: "solarflare" },
+  moonrise: { shader: "moonrise" },
+  asteroids: { shader: "asteroids" },
 };
 
 /** The CSS ambience standing in for each premium one. */
@@ -155,6 +158,9 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   constellations: "starfield",
   milkyway: "starfield",
   greatcomet: "starfield",
+  solarflare: "embers",
+  moonrise: "starfield",
+  asteroids: "starfield",
 };
 
 export function isPremiumAmbient(kind: string): boolean {

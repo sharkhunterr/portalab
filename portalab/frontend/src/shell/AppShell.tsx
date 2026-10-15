@@ -12,7 +12,7 @@ import { focusHeaderSearch, HeaderSearch, openFloatingSearch } from "./header/He
 import { ProfileCard } from "./header/ProfileCard";
 import { useHeaderData } from "./header/useHeaderData";
 import { BottomBar } from "./nav/BottomBar";
-import { PlanisphereNav, SystemNav } from "./nav/CosmosNavs";
+import { DeckNav, PlanisphereNav, SystemNav } from "./nav/CosmosNavs";
 import { HubTabs } from "./nav/HubTabs";
 import { useArrangement } from "./nav/NavFrame";
 import { useNavigationView } from "./nav/NavigationProvider";
@@ -215,6 +215,9 @@ export function AppShell({
         {nav === "dpad" ? <DpadNav sections={sections} /> : null}
         {nav === "planisphere" ? <PlanisphereNav sections={sections} /> : null}
         {nav === "system" ? <SystemNav sections={sections} /> : null}
+        {nav === "deck" ? (
+          <DeckNav sections={sections} progression={header.progression} unread={header.unread} />
+        ) : null}
         {nav === "player" ? <PlayerBar sections={sections} library={arrangement.device === "phone"} /> : null}
         {drawerNav ? (
           <Drawer

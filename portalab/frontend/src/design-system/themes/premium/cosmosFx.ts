@@ -14,8 +14,18 @@ export const COSMOS_BADGE_EFFECTS = [
   "pulsar",
   "totality",
   "meteor",
+  // the second wave
+  "solar",
+  "lunar",
 ] as const;
-export const COSMOS_STAGE_EFFECTS = ["meteorstorm", "bigbang", "hyperjump", "constellate"] as const;
+export const COSMOS_STAGE_EFFECTS = [
+  "meteorstorm",
+  "bigbang",
+  "hyperjump",
+  "constellate",
+  // issue 133: not the cosmos, but a stage of the same kind — the Upside Down's gate
+  "rift",
+] as const;
 export type CosmosEffect = (typeof COSMOS_BADGE_EFFECTS)[number] | (typeof COSMOS_STAGE_EFFECTS)[number];
 
 export const COSMOS_EFFECTS: Record<CosmosEffect, string> = {
@@ -251,12 +261,58 @@ export const COSMOS_EFFECTS: Record<CosmosEffect, string> = {
     o = over(o, vec3(1.0), exp(-length(rel) * 28.0) * burn);
   }
 `,
+  // the sun: its surface boiling inside, the corona streaming round the shape, prominences looping off it
+  solar: `
+  float ang = atan(p.y, p.x / max(ax, 0.001));
+  float r = max(d, 0.0);
+  float streams = fbm(vec2(ang * 4.0, r * 2.5 - t * 0.3));
+  o = over(o, vec3(1.0, 0.55, 0.15), exp(-r * (2.4 + 2.0 * (1.0 - streams))) * step(0.0, d) * 0.75);
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    float a0 = hash(vec2(fi, 21.0)) * 6.2832 + t * 0.06 * (fi - 1.0);
+    float da = mod(ang - a0 + 3.1416, 6.2832) - 3.1416;
+    float x = da / (0.25 + 0.2 * hash(vec2(fi, 22.0)));
+    float h = (0.25 + 0.3 * hash(vec2(fi, 23.0))) * (0.75 + 0.25 * sin(t * 0.6 + fi * 2.0));
+    float arc = h * sqrt(max(0.0, 1.0 - x * x));
+    float loop = smoothstep(0.07, 0.0, abs(r - arc)) * step(abs(x), 1.0) * step(0.0, d);
+    o = over(o, mix(vec3(1.0, 0.3, 0.08), vec3(1.0, 0.75, 0.3), noise(vec2(ang * 20.0, t * 2.0))), loop * 0.85);
+  }
+  vec2 q = p * 2.4;
+  float gran = fbm(q + vec2(fbm(q + t * 0.2), fbm(q - t * 0.15)) * 1.5);
+  vec3 surf = mix(vec3(0.95, 0.42, 0.06), vec3(1.0, 0.88, 0.5), gran);
+  surf += vec3(1.0, 0.95, 0.8) * smoothstep(-0.25, 0.0, d) * 0.45;
+  o = over(o, surf, smoothstep(0.03, -0.03, d));
+`,
+  // the moon: grey seas and craters, the line between day and night sweeping across with its phases, a
+  // silver halo and a few stars round it
+  lunar: `
+  vec2 e = vec2(p.x / max(ax, 1.0), p.y);
+  float phase = sin(t * 0.35);
+  float seas = smoothstep(0.45, 0.65, fbm(p * 1.4 + 3.0));
+  vec3 moon = mix(vec3(0.93, 0.92, 0.88), vec3(0.55, 0.57, 0.62), seas);
+  for (int i = 0; i < 5; i++) {
+    float fi = float(i);
+    vec2 cc = (vec2(hash(vec2(fi, 11.0)), hash(vec2(fi, 12.0))) - 0.5) * vec2(1.5 * ax, 1.5);
+    float cr = 0.12 + 0.14 * hash(vec2(fi, 13.0));
+    float dc = length(p - cc);
+    moon *= 1.0 - 0.15 * smoothstep(cr, cr * 0.6, dc) + 0.08 * smoothstep(0.04, 0.0, abs(dc - cr));
+  }
+  moon *= 0.85 + 0.15 * fbm(p * 6.0);
+  float lit = smoothstep(-0.12, 0.12, e.x * sign(phase) + (1.0 - abs(phase)) * 1.1 - 0.15);
+  moon = mix(moon * 0.12 + vec3(0.02, 0.03, 0.06), moon, lit);
+  moon += vec3(0.8, 0.85, 1.0) * smoothstep(-0.2, 0.0, d) * 0.3;
+  o = over(o, vec3(0.75, 0.82, 1.0), exp(-max(d, 0.0) * 3.5) * 0.35 * step(0.0, d));
+  vec2 sg = p * 7.0;
+  float sh = hash(floor(sg));
+  o = over(o, vec3(1.0), step(0.93, sh) * smoothstep(0.3, 0.0, length(fract(sg) - 0.5)) * step(0.15, d) * (0.5 + 0.5 * sin(t * 2.0 + sh * 30.0)));
+  o = over(o, moon, smoothstep(0.03, -0.03, d));
+`,
   // a meteor storm over the whole screen: from a radiant high up, dozens of shooting stars streak out, a few
   // fireballs flaring green and gold, over a deep sky
   meteorstorm: `
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
   float aspect = u_res.x / u_res.y;
-  float tl = u_age;
+  float tl = mod(u_age, 7.0);
   float fade = smoothstep(0.0, 0.5, tl) * smoothstep(6.5, 5.3, tl);
   o = over(o, vec3(0.01, 0.01, 0.05), 0.5 * fade);
   vec2 radiant = vec2(-0.3 * aspect, 0.55);
@@ -291,7 +347,7 @@ export const COSMOS_EFFECTS: Record<CosmosEffect, string> = {
   bigbang: `
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
   float r = length(c);
-  float tl = u_age;
+  float tl = mod(u_age, 7.0);
   float fade = smoothstep(6.6, 5.4, tl);
   float point = smoothstep(0.0, 0.5, tl) * step(tl, 0.8);
   o = over(o, vec3(1.0), exp(-r * mix(120.0, 40.0, point)) * point);
@@ -337,7 +393,7 @@ export const COSMOS_EFFECTS: Record<CosmosEffect, string> = {
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
   float r = length(c) + 1e-4;
   float a = atan(c.y, c.x);
-  float tl = u_age;
+  float tl = mod(u_age, 7.0);
   float fade = smoothstep(0.0, 0.3, tl) * smoothstep(6.6, 5.4, tl);
   float speed = smoothstep(0.4, 2.5, tl) * (1.0 - smoothstep(2.65, 2.85, tl));
   float travel = 0.25 * tl + 2.2 * max(tl - 0.6, 0.0) * max(tl - 0.6, 0.0) * step(tl, 2.8);
@@ -384,7 +440,7 @@ export const COSMOS_EFFECTS: Record<CosmosEffect, string> = {
   // into a crown of stars, it flashes, sparkles drift; the sky turns slowly behind
   constellate: `
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
-  float tl = u_age;
+  float tl = mod(u_age, 7.0);
   float fade = smoothstep(0.0, 0.4, tl) * smoothstep(6.6, 5.6, tl);
   float turn = tl * 0.03;
   vec2 rc = mat2(cos(turn), -sin(turn), sin(turn), cos(turn)) * c;
@@ -421,5 +477,69 @@ export const COSMOS_EFFECTS: Record<CosmosEffect, string> = {
     vec2 pos = vec2(cos(a), sin(a)) * (0.36 + life * 0.4);
     o = over(o, vec3(1.0, 0.9, 0.7), smoothstep(0.006, 0.0, length(c - pos)) * (1.0 - life) * done * fade);
   }
+`,
+  // issue 133, the Upside Down's gate: the room goes dark and the lights flicker, a red crack tears down the
+  // middle and opens, its lips burning, its membrane pulsing, sticky strands across it; we are drawn in
+  // (everything grows from the middle until the rift fills the screen), a red shudder — and we stand in the
+  // Upside Down: blue-grey fog, ash drifting up, vines over the edges, red lightning in the clouds overhead
+  rift: `
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float aspect = u_res.x / u_res.y;
+  float tl = mod(u_age, 7.0);
+  float fade = smoothstep(0.0, 0.3, tl) * smoothstep(6.6, 5.4, tl);
+  float enter = smoothstep(2.55, 3.05, tl);
+  // the room: dark, the lights flickering before it tears
+  float flick = step(0.4, hash(vec2(floor(tl * 13.0), 7.0))) * (1.0 - smoothstep(0.6, 1.4, tl));
+  o = over(o, vec3(0.02, 0.0, 0.01), (0.5 + 0.25 * flick) * fade * (1.0 - enter));
+  // drawn in: the rift and all round it grow from the middle, faster and faster, with a tremor
+  float push = exp(max(tl - 1.7, 0.0) * 2.4);
+  float shake = smoothstep(0.5, 1.5, tl) * (1.0 - enter) * 0.004;
+  vec2 q = (c + vec2(hash(vec2(floor(tl * 30.0), 3.0)) - 0.5, hash(vec2(floor(tl * 30.0), 4.0)) - 0.5) * shake) / push;
+  // the tear: a jagged vertical slit, widest at its middle, opening over a second
+  float open = smoothstep(0.35, 1.8, tl);
+  float jag = (fbm(vec2(q.y * 6.0, 3.0)) - 0.5) * 0.12 + (fbm(vec2(q.y * 24.0, 9.0)) - 0.5) * 0.035;
+  float len = 0.06 + 0.5 * open;
+  float along = clamp(1.0 - abs(q.y) / len, 0.0, 1.0);
+  float width = 0.08 * open * pow(along, 0.65);
+  float dx = abs(q.x - jag * (0.4 + open)) - width;
+  float rim = step(abs(q.y), len);
+  float inside = smoothstep(0.004, -0.004, dx) * rim;
+  // the other side: fog, the red glow of the sky, lightning, vines and ash
+  vec2 w = c * 1.3 + vec2(0.0, tl * 0.03);
+  float fog = fbm(w * 2.0 + vec2(tl * 0.06, -tl * 0.02));
+  vec3 world = mix(vec3(0.03, 0.05, 0.09), vec3(0.2, 0.24, 0.32), fog);
+  world += vec3(0.6, 0.06, 0.05) * 0.45 * smoothstep(0.0, 0.5, c.y) * (0.7 + 0.3 * sin(tl * 1.7));
+  float strike = step(0.55, hash(vec2(floor(tl * 2.5), 21.0))) * exp(-fract(tl * 2.5) * 7.0);
+  float bolt = smoothstep(0.02, 0.0, abs(c.x - 0.3 * sin(floor(tl * 2.5) * 5.1) - (fbm(vec2(c.y * 9.0, floor(tl * 2.5))) - 0.5) * 0.25)) * smoothstep(-0.05, 0.3, c.y);
+  world += vec3(1.0, 0.2, 0.15) * strike * (bolt * 1.2 + fbm(c * 3.0 + 11.0) * smoothstep(0.0, 0.5, c.y) * 0.8);
+  float edge = max(abs(c.x) / (0.5 * aspect), abs(c.y) / 0.5);
+  float vine = smoothstep(0.04, 0.0, abs(fbm(c * 4.5 + 3.0) - 0.5)) + 0.6 * smoothstep(0.025, 0.0, abs(fbm(c * 9.0 + 8.0) - 0.5));
+  world = mix(world, vec3(0.1, 0.03, 0.03), clamp(vine, 0.0, 1.0) * smoothstep(0.5, 1.0, edge) * 0.9);
+  for (int i = 0; i < 48; i++) {
+    float fi = float(i);
+    float rise = 0.025 + 0.05 * hash(vec2(fi, 141.0));
+    vec2 pos = vec2((hash(vec2(fi, 142.0)) - 0.5) * aspect + sin(tl * 0.6 + fi) * 0.03, fract(hash(vec2(fi, 143.0)) + tl * rise) - 0.5);
+    float size = 0.002 + 0.005 * hash(vec2(fi, 144.0));
+    world = mix(world, vec3(0.85, 0.85, 0.9), smoothstep(size, 0.0, length(c - pos)) * 0.8);
+  }
+  o = over(o, world, max(inside, enter) * fade);
+  // strands of membrane across the opening, torn away as it widens
+  float strand = smoothstep(0.1, 0.0, abs(fract(q.y * 8.0 + fbm(q * 5.0) * 2.0) - 0.5)) * inside * (1.0 - smoothstep(0.9, 2.1, tl));
+  o = over(o, vec3(0.45, 0.1, 0.08), strand * 0.65 * fade);
+  // its lips: white-hot right at the edge, burning red outside it, veins pulsing in the membrane round it
+  float pulse = 0.75 + 0.25 * sin(tl * 7.0);
+  float gap = max(dx, 0.0);
+  float edge0 = abs(dx);
+  float lips = (1.0 - enter) * fade * exp(-max(abs(q.y) - len, 0.0) * 30.0);
+  float outside = smoothstep(-0.004, 0.004, dx);
+  o = over(o, vec3(0.7, 0.06, 0.04), exp(-gap * 7.0) * 0.4 * open * lips * outside);
+  float veins = smoothstep(0.035, 0.0, abs(fbm(q * 9.0 + vec2(0.0, tl * 0.15)) - 0.5)) * exp(-gap * 9.0) * (0.3 + along);
+  o = over(o, vec3(0.65, 0.05, 0.07), veins * 0.8 * open * pulse * lips * outside);
+  o = over(o, vec3(1.0, 0.25, 0.08), exp(-edge0 * 90.0) * pulse * (0.4 + 0.6 * open) * lips);
+  o = over(o, vec3(1.0, 0.82, 0.55), exp(-edge0 * 400.0) * (0.5 + 0.5 * open) * lips);
+  // red light spilling out of it onto the inside of the opening
+  o = over(o, vec3(0.9, 0.15, 0.08), exp(-edge0 * 25.0) * 0.35 * inside * lips);
+  // the crossing: a red shudder
+  o = over(o, vec3(0.75, 0.08, 0.06), exp(-abs(tl - 2.85) * 10.0) * 0.45 * fade);
 `,
 };
