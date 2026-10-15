@@ -8,15 +8,7 @@ from typing import Annotated, Any, Literal, cast
 
 from pydantic import Field
 
-from portalab.capabilities.themes import (
-    AMBIENTS,
-    CELEBRATIONS,
-    LEVEL_UPS,
-    NOTIFICATION_ANIMATIONS,
-    NOTIFICATION_STYLES,
-    PALETTES,
-    UNIVERSE_THEMES,
-)
+from portalab.capabilities.themes import UNIVERSE_THEMES
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:ui"
@@ -25,6 +17,11 @@ OWNER = "module:ui"
 def _one_of(values: tuple[str, ...]) -> Any:
     """``Literal[...]`` of a tuple of values (the cosmetics keys are shared constants)."""
     return cast(Any, Literal)[values]
+
+
+# issue 1: a look is one of the built-in ones or of an imported pack's — the open vocabulary is checked by the
+# looks' dynamic validator (``NotificationLooks.validator``), the schema only bounds its form
+LOOK = Annotated[str, Field(min_length=1, max_length=64, pattern=r"^[a-z0-9][a-z0-9_.-]*$")]
 
 
 BUILTIN_KEYS = (
@@ -69,37 +66,37 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.notificationDurationSeconds", Annotated[int, Field(ge=2, le=60)], 6, "How long notifications stay."),
     (
         "ui.notificationStyle",
-        _one_of(("theme", *NOTIFICATION_STYLES)),
+        LOOK,
         "theme",
         "Notification style (shape and layout; theme: the theme's); some are sold in the shop (027).",
     ),
     (
         "ui.palette",
-        _one_of(PALETTES),
+        LOOK,
         "theme",
         "Colour palette over the theme (027); some palettes are sold in the shop.",
     ),
     (
         "ui.notificationAnimation",
-        _one_of(("theme", *NOTIFICATION_ANIMATIONS)),
+        LOOK,
         "theme",
         "How notifications enter (theme: the theme's); some animations are sold in the shop (027).",
     ),
     (
         "ui.ambient",
-        _one_of(("theme", *AMBIENTS)),
+        LOOK,
         "theme",
         "Animated layer behind the portal (theme: the theme's); some are sold in the shop (027).",
     ),
     (
         "ui.levelUp",
-        _one_of(("theme", *LEVEL_UPS)),
+        LOOK,
         "theme",
         "How a level-up is shown (027; theme: the theme's own); some are sold in the shop.",
     ),
     (
         "ui.celebration",
-        _one_of(("theme", *CELEBRATIONS)),
+        LOOK,
         "theme",
         "Celebration effect for rewards (theme: the theme's); some are sold in the shop (027).",
     ),

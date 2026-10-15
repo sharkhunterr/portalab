@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate, useNavigationType } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
+import { ExternalVisualsLoader } from "../design-system/themes/external/ExternalVisualsLoader";
 import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";
@@ -241,6 +242,7 @@ export function AppShell({
       </div>
       {/* #67: the header's search over the page, for the layouts whose header has none */}
       <HeaderSearch floating />
+      <ExternalVisualsLoader />
       <CommandPalette
         open={palette.open}
         initialQuery={palette.query}

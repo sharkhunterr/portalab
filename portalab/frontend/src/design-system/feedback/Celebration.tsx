@@ -13,6 +13,8 @@ import { useAnnounce } from "../a11y/Announce";
 import { FxLayer } from "../components/Fx";
 import { Icon } from "../components/Icon";
 import { sound } from "../sound/SoundService";
+import { ExternalScript } from "../themes/external/ExternalScript";
+import { externalLook, fxName } from "../themes/external/external";
 import { FX_CELEBRATIONS } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
 import "../themes/celebration.css";
@@ -152,7 +154,11 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
     announce(shown.text);
     void sound.play(shown.kind === "level" ? "levelUp" : "reward");
     // #78: a celebration drawn by the GPU plays a little longer (its scene needs the time)
-    const ms = DURATION_MS[shown.kind] + (FX_CELEBRATIONS[looks.celebration] ? 1200 : 0);
+    // issue 1: an imported one says how long it plays
+    const imported = externalLook("effect", looks.celebration)?.duration;
+    const ms = imported
+      ? imported * 1000
+      : DURATION_MS[shown.kind] + (FX_CELEBRATIONS[looks.celebration] ? 1200 : 0);
     const timer = window.setTimeout(() => setShown(queue.current.next()), ms);
     return () => window.clearTimeout(timer);
   }, [shown, announce, looks.celebration]);
@@ -186,7 +192,11 @@ export function CelebrationScene({
   reduced?: boolean;
   contained?: boolean;
 }) {
-  const gpu = FX_CELEBRATIONS[effect];
+  // issue 1: an imported pack's celebration — its GPU scene or its own script
+  const imported = externalLook("effect", effect);
+  const gpu =
+    FX_CELEBRATIONS[effect] ??
+    (imported?.kind === "glsl" ? { effect: fxName(imported), from: 0 } : undefined);
   const spec = gpu
     ? { count: 0, layer: "badge" as const }
     : (EFFECTS[effect] ?? { count: 0, layer: "badge" as const });
@@ -230,6 +240,13 @@ export function CelebrationScene({
           from={gpu.from}
           maxSide={contained ? 420 : 1100}
           className="celebration-gpu"
+        />
+      ) : null}
+      {imported?.kind === "js" && !reduced ? (
+        <ExternalScript
+          element={imported}
+          className="celebration-gpu"
+          context={{ reducedMotion: reduced, text: event.text }}
         />
       ) : null}
       {effect === "lightning" && !reduced ? <span className="celebration-flash" /> : null}

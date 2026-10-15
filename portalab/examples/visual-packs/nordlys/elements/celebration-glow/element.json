@@ -1,0 +1,11 @@
+{
+  "type": "effect",
+  "look": "nordlysglow",
+  "names": { "fr": "Lucioles polaires", "en": "Polar fireflies" },
+  "descriptions": {
+    "fr": "Des centaines d'étincelles vertes et violettes s'envolent de la récompense et dessinent un voile d'aurore avant de s'éteindre.",
+    "en": "Hundreds of green and violet sparks fly out of the reward and draw a curtain of light before fading."
+  },
+  "render": { "kind": "js", "file": "glow.js", "duration": 3.2 },
+  "economy": { "price": 900, "rarity": "epic", "level": 9, "collection": "celebrations", "icon": "party" }
+}

@@ -3,6 +3,8 @@
  * layout; a palette only changes the accents (and their readable contrast colour). Some are sold in the
  * shop. Never applied in high contrast (the accessibility theme keeps its own colours).
  */
+import { externalPalette } from "./external/external";
+
 export interface Palette {
   accent: string;
   accentAlt: string;
@@ -254,5 +256,5 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
 };
 
 export function paletteFor(key: string, scheme: "dark" | "light"): Palette | null {
-  return PALETTE_COLORS[key]?.[scheme] ?? null;
+  return PALETTE_COLORS[key]?.[scheme] ?? externalPalette(key, scheme); // issue 1: an imported palette
 }

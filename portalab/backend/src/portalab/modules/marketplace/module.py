@@ -36,6 +36,7 @@ from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.capabilities.terms import CAPABILITY as TERMS
 from portalab.capabilities.themes import COSMETICS
 from portalab.capabilities.themes import ENTITLEMENTS as THEME_ENTITLEMENTS
+from portalab.capabilities.visuals import CATALOG_WRITER
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
@@ -72,6 +73,7 @@ from portalab.modules.marketplace.observability import log, metrics
 from portalab.modules.marketplace.openings.service import Openings
 from portalab.modules.marketplace.privacy.participant import MarketplaceParticipant
 from portalab.modules.marketplace.products.service import Catalog
+from portalab.modules.marketplace.products.sync import MarketplaceCatalogWriter
 from portalab.modules.marketplace.projects.service import Projects
 from portalab.modules.marketplace.purchase.service import AlreadyOwned, Purchases
 from portalab.modules.marketplace.refunds.service import Refunds
@@ -290,6 +292,9 @@ class MarketplaceModule:
             )
         if not self.capabilities.system_providers(COSMETICS):
             self.capabilities.provide(COSMETICS, self.cosmetics, instance_ref=INSTANCE, owner=OWNER)
+        if not self.capabilities.system_providers(CATALOG_WRITER):  # issue 1: imported visual packs
+            writer = MarketplaceCatalogWriter(self.catalog)
+            self.capabilities.provide(CATALOG_WRITER, writer, instance_ref=INSTANCE, owner=OWNER)
         register_builtin_types(
             self.product_types,
             self.capabilities,

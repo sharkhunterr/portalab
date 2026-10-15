@@ -1,0 +1,9 @@
+/* the Nordlys interface's own touches: frosted cards and a faint aurora along the header */
+[data-theme="nordlys"] .shell-header {
+  box-shadow: 0 1px 0 #34d39955, 0 0.6rem 1.6rem -1rem #34d39966;
+}
+[data-theme="nordlys"] .ds-card,
+[data-theme="nordlys"] .admin-section {
+  backdrop-filter: blur(6px) saturate(1.2);
+  border-color: #5eead433;
+}

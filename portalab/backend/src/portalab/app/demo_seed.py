@@ -638,7 +638,7 @@ class DemoSeeder:
         """027: the demo shop (``demo_shop``) — new products are created and published, existing ones are
         revised when their price, texts, contents or level changed (purchases keep their snapshot), then
         their presentation and availability (copies, purchase limit) follow the catalog."""
-        from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
+        from portalab.modules.marketplace.products.sync import sync_product
 
         catalog = self.platform.marketplace.catalog
         await self._access_permissions()
@@ -646,62 +646,9 @@ class DemoSeeder:
             await catalog.add_category(key, label, position, icon)
         made = revised = 0
         for product in SHOP:
-            raw = definition(product)
-            exists = await self._scalar("SELECT 1 FROM marketplace.products WHERE key = :k", k=product["key"])
-            if not exists:
-                await catalog.create(self.admin, raw)
-                await catalog.move(self.admin, product["key"], "available")
-                made += 1
-            if product["type"] == "booster" and exists:
-                pass  # #81: its odds and refunds are the administrators' — never seeded back over them
-            elif product.get("reward_only"):  # 027: given by an achievement, never sold
-                current, _ = await catalog.get(product["key"])
-                if current.state == "available":
-                    await catalog.move(self.admin, product["key"], "unavailable")
-            else:
-                current, version = await catalog.get(product["key"])
-                wanted = raw["version"]
-                stored = {
-                    "price_coins": version.price_coins,
-                    "names": dict(version.names),
-                    "descriptions": dict(version.descriptions),
-                    "payload": dict(version.payload),
-                    "conditions": list(version.conditions),
-                }
-                if stored != wanted:
-                    await catalog.revise(self.admin, product["key"], wanted)
-                    revised += 1
-                if product["repeatable"] and not current.repeatable:
-                    async with self.database.unit_of_work() as uow:  # seeded before products could repeat
-                        await uow.session.execute(
-                            text("UPDATE marketplace.products SET repeatable = true WHERE key = :k"),
-                            {"k": product["key"]},
-                        )
-            current, _ = await catalog.get(product["key"])
-            presentation = PresentationIn(
-                rarity=product["rarity"],
-                poster_effect="none",
-                featured=product["featured"],
-                icon=product["icon"],
-                season=product.get("season"),
-            )
-            if (current.rarity, current.poster_effect, current.featured, current.icon, current.season) != (
-                presentation.rarity,
-                presentation.poster_effect,
-                presentation.featured,
-                presentation.icon,
-                presentation.season,
-            ) or current.category_id is None:
-                await catalog.present(self.admin, product["key"], presentation, product["collection"])
-            limit = product["limit"] or (None, None)
-            if (current.supply, current.limit_count, current.limit_days) != (product["supply"], *limit):
-                await catalog.set_availability(
-                    self.admin,
-                    product["key"],
-                    AvailabilityIn(supply=product["supply"], limit_count=limit[0], limit_days=limit[1]),
-                    product["level"],
-                    product.get("contribution"),  # #59: never drop the contribution minimum
-                )
+            outcome = await sync_product(catalog, self.admin, product)
+            made += outcome == "created"
+            revised += outcome == "revised"
         retired = 0
         for key in RETIRED:
             state = await self._scalar("SELECT state FROM marketplace.products WHERE key = :k", k=key)

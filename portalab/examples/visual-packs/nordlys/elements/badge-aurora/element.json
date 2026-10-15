@@ -1,0 +1,23 @@
+{
+  "type": "badge",
+  "product": "badge_nordlys",
+  "names": {
+    "fr": "Badge Flocon d'aurore",
+    "en": "Aurora snowflake badge"
+  },
+  "descriptions": {
+    "fr": "Un flocon de givre qui brille sur votre profil.",
+    "en": "A frost snowflake shining on your profile."
+  },
+  "payload": {
+    "label": "Aurora snowflake",
+    "icon": "snowflake",
+    "style": "frost"
+  },
+  "economy": {
+    "price": 220,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  }
+}

@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { liveAmbiences } from "../../motion/budget";
+import { externalFx, externalLook, fxName } from "../external/external";
 import type { Uniforms } from "./shaderRunner";
 
 /**
@@ -163,8 +164,18 @@ export const PREMIUM_FALLBACK: Record<string, string> = {
   asteroids: "starfield",
 };
 
+/** issue 1: an imported pack's ambience drawn by the GPU (its own shader, after ``COMMON``). */
+function importedLayers(kind: string): Layers | undefined {
+  const element = externalLook("ambient", kind) ?? externalLook("profile_background", kind);
+  return element?.kind === "glsl" ? { shader: fxName(element) } : undefined;
+}
+
+function layersOf(kind: string): Layers | undefined {
+  return LAYERS[kind] ?? importedLayers(kind);
+}
+
 export function isPremiumAmbient(kind: string): boolean {
-  return kind in LAYERS;
+  return kind in LAYERS || importedLayers(kind) !== undefined;
 }
 
 /** #68: whether this device draws the premium ambiences with its GPU, and which chip (when it says). */
@@ -214,17 +225,25 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
   let index = 0;
   const next = () => canvases[index++] as HTMLCanvasElement;
   if (layers.shader) {
-    const [{ runShader }, { SHADERS }, { COZY_SHADERS }, { WARM_SHADERS }, { WEATHER }, { COSMOS_SHADERS }] =
-      await Promise.all([
-        import("./shaderRunner"),
-        import("./shaders"),
-        import("./cozyShaders"),
-        import("./warmShaders"),
-        import("./weatherShader"),
-        import("./cosmosShaders"),
-      ]);
-    const source =
-      layers.shader === "weathersky"
+    const [
+      { runShader },
+      { SHADERS, COMMON },
+      { COZY_SHADERS },
+      { WARM_SHADERS },
+      { WEATHER },
+      { COSMOS_SHADERS },
+    ] = await Promise.all([
+      import("./shaderRunner"),
+      import("./shaders"),
+      import("./cozyShaders"),
+      import("./warmShaders"),
+      import("./weatherShader"),
+      import("./cosmosShaders"),
+    ]);
+    const imported = externalFx(layers.shader);
+    const source = imported
+      ? `${COMMON}${imported.body}`
+      : layers.shader === "weathersky"
         ? WEATHER
         : (SHADERS[layers.shader] ??
           COZY_SHADERS[layers.shader] ??
@@ -268,7 +287,7 @@ export function PremiumAmbient({
   /** #88: the scene's numbers, asked each frame (a stable function) */
   uniforms?: Uniforms;
 }) {
-  const layers = LAYERS[kind] ?? {};
+  const layers = layersOf(kind) ?? {};
   const canvasCount = [layers.shader, layers.mesh].filter(Boolean).length + flows(layers).length;
   const host = useRef<HTMLDivElement>(null);
   const canvases = useRef<HTMLCanvasElement[]>([]);

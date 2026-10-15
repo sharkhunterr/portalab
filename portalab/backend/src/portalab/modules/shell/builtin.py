@@ -727,6 +727,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 8,
         "required_permission": "appearance.manage",
     },
+    {  # issue 1 (POC): imported visual packs
+        "key": "ui.visual_packs",
+        "owner": "module:ui",
+        "kind": "entry",
+        "label_key": "nav.admin.visuals",
+        "icon": "sparkles",
+        "route": "/admin/visuals",
+        "group": "admin",
+        "topic": "shop",
+        "order_hint": 9,
+        "required_permission": "appearance.manage",
+    },
     {
         "key": "administration.config",
         "owner": "module:administration",

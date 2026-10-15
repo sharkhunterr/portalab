@@ -1,6 +1,7 @@
 import { type CSSProperties, memo } from "react";
 import type { Ambient } from "../a11y/preferences";
 import "./ambient.css";
+import { useExternalRevision } from "./external/external";
 import { isPremiumAmbient, PREMIUM_FALLBACK, PremiumAmbient } from "./premium/PremiumAmbient";
 import { WeatherAmbient } from "./premium/WeatherAmbient";
 
@@ -109,6 +110,7 @@ export const AmbientLayer = memo(function AmbientLayer({
   /** Inside a box (a profile background) instead of behind the whole page. */
   contained?: boolean;
 }) {
+  useExternalRevision(); // issue 1: an imported ambience drawn once its pack is loaded
   if (kind === "weather") {
     // #68, #88: the sky outside, drawn from the weather report
     return (

@@ -2,6 +2,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useMemo } from "react";
 import { IntlProvider } from "react-intl";
 import { api } from "../../api/client";
+import { externalMessages, useExternalRevision } from "../../design-system/themes/external/external";
 import { BUNDLED_MESSAGES, DEFAULT_NAMESPACES, flatten } from "../bundled";
 import { type PseudoLocale, pseudoCatalog } from "../pseudo/pseudo";
 
@@ -103,13 +104,17 @@ export function I18nProvider({
       },
     })),
   });
+  // issue 1: the names imported visual packs give their looks, over the catalogs
+  const externalRevision = useExternalRevision();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the packs' names follow their installation
   const messages = useMemo(() => {
     const merged: Record<string, string> = { ...BUNDLED_MESSAGES };
     catalogs.forEach((query, index) => {
       if (query.data) Object.assign(merged, flatten(namespaces[index] as string, query.data));
     });
+    Object.assign(merged, externalMessages(locale.language));
     return pseudo ? pseudoCatalog(merged, pseudo) : merged;
-  }, [catalogs, namespaces, pseudo]);
+  }, [catalogs, namespaces, pseudo, externalRevision, locale.language]);
   useEffect(() => {
     document.documentElement.lang = locale.language;
     document.documentElement.dir = locale.direction;

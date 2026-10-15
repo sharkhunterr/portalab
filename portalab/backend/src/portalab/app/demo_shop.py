@@ -13,6 +13,7 @@ from typing import Any
 
 from portalab.app.demo_economy import LEVEL_REWARDS
 from portalab.capabilities.themes import UNIVERSE_THEMES
+from portalab.modules.marketplace.products.sync import definition as sync_definition
 from portalab.modules.ui import themes as themes_package
 
 Product = dict[str, Any]
@@ -3910,27 +3911,7 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
 
 def definition(product: Product) -> dict[str, Any]:
     """The catalog definition of a demo product (what ``Catalog.create``/``revise`` take)."""
-    version: dict[str, Any] = {
-        "price_coins": product["price"],
-        "names": product["names"],
-        "descriptions": product["descriptions"],
-        "payload": product["payload"],
-        "conditions": [
-            *([{"kind": "min_level", "level": product["level"]}] if product["level"] else []),
-            *(
-                [{"kind": "min_contribution", "contribution": product["contribution"]}]
-                if product.get("contribution")
-                else []
-            ),
-        ],
-        **({"config_required": True} if product.get("config_required") else {}),
-    }
-    return {
-        "key": product["key"],
-        "type": product["type"],
-        **({"repeatable": True} if product["repeatable"] else {}),
-        "version": version,
-    }
+    return sync_definition(product)
 
 
 # --------------------------------------------------------------------------------- levels (#108)

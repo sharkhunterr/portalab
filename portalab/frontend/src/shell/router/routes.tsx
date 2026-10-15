@@ -86,6 +86,7 @@ const MembersAdmin = lazy(() => import("../../features/admin/members/MembersAdmi
 const AnnouncementsAdmin = lazy(() => import("../../features/admin/communication/AnnouncementsAdmin"));
 const WikiAdmin = lazy(() => import("../../features/wiki/WikiAdmin"));
 const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
+const VisualsAdmin = lazy(() => import("../../features/visuals/VisualsAdmin")); // issue 1 (POC)
 const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAdmin"));
 const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
@@ -381,6 +382,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "maintenance", element: <Navigate to="/admin/announcements?tab=maintenance" replace /> },
             { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
+            { path: "visuals", element: <VisualsAdmin />, handle: h({ crumb: "Visual packs" }) },
             { path: "modules", element: <ModulesAdmin />, handle: h({ crumb: "Modules" }) },
             {
               path: "community/moderation",

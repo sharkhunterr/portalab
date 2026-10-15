@@ -1,0 +1,11 @@
+{
+  "type": "avatar_frame",
+  "look": "fjordring",
+  "names": { "fr": "Cadre anneau du fjord", "en": "Fjord ring frame" },
+  "descriptions": {
+    "fr": "Un anneau d'eau glacée et d'aurore qui tourne lentement.",
+    "en": "A ring of icy water and northern lights turning slowly."
+  },
+  "render": { "kind": "css", "css": ["ring.css"] },
+  "economy": { "price": 450, "rarity": "rare", "collection": "profile", "icon": "user" }
+}

@@ -1,0 +1,34 @@
+{
+  "type": "bundle",
+  "product": "ultimate_nordlys",
+  "names": {
+    "fr": "Pack de thème Nordlys",
+    "en": "Nordlys theme pack"
+  },
+  "descriptions": {
+    "fr": "Tout l'univers Nordlys : son interface et tout ce qui va avec — l'aurore en passage de niveau, les cadres, le nom runique, les lucioles polaires, le fjord, la palette, le titre et le badge.",
+    "en": "The whole Nordlys universe: its interface and everything that goes with it — the northern lights as a level-up, the frames, the runic name, the polar fireflies, the fjord, the palette, the title and the badge."
+  },
+  "payload": {
+    "products": [
+      "theme_nordlys",
+      "levelup_nordlys",
+      "frame_nordlys",
+      "frame_fjordring",
+      "name_nordrune",
+      "effect_nordlysglow",
+      "ambient_fjord",
+      "palette_nordlys",
+      "title_aurora_wanderer",
+      "badge_nordlys"
+    ]
+  },
+  "economy": {
+    "price": 5200,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ultimate",
+    "icon": "crown",
+    "supply": 10
+  }
+}

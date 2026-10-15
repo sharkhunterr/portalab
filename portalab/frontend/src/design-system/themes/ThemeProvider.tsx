@@ -11,6 +11,7 @@ import {
   resolveLooks,
 } from "./apply";
 import { BUILTIN_THEMES, builtinTheme } from "./builtin";
+import { externalTheme, useExternalRevision } from "./external/external";
 import { parseTheme, type ThemeDefinition } from "./schema";
 
 /**
@@ -25,6 +26,8 @@ interface ThemeContextValue {
   looks: ResolvedLooks;
   themes: readonly ThemeDefinition[];
   stateStyle: (state: string) => ThemeDefinition["states"][keyof ThemeDefinition["states"]] | undefined;
+  /** issue 1: changes when an imported pack is installed or removed */
+  externalRevision?: number;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -50,22 +53,29 @@ export interface ThemeProviderProps {
 
 export function ThemeProvider({ children, themes, overlay = null, root, lockedLooks }: ThemeProviderProps) {
   const { preferences, policy, preview } = usePreferences();
+  // issue 1: an imported pack installed or removed — its looks and palettes redrawn everywhere
+  const externalRevision = useExternalRevision();
   const available = useMemo(() => {
     const valid = validThemes(themes ?? []);
     return valid.length ? valid : [...BUILTIN_THEMES];
   }, [themes]);
   const systemDark = useSystemDark(preferences.colorMode === "system");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: an imported interface is tried once loaded
   const trial = useMemo(
     () =>
       preview?.theme
-        ? (available.find((theme) => theme.key === preview.theme) ?? builtinTheme(preview.theme) ?? null)
+        ? (available.find((theme) => theme.key === preview.theme) ??
+          builtinTheme(preview.theme) ??
+          externalTheme(preview.theme) ?? // issue 1: an imported interface tried before it is published
+          null)
         : null,
-    [preview?.theme, available],
+    [preview?.theme, available, externalRevision],
   );
   const effective = useMemo(
     () => resolve(preferences, policy, available, { overlay, systemDark, trial }),
     [preferences, policy, available, overlay, systemDark, trial],
   );
+  // biome-ignore lint/correctness/useExhaustiveDependencies: an imported palette applies once it is loaded
   useEffect(() => {
     sound.sounds = { ...(effective.theme.sounds ?? {}) }; // the theme's sound set (027 R18)
     try {
@@ -74,7 +84,7 @@ export function ThemeProvider({ children, themes, overlay = null, root, lockedLo
       const fallback = builtinTheme(policy.defaultTheme) ?? (BUILTIN_THEMES[0] as ThemeDefinition);
       applyToDocument({ ...effective, theme: fallback }, preferences, root, lockedLooks);
     }
-  }, [effective, preferences, policy.defaultTheme, root, lockedLooks]);
+  }, [effective, preferences, policy.defaultTheme, root, lockedLooks, externalRevision]);
   const looks = useMemo(
     () => resolveLooks(effective, preferences, lockedLooks),
     [effective, preferences, lockedLooks],
@@ -85,8 +95,9 @@ export function ThemeProvider({ children, themes, overlay = null, root, lockedLo
       looks,
       themes: available,
       stateStyle: (state: string) => effective.theme.states[state as keyof ThemeDefinition["states"]],
+      externalRevision,
     }),
-    [effective, looks, available],
+    [effective, looks, available, externalRevision],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -91,12 +91,20 @@ class ThemeService:
 
     async def policy(self) -> dict[str, Any]:
         return {
-            "allowedThemes": list(await self._setting("ui.allowedThemes", list(BUILTIN_KEYS))),
+            "allowedThemes": await self._allowed(),
             "defaultTheme": await self._setting("ui.defaultTheme", DEFAULT_THEME),
             "textScaleMin": await self._setting("ui.textScale.min", 0.85),
             "textScaleMax": await self._setting("ui.textScale.max", 2.0),
             "forceReducedMotion": await self._setting("ui.forceReducedMotion", False),
         }
+
+    async def _allowed(self) -> list[str]:
+        """The themes the policy allows, and (issue 1) the interfaces of a visual pack, switched on."""
+        allowed = list(await self._setting("ui.allowedThemes", list(BUILTIN_KEYS)))
+        imported = [
+            row.key for row in await self.all() if row.enabled and str(row.source).startswith("visuals:")
+        ]
+        return [*allowed, *(key for key in imported if key not in allowed)]
 
     def check(self, document: Mapping[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
         theme, errors = validate_definition(document)

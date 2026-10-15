@@ -1,5 +1,7 @@
 """UI module facade (spec 022): theme registry, appearance policy and UI preference events."""
 
+from pathlib import Path
+
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -18,6 +20,7 @@ from portalab.modules.ui import settings as _settings  # noqa: F401 — declares
 from portalab.modules.ui.events import CONSUMER, preference_consumer, register_event_types
 from portalab.modules.ui.looks import NotificationLooks
 from portalab.modules.ui.themes.service import ThemeService
+from portalab.modules.ui.visuals.service import VisualPacks
 from portalab.modules.ui.weather import WeatherService
 
 OWNER = "module:ui"
@@ -34,6 +37,7 @@ class UiModule:
         clock: Clock | None = None,
         event_types: EventTypeRegistry = default_event_types,
         consumers: ConsumerRegistry = default_consumers,
+        visuals_root: Path | None = None,
     ) -> None:
         self.database = database
         self.events = events
@@ -41,6 +45,8 @@ class UiModule:
         self.themes = ThemeService(database, audit, capabilities, clock=clock)
         self.weather = WeatherService(capabilities)  # #68: the « live weather » ambience
         self.looks = NotificationLooks(capabilities)
+        # issue 1 (POC): imported visual packs, kept under ``DATA_DIR/visuals``
+        self.visuals = VisualPacks(visuals_root, capabilities, themes=self.themes) if visuals_root else None
         self.event_types = event_types
         self.consumers = consumers
 

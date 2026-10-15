@@ -21,6 +21,7 @@ from portalab.capabilities.themes import (
     PROFILE_BANNERS,
     PROFILE_SLOTS,
 )
+from portalab.capabilities.visuals import external_looks
 from portalab.core.db import Database
 from portalab.core.errors import ValidationFailed
 from portalab.core.time import Clock, utc_now
@@ -36,6 +37,18 @@ CHOICES = {
     "name": NAME_STYLES,  # 027: the name's font and effect
     "level": LEVEL_BADGES,  # 027: the level badge's look (``classic`` changes with the level)
 }
+
+
+def choices(slot: str) -> tuple[str, ...]:
+    """issue 1: a slot's built-in designs, then those of the published visual packs (an imported ambience is
+    also a profile background, as the built-in ones are)."""
+    kind = PROFILE_SLOTS[slot][0]
+    known = external_looks.known(kind)
+    if slot == "background":
+        known = (*known, *(k for k in external_looks.of("ambient") if k not in known))
+    return known
+
+
 SLOTS = (*CHOICES, "backdrop", "title", "badges")
 SHOWCASE = 3  # badges shown next to the name
 
@@ -161,11 +174,11 @@ class ProfileLooks:
             ]
 
         return {
-            "banners": listed("banner", PROFILE_BANNERS),
-            "frames": listed("frame", AVATAR_FRAMES),
-            "backgrounds": listed("background", AMBIENTS),
-            "names": listed("name", NAME_STYLES),
-            "levels": listed("level", LEVEL_BADGES),
+            "banners": listed("banner", choices("banner")),
+            "frames": listed("frame", choices("frame")),
+            "backgrounds": listed("background", choices("background")),
+            "names": listed("name", choices("name")),
+            "levels": listed("level", choices("level")),
             "titles": await self.owned_items(user, "title"),
             "badges": await self.owned_items(user, "badge"),
             # #79: how many more the shop sells (shown in one line, never listed)
@@ -211,7 +224,7 @@ class ProfileLooks:
                     raise ValidationFailed("This title has no backdrop.", code="marketplace.invalid_look")
                 stored = {"object_id": object_id, "ref": ref, "title": str(value.get("title") or "")[:200]}
             else:
-                if value not in CHOICES[slot]:
+                if value not in choices(slot):
                     raise ValidationFailed("Unknown design.", code="marketplace.invalid_look")
                 if value in await self.locked(user, slot):
                     raise LookLocked("This design is sold in the shop: buy it to use it.")

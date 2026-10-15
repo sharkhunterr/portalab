@@ -189,7 +189,7 @@ def wire_platform(
     health.register_capabilities()
     observability = ObservabilityModule(database, events, authz.audit, capabilities)
     observability.register_capabilities()
-    ui = UiModule(database, events, authz.audit, capabilities)
+    ui = UiModule(database, events, authz.audit, capabilities, visuals_root=data_dir / "visuals")
     ui.register()
     administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     for setting in ui.looks.SETTINGS:  # 027: shop cosmetics (notifications, palette, ambient, celebration)

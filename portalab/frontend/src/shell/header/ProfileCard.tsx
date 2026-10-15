@@ -10,7 +10,7 @@ import {
 } from "../../design-system/components/Badges";
 import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
-import { FRAME_CLIPS, FX_FRAMES } from "../../design-system/themes/premium/fxLooks";
+import { FRAME_CLIPS, fxFrameOf } from "../../design-system/themes/premium/fxLooks";
 import { useProfileLooks } from "../../features/community/profile/looks";
 import { BannerArt } from "../../features/community/profile/ProfileHero";
 import { useT } from "../../i18n/hooks/useT";
@@ -69,23 +69,23 @@ export function ProfileCard({
         />
       ) : null}
       <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
-        {frame && FX_FRAMES[frame] ? (
+        {frame && fxFrameOf(frame) ? (
           <span
             className="avatar-frame"
             data-frame={frame}
-            data-fx-frame={FX_FRAMES[frame]?.shape ?? 0}
-            data-fx-cycle={FX_FRAMES[frame]?.effect === "chrono" || undefined}
+            data-fx-frame={fxFrameOf(frame)?.shape ?? 0}
+            data-fx-cycle={fxFrameOf(frame)?.effect === "chrono" || undefined}
             style={
               {
-                "--frame-clip": FRAME_CLIPS[FX_FRAMES[frame]?.shape ?? 0] ?? "none",
-                "--frame-radius": FX_FRAMES[frame]?.radius ?? "50%",
+                "--frame-clip": FRAME_CLIPS[fxFrameOf(frame)?.shape ?? 0] ?? "none",
+                "--frame-radius": fxFrameOf(frame)?.radius ?? "50%",
               } as CSSProperties
             }
           >
             <FxLayer
-              effect={FX_FRAMES[frame]?.effect ?? "blaze"}
-              shape={FX_FRAMES[frame]?.shape ?? 0}
-              cycle={FX_FRAMES[frame]?.effect === "chrono"}
+              effect={fxFrameOf(frame)?.effect ?? "blaze"}
+              shape={fxFrameOf(frame)?.shape ?? 0}
+              cycle={fxFrameOf(frame)?.effect === "chrono"}
               className="avatar-frame__fx"
             />
             <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />

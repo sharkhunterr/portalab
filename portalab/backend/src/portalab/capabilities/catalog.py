@@ -31,6 +31,7 @@ from portalab.capabilities import (
     themes,
     user_grants,
     visibility,
+    visuals,
 )
 from portalab.capabilities.navigation import attention
 from portalab.capabilities.registry import CapabilityRegistry, CapabilitySpec
@@ -77,6 +78,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     themes.SPEC,
     themes.ENTITLEMENTS_SPEC,
     themes.COSMETICS_SPEC,
+    visuals.CATALOG_WRITER_SPEC,  # issue 1: imported visual packs
 )
 
 

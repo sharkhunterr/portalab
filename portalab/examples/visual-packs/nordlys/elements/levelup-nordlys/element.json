@@ -1,0 +1,12 @@
+{
+  "type": "level_up",
+  "look": "nordlys",
+  "names": { "fr": "Aurore boréale", "en": "Northern lights" },
+  "descriptions": {
+    "fr": "La nuit polaire : des voiles d'aurore verts et violets descendent en ondulant, un anneau de lumière s'ouvre et votre nouveau niveau apparaît, des cristaux de givre scintillent.",
+    "en": "The polar night: green and violet curtains of light come down rippling, a ring of light opens and your new level appears, frost crystals glittering."
+  },
+  "render": { "kind": "glsl", "file": "scene.glsl", "css": ["card.css"], "stage": true, "reveal": 2.4 },
+  "economy": { "price": 1600, "rarity": "legendary", "level": 20, "collection": "levels", "icon": "trophy" },
+  "preview": "preview.svg"
+}

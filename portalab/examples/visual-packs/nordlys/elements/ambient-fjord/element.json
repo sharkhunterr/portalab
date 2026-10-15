@@ -1,0 +1,11 @@
+{
+  "type": "ambient",
+  "look": "fjord",
+  "names": { "fr": "Fjord sous l'aurore", "en": "Fjord under the northern lights" },
+  "descriptions": {
+    "fr": "Un fjord la nuit : les montagnes en silhouette, l'aurore qui ondule au-dessus et se reflète dans l'eau calme, la neige qui tombe doucement.",
+    "en": "A fjord at night: the mountains in silhouette, the northern lights rippling above and mirrored in the still water, snow falling softly."
+  },
+  "render": { "kind": "glsl", "file": "fjord.glsl" },
+  "economy": { "price": 1200, "rarity": "epic", "level": 12, "collection": "ambients", "icon": "telescope" }
+}

@@ -3246,3 +3246,8 @@
   color: #f87171;
   text-shadow: 0 0 0.8rem #dc2626aa;
 }
+
+/* issue 1: an imported level-up says when its card shows (its scene plays first); the shop's picture at once */
+.levelup[data-reveal]:not([data-mini]) .levelup__card {
+  animation: levelup-emerge 1s cubic-bezier(0.2, 0.8, 0.2, 1) var(--levelup-reveal, 0s) both;
+}

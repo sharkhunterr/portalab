@@ -7,7 +7,7 @@ import { LevelBadge } from "../../../design-system/components/Badges";
 import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
-import { FRAME_CLIPS, FX_FRAMES, FX_NAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
+import { FRAME_CLIPS, FX_NAMES, FX_STYLES, fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
 import { useT } from "../../../i18n/hooks/useT";
 import { backdropUrl, type Equipped, type WornItem } from "./looks";
 import { ProfileCustomizer } from "./ProfileCustomizer";
@@ -52,7 +52,7 @@ export function FramedAvatar({
   src?: string | null | undefined;
   size?: "sm" | "md" | "lg" | "xl";
 }) {
-  const fx = frame ? FX_FRAMES[frame] : undefined;
+  const fx = frame ? fxFrameOf(frame) : undefined;
   if (fx) {
     // #78: a frame drawn by the GPU, in a shape of its own — the avatar cut to the same shape
     const style = {

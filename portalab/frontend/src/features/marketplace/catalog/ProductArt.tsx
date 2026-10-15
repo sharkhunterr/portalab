@@ -6,7 +6,8 @@ import { Notification } from "../../../design-system/components/Notification";
 import { CelebrationScene } from "../../../design-system/feedback/Celebration";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { builtinTheme } from "../../../design-system/themes/builtin";
-import { PALETTE_COLORS } from "../../../design-system/themes/palettes";
+import { externalTheme, useExternalRevision } from "../../../design-system/themes/external/external";
+import { paletteFor } from "../../../design-system/themes/palettes";
 import { useT } from "../../../i18n/hooks/useT";
 import { ThemeMiniature } from "../../appearance/AppearanceSettings";
 import { useMe } from "../../auth/useAuth";
@@ -137,9 +138,10 @@ function Swatches({ colors }: { colors: string[] }) {
 }
 
 function PaletteArt({ palette, fallback }: { palette: string | undefined; fallback: ReactNode }) {
-  const colors = PALETTE_COLORS[palette ?? ""];
-  if (!colors) return fallback;
-  const { dark, light } = colors;
+  // issue 1: an imported palette too
+  const dark = paletteFor(palette ?? "", "dark");
+  const light = paletteFor(palette ?? "", "light");
+  if (!dark || !light) return fallback;
   return (
     <span className="product-art__palette">
       <span className="product-art__ui" data-scheme="dark">
@@ -156,7 +158,8 @@ function PaletteArt({ palette, fallback }: { palette: string | undefined; fallba
 }
 
 function ThemeArt({ theme, fallback }: { theme: string | undefined; fallback: ReactNode }) {
-  const definition = builtinTheme(theme ?? "");
+  useExternalRevision();
+  const definition = builtinTheme(theme ?? "") ?? externalTheme(theme); // issue 1: an imported interface
   const c = definition?.colors;
   if (!c) return fallback;
   if (definition?.vocabulary || definition?.layout?.nav) {

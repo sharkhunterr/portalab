@@ -1,0 +1,11 @@
+/* the level's card in the northern lights' colours (only this look's card) */
+.levelup[data-look="nordlys"] .levelup__card {
+  border: 1px solid #5eead4aa;
+  background: linear-gradient(180deg, #06121ef2, #0b1830f2);
+  color: #e6fffa;
+  box-shadow: 0 0 2.5rem #2dd4bf55, inset 0 0 1.5rem #8b5cf633;
+}
+.levelup[data-look="nordlys"] .levelup__title {
+  color: #99f6e4;
+  text-shadow: 0 0 0.8rem #2dd4bfaa;
+}

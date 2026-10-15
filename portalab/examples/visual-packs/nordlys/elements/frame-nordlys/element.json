@@ -1,0 +1,11 @@
+{
+  "type": "avatar_frame",
+  "look": "nordlys",
+  "names": { "fr": "Cadre aurore boréale", "en": "Northern lights frame" },
+  "descriptions": {
+    "fr": "Un hexagone de glace parcouru par une aurore qui ondule autour de votre avatar.",
+    "en": "An ice hexagon with the northern lights rippling round your avatar."
+  },
+  "render": { "kind": "glsl", "file": "frame.glsl", "shape": 1 },
+  "economy": { "price": 1300, "rarity": "epic", "level": 14, "collection": "profile", "icon": "user" }
+}

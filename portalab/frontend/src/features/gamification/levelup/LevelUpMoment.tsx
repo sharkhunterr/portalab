@@ -7,6 +7,8 @@ import { LevelBadge } from "../../../design-system/components/Badges";
 import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { sound } from "../../../design-system/sound/SoundService";
+import { ExternalScript } from "../../../design-system/themes/external/ExternalScript";
+import { externalLook, fxName } from "../../../design-system/themes/external/external";
 import { FX_LEVEL_UPS } from "../../../design-system/themes/premium/fxLooks";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -272,9 +274,10 @@ export function LevelUpMoment() {
           data-layout={LAYOUTS[look] ?? "card"}
           data-reduced={reduced || undefined}
           aria-describedby={undefined}
+          {...revealOf(look)}
         >
           <div className="levelup__stage" aria-hidden="true">
-            <LevelUpFx look={look} />
+            <LevelUpFx look={look} level={level} />
           </div>
           <div className="levelup__card">
             <div className="levelup__badge">
@@ -360,7 +363,7 @@ export function LevelUpMoment() {
 export function LevelUpPreview({ look, label, size }: { look: string; label: string; size: string }) {
   const t = useT();
   return (
-    <span className="levelup" data-mini={size} data-look={look} data-layout="mini">
+    <span className="levelup" data-mini={size} data-look={look} data-layout="mini" {...revealOf(look)}>
       <span className="levelup__stage">
         <LevelUpFx look={look} max={size === "sheet" ? 24 : 10} />
       </span>
@@ -377,8 +380,29 @@ export function LevelUpPreview({ look, label, size }: { look: string; label: str
   );
 }
 
+/** issue 1: an imported level-up says when its card shows (after its scene): ``data-reveal`` and its time. */
+function revealOf(look: string): Record<string, unknown> {
+  const reveal = externalLook("level_up", look)?.reveal;
+  return reveal ? { "data-reveal": "", style: { "--levelup-reveal": `${reveal}s` } as CSSProperties } : {};
+}
+
 /** The decoration of each look — layers and particles placed once, animated by CSS. */
-function LevelUpFx({ look, max }: { look: string; max?: number }) {
+function LevelUpFx({ look, max, level }: { look: string; max?: number; level?: number }) {
+  const reduced = useTheme().effective.reducedMotion;
+  const imported = externalLook("level_up", look);
+  if (imported?.kind === "glsl") {
+    // issue 1: an imported pack's scene, drawn by the GPU like the built-in ones
+    return <FxLayer effect={fxName(imported)} maxSide={max ? 360 : 1100} className="levelup__gpu" />;
+  }
+  if (imported?.kind === "js") {
+    return (
+      <ExternalScript
+        element={imported}
+        className="levelup__gpu"
+        context={{ reducedMotion: reduced, ...(level ? { level } : {}) }}
+      />
+    );
+  }
   if (FX_LEVEL_UPS.has(look)) {
     // #78: a full-stage moment drawn by the GPU (smaller in the shop's miniature)
     return <FxLayer effect={look} maxSide={max ? 360 : 1100} className="levelup__gpu" />;

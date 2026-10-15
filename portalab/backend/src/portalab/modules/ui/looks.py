@@ -7,18 +7,9 @@ from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.capabilities.themes import (
-    AMBIENTS,
-    CELEBRATIONS,
-    COSMETICS,
-    LEVEL_UPS,
-    NOTIFICATION_ANIMATIONS,
-    NOTIFICATION_STYLES,
-    PALETTES,
-)
+from portalab.capabilities.themes import COSMETICS
+from portalab.capabilities.visuals import external_looks
 
-STYLES = NOTIFICATION_STYLES
-ANIMATIONS = NOTIFICATION_ANIMATIONS
 FREE_STYLES = frozenset({"theme", "toast", "banner", "pill", "minimal"})
 FREE_ANIMATIONS = frozenset({"theme", "slide", "fade", "pop", "zoom"})
 KINDS = {
@@ -91,12 +82,14 @@ class NotificationLooks:
             ]
 
         return {
-            "styles": await listed("ui.notificationStyle", STYLES, styles),
-            "animations": await listed("ui.notificationAnimation", ANIMATIONS, animations),
-            "palettes": await listed("ui.palette", PALETTES, palettes),
-            "ambients": await listed("ui.ambient", AMBIENTS, ambients),
-            "celebrations": await listed("ui.celebration", CELEBRATIONS, celebrations),
-            "level_ups": await listed("ui.levelUp", LEVEL_UPS, level_ups),
+            "styles": await listed("ui.notificationStyle", self.choices("ui.notificationStyle"), styles),
+            "animations": await listed(
+                "ui.notificationAnimation", self.choices("ui.notificationAnimation"), animations
+            ),
+            "palettes": await listed("ui.palette", self.choices("ui.palette"), palettes),
+            "ambients": await listed("ui.ambient", self.choices("ui.ambient"), ambients),
+            "celebrations": await listed("ui.celebration", self.choices("ui.celebration"), celebrations),
+            "level_ups": await listed("ui.levelUp", self.choices("ui.levelUp"), level_ups),
         }
 
     async def details(self, kind: str, field: str) -> dict[str, dict[str, Any]]:
@@ -111,10 +104,19 @@ class NotificationLooks:
             return {}
         return result
 
+    @staticmethod
+    def choices(setting: str) -> tuple[str, ...]:
+        """issue 1: the built-in looks of this setting, then those of the published packs."""
+        kind, _, _ = KINDS[setting]
+        return external_looks.known(kind)
+
     def validator(self, setting: str) -> Any:
         async def errors(value: Any, user_ref: str | None = None) -> list[str]:
             if value is None:
                 return []
+            _, _, free = KINDS[setting]
+            if value != "theme" and value not in free and value not in self.choices(setting):
+                return [f"{value!r} is not a known look"]
             try:
                 user = UUID(user_ref) if user_ref else None
             except ValueError:

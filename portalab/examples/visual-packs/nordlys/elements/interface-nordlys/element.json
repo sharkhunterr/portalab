@@ -1,0 +1,26 @@
+{
+  "type": "theme",
+  "look": "nordlys",
+  "names": {
+    "fr": "Interface Nordlys",
+    "en": "Nordlys interface"
+  },
+  "descriptions": {
+    "fr": "Une interface du Grand Nord : nuit polaire et vert d'aurore, titres en lettres onciales, la navigation en bulle autour de laquelle gravitent les rubriques, le fjord sous l'aurore derrière, et le vocabulaire d'un village nordique (le refuge, la veillée, le comptoir…).",
+    "en": "A far-north interface: polar night and aurora green, headings in uncial letters, the navigation as a bubble with the sections orbiting it, the fjord under the northern lights behind, and a Nordic village's words (the lodge, the fireside, the trading post…)."
+  },
+  "render": {
+    "kind": "theme",
+    "file": "interface.json",
+    "css": [
+      "interface.css"
+    ]
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "themes",
+    "icon": "palette"
+  }
+}

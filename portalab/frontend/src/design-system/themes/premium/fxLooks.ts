@@ -3,6 +3,8 @@
  * frames the shape (0 rounded box, 1 hexagon, 2 diamond, 3 shield, 4 star, 5 triangle) and corner radius. Plain data:
  * the renderer itself (``badgeFx``) is only loaded when one of them is shown.
  */
+import { externalLook, fxName } from "../external/external";
+
 export interface FxSpec {
   effect: string;
   shape?: number;
@@ -159,6 +161,20 @@ export const FX_CELEBRATIONS: Record<string, { effect: string; from: number }> =
   starshower: { effect: "meteorstorm", from: 0.2 },
   bigbang: { effect: "bigbang", from: 0 },
 };
+
+/** issue 1: the GPU frame drawing ``key`` — a built-in one or an imported pack's. */
+export function fxFrameOf(key: string | null | undefined): FxSpec | undefined {
+  if (!key) return undefined;
+  const builtin = FX_FRAMES[key];
+  if (builtin) return builtin;
+  const imported = externalLook("avatar_frame", key);
+  if (imported?.kind !== "glsl") return undefined;
+  return {
+    effect: fxName(imported),
+    shape: imported.shape,
+    ...(imported.radius ? { radius: imported.radius } : {}),
+  };
+}
 
 /** avatar frames, each in a shape of its own */
 export const FX_FRAMES: Record<string, FxSpec> = {

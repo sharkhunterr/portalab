@@ -1,0 +1,30 @@
+{
+  "type": "palette",
+  "look": "nordlys",
+  "names": {
+    "fr": "Palette aurore",
+    "en": "Aurora palette"
+  },
+  "descriptions": {
+    "fr": "Le vert et le violet des aurores boréales sur n'importe quelle interface.",
+    "en": "The northern lights' green and violet over any interface."
+  },
+  "palette": {
+    "dark": {
+      "accent": "#34d399",
+      "accentAlt": "#a78bfa",
+      "contrast": "#022c22"
+    },
+    "light": {
+      "accent": "#047857",
+      "accentAlt": "#6d28d9",
+      "contrast": "#ffffff"
+    }
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  }
+}

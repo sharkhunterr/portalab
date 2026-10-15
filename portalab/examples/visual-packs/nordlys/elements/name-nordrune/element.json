@@ -1,0 +1,11 @@
+{
+  "type": "name_style",
+  "look": "nordrune",
+  "names": { "fr": "Runes du Nord", "en": "Northern runes" },
+  "descriptions": {
+    "fr": "Votre nom en lettres onciales, givré, une lueur d'aurore qui passe dessus.",
+    "en": "Your name in uncial letters, frosted, a glow of the northern lights sweeping over it."
+  },
+  "render": { "kind": "css", "css": ["name.css"] },
+  "economy": { "price": 380, "rarity": "rare", "collection": "names", "icon": "feather" }
+}

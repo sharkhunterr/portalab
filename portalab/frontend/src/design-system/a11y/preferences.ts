@@ -37,6 +37,9 @@ export const UNIVERSE_THEMES = [
   "starship",
 ] as const;
 
+/** issue 1: the form of an imported look's key (the server checks it exists). */
+const IMPORTED_LOOK = /^[a-z0-9][a-z0-9_.-]{0,63}$/;
+
 export type Density = "compact" | "comfortable" | "spacious";
 export type ReducedMotion = "system" | "on" | "off";
 
@@ -770,12 +773,19 @@ export function sanitize(input: object): UiPreferences {
   pick("reducedMotion", ["system", "on", "off"]);
   pick("animations", ["all", "discreet", "none"]);
   pick("notificationPosition", ["top-end", "top-start", "bottom-end", "bottom-start"]);
-  pick("notificationStyle", ["theme", ...NOTIFICATION_STYLES]);
-  pick("notificationAnimation", ["theme", ...NOTIFICATION_ANIMATIONS]);
-  pick("ambient", ["theme", ...AMBIENTS]);
-  pick("celebration", ["theme", ...CELEBRATION_KEYS]);
-  pick("palette", PALETTE_KEYS);
-  pick("levelUp", ["theme", ...LEVEL_UPS]);
+  // issue 1: a look may come from an imported pack — any well-formed key the server accepted
+  const pickLook = <K extends keyof UiPreferences>(key: K, builtin: readonly unknown[]) => {
+    const value = raw[key];
+    if (builtin.includes(value) || (typeof value === "string" && IMPORTED_LOOK.test(value))) {
+      out[key] = value as UiPreferences[K];
+    }
+  };
+  pickLook("notificationStyle", ["theme", ...NOTIFICATION_STYLES]);
+  pickLook("notificationAnimation", ["theme", ...NOTIFICATION_ANIMATIONS]);
+  pickLook("ambient", ["theme", ...AMBIENTS]);
+  pickLook("celebration", ["theme", ...CELEBRATION_KEYS]);
+  pickLook("palette", PALETTE_KEYS);
+  pickLook("levelUp", ["theme", ...LEVEL_UPS]);
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;

@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "key": "nordlys",
+  "name": "Nordlys",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#06121e",
+    "surfaceRaised": "#0c1d2e",
+    "text": "#e8fbf7",
+    "textMuted": "#9dc4c0",
+    "border": "#1d3b4a",
+    "accent": "#34d399",
+    "accentContrast": "#022c22",
+    "focus": "#c4b5fd",
+    "accentAlt": "#a78bfa",
+    "rarity": {
+      "common": "#9dc4c0",
+      "rare": "#5eead4",
+      "epic": "#c4b5fd",
+      "legendary": "#fde68a"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Nunito, \"Plus Jakarta Sans Variable\", sans-serif",
+    "headingFamily": "\"Nordlys Uncial\", \"Cinzel\", serif",
+    "headingCase": "none",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.6,
+    "md": 1.1
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "nordlysglow",
+    "fastMs": 170,
+    "normalMs": 360,
+    "levelUp": "nordlys"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "orbit",
+      "tablet": "orbit",
+      "phone": "orbit"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "glass",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "home": "home",
+      "shop": "package",
+      "trophy": "star",
+      "search": "telescope"
+    }
+  },
+  "background": {
+    "fallback": "#06121e",
+    "pattern": "none",
+    "ambient": "fjord"
+  },
+  "sounds": {
+    "notification": "asset:magic/notification.wav",
+    "alert": "asset:magic/alert.wav",
+    "success": "asset:magic/success.wav",
+    "reward": "asset:magic/reward.wav",
+    "levelUp": "asset:magic/level-up.wav",
+    "ui": "asset:magic/ui.wav"
+  },
+  "notification": {
+    "style": "glass",
+    "animation": "fade"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le refuge",
+      "nav:nav.section.home": "Le refuge",
+      "dashboard:title": "Le refuge",
+      "nav:nav.media": "La veillée",
+      "nav:nav.section.media": "La veillée",
+      "media:home.title": "La veillée",
+      "nav:nav.section.content": "Les sagas",
+      "nav:nav.news": "Les nouvelles du village",
+      "news:title": "Les nouvelles du village",
+      "nav:nav.wiki": "Le livre des runes",
+      "wiki:title": "Le livre des runes",
+      "nav:nav.community": "Le clan",
+      "nav:nav.section.community": "Le clan",
+      "community:title": "Le clan",
+      "nav:nav.marketplace": "Le comptoir",
+      "nav:nav.section.marketplace": "Le comptoir",
+      "marketplace:catalog.title": "Le comptoir",
+      "nav:nav.support": "La cabane du guérisseur",
+      "nav:nav.section.support": "La cabane du guérisseur",
+      "gamification:value.coins": "Couronnes"
+    },
+    "en": {
+      "nav:nav.home": "The lodge",
+      "nav:nav.section.home": "The lodge",
+      "dashboard:title": "The lodge",
+      "nav:nav.media": "The fireside",
+      "nav:nav.section.media": "The fireside",
+      "media:home.title": "The fireside",
+      "nav:nav.section.content": "The sagas",
+      "nav:nav.news": "Village news",
+      "news:title": "Village news",
+      "nav:nav.wiki": "The book of runes",
+      "wiki:title": "The book of runes",
+      "nav:nav.community": "The clan",
+      "nav:nav.section.community": "The clan",
+      "community:title": "The clan",
+      "nav:nav.marketplace": "The trading post",
+      "nav:nav.section.marketplace": "The trading post",
+      "marketplace:catalog.title": "The trading post",
+      "nav:nav.support": "The healer's hut",
+      "nav:nav.section.support": "The healer's hut",
+      "gamification:value.coins": "Crowns"
+    }
+  }
+}

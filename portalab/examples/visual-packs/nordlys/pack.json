@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "id": "nordlys",
+  "version": "1.0.0",
+  "names": { "fr": "Nordlys — aurores boréales", "en": "Nordlys — northern lights" },
+  "descriptions": {
+    "fr": "Un pack d'exemple : les aurores boréales du Grand Nord, en passage de niveau, cadres, nom runique, célébration, ambiance de fjord, palette, titre, badge — et son pack et son booster.",
+    "en": "An example pack: the far north's lights as a level-up, frames, a runic name, a celebration, a fjord ambience, a palette, a title, a badge — with its pack and its booster."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0 (code) · OFL-1.1 (Uncial Antiqua)",
+  "homepage": "https://example.org/portalab-nordlys"
+}

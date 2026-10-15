@@ -1,0 +1,22 @@
+{
+  "type": "title",
+  "names": {
+    "fr": "Titre : Vagabond des aurores",
+    "en": "Title: Aurora wanderer"
+  },
+  "descriptions": {
+    "fr": "« Vagabond des aurores » sous votre nom.",
+    "en": "« Aurora wanderer » under your name."
+  },
+  "payload": {
+    "label": "Aurora wanderer",
+    "style": "frost"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "product": "title_aurora_wanderer"
+}

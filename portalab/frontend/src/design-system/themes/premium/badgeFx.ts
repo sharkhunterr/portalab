@@ -12,6 +12,7 @@
  */
 
 import { frameInterval, liveLooks, motionBudget } from "../../motion/budget";
+import { externalFx } from "../external/external";
 import { COSMOS_BADGE_EFFECTS, COSMOS_EFFECTS, COSMOS_STAGE_EFFECTS } from "./cosmosFx";
 
 export const FX_EFFECTS = [
@@ -1135,7 +1136,14 @@ function baseOf(effect: string): FxBadge {
 /** The fragment shader an effect is drawn with (also read by tests and previews). */
 export function fxFragment(effect: string): string {
   const base = baseOf(effect);
-  return `${HEAD}${MAIN_OPEN}${EFFECTS[base]}${FULL_STAGE.has(base) ? CLOSE_FULL : CLOSE}`;
+  // issue 1: an imported pack's look, in the same frame as the built-in ones
+  const external = externalFx(base);
+  const body = external ? external.body : EFFECTS[base];
+  return `${HEAD}${MAIN_OPEN}${body}${stageOf(base) ? CLOSE_FULL : CLOSE}`;
+}
+
+function stageOf(effect: string): boolean {
+  return FULL_STAGE.has(effect) || Boolean(externalFx(effect)?.stage);
 }
 
 function compile(context: WebGLRenderingContext, effect: FxBadge): Program | null {
@@ -1260,7 +1268,7 @@ function draw(context: WebGLRenderingContext, instance: Instance, time: number):
 
 /** #29: a moment that plays once (a notification's burst, a level-up, a celebration) always plays. */
 function timed(instance: Instance): boolean {
-  return instance.effect.startsWith("burst:") || FULL_STAGE.has(instance.effect);
+  return instance.effect.startsWith("burst:") || stageOf(instance.effect);
 }
 
 /** #29: the looks that move this frame — the timed ones, those pointed at, then the largest, up to the
@@ -1304,7 +1312,7 @@ export function attachFx(
   effect: FxBadge,
   options: FxOptions = {},
 ): (() => void) | null {
-  if (!(FX_EFFECTS as readonly string[]).includes(baseOf(effect))) return null;
+  if (!(FX_EFFECTS as readonly string[]).includes(baseOf(effect)) && !externalFx(baseOf(effect))) return null;
   if (!setup()) return null;
   const context = canvas.getContext("2d");
   if (!context) return null;

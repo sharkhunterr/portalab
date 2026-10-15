@@ -8,7 +8,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { Dialog } from "../../../design-system/components/Overlays";
-import { FX_FRAMES, FX_NAMES, FX_STYLES } from "../../../design-system/themes/premium/fxLooks";
+import { FX_NAMES, FX_STYLES, fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
 import { useT } from "../../../i18n/hooks/useT";
 import { InShop } from "../../appearance/InShop";
 import { HdTag, isHdAmbient, isHdLevelBadge, RarityTag } from "../../appearance/Rarity";
@@ -43,7 +43,7 @@ const NONE: Partial<Record<DesignSlot, string>> = {
 
 /** #79: whether a design of this slot is drawn by the graphics chip */
 function isHdLook(slot: DesignSlot, key: string): boolean {
-  if (slot === "frame") return Boolean(FX_FRAMES[key]);
+  if (slot === "frame") return Boolean(fxFrameOf(key));
   if (slot === "banner") return key.startsWith("live-") && isHdAmbient(key.slice(5));
   if (slot === "background") return isHdAmbient(key);
   if (slot === "level") return isHdLevelBadge(key);

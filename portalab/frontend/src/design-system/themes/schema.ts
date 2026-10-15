@@ -145,6 +145,13 @@ export const CONTENT_WIDTHS = ["narrow", "wide", "full"] as const;
 export const CORNER_STYLES = ["square", "soft", "round"] as const;
 export const WIDGET_FRAMES = ["card", "plain", "glass"] as const;
 export const MOTION_PROFILES = ["none", "subtle", "lively", "playful"] as const;
+/** issue 1: a look a theme names — a built-in one, or an imported pack's (the server checked it exists) */
+function openLook<T extends readonly [string, ...string[]]>(builtin: T) {
+  return z.union([z.enum(builtin), z.string().regex(/^[a-z0-9][a-z0-9_.-]{0,63}$/)]) as unknown as z.ZodEnum<{
+    [K in T[number]]: K;
+  }>;
+}
+
 /** the celebrations a theme may play (the same keys as the shop's) */
 export const CELEBRATIONS = CELEBRATION_KEYS;
 /** 027: what a theme draws behind the portal — a static pattern and an animated ambient layer. */
@@ -281,8 +288,8 @@ export const themeDefinitionSchema = z.strictObject({
       fastMs: z.number().int().min(0).max(1000).optional(),
       normalMs: z.number().int().min(0).max(2000).optional(),
       profile: z.enum(MOTION_PROFILES).optional(),
-      celebration: z.enum(CELEBRATIONS).optional(),
-      levelUp: z.enum(LEVEL_UPS).optional(), // 027: how this theme celebrates a new level
+      celebration: openLook(CELEBRATIONS).optional(),
+      levelUp: openLook(LEVEL_UPS).optional(), // 027: how this theme celebrates a new level
     })
     .optional(),
   layout: layoutSchema.optional(),
@@ -301,7 +308,7 @@ export const themeDefinitionSchema = z.strictObject({
       image: z.union([asset, rasterDataUri]).optional(),
       fallback: color,
       pattern: z.enum(BACKDROP_PATTERNS).optional(),
-      ambient: z.enum(AMBIENTS).optional(),
+      ambient: openLook(AMBIENTS).optional(),
     })
     .optional(),
   vocabulary: z
@@ -313,8 +320,8 @@ export const themeDefinitionSchema = z.strictObject({
     .strictObject({
       position: z.enum(["top-end", "top-start", "bottom-end", "bottom-start"]).optional(),
       durationSeconds: z.number().int().min(2).max(60).optional(),
-      style: z.enum(NOTIFICATION_STYLES).optional(),
-      animation: z.enum(NOTIFICATION_ANIMATIONS).optional(),
+      style: openLook(NOTIFICATION_STYLES).optional(),
+      animation: openLook(NOTIFICATION_ANIMATIONS).optional(),
     })
     .optional(),
 });
