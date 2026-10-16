@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_plex",
+  "names": {
+    "en": "Plex interface",
+    "fr": "Interface Plex"
+  },
+  "descriptions": {
+    "en": "The media server's look: charcoal and amber, a sidebar on screens and a bottom bar on phones, its own words for your libraries. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Le style du serveur multimédia : anthracite et ambre, barre latérale sur écran et barre du bas sur mobile, ses mots pour vos bibliothèques. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "plex"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_tide",
+  "names": {
+    "en": "Tide ambience",
+    "fr": "Ambiance marée"
+  },
+  "descriptions": {
+    "en": "Tide drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Marée derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "tide"
+}

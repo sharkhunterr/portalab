@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_lunar_module",
+  "names": {
+    "en": "Lunar module badge",
+    "fr": "Badge Module lunaire"
+  },
+  "descriptions": {
+    "en": "A « Lunar module » badge on your profile.",
+    "fr": "Un badge « Lunar module » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Lunar module",
+    "icon": "package",
+    "style": "shimmer"
+  }
+}

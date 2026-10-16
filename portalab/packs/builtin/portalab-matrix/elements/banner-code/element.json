@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_code",
+  "names": {
+    "en": "Green code banner",
+    "fr": "Bannière code vert"
+  },
+  "descriptions": {
+    "en": "Falling green code.",
+    "fr": "Du code vert qui défile."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "code"
+}

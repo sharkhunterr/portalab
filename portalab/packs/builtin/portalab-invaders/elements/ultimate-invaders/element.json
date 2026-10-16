@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_invaders",
+  "names": {
+    "en": "Invaders theme pack",
+    "fr": "Pack de thème Envahisseurs"
+  },
+  "descriptions": {
+    "en": "The whole Invaders theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1280 Coins saved.",
+    "fr": "Tout le thème Envahisseurs : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1280 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5120,
+    "rarity": "epic",
+    "level": 25,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_invaders",
+      "banner_bunkers",
+      "frame_crab",
+      "name_hiscore",
+      "notif_invasion",
+      "effect_lasers",
+      "ambient_fleet",
+      "badge_sharpshooter",
+      "title_last_defender",
+      "banner_live_fleet",
+      "palette_arcadegreen",
+      "level_saucer",
+      "notif_march",
+      "levelup_wavecleared"
+    ]
+  }
+}

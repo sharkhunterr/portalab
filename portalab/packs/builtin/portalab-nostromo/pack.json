@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-nostromo",
+  "version": "1.0.0+70ffbc6949",
+  "names": {
+    "en": "Nostromo interface",
+    "fr": "Interface Nostromo"
+  },
+  "descriptions": {
+    "en": "The « Nostromo interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Nostromo » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

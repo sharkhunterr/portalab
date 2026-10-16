@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_cardcascade",
+  "names": {
+    "en": "Card cascade celebration",
+    "fr": "Célébration cascade de cartes"
+  },
+  "descriptions": {
+    "en": "Playing cards bouncing down the screen like a won game of patience.",
+    "fr": "Des cartes à jouer qui rebondissent sur l'écran comme une réussite gagnée."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "cardcascade"
+}

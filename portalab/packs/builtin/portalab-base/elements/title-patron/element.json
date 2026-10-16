@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_patron",
+  "names": {
+    "en": "Title: Patron of the arts",
+    "fr": "Titre : Mécène"
+  },
+  "descriptions": {
+    "en": "Given for funding three projects.",
+    "fr": "Offert pour trois projets financés."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Patron of the arts",
+    "style": "gold"
+  }
+}

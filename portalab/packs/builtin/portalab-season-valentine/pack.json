@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-season-valentine",
+  "version": "1.0.0+2a94fbf878",
+  "names": {
+    "en": "Valentine's Day",
+    "fr": "Saint-Valentin"
+  },
+  "descriptions": {
+    "en": "The looks of Valentine's Day.",
+    "fr": "Les looks de la saison : Saint-Valentin."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

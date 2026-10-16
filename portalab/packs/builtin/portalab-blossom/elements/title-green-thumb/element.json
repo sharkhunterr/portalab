@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_green_thumb",
+  "names": {
+    "en": "Title: Green thumb",
+    "fr": "Titre : Main verte"
+  },
+  "descriptions": {
+    "en": "« Green thumb » under your name.",
+    "fr": "« Green thumb » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Green thumb",
+    "style": "float"
+  }
+}

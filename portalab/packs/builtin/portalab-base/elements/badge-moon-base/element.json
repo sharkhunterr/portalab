@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_moon_base",
+  "names": {
+    "en": "Moon base badge",
+    "fr": "Badge Base lunaire"
+  },
+  "descriptions": {
+    "en": "A « Moon base » badge on your profile.",
+    "fr": "Un badge « Moon base » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "frost",
+  "payload": {
+    "label": "Moon base",
+    "icon": "home"
+  }
+}

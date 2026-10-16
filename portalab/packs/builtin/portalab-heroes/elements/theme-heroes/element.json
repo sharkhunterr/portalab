@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_heroes",
+  "names": {
+    "en": "Heroes interface",
+    "fr": "Interface Super-héros"
+  },
+  "descriptions": {
+    "en": "Hero select: a launcher screen, light rays, bold titles and power stats. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Choix du héros : écran de lancement, rayons de lumière, titres puissants et stats de pouvoirs. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "heroes"
+}

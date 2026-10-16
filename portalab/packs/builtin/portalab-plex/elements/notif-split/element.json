@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_split",
+  "names": {
+    "en": "Two-tone notifications",
+    "fr": "Notifications bicolores"
+  },
+  "descriptions": {
+    "en": "The icon on a coloured band, the text beside it.",
+    "fr": "L'icône sur une bande colorée, le texte à côté."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 180,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "split"
+}

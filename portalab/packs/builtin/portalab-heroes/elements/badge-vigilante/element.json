@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_vigilante",
+  "names": {
+    "en": "Vigilante badge",
+    "fr": "Badge Justicier"
+  },
+  "descriptions": {
+    "en": "Protector of the portal.",
+    "fr": "Protecteur du portail."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "shield"
+  },
+  "payload": {
+    "label": "Vigilante",
+    "icon": "shield",
+    "style": "shimmer"
+  }
+}

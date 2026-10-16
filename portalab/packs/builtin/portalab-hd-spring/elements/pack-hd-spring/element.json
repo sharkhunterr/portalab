@@ -1,0 +1,29 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_spring",
+  "names": {
+    "en": "Spring HD pack",
+    "fr": "Pack Printemps HD"
+  },
+  "descriptions": {
+    "en": "The season's looks drawn by the graphics chip. — 480 Coins saved.",
+    "fr": "Les looks de la saison dessinés par la puce graphique. — 480 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1920,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop",
+    "season": "spring"
+  },
+  "payload": {
+    "products": [
+      "frame_verdant",
+      "level_verdant"
+    ]
+  }
+}

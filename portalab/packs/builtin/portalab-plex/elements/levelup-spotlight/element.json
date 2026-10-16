@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_spotlight",
+  "names": {
+    "en": "Spotlight level-up",
+    "fr": "Passage de niveau projecteur"
+  },
+  "descriptions": {
+    "en": "An amber spotlight finds you.",
+    "fr": "Un projecteur ambré vous trouve."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "spotlight"
+}

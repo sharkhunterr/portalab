@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_fairybokeh",
+  "names": {
+    "en": "Soft fairy lights ambience",
+    "fr": "Ambiance lumières douces"
+  },
+  "descriptions": {
+    "en": "Soft fairy lights drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Lumières douces derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "fairybokeh"
+}

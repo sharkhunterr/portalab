@@ -1,0 +1,52 @@
+{
+  "type": "bundle",
+  "product": "pack_spacecrew",
+  "names": {
+    "en": "Space crew pack",
+    "fr": "Pack Équipage"
+  },
+  "descriptions": {
+    "en": "The crew's badges and titles: moonwalker, captain, navigator, engineer, first contact… — 1610 Coins saved.",
+    "fr": "Les badges et titres de l'équipage : marcheur lunaire, capitaine, navigateur, ingénieur, premier contact… — 1610 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6440,
+    "rarity": "epic",
+    "level": 38,
+    "collection": "packs",
+    "icon": "rocket"
+  },
+  "payload": {
+    "products": [
+      "badge_moonwalker",
+      "badge_sun_chaser",
+      "badge_asteroid_miner",
+      "badge_big_bang",
+      "badge_space_cadet",
+      "badge_starship_captain",
+      "badge_navigator",
+      "badge_ship_engineer",
+      "badge_satellite",
+      "badge_red_planet",
+      "badge_solar_wind",
+      "badge_lunar_module",
+      "badge_first_contact",
+      "badge_stardust",
+      "badge_moon_base",
+      "title_moonwalker",
+      "title_sun_worshipper",
+      "title_asteroid_miner",
+      "title_space_cadet",
+      "title_starship_captain",
+      "title_ground_control",
+      "title_light_year_traveller",
+      "title_mission_specialist",
+      "title_orbit_master",
+      "title_big_bang_theorist"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_neon",
+  "names": {
+    "en": "Neon frame",
+    "fr": "Cadre néon"
+  },
+  "descriptions": {
+    "en": "A glowing neon ring.",
+    "fr": "Un anneau de néon lumineux."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "neon"
+}

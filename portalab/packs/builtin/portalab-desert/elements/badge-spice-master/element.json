@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_spice_master",
+  "names": {
+    "en": "Spice master badge",
+    "fr": "Badge Maître de l'épice"
+  },
+  "descriptions": {
+    "en": "The spice must flow.",
+    "fr": "L'épice doit couler."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "sun"
+  },
+  "payload": {
+    "label": "Spice master",
+    "icon": "sun",
+    "style": "gold"
+  }
+}

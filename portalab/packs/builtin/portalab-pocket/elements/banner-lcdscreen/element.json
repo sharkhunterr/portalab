@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_lcdscreen",
+  "names": {
+    "en": "Pocket screen banner",
+    "fr": "Bannière écran de poche"
+  },
+  "descriptions": {
+    "en": "A green screen with pixel hills, a cloud and the sun.",
+    "fr": "Un écran vert avec des collines en pixels, un nuage et le soleil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "lcdscreen"
+}

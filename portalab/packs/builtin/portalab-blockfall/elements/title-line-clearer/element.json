@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_line_clearer",
+  "names": {
+    "en": "Title: Line clearer",
+    "fr": "Titre : Effaceur de lignes"
+  },
+  "descriptions": {
+    "en": "« Line clearer » under your name.",
+    "fr": "« Line clearer » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Line clearer",
+    "style": "rainbow"
+  }
+}

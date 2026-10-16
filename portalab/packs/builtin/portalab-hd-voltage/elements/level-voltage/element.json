@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_voltage",
+  "names": {
+    "en": "High voltage level badge",
+    "fr": "Badge de niveau haute tension"
+  },
+  "descriptions": {
+    "en": "A charged badge: arcs crawl round its edge and leap out, sparks crackle inside.",
+    "fr": "Un badge chargé : des arcs courent sur son bord et s'en échappent, des étincelles crépitent dedans."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "voltage"
+}

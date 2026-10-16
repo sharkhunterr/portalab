@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_sand",
+  "names": {
+    "en": "Sand frame",
+    "fr": "Cadre de sable"
+  },
+  "descriptions": {
+    "en": "Warm desert tones.",
+    "fr": "Les tons chauds du désert."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user",
+    "season": "summer"
+  },
+  "look": "sand"
+}

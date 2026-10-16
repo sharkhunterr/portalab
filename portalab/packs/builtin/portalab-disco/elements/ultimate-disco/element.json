@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "ultimate_disco",
+  "names": {
+    "en": "Disco theme pack",
+    "fr": "Pack de thème Disco"
+  },
+  "descriptions": {
+    "en": "The whole Disco theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1810 Coins saved.",
+    "fr": "Tout le thème Disco : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1810 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7240,
+    "rarity": "epic",
+    "level": 42,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_disco",
+      "banner_mirrorball",
+      "frame_disco",
+      "name_disco",
+      "notif_spiral",
+      "effect_confetti",
+      "ambient_disco",
+      "badge_dancing_king",
+      "title_saturday_fever",
+      "level_hologram",
+      "notif_jelly",
+      "levelup_disco",
+      "notif_glass",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "opt_style_progress_odometer",
+      "opt_style_activity_live"
+    ]
+  }
+}

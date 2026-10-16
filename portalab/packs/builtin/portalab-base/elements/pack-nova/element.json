@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_nova",
+  "names": {
+    "en": "Nova pack",
+    "fr": "Pack Nova"
+  },
+  "descriptions": {
+    "en": "A phone's look: island and morph notifications, the app-icon level badge, the sheet level-up, colour mesh, activity rings (and the odometer of « My progression »), the gradient name, bloom and bokeh. — 1070 Coins saved.",
+    "fr": "Le style d'un téléphone : notifications îlot et métamorphose, badge de niveau icône d'app, passage de niveau en volet, dégradé fluide, anneaux d'activité (et le compteur animé de « Ma progression »), nom en dégradé, éclosion et bokeh. — 1070 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4280,
+    "rarity": "epic",
+    "level": 5,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_island",
+      "notif_morph",
+      "level_squircle",
+      "levelup_nova",
+      "banner_mesh",
+      "frame_rings",
+      "name_nova",
+      "effect_bloom",
+      "ambient_bokeh",
+      "opt_style_progress_odometer"
+    ]
+  }
+}

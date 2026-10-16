@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_last_defender",
+  "names": {
+    "en": "Title: Last defender",
+    "fr": "Titre : Dernier défenseur"
+  },
+  "descriptions": {
+    "en": "« Last defender » under your name.",
+    "fr": "« Last defender » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Last defender",
+    "style": "neon"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "bundle",
+  "product": "pack_level_badges",
+  "names": {
+    "en": "Level badge pack",
+    "fr": "Pack Badges de niveau"
+  },
+  "descriptions": {
+    "en": "Five looks for your level badge: pixel, neon, crest, gem and hologram. — 460 Coins saved.",
+    "fr": "Cinq apparences pour votre badge de niveau : pixel, néon, blason, gemme et hologramme. — 460 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1840,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_pixel",
+      "level_neon",
+      "level_crest",
+      "level_gem",
+      "level_hologram"
+    ]
+  }
+}

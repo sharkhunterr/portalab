@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_trafficlights",
+  "names": {
+    "en": "Traffic lights notifications",
+    "fr": "Notifications feux tricolores"
+  },
+  "descriptions": {
+    "en": "Notifications in frosted windows with their three coloured buttons.",
+    "fr": "Des notifications dans des fenêtres dépolies avec leurs trois boutons de couleur."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "trafficlights"
+}

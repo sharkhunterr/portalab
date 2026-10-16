@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_big_bang",
+  "names": {
+    "en": "Big Bang badge",
+    "fr": "Badge Big Bang"
+  },
+  "descriptions": {
+    "en": "A « Big Bang » badge on your profile.",
+    "fr": "Un badge « Big Bang » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Big Bang",
+    "icon": "sparkles",
+    "style": "rainbow"
+  }
+}

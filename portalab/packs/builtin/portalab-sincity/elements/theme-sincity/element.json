@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_sincity",
+  "names": {
+    "en": "Sin City interface",
+    "fr": "Interface Sin City"
+  },
+  "descriptions": {
+    "en": "Black and white with a splash of red: a film-reel navigation, ink-heavy cards, noir notifications that wipe in like a scene change. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Noir et blanc avec une touche de rouge : navigation en pellicule, cartes à l'encre, notifications noires qui entrent comme un changement de plan. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "sincity"
+}

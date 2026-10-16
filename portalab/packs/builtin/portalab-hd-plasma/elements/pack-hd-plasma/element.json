@@ -1,0 +1,34 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_plasma",
+  "names": {
+    "en": "Plasma HD pack",
+    "fr": "Pack Plasma HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner. — 1480 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée. — 1480 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5920,
+    "rarity": "epic",
+    "level": 13,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_plasma",
+      "notif_plasma",
+      "frame_corona",
+      "title_plasma_core",
+      "badge_atom",
+      "banner_live_plasma",
+      "name_nameplasma"
+    ]
+  }
+}

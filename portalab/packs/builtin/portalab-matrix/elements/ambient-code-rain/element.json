@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_code_rain",
+  "names": {
+    "en": "Code rain ambience",
+    "fr": "Ambiance pluie de code"
+  },
+  "descriptions": {
+    "en": "Code rain drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Pluie de code derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "code-rain"
+}

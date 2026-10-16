@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-halloween",
+  "version": "1.0.0+6591424d48",
+  "names": {
+    "en": "Halloween interface",
+    "fr": "Interface Halloween"
+  },
+  "descriptions": {
+    "en": "The « Halloween interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Halloween » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

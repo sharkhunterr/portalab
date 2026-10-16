@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_matrix",
+  "names": {
+    "en": "Digital rain level badge",
+    "fr": "Badge de niveau pluie numérique"
+  },
+  "descriptions": {
+    "en": "Glyphs falling inside your level.",
+    "fr": "Des glyphes qui tombent dans votre niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "matrix"
+}

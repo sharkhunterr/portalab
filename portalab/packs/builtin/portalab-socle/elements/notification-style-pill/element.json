@@ -1,0 +1,13 @@
+{
+  "type": "notification_style",
+  "look": "pill",
+  "names": {
+    "en": "Capsule",
+    "fr": "Capsule"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

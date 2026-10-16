@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_lunarsilver",
+  "names": {
+    "en": "Lunar silver name style",
+    "fr": "Style de nom argent lunaire"
+  },
+  "descriptions": {
+    "en": "A name in silver, wide space-age letters.",
+    "fr": "Un nom en argent, en larges lettres de l'ère spatiale."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "lunarsilver"
+}

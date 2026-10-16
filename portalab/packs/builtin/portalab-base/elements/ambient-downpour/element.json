@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_downpour",
+  "names": {
+    "en": "Downpour ambience",
+    "fr": "Ambiance averse"
+  },
+  "descriptions": {
+    "en": "Downpour drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Averse derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "downpour"
+}

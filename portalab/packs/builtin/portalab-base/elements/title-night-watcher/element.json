@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_night_watcher",
+  "names": {
+    "en": "Title: Night watcher",
+    "fr": "Titre : Veilleur de nuit"
+  },
+  "descriptions": {
+    "en": "Given by a secret achievement of the night.",
+    "fr": "Offert par un succès secret de la nuit."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "legendary",
+    "collection": "rewards",
+    "icon": "moon",
+    "reward_only": true
+  },
+  "look": "starmap",
+  "payload": {
+    "label": "Night watcher"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_knit",
+  "names": {
+    "en": "Cosy knit ambience",
+    "fr": "Ambiance tricot douillet"
+  },
+  "descriptions": {
+    "en": "Cosy knit drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Tricot douillet derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "christmas"
+  },
+  "look": "knit"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "level_badge",
+  "look": "classic",
+  "names": {
+    "en": "Classic",
+    "fr": "Classique"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_assemblyline",
+  "names": {
+    "en": "Assembly line banner",
+    "fr": "Bannière chaîne de montage"
+  },
+  "descriptions": {
+    "en": "Robot arms over an assembly line, warning lights blinking.",
+    "fr": "Des bras robotisés au-dessus d'une chaîne de montage, des voyants qui clignotent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "assemblyline"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_wipe",
+  "names": {
+    "en": "Wiping notifications",
+    "fr": "Notifications balayage"
+  },
+  "descriptions": {
+    "en": "They are revealed from one side to the other.",
+    "fr": "Elles se dévoilent d'un côté à l'autre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "wipe"
+}

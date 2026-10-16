@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_music_lover",
+  "names": {
+    "en": "Title: Music lover",
+    "fr": "Titre : Mélomane"
+  },
+  "descriptions": {
+    "en": "Given for fifty songs.",
+    "fr": "Offert pour cinquante chansons."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "music",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Music lover",
+    "style": "shimmer"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_lcdstars",
+  "names": {
+    "en": "8-bit stars animated banner",
+    "fr": "Bannière animée étoiles 8 bits"
+  },
+  "descriptions": {
+    "en": "8-bit stars playing in your profile's banner, for every visitor to see.",
+    "fr": "Des étoiles 8 bits dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-lcdstars"
+}

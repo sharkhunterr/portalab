@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_burn",
+  "names": {
+    "en": "Burning bubble celebration",
+    "fr": "Célébration bulle en flammes"
+  },
+  "descriptions": {
+    "en": "Burning bubble burst out when you earn a reward or level up.",
+    "fr": "Bulle en flammes jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "burn"
+}

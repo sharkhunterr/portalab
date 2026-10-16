@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_cosmonaut",
+  "names": {
+    "en": "Title: Cosmonaut",
+    "fr": "Titre : Cosmonaute"
+  },
+  "descriptions": {
+    "en": "« Cosmonaut » under your name, drawn by the graphics chip.",
+    "fr": "« Cosmonaut » sous votre nom, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "level": 8,
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "orrery",
+  "payload": {
+    "label": "Cosmonaut"
+  }
+}

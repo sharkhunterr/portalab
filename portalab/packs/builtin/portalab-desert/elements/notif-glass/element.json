@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_glass",
+  "names": {
+    "en": "Frosted glass notifications",
+    "fr": "Notifications verre dépoli"
+  },
+  "descriptions": {
+    "en": "Translucent notifications that blur what is behind them.",
+    "fr": "Des notifications translucides qui floutent ce qu'il y a derrière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "glass"
+}

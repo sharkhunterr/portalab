@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_night_owl",
+  "names": {
+    "en": "Night owl badge",
+    "fr": "Badge Oiseau de nuit"
+  },
+  "descriptions": {
+    "en": "For those who watch until dawn.",
+    "fr": "Pour celles et ceux qui regardent jusqu'à l'aube."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "moon"
+  },
+  "look": "float",
+  "payload": {
+    "label": "Night owl",
+    "icon": "moon"
+  }
+}

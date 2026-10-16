@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_flagpole",
+  "names": {
+    "en": "Course clear level-up",
+    "fr": "Passage de niveau fin de niveau"
+  },
+  "descriptions": {
+    "en": "The flag slides down the pole, fireworks over the castle: COURSE CLEAR!",
+    "fr": "Le drapeau glisse le long du mât, un feu d'artifice au-dessus du château : COURSE CLEAR !"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "flagpole"
+}

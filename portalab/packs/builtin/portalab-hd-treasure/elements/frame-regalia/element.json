@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_regalia",
+  "names": {
+    "en": "Regalia frame",
+    "fr": "Cadre régalia"
+  },
+  "descriptions": {
+    "en": "A shield of liquid gold.",
+    "fr": "Un écusson d'or liquide."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "regalia"
+}

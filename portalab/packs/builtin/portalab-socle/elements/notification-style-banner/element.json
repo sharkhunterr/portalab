@@ -1,0 +1,13 @@
+{
+  "type": "notification_style",
+  "look": "banner",
+  "names": {
+    "en": "Banner",
+    "fr": "Bandeau"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

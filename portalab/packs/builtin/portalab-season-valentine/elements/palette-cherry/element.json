@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "product": "palette_cherry",
+  "names": {
+    "en": "Cherry palette",
+    "fr": "Palette cerise"
+  },
+  "descriptions": {
+    "en": "Deep cherry red and blush pink over the theme.",
+    "fr": "Rouge cerise profond et rose poudré sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette",
+    "season": "valentine"
+  },
+  "look": "cherry"
+}

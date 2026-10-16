@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_postergrid",
+  "names": {
+    "en": "Poster wall banner",
+    "fr": "Bannière mur d'affiches"
+  },
+  "descriptions": {
+    "en": "Rows of posters fading into black, a red glow behind.",
+    "fr": "Des rangées d'affiches qui se fondent dans le noir, une lueur rouge derrière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "postergrid"
+}

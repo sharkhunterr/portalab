@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_greathall",
+  "names": {
+    "en": "Great Hall banner",
+    "fr": "Bannière grande salle"
+  },
+  "descriptions": {
+    "en": "Long tables under an enchanted night sky, candles floating.",
+    "fr": "De longues tables sous un ciel nocturne enchanté, des bougies qui flottent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "greathall"
+}

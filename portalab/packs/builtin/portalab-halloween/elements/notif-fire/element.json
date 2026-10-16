@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_fire",
+  "names": {
+    "en": "Fire notifications",
+    "fr": "Notifications feu"
+  },
+  "descriptions": {
+    "en": "They flare up from embers, glowing, then cool down.",
+    "fr": "Elles s'embrasent depuis les braises, rougeoient, puis refroidissent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "fire"
+}

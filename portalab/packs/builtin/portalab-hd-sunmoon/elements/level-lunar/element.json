@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_lunar",
+  "names": {
+    "en": "Moon level badge",
+    "fr": "Badge de niveau lune"
+  },
+  "descriptions": {
+    "en": "Your level inside: the moon's seas and craters, its phases sweeping across, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : les mers et les cratères de la lune, ses phases qui défilent, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 42,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "lunar"
+}

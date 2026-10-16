@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_loveletters",
+  "names": {
+    "en": "Love letters ambience",
+    "fr": "Ambiance lettres d'amour"
+  },
+  "descriptions": {
+    "en": "Sealed envelopes drifting up like paper boats.",
+    "fr": "Des enveloppes scellées qui montent comme des bateaux de papier."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles",
+    "season": "valentine"
+  },
+  "look": "loveletters"
+}

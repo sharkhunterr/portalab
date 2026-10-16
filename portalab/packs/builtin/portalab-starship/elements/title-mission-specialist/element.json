@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_mission_specialist",
+  "names": {
+    "en": "Title: Mission specialist",
+    "fr": "Titre : Spécialiste de mission"
+  },
+  "descriptions": {
+    "en": "« Mission specialist » under your name.",
+    "fr": "« Mission specialist » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Mission specialist",
+    "style": "shimmer"
+  }
+}

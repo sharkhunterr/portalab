@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_level_ups",
+  "names": {
+    "en": "HD level-ups pack",
+    "fr": "Pack Passages de niveau HD"
+  },
+  "descriptions": {
+    "en": "Every full-stage level-up drawn by the graphics chip. — 2960 Coins saved.",
+    "fr": "Tous les passages de niveau plein écran dessinés par la puce graphique. — 2960 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 11840,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "levelup_phoenix",
+      "levelup_thunderstrike",
+      "levelup_tidalwave",
+      "levelup_supernova",
+      "levelup_goldrush",
+      "levelup_arcanum",
+      "levelup_sakurastorm",
+      "levelup_aurorasky",
+      "levelup_timeportal",
+      "levelup_rift"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_crawl",
+  "names": {
+    "en": "Opening crawl level-up",
+    "fr": "Passage de niveau générique spatial"
+  },
+  "descriptions": {
+    "en": "Your new level rises through the stars like a film's opening crawl.",
+    "fr": "Votre nouveau niveau défile dans les étoiles comme un générique de film."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "crawl"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_holo",
+  "names": {
+    "en": "Holo foil level badge",
+    "fr": "Badge de niveau holographique"
+  },
+  "descriptions": {
+    "en": "A rainbow foil sliding with the light.",
+    "fr": "Un film arc-en-ciel qui glisse avec la lumière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "holo"
+}

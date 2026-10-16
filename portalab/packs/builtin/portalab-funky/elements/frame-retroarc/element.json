@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_retroarc",
+  "names": {
+    "en": "Seventies rainbow frame",
+    "fr": "Cadre arc-en-ciel 70"
+  },
+  "descriptions": {
+    "en": "Your avatar under a three-striped seventies rainbow.",
+    "fr": "Votre avatar sous un arc-en-ciel des années 70 à trois bandes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "retroarc"
+}

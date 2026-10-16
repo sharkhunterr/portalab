@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_nostromo",
+  "names": {
+    "en": "Onboard computer notifications",
+    "fr": "Notifications ordinateur de bord"
+  },
+  "descriptions": {
+    "en": "MU/TH/UR's transmissions: an amber strip, phosphor text, corner brackets and a blinking cursor.",
+    "fr": "Les transmissions de MU/TH/UR : bandeau ambre, texte phosphore, coins de cadre et curseur qui clignote."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "nostromo"
+}

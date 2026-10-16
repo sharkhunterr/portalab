@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "orbit",
+  "names": {
+    "en": "orbit",
+    "fr": "orbit"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:orbit"
+  },
+  "free": true
+}

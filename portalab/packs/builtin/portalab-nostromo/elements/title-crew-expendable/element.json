@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_crew_expendable",
+  "names": {
+    "en": "Title: Crew expendable",
+    "fr": "Titre : Équipage sacrifiable"
+  },
+  "descriptions": {
+    "en": "Special order 937 — read it twice.",
+    "fr": "Ordre spécial 937 — à relire deux fois."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "hazard",
+  "payload": {
+    "label": "Crew expendable"
+  }
+}

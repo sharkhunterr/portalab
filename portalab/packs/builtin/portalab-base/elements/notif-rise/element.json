@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_rise",
+  "names": {
+    "en": "Rising notifications",
+    "fr": "Notifications qui s'envolent"
+  },
+  "descriptions": {
+    "en": "They float up from below, softly.",
+    "fr": "Elles montent doucement depuis le bas."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "rise"
+}

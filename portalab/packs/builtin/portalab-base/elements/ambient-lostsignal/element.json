@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_lostsignal",
+  "names": {
+    "en": "Lost signal ambience",
+    "fr": "Ambiance signal perdu"
+  },
+  "descriptions": {
+    "en": "Lost signal drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Signal perdu derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "lostsignal"
+}

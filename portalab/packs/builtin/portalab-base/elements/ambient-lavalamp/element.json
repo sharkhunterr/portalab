@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_lavalamp",
+  "names": {
+    "en": "Lava lamp ambience",
+    "fr": "Ambiance lampe à lave"
+  },
+  "descriptions": {
+    "en": "Lava lamp drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Lampe à lave derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "lavalamp"
+}

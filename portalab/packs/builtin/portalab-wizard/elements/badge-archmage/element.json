@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_archmage",
+  "names": {
+    "en": "Archmage badge",
+    "fr": "Badge Archimage"
+  },
+  "descriptions": {
+    "en": "The highest rank of the wizarding school.",
+    "fr": "Le plus haut rang de l'école de sorcellerie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "collection": "badges",
+    "icon": "wand"
+  },
+  "payload": {
+    "label": "Archmage",
+    "icon": "wand",
+    "style": "gold"
+  }
+}

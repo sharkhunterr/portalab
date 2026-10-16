@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_last_survivor",
+  "names": {
+    "en": "Last survivor badge",
+    "fr": "Badge Dernier survivant"
+  },
+  "descriptions": {
+    "en": "Final report of the commercial starship Nostromo.",
+    "fr": "Rapport final du cargo commercial Nostromo."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "radiation"
+  },
+  "look": "hazard",
+  "payload": {
+    "label": "Last survivor",
+    "icon": "radiation"
+  }
+}

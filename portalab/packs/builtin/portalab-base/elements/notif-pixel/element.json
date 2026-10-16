@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_pixel",
+  "names": {
+    "en": "Pixel notifications",
+    "fr": "Notifications pixel"
+  },
+  "descriptions": {
+    "en": "8-bit borders and font.",
+    "fr": "Bordures et police 8 bits."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "pixel"
+}

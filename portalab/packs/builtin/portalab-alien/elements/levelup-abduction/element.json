@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_abduction",
+  "names": {
+    "en": "Abduction level-up",
+    "fr": "Passage de niveau enlèvement"
+  },
+  "descriptions": {
+    "en": "A saucer's beam lifts your new level up.",
+    "fr": "Le rayon d'une soucoupe soulève votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "abduction"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_decode",
+  "names": {
+    "en": "Decode level-up",
+    "fr": "Passage de niveau décodage"
+  },
+  "descriptions": {
+    "en": "Green code falls, the terminal types ACCESS GRANTED.",
+    "fr": "Le code vert tombe, le terminal tape ACCESS GRANTED."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "decode"
+}

@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_blossom",
+  "names": {
+    "en": "Spring theme pack",
+    "fr": "Pack de thème Printemps"
+  },
+  "descriptions": {
+    "en": "The whole Spring theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1280 Coins saved.",
+    "fr": "Tout le thème Printemps : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1280 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5120,
+    "rarity": "epic",
+    "level": 23,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_blossom",
+      "banner_tulipfield",
+      "frame_flowerwreath",
+      "name_watercolour",
+      "notif_seedpacket",
+      "effect_songbirds",
+      "ambient_dandelion",
+      "badge_gardener",
+      "title_green_thumb",
+      "banner_live_dandelion",
+      "palette_lilac",
+      "level_ladybug",
+      "notif_sprout",
+      "levelup_fullbloom"
+    ]
+  }
+}

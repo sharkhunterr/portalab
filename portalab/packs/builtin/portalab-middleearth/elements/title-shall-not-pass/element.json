@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_shall_not_pass",
+  "names": {
+    "en": "Title: You shall not pass",
+    "fr": "Titre : Vous ne passerez pas"
+  },
+  "descriptions": {
+    "en": "The bridge holds.",
+    "fr": "Le pont tient."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "elven",
+  "payload": {
+    "label": "You shall not pass"
+  }
+}

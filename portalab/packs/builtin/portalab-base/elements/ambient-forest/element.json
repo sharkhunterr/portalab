@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_forest",
+  "names": {
+    "en": "Living forest ambience",
+    "fr": "Ambiance forêt vivante"
+  },
+  "descriptions": {
+    "en": "Living forest drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Forêt vivante derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "forest"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "notification_style",
+  "look": "minimal",
+  "names": {
+    "en": "Minimal",
+    "fr": "Minimal"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

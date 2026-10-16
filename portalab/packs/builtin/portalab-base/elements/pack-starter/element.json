@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_starter",
+  "names": {
+    "en": "Starter pack",
+    "fr": "Pack Découverte"
+  },
+  "descriptions": {
+    "en": "Sticky-note notifications, the drop animation, the Pioneer badge and a mint palette. — 110 Coins saved.",
+    "fr": "Notifications post-it, l'animation de chute, le badge Pionnier et une palette menthe. — 110 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 460,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_paper",
+      "notif_drop",
+      "badge_pioneer",
+      "palette_mint"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_nebula",
+  "names": {
+    "en": "Nebula level badge",
+    "fr": "Badge de niveau nébuleuse"
+  },
+  "descriptions": {
+    "en": "A drifting nebula with a few stars.",
+    "fr": "Une nébuleuse qui dérive, quelques étoiles."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "nebula"
+}

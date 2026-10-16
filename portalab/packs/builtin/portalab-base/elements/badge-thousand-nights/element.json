@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_thousand_nights",
+  "names": {
+    "en": "A thousand nights badge",
+    "fr": "Badge Mille et une nuits"
+  },
+  "descriptions": {
+    "en": "Given for 1,000 films and episodes.",
+    "fr": "Offert pour 1 000 films et épisodes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "moon",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "A thousand nights",
+    "icon": "moon",
+    "style": "shimmer"
+  }
+}

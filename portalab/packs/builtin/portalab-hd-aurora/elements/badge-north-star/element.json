@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_north_star",
+  "names": {
+    "en": "North star badge",
+    "fr": "Badge Étoile du nord"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "aurora",
+  "payload": {
+    "label": "North star",
+    "icon": "star"
+  }
+}

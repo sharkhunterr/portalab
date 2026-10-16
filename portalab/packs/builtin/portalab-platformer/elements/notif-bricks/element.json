@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_bricks",
+  "names": {
+    "en": "Bricks notifications",
+    "fr": "Notifications briques"
+  },
+  "descriptions": {
+    "en": "Notifications framed in bricks, like a level's wall.",
+    "fr": "Des notifications encadrées de briques, comme le mur d'un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "bricks"
+}

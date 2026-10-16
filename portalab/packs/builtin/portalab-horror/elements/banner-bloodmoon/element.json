@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_bloodmoon",
+  "names": {
+    "en": "Blood moon banner",
+    "fr": "Bannière lune de sang"
+  },
+  "descriptions": {
+    "en": "A red moon over a dark sky.",
+    "fr": "Une lune rouge dans un ciel noir."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "bloodmoon"
+}

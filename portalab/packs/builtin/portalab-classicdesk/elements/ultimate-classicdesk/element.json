@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_classicdesk",
+  "names": {
+    "en": "Desktop 2001 theme pack",
+    "fr": "Pack de thème Bureau 2001"
+  },
+  "descriptions": {
+    "en": "The whole Desktop 2001 theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1340 Coins saved.",
+    "fr": "Tout le thème Bureau 2001 : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1340 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5360,
+    "rarity": "epic",
+    "level": 30,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_classicdesk",
+      "banner_greenhill",
+      "frame_window",
+      "name_titlebar",
+      "notif_balloon",
+      "effect_cardcascade",
+      "ambient_skyclouds",
+      "badge_defragmented",
+      "title_safe_to_turn_off",
+      "banner_live_skyclouds",
+      "palette_luna",
+      "level_startbutton",
+      "notif_trayrise",
+      "levelup_setupwizard"
+    ]
+  }
+}

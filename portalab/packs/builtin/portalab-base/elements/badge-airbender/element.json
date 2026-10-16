@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_airbender",
+  "names": {
+    "en": "Airbender badge",
+    "fr": "Badge Maître de l'air"
+  },
+  "descriptions": {
+    "en": "Light as the wind, never in a hurry.",
+    "fr": "Léger comme le vent, jamais pressé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "wind"
+  },
+  "look": "wind",
+  "payload": {
+    "label": "Airbender",
+    "icon": "wind"
+  }
+}

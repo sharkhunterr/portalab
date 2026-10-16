@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_island",
+  "names": {
+    "en": "Island notifications",
+    "fr": "Notifications îlot"
+  },
+  "descriptions": {
+    "en": "A black capsule at the top of the screen, like a phone's island.",
+    "fr": "Une capsule noire en haut de l'écran, comme l'îlot d'un téléphone."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "island"
+}

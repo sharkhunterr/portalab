@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_postage",
+  "names": {
+    "en": "Postage stamp frame",
+    "fr": "Cadre timbre-poste"
+  },
+  "descriptions": {
+    "en": "Your avatar on a postage stamp, its perforated edges and its postmark.",
+    "fr": "Votre avatar sur un timbre-poste, ses bords dentelés et son cachet."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "postage"
+}

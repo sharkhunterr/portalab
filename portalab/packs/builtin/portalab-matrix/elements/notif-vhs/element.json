@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_vhs",
+  "names": {
+    "en": "VHS notifications",
+    "fr": "Notifications VHS"
+  },
+  "descriptions": {
+    "en": "A tape on pause: scanlines, a colour split and PLAY in the corner.",
+    "fr": "Une cassette en pause : lignes de balayage, couleurs décalées et PLAY dans le coin."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "vhs"
+}

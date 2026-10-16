@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_phoenix_feather",
+  "names": {
+    "en": "Phoenix feather badge",
+    "fr": "Badge Plume de phénix"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "flame"
+  },
+  "look": "blaze",
+  "payload": {
+    "label": "Phoenix feather",
+    "icon": "flame"
+  }
+}

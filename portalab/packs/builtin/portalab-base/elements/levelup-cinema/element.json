@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_cinema",
+  "names": {
+    "en": "Premiere level-up",
+    "fr": "Passage de niveau avant-première"
+  },
+  "descriptions": {
+    "en": "A film countdown 3-2-1, then your new level on the big screen — for the ten-thousand-XP club.",
+    "fr": "Un compte à rebours de film 3-2-1, puis votre nouveau niveau sur grand écran — pour le club des dix mille XP."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "clapperboard",
+    "reward_only": true
+  },
+  "look": "cinema"
+}

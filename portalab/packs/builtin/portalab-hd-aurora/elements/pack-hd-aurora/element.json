@@ -1,0 +1,36 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_aurora",
+  "names": {
+    "en": "Aurora HD pack",
+    "fr": "Pack Aurore HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 1980 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 1980 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7920,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_aurora",
+      "notif_aurora",
+      "frame_borealis",
+      "title_northern_light",
+      "badge_north_star",
+      "levelup_aurorasky",
+      "banner_live_polar",
+      "name_nameaurora",
+      "effect_skyveil"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_tulipfield",
+  "names": {
+    "en": "Tulip field banner",
+    "fr": "Bannière champ de tulipes"
+  },
+  "descriptions": {
+    "en": "Rows of tulips, red, yellow and pink, under a spring sky.",
+    "fr": "Des rangées de tulipes, rouges, jaunes et roses, sous un ciel de printemps."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "tulipfield"
+}

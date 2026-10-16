@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_terminal",
+  "names": {
+    "en": "Terminal notifications",
+    "fr": "Notifications terminal"
+  },
+  "descriptions": {
+    "en": "Green on black, like a console.",
+    "fr": "Vert sur noir, comme une console."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "terminal"
+}

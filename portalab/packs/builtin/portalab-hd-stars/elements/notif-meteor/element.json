@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_meteor",
+  "names": {
+    "en": "Shooting stars notifications",
+    "fr": "Notifications étoiles filantes"
+  },
+  "descriptions": {
+    "en": "Notifications in a shape of their own: shooting stars streaking across a night sky, drawn by the graphics chip.",
+    "fr": "Des notifications à la forme bien à elles : des étoiles filantes qui traversent un ciel nocturne, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "level": 2,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "meteor"
+}

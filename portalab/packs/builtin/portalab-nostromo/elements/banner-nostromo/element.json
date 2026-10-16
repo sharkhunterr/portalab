@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_nostromo",
+  "names": {
+    "en": "Onboard computer banner",
+    "fr": "Bannière ordinateur de bord"
+  },
+  "descriptions": {
+    "en": "A phosphor grid, a heartbeat running across and a bulkhead's hazard stripe.",
+    "fr": "Une grille phosphore, un battement de cœur qui défile et la bande de danger d'une cloison."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "nostromo"
+}

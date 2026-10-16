@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_pillars",
+  "names": {
+    "en": "Pillars of Creation ambience",
+    "fr": "Ambiance Piliers de la création"
+  },
+  "descriptions": {
+    "en": "Towering columns of golden-brown dust against a blue field of stars, their tops lit and evaporating, stars with six spikes.",
+    "fr": "Des colonnes de poussière dorée dressées sur un champ d'étoiles bleu, leurs sommets éclairés qui s'évaporent, des étoiles à six aigrettes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "pillars"
+}

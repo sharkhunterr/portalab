@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-futuristic",
+  "version": "1.0.0+82d99d6951",
+  "names": {
+    "en": "Neo Future interface",
+    "fr": "Interface Néo-futur"
+  },
+  "descriptions": {
+    "en": "The « Neo Future interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Néo-futur » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

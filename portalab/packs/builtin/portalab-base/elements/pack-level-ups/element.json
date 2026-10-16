@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_level_ups",
+  "names": {
+    "en": "Level-up pack",
+    "fr": "Pack Passages de niveau"
+  },
+  "descriptions": {
+    "en": "Four ways to celebrate a new level: arcade, cosmic, comic book and the four elements. — 510 Coins saved.",
+    "fr": "Quatre façons de fêter un nouveau niveau : arcade, cosmique, bande dessinée et quatre éléments. — 510 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2040,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "levelup_arcade",
+      "levelup_cosmic",
+      "levelup_comic",
+      "levelup_elements"
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_planets",
+  "names": {
+    "en": "Planets HD pack",
+    "fr": "Pack Planètes HD"
+  },
+  "descriptions": {
+    "en": "The solar system and the ringed giant, their animated banners, the orrery and ringed-world frames, level badges and notifications. — 2840 Coins saved.",
+    "fr": "Le système solaire et la géante aux anneaux, leurs bannières animées, les cadres planétaire et monde aux anneaux, leurs badges de niveau et notifications. — 2840 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 11360,
+    "rarity": "legendary",
+    "level": 50,
+    "collection": "packs",
+    "icon": "orbit"
+  },
+  "payload": {
+    "products": [
+      "ambient_solarsystem",
+      "ambient_saturnrise",
+      "banner_live_solarsystem",
+      "banner_live_saturnrise",
+      "frame_orrery",
+      "frame_ringedworld",
+      "level_orrery",
+      "level_ringworld",
+      "notif_orrery",
+      "notif_ringworld",
+      "badge_ringed_planet",
+      "title_cosmonaut"
+    ]
+  }
+}

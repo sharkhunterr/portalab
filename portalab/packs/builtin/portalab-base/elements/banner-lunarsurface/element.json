@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_lunarsurface",
+  "names": {
+    "en": "Lunar surface banner",
+    "fr": "Bannière surface lunaire"
+  },
+  "descriptions": {
+    "en": "Grey dunes and craters under a black sky, the moon high.",
+    "fr": "Des dunes grises et des cratères sous un ciel noir."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "lunarsurface"
+}

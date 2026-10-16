@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_transform",
+  "names": {
+    "en": "Transform notification animation",
+    "fr": "Animation de notification transformation"
+  },
+  "descriptions": {
+    "en": "Notifications unfolding panel by panel.",
+    "fr": "Des notifications qui se déplient panneau par panneau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "transform"
+}

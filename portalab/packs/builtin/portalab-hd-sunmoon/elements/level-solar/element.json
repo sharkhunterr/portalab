@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_solar",
+  "names": {
+    "en": "Sun level badge",
+    "fr": "Badge de niveau soleil"
+  },
+  "descriptions": {
+    "en": "Your level inside: the sun's boiling surface, its corona and its prominences, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : la surface en ébullition du soleil, sa couronne et ses protubérances, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "epic",
+    "level": 35,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "solar"
+}

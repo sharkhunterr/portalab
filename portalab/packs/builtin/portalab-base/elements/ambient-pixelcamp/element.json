@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_pixelcamp",
+  "names": {
+    "en": "Pixel campfire ambience",
+    "fr": "Ambiance feu de camp pixel"
+  },
+  "descriptions": {
+    "en": "Pixel campfire drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Feu de camp pixel derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "pixelcamp"
+}

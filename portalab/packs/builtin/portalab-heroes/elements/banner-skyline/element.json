@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_skyline",
+  "names": {
+    "en": "Hero skyline banner",
+    "fr": "Bannière ville héroïque"
+  },
+  "descriptions": {
+    "en": "The city you protect.",
+    "fr": "La ville que vous protégez."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "skyline"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_launchpad",
+  "names": {
+    "en": "Launch pad banner",
+    "fr": "Bannière pas de tir"
+  },
+  "descriptions": {
+    "en": "A tower on its pad at dusk, the flames of a launch below.",
+    "fr": "Une tour sur son pas de tir au crépuscule, les flammes d'un lancement en bas."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "launchpad"
+}

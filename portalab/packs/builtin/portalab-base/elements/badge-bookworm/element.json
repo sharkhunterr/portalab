@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_bookworm",
+  "names": {
+    "en": "Bookworm badge",
+    "fr": "Badge Rat de bibliothèque"
+  },
+  "descriptions": {
+    "en": "Given for ten books finished.",
+    "fr": "Offert pour dix livres terminés."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "library",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Bookworm",
+    "icon": "library",
+    "style": "gold"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_nebula",
+  "names": {
+    "en": "Nebula banner",
+    "fr": "Bannière nébuleuse"
+  },
+  "descriptions": {
+    "en": "A living nebula slowly shifting colours.",
+    "fr": "Une nébuleuse vivante aux couleurs changeantes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "nebula"
+}

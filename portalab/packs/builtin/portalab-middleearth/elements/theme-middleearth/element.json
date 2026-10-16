@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_middleearth",
+  "names": {
+    "en": "Middle-earth interface",
+    "fr": "Interface Terre du Milieu"
+  },
+  "descriptions": {
+    "en": "From the Shire to Mordor: parchment, a map screen to travel, elven notifications, the One Ring and fireworks. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "De la Comté au Mordor : parchemin, un écran de carte pour voyager, notifications elfiques, l'Anneau unique et des feux d'artifice. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "middleearth"
+}

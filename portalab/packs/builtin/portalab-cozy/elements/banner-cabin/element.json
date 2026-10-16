@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_cabin",
+  "names": {
+    "en": "Cabin banner",
+    "fr": "Bannière chalet"
+  },
+  "descriptions": {
+    "en": "Warm plaid by the fire.",
+    "fr": "Plaid chaud au coin du feu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "cabin"
+}

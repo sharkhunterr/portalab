@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "product": "pack_pixel_art",
+  "names": {
+    "en": "Pixel art pack",
+    "fr": "Pack Pixel art"
+  },
+  "descriptions": {
+    "en": "Animated pixel art: a campfire, a sunset beach, hot-air balloons and the 8-bit sky, with the pixel level badge and the arcade level-up. — 920 Coins saved.",
+    "fr": "Du pixel art animé : feu de camp, plage au couchant, montgolfières et ciel 8 bits, avec le badge de niveau pixel et le passage de niveau arcade. — 920 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3680,
+    "rarity": "epic",
+    "level": 4,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_pixelcamp",
+      "ambient_pixelbeach",
+      "ambient_pixelballoons",
+      "ambient_pixelsky",
+      "level_pixel",
+      "levelup_arcade"
+    ]
+  }
+}

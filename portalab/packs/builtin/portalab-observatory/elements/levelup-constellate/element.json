@@ -1,0 +1,24 @@
+{
+  "type": "level_up",
+  "product": "levelup_constellate",
+  "names": {
+    "en": "A constellation is born level-up",
+    "fr": "Passage de niveau naissance d'une constellation"
+  },
+  "descriptions": {
+    "en": "Stars light up one by one round your new level and join into a crown of stars.",
+    "fr": "Des étoiles s'allument une à une autour de votre nouveau niveau et se relient en couronne d'étoiles."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 29,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "constellate"
+}

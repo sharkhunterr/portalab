@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_mazeblue",
+  "names": {
+    "en": "Maze blue palette",
+    "fr": "Palette bleu labyrinthe"
+  },
+  "descriptions": {
+    "en": "Maze blue and eater yellow over the theme.",
+    "fr": "Le bleu du labyrinthe et le jaune du glouton sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "mazeblue"
+}

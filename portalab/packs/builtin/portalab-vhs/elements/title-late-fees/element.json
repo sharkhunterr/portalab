@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_late_fees",
+  "names": {
+    "en": "Title: Late fees collector",
+    "fr": "Titre : Roi des pénalités de retard"
+  },
+  "descriptions": {
+    "en": "The tape always comes back… eventually.",
+    "fr": "La cassette revient toujours… un jour."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Late fees collector",
+    "style": "vhs"
+  }
+}

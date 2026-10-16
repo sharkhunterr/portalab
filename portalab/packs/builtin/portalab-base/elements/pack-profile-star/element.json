@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_profile_star",
+  "names": {
+    "en": "Star profile pack",
+    "fr": "Pack Profil star"
+  },
+  "descriptions": {
+    "en": "The starfield banner and its animated version, the golden frame and the royal name style. — 720 Coins saved.",
+    "fr": "La bannière étoilée et sa version animée, le cadre doré et le style de nom royal. — 720 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2880,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "banner_starfield",
+      "banner_live_starfield",
+      "frame_gold",
+      "name_royal"
+    ]
+  }
+}

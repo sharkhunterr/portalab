@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_circuit",
+  "names": {
+    "en": "Circuit level badge",
+    "fr": "Badge de niveau circuit"
+  },
+  "descriptions": {
+    "en": "Green traces on a circuit board.",
+    "fr": "Des pistes vertes sur un circuit imprimé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "circuit"
+}

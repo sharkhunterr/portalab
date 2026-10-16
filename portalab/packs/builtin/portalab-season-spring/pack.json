@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-season-spring",
+  "version": "1.0.0+1e5e0618f2",
+  "names": {
+    "en": "Spring",
+    "fr": "Printemps"
+  },
+  "descriptions": {
+    "en": "The looks of Spring.",
+    "fr": "Les looks de la saison : Printemps."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

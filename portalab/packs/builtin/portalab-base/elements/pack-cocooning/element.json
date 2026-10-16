@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_cocooning",
+  "names": {
+    "en": "Cocooning pack",
+    "fr": "Pack Cocooning"
+  },
+  "descriptions": {
+    "en": "Stay in where it is warm: candlelight, by the fire, a knitted blanket, honey, warm steam, soft fairy lights, an amber glow and rain on the window. — 1320 Coins saved.",
+    "fr": "Bien au chaud : lueur de bougies, coin du feu, tricot douillet, miel, vapeur chaude, lumières douces, lueur ambrée et pluie à la fenêtre. — 1320 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5280,
+    "rarity": "epic",
+    "level": 7,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_candlelight",
+      "ambient_hearth",
+      "ambient_knit",
+      "ambient_honey",
+      "ambient_steam",
+      "ambient_fairybokeh",
+      "ambient_amberglow",
+      "ambient_windowrain"
+    ]
+  }
+}

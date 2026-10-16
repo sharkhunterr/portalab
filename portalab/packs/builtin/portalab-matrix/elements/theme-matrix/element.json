@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_matrix",
+  "names": {
+    "en": "Simulation interface",
+    "fr": "Interface Simulation"
+  },
+  "descriptions": {
+    "en": "Wake up: a command-line navigation, falling green code, terminal cards and glitches. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Réveillez-vous : navigation en ligne de commande, pluie de code vert, cartes terminal et glitchs. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "matrix"
+}

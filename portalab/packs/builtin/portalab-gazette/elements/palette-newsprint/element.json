@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_newsprint",
+  "names": {
+    "en": "Ink and paper palette",
+    "fr": "Palette encre et papier"
+  },
+  "descriptions": {
+    "en": "Ink black and editorial red over the theme.",
+    "fr": "Le noir de l'encre et le rouge de la rédaction sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "newsprint"
+}

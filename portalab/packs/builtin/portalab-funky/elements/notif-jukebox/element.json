@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_jukebox",
+  "names": {
+    "en": "Jukebox notifications",
+    "fr": "Notifications juke-box"
+  },
+  "descriptions": {
+    "en": "Notifications under a jukebox's glowing chrome arch.",
+    "fr": "Des notifications sous l'arche chromée et lumineuse d'un juke-box."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "jukebox"
+}

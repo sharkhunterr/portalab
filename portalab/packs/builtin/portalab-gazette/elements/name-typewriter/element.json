@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_typewriter",
+  "names": {
+    "en": "Typewriter name style",
+    "fr": "Style de nom machine à écrire"
+  },
+  "descriptions": {
+    "en": "A name typed on an old typewriter, the ink a little uneven.",
+    "fr": "Un nom tapé à la machine à écrire, l'encre un peu inégale."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "typewriter"
+}

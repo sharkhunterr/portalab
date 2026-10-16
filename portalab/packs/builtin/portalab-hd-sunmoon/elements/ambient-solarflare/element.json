@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_solarflare",
+  "names": {
+    "en": "Solar flare ambience",
+    "fr": "Ambiance éruption solaire"
+  },
+  "descriptions": {
+    "en": "The sun up close: its boiling surface, dark spots, prominences arching off its edge, a flare now and then.",
+    "fr": "Le soleil de tout près : sa surface en ébullition, ses taches, des protubérances qui jaillissent de son bord, parfois une éruption."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "solarflare"
+}

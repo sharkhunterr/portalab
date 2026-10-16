@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_neon",
+  "names": {
+    "en": "Neon notifications",
+    "fr": "Notifications néon"
+  },
+  "descriptions": {
+    "en": "Glowing outlines in the colour of each notification.",
+    "fr": "Des contours lumineux de la couleur de chaque notification."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "neon"
+}

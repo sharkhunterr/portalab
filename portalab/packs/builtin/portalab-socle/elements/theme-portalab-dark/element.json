@@ -1,0 +1,13 @@
+{
+  "type": "theme",
+  "look": "portalab-dark",
+  "names": {
+    "en": "Portalab (dark)",
+    "fr": "Portalab (dark)"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

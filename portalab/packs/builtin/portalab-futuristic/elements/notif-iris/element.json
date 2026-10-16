@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_iris",
+  "names": {
+    "en": "Iris notifications",
+    "fr": "Notifications iris"
+  },
+  "descriptions": {
+    "en": "They open in a circle, like an old film.",
+    "fr": "Elles s'ouvrent en cercle, comme un vieux film."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "iris"
+}

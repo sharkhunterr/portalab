@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_balloon",
+  "names": {
+    "en": "Balloon tip notifications",
+    "fr": "Notifications info-bulle"
+  },
+  "descriptions": {
+    "en": "Notifications in pale yellow balloon tips, their tail pointing down to the tray.",
+    "fr": "Des notifications en info-bulles jaune pâle, leur pointe tournée vers la zone de notification."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "balloon"
+}

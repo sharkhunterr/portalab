@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "pack_notifications",
+  "names": {
+    "en": "Notification designer pack",
+    "fr": "Pack Designer de notifications"
+  },
+  "descriptions": {
+    "en": "Nine notification styles and six animations. — 1180 Coins saved.",
+    "fr": "Neuf styles et six animations de notifications. — 1180 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4720,
+    "rarity": "epic",
+    "level": 5,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_glass",
+      "notif_comic",
+      "notif_terminal",
+      "notif_pixel",
+      "notif_parchment",
+      "notif_hologram",
+      "notif_flip",
+      "notif_glitch",
+      "notif_spiral",
+      "notif_slam",
+      "notif_square",
+      "notif_cloud",
+      "notif_ticket",
+      "notif_melt",
+      "notif_iris"
+    ]
+  }
+}

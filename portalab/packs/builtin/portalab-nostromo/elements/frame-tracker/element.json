@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_tracker",
+  "names": {
+    "en": "Motion tracker frame",
+    "fr": "Cadre détecteur de mouvement"
+  },
+  "descriptions": {
+    "en": "Amber brackets and a tracker's sweep going round you.",
+    "fr": "Des coins ambrés et le balayage d'un détecteur autour de vous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "tracker"
+}

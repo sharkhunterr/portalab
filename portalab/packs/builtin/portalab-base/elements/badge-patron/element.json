@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_patron",
+  "names": {
+    "en": "Patron badge",
+    "fr": "Badge Mécène"
+  },
+  "descriptions": {
+    "en": "Given for funding three projects.",
+    "fr": "Offert pour trois projets financés."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "handshake",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Patron",
+    "icon": "handshake",
+    "style": "gold"
+  }
+}

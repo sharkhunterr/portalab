@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_beachballs",
+  "names": {
+    "en": "Beach balls ambience",
+    "fr": "Ambiance ballons de plage"
+  },
+  "descriptions": {
+    "en": "Striped beach balls bouncing across the page.",
+    "fr": "Des ballons de plage rayés qui rebondissent sur la page."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "beachballs"
+}

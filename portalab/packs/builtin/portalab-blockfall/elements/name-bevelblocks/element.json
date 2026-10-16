@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_bevelblocks",
+  "names": {
+    "en": "Bevelled blocks name style",
+    "fr": "Style de nom blocs biseautés"
+  },
+  "descriptions": {
+    "en": "A name in chunky pixel capitals, banded like a stack of pieces.",
+    "fr": "Un nom en grosses capitales de pixels, rayé comme une pile de pièces."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "bevelblocks"
+}

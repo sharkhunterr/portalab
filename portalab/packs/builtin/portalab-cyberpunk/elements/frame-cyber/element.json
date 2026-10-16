@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_cyber",
+  "names": {
+    "en": "Cyber frame",
+    "fr": "Cadre cyber"
+  },
+  "descriptions": {
+    "en": "Notched yellow plating.",
+    "fr": "Un blindage jaune biseauté."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "cyber"
+}

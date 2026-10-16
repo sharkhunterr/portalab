@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_hero",
+  "names": {
+    "en": "Hero shield level-up",
+    "fr": "Passage de niveau bouclier de héros"
+  },
+  "descriptions": {
+    "en": "A shield of rings slams down — BAM!",
+    "fr": "Un bouclier d'anneaux s'abat — BAM !"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "hero"
+}

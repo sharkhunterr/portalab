@@ -1,0 +1,13 @@
+{
+  "type": "name_style",
+  "look": "none",
+  "names": {
+    "en": "Classic",
+    "fr": "Classique"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

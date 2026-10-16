@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_candy",
+  "names": {
+    "en": "Candy shower celebration",
+    "fr": "Célébration pluie de bonbons"
+  },
+  "descriptions": {
+    "en": "Wrapped sweets bursting out of the reward.",
+    "fr": "Des bonbons emballés qui jaillissent de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "halloween"
+  },
+  "look": "candy"
+}

@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_snowflake",
+  "names": {
+    "en": "Snowflake badge",
+    "fr": "Badge Flocon"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "snowflake",
+    "season": "christmas"
+  },
+  "look": "glacier",
+  "payload": {
+    "label": "Snowflake",
+    "icon": "snowflake"
+  }
+}

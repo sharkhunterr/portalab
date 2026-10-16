@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_starchart",
+  "names": {
+    "en": "Star chart banner",
+    "fr": "Bannière carte du ciel"
+  },
+  "descriptions": {
+    "en": "A navy star chart, its grid and two constellations drawn.",
+    "fr": "Une carte du ciel bleu nuit, sa grille et deux constellations tracées."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "starchart"
+}

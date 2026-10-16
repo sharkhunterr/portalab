@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_achievement_hunter",
+  "names": {
+    "en": "Achievement hunter badge",
+    "fr": "Badge Chasseur de succès"
+  },
+  "descriptions": {
+    "en": "Given for ten achievements.",
+    "fr": "Offert pour dix succès."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "look": "shimmer",
+  "payload": {
+    "label": "Achievement hunter",
+    "icon": "trophy"
+  }
+}

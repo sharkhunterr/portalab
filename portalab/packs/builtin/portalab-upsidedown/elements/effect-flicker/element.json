@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_flicker",
+  "names": {
+    "en": "Christmas lights celebration",
+    "fr": "Célébration guirlande"
+  },
+  "descriptions": {
+    "en": "Christmas lights burst out when you earn a reward or level up.",
+    "fr": "Guirlande jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "christmas"
+  },
+  "look": "flicker"
+}

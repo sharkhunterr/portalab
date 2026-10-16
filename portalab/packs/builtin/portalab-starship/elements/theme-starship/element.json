@@ -1,0 +1,25 @@
+{
+  "type": "theme",
+  "product": "theme_starship",
+  "names": {
+    "en": "Starship interface",
+    "fr": "Interface Vaisseau spatial"
+  },
+  "descriptions": {
+    "en": "In command of a starship: steel and amber, the ship seen from the side along the bottom of the screen — its engines burning, one compartment per section, the energy gauge and the comms light — asteroids drifting past, mission-control notifications that lift off. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Aux commandes d'un vaisseau spatial : acier et ambre, le vaisseau vu de profil en bas de l'écran — ses moteurs allumés, un compartiment par rubrique, la jauge d'énergie et le voyant des communications —, des astéroïdes qui défilent, des notifications du contrôle de mission qui décollent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "epic",
+    "level": 20,
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "starship"
+}

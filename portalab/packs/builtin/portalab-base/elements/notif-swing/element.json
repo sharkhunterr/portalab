@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_swing",
+  "names": {
+    "en": "Swinging notifications",
+    "fr": "Notifications balancier"
+  },
+  "descriptions": {
+    "en": "Notifications swing in like a hanging sign.",
+    "fr": "Les notifications se balancent comme une enseigne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "swing"
+}

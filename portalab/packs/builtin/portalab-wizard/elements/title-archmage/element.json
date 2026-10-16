@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_archmage",
+  "names": {
+    "en": "Title: Archmage of the portal",
+    "fr": "Titre : Archimage du portail"
+  },
+  "descriptions": {
+    "en": "For the greatest wizards.",
+    "fr": "Pour les plus grands sorciers."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Archmage of the portal",
+    "style": "gold"
+  }
+}

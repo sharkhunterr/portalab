@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_nova",
+  "names": {
+    "en": "Supernova celebration",
+    "fr": "Célébration supernova"
+  },
+  "descriptions": {
+    "en": "Supernova burst out when you earn a reward or level up.",
+    "fr": "Supernova jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "nova"
+}

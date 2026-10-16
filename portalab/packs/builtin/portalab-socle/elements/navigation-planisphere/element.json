@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "planisphere",
+  "names": {
+    "en": "planisphere",
+    "fr": "planisphere"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:planisphere"
+  },
+  "free": true
+}

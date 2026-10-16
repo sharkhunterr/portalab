@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_sandbar",
+  "names": {
+    "en": "Sandbar palette",
+    "fr": "Palette banc de sable"
+  },
+  "descriptions": {
+    "en": "Lagoon blue and coral over the theme.",
+    "fr": "Le bleu du lagon et le corail sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "sandbar"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_ringworld",
+  "names": {
+    "en": "Ringed planet notifications",
+    "fr": "Notifications planète à anneaux"
+  },
+  "descriptions": {
+    "en": "Notifications in a shape of their own: a ringed planet, its banded clouds turning, drawn by the graphics chip.",
+    "fr": "Des notifications à la forme bien à elles : une planète à anneaux, ses nuages en bandes qui tournent, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 13,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "ringworld"
+}

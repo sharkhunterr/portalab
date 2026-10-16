@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_runemaster",
+  "names": {
+    "en": "Title: Runemaster",
+    "fr": "Titre : Maître des runes"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "runes",
+  "payload": {
+    "label": "Runemaster"
+  }
+}

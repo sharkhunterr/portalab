@@ -1,0 +1,13 @@
+{
+  "type": "theme",
+  "look": "dark",
+  "names": {
+    "en": "Dark",
+    "fr": "Dark"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

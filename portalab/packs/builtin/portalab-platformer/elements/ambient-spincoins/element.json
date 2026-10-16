@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_spincoins",
+  "names": {
+    "en": "Spinning coins ambience",
+    "fr": "Ambiance pièces qui tournent"
+  },
+  "descriptions": {
+    "en": "Gold coins spinning in the air across the page.",
+    "fr": "Des pièces d'or qui tournent dans les airs sur la page."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "spincoins"
+}

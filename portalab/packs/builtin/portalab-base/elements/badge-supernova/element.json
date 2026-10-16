@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_supernova",
+  "names": {
+    "en": "Supernova badge",
+    "fr": "Badge Supernova"
+  },
+  "descriptions": {
+    "en": "Given at level 46 (Diamant II).",
+    "fr": "Offert au niveau 46 (Diamant II)."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "legendary",
+    "collection": "rewards",
+    "icon": "sparkles",
+    "reward_only": true
+  },
+  "look": "stellar",
+  "payload": {
+    "label": "Supernova",
+    "icon": "sparkles"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "type": "bundle",
+  "product": "pack_sunmoon",
+  "names": {
+    "en": "Sun and Moon pack",
+    "fr": "Pack Soleil et Lune"
+  },
+  "descriptions": {
+    "en": "The sun's and the moon's frames, banners, level badges, notifications, celebrations, name styles and palettes. — 2140 Coins saved.",
+    "fr": "Les cadres, bannières, badges de niveau, notifications, célébrations, styles de nom et palettes du soleil et de la lune. — 2140 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8560,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "packs",
+    "icon": "moon"
+  },
+  "payload": {
+    "products": [
+      "frame_crescent",
+      "frame_sunrays",
+      "frame_asteroidring",
+      "frame_saturnring",
+      "banner_lunarsurface",
+      "banner_earthrise",
+      "banner_asteroidfield",
+      "banner_launchpad",
+      "level_moonphase",
+      "level_sunbadge",
+      "level_rocketbadge",
+      "notif_transmission",
+      "notif_missioncontrol",
+      "notif_liftoff",
+      "notif_orbitin",
+      "effect_comets",
+      "effect_planets",
+      "name_lunarsilver",
+      "name_solarfire",
+      "name_bigbang",
+      "palette_solarflare",
+      "palette_lunar",
+      "palette_nebulateal"
+    ]
+  }
+}

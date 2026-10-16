@@ -91,6 +91,17 @@
           "epoch": {
             "title": "Epoch",
             "type": "integer"
+          },
+          "withheld": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default": {},
+            "title": "Withheld",
+            "type": "object"
           }
         },
         "required": [
@@ -29831,6 +29842,50 @@
           }
         },
         "summary": "Listing",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/admin/visuals/builtin/state": {
+      "post": {
+        "description": "Portalab's whole catalog switched on \u2014 or off, the socle staying on.",
+        "operationId": "builtin_state_api_v1_admin_visuals_builtin_state_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Builtin State Api V1 Admin Visuals Builtin State Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Builtin State",
         "tags": [
           "visuals"
         ]

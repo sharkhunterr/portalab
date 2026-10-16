@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_lightning",
+  "names": {
+    "en": "Lightning celebration",
+    "fr": "Célébration éclairs"
+  },
+  "descriptions": {
+    "en": "Lightning burst out when you earn a reward or level up.",
+    "fr": "Éclairs jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "lightning"
+}

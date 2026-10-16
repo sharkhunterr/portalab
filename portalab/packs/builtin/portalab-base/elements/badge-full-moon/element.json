@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_full_moon",
+  "names": {
+    "en": "Full moon badge",
+    "fr": "Badge Pleine lune"
+  },
+  "descriptions": {
+    "en": "A « Full moon » badge on your profile, drawn by the graphics chip.",
+    "fr": "Un badge « Full moon » sur votre profil, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "level": 27,
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "lunar",
+  "payload": {
+    "label": "Full moon",
+    "icon": "moon"
+  }
+}

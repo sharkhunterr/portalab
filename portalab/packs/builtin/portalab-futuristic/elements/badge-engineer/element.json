@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_engineer",
+  "names": {
+    "en": "Engineer badge",
+    "fr": "Badge Ingénieur"
+  },
+  "descriptions": {
+    "en": "Builds the future, one widget at a time.",
+    "fr": "Construit le futur, un widget à la fois."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "cpu"
+  },
+  "payload": {
+    "label": "Engineer",
+    "icon": "cpu",
+    "style": "neon"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_ornaments",
+  "names": {
+    "en": "Ornaments animated banner",
+    "fr": "Bannière animée boules de Noël"
+  },
+  "descriptions": {
+    "en": "Ornaments playing in your profile's banner, for every visitor to see.",
+    "fr": "Des boules de Noël dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "christmas"
+  },
+  "look": "live-ornaments"
+}

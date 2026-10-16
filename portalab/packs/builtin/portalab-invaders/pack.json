@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-invaders",
+  "version": "1.0.0+963f17a765",
+  "names": {
+    "en": "Invaders interface",
+    "fr": "Interface Envahisseurs"
+  },
+  "descriptions": {
+    "en": "The « Invaders interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Envahisseurs » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

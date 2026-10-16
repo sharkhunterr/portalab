@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_big_screen",
+  "names": {
+    "en": "Big screen badge",
+    "fr": "Badge Grand écran"
+  },
+  "descriptions": {
+    "en": "Given for a title cast to a TV.",
+    "fr": "Offert pour un titre envoyé sur la télé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "cast",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Big screen",
+    "icon": "cast",
+    "style": "shimmer"
+  }
+}

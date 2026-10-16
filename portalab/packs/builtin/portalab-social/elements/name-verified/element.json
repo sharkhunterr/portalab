@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_verified",
+  "names": {
+    "en": "Verified name style",
+    "fr": "Style de nom certifié"
+  },
+  "descriptions": {
+    "en": "Your name in bold with a blue verified tick after it.",
+    "fr": "Votre nom en gras suivi d'une coche bleue de compte certifié."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "verified"
+}

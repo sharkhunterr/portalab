@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_cosmos",
+  "names": {
+    "en": "Cosmos pack",
+    "fr": "Pack Cosmos"
+  },
+  "descriptions": {
+    "en": "Black hole and portal notifications and level badges, the cosmic level-up and the space saga look. — 2440 Coins saved.",
+    "fr": "Notifications et badges de niveau trou noir et portail, passage de niveau cosmique et style saga spatiale. — 2440 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 9760,
+    "rarity": "legendary",
+    "level": 50,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_blackhole",
+      "notif_portal",
+      "level_blackhole",
+      "level_portal",
+      "levelup_cosmic",
+      "notif_saga",
+      "level_galaxy",
+      "notif_galaxy",
+      "frame_starlit",
+      "levelup_supernova"
+    ]
+  }
+}

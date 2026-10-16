@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_verdant",
+  "names": {
+    "en": "Verdant level badge",
+    "fr": "Badge de niveau verdoyant"
+  },
+  "descriptions": {
+    "en": "Your level sprouting leaves of light, drawn by the graphics chip.",
+    "fr": "Votre niveau d'où poussent des feuilles de lumière, dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "spring"
+  },
+  "look": "verdant"
+}

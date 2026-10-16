@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_cartridge",
+  "names": {
+    "en": "Cartridge frame",
+    "fr": "Cadre cartouche"
+  },
+  "descriptions": {
+    "en": "Your avatar on a grey cartridge's label, its corner cut.",
+    "fr": "Votre avatar sur l'étiquette d'une cartouche grise, son coin coupé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "cartridge"
+}

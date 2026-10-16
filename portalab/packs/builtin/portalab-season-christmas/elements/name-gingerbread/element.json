@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_gingerbread",
+  "names": {
+    "en": "Gingerbread name style",
+    "fr": "Style de nom pain d'épices"
+  },
+  "descriptions": {
+    "en": "A name baked like gingerbread, piped with icing.",
+    "fr": "Un nom cuit comme un pain d'épices, souligné de glaçage."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather",
+    "season": "christmas"
+  },
+  "look": "gingerbread"
+}

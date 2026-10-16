@@ -1,0 +1,13 @@
+{
+  "type": "profile_banner",
+  "look": "ocean",
+  "names": {
+    "en": "Ocean",
+    "fr": "Océan"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

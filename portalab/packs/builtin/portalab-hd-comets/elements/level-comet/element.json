@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_comet",
+  "names": {
+    "en": "Comet level badge",
+    "fr": "Badge de niveau comète"
+  },
+  "descriptions": {
+    "en": "Your level inside: a comet going round, its tails streaming behind, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : une comète qui fait le tour, ses queues derrière elle, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "comet"
+}

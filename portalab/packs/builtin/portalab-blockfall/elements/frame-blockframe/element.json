@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_blockframe",
+  "names": {
+    "en": "Frame of blocks frame",
+    "fr": "Cadre cadre de blocs"
+  },
+  "descriptions": {
+    "en": "Your avatar walled in bevelled blocks of every colour.",
+    "fr": "Votre avatar entouré de blocs biseautés de toutes les couleurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "blockframe"
+}

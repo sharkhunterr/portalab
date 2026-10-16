@@ -26,7 +26,6 @@ from typing import Any
 from portalab.capabilities.visuals import LOOK_TYPES, PACK_LOOKS, InterfaceRegistry
 from portalab.modules.visuals.manifest import (
     LOOK_FIELD,
-    NOT_SOLD,
     PAYLOAD_FIELDS,
     RARITIES,
     TYPES,
@@ -136,7 +135,7 @@ def analyse(
     _texts(report, pack.names.model_dump(), None)
     if not pack.license:
         report.add("info", "pack.no_license")
-    if not re.fullmatch(r"v?\d+(\.\d+){1,3}(-[\w.]+)?", pack.version):
+    if not re.fullmatch(r"v?\d+(\.\d+){1,3}(-[\w.]+)?(\+[\w.]+)?", pack.version):
         report.add("warning", "pack.version_format", version=pack.version)
     for name in files.entries:
         suffix = PurePosixPath(name).suffix.lower()
@@ -201,10 +200,18 @@ def _element(
     if allowed is None:
         report.add("blocking", "element.type", key, type=element.type)
         return
-    if kind not in allowed[0]:
+    if kind not in allowed[0] and kind != "renderer":
         report.add("blocking", "render.kind", key, kind=kind, type=element.type, allowed=sorted(allowed[0]))
+    if kind == "renderer" and element.render.renderer == "builtin" and not builtin:
+        report.add("blocking", "render.builtin_reserved", key)  # Portalab's own looks, by their own code
     # a title or a badge may wear a built-in style (its look then optional)
-    if element.type in LOOK_FIELD and element.type not in ("badge", "title") and not element.look:
+    held_in_payload = builtin and LOOK_FIELD.get(element.type) in element.payload  # a look two products sell
+    if (
+        element.type in LOOK_FIELD
+        and element.type not in ("badge", "title")
+        and not element.look
+        and not held_in_payload
+    ):
         report.add("blocking", "element.no_look", key)
     _texts(report, element.names.model_dump(), key)
     # the files it names: inside its folder, present, of a kind it may use
@@ -218,7 +225,7 @@ def _element(
         report.add("blocking", "render.no_file", key, kind=kind)
     if kind == "renderer" and not element.render.renderer:
         report.add("blocking", "render.no_renderer", key)
-    if not element.preview:
+    if not element.preview and not builtin:
         report.add("info", "element.no_preview", key)
     # the look: a built-in one or another pack's is a conflict
     if (
@@ -237,7 +244,7 @@ def _element(
             report.add("warning", "look.replaces", key, look=element.look, pack=owner)
         else:
             report.add("blocking", "look.taken", key, look=element.look, pack=owner)
-    if key in products_taken:
+    if key in products_taken and element.sold:
         report.add("blocking", "product.taken", key, pack=products_taken[key])
     css = [files.get(f"{folder}/{name}") or b"" for name in element.render.css]
     for name, data in zip(element.render.css, css, strict=True):
@@ -250,16 +257,17 @@ def _element(
         _js(report, key, source)
     if kind == "theme" and main is not None:
         _theme(report, key, element, source, own_looks, interfaces, builtin=builtin)
-    if element.type not in NOT_SOLD:
+    if element.sold:
         _economy(report, key, element)
     if element.type == "navigation" and element.render.nav is None:
         report.add("info", "nav.default_layout", key)
-    extra = sorted(set(element.payload) - PAYLOAD_FIELDS.get(element.type, frozenset()))
+    own_field = {LOOK_FIELD[element.type]} if held_in_payload else set()
+    extra = sorted(set(element.payload) - PAYLOAD_FIELDS.get(element.type, frozenset()) - own_field)
     if extra:
         report.add("blocking", "payload.fields", key, fields=extra)
     if element.type == "bundle":
         _bundle(report, key, element, own_products)
-    if element.type == "palette":
+    if element.type == "palette" and kind != "renderer":  # a built-in palette's colours are in its renderer
         _palette(report, key, element)
     report.elements.append(
         {
@@ -270,6 +278,7 @@ def _element(
             "kind": kind,
             "folder_files": element.files(),
             "contracts": element.contracts,
+            "free": element.free,
             "hd": kind == "glsl",
             "script": kind == "js",
             "names": element.names.model_dump(),

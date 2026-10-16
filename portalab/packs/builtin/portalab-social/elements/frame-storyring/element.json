@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_storyring",
+  "names": {
+    "en": "Story ring frame",
+    "fr": "Cadre anneau de story"
+  },
+  "descriptions": {
+    "en": "Your avatar inside a gradient ring broken into stories.",
+    "fr": "Votre avatar dans un anneau dégradé découpé en stories."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "storyring"
+}

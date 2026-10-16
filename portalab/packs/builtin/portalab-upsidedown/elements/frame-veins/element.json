@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_veins",
+  "names": {
+    "en": "Red veins frame",
+    "fr": "Cadre veines rouges"
+  },
+  "descriptions": {
+    "en": "Red veins pulsing around your face.",
+    "fr": "Des veines rouges qui pulsent autour de vous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "veins"
+}

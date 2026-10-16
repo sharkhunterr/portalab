@@ -1,0 +1,41 @@
+{
+  "type": "bundle",
+  "product": "pack_vhs",
+  "names": {
+    "en": "VHS pack",
+    "fr": "Pack VHS"
+  },
+  "descriptions": {
+    "en": "Everything for the video store: VHS and bad-tracking notifications, the VHS ambience, banner, frame and name, the VHS and cassette level badges, the VHS level-up, the rewind celebration, two badges and the poster wall with its travelling camera. — 1190 Coins saved.",
+    "fr": "Tout pour le vidéoclub : notifications VHS et mauvais tracking, ambiance, bannière, cadre et nom VHS, badges de niveau VHS et cassette, passage de niveau VHS, célébration rembobinage, deux badges et le mur d'affiches avec son travelling. — 1190 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4760,
+    "rarity": "epic",
+    "level": 5,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_vhs",
+      "notif_tracking",
+      "ambient_vhs",
+      "banner_vhs",
+      "frame_vhs",
+      "name_vhs",
+      "level_vhs",
+      "level_cassette",
+      "levelup_vhs",
+      "effect_rewind",
+      "badge_rewinder",
+      "badge_be_kind_rewind",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "meteor",
+  "names": {
+    "en": "meteor",
+    "fr": "meteor"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

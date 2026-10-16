@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_eqbars",
+  "names": {
+    "en": "Equalizer level badge",
+    "fr": "Badge de niveau égaliseur"
+  },
+  "descriptions": {
+    "en": "Your level on a green pill with three little bars dancing.",
+    "fr": "Votre niveau sur une pastille verte où dansent trois petites barres."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "eqbars"
+}

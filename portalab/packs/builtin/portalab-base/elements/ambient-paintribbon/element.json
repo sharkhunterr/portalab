@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_paintribbon",
+  "names": {
+    "en": "Paint ribbons ambience",
+    "fr": "Ambiance rubans de peinture"
+  },
+  "descriptions": {
+    "en": "Paint ribbons drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Rubans de peinture derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "paintribbon"
+}

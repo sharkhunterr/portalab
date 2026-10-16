@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_nostromo",
+  "names": {
+    "en": "Phosphor name style",
+    "fr": "Style de nom phosphore"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "nostromo"
+}

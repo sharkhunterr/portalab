@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_whiteout",
+  "names": {
+    "en": "Night blizzard ambience",
+    "fr": "Ambiance blizzard nocturne"
+  },
+  "descriptions": {
+    "en": "Night blizzard drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Blizzard nocturne derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "whiteout"
+}

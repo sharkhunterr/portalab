@@ -1,0 +1,43 @@
+{
+  "type": "bundle",
+  "product": "ultimate_plex",
+  "names": {
+    "en": "Plex theme pack",
+    "fr": "Pack de thème Plex"
+  },
+  "descriptions": {
+    "en": "The whole Plex theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1430 Coins saved.",
+    "fr": "Tout le thème Plex : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1430 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5700,
+    "rarity": "epic",
+    "level": 40,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_plex",
+      "banner_skyline",
+      "frame_chrome",
+      "name_futuristic",
+      "notif_split",
+      "effect_glitch",
+      "badge_golden_cinephile",
+      "title_cinephile",
+      "level_neon",
+      "notif_iris",
+      "levelup_spotlight",
+      "opt_style_continue_ambient",
+      "opt_style_added_deck",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns"
+    ]
+  }
+}

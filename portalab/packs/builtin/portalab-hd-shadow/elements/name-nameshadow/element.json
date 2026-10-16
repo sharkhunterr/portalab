@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_nameshadow",
+  "names": {
+    "en": "Shadowed name style",
+    "fr": "Style de nom ombreux"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "nameshadow"
+}

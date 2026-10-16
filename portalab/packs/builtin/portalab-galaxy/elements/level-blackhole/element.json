@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_blackhole",
+  "names": {
+    "en": "Black hole level badge",
+    "fr": "Badge de niveau trou noir"
+  },
+  "descriptions": {
+    "en": "An accretion disc spinning around your level, the number pulled in now and then.",
+    "fr": "Un disque d'accrétion qui tourne autour de votre niveau, le chiffre aspiré de temps en temps."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "blackhole"
+}

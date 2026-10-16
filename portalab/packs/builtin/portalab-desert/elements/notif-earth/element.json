@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_earth",
+  "names": {
+    "en": "Earth notifications",
+    "fr": "Notifications terre"
+  },
+  "descriptions": {
+    "en": "They rise like a slab of rock and land with a jolt.",
+    "fr": "Elles surgissent comme une dalle de roche et retombent d'un coup."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "earth"
+}

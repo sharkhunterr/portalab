@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_namechrono",
+  "names": {
+    "en": "Out of time name style",
+    "fr": "Style de nom hors du temps"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "namechrono"
+}

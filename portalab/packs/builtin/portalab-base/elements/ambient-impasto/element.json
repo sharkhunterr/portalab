@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_impasto",
+  "names": {
+    "en": "Thick paint ambience",
+    "fr": "Ambiance peinture épaisse"
+  },
+  "descriptions": {
+    "en": "Thick paint drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Peinture épaisse derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "impasto"
+}

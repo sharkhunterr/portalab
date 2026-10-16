@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_asteroidfield",
+  "names": {
+    "en": "Asteroid field banner",
+    "fr": "Bannière champ d'astéroïdes"
+  },
+  "descriptions": {
+    "en": "Rocks floating in the dark.",
+    "fr": "Des rochers qui flottent dans le noir."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "asteroidfield"
+}

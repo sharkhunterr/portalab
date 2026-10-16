@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_orbit",
+  "names": {
+    "en": "Orbit interface",
+    "fr": "Interface Orbite"
+  },
+  "descriptions": {
+    "en": "Navigation in an orbiting bubble, header at the bottom, playful motion.",
+    "fr": "La navigation dans une bulle en orbite, l'en-tête en bas, des animations joueuses."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "orbit"
+}

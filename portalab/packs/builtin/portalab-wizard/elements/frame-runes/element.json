@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_runes",
+  "names": {
+    "en": "Rune frame",
+    "fr": "Cadre de runes"
+  },
+  "descriptions": {
+    "en": "Golden runes turning around you.",
+    "fr": "Des runes dorées qui tournent autour de vous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "runes"
+}

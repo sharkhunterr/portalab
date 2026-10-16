@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-hd-titles",
+  "version": "1.0.0+4756363169",
+  "names": {
+    "en": "HD titles and badges pack",
+    "fr": "Pack Titres et badges HD"
+  },
+  "descriptions": {
+    "en": "An HD collection: looks drawn by the graphics chip.",
+    "fr": "Une collection HD : des looks dessinés par la carte graphique."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

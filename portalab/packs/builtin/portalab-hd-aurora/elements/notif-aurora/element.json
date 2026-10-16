@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_aurora",
+  "names": {
+    "en": "Aurora notifications",
+    "fr": "Notifications aurore"
+  },
+  "descriptions": {
+    "en": "Northern lights behind each notification. Drawn by the graphics chip.",
+    "fr": "Des aurores boréales derrière chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "aurora"
+}

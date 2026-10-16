@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_greatcomet",
+  "names": {
+    "en": "Great comet ambience",
+    "fr": "Ambiance Grande comète"
+  },
+  "descriptions": {
+    "en": "A great comet crossing the sky, its curved golden dust tail and its straight blue ion tail.",
+    "fr": "Une grande comète qui traverse le ciel, sa queue de poussière dorée et courbe, sa queue d'ions bleue et droite."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "greatcomet"
+}

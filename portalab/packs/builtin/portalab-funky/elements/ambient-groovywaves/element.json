@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_groovywaves",
+  "names": {
+    "en": "Groovy waves ambience",
+    "fr": "Ambiance vagues groovy"
+  },
+  "descriptions": {
+    "en": "Wide orange, mustard and brown stripes waving slowly behind the page.",
+    "fr": "De larges rayures orange, moutarde et marron qui ondulent lentement derrière la page."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "groovywaves"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_weather",
+  "names": {
+    "en": "Live weather ambience",
+    "fr": "Ambiance météo en direct"
+  },
+  "descriptions": {
+    "en": "Live weather drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Météo en direct derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "weather"
+}

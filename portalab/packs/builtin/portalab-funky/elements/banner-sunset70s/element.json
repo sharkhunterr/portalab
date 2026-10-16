@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_sunset70s",
+  "names": {
+    "en": "Seventies sunset banner",
+    "fr": "Bannière coucher de soleil 70"
+  },
+  "descriptions": {
+    "en": "A striped seventies sun setting over brown hills.",
+    "fr": "Un soleil rayé des années 70 qui se couche sur des collines brunes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "sunset70s"
+}

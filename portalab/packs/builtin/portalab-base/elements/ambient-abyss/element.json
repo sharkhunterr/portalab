@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_abyss",
+  "names": {
+    "en": "Abyss ambience",
+    "fr": "Ambiance abysses"
+  },
+  "descriptions": {
+    "en": "Abyss drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Abysses derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "abyss"
+}

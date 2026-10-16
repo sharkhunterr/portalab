@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "bottom-bar",
+  "names": {
+    "en": "bottom-bar",
+    "fr": "bottom-bar"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:bottom-bar"
+  },
+  "free": true
+}

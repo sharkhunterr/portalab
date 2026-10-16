@@ -1,0 +1,41 @@
+{
+  "type": "bundle",
+  "product": "pack_elements",
+  "names": {
+    "en": "Four elements pack",
+    "fr": "Pack Quatre éléments"
+  },
+  "descriptions": {
+    "en": "Air, water, earth and fire notifications, the elements level badge, the waterbender and airbender badges, wind and tide. — 2420 Coins saved.",
+    "fr": "Notifications air, eau, terre et feu, le badge de niveau éléments, les badges maître de l'eau et de l'air, vent et marée. — 2420 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 9680,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_air",
+      "notif_water",
+      "notif_earth",
+      "notif_fire",
+      "level_elements",
+      "levelup_elements",
+      "badge_waterbender",
+      "badge_airbender",
+      "ambient_wind",
+      "ambient_tide",
+      "level_blaze",
+      "level_aqua",
+      "levelup_phoenix",
+      "levelup_tidalwave"
+    ]
+  }
+}

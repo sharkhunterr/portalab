@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_moonphase",
+  "names": {
+    "en": "Moon phase level badge",
+    "fr": "Badge de niveau phase de lune"
+  },
+  "descriptions": {
+    "en": "Your level beside a crescent moon.",
+    "fr": "Votre niveau à côté d'un croissant de lune."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 5,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "moonphase"
+}

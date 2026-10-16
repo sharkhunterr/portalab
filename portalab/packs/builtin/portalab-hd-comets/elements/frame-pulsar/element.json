@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_pulsar",
+  "names": {
+    "en": "Pulsar frame",
+    "fr": "Cadre pulsar"
+  },
+  "descriptions": {
+    "en": "A pulsar's beams sweeping round like a lighthouse your avatar, drawn by the graphics chip.",
+    "fr": "Les faisceaux d'un pulsar qui balaient comme un phare de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 13,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "pulsar"
+}

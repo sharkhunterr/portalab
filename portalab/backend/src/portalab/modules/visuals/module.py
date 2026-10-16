@@ -15,6 +15,7 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
 from portalab.modules.visuals import event_types as _event_types  # noqa: F401 — declares event types
+from portalab.modules.visuals.builtin import BuiltinSync, builtin_root
 from portalab.modules.visuals.github import GitHub
 from portalab.modules.visuals.service import VisualPacks
 
@@ -50,6 +51,16 @@ class VisualsModule:
             clock=clock,
         )
         self._refresher: asyncio.Task[None] | None = None
+        self._syncing: asyncio.Task[None] | None = None
+        self.builtin_root = builtin_root()
+
+    async def _sync_builtin(self) -> None:
+        try:
+            report = await BuiltinSync(self.packs, self.builtin_root).run()
+            if report.created or report.updated or report.failed:
+                log.info("built-in visual packs: %s", "; ".join(report.lines()))
+        except Exception:
+            log.warning("built-in visual packs: synchronisation failed", exc_info=True)
 
     async def _audit(self, actor: Principal | None, action: str, context: dict[str, Any]) -> None:
         """Every action on a visual pack in the audit log, sensitive (it runs in members' pages)."""
@@ -79,10 +90,13 @@ class VisualsModule:
         )
 
     async def start(self) -> None:
-        """Brings the proof of concept's registry in once, then keeps this process's view of the registry
-        fresh (the members' interfaces are told through the live stream)."""
+        """Brings the proof of concept's registry in once, synchronises Portalab's own packs (in the
+        background: a start never waits for it), then keeps this process's view of the registry fresh (the
+        members' interfaces are told through the live stream)."""
         with contextlib.suppress(Exception):
             await self.packs.import_poc_state(Principal(channel="system"))
+        if self._syncing is None:
+            self._syncing = asyncio.create_task(self._sync_builtin())
         with contextlib.suppress(Exception):
             await self.packs.refresh(force=True)
         if self._refresher is None:
@@ -97,6 +111,10 @@ class VisualsModule:
                 log.debug("visual packs: refresh failed", exc_info=True)
 
     async def stop(self) -> None:
+        if self._syncing is not None and not self._syncing.done():
+            self._syncing.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._syncing
         if self._refresher is not None:
             self._refresher.cancel()
             with contextlib.suppress(asyncio.CancelledError):

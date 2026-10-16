@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_aurora",
+  "names": {
+    "en": "Northern lights ambience",
+    "fr": "Ambiance aurore boréale"
+  },
+  "descriptions": {
+    "en": "Northern lights drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Aurore boréale derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "aurora"
+}

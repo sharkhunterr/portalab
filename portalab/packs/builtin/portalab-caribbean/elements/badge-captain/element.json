@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_captain",
+  "names": {
+    "en": "Captain badge",
+    "fr": "Badge Capitaine"
+  },
+  "descriptions": {
+    "en": "A « Captain » badge on your profile.",
+    "fr": "Un badge « Captain » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Captain",
+    "icon": "anchor",
+    "style": "shimmer"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_lifeguard",
+  "names": {
+    "en": "Lifeguard badge",
+    "fr": "Badge Maître-nageur"
+  },
+  "descriptions": {
+    "en": "A « Lifeguard » badge on your profile.",
+    "fr": "Un badge « Lifeguard » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Lifeguard",
+    "icon": "umbrella",
+    "style": "float"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "type": "bundle",
+  "product": "pack_season_christmas",
+  "names": {
+    "en": "Christmas pack",
+    "fr": "Pack Noël"
+  },
+  "descriptions": {
+    "en": "Every look of Christmas together: snow, fairy lights and the fireside. — 4550 Coins saved.",
+    "fr": "Tous les looks de Noël réunis : neige, guirlandes et coin du feu. — 4550 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 18200,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "packs",
+    "icon": "snowflake",
+    "season": "christmas"
+  },
+  "payload": {
+    "products": [
+      "badge_snowflake",
+      "title_frostborn",
+      "notif_frostbite",
+      "effect_snow",
+      "effect_flicker",
+      "ambient_snow",
+      "ambient_christmasnight",
+      "ambient_hearth",
+      "ambient_candlelight",
+      "ambient_knit",
+      "banner_live_snow",
+      "banner_snowfall",
+      "frame_holly",
+      "frame_lights",
+      "frame_frostcrown",
+      "name_christmas",
+      "name_cozy",
+      "name_ice",
+      "name_namefrost",
+      "palette_ice",
+      "level_lights",
+      "level_frost",
+      "levelup_gift",
+      "levelup_hearth",
+      "ambient_ornaments",
+      "banner_live_ornaments",
+      "effect_gifts",
+      "palette_evergreen",
+      "name_gingerbread",
+      "banner_wrapping",
+      "title_santas_elf",
+      "badge_christmas_tree",
+      "frame_candycane",
+      "level_bauble",
+      "notif_giftwrap",
+      "name_nametinsel",
+      "level_tinsel",
+      "frame_tinsel"
+    ]
+  }
+}

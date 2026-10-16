@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_owlpost",
+  "names": {
+    "en": "Owl post level-up",
+    "fr": "Passage de niveau hibou postal"
+  },
+  "descriptions": {
+    "en": "An owl swoops in with a letter: your new level, under a sky of gold sparkles.",
+    "fr": "Un hibou arrive en piqué avec une lettre : votre nouveau niveau, sous un ciel d'étincelles dorées."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "owlpost"
+}

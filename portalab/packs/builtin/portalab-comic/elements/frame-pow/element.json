@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_pow",
+  "names": {
+    "en": "POW frame",
+    "fr": "Cadre POW"
+  },
+  "descriptions": {
+    "en": "A comic burst around your face.",
+    "fr": "Une explosion de BD autour de votre visage."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "pow"
+}

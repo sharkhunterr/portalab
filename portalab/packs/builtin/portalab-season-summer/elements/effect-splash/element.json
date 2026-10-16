@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_splash",
+  "names": {
+    "en": "Splash celebration",
+    "fr": "Célébration éclaboussures"
+  },
+  "descriptions": {
+    "en": "Sea water splashing out of the reward.",
+    "fr": "De l'eau de mer qui gicle hors de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "summer"
+  },
+  "look": "splash"
+}

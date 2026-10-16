@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_code_rain",
+  "names": {
+    "en": "Code rain animated banner",
+    "fr": "Bannière animée pluie de code"
+  },
+  "descriptions": {
+    "en": "Code rain playing in your profile's banner, for every visitor to see.",
+    "fr": "Pluie de code dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-code-rain"
+}

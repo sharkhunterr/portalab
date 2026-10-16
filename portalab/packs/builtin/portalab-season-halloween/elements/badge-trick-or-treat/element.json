@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_trick_or_treat",
+  "names": {
+    "en": "Trick or treat badge",
+    "fr": "Badge Bonbon ou sort"
+  },
+  "descriptions": {
+    "en": "A « Trick or treat » badge on your profile.",
+    "fr": "Un badge « Trick or treat » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star",
+    "season": "halloween"
+  },
+  "payload": {
+    "label": "Trick or treat",
+    "icon": "candy",
+    "style": "pulse"
+  }
+}

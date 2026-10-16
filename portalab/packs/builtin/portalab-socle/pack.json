@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-socle",
+  "version": "1.0.0+7e17fe8378",
+  "names": {
+    "en": "Portalab — socle",
+    "fr": "Portalab — socle"
+  },
+  "descriptions": {
+    "en": "Always on: the default interfaces, the looks everyone wears, the built-in navigations.",
+    "fr": "Toujours actif : les interfaces par défaut, les looks portés par tous, les navigations intégrées."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

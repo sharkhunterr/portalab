@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_chathead",
+  "names": {
+    "en": "Chat head notifications",
+    "fr": "Notifications bulle de discussion"
+  },
+  "descriptions": {
+    "en": "Notifications as chat bubbles hanging from a round head.",
+    "fr": "Des notifications en bulles de discussion accrochées à une tête ronde."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "chathead"
+}

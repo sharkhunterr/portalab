@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_unboxer",
+  "names": {
+    "en": "Unboxer badge",
+    "fr": "Badge Pro du déballage"
+  },
+  "descriptions": {
+    "en": "A « Unboxer » badge on your profile.",
+    "fr": "Un badge « Unboxer » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "glass",
+  "payload": {
+    "label": "Unboxer",
+    "icon": "package"
+  }
+}

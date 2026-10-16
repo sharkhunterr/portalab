@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_encore",
+  "names": {
+    "en": "Encore level-up",
+    "fr": "Passage de niveau rappel"
+  },
+  "descriptions": {
+    "en": "The stage lights sweep, a record spins and the equalizer goes wild: your new level, once more.",
+    "fr": "Les projecteurs balaient la scène, un disque tourne et l'égaliseur s'emballe : votre nouveau niveau, une fois de plus."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "encore"
+}

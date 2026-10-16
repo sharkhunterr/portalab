@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_flip",
+  "names": {
+    "en": "Flipping notifications",
+    "fr": "Notifications qui pivotent"
+  },
+  "descriptions": {
+    "en": "Notifications flip into view like a card.",
+    "fr": "Les notifications pivotent comme une carte."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "flip"
+}

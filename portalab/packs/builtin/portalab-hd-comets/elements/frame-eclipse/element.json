@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_eclipse",
+  "names": {
+    "en": "Total eclipse frame",
+    "fr": "Cadre éclipse totale"
+  },
+  "descriptions": {
+    "en": "The corona of a total eclipse, the diamond ring flashing your avatar, drawn by the graphics chip.",
+    "fr": "La couronne d'une éclipse totale, l'anneau de diamant qui étincelle de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "level": 31,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "eclipse"
+}

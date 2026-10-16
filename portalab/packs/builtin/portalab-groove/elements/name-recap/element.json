@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_recap",
+  "names": {
+    "en": "Year recap name style",
+    "fr": "Style de nom bilan de l'année"
+  },
+  "descriptions": {
+    "en": "A name in big bold letters, a gradient of pink, orange and green running through.",
+    "fr": "Un nom en grosses lettres grasses, parcouru d'un dégradé rose, orange et vert."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "recap"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_namespectre",
+  "names": {
+    "en": "Spectre name style",
+    "fr": "Style de nom spectral"
+  },
+  "descriptions": {
+    "en": "An aura around your name. Drawn by the graphics chip.",
+    "fr": "Une aura autour de votre nom. Dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "names",
+    "icon": "feather",
+    "season": "halloween"
+  },
+  "look": "namespectre"
+}

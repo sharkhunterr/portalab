@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_mono",
+  "names": {
+    "en": "Monochrome banner",
+    "fr": "Bannière monochrome"
+  },
+  "descriptions": {
+    "en": "Soft greys, nothing else.",
+    "fr": "Des gris doux, rien d'autre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 120,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "mono"
+}

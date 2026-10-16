@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_stellar",
+  "names": {
+    "en": "Nebula level badge",
+    "fr": "Badge de niveau nébuleuse"
+  },
+  "descriptions": {
+    "en": "Your level inside: glowing gas, pink and teal, folding round, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : du gaz lumineux, rose et turquoise, qui se replie autour, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "epic",
+    "level": 47,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "stellar"
+}

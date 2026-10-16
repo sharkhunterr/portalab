@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_pixelbeach",
+  "names": {
+    "en": "Pixel sunset beach ambience",
+    "fr": "Ambiance plage pixel au couchant"
+  },
+  "descriptions": {
+    "en": "Pixel sunset beach drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Plage pixel au couchant derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "summer"
+  },
+  "look": "pixelbeach"
+}

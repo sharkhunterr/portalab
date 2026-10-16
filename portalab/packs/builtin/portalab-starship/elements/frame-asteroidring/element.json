@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_asteroidring",
+  "names": {
+    "en": "Asteroid ring frame",
+    "fr": "Cadre anneau d'astéroïdes"
+  },
+  "descriptions": {
+    "en": "Rocks going round your avatar.",
+    "fr": "Des rochers qui tournent autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "asteroidring"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "console",
+  "names": {
+    "en": "console",
+    "fr": "console"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:console"
+  },
+  "free": true
+}

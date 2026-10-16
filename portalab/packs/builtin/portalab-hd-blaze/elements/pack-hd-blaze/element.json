@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_blaze",
+  "names": {
+    "en": "Blaze HD pack",
+    "fr": "Pack Brasier HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 2440 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 2440 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 9760,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_blaze",
+      "notif_blaze",
+      "frame_pyre",
+      "title_firebrand",
+      "badge_phoenix_feather",
+      "levelup_phoenix",
+      "banner_live_inferno",
+      "notif_ignite",
+      "name_nameblaze",
+      "effect_rebirth"
+    ]
+  }
+}

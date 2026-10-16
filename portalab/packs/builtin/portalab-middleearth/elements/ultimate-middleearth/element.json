@@ -1,0 +1,60 @@
+{
+  "type": "bundle",
+  "product": "ultimate_middleearth",
+  "names": {
+    "en": "Middle-earth theme pack",
+    "fr": "Pack de thème Terre du Milieu"
+  },
+  "descriptions": {
+    "en": "The whole Middle-earth theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 3780 Coins saved.",
+    "fr": "Tout le thème Terre du Milieu : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 3780 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 15140,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_middleearth",
+      "banner_shire",
+      "frame_onering",
+      "name_elvish",
+      "notif_elven",
+      "effect_fireworks",
+      "ambient_meadow",
+      "badge_grey_wizard",
+      "title_shall_not_pass",
+      "level_onering",
+      "level_eye",
+      "level_mithril",
+      "notif_onering",
+      "notif_balrog",
+      "notif_eye",
+      "levelup_onering",
+      "banner_mordor",
+      "banner_pixelshire",
+      "frame_elven",
+      "name_mordor",
+      "banner_live_meadow",
+      "banner_live_ash",
+      "ambient_ash",
+      "palette_gondor",
+      "badge_hobbit",
+      "badge_pixel_quest",
+      "title_second_breakfast",
+      "opt_style_daily_liquid",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "widget_clock",
+      "opt_style_clock_analog"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_dandelion",
+  "names": {
+    "en": "Dandelion seeds ambience",
+    "fr": "Ambiance aigrettes de pissenlit"
+  },
+  "descriptions": {
+    "en": "Dandelion seeds floating up on the breeze.",
+    "fr": "Des aigrettes de pissenlit qui s'envolent au gré de la brise."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "dandelion"
+}

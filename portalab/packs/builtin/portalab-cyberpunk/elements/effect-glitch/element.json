@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_glitch",
+  "names": {
+    "en": "Glitch celebration",
+    "fr": "Célébration glitch"
+  },
+  "descriptions": {
+    "en": "Glitch burst out when you earn a reward or level up.",
+    "fr": "Glitch jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "glitch"
+}

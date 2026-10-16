@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_lovestruck",
+  "names": {
+    "en": "Lovestruck name style",
+    "fr": "Style de nom amoureux"
+  },
+  "descriptions": {
+    "en": "A pink name beating like a heart.",
+    "fr": "Un nom rose qui bat comme un cœur."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather",
+    "season": "valentine"
+  },
+  "look": "lovestruck"
+}

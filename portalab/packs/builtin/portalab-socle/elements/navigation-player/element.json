@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "player",
+  "names": {
+    "en": "player",
+    "fr": "player"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:player"
+  },
+  "free": true
+}

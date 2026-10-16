@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_chrono",
+  "names": {
+    "en": "Time rift level badge",
+    "fr": "Badge de niveau faille temporelle"
+  },
+  "descriptions": {
+    "en": "A triangular time portal tearing open behind your level, the vortex of time seen through it.",
+    "fr": "Un portail temporel triangulaire qui s'ouvre derrière votre niveau, le vortex du temps vu au travers."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "chrono"
+}

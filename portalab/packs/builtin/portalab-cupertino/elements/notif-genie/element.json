@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_genie",
+  "names": {
+    "en": "Genie notification animation",
+    "fr": "Animation de notification génie"
+  },
+  "descriptions": {
+    "en": "Notifications pouring out of the corner like a genie from its lamp.",
+    "fr": "Des notifications qui sortent du coin comme un génie de sa lampe."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "genie"
+}

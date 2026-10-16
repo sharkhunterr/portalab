@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_animations",
+  "names": {
+    "en": "HD notification animations pack",
+    "fr": "Pack Animations de notification HD"
+  },
+  "descriptions": {
+    "en": "Every notification animation drawn by the graphics chip: each bursts as they arrive and leave. — 2180 Coins saved.",
+    "fr": "Toutes les animations de notification dessinées par la puce graphique : chacune éclate à leur arrivée et à leur départ. — 2180 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8720,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_ignite",
+      "notif_surge",
+      "notif_splash",
+      "notif_frostbite",
+      "notif_stardust",
+      "notif_hex",
+      "notif_decrypt",
+      "notif_petalfall",
+      "notif_eclipse",
+      "notif_warp"
+    ]
+  }
+}

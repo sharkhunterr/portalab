@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "ultimate_starship",
+  "names": {
+    "en": "Starship theme pack",
+    "fr": "Pack de thème Vaisseau spatial"
+  },
+  "descriptions": {
+    "en": "The whole Starship theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 2200 Coins saved.",
+    "fr": "Tout le thème Vaisseau spatial : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 2200 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8800,
+    "rarity": "legendary",
+    "level": 40,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_starship",
+      "banner_launchpad",
+      "frame_asteroidring",
+      "name_lunarsilver",
+      "notif_missioncontrol",
+      "effect_comets",
+      "ambient_asteroids",
+      "badge_starship_captain",
+      "title_starship_captain",
+      "banner_live_asteroids",
+      "level_rocketbadge",
+      "badge_navigator",
+      "badge_ship_engineer",
+      "title_mission_specialist",
+      "title_ground_control",
+      "levelup_hyperjump",
+      "notif_liftoff"
+    ]
+  }
+}

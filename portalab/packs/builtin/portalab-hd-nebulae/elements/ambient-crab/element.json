@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_crab",
+  "names": {
+    "en": "Crab Nebula ambience",
+    "fr": "Ambiance Nébuleuse du Crabe"
+  },
+  "descriptions": {
+    "en": "What a star left when it blew up: a web of orange and red filaments round a ghostly cyan glow, its pulsar flickering in the middle.",
+    "fr": "Ce qu'a laissé une étoile en explosant : une toile de filaments orange et rouges autour d'une lueur cyan, son pulsar qui scintille au milieu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "level": 12,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "crab"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-base",
+  "version": "1.0.0+858d66abf4",
+  "names": {
+    "en": "Base collection",
+    "fr": "Collection de base"
+  },
+  "descriptions": {
+    "en": "Portalab's looks that belong to no universe, season or HD collection.",
+    "fr": "Les looks de Portalab qui n'appartiennent à aucun univers, saison ou collection HD."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

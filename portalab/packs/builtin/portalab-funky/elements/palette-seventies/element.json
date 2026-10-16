@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_seventies",
+  "names": {
+    "en": "Seventies palette",
+    "fr": "Palette années 70"
+  },
+  "descriptions": {
+    "en": "Orange and mustard over the theme.",
+    "fr": "De l'orange et de la moutarde sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "seventies"
+}

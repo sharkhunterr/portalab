@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_eye",
+  "names": {
+    "en": "The Eye level badge",
+    "fr": "Badge de niveau l'œil"
+  },
+  "descriptions": {
+    "en": "A fiery slit eye that blinks now and then.",
+    "fr": "Un œil de feu qui cligne de temps en temps."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "eye"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_lcdstars",
+  "names": {
+    "en": "8-bit stars ambience",
+    "fr": "Ambiance étoiles 8 bits"
+  },
+  "descriptions": {
+    "en": "Little pixel stars twinkling in four shades of green.",
+    "fr": "De petites étoiles en pixels qui scintillent en quatre nuances de vert."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "lcdstars"
+}

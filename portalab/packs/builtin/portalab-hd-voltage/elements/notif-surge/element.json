@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_surge",
+  "names": {
+    "en": "Power surge notifications",
+    "fr": "Notifications surtension"
+  },
+  "descriptions": {
+    "en": "Electricity crackles round them as they arrive and leave. Drawn by the graphics chip.",
+    "fr": "L'électricité crépite autour d'elles à l'arrivée et au départ. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "surge"
+}

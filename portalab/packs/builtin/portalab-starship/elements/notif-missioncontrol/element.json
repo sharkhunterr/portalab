@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_missioncontrol",
+  "names": {
+    "en": "Mission control notifications",
+    "fr": "Notifications contrôle de mission"
+  },
+  "descriptions": {
+    "en": "Notifications on mission control's amber screens.",
+    "fr": "Des notifications sur les écrans ambrés du contrôle de mission."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "missioncontrol"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_mecha",
+  "names": {
+    "en": "Mecha interface",
+    "fr": "Interface Méca"
+  },
+  "descriptions": {
+    "en": "Robots in disguise: steel plates with cut corners, a console docked at the bottom, gears turning and panels that unfold. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Des robots déguisés : des plaques d'acier aux coins coupés, une console à quai en bas, des engrenages qui tournent et des panneaux qui se déplient. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "mecha"
+}

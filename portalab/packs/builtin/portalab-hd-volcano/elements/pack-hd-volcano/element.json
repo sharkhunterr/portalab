@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_volcano",
+  "names": {
+    "en": "Volcano HD pack",
+    "fr": "Pack Volcan HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner. — 1260 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée. — 1260 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5040,
+    "rarity": "epic",
+    "level": 13,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_magma",
+      "notif_magma",
+      "frame_obsidian",
+      "title_volcano_heart",
+      "badge_lava_stone",
+      "banner_live_volcano"
+    ]
+  }
+}

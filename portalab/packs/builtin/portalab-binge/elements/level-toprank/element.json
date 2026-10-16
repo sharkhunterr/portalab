@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_toprank",
+  "names": {
+    "en": "Top 10 level badge",
+    "fr": "Badge de niveau top 10"
+  },
+  "descriptions": {
+    "en": "Your level as a huge outlined number, like a top-ten row.",
+    "fr": "Votre niveau en énorme chiffre détouré, comme dans un classement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "toprank"
+}

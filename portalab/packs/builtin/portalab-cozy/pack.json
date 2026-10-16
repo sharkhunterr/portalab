@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-cozy",
+  "version": "1.0.0+10f0856bd0",
+  "names": {
+    "en": "Cozy interface",
+    "fr": "Interface Cosy"
+  },
+  "descriptions": {
+    "en": "The « Cozy interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Cosy » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

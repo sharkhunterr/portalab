@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "pack_living_badges",
+  "names": {
+    "en": "Living level badges pack",
+    "fr": "Pack Badges vivants"
+  },
+  "descriptions": {
+    "en": "Every level badge drawn by the graphics chip: flames, voltage, water, magma, ice, galaxy, gold, acid, holo foil, runes, digital rain, sakura, shadow, candy, aurora and plasma. — 4220 Coins saved.",
+    "fr": "Tous les badges de niveau dessinés par la puce graphique : flammes, haute tension, eau, magma, glace, galaxie, or, acide, holographique, runes, pluie numérique, sakura, ombre, bonbon, aurore et plasma. — 4220 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 16880,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_blaze",
+      "level_voltage",
+      "level_aqua",
+      "level_magma",
+      "level_glacier",
+      "level_galaxy",
+      "level_aurum",
+      "level_toxic",
+      "level_holo",
+      "level_runes",
+      "level_matrix",
+      "level_sakura",
+      "level_shadow",
+      "level_candy",
+      "level_aurora",
+      "level_plasma",
+      "level_chrono"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_staratlas",
+  "names": {
+    "en": "Star atlas name style",
+    "fr": "Style de nom atlas céleste"
+  },
+  "descriptions": {
+    "en": "A name engraved in gold like the title of an old star atlas.",
+    "fr": "Un nom gravé à l'or comme le titre d'un vieil atlas céleste."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "staratlas"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_batteryled",
+  "names": {
+    "en": "Battery light level badge",
+    "fr": "Badge de niveau voyant de pile"
+  },
+  "descriptions": {
+    "en": "Your level beside a little red light glowing like the battery's.",
+    "fr": "Votre niveau à côté d'un petit voyant rouge qui brille comme celui de la pile."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "batteryled"
+}

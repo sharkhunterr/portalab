@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_loyal",
+  "names": {
+    "en": "Loyal golden frame",
+    "fr": "Cadre doré de la fidélité"
+  },
+  "descriptions": {
+    "en": "Given for a hundred visits.",
+    "fr": "Offert pour cent visites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "user",
+    "reward_only": true
+  },
+  "payload": {
+    "frame": "gold"
+  }
+}

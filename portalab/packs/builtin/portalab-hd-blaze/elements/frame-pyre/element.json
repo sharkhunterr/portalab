@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_pyre",
+  "names": {
+    "en": "Pyre frame",
+    "fr": "Cadre bûcher"
+  },
+  "descriptions": {
+    "en": "A hexagon of living flames around your avatar.",
+    "fr": "Un hexagone de flammes vives autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "pyre"
+}

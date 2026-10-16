@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_milkyway",
+  "names": {
+    "en": "Milky Way ambience",
+    "fr": "Ambiance Voie lactée"
+  },
+  "descriptions": {
+    "en": "A band of countless stars across the sky, its glowing core and dark lanes of dust, over the mountains.",
+    "fr": "Une bande d'innombrables étoiles à travers le ciel, son cœur lumineux et ses traînées de poussière, au-dessus des montagnes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 8,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "milkyway"
+}

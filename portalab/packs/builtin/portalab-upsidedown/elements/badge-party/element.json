@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_party",
+  "names": {
+    "en": "Party member badge",
+    "fr": "Badge Membre de la bande"
+  },
+  "descriptions": {
+    "en": "Never splits the party.",
+    "fr": "Ne sépare jamais la bande."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "dices"
+  },
+  "payload": {
+    "label": "Party member",
+    "icon": "dices",
+    "style": "pulse"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_dandelion",
+  "names": {
+    "en": "Dandelion seeds animated banner",
+    "fr": "Bannière animée aigrettes de pissenlit"
+  },
+  "descriptions": {
+    "en": "Dandelion seeds playing in your profile's banner, for every visitor to see.",
+    "fr": "Des aigrettes de pissenlit dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-dandelion"
+}

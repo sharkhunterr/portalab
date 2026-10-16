@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_upsidedown",
+  "names": {
+    "en": "Upside Down interface",
+    "fr": "Interface Monde à l'envers"
+  },
+  "descriptions": {
+    "en": "The other side: red veins, spores drifting up, a string of lights to find your way and notifications that flip up from below. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "L'autre côté : veines rouges, spores qui remontent, une guirlande pour s'orienter et des notifications qui se retournent depuis le bas. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "upsidedown"
+}

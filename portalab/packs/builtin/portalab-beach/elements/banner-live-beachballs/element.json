@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_beachballs",
+  "names": {
+    "en": "Beach balls animated banner",
+    "fr": "Bannière animée ballons de plage"
+  },
+  "descriptions": {
+    "en": "Beach balls playing in your profile's banner, for every visitor to see.",
+    "fr": "Des ballons de plage dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-beachballs"
+}

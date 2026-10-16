@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_melt",
+  "names": {
+    "en": "Melting notifications",
+    "fr": "Notifications fondantes"
+  },
+  "descriptions": {
+    "en": "They drip into shape — and melt away when they go.",
+    "fr": "Elles prennent forme en coulant — et fondent en partant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "melt"
+}

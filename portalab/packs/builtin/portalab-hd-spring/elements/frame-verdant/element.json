@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_verdant",
+  "names": {
+    "en": "Verdant frame",
+    "fr": "Cadre verdoyant"
+  },
+  "descriptions": {
+    "en": "Leaves of light growing around your avatar, drawn by the graphics chip.",
+    "fr": "Des feuilles de lumière qui poussent autour de votre avatar, dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user",
+    "season": "spring"
+  },
+  "look": "verdant"
+}

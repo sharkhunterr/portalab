@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_lunarhalo",
+  "names": {
+    "en": "Moon frame",
+    "fr": "Cadre lune"
+  },
+  "descriptions": {
+    "en": "The moon's seas and craters, its phases sweeping across round your avatar, drawn by the graphics chip.",
+    "fr": "Les mers et les cratères de la lune, ses phases qui défilent autour de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 14,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "lunarhalo"
+}

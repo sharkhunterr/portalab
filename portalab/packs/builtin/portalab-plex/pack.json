@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-plex",
+  "version": "1.0.0+5dd5d2d508",
+  "names": {
+    "en": "Plex interface",
+    "fr": "Interface Plex"
+  },
+  "descriptions": {
+    "en": "The « Plex interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Plex » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

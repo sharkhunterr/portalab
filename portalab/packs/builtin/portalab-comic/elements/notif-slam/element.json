@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_slam",
+  "names": {
+    "en": "Slamming notifications",
+    "fr": "Notifications impact"
+  },
+  "descriptions": {
+    "en": "They slam onto the screen.",
+    "fr": "Elles s'abattent sur l'écran."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "slam"
+}

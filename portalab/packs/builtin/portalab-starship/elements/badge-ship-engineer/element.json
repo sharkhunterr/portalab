@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_ship_engineer",
+  "names": {
+    "en": "Ship engineer badge",
+    "fr": "Badge Ingénieur de bord"
+  },
+  "descriptions": {
+    "en": "A « Ship engineer » badge on your profile.",
+    "fr": "Un badge « Ship engineer » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Ship engineer",
+    "icon": "wrench",
+    "style": "pulse"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-heroes",
+  "version": "1.0.0+77f0b35ec8",
+  "names": {
+    "en": "Heroes interface",
+    "fr": "Interface Super-héros"
+  },
+  "descriptions": {
+    "en": "The « Heroes interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Super-héros » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

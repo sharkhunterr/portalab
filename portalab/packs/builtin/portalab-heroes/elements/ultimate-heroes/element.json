@@ -1,0 +1,43 @@
+{
+  "type": "bundle",
+  "product": "ultimate_heroes",
+  "names": {
+    "en": "Heroes theme pack",
+    "fr": "Pack de thème Super-héros"
+  },
+  "descriptions": {
+    "en": "The whole Heroes theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1630 Coins saved.",
+    "fr": "Tout le thème Super-héros : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1630 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6520,
+    "rarity": "epic",
+    "level": 47,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_heroes",
+      "banner_skyline",
+      "frame_hero",
+      "name_hero",
+      "notif_slam",
+      "effect_lightning",
+      "badge_vigilante",
+      "title_neighbourhood_hero",
+      "level_kapow",
+      "notif_kapow",
+      "levelup_comic",
+      "levelup_hero",
+      "opt_style_progress_odometer",
+      "opt_style_services_pulse",
+      "opt_style_added_deck"
+    ]
+  }
+}

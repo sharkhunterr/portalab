@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_invaders",
+  "names": {
+    "en": "Invaders interface",
+    "fr": "Interface Envahisseurs"
+  },
+  "descriptions": {
+    "en": "The arcade shooter: phosphor green on black, a fleet marching overhead, the sections as your cannon's bunkers and notifications that march in. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Le jeu de tir d'arcade : vert phosphore sur noir, une flotte qui avance au-dessus, les rubriques en bunkers de votre canon et des notifications qui arrivent en marchant. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "invaders"
+}

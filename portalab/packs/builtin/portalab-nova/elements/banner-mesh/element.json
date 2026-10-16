@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_mesh",
+  "names": {
+    "en": "Colour mesh banner",
+    "fr": "Bannière dégradé fluide"
+  },
+  "descriptions": {
+    "en": "Soft colours drifting like a phone's wallpaper.",
+    "fr": "Des couleurs douces qui dérivent comme un fond d'écran de téléphone."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "mesh"
+}

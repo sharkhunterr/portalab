@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_season_finisher",
+  "names": {
+    "en": "Season finisher badge",
+    "fr": "Badge Saison bouclée"
+  },
+  "descriptions": {
+    "en": "A « Season finisher » badge on your profile.",
+    "fr": "Un badge « Season finisher » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Season finisher",
+    "icon": "clapperboard",
+    "style": "flame"
+  }
+}

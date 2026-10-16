@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_march",
+  "names": {
+    "en": "Invaders' march notification animation",
+    "fr": "Animation de notification marche des envahisseurs"
+  },
+  "descriptions": {
+    "en": "Notifications stepping in side to side, like the fleet.",
+    "fr": "Des notifications qui arrivent pas à pas de côté, comme la flotte."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "march"
+}

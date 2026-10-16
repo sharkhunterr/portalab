@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-observatory",
+  "version": "1.0.0+281534bbbd",
+  "names": {
+    "en": "Observatory interface",
+    "fr": "Interface Observatoire"
+  },
+  "descriptions": {
+    "en": "The « Observatory interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Observatoire » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

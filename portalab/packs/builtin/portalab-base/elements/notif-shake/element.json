@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_shake",
+  "names": {
+    "en": "Shaking notifications",
+    "fr": "Notifications secousse"
+  },
+  "descriptions": {
+    "en": "They arrive with a shake — hard to miss.",
+    "fr": "Elles arrivent en tremblant — impossible de les manquer."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "shake"
+}

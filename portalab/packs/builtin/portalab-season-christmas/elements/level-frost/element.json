@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_frost",
+  "names": {
+    "en": "Frost level badge",
+    "fr": "Badge de niveau givre"
+  },
+  "descriptions": {
+    "en": "Cold blue ice.",
+    "fr": "Une glace d'un bleu froid."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star",
+    "season": "christmas"
+  },
+  "look": "frost"
+}

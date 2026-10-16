@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_head_prefect",
+  "names": {
+    "en": "Title: Head prefect",
+    "fr": "Titre : Préfet en chef"
+  },
+  "descriptions": {
+    "en": "« Head prefect » under your name.",
+    "fr": "« Head prefect » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "shimmer",
+  "payload": {
+    "label": "Head prefect"
+  }
+}

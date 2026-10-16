@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_filmwipe",
+  "names": {
+    "en": "Film wipe notifications",
+    "fr": "Notifications volet de film"
+  },
+  "descriptions": {
+    "en": "A hard-edged wipe from right to left, like a scene change.",
+    "fr": "Un volet net de droite à gauche, comme un changement de plan."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "filmwipe"
+}

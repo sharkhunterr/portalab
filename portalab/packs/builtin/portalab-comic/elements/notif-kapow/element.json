@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_kapow",
+  "names": {
+    "en": "KAPOW! notifications",
+    "fr": "Notifications KAPOW !"
+  },
+  "descriptions": {
+    "en": "A comic punch: they land with a « KAPOW! » burst — and a « POOF » when they go.",
+    "fr": "Un coup de poing de BD : elles arrivent dans un « KAPOW ! » — et repartent dans un « POUF »."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "kapow"
+}

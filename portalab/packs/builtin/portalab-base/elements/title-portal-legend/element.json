@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_portal_legend",
+  "names": {
+    "en": "Title: Legend of the portal",
+    "fr": "Titre : Légende du portail"
+  },
+  "descriptions": {
+    "en": "Given at level 50, the highest.",
+    "fr": "Offert au niveau 50, le plus haut."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "crown",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Legend of the portal",
+    "style": "rainbow"
+  }
+}

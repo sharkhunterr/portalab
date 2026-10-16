@@ -1,0 +1,47 @@
+{
+  "type": "bundle",
+  "product": "ultimate_nova",
+  "names": {
+    "en": "Nova theme pack",
+    "fr": "Pack de thème Nova"
+  },
+  "descriptions": {
+    "en": "The whole Nova theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 2040 Coins saved.",
+    "fr": "Tout le thème Nova : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 2040 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8160,
+    "rarity": "legendary",
+    "level": 5,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_nova",
+      "banner_mesh",
+      "frame_rings",
+      "name_nova",
+      "notif_island",
+      "effect_bloom",
+      "ambient_bokeh",
+      "badge_early_adopter",
+      "title_one_more_thing",
+      "level_squircle",
+      "notif_morph",
+      "levelup_nova",
+      "banner_live_bokeh",
+      "palette_nova",
+      "badge_power_user",
+      "title_beta_tester",
+      "opt_style_progress_odometer",
+      "opt_style_continue_ambient",
+      "opt_style_news_ticker"
+    ]
+  }
+}

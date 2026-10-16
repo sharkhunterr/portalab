@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_ocean",
+  "names": {
+    "en": "Ocean HD pack",
+    "fr": "Pack Océan HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 1700 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 1700 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6800,
+    "rarity": "epic",
+    "level": 16,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_aqua",
+      "notif_aqua",
+      "frame_abyssal",
+      "title_deep_diver",
+      "badge_trident",
+      "levelup_tidalwave",
+      "banner_live_reef",
+      "notif_splash"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_fullbloom",
+  "names": {
+    "en": "Full bloom level-up",
+    "fr": "Passage de niveau pleine floraison"
+  },
+  "descriptions": {
+    "en": "A tree bursts into blossom, its petals swirling around your new level.",
+    "fr": "Un arbre se couvre de fleurs, ses pétales tourbillonnent autour de votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "fullbloom"
+}

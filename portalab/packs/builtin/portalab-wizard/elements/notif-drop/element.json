@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_drop",
+  "names": {
+    "en": "Dropping notifications",
+    "fr": "Notifications qui tombent"
+  },
+  "descriptions": {
+    "en": "They fall from above with a bounce.",
+    "fr": "Elles tombent d'en haut avec un rebond."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "drop"
+}

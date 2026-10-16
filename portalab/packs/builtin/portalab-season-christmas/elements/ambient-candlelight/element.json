@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_candlelight",
+  "names": {
+    "en": "Candlelight ambience",
+    "fr": "Ambiance lueur de bougies"
+  },
+  "descriptions": {
+    "en": "Candlelight drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Lueur de bougies derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "christmas"
+  },
+  "look": "candlelight"
+}

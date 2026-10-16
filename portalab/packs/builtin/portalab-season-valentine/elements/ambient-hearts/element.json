@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_hearts",
+  "names": {
+    "en": "Floating hearts ambience",
+    "fr": "Ambiance cœurs flottants"
+  },
+  "descriptions": {
+    "en": "Floating hearts drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Cœurs flottants derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "valentine"
+  },
+  "look": "hearts"
+}

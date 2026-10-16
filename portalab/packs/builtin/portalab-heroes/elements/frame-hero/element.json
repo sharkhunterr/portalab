@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_hero",
+  "names": {
+    "en": "Hero frame",
+    "fr": "Cadre héros"
+  },
+  "descriptions": {
+    "en": "Red, white and blue.",
+    "fr": "Rouge, blanc et bleu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "hero"
+}

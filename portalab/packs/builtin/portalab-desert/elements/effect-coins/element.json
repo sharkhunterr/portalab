@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_coins",
+  "names": {
+    "en": "Coin shower celebration",
+    "fr": "Célébration pluie de pièces"
+  },
+  "descriptions": {
+    "en": "Coin shower burst out when you earn a reward or level up.",
+    "fr": "Pluie de pièces jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "coins"
+}

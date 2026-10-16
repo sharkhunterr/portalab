@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_eggs",
+  "names": {
+    "en": "Easter eggs celebration",
+    "fr": "Célébration œufs de pâques"
+  },
+  "descriptions": {
+    "en": "Painted eggs bouncing out of the reward.",
+    "fr": "Des œufs peints qui rebondissent hors de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "spring"
+  },
+  "look": "eggs"
+}

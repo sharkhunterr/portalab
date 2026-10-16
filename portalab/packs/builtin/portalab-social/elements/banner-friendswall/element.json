@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_friendswall",
+  "names": {
+    "en": "Wall of friends banner",
+    "fr": "Bannière mur d'amis"
+  },
+  "descriptions": {
+    "en": "Snapshots pinned edge to edge, like a cover photo of friends.",
+    "fr": "Des photos épinglées bord à bord, comme une photo de couverture entre amis."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "friendswall"
+}

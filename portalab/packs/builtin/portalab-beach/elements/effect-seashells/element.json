@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_seashells",
+  "names": {
+    "en": "Seashells celebration",
+    "fr": "Célébration coquillages"
+  },
+  "descriptions": {
+    "en": "Seashells and starfish scattering out of the reward.",
+    "fr": "Des coquillages et des étoiles de mer qui s'éparpillent de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "seashells"
+}

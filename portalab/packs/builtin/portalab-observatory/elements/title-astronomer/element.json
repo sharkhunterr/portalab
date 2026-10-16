@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_astronomer",
+  "names": {
+    "en": "Title: Astronomer",
+    "fr": "Titre : Astronome"
+  },
+  "descriptions": {
+    "en": "« Astronomer » under your name, drawn by the graphics chip.",
+    "fr": "« Astronomer » sous votre nom, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 5,
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Astronomer",
+    "style": "starmap"
+  }
+}

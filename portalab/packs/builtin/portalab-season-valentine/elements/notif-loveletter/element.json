@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_loveletter",
+  "names": {
+    "en": "Love letter notifications",
+    "fr": "Notifications lettre d'amour"
+  },
+  "descriptions": {
+    "en": "Notifications that arrive as sealed love letters.",
+    "fr": "Des notifications qui arrivent en lettres d'amour scellées."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell",
+    "season": "valentine"
+  },
+  "look": "loveletter"
+}

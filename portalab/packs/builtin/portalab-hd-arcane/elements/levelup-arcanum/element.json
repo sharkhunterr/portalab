@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_arcanum",
+  "names": {
+    "en": "Arcane circle level-up",
+    "fr": "Passage de niveau cercle arcanique"
+  },
+  "descriptions": {
+    "en": "A magic circle draws itself and flares.",
+    "fr": "Un cercle magique se trace et s'embrase."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "arcanum"
+}

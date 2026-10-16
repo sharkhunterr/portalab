@@ -1,0 +1,24 @@
+{
+  "type": "notification_animation",
+  "product": "notif_petalfall",
+  "names": {
+    "en": "Petal fall notifications",
+    "fr": "Notifications chute de pétales"
+  },
+  "descriptions": {
+    "en": "A gust of petals brings them and takes them away. Drawn by the graphics chip.",
+    "fr": "Une bourrasque de pétales les apporte et les emporte. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "sparkles",
+    "season": "spring"
+  },
+  "look": "petalfall"
+}

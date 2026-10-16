@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_survivor",
+  "names": {
+    "en": "Survivor badge",
+    "fr": "Badge Survivant"
+  },
+  "descriptions": {
+    "en": "You made it through the night.",
+    "fr": "Vous avez survécu à la nuit."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "skull"
+  },
+  "payload": {
+    "label": "Survivor",
+    "icon": "skull",
+    "style": "pulse"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_ghosts",
+  "names": {
+    "en": "Ghosts ambience",
+    "fr": "Ambiance fantômes"
+  },
+  "descriptions": {
+    "en": "Little ghosts drifting through the page, their eyes darting.",
+    "fr": "De petits fantômes qui flottent à travers la page, les yeux qui roulent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "ghosts"
+}

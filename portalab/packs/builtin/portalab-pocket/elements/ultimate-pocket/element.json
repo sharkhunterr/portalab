@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_pocket",
+  "names": {
+    "en": "Pocket console theme pack",
+    "fr": "Pack de thème Console de poche"
+  },
+  "descriptions": {
+    "en": "The whole Pocket console theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1340 Coins saved.",
+    "fr": "Tout le thème Console de poche : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1340 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5360,
+    "rarity": "epic",
+    "level": 36,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_pocket",
+      "banner_lcdscreen",
+      "frame_cartridge",
+      "name_lcdtext",
+      "notif_rpgbox",
+      "effect_pixelhearts",
+      "ambient_lcdstars",
+      "badge_link_cable",
+      "title_insert_cartridge",
+      "banner_live_lcdstars",
+      "palette_dotmatrix",
+      "level_batteryled",
+      "notif_pixelreveal",
+      "levelup_statsup"
+    ]
+  }
+}

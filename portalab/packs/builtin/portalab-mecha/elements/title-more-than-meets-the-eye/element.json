@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_more_than_meets_the_eye",
+  "names": {
+    "en": "Title: More than meets the eye",
+    "fr": "Titre : Plus qu'il n'y paraît"
+  },
+  "descriptions": {
+    "en": "« More than meets the eye » under your name.",
+    "fr": "« More than meets the eye » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "More than meets the eye",
+    "style": "glitch"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_xenobiologist",
+  "names": {
+    "en": "Xenobiologist badge",
+    "fr": "Badge Xénobiologiste"
+  },
+  "descriptions": {
+    "en": "Studies what came from the stars.",
+    "fr": "Étudie ce qui vient des étoiles."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "dna"
+  },
+  "look": "pulse",
+  "payload": {
+    "label": "Xenobiologist",
+    "icon": "dna"
+  }
+}

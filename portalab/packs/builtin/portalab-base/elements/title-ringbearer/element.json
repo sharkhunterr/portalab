@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_ringbearer",
+  "names": {
+    "en": "Title: Ringbearer",
+    "fr": "Titre : Porteur de l'Anneau"
+  },
+  "descriptions": {
+    "en": "One title to rule them all.",
+    "fr": "Un titre pour les gouverner tous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "ring",
+  "payload": {
+    "label": "Ringbearer"
+  }
+}

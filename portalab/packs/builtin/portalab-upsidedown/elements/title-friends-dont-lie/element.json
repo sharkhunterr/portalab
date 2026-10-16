@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_friends_dont_lie",
+  "names": {
+    "en": "Title: Friends don't lie",
+    "fr": "Titre : Les amis ne mentent pas"
+  },
+  "descriptions": {
+    "en": "A promise kept.",
+    "fr": "Une promesse tenue."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "veins",
+  "payload": {
+    "label": "Friends don't lie"
+  }
+}

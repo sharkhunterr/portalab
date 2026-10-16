@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_sandcastle",
+  "names": {
+    "en": "Sandcastle level-up",
+    "fr": "Passage de niveau château de sable"
+  },
+  "descriptions": {
+    "en": "A sandcastle rises tower by tower, a flag with your new level on top.",
+    "fr": "Un château de sable s'élève tour par tour, un drapeau à votre nouveau niveau au sommet."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "sandcastle"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_nextepisode",
+  "names": {
+    "en": "Next episode notifications",
+    "fr": "Notifications épisode suivant"
+  },
+  "descriptions": {
+    "en": "Notifications like « next episode »: black, a red countdown filling.",
+    "fr": "Des notifications comme « épisode suivant » : noires, un compte à rebours rouge qui se remplit."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "nextepisode"
+}

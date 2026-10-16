@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_tracker",
+  "names": {
+    "en": "Motion tracker level badge",
+    "fr": "Badge de niveau détecteur de mouvement"
+  },
+  "descriptions": {
+    "en": "A phosphor disc, the tracker's sweep going round your level.",
+    "fr": "Un disque phosphore, le balayage du détecteur autour de votre niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "tracker"
+}

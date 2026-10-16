@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_five_hundred",
+  "names": {
+    "en": "Title: Five hundred screenings",
+    "fr": "Titre : Cinq cents séances"
+  },
+  "descriptions": {
+    "en": "Given for 500 films and episodes.",
+    "fr": "Offert pour 500 films et épisodes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "clapperboard",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Five hundred screenings",
+    "style": "gold"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_giftwrap",
+  "names": {
+    "en": "Gift wrap notifications",
+    "fr": "Notifications paquet cadeau"
+  },
+  "descriptions": {
+    "en": "Notifications wrapped like presents.",
+    "fr": "Des notifications emballées comme des cadeaux."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell",
+    "season": "christmas"
+  },
+  "look": "giftwrap"
+}

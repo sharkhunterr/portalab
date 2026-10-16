@@ -1,0 +1,31 @@
+{
+  "type": "bundle",
+  "product": "pack_celebrations",
+  "names": {
+    "en": "Party pack",
+    "fr": "Pack Fête"
+  },
+  "descriptions": {
+    "en": "Confetti, hearts, bubbles, petals and a coin shower for every reward. — 310 Coins saved.",
+    "fr": "Confettis, cœurs, bulles, pétales et pluie de pièces pour chaque récompense. — 310 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1250,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "effect_confetti",
+      "effect_hearts",
+      "effect_bubbles",
+      "effect_petals",
+      "effect_coins"
+    ]
+  }
+}

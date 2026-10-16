@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_frames",
+  "names": {
+    "en": "HD avatar frames pack",
+    "fr": "Pack Cadres HD"
+  },
+  "descriptions": {
+    "en": "Every avatar frame drawn by the graphics chip, in shapes of their own. — 4320 Coins saved.",
+    "fr": "Tous les cadres d'avatar dessinés par la puce graphique, chacun sa forme. — 4320 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 17280,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "frame_pyre",
+      "frame_tesla",
+      "frame_abyssal",
+      "frame_obsidian",
+      "frame_frostcrown",
+      "frame_starlit",
+      "frame_regalia",
+      "frame_biohazard",
+      "frame_prism",
+      "frame_sigil",
+      "frame_mainframe",
+      "frame_hanami",
+      "frame_wraith",
+      "frame_sweetie",
+      "frame_borealis",
+      "frame_corona",
+      "frame_chronogate"
+    ]
+  }
+}

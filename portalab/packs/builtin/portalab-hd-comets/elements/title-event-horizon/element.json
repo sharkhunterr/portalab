@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_event_horizon",
+  "names": {
+    "en": "Title: Event horizon",
+    "fr": "Titre : Horizon des événements"
+  },
+  "descriptions": {
+    "en": "« Event horizon » under your name, drawn by the graphics chip.",
+    "fr": "« Event horizon » sous votre nom, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 15,
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "totality",
+  "payload": {
+    "label": "Event horizon"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_easter_bunny",
+  "names": {
+    "en": "Easter bunny badge",
+    "fr": "Badge Lapin de Pâques"
+  },
+  "descriptions": {
+    "en": "A « Easter bunny » badge on your profile.",
+    "fr": "Un badge « Easter bunny » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star",
+    "season": "spring"
+  },
+  "payload": {
+    "label": "Easter bunny",
+    "icon": "rabbit",
+    "style": "pulse"
+  }
+}

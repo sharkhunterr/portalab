@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_academy",
+  "names": {
+    "en": "Academy theme pack",
+    "fr": "Pack de thème Académie"
+  },
+  "descriptions": {
+    "en": "The whole Academy theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1460 Coins saved.",
+    "fr": "Tout le thème Académie : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1460 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5840,
+    "rarity": "epic",
+    "level": 46,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_academy",
+      "banner_greathall",
+      "frame_housecrest",
+      "name_spellbound",
+      "notif_scroll",
+      "effect_wandsparks",
+      "ambient_floatingcandles",
+      "badge_seeker",
+      "title_head_prefect",
+      "banner_live_floatingcandles",
+      "palette_scarletgold",
+      "level_snitch",
+      "notif_swoop",
+      "levelup_owlpost"
+    ]
+  }
+}

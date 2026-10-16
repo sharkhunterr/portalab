@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-upsidedown",
+  "version": "1.0.0+b709a2ba7b",
+  "names": {
+    "en": "Upside Down interface",
+    "fr": "Interface Monde à l'envers"
+  },
+  "descriptions": {
+    "en": "The « Upside Down interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Monde à l'envers » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

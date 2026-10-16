@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-platformer",
+  "version": "1.0.0+dd7d18ec4c",
+  "names": {
+    "en": "Platformer interface",
+    "fr": "Interface Plateformes"
+  },
+  "descriptions": {
+    "en": "The « Platformer interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Plateformes » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

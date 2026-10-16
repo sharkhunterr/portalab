@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_runes",
+  "names": {
+    "en": "Arcane notifications",
+    "fr": "Notifications arcaniques"
+  },
+  "descriptions": {
+    "en": "Runes orbiting each notification. Drawn by the graphics chip.",
+    "fr": "Des runes qui orbitent autour de chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "runes"
+}

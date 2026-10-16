@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_helix",
+  "names": {
+    "en": "Helix Nebula ambience",
+    "fr": "Ambiance Nébuleuse de l'Hélice"
+  },
+  "descriptions": {
+    "en": "The « eye of God »: a ring of teal gas streaked with cometary knots round a red ring and a deep blue heart, turning slowly.",
+    "fr": "L'« œil de Dieu » : un anneau de gaz turquoise strié de nœuds cométaires autour d'un anneau rouge et d'un cœur bleu profond, qui tourne lentement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "level": 14,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "helix"
+}

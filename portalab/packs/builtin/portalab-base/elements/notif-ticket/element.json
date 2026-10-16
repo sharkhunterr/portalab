@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_ticket",
+  "names": {
+    "en": "Ticket notifications",
+    "fr": "Notifications ticket"
+  },
+  "descriptions": {
+    "en": "A notched ticket with its tear line.",
+    "fr": "Un ticket échancré avec sa ligne de découpe."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "ticket"
+}

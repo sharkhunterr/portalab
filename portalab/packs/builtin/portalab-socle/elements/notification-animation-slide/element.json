@@ -1,0 +1,13 @@
+{
+  "type": "notification_animation",
+  "look": "slide",
+  "names": {
+    "en": "Slide",
+    "fr": "Glissement"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

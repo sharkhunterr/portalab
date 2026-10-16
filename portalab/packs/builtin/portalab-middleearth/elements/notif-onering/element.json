@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_onering",
+  "names": {
+    "en": "One Ring notifications",
+    "fr": "Notifications de l'Anneau"
+  },
+  "descriptions": {
+    "en": "Black, inside a turning golden ring.",
+    "fr": "Noires, dans un anneau d'or qui tourne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1000,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "onering"
+}

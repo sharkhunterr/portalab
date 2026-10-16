@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_frontpage",
+  "names": {
+    "en": "Front page banner",
+    "fr": "Bannière une du journal"
+  },
+  "descriptions": {
+    "en": "A newspaper's front page: its title, its rules and its columns.",
+    "fr": "La une d'un journal : son titre, ses filets et ses colonnes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "frontpage"
+}

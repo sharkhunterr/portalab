@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-vhs",
+  "version": "1.0.0+a3078b0081",
+  "names": {
+    "en": "VHS interface",
+    "fr": "Interface VHS"
+  },
+  "descriptions": {
+    "en": "The « VHS interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface VHS » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

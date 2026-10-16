@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_cartoon",
+  "names": {
+    "en": "Cartoon interface",
+    "fr": "Interface Dessin animé"
+  },
+  "descriptions": {
+    "en": "Bubbly and bouncy: a toy dock, outlined cards, bubbles and boings. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Pétillant et rebondissant : un dock de jouets, cartes cernées, bulles et sons rigolos. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "cartoon"
+}

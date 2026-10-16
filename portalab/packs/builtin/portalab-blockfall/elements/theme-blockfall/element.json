@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_blockfall",
+  "names": {
+    "en": "Blocks interface",
+    "fr": "Interface Blocs"
+  },
+  "descriptions": {
+    "en": "The falling-blocks puzzle: bright pieces on a night-blue playfield, the sections stacked like pieces on the edge, lines that flash and clear. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Le casse-tête des blocs qui tombent : des pièces vives sur un plateau bleu nuit, les rubriques empilées comme des pièces sur le bord, des lignes qui clignotent et s'effacent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "blockfall"
+}

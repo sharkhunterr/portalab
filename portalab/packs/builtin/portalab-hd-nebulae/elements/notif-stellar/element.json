@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_stellar",
+  "names": {
+    "en": "Nebula notifications",
+    "fr": "Notifications nébuleuse"
+  },
+  "descriptions": {
+    "en": "Notifications in a shape of their own: glowing gas, pink and teal, folding round, drawn by the graphics chip.",
+    "fr": "Des notifications à la forme bien à elles : du gaz lumineux, rose et turquoise, qui se replie autour, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "stellar"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_pulsar",
+  "names": {
+    "en": "Pulsar level badge",
+    "fr": "Badge de niveau pulsar"
+  },
+  "descriptions": {
+    "en": "Your level inside: a pulsar's beams sweeping round like a lighthouse, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : les faisceaux d'un pulsar qui balaient comme un phare, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 19,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "pulsar"
+}

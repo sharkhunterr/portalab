@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "saber",
+  "names": {
+    "en": "saber",
+    "fr": "saber"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

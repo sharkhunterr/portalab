@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_comets",
+  "names": {
+    "en": "Comets celebration",
+    "fr": "Célébration comètes"
+  },
+  "descriptions": {
+    "en": "Little comets streaking out of the reward.",
+    "fr": "De petites comètes qui jaillissent de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "comets"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "product": "palette_evergreen",
+  "names": {
+    "en": "Evergreen palette",
+    "fr": "Palette sapin"
+  },
+  "descriptions": {
+    "en": "Fir green and berry red over the theme.",
+    "fr": "Vert sapin et rouge baie sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette",
+    "season": "christmas"
+  },
+  "look": "evergreen"
+}

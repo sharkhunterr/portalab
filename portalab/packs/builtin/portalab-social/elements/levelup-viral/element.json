@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_viral",
+  "names": {
+    "en": "Gone viral level-up",
+    "fr": "Passage de niveau publication virale"
+  },
+  "descriptions": {
+    "en": "Your new level posted: likes and hearts pour in, the counter goes wild.",
+    "fr": "Votre nouveau niveau publié : les j'aime et les cœurs affluent, le compteur s'affole."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "viral"
+}

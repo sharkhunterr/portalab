@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_eye",
+  "names": {
+    "en": "Eye notifications",
+    "fr": "Notifications de l'Œil"
+  },
+  "descriptions": {
+    "en": "They open like a fiery slit eye.",
+    "fr": "Elles s'ouvrent comme un œil de feu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "eye"
+}

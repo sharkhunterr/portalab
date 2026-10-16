@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_chrome_chip",
+  "names": {
+    "en": "Chrome chip badge",
+    "fr": "Badge Puce chromée"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "cpu"
+  },
+  "look": "holo",
+  "payload": {
+    "label": "Chrome chip",
+    "icon": "cpu"
+  }
+}

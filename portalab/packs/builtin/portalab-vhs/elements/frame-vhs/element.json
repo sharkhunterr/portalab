@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_vhs",
+  "names": {
+    "en": "VHS rainbow frame",
+    "fr": "Cadre arc-en-ciel VHS"
+  },
+  "descriptions": {
+    "en": "The tape's rainbow around you, slipping now and then.",
+    "fr": "L'arc-en-ciel de la cassette autour de vous, qui décroche parfois."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "vhs"
+}

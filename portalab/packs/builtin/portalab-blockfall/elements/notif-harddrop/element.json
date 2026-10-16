@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_harddrop",
+  "names": {
+    "en": "Hard drop notification animation",
+    "fr": "Animation de notification chute brutale"
+  },
+  "descriptions": {
+    "en": "Notifications dropping straight down and landing with a jolt.",
+    "fr": "Des notifications qui tombent tout droit et se posent d'un coup sec."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "harddrop"
+}

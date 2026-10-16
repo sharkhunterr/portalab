@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_voltage",
+  "names": {
+    "en": "Charged notifications",
+    "fr": "Notifications chargées"
+  },
+  "descriptions": {
+    "en": "Arcs crawl round each notification and leap out. Drawn by the graphics chip.",
+    "fr": "Des arcs électriques courent sur chaque notification et s'en échappent. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "voltage"
+}

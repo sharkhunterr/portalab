@@ -1,0 +1,32 @@
+{
+  "type": "bundle",
+  "product": "pack_christmas_eve",
+  "names": {
+    "en": "Christmas eve pack",
+    "fr": "Pack Veillée de Noël"
+  },
+  "descriptions": {
+    "en": "String lights, Christmas night, by the fire, candlelight and snowfall. — 880 Coins saved.",
+    "fr": "Guirlandes, nuit de Noël, coin du feu, lueur de bougies et neige. — 880 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3520,
+    "rarity": "epic",
+    "level": 3,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_garland",
+      "ambient_christmasnight",
+      "ambient_hearth",
+      "ambient_candlelight",
+      "ambient_snow"
+    ]
+  }
+}

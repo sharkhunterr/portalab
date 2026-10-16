@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_cliffs",
+  "names": {
+    "en": "Cosmic Cliffs ambience",
+    "fr": "Ambiance Falaises cosmiques"
+  },
+  "descriptions": {
+    "en": "Carina's ridge of orange dust like a mountain range, steam rising from its crest into a blue sky of glowing gas.",
+    "fr": "La crête de poussière orangée de la Carène comme une chaîne de montagnes, de la vapeur qui s'élève de sa crête dans un ciel de gaz bleu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 16,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "cliffs"
+}

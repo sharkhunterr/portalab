@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_nova",
+  "names": {
+    "en": "Nova sheet level-up",
+    "fr": "Passage de niveau volet dépoli"
+  },
+  "descriptions": {
+    "en": "Soft colours breathe while a frosted sheet slides up with your new level.",
+    "fr": "Des couleurs douces respirent pendant qu'un volet dépoli glisse avec votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "nova"
+}

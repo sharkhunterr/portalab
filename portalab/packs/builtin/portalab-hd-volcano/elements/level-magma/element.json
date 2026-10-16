@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_magma",
+  "names": {
+    "en": "Magma level badge",
+    "fr": "Badge de niveau magma"
+  },
+  "descriptions": {
+    "en": "Molten rock flowing under a cracked crust, its heat glowing around it.",
+    "fr": "De la roche en fusion qui coule sous une croûte fissurée, sa chaleur rougeoie autour."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "magma"
+}

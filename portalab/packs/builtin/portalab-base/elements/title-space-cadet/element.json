@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_space_cadet",
+  "names": {
+    "en": "Title: Space cadet",
+    "fr": "Titre : Cadet de l'espace"
+  },
+  "descriptions": {
+    "en": "« Space cadet » under your name.",
+    "fr": "« Space cadet » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "pulse",
+  "payload": {
+    "label": "Space cadet"
+  }
+}

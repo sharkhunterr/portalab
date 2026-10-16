@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "vcr",
+  "names": {
+    "en": "vcr",
+    "fr": "vcr"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:vcr"
+  },
+  "free": true
+}

@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_visor",
+  "names": {
+    "en": "Visor frame",
+    "fr": "Cadre visière"
+  },
+  "descriptions": {
+    "en": "Your avatar behind a bolted hexagonal visor.",
+    "fr": "Votre avatar derrière une visière hexagonale boulonnée."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "visor"
+}

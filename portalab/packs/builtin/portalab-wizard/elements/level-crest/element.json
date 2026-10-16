@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_crest",
+  "names": {
+    "en": "Crest level badge",
+    "fr": "Badge de niveau blason"
+  },
+  "descriptions": {
+    "en": "A heraldic shield edged with gold.",
+    "fr": "Un écu héraldique bordé d'or."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "crest"
+}

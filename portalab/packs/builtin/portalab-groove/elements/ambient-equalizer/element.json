@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_equalizer",
+  "names": {
+    "en": "Equalizer ambience",
+    "fr": "Ambiance égaliseur"
+  },
+  "descriptions": {
+    "en": "Equalizer bars pulsing along the bottom of the page.",
+    "fr": "Des barres d'égaliseur qui pulsent en bas de la page."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "equalizer"
+}

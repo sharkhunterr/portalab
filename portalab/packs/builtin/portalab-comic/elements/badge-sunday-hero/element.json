@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_sunday_hero",
+  "names": {
+    "en": "Sunday hero badge",
+    "fr": "Badge Héros du dimanche"
+  },
+  "descriptions": {
+    "en": "Saves the day, then takes a nap.",
+    "fr": "Sauve la journée, puis fait la sieste."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "zap"
+  },
+  "payload": {
+    "label": "Sunday hero",
+    "icon": "zap",
+    "style": "rainbow"
+  }
+}

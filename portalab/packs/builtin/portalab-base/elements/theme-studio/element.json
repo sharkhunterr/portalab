@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_studio",
+  "names": {
+    "en": "Studio interface",
+    "fr": "Interface Studio"
+  },
+  "descriptions": {
+    "en": "A calm studio: top bar, flat cards, narrow reading width.",
+    "fr": "Un studio calme : barre du haut, cartes plates, largeur de lecture étroite."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "studio"
+}

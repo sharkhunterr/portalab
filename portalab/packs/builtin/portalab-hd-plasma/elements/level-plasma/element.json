@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_plasma",
+  "names": {
+    "en": "Plasma ball level badge",
+    "fr": "Badge de niveau boule plasma"
+  },
+  "descriptions": {
+    "en": "Filaments of light reaching from a bright core.",
+    "fr": "Des filaments de lumière qui partent d'un cœur brillant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "plasma"
+}

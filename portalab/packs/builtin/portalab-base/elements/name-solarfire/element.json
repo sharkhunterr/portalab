@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_solarfire",
+  "names": {
+    "en": "Solar fire name style",
+    "fr": "Style de nom feu solaire"
+  },
+  "descriptions": {
+    "en": "A name burning like the sun, yellow to red.",
+    "fr": "Un nom qui brûle comme le soleil, du jaune au rouge."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "solarfire"
+}

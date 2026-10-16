@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_cobwebs",
+  "names": {
+    "en": "Cobwebs animated banner",
+    "fr": "Bannière animée toiles d'araignée"
+  },
+  "descriptions": {
+    "en": "Cobwebs playing in your profile's banner, for every visitor to see.",
+    "fr": "Des toiles d'araignée dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "halloween"
+  },
+  "look": "live-cobwebs"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_greatcomet",
+  "names": {
+    "en": "Great comet animated banner",
+    "fr": "Bannière animée Grande comète"
+  },
+  "descriptions": {
+    "en": "Great comet in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+    "fr": "Grande comète dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 850,
+    "rarity": "rare",
+    "level": 2,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-greatcomet"
+}

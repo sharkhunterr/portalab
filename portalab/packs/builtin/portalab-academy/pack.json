@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-academy",
+  "version": "1.0.0+74555c73bd",
+  "names": {
+    "en": "Academy interface",
+    "fr": "Interface Académie"
+  },
+  "descriptions": {
+    "en": "The « Academy interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Académie » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

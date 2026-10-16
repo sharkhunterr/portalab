@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_comets",
+  "names": {
+    "en": "Comets and eclipses HD pack",
+    "fr": "Pack Comètes et éclipses HD"
+  },
+  "descriptions": {
+    "en": "The great comet, pulsars and the total eclipse: an ambience, a banner, frames, level badges, notifications, the Big Bang and the hyperspace jump. — 3840 Coins saved.",
+    "fr": "La grande comète, les pulsars et l'éclipse totale : une ambiance, une bannière, des cadres, des badges de niveau, des notifications, le Big Bang et le saut dans l'hyperespace. — 3840 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 15360,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "packs",
+    "icon": "moon"
+  },
+  "payload": {
+    "products": [
+      "ambient_greatcomet",
+      "banner_live_greatcomet",
+      "frame_cometring",
+      "frame_pulsar",
+      "frame_eclipse",
+      "level_comet",
+      "level_pulsar",
+      "level_totality",
+      "notif_comet",
+      "notif_pulsar",
+      "notif_totality",
+      "notif_eclipsed",
+      "effect_bigbang",
+      "levelup_hyperjump",
+      "badge_pulsar",
+      "title_comet_chaser",
+      "title_event_horizon"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-funky",
+  "version": "1.0.0+81b6de5071",
+  "names": {
+    "en": "Funky interface",
+    "fr": "Interface Funky"
+  },
+  "descriptions": {
+    "en": "The « Funky interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Funky » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

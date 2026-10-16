@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_moonrise",
+  "names": {
+    "en": "Moonrise ambience",
+    "fr": "Ambiance lever de lune"
+  },
+  "descriptions": {
+    "en": "A full moon rising over a calm sea, its silver path trembling on the water, thin clouds drifting.",
+    "fr": "Une pleine lune qui se lève sur une mer calme, son chemin d'argent qui tremble sur l'eau, de fins nuages qui passent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 950,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "moonrise"
+}

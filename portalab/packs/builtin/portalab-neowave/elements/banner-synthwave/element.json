@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_synthwave",
+  "names": {
+    "en": "Synthwave banner",
+    "fr": "Bannière synthwave"
+  },
+  "descriptions": {
+    "en": "A retro sunset grid.",
+    "fr": "Une grille rétro au coucher du soleil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "synthwave"
+}

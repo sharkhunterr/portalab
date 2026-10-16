@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_ice",
+  "names": {
+    "en": "Ice HD pack",
+    "fr": "Pack Glace HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner. — 1660 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée. — 1660 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6640,
+    "rarity": "epic",
+    "level": 16,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_glacier",
+      "notif_glacier",
+      "frame_frostcrown",
+      "title_frostborn",
+      "badge_snowflake",
+      "banner_live_whiteout",
+      "notif_frostbite",
+      "name_namefrost"
+    ]
+  }
+}

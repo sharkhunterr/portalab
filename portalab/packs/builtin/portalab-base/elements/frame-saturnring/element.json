@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_saturnring",
+  "names": {
+    "en": "Saturn's ring frame",
+    "fr": "Cadre anneau de Saturne"
+  },
+  "descriptions": {
+    "en": "Your avatar as a ringed planet.",
+    "fr": "Votre avatar en planète à anneaux."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "level": 6,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "saturnring"
+}

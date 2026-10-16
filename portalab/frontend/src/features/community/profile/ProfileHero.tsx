@@ -8,8 +8,9 @@ import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { FRAME_CLIPS, FX_NAMES, FX_STYLES, fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
+import { useExternalRevision } from "../../../design-system/visuals/registry";
 import { useT } from "../../../i18n/hooks/useT";
-import { backdropUrl, type Equipped, type WornItem } from "./looks";
+import { backdropUrl, type Equipped, shownEquipped, type WornItem } from "./looks";
 import { ProfileCustomizer } from "./ProfileCustomizer";
 import "./profile.css";
 
@@ -135,7 +136,7 @@ export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "tit
 export function ProfileHero({
   memberId,
   name,
-  looks,
+  looks: worn,
   own,
   avatarSrc,
   avatarAction,
@@ -154,6 +155,8 @@ export function ProfileHero({
 }) {
   const t = useT();
   const Name = heading === 1 ? "h1" : "h2";
+  useExternalRevision(); // 028: a pack switched off or on changes what shows
+  const looks = shownEquipped(worn);
   return (
     <header className="profile-hero">
       <BannerArt banner={looks.banner ?? null} backdrop={looks.backdrop ?? null} />

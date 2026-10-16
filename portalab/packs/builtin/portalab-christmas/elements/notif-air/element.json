@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_air",
+  "names": {
+    "en": "Air notifications",
+    "fr": "Notifications air"
+  },
+  "descriptions": {
+    "en": "A gust brings them in, still blurred by the wind.",
+    "fr": "Une bourrasque les apporte, encore floues de vent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "air"
+}

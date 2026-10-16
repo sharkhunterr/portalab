@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_crown",
+  "names": {
+    "en": "Crowned level badge",
+    "fr": "Badge de niveau couronné"
+  },
+  "descriptions": {
+    "en": "A golden crown over your level — only for living legends (achievement « Living legend »).",
+    "fr": "Une couronne d'or sur votre niveau — réservée aux légendes vivantes (succès « Légende vivante »)."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "crown",
+    "reward_only": true
+  },
+  "look": "crown"
+}

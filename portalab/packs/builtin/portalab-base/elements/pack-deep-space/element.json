@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "product": "pack_deep_space",
+  "names": {
+    "en": "Deep space pack",
+    "fr": "Pack Espace lointain"
+  },
+  "descriptions": {
+    "en": "Beyond the sky: deep space, the black hole, polar lights, a plasma storm and the moving mesh networks. — 1500 Coins saved.",
+    "fr": "Au-delà du ciel : espace profond, trou noir, lumières polaires, tempête de plasma et réseaux maillés. — 1500 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6000,
+    "rarity": "epic",
+    "level": 40,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_cosmos",
+      "ambient_blackhole",
+      "ambient_polar",
+      "ambient_plasma",
+      "ambient_meshwave",
+      "ambient_mesh"
+    ]
+  }
+}

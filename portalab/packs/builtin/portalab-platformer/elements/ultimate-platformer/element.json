@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_platformer",
+  "names": {
+    "en": "Platformer theme pack",
+    "fr": "Pack de thème Plateformes"
+  },
+  "descriptions": {
+    "en": "The whole Platformer theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1340 Coins saved.",
+    "fr": "Tout le thème Plateformes : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1340 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5360,
+    "rarity": "epic",
+    "level": 34,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_platformer",
+      "banner_brickworld",
+      "frame_warppipe",
+      "name_gametitle",
+      "notif_bricks",
+      "effect_coinpop",
+      "ambient_spincoins",
+      "badge_speedrunner",
+      "title_extra_life",
+      "banner_live_spincoins",
+      "palette_brickred",
+      "level_qblock",
+      "notif_jumpin",
+      "levelup_flagpole"
+    ]
+  }
+}

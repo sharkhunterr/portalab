@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_bats",
+  "names": {
+    "en": "Bats ambience",
+    "fr": "Ambiance chauves-souris"
+  },
+  "descriptions": {
+    "en": "Bats drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Chauves-souris derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "halloween"
+  },
+  "look": "bats"
+}

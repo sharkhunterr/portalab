@@ -1,0 +1,32 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_toxic",
+  "names": {
+    "en": "Toxic HD pack",
+    "fr": "Pack Toxique HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge. — 1040 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge. — 1040 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4160,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_toxic",
+      "notif_toxic",
+      "frame_biohazard",
+      "title_mad_scientist",
+      "badge_radioactive"
+    ]
+  }
+}

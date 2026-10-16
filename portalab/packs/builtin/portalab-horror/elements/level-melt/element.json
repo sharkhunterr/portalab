@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_melt",
+  "names": {
+    "en": "Melting level badge",
+    "fr": "Badge de niveau fondant"
+  },
+  "descriptions": {
+    "en": "Your level drips like hot wax.",
+    "fr": "Votre niveau coule comme de la cire chaude."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "melt"
+}

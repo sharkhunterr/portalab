@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_stars",
+  "names": {
+    "en": "Stars HD pack",
+    "fr": "Pack Étoiles HD"
+  },
+  "descriptions": {
+    "en": "Shooting stars, constellations and the Milky Way: ambiences, banners, frames, level badges, notifications, the meteor storm and a constellation's birth. — 3270 Coins saved.",
+    "fr": "Étoiles filantes, constellations et Voie lactée : ambiances, bannières, cadres, badges de niveau, notifications, la pluie d'étoiles filantes et la naissance d'une constellation. — 3270 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 13080,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "packs",
+    "icon": "star"
+  },
+  "payload": {
+    "products": [
+      "ambient_perseids",
+      "ambient_constellations",
+      "ambient_milkyway",
+      "banner_live_perseids",
+      "banner_live_constellations",
+      "banner_live_milkyway",
+      "frame_starchart",
+      "frame_meteorite",
+      "level_starmap",
+      "level_meteor",
+      "notif_starmap",
+      "notif_meteor",
+      "notif_shootingstar",
+      "effect_starshower",
+      "levelup_constellate",
+      "badge_meteorite",
+      "title_astronomer"
+    ]
+  }
+}

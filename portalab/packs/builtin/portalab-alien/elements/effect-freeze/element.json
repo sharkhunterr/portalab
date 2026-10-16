@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_freeze",
+  "names": {
+    "en": "Freeze celebration",
+    "fr": "Célébration gel"
+  },
+  "descriptions": {
+    "en": "Freeze burst out when you earn a reward or level up.",
+    "fr": "Gel jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "freeze"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_cannonsmoke",
+  "names": {
+    "en": "Cannon smoke ambience",
+    "fr": "Ambiance fumée de canon"
+  },
+  "descriptions": {
+    "en": "Puffs of cannon smoke drifting across.",
+    "fr": "Des bouffées de fumée de canon qui dérivent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "cannonsmoke"
+}

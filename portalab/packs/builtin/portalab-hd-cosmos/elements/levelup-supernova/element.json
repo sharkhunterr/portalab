@@ -1,0 +1,24 @@
+{
+  "type": "level_up",
+  "product": "levelup_supernova",
+  "names": {
+    "en": "Supernova level-up",
+    "fr": "Passage de niveau supernova"
+  },
+  "descriptions": {
+    "en": "A star gathers, bursts, a shock wave rings out.",
+    "fr": "Une étoile se contracte, explose, une onde de choc se propage."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "supernova"
+}

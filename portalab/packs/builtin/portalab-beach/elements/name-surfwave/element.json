@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_surfwave",
+  "names": {
+    "en": "Surf wave name style",
+    "fr": "Style de nom vague de surf"
+  },
+  "descriptions": {
+    "en": "A name in lagoon blues, a little wave rolling under it.",
+    "fr": "Un nom dans les bleus du lagon, une petite vague qui roule dessous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "surfwave"
+}

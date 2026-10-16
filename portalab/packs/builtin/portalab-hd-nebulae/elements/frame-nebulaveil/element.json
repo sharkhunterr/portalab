@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_nebulaveil",
+  "names": {
+    "en": "Nebula frame",
+    "fr": "Cadre nébuleuse"
+  },
+  "descriptions": {
+    "en": "Glowing gas, pink and teal, folding round your avatar, drawn by the graphics chip.",
+    "fr": "Du gaz lumineux, rose et turquoise, qui se replie autour de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 15,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "nebulaveil"
+}

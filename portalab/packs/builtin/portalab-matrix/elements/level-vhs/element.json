@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_vhs",
+  "names": {
+    "en": "VHS level badge",
+    "fr": "Badge de niveau vhs"
+  },
+  "descriptions": {
+    "en": "Scanlines and a colour split, straight off the tape.",
+    "fr": "Lignes de balayage et couleurs décalées, tout droit de la cassette."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "vhs"
+}

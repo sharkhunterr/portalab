@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_seagulls",
+  "names": {
+    "en": "Seagulls ambience",
+    "fr": "Ambiance mouettes"
+  },
+  "descriptions": {
+    "en": "Seagulls gliding over a summer sky.",
+    "fr": "Des mouettes qui planent dans un ciel d'été."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles",
+    "season": "summer"
+  },
+  "look": "seagulls"
+}

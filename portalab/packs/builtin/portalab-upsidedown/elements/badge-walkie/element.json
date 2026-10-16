@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_walkie",
+  "names": {
+    "en": "Over and out badge",
+    "fr": "Badge Terminé"
+  },
+  "descriptions": {
+    "en": "Walkie-talkie always on channel six.",
+    "fr": "Talkie-walkie toujours sur le canal six."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "radio"
+  },
+  "look": "vhs",
+  "payload": {
+    "label": "Over and out",
+    "icon": "radio"
+  }
+}

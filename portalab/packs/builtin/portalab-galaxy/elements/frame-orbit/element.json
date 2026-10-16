@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_orbit",
+  "names": {
+    "en": "Orbit frame",
+    "fr": "Cadre orbite"
+  },
+  "descriptions": {
+    "en": "A tiny planet in orbit.",
+    "fr": "Une petite planète en orbite."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "payload": {
+    "frame": "orbit"
+  }
+}

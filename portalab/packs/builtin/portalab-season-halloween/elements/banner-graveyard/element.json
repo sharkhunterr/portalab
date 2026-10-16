@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_graveyard",
+  "names": {
+    "en": "Graveyard banner",
+    "fr": "Bannière cimetière"
+  },
+  "descriptions": {
+    "en": "Crooked tombstones under a full moon.",
+    "fr": "Des tombes de travers sous la pleine lune."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "halloween"
+  },
+  "look": "graveyard"
+}

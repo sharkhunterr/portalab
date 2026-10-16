@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_night_city",
+  "names": {
+    "en": "Night city banner",
+    "fr": "Bannière Night City"
+  },
+  "descriptions": {
+    "en": "Neon towers in the rain.",
+    "fr": "Des tours de néon sous la pluie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "night-city"
+}

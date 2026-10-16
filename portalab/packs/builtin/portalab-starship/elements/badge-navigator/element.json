@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_navigator",
+  "names": {
+    "en": "Navigator badge",
+    "fr": "Badge Navigateur"
+  },
+  "descriptions": {
+    "en": "A « Navigator » badge on your profile.",
+    "fr": "Un badge « Navigator » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Navigator",
+    "icon": "compass",
+    "style": "spin"
+  }
+}

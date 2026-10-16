@@ -1,0 +1,32 @@
+{
+  "type": "bundle",
+  "product": "pack_chills",
+  "names": {
+    "en": "Chills pack",
+    "fr": "Pack Frissons"
+  },
+  "descriptions": {
+    "en": "For the brave: a haunting, the darkness and its eyes, a lost signal, bats and red veins. — 920 Coins saved.",
+    "fr": "Pour les courageux : hantise, ténèbres et leurs yeux, signal perdu, chauves-souris et veines rouges. — 920 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3680,
+    "rarity": "epic",
+    "level": 8,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_haunted",
+      "ambient_darkness",
+      "ambient_lostsignal",
+      "ambient_bats",
+      "ambient_veins"
+    ]
+  }
+}

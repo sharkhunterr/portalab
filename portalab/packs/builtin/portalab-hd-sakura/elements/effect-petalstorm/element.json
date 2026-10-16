@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_petalstorm",
+  "names": {
+    "en": "Petal storm celebration",
+    "fr": "Célébration tempête de pétales"
+  },
+  "descriptions": {
+    "en": "Petal storm burst out when you earn a reward or level up.",
+    "fr": "Tempête de pétales jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "spring"
+  },
+  "look": "petalstorm"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_demohunter",
+  "names": {
+    "en": "Demogorgon hunter badge",
+    "fr": "Badge Chasseur de Démogorgon"
+  },
+  "descriptions": {
+    "en": "Rolled a natural twenty when it mattered.",
+    "fr": "A fait un vingt naturel au bon moment."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "skull"
+  },
+  "look": "veins",
+  "payload": {
+    "label": "Demogorgon hunter",
+    "icon": "skull"
+  }
+}

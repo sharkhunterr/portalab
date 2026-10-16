@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_tinsel",
+  "names": {
+    "en": "Tinsel frame",
+    "fr": "Cadre guirlande"
+  },
+  "descriptions": {
+    "en": "Golden and green tinsel sparkling around your avatar, drawn by the graphics chip.",
+    "fr": "Une guirlande dorée et verte qui scintille autour de votre avatar, dessinée par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "profile",
+    "icon": "user",
+    "season": "christmas"
+  },
+  "look": "tinsel"
+}

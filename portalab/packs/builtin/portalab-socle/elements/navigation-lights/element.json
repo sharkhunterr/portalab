@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "lights",
+  "names": {
+    "en": "lights",
+    "fr": "lights"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:lights"
+  },
+  "free": true
+}

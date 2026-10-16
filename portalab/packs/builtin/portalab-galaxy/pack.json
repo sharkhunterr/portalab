@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-galaxy",
+  "version": "1.0.0+d9ac6ed5e4",
+  "names": {
+    "en": "Space Opera interface",
+    "fr": "Interface Space Opera"
+  },
+  "descriptions": {
+    "en": "The « Space Opera interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Space Opera » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

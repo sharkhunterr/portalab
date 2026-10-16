@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_light_year_traveller",
+  "names": {
+    "en": "Title: Light-year traveller",
+    "fr": "Titre : Voyageur des années-lumière"
+  },
+  "descriptions": {
+    "en": "« Light-year traveller » under your name.",
+    "fr": "« Light-year traveller » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Light-year traveller",
+    "style": "rainbow"
+  }
+}

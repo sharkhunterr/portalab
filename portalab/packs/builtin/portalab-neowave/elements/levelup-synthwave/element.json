@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_synthwave",
+  "names": {
+    "en": "Synthwave sunset level-up",
+    "fr": "Passage de niveau coucher synthwave"
+  },
+  "descriptions": {
+    "en": "A sunset over a moving neon grid.",
+    "fr": "Un coucher de soleil sur une grille néon en mouvement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "synthwave"
+}

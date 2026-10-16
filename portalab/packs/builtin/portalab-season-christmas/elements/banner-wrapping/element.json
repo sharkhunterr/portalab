@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_wrapping",
+  "names": {
+    "en": "Wrapping paper banner",
+    "fr": "Bannière papier cadeau"
+  },
+  "descriptions": {
+    "en": "Red paper with stars, tied with a golden ribbon.",
+    "fr": "Du papier rouge étoilé noué d'un ruban doré."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "christmas"
+  },
+  "look": "wrapping"
+}

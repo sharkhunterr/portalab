@@ -1,0 +1,34 @@
+{
+  "type": "bundle",
+  "product": "pack_astro",
+  "names": {
+    "en": "Astronomy pack",
+    "fr": "Pack Astronomie"
+  },
+  "descriptions": {
+    "en": "The cosmos' name styles, palettes and banners together. — 460 Coins saved.",
+    "fr": "Les styles de nom, palettes et bannières du cosmos réunis. — 460 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1840,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "packs",
+    "icon": "telescope"
+  },
+  "payload": {
+    "products": [
+      "name_spaceage",
+      "name_starlines",
+      "name_staratlas",
+      "palette_orionpink",
+      "palette_deepspace",
+      "banner_starchart",
+      "banner_orbits"
+    ]
+  }
+}

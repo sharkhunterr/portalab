@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_elf",
+  "names": {
+    "en": "Head elf badge",
+    "fr": "Badge Lutin en chef"
+  },
+  "descriptions": {
+    "en": "Wrapping gifts since forever.",
+    "fr": "Emballe des cadeaux depuis toujours."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "gift"
+  },
+  "payload": {
+    "label": "Head elf",
+    "icon": "gift",
+    "style": "shimmer"
+  }
+}

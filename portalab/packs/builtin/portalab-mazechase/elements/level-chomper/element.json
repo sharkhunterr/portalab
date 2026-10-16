@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_chomper",
+  "names": {
+    "en": "Chomper level badge",
+    "fr": "Badge de niveau glouton"
+  },
+  "descriptions": {
+    "en": "Your level beside a yellow eater opening and closing its mouth.",
+    "fr": "Votre niveau à côté d'un glouton jaune qui ouvre et ferme la bouche."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "chomper"
+}

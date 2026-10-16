@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_blockfall",
+  "names": {
+    "en": "Blocks theme pack",
+    "fr": "Pack de thème Blocs"
+  },
+  "descriptions": {
+    "en": "The whole Blocks theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1280 Coins saved.",
+    "fr": "Tout le thème Blocs : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1280 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5120,
+    "rarity": "epic",
+    "level": 21,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_blockfall",
+      "banner_linestack",
+      "frame_blockframe",
+      "name_bevelblocks",
+      "notif_blockrow",
+      "effect_lineclear",
+      "ambient_fallingblocks",
+      "badge_perfect_clear",
+      "title_line_clearer",
+      "banner_live_fallingblocks",
+      "palette_blockcolors",
+      "level_tpiece",
+      "notif_harddrop",
+      "levelup_fourlines"
+    ]
+  }
+}

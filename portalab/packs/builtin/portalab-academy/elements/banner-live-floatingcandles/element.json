@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_floatingcandles",
+  "names": {
+    "en": "Floating candles animated banner",
+    "fr": "Bannière animée bougies flottantes"
+  },
+  "descriptions": {
+    "en": "Floating candles playing in your profile's banner, for every visitor to see.",
+    "fr": "Des bougies flottantes dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-floatingcandles"
+}

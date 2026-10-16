@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_halloween",
+  "names": {
+    "en": "Haunted banner",
+    "fr": "Bannière hantée"
+  },
+  "descriptions": {
+    "en": "Pumpkins and a full moon.",
+    "fr": "Citrouilles et pleine lune."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "halloween"
+  },
+  "look": "halloween"
+}

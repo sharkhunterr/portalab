@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-spacestation",
+  "version": "1.0.0+3def1f1512",
+  "names": {
+    "en": "Space station interface",
+    "fr": "Interface Station spatiale"
+  },
+  "descriptions": {
+    "en": "The « Space station interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Station spatiale » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

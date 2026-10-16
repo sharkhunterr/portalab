@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_mithril",
+  "names": {
+    "en": "Mithril level badge",
+    "fr": "Badge de niveau mithril"
+  },
+  "descriptions": {
+    "en": "Light chainmail with a silver gleam.",
+    "fr": "Une fine cotte de mailles à l'éclat d'argent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "mithril"
+}

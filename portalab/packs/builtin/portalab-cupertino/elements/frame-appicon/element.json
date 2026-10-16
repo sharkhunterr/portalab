@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_appicon",
+  "names": {
+    "en": "App icon frame",
+    "fr": "Cadre icône d'app"
+  },
+  "descriptions": {
+    "en": "Your avatar as an app icon, its rounded square and its red bubble.",
+    "fr": "Votre avatar en icône d'app, son carré arrondi et sa pastille rouge."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "appicon"
+}

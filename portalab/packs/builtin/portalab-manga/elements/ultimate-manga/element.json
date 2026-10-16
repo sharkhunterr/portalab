@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "ultimate_manga",
+  "names": {
+    "en": "Manga theme pack",
+    "fr": "Pack de thème Manga"
+  },
+  "descriptions": {
+    "en": "The whole Manga theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1420 Coins saved.",
+    "fr": "Tout le thème Manga : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1420 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5680,
+    "rarity": "epic",
+    "level": 38,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_manga",
+      "banner_speedlines",
+      "frame_sakura",
+      "name_manga",
+      "notif_slam",
+      "effect_petals",
+      "ambient_petals",
+      "badge_senpai",
+      "title_otaku",
+      "level_kapow",
+      "notif_manga",
+      "levelup_comic",
+      "levelup_manga",
+      "notif_comic",
+      "opt_style_added_deck",
+      "opt_style_progress_odometer",
+      "opt_style_activity_live"
+    ]
+  }
+}

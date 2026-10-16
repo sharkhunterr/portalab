@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_beachtowel",
+  "names": {
+    "en": "Beach towel notifications",
+    "fr": "Notifications serviette de plage"
+  },
+  "descriptions": {
+    "en": "Notifications laid out on a striped beach towel, fringes and all.",
+    "fr": "Des notifications étendues sur une serviette de plage rayée, franges comprises."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "beachtowel"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_balrog_slayer",
+  "names": {
+    "en": "Balrog slayer badge",
+    "fr": "Badge Tueur de Balrog"
+  },
+  "descriptions": {
+    "en": "Stood on the bridge and held.",
+    "fr": "A tenu sur le pont."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "collection": "badges",
+    "icon": "flame"
+  },
+  "payload": {
+    "label": "Balrog slayer",
+    "icon": "flame",
+    "style": "flame"
+  }
+}

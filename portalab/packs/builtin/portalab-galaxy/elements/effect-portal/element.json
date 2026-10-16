@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_portal",
+  "names": {
+    "en": "Portal celebration",
+    "fr": "Célébration portail"
+  },
+  "descriptions": {
+    "en": "Portal burst out when you earn a reward or level up.",
+    "fr": "Portail jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "portal"
+}

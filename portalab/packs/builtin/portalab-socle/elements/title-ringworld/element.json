@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "ringworld",
+  "names": {
+    "en": "ringworld",
+    "fr": "ringworld"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

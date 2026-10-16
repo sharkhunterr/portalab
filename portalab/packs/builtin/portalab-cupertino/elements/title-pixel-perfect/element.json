@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_pixel_perfect",
+  "names": {
+    "en": "Title: Pixel perfect",
+    "fr": "Titre : Au pixel près"
+  },
+  "descriptions": {
+    "en": "« Pixel perfect » under your name.",
+    "fr": "« Pixel perfect » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "glass",
+  "payload": {
+    "label": "Pixel perfect"
+  }
+}

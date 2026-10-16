@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_asteroids",
+  "names": {
+    "en": "Asteroid belt animated banner",
+    "fr": "Bannière animée ceinture d'astéroïdes"
+  },
+  "descriptions": {
+    "en": "Asteroid belt in your profile's banner, drawn by the graphics chip.",
+    "fr": "Ceinture d'astéroïdes dans la bannière de votre profil, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 850,
+    "rarity": "rare",
+    "level": 2,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-asteroids"
+}

@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "product": "badge_dragon_tamer",
+  "names": {
+    "en": "Dragon tamer badge",
+    "fr": "Badge Dompteur de dragons"
+  },
+  "descriptions": {
+    "en": "Few have ever done it — a single copy.",
+    "fr": "Rares sont ceux qui y sont arrivés — exemplaire unique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 1,
+    "collection": "badges",
+    "icon": "flame"
+  },
+  "payload": {
+    "label": "Dragon tamer",
+    "icon": "flame",
+    "style": "flame"
+  }
+}

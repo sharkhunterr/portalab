@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "product": "palette_tropical",
+  "names": {
+    "en": "Tropical palette",
+    "fr": "Palette tropical"
+  },
+  "descriptions": {
+    "en": "Lagoon turquoise and coral over the theme.",
+    "fr": "Turquoise lagon et corail sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette",
+    "season": "summer"
+  },
+  "look": "tropical"
+}

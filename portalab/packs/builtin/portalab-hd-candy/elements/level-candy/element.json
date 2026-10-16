@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_candy",
+  "names": {
+    "en": "Candy level badge",
+    "fr": "Badge de niveau bonbon"
+  },
+  "descriptions": {
+    "en": "Pastel stripes swirling, sprinkles and a glossy shine.",
+    "fr": "Des rayures pastel qui tourbillonnent, des vermicelles, un reflet brillant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "candy"
+}

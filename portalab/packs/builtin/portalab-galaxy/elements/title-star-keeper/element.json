@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_star_keeper",
+  "names": {
+    "en": "Title: Keeper of the stars",
+    "fr": "Titre : Gardien des étoiles"
+  },
+  "descriptions": {
+    "en": "Watches over the galaxy.",
+    "fr": "Veille sur la galaxie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "neon",
+  "payload": {
+    "label": "Keeper of the stars"
+  }
+}

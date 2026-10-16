@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_gold",
+  "names": {
+    "en": "Golden frame",
+    "fr": "Cadre doré"
+  },
+  "descriptions": {
+    "en": "A shining golden ring around your avatar.",
+    "fr": "Un anneau doré brillant autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "gold"
+}

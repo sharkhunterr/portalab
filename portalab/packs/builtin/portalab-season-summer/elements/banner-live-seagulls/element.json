@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_seagulls",
+  "names": {
+    "en": "Seagulls animated banner",
+    "fr": "Bannière animée mouettes"
+  },
+  "descriptions": {
+    "en": "Seagulls playing in your profile's banner, for every visitor to see.",
+    "fr": "Des mouettes dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "summer"
+  },
+  "look": "live-seagulls"
+}

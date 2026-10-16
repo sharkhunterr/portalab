@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_aquagel",
+  "names": {
+    "en": "Gel button level badge",
+    "fr": "Badge de niveau bouton gel"
+  },
+  "descriptions": {
+    "en": "Your level in a glossy blue gel drop.",
+    "fr": "Votre niveau dans une goutte de gel bleu brillant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "aquagel"
+}

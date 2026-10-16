@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "system",
+  "names": {
+    "en": "system",
+    "fr": "system"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:system"
+  },
+  "free": true
+}

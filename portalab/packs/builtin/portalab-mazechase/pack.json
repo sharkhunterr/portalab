@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-mazechase",
+  "version": "1.0.0+4c3464ecf4",
+  "names": {
+    "en": "Maze interface",
+    "fr": "Interface Labyrinthe"
+  },
+  "descriptions": {
+    "en": "The « Maze interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Labyrinthe » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

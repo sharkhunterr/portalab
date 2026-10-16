@@ -1,0 +1,13 @@
+{
+  "type": "profile_banner",
+  "look": "circuit",
+  "names": {
+    "en": "Circuit",
+    "fr": "Circuit"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

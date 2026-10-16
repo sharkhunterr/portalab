@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_minimal",
+  "names": {
+    "en": "Minimal level-up",
+    "fr": "Passage de niveau minimal"
+  },
+  "descriptions": {
+    "en": "A thin line, and the facts.",
+    "fr": "Un trait fin, et l'essentiel."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "minimal"
+}

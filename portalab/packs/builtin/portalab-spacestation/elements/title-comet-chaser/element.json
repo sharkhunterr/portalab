@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_comet_chaser",
+  "names": {
+    "en": "Title: Comet chaser",
+    "fr": "Titre : Chasseur de comètes"
+  },
+  "descriptions": {
+    "en": "« Comet chaser » under your name, drawn by the graphics chip.",
+    "fr": "« Comet chaser » sous votre nom, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Comet chaser",
+    "style": "comet"
+  }
+}

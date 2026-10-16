@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_snow",
+  "names": {
+    "en": "Snowflakes celebration",
+    "fr": "Célébration flocons"
+  },
+  "descriptions": {
+    "en": "Snowflakes burst out when you earn a reward or level up.",
+    "fr": "Flocons jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "christmas"
+  },
+  "look": "snow"
+}

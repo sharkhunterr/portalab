@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_lifeguard",
+  "names": {
+    "en": "Lifeguard tower banner",
+    "fr": "Bannière poste de secours"
+  },
+  "descriptions": {
+    "en": "A lifeguard tower on the sand, its flag flying, the lagoon behind.",
+    "fr": "Un poste de secours sur le sable, son drapeau au vent, le lagon derrière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "lifeguard"
+}

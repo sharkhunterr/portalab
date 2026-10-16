@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_pixelballoons",
+  "names": {
+    "en": "Pixel balloons ambience",
+    "fr": "Ambiance montgolfières pixel"
+  },
+  "descriptions": {
+    "en": "Pixel balloons drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Montgolfières pixel derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "pixelballoons"
+}

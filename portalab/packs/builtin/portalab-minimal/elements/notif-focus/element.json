@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_focus",
+  "names": {
+    "en": "Focusing notifications",
+    "fr": "Notifications mise au point"
+  },
+  "descriptions": {
+    "en": "Blurred at first, then sharp.",
+    "fr": "Floues d'abord, puis nettes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "focus"
+}

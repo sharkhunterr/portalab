@@ -1,0 +1,24 @@
+{
+  "type": "level_up",
+  "product": "levelup_hyperjump",
+  "names": {
+    "en": "Hyperspace jump level-up",
+    "fr": "Passage de niveau saut dans l'hyperespace"
+  },
+  "descriptions": {
+    "en": "The stars stretch into streaks, a tunnel of light rushes past — a flash — and you come out before a nebula in bloom, at your new level.",
+    "fr": "Les étoiles s'étirent en traînées, un tunnel de lumière défile — un éclair — et vous arrivez devant une nébuleuse en fleur, à votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2000,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "hyperjump"
+}

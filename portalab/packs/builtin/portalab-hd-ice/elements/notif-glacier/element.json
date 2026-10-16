@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_glacier",
+  "names": {
+    "en": "Frozen notifications",
+    "fr": "Notifications gelées"
+  },
+  "descriptions": {
+    "en": "Ice facets and growing frost. Drawn by the graphics chip.",
+    "fr": "Des facettes de glace et du givre qui pousse. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "glacier"
+}

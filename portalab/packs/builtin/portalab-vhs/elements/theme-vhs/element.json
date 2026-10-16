@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_vhs",
+  "names": {
+    "en": "VHS interface",
+    "fr": "Interface VHS"
+  },
+  "descriptions": {
+    "en": "Back to the video store: a blue screen, PLAY ▶, a VCR to zap between sections like channels, bad tracking and tapes rewinding. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Retour au vidéoclub : écran bleu, PLAY ▶, un magnétoscope pour zapper entre les rubriques comme des chaînes, du mauvais tracking et des cassettes qui rembobinent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "vhs"
+}

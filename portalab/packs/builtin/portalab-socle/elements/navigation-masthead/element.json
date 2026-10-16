@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "masthead",
+  "names": {
+    "en": "masthead",
+    "fr": "masthead"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:masthead"
+  },
+  "free": true
+}

@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_santas_elf",
+  "names": {
+    "en": "Title: Santa's elf",
+    "fr": "Titre : Lutin du Père Noël"
+  },
+  "descriptions": {
+    "en": "« Santa's elf » under your name.",
+    "fr": "« Santa's elf » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "christmas"
+  },
+  "payload": {
+    "label": "Santa's elf",
+    "style": "frost"
+  }
+}

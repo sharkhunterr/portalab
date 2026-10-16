@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_be_kind_rewind",
+  "names": {
+    "en": "Title: Be kind, rewind",
+    "fr": "Titre : Rembobinez, svp"
+  },
+  "descriptions": {
+    "en": "The video store's golden rule.",
+    "fr": "La règle d'or du vidéoclub."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "vhs",
+  "payload": {
+    "label": "Be kind, rewind"
+  }
+}

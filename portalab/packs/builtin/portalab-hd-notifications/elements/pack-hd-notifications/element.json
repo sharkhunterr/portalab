@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_notifications",
+  "names": {
+    "en": "HD notifications pack",
+    "fr": "Pack Notifications HD"
+  },
+  "descriptions": {
+    "en": "Every notification style drawn by the graphics chip. — 3820 Coins saved.",
+    "fr": "Tous les styles de notification dessinés par la puce graphique. — 3820 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 15280,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_blaze",
+      "notif_voltage",
+      "notif_aqua",
+      "notif_magma",
+      "notif_glacier",
+      "notif_galaxy",
+      "notif_aurum",
+      "notif_toxic",
+      "notif_holo",
+      "notif_runes",
+      "notif_matrix",
+      "notif_sakura",
+      "notif_shadow",
+      "notif_candy",
+      "notif_aurora",
+      "notif_plasma",
+      "notif_chrono"
+    ]
+  }
+}

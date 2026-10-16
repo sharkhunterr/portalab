@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_neon_nights",
+  "names": {
+    "en": "Neon nights pack",
+    "fr": "Pack Nuits néon"
+  },
+  "descriptions": {
+    "en": "Neon notifications, neon rain, a neon frame and shooting stars. — 430 Coins saved.",
+    "fr": "Notifications néon, pluie néon, cadre néon et étoiles filantes. — 430 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1720,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_neon",
+      "ambient_rain",
+      "frame_neon",
+      "effect_aurora"
+    ]
+  }
+}

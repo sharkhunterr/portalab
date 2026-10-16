@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_berry",
+  "names": {
+    "en": "Berry palette",
+    "fr": "Palette baie"
+  },
+  "descriptions": {
+    "en": "Accent colours laid over any theme — try it before buying.",
+    "fr": "Des couleurs d'accent posées sur n'importe quel thème — essayez-la avant d'acheter."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "berry"
+}

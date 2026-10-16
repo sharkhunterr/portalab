@@ -1,0 +1,25 @@
+{
+  "type": "level_badge",
+  "product": "level_spectre",
+  "names": {
+    "en": "Spectre level badge",
+    "fr": "Badge de niveau spectre"
+  },
+  "descriptions": {
+    "en": "Your level haunted by a ghostly flame, drawn by the graphics chip.",
+    "fr": "Votre niveau hanté par une flamme spectrale, dessinée par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "halloween"
+  },
+  "look": "spectre"
+}

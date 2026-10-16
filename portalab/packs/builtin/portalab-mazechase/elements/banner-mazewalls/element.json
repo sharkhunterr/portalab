@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_mazewalls",
+  "names": {
+    "en": "Maze banner",
+    "fr": "Bannière labyrinthe"
+  },
+  "descriptions": {
+    "en": "Blue maze corridors lined with pellets, a power pellet glowing.",
+    "fr": "Des couloirs de labyrinthe bleus bordés de gommes, une super gomme qui brille."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "mazewalls"
+}

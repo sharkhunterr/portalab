@@ -1,0 +1,43 @@
+{
+  "type": "bundle",
+  "product": "ultimate_comic",
+  "names": {
+    "en": "Comic theme pack",
+    "fr": "Pack de thème BD"
+  },
+  "descriptions": {
+    "en": "The whole Comic theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1350 Coins saved.",
+    "fr": "Tout le thème BD : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1350 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5400,
+    "rarity": "epic",
+    "level": 36,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_comic",
+      "banner_pow",
+      "frame_pow",
+      "name_comic",
+      "notif_comic",
+      "effect_lightning",
+      "badge_sunday_hero",
+      "level_kapow",
+      "notif_kapow",
+      "levelup_comic",
+      "effect_aurora",
+      "notif_slam",
+      "opt_style_added_deck",
+      "opt_style_progress_odometer",
+      "opt_style_news_ticker"
+    ]
+  }
+}

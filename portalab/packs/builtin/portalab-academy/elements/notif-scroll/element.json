@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_scroll",
+  "names": {
+    "en": "Scroll notifications",
+    "fr": "Notifications parchemin enroulé"
+  },
+  "descriptions": {
+    "en": "Notifications unrolled like a scroll between its two rolls.",
+    "fr": "Des notifications déroulées comme un parchemin entre ses deux rouleaux."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "scroll"
+}

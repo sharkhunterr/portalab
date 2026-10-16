@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_arcane",
+  "names": {
+    "en": "Arcana HD pack",
+    "fr": "Pack Arcanes HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up. — 1760 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau. — 1760 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7040,
+    "rarity": "epic",
+    "level": 19,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_runes",
+      "notif_runes",
+      "frame_sigil",
+      "title_runemaster",
+      "badge_grimoire",
+      "levelup_arcanum",
+      "notif_hex",
+      "effect_arcana"
+    ]
+  }
+}

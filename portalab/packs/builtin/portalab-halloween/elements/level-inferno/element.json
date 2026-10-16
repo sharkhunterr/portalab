@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_inferno",
+  "names": {
+    "en": "Inferno level badge",
+    "fr": "Badge de niveau brasier"
+  },
+  "descriptions": {
+    "en": "Your level burns with living flames.",
+    "fr": "Votre niveau brûle de flammes vives."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "inferno"
+}

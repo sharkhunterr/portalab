@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_chomp",
+  "names": {
+    "en": "Chomped notification animation",
+    "fr": "Animation de notification croqué"
+  },
+  "descriptions": {
+    "en": "Notifications opening like a mouth chomping its way in.",
+    "fr": "Des notifications qui s'ouvrent comme une bouche qui croque."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "chomp"
+}

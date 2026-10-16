@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_disco",
+  "names": {
+    "en": "Disco interface",
+    "fr": "Interface Disco"
+  },
+  "descriptions": {
+    "en": "Mirror ball: a menu that orbits, disco lights, rainbow titles and funky sounds. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Boule à facettes : menu en orbite, lumières disco, titres arc-en-ciel et sons funky. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "disco"
+}

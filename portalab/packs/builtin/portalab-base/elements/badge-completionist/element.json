@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_completionist",
+  "names": {
+    "en": "The Collector badge",
+    "fr": "Badge Le Collectionneur"
+  },
+  "descriptions": {
+    "en": "Unique: for those who bought 150 things in the shop.",
+    "fr": "Unique : pour qui a acheté 150 objets dans la boutique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "gem",
+    "reward_only": true
+  },
+  "look": "rainbow",
+  "payload": {
+    "label": "The Collector",
+    "icon": "gem"
+  }
+}

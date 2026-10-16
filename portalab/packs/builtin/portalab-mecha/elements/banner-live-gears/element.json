@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_gears",
+  "names": {
+    "en": "Gears animated banner",
+    "fr": "Bannière animée engrenages"
+  },
+  "descriptions": {
+    "en": "Gears playing in your profile's banner, for every visitor to see.",
+    "fr": "Des engrenages dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-gears"
+}

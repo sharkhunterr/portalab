@@ -1,0 +1,13 @@
+{
+  "type": "notification_animation",
+  "look": "fade",
+  "names": {
+    "en": "Fade",
+    "fr": "Fondu"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

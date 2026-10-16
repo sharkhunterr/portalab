@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_biohazard",
+  "names": {
+    "en": "Biohazard frame",
+    "fr": "Cadre danger biologique"
+  },
+  "descriptions": {
+    "en": "A hexagon of bubbling acid.",
+    "fr": "Un hexagone d'acide bouillonnant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "biohazard"
+}

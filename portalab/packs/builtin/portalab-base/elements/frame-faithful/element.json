@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_faithful",
+  "names": {
+    "en": "Faithful orbit frame",
+    "fr": "Cadre orbital de la constance"
+  },
+  "descriptions": {
+    "en": "Given for 365 visits.",
+    "fr": "Offert pour 365 visites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "user",
+    "reward_only": true
+  },
+  "look": "orbit"
+}

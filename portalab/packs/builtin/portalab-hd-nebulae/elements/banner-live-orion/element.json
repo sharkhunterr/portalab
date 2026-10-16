@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_orion",
+  "names": {
+    "en": "Orion Nebula animated banner",
+    "fr": "Bannière animée Nébuleuse d'Orion"
+  },
+  "descriptions": {
+    "en": "Orion Nebula in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+    "fr": "Nébuleuse d'Orion dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 18,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-orion"
+}

@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "product": "pack_dark_room",
+  "names": {
+    "en": "Dark room pack",
+    "fr": "Pack Salle obscure"
+  },
+  "descriptions": {
+    "en": "The cinema on your dashboard: ambient light behind « Continue », card decks for what is new, released and requested, the poster wall with its travelling camera and the living wall. — 560 Coins saved.",
+    "fr": "Le cinéma sur votre tableau de bord : lumière d'ambiance pour « Continuer », piles de cartes pour les ajouts, sorties et demandes, le mur d'affiches et son travelling, et le mur vivant. — 560 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2240,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "opt_style_continue_ambient",
+      "opt_style_added_deck",
+      "opt_style_releases_deck",
+      "opt_style_requested_deck",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "widget_living_wall"
+    ]
+  }
+}

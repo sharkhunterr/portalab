@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_brickworld",
+  "names": {
+    "en": "Brick world banner",
+    "fr": "Bannière monde de briques"
+  },
+  "descriptions": {
+    "en": "A blue sky, bricks, a mystery block, a green pipe and hills.",
+    "fr": "Un ciel bleu, des briques, un bloc mystère, un tuyau vert et des collines."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "brickworld"
+}

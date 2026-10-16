@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_bubbles",
+  "names": {
+    "en": "Bubbles ambience",
+    "fr": "Ambiance bulles"
+  },
+  "descriptions": {
+    "en": "Bubbles drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Bulles derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "bubbles"
+}

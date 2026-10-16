@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_beta_tester",
+  "names": {
+    "en": "Title: Beta tester",
+    "fr": "Titre : Bêta-testeur"
+  },
+  "descriptions": {
+    "en": "Tries everything first.",
+    "fr": "Essaie tout en premier."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Beta tester",
+    "style": "glass"
+  }
+}

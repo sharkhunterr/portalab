@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_blossom",
+  "names": {
+    "en": "Spring interface",
+    "fr": "Interface Printemps"
+  },
+  "descriptions": {
+    "en": "A spring garden: fresh greens and pink, a vine down the side with a leaf for each section, dandelion seeds floating, seed-packet notifications sprouting up. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Un jardin au printemps : des verts frais et du rose, une liane sur le côté avec une feuille par rubrique, des aigrettes de pissenlit qui flottent, des notifications en sachets de graines qui poussent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "blossom"
+}

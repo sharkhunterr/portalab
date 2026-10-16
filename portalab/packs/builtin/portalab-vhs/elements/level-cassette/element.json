@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_cassette",
+  "names": {
+    "en": "Cassette level badge",
+    "fr": "Badge de niveau cassette"
+  },
+  "descriptions": {
+    "en": "Your level written on the label of a tape.",
+    "fr": "Votre niveau écrit sur l'étiquette d'une cassette."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "cassette"
+}

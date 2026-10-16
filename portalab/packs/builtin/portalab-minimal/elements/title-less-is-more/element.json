@@ -1,0 +1,25 @@
+{
+  "type": "title",
+  "product": "title_less_is_more",
+  "names": {
+    "en": "Title: Less is more",
+    "fr": "Titre : Moins, c'est mieux"
+  },
+  "descriptions": {
+    "en": "Simplicity as a way of life.",
+    "fr": "La simplicité comme art de vivre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 120,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Less is more"
+  }
+}

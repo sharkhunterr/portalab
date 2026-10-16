@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_liquidmetal",
+  "names": {
+    "en": "Liquid metal animated banner",
+    "fr": "Bannière animée métal liquide"
+  },
+  "descriptions": {
+    "en": "Liquid metal in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+    "fr": "Métal liquide dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-liquidmetal"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_nebulateal",
+  "names": {
+    "en": "Teal nebula palette",
+    "fr": "Palette nébuleuse turquoise"
+  },
+  "descriptions": {
+    "en": "A nebula's teal and violet over the theme.",
+    "fr": "Le turquoise et le violet d'une nébuleuse sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "nebulateal"
+}

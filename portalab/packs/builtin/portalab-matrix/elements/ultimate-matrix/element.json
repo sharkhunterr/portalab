@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "ultimate_matrix",
+  "names": {
+    "en": "Simulation theme pack",
+    "fr": "Pack de thème Simulation"
+  },
+  "descriptions": {
+    "en": "The whole Simulation theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1920 Coins saved.",
+    "fr": "Tout le thème Simulation : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1920 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7680,
+    "rarity": "legendary",
+    "level": 40,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_matrix",
+      "banner_code",
+      "frame_code",
+      "name_matrix",
+      "notif_terminal",
+      "effect_assemble",
+      "ambient_code_rain",
+      "badge_the_one",
+      "title_awakened",
+      "level_vhs",
+      "notif_vhs",
+      "levelup_decode",
+      "notif_glitch",
+      "opt_style_activity_live",
+      "opt_style_stats_countup",
+      "opt_style_news_ticker"
+    ]
+  }
+}

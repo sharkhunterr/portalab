@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_upsidedown",
+  "names": {
+    "en": "Upside Down level badge",
+    "fr": "Badge de niveau monde à l'envers"
+  },
+  "descriptions": {
+    "en": "Red neon, a faint mirror, and now and then it turns over.",
+    "fr": "Néon rouge, un reflet pâle, et de temps en temps il se retourne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "upsidedown"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_aurum",
+  "names": {
+    "en": "Gilded notifications",
+    "fr": "Notifications dorées"
+  },
+  "descriptions": {
+    "en": "Liquid gold behind each notification. Drawn by the graphics chip.",
+    "fr": "De l'or liquide derrière chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "aurum"
+}

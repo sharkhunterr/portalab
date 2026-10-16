@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_glitch",
+  "names": {
+    "en": "Glitching notifications",
+    "fr": "Notifications glitch"
+  },
+  "descriptions": {
+    "en": "They arrive scrambled, then lock in.",
+    "fr": "Elles arrivent brouillées, puis se figent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "glitch"
+}

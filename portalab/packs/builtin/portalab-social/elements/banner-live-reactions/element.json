@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_reactions",
+  "names": {
+    "en": "Live reactions animated banner",
+    "fr": "Bannière animée réactions en direct"
+  },
+  "descriptions": {
+    "en": "Live reactions playing in your profile's banner, for every visitor to see.",
+    "fr": "Des réactions en direct dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-reactions"
+}

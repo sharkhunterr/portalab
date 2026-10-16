@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_mad_scientist",
+  "names": {
+    "en": "Title: Mad scientist",
+    "fr": "Titre : Savant fou"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "toxic",
+  "payload": {
+    "label": "Mad scientist"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_meteorite",
+  "names": {
+    "en": "Shooting stars frame",
+    "fr": "Cadre étoiles filantes"
+  },
+  "descriptions": {
+    "en": "Shooting stars streaking across a night sky your avatar, drawn by the graphics chip.",
+    "fr": "Des étoiles filantes qui traversent un ciel nocturne de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "meteorite"
+}

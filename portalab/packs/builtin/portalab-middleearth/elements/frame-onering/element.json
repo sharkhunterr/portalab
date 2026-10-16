@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_onering",
+  "names": {
+    "en": "One Ring frame",
+    "fr": "Cadre de l'Anneau unique"
+  },
+  "descriptions": {
+    "en": "A golden ring turning around you.",
+    "fr": "Un anneau d'or qui tourne autour de vous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "onering"
+}

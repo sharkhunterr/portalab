@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_link_cable",
+  "names": {
+    "en": "Link cable badge",
+    "fr": "Badge Câble de liaison"
+  },
+  "descriptions": {
+    "en": "A « Link cable » badge on your profile.",
+    "fr": "Un badge « Link cable » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Link cable",
+    "icon": "gamepad",
+    "style": "pixel"
+  }
+}

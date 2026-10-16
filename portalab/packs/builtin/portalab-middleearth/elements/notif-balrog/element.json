@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_balrog",
+  "names": {
+    "en": "Balrog notifications",
+    "fr": "Notifications Balrog"
+  },
+  "descriptions": {
+    "en": "They rise from fire, wings of shadow opening.",
+    "fr": "Elles surgissent du feu, des ailes d'ombre s'ouvrant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "balrog"
+}

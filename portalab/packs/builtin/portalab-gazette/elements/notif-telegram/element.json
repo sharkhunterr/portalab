@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_telegram",
+  "names": {
+    "en": "Telegram notifications",
+    "fr": "Notifications télégramme"
+  },
+  "descriptions": {
+    "en": "Notifications as telegrams: a strip of paper glued on a form, STOP.",
+    "fr": "Des notifications en télégrammes : une bande de papier collée sur un formulaire, STOP."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "telegram"
+}

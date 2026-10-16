@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "deck",
+  "names": {
+    "en": "deck",
+    "fr": "deck"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:deck"
+  },
+  "free": true
+}

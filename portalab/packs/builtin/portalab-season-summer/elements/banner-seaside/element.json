@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_seaside",
+  "names": {
+    "en": "Seaside banner",
+    "fr": "Bannière bord de mer"
+  },
+  "descriptions": {
+    "en": "The sea, the sun low over it, a beach.",
+    "fr": "La mer, le soleil bas au-dessus, une plage."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "summer"
+  },
+  "look": "seaside"
+}

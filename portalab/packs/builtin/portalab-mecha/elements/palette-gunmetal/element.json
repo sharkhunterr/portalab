@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_gunmetal",
+  "names": {
+    "en": "Gunmetal palette",
+    "fr": "Palette acier canon"
+  },
+  "descriptions": {
+    "en": "Steel grey and warning red over the theme.",
+    "fr": "Gris acier et rouge d'alerte sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "gunmetal"
+}

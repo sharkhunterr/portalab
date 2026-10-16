@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_alien",
+  "names": {
+    "en": "Xeno interface",
+    "fr": "Interface Xéno"
+  },
+  "descriptions": {
+    "en": "The ship's computer: a command line, spores in the dark, motion tracker words. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "L'ordinateur de bord : ligne de commande, spores dans le noir, vocabulaire de l'équipage. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "alien"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_neowave",
+  "names": {
+    "en": "Retro neon name style",
+    "fr": "Style de nom néon rétro"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "neowave"
+}

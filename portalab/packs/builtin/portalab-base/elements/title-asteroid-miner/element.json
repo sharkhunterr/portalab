@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_asteroid_miner",
+  "names": {
+    "en": "Title: Asteroid miner",
+    "fr": "Titre : Mineur d'astéroïdes"
+  },
+  "descriptions": {
+    "en": "« Asteroid miner » under your name.",
+    "fr": "« Asteroid miner » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Asteroid miner",
+    "style": "shimmer"
+  }
+}

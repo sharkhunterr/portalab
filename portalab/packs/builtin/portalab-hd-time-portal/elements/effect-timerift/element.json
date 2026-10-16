@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_timerift",
+  "names": {
+    "en": "Time rift celebration",
+    "fr": "Célébration faille temporelle"
+  },
+  "descriptions": {
+    "en": "Time rift burst out when you earn a reward or level up.",
+    "fr": "Faille temporelle jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "timerift"
+}

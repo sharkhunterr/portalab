@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_shire",
+  "names": {
+    "en": "Shire banner",
+    "fr": "Bannière de la Comté"
+  },
+  "descriptions": {
+    "en": "Green hills under a gentle sun.",
+    "fr": "Des collines vertes sous un doux soleil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "shire"
+}

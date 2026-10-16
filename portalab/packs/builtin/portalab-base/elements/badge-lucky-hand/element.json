@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_lucky_hand",
+  "names": {
+    "en": "Lucky hand badge",
+    "fr": "Badge Main heureuse"
+  },
+  "descriptions": {
+    "en": "Given for a legendary card drawn from a booster.",
+    "fr": "Offert pour une carte légendaire tirée d'un booster."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "dices",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Lucky hand",
+    "icon": "dices",
+    "style": "rainbow"
+  }
+}

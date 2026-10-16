@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_solar",
+  "names": {
+    "en": "Sun notifications",
+    "fr": "Notifications soleil"
+  },
+  "descriptions": {
+    "en": "Notifications drawn as the sun's boiling surface, its corona and its prominences, drawn by the graphics chip.",
+    "fr": "Des notifications dessinées comme la surface en ébullition du soleil, sa couronne et ses protubérances, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 12,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "solar"
+}

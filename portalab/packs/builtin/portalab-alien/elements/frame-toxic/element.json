@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_toxic",
+  "names": {
+    "en": "Toxic frame",
+    "fr": "Cadre toxique"
+  },
+  "descriptions": {
+    "en": "Pulsing acid glow.",
+    "fr": "Une lueur acide qui pulse."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "toxic"
+}

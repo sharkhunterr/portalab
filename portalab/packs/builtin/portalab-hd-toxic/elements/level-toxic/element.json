@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_toxic",
+  "names": {
+    "en": "Toxic level badge",
+    "fr": "Badge de niveau toxique"
+  },
+  "descriptions": {
+    "en": "Green acid bubbling, drops dripping below.",
+    "fr": "De l'acide vert qui bouillonne, des gouttes qui tombent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "toxic"
+}

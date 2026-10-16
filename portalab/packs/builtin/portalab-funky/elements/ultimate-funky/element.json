@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_funky",
+  "names": {
+    "en": "Funky theme pack",
+    "fr": "Pack de thème Funky"
+  },
+  "descriptions": {
+    "en": "The whole Funky theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1340 Coins saved.",
+    "fr": "Tout le thème Funky : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1340 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5360,
+    "rarity": "epic",
+    "level": 32,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_funky",
+      "banner_sunset70s",
+      "frame_retroarc",
+      "name_funkadelic",
+      "notif_jukebox",
+      "effect_flowerpower",
+      "ambient_groovywaves",
+      "badge_bell_bottoms",
+      "title_get_funky",
+      "banner_live_groovywaves",
+      "palette_seventies",
+      "level_eighttrack",
+      "notif_funkwalk",
+      "levelup_jukeboxdrop"
+    ]
+  }
+}

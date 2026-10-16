@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_bigbang",
+  "names": {
+    "en": "Big Bang name style",
+    "fr": "Style de nom Big Bang"
+  },
+  "descriptions": {
+    "en": "A name swelling with every colour of the first light.",
+    "fr": "Un nom qui enfle de toutes les couleurs de la première lumière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 6,
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "bigbang"
+}

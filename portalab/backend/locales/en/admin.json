@@ -883,5 +883,8 @@
   "visuals.type.widget_style": "Widget style",
   "visuals.type.widget": "Widget",
   "visuals.type.bundle": "Product pack",
-  "visuals.type.theme_pack": "Theme pack"
+  "visuals.type.theme_pack": "Theme pack",
+  "visuals.builtinOn": "Switch on all of Portalab's",
+  "visuals.builtinOff": "Switch off all but the socle",
+  "visuals.builtinChanged": "{count, plural, =0 {Nothing to change} one {# pack changed} other {# packs changed}}"
 }

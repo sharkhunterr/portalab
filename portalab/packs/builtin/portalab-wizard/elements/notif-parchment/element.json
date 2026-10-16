@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_parchment",
+  "names": {
+    "en": "Parchment notifications",
+    "fr": "Notifications parchemin"
+  },
+  "descriptions": {
+    "en": "Old paper and a serif title.",
+    "fr": "Vieux papier et titre à empattements."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "parchment"
+}

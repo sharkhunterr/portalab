@@ -1,0 +1,32 @@
+{
+  "type": "bundle",
+  "product": "pack_palettes",
+  "names": {
+    "en": "Painter's pack",
+    "fr": "Pack Peintre"
+  },
+  "descriptions": {
+    "en": "Six palettes to repaint any theme. — 310 Coins saved.",
+    "fr": "Six palettes pour repeindre n'importe quel thème. — 310 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1240,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "palette_sunset",
+      "palette_candy",
+      "palette_lagoon",
+      "palette_ice",
+      "palette_lavender",
+      "palette_bubblegum"
+    ]
+  }
+}

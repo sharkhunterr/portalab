@@ -60,7 +60,45 @@ def _cmd_migrate(args: argparse.Namespace) -> int:
         log.info("permission catalog synchronised", extra={"fields": {"created": created}})
         themes = asyncio.run(_sync_builtin_themes(settings.database_url.reveal()))
         log.info("built-in themes synchronised", extra={"fields": {"changed": themes}})
+        packs = asyncio.run(_sync_builtin_packs(dry_run=False))
+        log.info("built-in visual packs synchronised", extra={"fields": {"report": packs}})
     return 0
+
+
+async def _sync_builtin_packs(*, dry_run: bool) -> list[str]:
+    """028: Portalab's own visual packs follow the release (the first time, what exists is adopted)."""
+    from portalab.app.composition import import_all_models
+    from portalab.app.wiring import wire_platform
+    from portalab.capabilities.catalog import new_registry
+    from portalab.core.db import Database
+    from portalab.modules.visuals.builtin import BuiltinSync, builtin_root
+
+    settings = load_settings()
+    import_all_models()
+    database = Database.from_url(settings.database_url.reveal())
+    try:
+        platform = wire_platform(
+            database, data_dir=settings.data_dir, capabilities=new_registry(), secret_key=settings.secret_key
+        )
+        assert platform.visuals is not None
+        report = await BuiltinSync(platform.visuals.packs, builtin_root()).run(dry_run=dry_run)
+        return report.lines()
+    finally:
+        await database.dispose()
+
+
+def _cmd_visuals(args: argparse.Namespace) -> int:
+    """028: Portalab's own packs synchronised, or a pack analysed offline (the portal's own analysis)."""
+    configure_logging(load_settings().log_level if args.visuals_command == "builtin" else "WARNING")
+    if args.visuals_command == "builtin":
+        for line in asyncio.run(_sync_builtin_packs(dry_run=args.dry_run)):
+            sys.stdout.write(f"{line}\n")
+        return 0
+    from portalab.modules.ui.interfaces import PackInterfaces
+    from portalab.modules.visuals.cli import analyse_command
+
+    # UI's own validation of interface definitions (no theme registry is needed to validate one)
+    return analyse_command(Path(args.path), as_json=args.json, interfaces=PackInterfaces(None))  # type: ignore[arg-type]
 
 
 async def _sync_builtin_themes(url: str) -> int:
@@ -424,6 +462,17 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "pseudo":
             command.add_argument("--code", default="en-XA", choices=["en-XA", "ar-XB"])
         command.set_defaults(func=_cmd_i18n)
+    visuals = sub.add_parser("visuals", help="visual packs (028)").add_subparsers(
+        dest="visuals_command", required=True
+    )
+    sync = visuals.add_parser("builtin", help="synchronise Portalab's own packs (`builtin sync`)")
+    sync.add_argument("action", choices=("sync",))
+    sync.add_argument("--dry-run", action="store_true", help="say what would change, change nothing")
+    sync.set_defaults(func=_cmd_visuals)
+    analyse = visuals.add_parser("analyse", help="analyse a pack (a folder or a .zip) as the portal would")
+    analyse.add_argument("path")
+    analyse.add_argument("--json", action="store_true", help="the report as JSON")
+    analyse.set_defaults(func=_cmd_visuals)
     security = sub.add_parser("security", help="security commands (operator)").add_subparsers(
         dest="security_command", required=True
     )

@@ -1,0 +1,24 @@
+{
+  "type": "level_up",
+  "product": "levelup_phoenix",
+  "names": {
+    "en": "Phoenix level-up",
+    "fr": "Passage de niveau phénix"
+  },
+  "descriptions": {
+    "en": "Fire rises, a bird of flame spreads its wings, embers fly.",
+    "fr": "Le feu monte, un oiseau de flammes déploie ses ailes, des braises s'envolent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "phoenix"
+}

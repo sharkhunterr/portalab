@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_tropical",
+  "names": {
+    "en": "Tropical name style",
+    "fr": "Style de nom tropical"
+  },
+  "descriptions": {
+    "en": "A name in lagoon and coral colours, gently swaying.",
+    "fr": "Un nom aux couleurs de lagon et de corail, qui ondule doucement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather",
+    "season": "summer"
+  },
+  "look": "tropical"
+}

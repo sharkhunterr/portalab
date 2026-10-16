@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-starship",
+  "version": "1.0.0+dcd3d660f6",
+  "names": {
+    "en": "Starship interface",
+    "fr": "Interface Vaisseau spatial"
+  },
+  "descriptions": {
+    "en": "The « Starship interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Vaisseau spatial » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

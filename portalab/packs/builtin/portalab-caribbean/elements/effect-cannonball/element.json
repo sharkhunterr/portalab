@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_cannonball",
+  "names": {
+    "en": "Cannonballs celebration",
+    "fr": "Célébration boulets de canon"
+  },
+  "descriptions": {
+    "en": "Cannonballs bursting out of the reward in a puff of smoke.",
+    "fr": "Des boulets de canon qui jaillissent de la récompense dans un nuage de fumée."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "cannonball"
+}

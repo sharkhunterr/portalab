@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "sidebar",
+  "names": {
+    "en": "sidebar",
+    "fr": "sidebar"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:sidebar"
+  },
+  "free": true
+}

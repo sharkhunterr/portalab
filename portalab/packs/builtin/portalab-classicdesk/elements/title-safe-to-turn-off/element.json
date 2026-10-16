@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_safe_to_turn_off",
+  "names": {
+    "en": "Title: Safe to turn off",
+    "fr": "Titre : Vous pouvez éteindre"
+  },
+  "descriptions": {
+    "en": "« Safe to turn off » under your name.",
+    "fr": "« Safe to turn off » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Safe to turn off",
+    "style": "shimmer"
+  }
+}

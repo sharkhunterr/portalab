@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-nova",
+  "version": "1.0.0+a1eeb6d01a",
+  "names": {
+    "en": "Nova interface",
+    "fr": "Interface Nova"
+  },
+  "descriptions": {
+    "en": "The « Nova interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Nova » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

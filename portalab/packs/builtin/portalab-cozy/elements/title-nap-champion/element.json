@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_nap_champion",
+  "names": {
+    "en": "Title: Nap champion",
+    "fr": "Titre : Champion·ne de la sieste"
+  },
+  "descriptions": {
+    "en": "Undefeated on the sofa.",
+    "fr": "Invaincu·e sur le canapé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Nap champion",
+    "style": "pulse"
+  }
+}

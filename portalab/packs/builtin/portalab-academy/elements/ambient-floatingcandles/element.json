@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_floatingcandles",
+  "names": {
+    "en": "Floating candles ambience",
+    "fr": "Ambiance bougies flottantes"
+  },
+  "descriptions": {
+    "en": "Candles hanging in the air, bobbing, their flames flickering.",
+    "fr": "Des bougies suspendues dans les airs qui flottent, leurs flammes qui vacillent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "floatingcandles"
+}

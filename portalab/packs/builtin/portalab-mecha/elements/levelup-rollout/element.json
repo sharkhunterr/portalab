@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_rollout",
+  "names": {
+    "en": "Roll out level-up",
+    "fr": "Passage de niveau en route"
+  },
+  "descriptions": {
+    "en": "Steel plates fly in from every side and lock into place around your new level.",
+    "fr": "Des plaques d'acier arrivent de partout et se verrouillent autour de votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "rollout"
+}

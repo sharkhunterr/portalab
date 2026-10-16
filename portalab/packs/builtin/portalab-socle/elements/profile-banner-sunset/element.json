@@ -1,0 +1,13 @@
+{
+  "type": "profile_banner",
+  "look": "sunset",
+  "names": {
+    "en": "Sunset",
+    "fr": "Coucher de soleil"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

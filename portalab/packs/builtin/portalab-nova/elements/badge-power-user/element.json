@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_power_user",
+  "names": {
+    "en": "Power user badge",
+    "fr": "Badge Utilisateur expert"
+  },
+  "descriptions": {
+    "en": "Knows every shortcut.",
+    "fr": "Connaît tous les raccourcis."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "zap"
+  },
+  "payload": {
+    "label": "Power user",
+    "icon": "zap",
+    "style": "glass"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_8bit_hero",
+  "names": {
+    "en": "8-bit hero badge",
+    "fr": "Badge Héros 8 bits"
+  },
+  "descriptions": {
+    "en": "Three lives and a high score.",
+    "fr": "Trois vies et un record."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "joystick"
+  },
+  "look": "pixel",
+  "payload": {
+    "label": "8-bit hero",
+    "icon": "joystick"
+  }
+}

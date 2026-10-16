@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_neighbourhood_hero",
+  "names": {
+    "en": "Title: Neighbourhood hero",
+    "fr": "Titre : Héros du quartier"
+  },
+  "descriptions": {
+    "en": "Always there when it matters.",
+    "fr": "Toujours là quand il le faut."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Neighbourhood hero",
+    "style": "shimmer"
+  }
+}

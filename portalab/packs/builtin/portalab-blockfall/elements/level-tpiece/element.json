@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_tpiece",
+  "names": {
+    "en": "T piece level badge",
+    "fr": "Badge de niveau pièce en t"
+  },
+  "descriptions": {
+    "en": "Your level on a purple T-shaped piece.",
+    "fr": "Votre niveau sur une pièce violette en forme de T."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "tpiece"
+}

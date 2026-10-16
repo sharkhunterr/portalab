@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_comic",
+  "names": {
+    "en": "Comic name style",
+    "fr": "Style de nom bd"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "comic"
+}

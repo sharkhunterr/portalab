@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_petals",
+  "names": {
+    "en": "Sakura petals animated banner",
+    "fr": "Bannière animée pétales de sakura"
+  },
+  "descriptions": {
+    "en": "Sakura petals playing in your profile's banner, for every visitor to see.",
+    "fr": "Pétales de sakura dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "spring"
+  },
+  "look": "live-petals"
+}

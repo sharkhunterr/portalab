@@ -1,0 +1,25 @@
+{
+  "type": "theme",
+  "product": "theme_academy",
+  "names": {
+    "en": "Academy interface",
+    "fr": "Interface Académie"
+  },
+  "descriptions": {
+    "en": "A school of magic: scarlet and gold, parchment scrolls, floating candles in the Great Hall, owls bringing your news. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Une école de magie : écarlate et or, parchemins, bougies flottantes dans la Grande Salle, des hiboux qui apportent vos nouvelles. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 20,
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "academy"
+}

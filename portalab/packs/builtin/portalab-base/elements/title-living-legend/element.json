@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_living_legend",
+  "names": {
+    "en": "Title: Living legend",
+    "fr": "Titre : Légende vivante"
+  },
+  "descriptions": {
+    "en": "Given at level 20.",
+    "fr": "Offert au niveau 20."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "look": "flame",
+  "payload": {
+    "label": "Living legend"
+  }
+}

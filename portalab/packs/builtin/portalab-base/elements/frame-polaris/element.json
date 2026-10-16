@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_polaris",
+  "names": {
+    "en": "Polaris frame",
+    "fr": "Cadre étoile polaire"
+  },
+  "descriptions": {
+    "en": "A star chart in the shape of the North Star round your avatar. Given at level 40.",
+    "fr": "Une carte du ciel en forme d'étoile polaire autour de votre avatar. Offert au niveau 40."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "legendary",
+    "collection": "rewards",
+    "icon": "user",
+    "reward_only": true
+  },
+  "look": "polaris"
+}

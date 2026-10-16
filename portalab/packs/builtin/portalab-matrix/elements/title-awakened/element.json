@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_awakened",
+  "names": {
+    "en": "Title: The Awakened",
+    "fr": "Titre : L'Éveillé"
+  },
+  "descriptions": {
+    "en": "Took the red pill.",
+    "fr": "A pris la pilule rouge."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "The Awakened",
+    "style": "glitch"
+  }
+}

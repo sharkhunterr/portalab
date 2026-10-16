@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_stardust",
+  "names": {
+    "en": "Stardust notifications",
+    "fr": "Notifications poussière d'étoiles"
+  },
+  "descriptions": {
+    "en": "A galaxy swirls them in and out. Drawn by the graphics chip.",
+    "fr": "Une galaxie les fait apparaître et disparaître en tourbillonnant. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "stardust"
+}

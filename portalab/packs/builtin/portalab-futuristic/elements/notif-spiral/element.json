@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_spiral",
+  "names": {
+    "en": "Spiral notifications",
+    "fr": "Notifications spirale"
+  },
+  "descriptions": {
+    "en": "They spin in from nowhere.",
+    "fr": "Elles arrivent en tournoyant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "spiral"
+}

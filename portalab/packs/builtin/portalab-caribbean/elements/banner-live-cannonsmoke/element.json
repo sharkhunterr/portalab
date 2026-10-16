@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_cannonsmoke",
+  "names": {
+    "en": "Cannon smoke animated banner",
+    "fr": "Bannière animée fumée de canon"
+  },
+  "descriptions": {
+    "en": "Cannon smoke playing in your profile's banner, for every visitor to see.",
+    "fr": "Des fumée de canon dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-cannonsmoke"
+}

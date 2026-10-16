@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "drawer",
+  "names": {
+    "en": "drawer",
+    "fr": "drawer"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:drawer"
+  },
+  "free": true
+}

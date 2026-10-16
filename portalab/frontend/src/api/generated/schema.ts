@@ -3762,6 +3762,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/visuals/builtin/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Builtin State
+         * @description Portalab's whole catalog switched on — or off, the socle staying on.
+         */
+        post: operations["builtin_state_api_v1_admin_visuals_builtin_state_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/visuals/files/{pack}/{sha}/{name}": {
         parameters: {
             query?: never;
@@ -9456,6 +9476,13 @@ export interface components {
             }[];
             /** Epoch */
             epoch: number;
+            /**
+             * Withheld
+             * @default {}
+             */
+            withheld: {
+                [key: string]: string[];
+            };
         };
         /** ActivityOut */
         ActivityOut: {
@@ -23770,6 +23797,41 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    builtin_state_api_v1_admin_visuals_builtin_state_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

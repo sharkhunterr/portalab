@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_balloons",
+  "names": {
+    "en": "Balloons celebration",
+    "fr": "Célébration ballons"
+  },
+  "descriptions": {
+    "en": "Glossy balloons floating up across the whole screen.",
+    "fr": "Des ballons brillants qui s'envolent sur tout l'écran."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "balloons"
+}

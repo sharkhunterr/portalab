@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_solarflare",
+  "names": {
+    "en": "Solar flare animated banner",
+    "fr": "Bannière animée éruption solaire"
+  },
+  "descriptions": {
+    "en": "Solar flare in your profile's banner, drawn by the graphics chip.",
+    "fr": "Éruption solaire dans la bannière de votre profil, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 21,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-solarflare"
+}

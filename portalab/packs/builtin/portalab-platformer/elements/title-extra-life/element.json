@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_extra_life",
+  "names": {
+    "en": "Title: Extra life",
+    "fr": "Titre : Vie supplémentaire"
+  },
+  "descriptions": {
+    "en": "« Extra life » under your name.",
+    "fr": "« Extra life » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "pixel",
+  "payload": {
+    "label": "Extra life"
+  }
+}

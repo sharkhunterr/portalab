@@ -1,0 +1,13 @@
+{
+  "type": "profile_banner",
+  "look": "dusk",
+  "names": {
+    "en": "Dusk",
+    "fr": "Crépuscule"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

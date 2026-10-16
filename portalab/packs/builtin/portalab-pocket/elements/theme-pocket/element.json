@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_pocket",
+  "names": {
+    "en": "Pocket console interface",
+    "fr": "Interface Console de poche"
+  },
+  "descriptions": {
+    "en": "A pocket console's green screen: four shades of green, pixel type, a d-pad at the bottom to steer between the sections and their pages, A for the menu, B to go back. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "L'écran vert d'une console de poche : quatre nuances de vert, des caractères en pixels, une croix directionnelle en bas pour passer d'une rubrique et d'une page à l'autre, A pour le menu, B pour revenir. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "pocket"
+}

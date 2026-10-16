@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_netrunner",
+  "names": {
+    "en": "Netrunner badge",
+    "fr": "Badge Netrunner"
+  },
+  "descriptions": {
+    "en": "Jacked in, never caught.",
+    "fr": "Branché, jamais repéré."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "fingerprint"
+  },
+  "payload": {
+    "label": "Netrunner",
+    "icon": "fingerprint",
+    "style": "glitch"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_popmarbling",
+  "names": {
+    "en": "Pop marbling ambience",
+    "fr": "Ambiance marbré pop"
+  },
+  "descriptions": {
+    "en": "Pop marbling drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Marbré pop derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "popmarbling"
+}

@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_nebulae",
+  "names": {
+    "en": "Nebulae HD pack",
+    "fr": "Pack Nébuleuses HD"
+  },
+  "descriptions": {
+    "en": "Orion, the Crab, the Helix, the Pillars of Creation and Carina's cliffs — behind the portal and in your banner — with the nebula frame, level badge and notifications. — 3930 Coins saved.",
+    "fr": "Orion, le Crabe, l'Hélice, les Piliers de la création et les falaises de la Carène — derrière le portail et dans votre bannière — avec le cadre, le badge de niveau et les notifications nébuleuse. — 3930 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 15720,
+    "rarity": "legendary",
+    "level": 50,
+    "collection": "packs",
+    "icon": "sparkles"
+  },
+  "payload": {
+    "products": [
+      "ambient_orion",
+      "ambient_crab",
+      "ambient_helix",
+      "ambient_pillars",
+      "ambient_cliffs",
+      "banner_live_orion",
+      "banner_live_crab",
+      "banner_live_helix",
+      "banner_live_pillars",
+      "banner_live_cliffs",
+      "frame_nebulaveil",
+      "level_stellar",
+      "notif_stellar",
+      "notif_nebulabloom",
+      "badge_telescope"
+    ]
+  }
+}

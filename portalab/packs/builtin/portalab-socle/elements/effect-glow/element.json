@@ -1,0 +1,13 @@
+{
+  "type": "effect",
+  "look": "glow",
+  "names": {
+    "en": "Glow",
+    "fr": "Halo"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

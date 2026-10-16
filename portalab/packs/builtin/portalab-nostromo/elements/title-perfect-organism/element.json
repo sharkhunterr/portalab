@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_perfect_organism",
+  "names": {
+    "en": "Title: Perfect organism",
+    "fr": "Titre : Organisme parfait"
+  },
+  "descriptions": {
+    "en": "Its structural perfection is matched only by its hostility.",
+    "fr": "Sa perfection n'a d'égale que son hostilité."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Perfect organism",
+    "style": "hazard"
+  }
+}

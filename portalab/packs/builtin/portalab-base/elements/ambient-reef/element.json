@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_reef",
+  "names": {
+    "en": "Under the surface ambience",
+    "fr": "Ambiance sous la surface"
+  },
+  "descriptions": {
+    "en": "Under the surface drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Sous la surface derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "reef"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "ambient",
+  "look": "none",
+  "names": {
+    "en": "None",
+    "fr": "Aucune"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

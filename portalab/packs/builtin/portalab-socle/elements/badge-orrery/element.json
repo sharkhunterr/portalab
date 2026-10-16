@@ -1,0 +1,13 @@
+{
+  "type": "badge",
+  "look": "orrery",
+  "names": {
+    "en": "orrery",
+    "fr": "orrery"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

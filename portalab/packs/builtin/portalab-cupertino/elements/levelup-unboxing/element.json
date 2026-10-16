@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_unboxing",
+  "names": {
+    "en": "Unboxing level-up",
+    "fr": "Passage de niveau déballage"
+  },
+  "descriptions": {
+    "en": "A white box slides open and your new level rises out of it.",
+    "fr": "Une boîte blanche s'ouvre en glissant et votre nouveau niveau en sort."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "unboxing"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-wizard",
+  "version": "1.0.0+f5f1d8abc2",
+  "names": {
+    "en": "Grimoire interface",
+    "fr": "Interface Grimoire"
+  },
+  "descriptions": {
+    "en": "The « Grimoire interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Grimoire » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

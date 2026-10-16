@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_deepspace",
+  "names": {
+    "en": "Deep space palette",
+    "fr": "Palette espace lointain"
+  },
+  "descriptions": {
+    "en": "The blue and teal of deep space over the theme.",
+    "fr": "Le bleu et le turquoise de l'espace lointain sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "deepspace"
+}

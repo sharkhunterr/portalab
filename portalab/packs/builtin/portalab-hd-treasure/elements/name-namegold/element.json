@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_namegold",
+  "names": {
+    "en": "Gilded name style",
+    "fr": "Style de nom doré"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "namegold"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_ladybug",
+  "names": {
+    "en": "Ladybird level badge",
+    "fr": "Badge de niveau coccinelle"
+  },
+  "descriptions": {
+    "en": "Your level on a ladybird's red, spotted shell.",
+    "fr": "Votre niveau sur la carapace rouge et tachetée d'une coccinelle."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "ladybug"
+}

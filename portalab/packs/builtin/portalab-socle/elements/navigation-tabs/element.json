@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "tabs",
+  "names": {
+    "en": "tabs",
+    "fr": "tabs"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:tabs"
+  },
+  "free": true
+}

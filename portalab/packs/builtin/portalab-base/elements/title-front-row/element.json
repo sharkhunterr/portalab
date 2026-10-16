@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_front_row",
+  "names": {
+    "en": "Title: Front row",
+    "fr": "Titre : Premier rang"
+  },
+  "descriptions": {
+    "en": "Given for a film watched to the end in the portal.",
+    "fr": "Offert pour un film vu jusqu'au bout dans le portail."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "film",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Front row",
+    "style": "gold"
+  }
+}

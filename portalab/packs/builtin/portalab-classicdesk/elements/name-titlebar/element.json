@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_titlebar",
+  "names": {
+    "en": "Title bar name style",
+    "fr": "Style de nom barre de titre"
+  },
+  "descriptions": {
+    "en": "A name in bold italic white, outlined in blue like a window's title.",
+    "fr": "Un nom en blanc gras italique, cerné de bleu comme le titre d'une fenêtre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "titlebar"
+}

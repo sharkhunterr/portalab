@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_bloodmoon",
+  "names": {
+    "en": "Blood moon level-up",
+    "fr": "Passage de niveau lune de sang"
+  },
+  "descriptions": {
+    "en": "A red moon, dripping blood, a flickering screen.",
+    "fr": "Une lune rouge, du sang qui coule, un écran qui vacille."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "bloodmoon"
+}

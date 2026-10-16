@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_sakura",
+  "names": {
+    "en": "Sakura HD pack",
+    "fr": "Pack Sakura HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 2100 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 2100 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8400,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_sakura",
+      "notif_sakura",
+      "frame_hanami",
+      "title_spring_spirit",
+      "badge_blossom",
+      "levelup_sakurastorm",
+      "banner_live_goldenhour",
+      "notif_petalfall",
+      "name_namesakura",
+      "effect_petalstorm"
+    ]
+  }
+}

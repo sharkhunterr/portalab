@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_spincoins",
+  "names": {
+    "en": "Spinning coins animated banner",
+    "fr": "Bannière animée pièces qui tournent"
+  },
+  "descriptions": {
+    "en": "Spinning coins playing in your profile's banner, for every visitor to see.",
+    "fr": "Des pièces qui tournent dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-spincoins"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_groove",
+  "names": {
+    "en": "Groove interface",
+    "fr": "Interface Groove"
+  },
+  "descriptions": {
+    "en": "A music app at night: green on black, your sections as playlists in a library, a « now playing » bar to skip from page to page, an equalizer pulsing behind. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Une appli de musique la nuit : vert sur noir, vos rubriques en playlists dans une bibliothèque, une barre « en cours de lecture » pour passer de page en page, un égaliseur qui pulse derrière. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "groove"
+}

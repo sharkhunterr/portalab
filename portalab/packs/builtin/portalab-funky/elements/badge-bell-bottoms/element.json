@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_bell_bottoms",
+  "names": {
+    "en": "Bell bottoms badge",
+    "fr": "Badge Pattes d'eph"
+  },
+  "descriptions": {
+    "en": "A « Bell bottoms » badge on your profile.",
+    "fr": "Un badge « Bell bottoms » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Bell bottoms",
+    "icon": "music",
+    "style": "rainbow"
+  }
+}

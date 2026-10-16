@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_on_repeat",
+  "names": {
+    "en": "Title: On repeat",
+    "fr": "Titre : En boucle"
+  },
+  "descriptions": {
+    "en": "« On repeat » under your name.",
+    "fr": "« On repeat » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "On repeat",
+    "style": "pulse"
+  }
+}

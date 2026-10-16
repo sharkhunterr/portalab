@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_sakura",
+  "names": {
+    "en": "Sakura frame",
+    "fr": "Cadre sakura"
+  },
+  "descriptions": {
+    "en": "Cherry blossoms around you.",
+    "fr": "Des fleurs de cerisier autour de vous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user",
+    "season": "spring"
+  },
+  "look": "sakura"
+}

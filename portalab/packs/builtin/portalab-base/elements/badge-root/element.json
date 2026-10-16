@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_root",
+  "names": {
+    "en": "Root access badge",
+    "fr": "Badge Accès root"
+  },
+  "descriptions": {
+    "en": "sudo watch everything.",
+    "fr": "sudo regarde tout."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "terminal"
+  },
+  "look": "terminal",
+  "payload": {
+    "label": "Root access",
+    "icon": "terminal"
+  }
+}

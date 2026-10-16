@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_rpgbox",
+  "names": {
+    "en": "Dialogue box notifications",
+    "fr": "Notifications boîte de dialogue"
+  },
+  "descriptions": {
+    "en": "Notifications in a role-playing game's text box, its arrow blinking.",
+    "fr": "Des notifications dans la boîte de texte d'un jeu de rôle, sa flèche qui clignote."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "rpgbox"
+}

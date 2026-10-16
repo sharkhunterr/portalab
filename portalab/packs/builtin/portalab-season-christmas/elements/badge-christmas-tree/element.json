@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_christmas_tree",
+  "names": {
+    "en": "Christmas tree badge",
+    "fr": "Badge Sapin de Noël"
+  },
+  "descriptions": {
+    "en": "A « Christmas tree » badge on your profile.",
+    "fr": "Un badge « Christmas tree » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star",
+    "season": "christmas"
+  },
+  "payload": {
+    "label": "Christmas tree",
+    "icon": "tree",
+    "style": "shimmer"
+  }
+}

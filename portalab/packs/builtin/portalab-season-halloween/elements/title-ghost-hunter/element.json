@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_ghost_hunter",
+  "names": {
+    "en": "Title: Ghost hunter",
+    "fr": "Titre : Chasseur de fantômes"
+  },
+  "descriptions": {
+    "en": "« Ghost hunter » under your name.",
+    "fr": "« Ghost hunter » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "halloween"
+  },
+  "payload": {
+    "label": "Ghost hunter",
+    "style": "glitch"
+  }
+}

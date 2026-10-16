@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "terminal",
+  "names": {
+    "en": "terminal",
+    "fr": "terminal"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:terminal"
+  },
+  "free": true
+}

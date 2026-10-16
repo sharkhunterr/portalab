@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_totality",
+  "names": {
+    "en": "Total eclipse level badge",
+    "fr": "Badge de niveau éclipse totale"
+  },
+  "descriptions": {
+    "en": "Your level inside: the corona of a total eclipse, the diamond ring flashing, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : la couronne d'une éclipse totale, l'anneau de diamant qui étincelle, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1900,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "totality"
+}

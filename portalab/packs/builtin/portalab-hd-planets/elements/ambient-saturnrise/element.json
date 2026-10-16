@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_saturnrise",
+  "names": {
+    "en": "Ringed giant ambience",
+    "fr": "Ambiance Géante aux anneaux"
+  },
+  "descriptions": {
+    "en": "A ringed giant rising in a corner: banded clouds turning, rings with their gap, little moons going round.",
+    "fr": "Une géante aux anneaux qui se lève dans un coin : des nuages en bandes qui tournent, des anneaux et leur division, de petites lunes qui tournent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "saturnrise"
+}

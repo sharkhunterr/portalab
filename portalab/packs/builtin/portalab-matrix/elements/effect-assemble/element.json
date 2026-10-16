@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_assemble",
+  "names": {
+    "en": "Pixel rain celebration",
+    "fr": "Célébration pluie de pixels"
+  },
+  "descriptions": {
+    "en": "Pixel rain burst out when you earn a reward or level up.",
+    "fr": "Pluie de pixels jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "assemble"
+}

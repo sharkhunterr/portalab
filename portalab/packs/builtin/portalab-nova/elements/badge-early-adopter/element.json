@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_early_adopter",
+  "names": {
+    "en": "Early adopter badge",
+    "fr": "Badge Early adopter"
+  },
+  "descriptions": {
+    "en": "Updates on day one.",
+    "fr": "Fait les mises à jour dès le premier jour."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "rocket"
+  },
+  "payload": {
+    "label": "Early adopter",
+    "icon": "rocket",
+    "style": "glass"
+  }
+}

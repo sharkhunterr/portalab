@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_christmas",
+  "names": {
+    "en": "Christmas HD pack",
+    "fr": "Pack Noël HD"
+  },
+  "descriptions": {
+    "en": "The season's looks drawn by the graphics chip. — 800 Coins saved.",
+    "fr": "Les looks de la saison dessinés par la puce graphique. — 800 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3200,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop",
+    "season": "christmas"
+  },
+  "payload": {
+    "products": [
+      "name_nametinsel",
+      "level_tinsel",
+      "frame_tinsel"
+    ]
+  }
+}

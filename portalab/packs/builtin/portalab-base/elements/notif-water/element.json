@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_water",
+  "names": {
+    "en": "Water notifications",
+    "fr": "Notifications eau"
+  },
+  "descriptions": {
+    "en": "They well up from below and settle with a ripple.",
+    "fr": "Elles jaillissent d'en bas et se posent en ondulant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "water"
+}

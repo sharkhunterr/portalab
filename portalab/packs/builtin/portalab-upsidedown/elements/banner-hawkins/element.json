@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_hawkins",
+  "names": {
+    "en": "Hawkins lights banner",
+    "fr": "Bannière guirlande de Hawkins"
+  },
+  "descriptions": {
+    "en": "A string of Christmas lights blinking on a wallpapered wall.",
+    "fr": "Une guirlande qui clignote sur un mur tapissé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "hawkins"
+}

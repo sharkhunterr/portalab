@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "dpad",
+  "names": {
+    "en": "dpad",
+    "fr": "dpad"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:dpad"
+  },
+  "free": true
+}

@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_redcarpet",
+  "names": {
+    "en": "Red carpet palette",
+    "fr": "Palette tapis rouge"
+  },
+  "descriptions": {
+    "en": "Screen red and a touch of gold over the theme.",
+    "fr": "Le rouge de l'écran et une touche d'or sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "redcarpet"
+}

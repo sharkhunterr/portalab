@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_front_page",
+  "names": {
+    "en": "Title: Front page",
+    "fr": "Titre : À la une"
+  },
+  "descriptions": {
+    "en": "« Front page » under your name.",
+    "fr": "« Front page » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Front page",
+    "style": "shimmer"
+  }
+}

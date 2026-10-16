@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_golden_reel",
+  "names": {
+    "en": "Title: Golden reel",
+    "fr": "Titre : Bobine d'or"
+  },
+  "descriptions": {
+    "en": "Given for 250 films and episodes.",
+    "fr": "Offert pour 250 films et épisodes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Golden reel",
+    "style": "gold"
+  }
+}

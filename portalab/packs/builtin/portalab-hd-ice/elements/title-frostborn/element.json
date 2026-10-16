@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_frostborn",
+  "names": {
+    "en": "Title: Frostborn",
+    "fr": "Titre : Né du givre"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "christmas"
+  },
+  "look": "glacier",
+  "payload": {
+    "label": "Frostborn"
+  }
+}

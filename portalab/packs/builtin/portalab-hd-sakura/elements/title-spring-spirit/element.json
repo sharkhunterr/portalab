@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_spring_spirit",
+  "names": {
+    "en": "Title: Spring spirit",
+    "fr": "Titre : Esprit du printemps"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "spring"
+  },
+  "look": "sakura",
+  "payload": {
+    "label": "Spring spirit"
+  }
+}

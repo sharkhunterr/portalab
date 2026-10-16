@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_orion",
+  "names": {
+    "en": "Orion Nebula ambience",
+    "fr": "Ambiance Nébuleuse d'Orion"
+  },
+  "descriptions": {
+    "en": "M42: billowing clouds of magenta and crimson round a white-hot heart where young stars blaze, violet and blue wings, dark bays of dust — folding slowly.",
+    "fr": "M42 : des nuages magenta et cramoisis autour d'un cœur blanc où brillent de jeunes étoiles, des ailes violettes et bleues, des baies de poussière — qui se replient lentement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "orion"
+}

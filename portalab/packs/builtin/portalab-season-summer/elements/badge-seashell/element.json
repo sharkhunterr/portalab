@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_seashell",
+  "names": {
+    "en": "Seashell badge",
+    "fr": "Badge Coquillage"
+  },
+  "descriptions": {
+    "en": "A « Seashell » badge on your profile.",
+    "fr": "Un badge « Seashell » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star",
+    "season": "summer"
+  },
+  "payload": {
+    "label": "Seashell",
+    "icon": "shell",
+    "style": "shimmer"
+  }
+}

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { api } from "../../../api/client";
+import { isWithheld, useExternalRevision } from "../../../design-system/visuals/registry";
 import type { Waiting } from "../../appearance/waiting";
 
 /**
@@ -66,13 +67,38 @@ export interface LooksCatalog {
 const KEY = ["marketplace", "profile-looks"] as const;
 
 export function useProfileLooks(enabled = true) {
+  const revision = useExternalRevision();
+  const select = useCallback(
+    (data: LooksCatalog): LooksCatalog => {
+      void revision; // 028: a pack switched off or on changes what shows
+      return { ...data, equipped: shownEquipped(data.equipped) };
+    },
+    [revision],
+  );
   return useQuery({
     queryKey: KEY,
     enabled,
     retry: false,
     staleTime: 5 * 60_000,
     queryFn: async () => (await api.GET("/api/v1/me/profile-looks")).data as unknown as LooksCatalog,
+    select,
   });
+}
+
+/** 028: the looks a member wears, as they show — one of a pack switched off shows the default (the choice
+ * itself is kept, and shows again when the pack is switched on). */
+export function shownEquipped(equipped: Equipped): Equipped {
+  if (!equipped) return equipped;
+  const out: Equipped = { ...equipped };
+  const slots: Array<["banner" | "frame" | "background" | "name" | "level", string]> = [
+    ["banner", "profile_banner"],
+    ["frame", "avatar_frame"],
+    ["background", "ambient"],
+    ["name", "name_style"],
+    ["level", "level_badge"],
+  ];
+  for (const [slot, type] of slots) if (isWithheld(type, equipped[slot])) out[slot] = null;
+  return out;
 }
 
 export function useEquipLook() {

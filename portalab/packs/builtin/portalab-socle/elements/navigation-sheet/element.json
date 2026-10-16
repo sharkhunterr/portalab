@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "sheet",
+  "names": {
+    "en": "sheet",
+    "fr": "sheet"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:sheet"
+  },
+  "free": true
+}

@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_rainbow",
+  "names": {
+    "en": "Rainbow frame",
+    "fr": "Cadre arc-en-ciel"
+  },
+  "descriptions": {
+    "en": "A turning rainbow ring.",
+    "fr": "Un anneau arc-en-ciel qui tourne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "rainbow"
+}

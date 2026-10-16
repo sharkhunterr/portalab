@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_window",
+  "names": {
+    "en": "Window frame",
+    "fr": "Cadre fenêtre"
+  },
+  "descriptions": {
+    "en": "Your avatar in a little window, its blue title bar and red close button.",
+    "fr": "Votre avatar dans une petite fenêtre, sa barre de titre bleue et son bouton fermer rouge."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "window"
+}

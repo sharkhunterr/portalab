@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_helix",
+  "names": {
+    "en": "Helix Nebula animated banner",
+    "fr": "Bannière animée Nébuleuse de l'Hélice"
+  },
+  "descriptions": {
+    "en": "Helix Nebula in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+    "fr": "Nébuleuse de l'Hélice dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 13,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-helix"
+}

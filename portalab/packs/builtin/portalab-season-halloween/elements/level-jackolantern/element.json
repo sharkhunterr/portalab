@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_jackolantern",
+  "names": {
+    "en": "Jack-o'-lantern level badge",
+    "fr": "Badge de niveau citrouille-lanterne"
+  },
+  "descriptions": {
+    "en": "A carved pumpkin lit from inside.",
+    "fr": "Une citrouille sculptée éclairée de l'intérieur."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "halloween"
+  },
+  "look": "jackolantern"
+}

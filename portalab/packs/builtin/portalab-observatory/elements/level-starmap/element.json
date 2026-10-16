@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_starmap",
+  "names": {
+    "en": "Star chart level badge",
+    "fr": "Badge de niveau carte du ciel"
+  },
+  "descriptions": {
+    "en": "Your level inside: a constellation drawing itself on a star chart, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : une constellation qui se dessine sur une carte du ciel, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "level": 12,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "starmap"
+}

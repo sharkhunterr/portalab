@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_groovywaves",
+  "names": {
+    "en": "Groovy waves animated banner",
+    "fr": "Bannière animée vagues groovy"
+  },
+  "descriptions": {
+    "en": "Groovy waves playing in your profile's banner, for every visitor to see.",
+    "fr": "Des vagues groovy dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-groovywaves"
+}

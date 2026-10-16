@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_halloween",
+  "names": {
+    "en": "Halloween interface",
+    "fr": "Interface Halloween"
+  },
+  "descriptions": {
+    "en": "Trick or treat: bats flying by, a cauldron bubble for the menu, candy for Coins. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Des bonbons ou un sort : chauves-souris, menu en bulle-chaudron, des bonbons comme monnaie. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette",
+    "season": "halloween"
+  },
+  "look": "halloween"
+}

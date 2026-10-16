@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_sun_chaser",
+  "names": {
+    "en": "Sun chaser badge",
+    "fr": "Badge Chasseur de soleil"
+  },
+  "descriptions": {
+    "en": "A « Sun chaser » badge on your profile.",
+    "fr": "Un badge « Sun chaser » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Sun chaser",
+    "icon": "sun",
+    "style": "pulse"
+  }
+}

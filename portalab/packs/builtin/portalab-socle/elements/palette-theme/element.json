@@ -1,0 +1,13 @@
+{
+  "type": "palette",
+  "look": "theme",
+  "names": {
+    "en": "The theme's",
+    "fr": "Celle du thème"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

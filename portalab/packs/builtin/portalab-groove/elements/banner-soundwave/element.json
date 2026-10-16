@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_soundwave",
+  "names": {
+    "en": "Sound wave banner",
+    "fr": "Bannière onde sonore"
+  },
+  "descriptions": {
+    "en": "A green sound wave across a night-black banner.",
+    "fr": "Une onde sonore verte en travers d'une bannière noire."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "soundwave"
+}

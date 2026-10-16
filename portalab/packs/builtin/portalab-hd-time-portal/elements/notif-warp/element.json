@@ -1,0 +1,24 @@
+{
+  "type": "notification_animation",
+  "product": "notif_warp",
+  "names": {
+    "en": "Time warp notifications",
+    "fr": "Notifications distorsion temporelle"
+  },
+  "descriptions": {
+    "en": "They step out of a triangular time portal that closes behind them. Drawn by the graphics chip.",
+    "fr": "Elles sortent d'un portail temporel triangulaire qui se referme derrière elles. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "warp"
+}

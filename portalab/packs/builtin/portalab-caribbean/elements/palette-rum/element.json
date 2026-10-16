@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_rum",
+  "names": {
+    "en": "Rum and lagoon palette",
+    "fr": "Palette rhum et lagon"
+  },
+  "descriptions": {
+    "en": "Amber rum and lagoon turquoise over the theme.",
+    "fr": "Rhum ambré et turquoise du lagon sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "rum"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_orbits",
+  "names": {
+    "en": "Orbits banner",
+    "fr": "Bannière orbites"
+  },
+  "descriptions": {
+    "en": "A sun and its planets on their orbits.",
+    "fr": "Un soleil et ses planètes sur leurs orbites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "orbits"
+}

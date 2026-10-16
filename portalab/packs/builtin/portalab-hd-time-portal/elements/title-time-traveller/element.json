@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_time_traveller",
+  "names": {
+    "en": "Title: Time traveller",
+    "fr": "Titre : Voyageur temporel"
+  },
+  "descriptions": {
+    "en": "A title seen through a time portal.",
+    "fr": "Un titre vu à travers un portail temporel."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "chrono",
+  "payload": {
+    "label": "Time traveller"
+  }
+}

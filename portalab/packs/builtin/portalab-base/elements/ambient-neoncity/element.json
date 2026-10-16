@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_neoncity",
+  "names": {
+    "en": "Neon city ambience",
+    "fr": "Ambiance cité néon"
+  },
+  "descriptions": {
+    "en": "Neon city drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Cité néon derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "neoncity"
+}

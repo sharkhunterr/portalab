@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_pages",
+  "names": {
+    "en": "Flying pages ambience",
+    "fr": "Ambiance pages qui s'envolent"
+  },
+  "descriptions": {
+    "en": "Newspaper pages fluttering across, carried by the wind.",
+    "fr": "Des pages de journal qui volettent, portées par le vent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "pages"
+}

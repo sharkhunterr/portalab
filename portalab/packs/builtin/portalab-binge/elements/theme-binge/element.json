@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_binge",
+  "names": {
+    "en": "Binge interface",
+    "fr": "Interface Binge"
+  },
+  "descriptions": {
+    "en": "A night of series: red on black, a top bar over the posters, cinema glows, « next episode » notifications and a season finale for every level. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Une soirée séries : rouge sur noir, une barre en haut au-dessus des affiches, des lueurs de cinéma, des notifications « épisode suivant » et un final de saison à chaque niveau. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "binge"
+}

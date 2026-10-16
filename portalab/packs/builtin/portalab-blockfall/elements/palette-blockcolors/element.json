@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_blockcolors",
+  "names": {
+    "en": "Block colours palette",
+    "fr": "Palette couleurs des blocs"
+  },
+  "descriptions": {
+    "en": "Cyan and yellow pieces over the theme.",
+    "fr": "Des pièces cyan et jaunes sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "blockcolors"
+}

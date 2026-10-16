@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_pirate",
+  "names": {
+    "en": "Pirate notifications",
+    "fr": "Notifications pirate"
+  },
+  "descriptions": {
+    "en": "A weathered plank, brass rivets and a rope edge.",
+    "fr": "Une planche patinée, des rivets de laiton et un bord en corde."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "pirate"
+}

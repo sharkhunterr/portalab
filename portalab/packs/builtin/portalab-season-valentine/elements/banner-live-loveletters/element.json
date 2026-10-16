@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_loveletters",
+  "names": {
+    "en": "Love letters animated banner",
+    "fr": "Bannière animée lettres d'amour"
+  },
+  "descriptions": {
+    "en": "Love letters playing in your profile's banner, for every visitor to see.",
+    "fr": "Des lettres d'amour dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "valentine"
+  },
+  "look": "live-loveletters"
+}

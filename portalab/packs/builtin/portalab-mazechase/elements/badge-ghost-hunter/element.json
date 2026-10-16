@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_ghost_hunter",
+  "names": {
+    "en": "Ghost hunter badge",
+    "fr": "Badge Chasseur de fantômes"
+  },
+  "descriptions": {
+    "en": "A « Ghost hunter » badge on your profile.",
+    "fr": "Un badge « Ghost hunter » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Ghost hunter",
+    "icon": "ghost",
+    "style": "neon"
+  }
+}

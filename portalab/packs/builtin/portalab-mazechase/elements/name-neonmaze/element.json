@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_neonmaze",
+  "names": {
+    "en": "Maze neon name style",
+    "fr": "Style de nom néon du labyrinthe"
+  },
+  "descriptions": {
+    "en": "A name in yellow pixel letters outlined in maze blue.",
+    "fr": "Un nom en lettres de pixels jaunes cernées du bleu du labyrinthe."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "neonmaze"
+}

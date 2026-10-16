@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_orbit_master",
+  "names": {
+    "en": "Title: Orbit master",
+    "fr": "Titre : Maître des orbites"
+  },
+  "descriptions": {
+    "en": "« Orbit master » under your name.",
+    "fr": "« Orbit master » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "frost",
+  "payload": {
+    "label": "Orbit master"
+  }
+}

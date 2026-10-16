@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_pow",
+  "names": {
+    "en": "POW! banner",
+    "fr": "Bannière POW !"
+  },
+  "descriptions": {
+    "en": "A comic-book burst.",
+    "fr": "Une explosion de BD."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "pow"
+}

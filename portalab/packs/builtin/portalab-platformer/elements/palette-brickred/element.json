@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_brickred",
+  "names": {
+    "en": "Brick red palette",
+    "fr": "Palette rouge brique"
+  },
+  "descriptions": {
+    "en": "Brick red and pipe green over the theme.",
+    "fr": "Le rouge des briques et le vert des tuyaux sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "brickred"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_starfield",
+  "names": {
+    "en": "Starry sky ambience",
+    "fr": "Ambiance ciel étoilé"
+  },
+  "descriptions": {
+    "en": "Starry sky drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Ciel étoilé derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "starfield"
+}

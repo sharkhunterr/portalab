@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_pulsar",
+  "names": {
+    "en": "Pulsar badge",
+    "fr": "Badge Pulsar"
+  },
+  "descriptions": {
+    "en": "A « Pulsar » badge on your profile, drawn by the graphics chip.",
+    "fr": "Un badge « Pulsar » sur votre profil, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "pulsar",
+  "payload": {
+    "label": "Pulsar",
+    "icon": "radio"
+  }
+}

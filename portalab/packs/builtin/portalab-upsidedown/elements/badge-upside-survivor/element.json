@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_upside_survivor",
+  "names": {
+    "en": "Upside Down survivor badge",
+    "fr": "Badge Survivant de l'envers"
+  },
+  "descriptions": {
+    "en": "Came back from the other side.",
+    "fr": "Revenu de l'autre côté."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "flashlight"
+  },
+  "look": "mirror",
+  "payload": {
+    "label": "Upside Down survivor",
+    "icon": "flashlight"
+  }
+}

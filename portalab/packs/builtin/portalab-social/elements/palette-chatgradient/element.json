@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_chatgradient",
+  "names": {
+    "en": "Chat gradient palette",
+    "fr": "Palette dégradé discussion"
+  },
+  "descriptions": {
+    "en": "The blue-to-pink gradient of a chat over the theme.",
+    "fr": "Le dégradé bleu-rose d'une discussion sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "chatgradient"
+}

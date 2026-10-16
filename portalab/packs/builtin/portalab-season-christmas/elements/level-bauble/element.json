@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_bauble",
+  "names": {
+    "en": "Bauble level badge",
+    "fr": "Badge de niveau boule de noël"
+  },
+  "descriptions": {
+    "en": "Your level in a shiny Christmas bauble.",
+    "fr": "Votre niveau dans une boule de Noël brillante."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "christmas"
+  },
+  "look": "bauble"
+}

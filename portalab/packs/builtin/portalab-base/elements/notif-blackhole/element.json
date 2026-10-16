@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_blackhole",
+  "names": {
+    "en": "Black hole notifications",
+    "fr": "Notifications trou noir"
+  },
+  "descriptions": {
+    "en": "They spin out of a singularity — and are sucked back in when they go.",
+    "fr": "Elles jaillissent d'une singularité en tournoyant — et y sont aspirées en partant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "blackhole"
+}

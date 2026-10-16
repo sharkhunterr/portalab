@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_lasers",
+  "names": {
+    "en": "Laser shots celebration",
+    "fr": "Célébration tirs laser"
+  },
+  "descriptions": {
+    "en": "Laser bolts shooting out of the reward.",
+    "fr": "Des tirs laser qui jaillissent de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "lasers"
+}

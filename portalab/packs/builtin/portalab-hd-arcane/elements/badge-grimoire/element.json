@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_grimoire",
+  "names": {
+    "en": "Grimoire badge",
+    "fr": "Badge Grimoire"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "book"
+  },
+  "look": "runes",
+  "payload": {
+    "label": "Grimoire",
+    "icon": "book"
+  }
+}

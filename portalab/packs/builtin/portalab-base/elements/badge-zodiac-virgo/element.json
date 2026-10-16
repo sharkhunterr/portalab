@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_zodiac_virgo",
+  "names": {
+    "en": "Virgo badge",
+    "fr": "Badge Vierge"
+  },
+  "descriptions": {
+    "en": "The constellation of Virgo, its stars joined, on your profile — drawn by the graphics chip.",
+    "fr": "La constellation du Vierge, ses étoiles reliées, sur votre profil — dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Virgo",
+    "icon": "zodiac-virgo",
+    "style": "starmap"
+  }
+}

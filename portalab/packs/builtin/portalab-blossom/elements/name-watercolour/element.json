@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_watercolour",
+  "names": {
+    "en": "Watercolour name style",
+    "fr": "Style de nom aquarelle"
+  },
+  "descriptions": {
+    "en": "A name painted in soft watercolour, pink running into green.",
+    "fr": "Un nom peint à l'aquarelle, le rose qui coule dans le vert."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "watercolour"
+}

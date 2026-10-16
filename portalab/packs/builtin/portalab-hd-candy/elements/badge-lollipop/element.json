@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_lollipop",
+  "names": {
+    "en": "Lollipop badge",
+    "fr": "Badge Sucette"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "candy"
+  },
+  "look": "candy",
+  "payload": {
+    "label": "Lollipop",
+    "icon": "candy"
+  }
+}

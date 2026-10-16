@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_candy",
+  "names": {
+    "en": "Candy notifications",
+    "fr": "Notifications bonbon"
+  },
+  "descriptions": {
+    "en": "Swirling candy stripes and sprinkles. Drawn by the graphics chip.",
+    "fr": "Des rayures de bonbon et des vermicelles. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "candy"
+}

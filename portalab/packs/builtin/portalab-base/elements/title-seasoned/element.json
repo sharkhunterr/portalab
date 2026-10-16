@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_seasoned",
+  "names": {
+    "en": "Title: Seasoned",
+    "fr": "Titre : Chevronné"
+  },
+  "descriptions": {
+    "en": "Given at level 30.",
+    "fr": "Offert au niveau 30."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "medal",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Seasoned",
+    "style": "shimmer"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_solar_wind",
+  "names": {
+    "en": "Solar wind badge",
+    "fr": "Badge Vent solaire"
+  },
+  "descriptions": {
+    "en": "A « Solar wind » badge on your profile.",
+    "fr": "Un badge « Solar wind » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Solar wind",
+    "icon": "wind",
+    "style": "float"
+  }
+}

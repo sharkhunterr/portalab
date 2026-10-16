@@ -1,0 +1,52 @@
+{
+  "type": "bundle",
+  "product": "pack_season_summer",
+  "names": {
+    "en": "Summer pack",
+    "fr": "Pack Été"
+  },
+  "descriptions": {
+    "en": "Every look of summer together: sun, sand, sea and warm nights. — 2680 Coins saved.",
+    "fr": "Tous les looks de l'été réunis : soleil, sable, mer et nuits chaudes. — 2680 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 10720,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "packs",
+    "icon": "sun",
+    "season": "summer"
+  },
+  "payload": {
+    "products": [
+      "title_sand_lord",
+      "ambient_fireflies",
+      "ambient_sand",
+      "ambient_sandstorm",
+      "ambient_summerfield",
+      "ambient_pixelbeach",
+      "banner_live_fireflies",
+      "frame_sand",
+      "name_desert",
+      "palette_sunset",
+      "levelup_sandstorm",
+      "ambient_seagulls",
+      "banner_live_seagulls",
+      "effect_splash",
+      "palette_tropical",
+      "name_tropical",
+      "banner_seaside",
+      "title_beach_king",
+      "badge_seashell",
+      "frame_lifebuoy",
+      "level_sunset",
+      "notif_postcard",
+      "frame_sunburst",
+      "name_namesunburst"
+    ]
+  }
+}

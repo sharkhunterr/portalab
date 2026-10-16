@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_saturnrise",
+  "names": {
+    "en": "Ringed giant animated banner",
+    "fr": "Bannière animée Géante aux anneaux"
+  },
+  "descriptions": {
+    "en": "Ringed giant in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+    "fr": "Géante aux anneaux dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-saturnrise"
+}

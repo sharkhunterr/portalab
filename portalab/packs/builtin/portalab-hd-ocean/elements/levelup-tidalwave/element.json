@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_tidalwave",
+  "names": {
+    "en": "Tidal wave level-up",
+    "fr": "Passage de niveau raz-de-marée"
+  },
+  "descriptions": {
+    "en": "The water rises and a great wave rolls across.",
+    "fr": "L'eau monte et une vague géante déferle."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "tidalwave"
+}

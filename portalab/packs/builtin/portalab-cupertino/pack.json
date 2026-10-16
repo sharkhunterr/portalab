@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-cupertino",
+  "version": "1.0.0+96475bce72",
+  "names": {
+    "en": "Cupertino interface",
+    "fr": "Interface Cupertino"
+  },
+  "descriptions": {
+    "en": "The « Cupertino interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Cupertino » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-gazette",
+  "version": "1.0.0+964bad9e71",
+  "names": {
+    "en": "The Gazette interface",
+    "fr": "Interface La Gazette"
+  },
+  "descriptions": {
+    "en": "The « The Gazette interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface La Gazette » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

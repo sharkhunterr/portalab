@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_pixelshire",
+  "names": {
+    "en": "Pixel Shire banner",
+    "fr": "Bannière Comté pixel"
+  },
+  "descriptions": {
+    "en": "The Shire in pixel art: hills, a round door, clouds.",
+    "fr": "La Comté en pixel art : collines, porte ronde, nuages."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "pixelshire"
+}

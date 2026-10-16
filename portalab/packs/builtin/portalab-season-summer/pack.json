@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-season-summer",
+  "version": "1.0.0+e9e67fc1ee",
+  "names": {
+    "en": "Summer",
+    "fr": "Été"
+  },
+  "descriptions": {
+    "en": "The looks of Summer.",
+    "fr": "Les looks de la saison : Été."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

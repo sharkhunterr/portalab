@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_thunderbolt",
+  "names": {
+    "en": "Thunderbolt badge",
+    "fr": "Badge Éclair"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "bolt"
+  },
+  "look": "voltage",
+  "payload": {
+    "label": "Thunderbolt",
+    "icon": "bolt"
+  }
+}

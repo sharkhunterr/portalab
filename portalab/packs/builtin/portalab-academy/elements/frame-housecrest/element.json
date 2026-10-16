@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_housecrest",
+  "names": {
+    "en": "House crest frame",
+    "fr": "Cadre blason de maison"
+  },
+  "descriptions": {
+    "en": "Your avatar on a house's quartered shield.",
+    "fr": "Votre avatar sur l'écu écartelé d'une maison."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "housecrest"
+}

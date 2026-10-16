@@ -1,0 +1,24 @@
+{
+  "type": "notification_animation",
+  "product": "notif_frostbite",
+  "names": {
+    "en": "Frostbite notifications",
+    "fr": "Notifications morsure du givre"
+  },
+  "descriptions": {
+    "en": "Frost grows round them, then shatters as they go. Drawn by the graphics chip.",
+    "fr": "Le givre les entoure, puis se brise quand elles partent. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1000,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles",
+    "season": "christmas"
+  },
+  "look": "frostbite"
+}

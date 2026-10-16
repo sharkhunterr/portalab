@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_earthrise",
+  "names": {
+    "en": "Earthrise banner",
+    "fr": "Bannière lever de Terre"
+  },
+  "descriptions": {
+    "en": "The blue Earth rising over the moon's horizon.",
+    "fr": "La Terre bleue qui se lève sur l'horizon de la lune."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "earthrise"
+}

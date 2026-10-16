@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_hopeless_romantic",
+  "names": {
+    "en": "Title: Hopeless romantic",
+    "fr": "Titre : Romantique incurable"
+  },
+  "descriptions": {
+    "en": "« Hopeless romantic » under your name.",
+    "fr": "« Hopeless romantic » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "valentine"
+  },
+  "payload": {
+    "label": "Hopeless romantic",
+    "style": "pulse"
+  }
+}

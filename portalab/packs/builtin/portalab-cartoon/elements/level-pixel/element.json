@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_pixel",
+  "names": {
+    "en": "Pixel level badge",
+    "fr": "Badge de niveau pixel"
+  },
+  "descriptions": {
+    "en": "Your level in 8-bit, framed in square pixels.",
+    "fr": "Votre niveau en 8 bits, encadré de pixels carrés."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "pixel"
+}

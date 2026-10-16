@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_sunbadge",
+  "names": {
+    "en": "Sunny level badge",
+    "fr": "Badge de niveau soleil"
+  },
+  "descriptions": {
+    "en": "Your level on a glowing sun.",
+    "fr": "Votre niveau sur un soleil rayonnant."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 6,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "sunbadge"
+}

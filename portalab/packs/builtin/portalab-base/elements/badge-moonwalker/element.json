@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_moonwalker",
+  "names": {
+    "en": "Moonwalker badge",
+    "fr": "Badge Marcheur lunaire"
+  },
+  "descriptions": {
+    "en": "A « Moonwalker » badge on your profile.",
+    "fr": "Un badge « Moonwalker » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Moonwalker",
+    "icon": "moon",
+    "style": "float"
+  }
+}

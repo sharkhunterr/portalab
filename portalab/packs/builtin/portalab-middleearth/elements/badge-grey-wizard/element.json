@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_grey_wizard",
+  "names": {
+    "en": "Grey wizard badge",
+    "fr": "Badge Magicien gris"
+  },
+  "descriptions": {
+    "en": "Never late, nor early.",
+    "fr": "Jamais en retard, ni en avance."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "wand"
+  },
+  "look": "elven",
+  "payload": {
+    "label": "Grey wizard",
+    "icon": "wand"
+  }
+}

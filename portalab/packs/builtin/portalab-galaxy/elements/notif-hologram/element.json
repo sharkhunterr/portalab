@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_hologram",
+  "names": {
+    "en": "Hologram notifications",
+    "fr": "Notifications hologramme"
+  },
+  "descriptions": {
+    "en": "A shifting iridescent border.",
+    "fr": "Une bordure irisée qui ondule."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "hologram"
+}

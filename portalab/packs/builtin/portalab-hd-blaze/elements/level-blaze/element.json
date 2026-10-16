@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_blaze",
+  "names": {
+    "en": "Living flames level badge",
+    "fr": "Badge de niveau flammes vives"
+  },
+  "descriptions": {
+    "en": "Real flames wrapped around your level, rising above it, sparks flying.",
+    "fr": "De vraies flammes qui enveloppent votre niveau et montent au-dessus, des étincelles qui s'envolent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "blaze"
+}

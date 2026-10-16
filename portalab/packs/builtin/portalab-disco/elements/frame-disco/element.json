@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_disco",
+  "names": {
+    "en": "Disco frame",
+    "fr": "Cadre disco"
+  },
+  "descriptions": {
+    "en": "A spinning ring of colours.",
+    "fr": "Un anneau de couleurs qui tourne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "disco"
+}

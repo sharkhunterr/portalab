@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_insert_cartridge",
+  "names": {
+    "en": "Title: Insert cartridge",
+    "fr": "Titre : Insérez la cartouche"
+  },
+  "descriptions": {
+    "en": "« Insert cartridge » under your name.",
+    "fr": "« Insert cartridge » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Insert cartridge",
+    "style": "pixel"
+  }
+}

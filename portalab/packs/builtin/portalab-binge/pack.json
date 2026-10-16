@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-binge",
+  "version": "1.0.0+5ca7601b33",
+  "names": {
+    "en": "Binge interface",
+    "fr": "Interface Binge"
+  },
+  "descriptions": {
+    "en": "The « Binge interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Binge » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

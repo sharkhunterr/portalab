@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "ultimate_observatory",
+  "names": {
+    "en": "Observatory theme pack",
+    "fr": "Pack de thème Observatoire"
+  },
+  "descriptions": {
+    "en": "The whole Observatory theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 2710 Coins saved.",
+    "fr": "Tout le thème Observatoire : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 2710 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 10840,
+    "rarity": "legendary",
+    "level": 30,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_observatory",
+      "banner_starchart",
+      "frame_starchart",
+      "name_staratlas",
+      "notif_starmap",
+      "effect_starshower",
+      "ambient_constellations",
+      "badge_telescope",
+      "title_astronomer",
+      "banner_live_constellations",
+      "level_starmap",
+      "palette_orionpink",
+      "name_starlines",
+      "badge_zodiac_leo",
+      "badge_zodiac_scorpio",
+      "levelup_constellate",
+      "notif_shootingstar"
+    ]
+  }
+}

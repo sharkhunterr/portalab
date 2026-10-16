@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_profiletile",
+  "names": {
+    "en": "Viewing profile frame",
+    "fr": "Cadre profil de visionnage"
+  },
+  "descriptions": {
+    "en": "Your avatar as a viewing profile's rounded square, a red edge around it.",
+    "fr": "Votre avatar en carré arrondi de profil de visionnage, bordé de rouge."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "profiletile"
+}

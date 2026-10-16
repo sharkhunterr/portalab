@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_bottle",
+  "names": {
+    "en": "Message in a bottle notifications",
+    "fr": "Notifications bouteille à la mer"
+  },
+  "descriptions": {
+    "en": "Notifications arriving as messages in bottles.",
+    "fr": "Des notifications qui arrivent en bouteilles à la mer."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "bottle"
+}

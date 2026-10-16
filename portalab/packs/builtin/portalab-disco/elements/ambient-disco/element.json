@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_disco",
+  "names": {
+    "en": "Disco lights ambience",
+    "fr": "Ambiance lumières disco"
+  },
+  "descriptions": {
+    "en": "Disco lights drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Lumières disco derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "disco"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-horror",
+  "version": "1.0.0+693436e448",
+  "names": {
+    "en": "Horror interface",
+    "fr": "Interface Horreur"
+  },
+  "descriptions": {
+    "en": "The « Horror interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Horreur » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

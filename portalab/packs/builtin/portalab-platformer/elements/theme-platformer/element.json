@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_platformer",
+  "names": {
+    "en": "Platformer interface",
+    "fr": "Interface Plateformes"
+  },
+  "descriptions": {
+    "en": "The 8-bit platformer: a blue sky, bricks and mystery blocks, a world map to pick your level, coins spinning and a flagpole at the end of every level. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Le jeu de plateformes 8 bits : un ciel bleu, des briques et des blocs mystère, une carte du monde pour choisir son niveau, des pièces qui tournent et un drapeau au bout de chaque niveau. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "platformer"
+}

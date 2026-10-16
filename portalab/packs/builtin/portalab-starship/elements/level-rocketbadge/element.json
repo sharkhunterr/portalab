@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_rocketbadge",
+  "names": {
+    "en": "Rocket level badge",
+    "fr": "Badge de niveau fusée"
+  },
+  "descriptions": {
+    "en": "Your level on a rocket's hull, its engine lit.",
+    "fr": "Votre niveau sur la coque d'une fusée, moteur allumé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "rocketbadge"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_starlit",
+  "names": {
+    "en": "Starlit frame",
+    "fr": "Cadre constellé"
+  },
+  "descriptions": {
+    "en": "A ring of turning stars and nebulae.",
+    "fr": "Un anneau d'étoiles et de nébuleuses qui tourne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "starlit"
+}

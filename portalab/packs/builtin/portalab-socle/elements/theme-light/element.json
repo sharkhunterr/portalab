@@ -1,0 +1,13 @@
+{
+  "type": "theme",
+  "look": "light",
+  "names": {
+    "en": "Light",
+    "fr": "Light"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

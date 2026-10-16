@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "none",
+  "names": {
+    "en": "none",
+    "fr": "none"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

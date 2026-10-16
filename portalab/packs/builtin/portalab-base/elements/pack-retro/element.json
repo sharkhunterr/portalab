@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_retro",
+  "names": {
+    "en": "Retro pack",
+    "fr": "Pack Rétro"
+  },
+  "descriptions": {
+    "en": "VHS notifications and ambience, pixel and VHS level badges, the arcade level-up, an 8-bit sky, two retro badges and a countdown on flip digits. — 790 Coins saved.",
+    "fr": "Notifications et ambiance VHS, badges de niveau pixel et VHS, passage de niveau arcade, ciel 8 bits, deux badges rétro et un compte à rebours à palettes. — 790 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3160,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_vhs",
+      "ambient_vhs",
+      "level_pixel",
+      "level_vhs",
+      "levelup_arcade",
+      "ambient_pixelsky",
+      "badge_rewinder",
+      "badge_8bit_hero",
+      "badge_root",
+      "widget_countdown",
+      "opt_style_countdown_flip"
+    ]
+  }
+}

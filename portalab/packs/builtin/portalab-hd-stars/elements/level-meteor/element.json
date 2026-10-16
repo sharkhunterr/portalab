@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_meteor",
+  "names": {
+    "en": "Shooting stars level badge",
+    "fr": "Badge de niveau étoiles filantes"
+  },
+  "descriptions": {
+    "en": "Your level inside: shooting stars streaking across a night sky, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : des étoiles filantes qui traversent un ciel nocturne, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1000,
+    "rarity": "epic",
+    "level": 7,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "meteor"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_shadow_walker",
+  "names": {
+    "en": "Title: Shadow walker",
+    "fr": "Titre : Marcheur des ombres"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "shadow",
+  "payload": {
+    "label": "Shadow walker"
+  }
+}

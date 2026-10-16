@@ -1,0 +1,43 @@
+{
+  "type": "bundle",
+  "product": "ultimate_alien",
+  "names": {
+    "en": "Xeno theme pack",
+    "fr": "Pack de thème Xéno"
+  },
+  "descriptions": {
+    "en": "The whole Xeno theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1880 Coins saved.",
+    "fr": "Tout le thème Xéno : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1880 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7520,
+    "rarity": "legendary",
+    "level": 40,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_alien",
+      "banner_nebula",
+      "frame_toxic",
+      "name_alien",
+      "notif_terminal",
+      "effect_freeze",
+      "ambient_spores",
+      "badge_xenobiologist",
+      "level_portal",
+      "notif_portal",
+      "levelup_cosmic",
+      "levelup_abduction",
+      "notif_drop",
+      "opt_style_services_pulse",
+      "opt_style_stats_countup"
+    ]
+  }
+}

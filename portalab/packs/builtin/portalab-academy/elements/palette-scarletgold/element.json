@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_scarletgold",
+  "names": {
+    "en": "Scarlet and gold palette",
+    "fr": "Palette écarlate et or"
+  },
+  "descriptions": {
+    "en": "A house's scarlet and gold over the theme.",
+    "fr": "L'écarlate et l'or d'une maison sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "scarletgold"
+}

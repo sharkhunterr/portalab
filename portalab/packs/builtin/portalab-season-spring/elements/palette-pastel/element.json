@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "product": "palette_pastel",
+  "names": {
+    "en": "Pastel palette",
+    "fr": "Palette pastel"
+  },
+  "descriptions": {
+    "en": "Soft lilac and mint over the theme.",
+    "fr": "Lilas tendre et menthe sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette",
+    "season": "spring"
+  },
+  "look": "pastel"
+}

@@ -72,4 +72,8 @@ route, the single-page admin screen.
 - **R27**: anonymous `/api/v1/i18n/catalogs/{auth,common,errors}` only — the SPA bundles its messages, so the
   sign-in page needs no other catalog; the generic answer is `401 {"code": "unauthorized"}` (the code every
   route already used for a missing session), answered before routing.
+- **Fallbacks in the code** (clarified by the user, 2026-10-16): the default interfaces (`portalab-dark`,
+  `portalab-light`, `light`, `dark`, `high-contrast`) and each family's base look stay drawn by the portal's
+  code, never extracted (R8 applies to optional looks only); the socle's elements reference them
+  (`render.renderer = "builtin"`), so a broken, missing or switched-off pack always falls back to them.
 

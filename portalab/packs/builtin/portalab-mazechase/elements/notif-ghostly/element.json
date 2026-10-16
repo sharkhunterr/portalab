@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_ghostly",
+  "names": {
+    "en": "Ghost notifications",
+    "fr": "Notifications fantôme"
+  },
+  "descriptions": {
+    "en": "Notifications shaped like a ghost, their wavy hem and their two eyes.",
+    "fr": "Des notifications en forme de fantôme, leur bas ondulé et leurs deux yeux."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "ghostly"
+}

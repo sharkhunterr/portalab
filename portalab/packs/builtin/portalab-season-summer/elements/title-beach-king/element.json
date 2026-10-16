@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_beach_king",
+  "names": {
+    "en": "Title: Beach king",
+    "fr": "Titre : Roi de la plage"
+  },
+  "descriptions": {
+    "en": "« Beach king » under your name.",
+    "fr": "« Beach king » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "summer"
+  },
+  "payload": {
+    "label": "Beach king",
+    "style": "gold"
+  }
+}

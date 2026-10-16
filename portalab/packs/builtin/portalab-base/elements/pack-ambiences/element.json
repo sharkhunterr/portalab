@@ -1,0 +1,31 @@
+{
+  "type": "bundle",
+  "product": "pack_ambiences",
+  "names": {
+    "en": "Ambience pack",
+    "fr": "Pack Ambiances"
+  },
+  "descriptions": {
+    "en": "Snowfall, fireflies, autumn leaves, sakura petals and floating hearts behind the portal. — 350 Coins saved.",
+    "fr": "Neige, lucioles, feuilles d'automne, pétales de sakura et cœurs flottants derrière le portail. — 350 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_snow",
+      "ambient_fireflies",
+      "ambient_leaves",
+      "ambient_petals",
+      "ambient_hearts"
+    ]
+  }
+}

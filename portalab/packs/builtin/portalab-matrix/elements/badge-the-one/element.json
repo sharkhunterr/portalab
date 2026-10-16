@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "product": "badge_the_one",
+  "names": {
+    "en": "The One badge",
+    "fr": "Badge L'Élu"
+  },
+  "descriptions": {
+    "en": "You see the code. One copy, ever.",
+    "fr": "Vous voyez le code. Un seul exemplaire, à jamais."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 1,
+    "collection": "badges",
+    "icon": "binary"
+  },
+  "payload": {
+    "label": "The One",
+    "icon": "binary",
+    "style": "glitch"
+  }
+}

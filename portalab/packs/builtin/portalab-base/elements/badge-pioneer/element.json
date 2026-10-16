@@ -1,0 +1,26 @@
+{
+  "type": "badge",
+  "product": "badge_pioneer",
+  "names": {
+    "en": "Pioneer badge",
+    "fr": "Badge Pionnier"
+  },
+  "descriptions": {
+    "en": "For the first members of the portal.",
+    "fr": "Pour les premiers membres du portail."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 120,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "compass"
+  },
+  "payload": {
+    "label": "Pioneer",
+    "icon": "compass"
+  }
+}

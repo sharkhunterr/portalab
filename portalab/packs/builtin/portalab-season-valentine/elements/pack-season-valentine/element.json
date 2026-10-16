@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "pack_season_valentine",
+  "names": {
+    "en": "Valentine's pack",
+    "fr": "Pack Saint-Valentin"
+  },
+  "descriptions": {
+    "en": "Every look of Valentine's Day together. — 1500 Coins saved.",
+    "fr": "Tous les looks de la Saint-Valentin réunis. — 1500 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5980,
+    "rarity": "epic",
+    "level": 3,
+    "collection": "packs",
+    "icon": "heart",
+    "season": "valentine"
+  },
+  "payload": {
+    "products": [
+      "effect_hearts",
+      "ambient_hearts",
+      "banner_live_hearts",
+      "palette_rose",
+      "ambient_loveletters",
+      "banner_live_loveletters",
+      "effect_cupid",
+      "palette_cherry",
+      "name_lovestruck",
+      "banner_sweetheart",
+      "title_hopeless_romantic",
+      "badge_cupids_arrow",
+      "frame_heartbeat",
+      "level_heart",
+      "notif_loveletter",
+      "frame_amour",
+      "name_nameamour"
+    ]
+  }
+}

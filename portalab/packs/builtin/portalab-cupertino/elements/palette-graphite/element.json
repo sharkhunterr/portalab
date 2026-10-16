@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_graphite",
+  "names": {
+    "en": "Graphite palette",
+    "fr": "Palette graphite"
+  },
+  "descriptions": {
+    "en": "Graphite grey and a touch of blue over the theme.",
+    "fr": "Gris graphite et une touche de bleu sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "graphite"
+}

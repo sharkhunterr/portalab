@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_child_of_the_sun",
+  "names": {
+    "en": "Title: Child of the Sun",
+    "fr": "Titre : Enfant du Soleil"
+  },
+  "descriptions": {
+    "en": "« Child of the Sun » under your name, drawn by the graphics chip.",
+    "fr": "« Child of the Sun » sous votre nom, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "level": 48,
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "solar",
+  "payload": {
+    "label": "Child of the Sun"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_hourglass",
+  "names": {
+    "en": "Hourglass badge",
+    "fr": "Badge Sablier"
+  },
+  "descriptions": {
+    "en": "A badge seen through a time portal.",
+    "fr": "Un badge vu à travers un portail temporel."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1000,
+    "rarity": "epic",
+    "collection": "badges",
+    "icon": "hourglass"
+  },
+  "look": "chrono",
+  "payload": {
+    "label": "Hourglass",
+    "icon": "hourglass"
+  }
+}

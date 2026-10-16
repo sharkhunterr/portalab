@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_liquidmetal",
+  "names": {
+    "en": "Liquid metal ambience",
+    "fr": "Ambiance métal liquide"
+  },
+  "descriptions": {
+    "en": "Liquid metal drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Métal liquide derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "liquidmetal"
+}

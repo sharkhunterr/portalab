@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_tombstone",
+  "names": {
+    "en": "Tombstone notifications",
+    "fr": "Notifications pierre tombale"
+  },
+  "descriptions": {
+    "en": "Notifications carved in old stone.",
+    "fr": "Des notifications gravées dans la vieille pierre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell",
+    "season": "halloween"
+  },
+  "look": "tombstone"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_darkness",
+  "names": {
+    "en": "Darkness ambience",
+    "fr": "Ambiance ténèbres"
+  },
+  "descriptions": {
+    "en": "Darkness drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Ténèbres derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "darkness"
+}

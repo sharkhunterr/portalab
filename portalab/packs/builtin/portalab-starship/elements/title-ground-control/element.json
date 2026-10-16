@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_ground_control",
+  "names": {
+    "en": "Title: Ground control",
+    "fr": "Titre : Contrôle au sol"
+  },
+  "descriptions": {
+    "en": "« Ground control » under your name.",
+    "fr": "« Ground control » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Ground control",
+    "style": "neon"
+  }
+}

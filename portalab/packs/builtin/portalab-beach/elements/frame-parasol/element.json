@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_parasol",
+  "names": {
+    "en": "Parasol frame",
+    "fr": "Cadre parasol"
+  },
+  "descriptions": {
+    "en": "Your avatar in the shade of a striped parasol.",
+    "fr": "Votre avatar à l'ombre d'un parasol rayé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "parasol"
+}

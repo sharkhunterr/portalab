@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_nostromo",
+  "names": {
+    "en": "Onboard computer level-up",
+    "fr": "Passage de niveau ordinateur de bord"
+  },
+  "descriptions": {
+    "en": "The CRT switches on, the motion tracker sweeps behind, MU/TH/UR types your crew file update.",
+    "fr": "L'écran s'allume, le détecteur de mouvement balaie, MU/TH/UR tape la mise à jour de votre dossier."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "nostromo"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_sakura",
+  "names": {
+    "en": "Sakura banner",
+    "fr": "Bannière sakura"
+  },
+  "descriptions": {
+    "en": "Falling cherry blossom petals.",
+    "fr": "Des pétales de cerisier qui tombent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "spring"
+  },
+  "look": "sakura"
+}

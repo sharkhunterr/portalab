@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_moonchild",
+  "names": {
+    "en": "Title: Moonchild",
+    "fr": "Titre : Enfant de la Lune"
+  },
+  "descriptions": {
+    "en": "« Moonchild » under your name, drawn by the graphics chip.",
+    "fr": "« Moonchild » sous votre nom, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "level": 39,
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "lunar",
+  "payload": {
+    "label": "Moonchild"
+  }
+}

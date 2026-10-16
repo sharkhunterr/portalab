@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_defragmented",
+  "names": {
+    "en": "Defragmented badge",
+    "fr": "Badge Défragmenté"
+  },
+  "descriptions": {
+    "en": "A « Defragmented » badge on your profile.",
+    "fr": "Un badge « Defragmented » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Defragmented",
+    "icon": "hard-drive",
+    "style": "pixel"
+  }
+}

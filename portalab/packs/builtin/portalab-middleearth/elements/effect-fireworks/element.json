@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_fireworks",
+  "names": {
+    "en": "Wizard's fireworks celebration",
+    "fr": "Célébration feux d'artifice du magicien"
+  },
+  "descriptions": {
+    "en": "Wizard's fireworks burst out when you earn a reward or level up.",
+    "fr": "Feux d'artifice du magicien jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "fireworks"
+}

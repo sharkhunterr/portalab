@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_funky",
+  "names": {
+    "en": "Funky interface",
+    "fr": "Interface Funky"
+  },
+  "descriptions": {
+    "en": "The seventies at full groove: orange, mustard and brown, wavy stripes, a jukebox to choose your section, notifications that strut in. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Les années 70 à plein groove : orange, moutarde et marron, des rayures ondulées, un juke-box pour choisir sa rubrique, des notifications qui arrivent en se déhanchant. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "funky"
+}

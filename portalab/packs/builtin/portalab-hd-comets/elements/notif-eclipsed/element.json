@@ -1,0 +1,24 @@
+{
+  "type": "notification_animation",
+  "product": "notif_eclipsed",
+  "names": {
+    "en": "Eclipse notification animation",
+    "fr": "Animation de notification éclipse"
+  },
+  "descriptions": {
+    "en": "Notifications appearing as the moon slides off the sun, the corona flaring.",
+    "fr": "Des notifications qui apparaissent quand la lune quitte le soleil, la couronne qui flamboie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "level": 7,
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "eclipsed"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_butterflies",
+  "names": {
+    "en": "Butterflies animated banner",
+    "fr": "Bannière animée papillons"
+  },
+  "descriptions": {
+    "en": "Butterflies playing in your profile's banner, for every visitor to see.",
+    "fr": "Des papillons dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "spring"
+  },
+  "look": "live-butterflies"
+}

@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "ultimate_galaxy",
+  "names": {
+    "en": "Space Opera theme pack",
+    "fr": "Pack de thème Space Opera"
+  },
+  "descriptions": {
+    "en": "The whole Space Opera theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 2520 Coins saved.",
+    "fr": "Tout le thème Space Opera : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 2520 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 10080,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_galaxy",
+      "banner_hyperspace",
+      "frame_orbit",
+      "name_galaxy",
+      "notif_hologram",
+      "effect_portal",
+      "ambient_starfield",
+      "badge_ace_pilot",
+      "title_star_keeper",
+      "level_blackhole",
+      "notif_saga",
+      "notif_filmwipe",
+      "levelup_cosmic",
+      "levelup_crawl",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "opt_style_progress_odometer"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_neon",
+  "names": {
+    "en": "Neon level badge",
+    "fr": "Badge de niveau néon"
+  },
+  "descriptions": {
+    "en": "A glowing cyan tube around your level.",
+    "fr": "Un tube cyan lumineux autour de votre niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "neon"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_goldshower",
+  "names": {
+    "en": "Gold shower celebration",
+    "fr": "Célébration pluie d'or"
+  },
+  "descriptions": {
+    "en": "Gold shower burst out when you earn a reward or level up.",
+    "fr": "Pluie d'or jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "goldshower"
+}

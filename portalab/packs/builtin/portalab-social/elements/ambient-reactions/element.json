@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_reactions",
+  "names": {
+    "en": "Live reactions ambience",
+    "fr": "Ambiance réactions en direct"
+  },
+  "descriptions": {
+    "en": "Hearts and thumbs up floating up like reactions on a live video.",
+    "fr": "Des cœurs et des pouces qui s'envolent comme les réactions d'une vidéo en direct."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "reactions"
+}

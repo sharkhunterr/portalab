@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_lcdtext",
+  "names": {
+    "en": "LCD screen name style",
+    "fr": "Style de nom écran LCD"
+  },
+  "descriptions": {
+    "en": "A name in pixel letters, dark green with the screen's faint ghost.",
+    "fr": "Un nom en lettres de pixels, vert sombre avec la légère rémanence de l'écran."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "lcdtext"
+}

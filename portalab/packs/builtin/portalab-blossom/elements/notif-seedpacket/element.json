@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_seedpacket",
+  "names": {
+    "en": "Seed packet notifications",
+    "fr": "Notifications sachet de graines"
+  },
+  "descriptions": {
+    "en": "Notifications like a seed packet, its torn top edge and its flowers.",
+    "fr": "Des notifications comme un sachet de graines, son haut déchiré et ses fleurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "seedpacket"
+}

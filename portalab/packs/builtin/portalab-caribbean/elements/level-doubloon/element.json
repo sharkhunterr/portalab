@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_doubloon",
+  "names": {
+    "en": "Doubloon level badge",
+    "fr": "Badge de niveau doublon"
+  },
+  "descriptions": {
+    "en": "Your level struck on a notched gold doubloon.",
+    "fr": "Votre niveau frappé sur un doublon d'or cranté."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "doubloon"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_postcard",
+  "names": {
+    "en": "Postcard notifications",
+    "fr": "Notifications carte postale"
+  },
+  "descriptions": {
+    "en": "Notifications that arrive as postcards.",
+    "fr": "Des notifications qui arrivent en cartes postales."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell",
+    "season": "summer"
+  },
+  "look": "postcard"
+}

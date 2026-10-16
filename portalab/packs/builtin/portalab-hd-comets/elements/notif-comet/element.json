@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_comet",
+  "names": {
+    "en": "Comet notifications",
+    "fr": "Notifications comète"
+  },
+  "descriptions": {
+    "en": "Notifications in a shape of their own: a comet going round, its tails streaming behind, drawn by the graphics chip.",
+    "fr": "Des notifications à la forme bien à elles : une comète qui fait le tour, ses queues derrière elle, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "comet"
+}

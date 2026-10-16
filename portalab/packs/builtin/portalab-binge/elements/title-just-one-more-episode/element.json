@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_just_one_more_episode",
+  "names": {
+    "en": "Title: Just one more episode",
+    "fr": "Titre : Encore un épisode"
+  },
+  "descriptions": {
+    "en": "« Just one more episode » under your name.",
+    "fr": "« Just one more episode » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Just one more episode",
+    "style": "flame"
+  }
+}

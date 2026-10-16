@@ -1,0 +1,25 @@
+{
+  "type": "theme",
+  "product": "theme_christmas",
+  "names": {
+    "en": "Noël interface",
+    "fr": "Interface Noël"
+  },
+  "descriptions": {
+    "en": "By the fireplace: falling snow, an advent-calendar launcher, sticky notes and bells. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Au coin du feu : neige qui tombe, menu calendrier de l'Avent, post-it et clochettes. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette",
+    "season": "christmas"
+  },
+  "look": "christmas"
+}

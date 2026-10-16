@@ -173,20 +173,58 @@ export default function VisualsAdmin() {
         icon="package"
         flush
         actions={
-          <fieldset className="visuals-filter">
-            <legend className="visually-hidden">{t("admin:visuals.filter")}</legend>
-            {(["all", "builtin", "imported"] as const).map((value) => (
-              <label key={value}>
-                <input
-                  type="radio"
-                  name="visuals-filter"
-                  checked={filter === value}
-                  onChange={() => setFilter(value)}
-                />
-                {t(`admin:visuals.filters.${value}`)}
-              </label>
-            ))}
-          </fieldset>
+          <>
+            {filter === "builtin" ? (
+              <div className="ds-stack--row">
+                <Button
+                  variant="secondary"
+                  disabled={action.isPending}
+                  onClick={async () => {
+                    const result = await run("/api/v1/admin/visuals/builtin/state", { state: "enabled" });
+                    if (result)
+                      setMessage({
+                        tone: "ok",
+                        text: t("admin:visuals.builtinChanged", {
+                          count: (result.changed as string[]).length,
+                        }),
+                      });
+                  }}
+                >
+                  <Icon name="play" size={16} /> {t("admin:visuals.builtinOn")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  disabled={action.isPending}
+                  onClick={async () => {
+                    const result = await run("/api/v1/admin/visuals/builtin/state", { state: "disabled" });
+                    if (result)
+                      setMessage({
+                        tone: "ok",
+                        text: t("admin:visuals.builtinChanged", {
+                          count: (result.changed as string[]).length,
+                        }),
+                      });
+                  }}
+                >
+                  <Icon name="pause" size={16} /> {t("admin:visuals.builtinOff")}
+                </Button>
+              </div>
+            ) : null}
+            <fieldset className="visuals-filter">
+              <legend className="visually-hidden">{t("admin:visuals.filter")}</legend>
+              {(["all", "builtin", "imported"] as const).map((value) => (
+                <label key={value}>
+                  <input
+                    type="radio"
+                    name="visuals-filter"
+                    checked={filter === value}
+                    onChange={() => setFilter(value)}
+                  />
+                  {t(`admin:visuals.filters.${value}`)}
+                </label>
+              ))}
+            </fieldset>
+          </>
         }
       >
         {packs.isPending ? <FunctionalState state="loading" label={t("admin:visuals.loading")} /> : null}

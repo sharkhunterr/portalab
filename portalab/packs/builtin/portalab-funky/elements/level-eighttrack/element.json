@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_eighttrack",
+  "names": {
+    "en": "8-track cartridge level badge",
+    "fr": "Badge de niveau cartouche 8 pistes"
+  },
+  "descriptions": {
+    "en": "Your level on an 8-track cartridge's label.",
+    "fr": "Votre niveau sur l'étiquette d'une cartouche 8 pistes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "eighttrack"
+}

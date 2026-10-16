@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_shadow",
+  "names": {
+    "en": "Shadow level badge",
+    "fr": "Badge de niveau ombre"
+  },
+  "descriptions": {
+    "en": "Black smoke reaching out, eyes opening in the dark.",
+    "fr": "Une fumée noire qui s'étend, des yeux qui s'ouvrent dans le noir."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "shadow"
+}

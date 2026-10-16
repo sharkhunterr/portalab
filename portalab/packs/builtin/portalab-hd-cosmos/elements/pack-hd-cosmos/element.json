@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_cosmos",
+  "names": {
+    "en": "Cosmos HD pack",
+    "fr": "Pack Cosmos HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 2440 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 2440 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 9760,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_galaxy",
+      "notif_galaxy",
+      "frame_starlit",
+      "title_stargazer",
+      "badge_comet",
+      "levelup_supernova",
+      "banner_live_blackhole",
+      "notif_stardust",
+      "name_namegalaxy",
+      "effect_nova"
+    ]
+  }
+}

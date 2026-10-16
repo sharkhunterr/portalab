@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_big_bang_theorist",
+  "names": {
+    "en": "Title: Big Bang theorist",
+    "fr": "Titre : Théoricien du Big Bang"
+  },
+  "descriptions": {
+    "en": "« Big Bang theorist » under your name.",
+    "fr": "« Big Bang theorist » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Big Bang theorist",
+    "style": "rainbow"
+  }
+}

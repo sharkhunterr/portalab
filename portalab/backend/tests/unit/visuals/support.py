@@ -57,8 +57,13 @@ class FakeWriter:
             self.withdrawn.remove(product["key"])
         return outcome
 
-    async def withdraw(self, actor: Principal, key: str) -> None:
+    async def withdraw(self, actor: Principal, key: str) -> bool:
+        on_sale = key in self.products and key not in self.withdrawn
         self.withdrawn.append(key)
+        return on_sale
+
+    async def existing(self, keys: Iterable[str]) -> frozenset[str]:
+        return frozenset(k for k in keys if k in self.products)
 
     async def owners(self, keys: Iterable[str]) -> int:
         return sum(self.owned.get(k, 0) for k in keys)

@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_solarflare",
+  "names": {
+    "en": "Solar flare palette",
+    "fr": "Palette éruption solaire"
+  },
+  "descriptions": {
+    "en": "The sun's orange and fire over the theme.",
+    "fr": "L'orange et le feu du soleil sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "solarflare"
+}

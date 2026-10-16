@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_startbutton",
+  "names": {
+    "en": "Start button level badge",
+    "fr": "Badge de niveau bouton démarrer"
+  },
+  "descriptions": {
+    "en": "Your level on a green rounded button, in white italics.",
+    "fr": "Votre niveau sur un bouton vert arrondi, en italique blanc."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "startbutton"
+}

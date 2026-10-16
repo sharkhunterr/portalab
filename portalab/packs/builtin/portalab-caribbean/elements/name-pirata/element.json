@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_pirata",
+  "names": {
+    "en": "Pirate name style",
+    "fr": "Style de nom pirate"
+  },
+  "descriptions": {
+    "en": "A name in a pirate's blackletter, old gold.",
+    "fr": "Un nom en gothique de pirate, vieil or."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "pirata"
+}

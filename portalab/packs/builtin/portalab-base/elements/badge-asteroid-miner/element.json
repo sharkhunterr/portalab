@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_asteroid_miner",
+  "names": {
+    "en": "Asteroid miner badge",
+    "fr": "Badge Mineur d'astéroïdes"
+  },
+  "descriptions": {
+    "en": "A « Asteroid miner » badge on your profile.",
+    "fr": "Un badge « Asteroid miner » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Asteroid miner",
+    "icon": "gem",
+    "style": "shimmer"
+  }
+}

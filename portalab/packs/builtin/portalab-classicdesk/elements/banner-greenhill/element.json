@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_greenhill",
+  "names": {
+    "en": "Green hill banner",
+    "fr": "Bannière colline verdoyante"
+  },
+  "descriptions": {
+    "en": "A green hill rolling under a deep blue sky and its clouds.",
+    "fr": "Une colline verte qui ondule sous un ciel bleu profond et ses nuages."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "greenhill"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "level_up",
+  "product": "levelup_rift",
+  "names": {
+    "en": "The Gate level-up",
+    "fr": "Passage de niveau la brèche"
+  },
+  "descriptions": {
+    "en": "The lights flicker, a red rift tears the wall open, its membrane pulsing — you step into it and come out in the Upside Down, ash drifting up, red lightning overhead, at your new level.",
+    "fr": "Les lumières vacillent, une brèche rouge déchire le mur, sa membrane palpite — vous y entrez et ressortez dans le monde à l'envers, des cendres qui montent, des éclairs rouges au-dessus, à votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "rift"
+}

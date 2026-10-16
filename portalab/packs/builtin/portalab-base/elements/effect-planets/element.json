@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_planets",
+  "names": {
+    "en": "Planets celebration",
+    "fr": "Célébration planètes"
+  },
+  "descriptions": {
+    "en": "Little planets, a ringed one among them, bursting out.",
+    "fr": "De petites planètes, dont une à anneaux, qui jaillissent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "planets"
+}

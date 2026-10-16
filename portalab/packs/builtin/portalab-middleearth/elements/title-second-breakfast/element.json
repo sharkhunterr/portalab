@@ -1,0 +1,25 @@
+{
+  "type": "title",
+  "product": "title_second_breakfast",
+  "names": {
+    "en": "Title: Second breakfast champion",
+    "fr": "Titre : Champion du second petit-déjeuner"
+  },
+  "descriptions": {
+    "en": "What about elevenses?",
+    "fr": "Et l'en-cas de onze heures ?"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Second breakfast champion"
+  }
+}

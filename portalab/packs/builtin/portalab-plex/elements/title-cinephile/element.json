@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_cinephile",
+  "names": {
+    "en": "Cinephile",
+    "fr": "Titre : Cinéphile"
+  },
+  "descriptions": {
+    "en": "For lovers of the big screen.",
+    "fr": "Pour les amoureux du grand écran."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Cinephile",
+    "style": "shimmer"
+  }
+}

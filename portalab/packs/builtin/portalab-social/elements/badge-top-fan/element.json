@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_top_fan",
+  "names": {
+    "en": "Top fan badge",
+    "fr": "Badge Fan numéro un"
+  },
+  "descriptions": {
+    "en": "A « Top fan » badge on your profile.",
+    "fr": "Un badge « Top fan » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Top fan",
+    "icon": "thumbs-up",
+    "style": "shimmer"
+  }
+}

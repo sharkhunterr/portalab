@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_mint",
+  "names": {
+    "en": "Mint palette",
+    "fr": "Palette menthe"
+  },
+  "descriptions": {
+    "en": "Accent colours laid over any theme — try it before buying.",
+    "fr": "Des couleurs d'accent posées sur n'importe quel thème — essayez-la avant d'acheter."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "mint"
+}

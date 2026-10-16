@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_onering",
+  "names": {
+    "en": "One Ring level badge",
+    "fr": "Badge de niveau anneau unique"
+  },
+  "descriptions": {
+    "en": "A golden ring turning around your level.",
+    "fr": "Un anneau d'or qui tourne autour de votre niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 46,
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "onering"
+}

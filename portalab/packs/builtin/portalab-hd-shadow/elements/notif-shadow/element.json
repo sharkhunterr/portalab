@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_shadow",
+  "names": {
+    "en": "Shadowy notifications",
+    "fr": "Notifications ténébreuses"
+  },
+  "descriptions": {
+    "en": "Smoke and eyes in the dark. Drawn by the graphics chip.",
+    "fr": "De la fumée et des yeux dans le noir. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "shadow"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_gem",
+  "names": {
+    "en": "Gem level badge",
+    "fr": "Badge de niveau gemme"
+  },
+  "descriptions": {
+    "en": "A cut amethyst catching the light.",
+    "fr": "Une améthyste taillée qui accroche la lumière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "gem"
+}

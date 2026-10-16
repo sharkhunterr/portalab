@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_manga",
+  "names": {
+    "en": "Manga panel notifications",
+    "fr": "Notifications case de manga"
+  },
+  "descriptions": {
+    "en": "Screentone, speed lines and a heavy ink frame cut on a slant.",
+    "fr": "Trame, lignes de vitesse et un cadre à l'encre coupé en biais."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "manga"
+}

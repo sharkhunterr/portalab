@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_lilac",
+  "names": {
+    "en": "Lilac palette",
+    "fr": "Palette lilas"
+  },
+  "descriptions": {
+    "en": "Lilac and leaf green over the theme.",
+    "fr": "Du lilas et du vert tendre sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "lilac"
+}

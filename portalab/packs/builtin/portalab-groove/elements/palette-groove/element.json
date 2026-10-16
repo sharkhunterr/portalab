@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_groove",
+  "names": {
+    "en": "Groove green palette",
+    "fr": "Palette vert groove"
+  },
+  "descriptions": {
+    "en": "A bright green and a pink over the theme.",
+    "fr": "Un vert vif et un rose sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "groove"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_elven",
+  "names": {
+    "en": "Elven frame",
+    "fr": "Cadre elfique"
+  },
+  "descriptions": {
+    "en": "Silver and green, like Lothlórien.",
+    "fr": "Argent et vert, comme la Lothlórien."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "elven"
+}

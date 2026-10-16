@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_manga",
+  "names": {
+    "en": "Manga panel level-up",
+    "fr": "Passage de niveau planche de manga"
+  },
+  "descriptions": {
+    "en": "Speed lines and a big ドン! on a manga page.",
+    "fr": "Lignes de vitesse et un grand ドン ! sur une planche de manga."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "manga"
+}

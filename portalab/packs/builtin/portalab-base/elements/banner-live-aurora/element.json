@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_aurora",
+  "names": {
+    "en": "Northern lights animated banner",
+    "fr": "Bannière animée aurore boréale"
+  },
+  "descriptions": {
+    "en": "Northern lights playing in your profile's banner, for every visitor to see.",
+    "fr": "Aurore boréale dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-aurora"
+}

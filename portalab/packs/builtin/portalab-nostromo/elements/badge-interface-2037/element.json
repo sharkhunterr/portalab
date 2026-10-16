@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_interface_2037",
+  "names": {
+    "en": "Interface 2037 badge",
+    "fr": "Badge Interface 2037"
+  },
+  "descriptions": {
+    "en": "Talks to MU/TH/UR without raising its voice.",
+    "fr": "Parle à MU/TH/UR sans hausser le ton."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "terminal"
+  },
+  "payload": {
+    "label": "Interface 2037",
+    "icon": "terminal",
+    "style": "hazard"
+  }
+}

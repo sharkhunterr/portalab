@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_backdoor",
+  "names": {
+    "en": "Backdoor badge",
+    "fr": "Badge Porte dérobée"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "terminal"
+  },
+  "look": "matrix",
+  "payload": {
+    "label": "Backdoor",
+    "icon": "terminal"
+  }
+}

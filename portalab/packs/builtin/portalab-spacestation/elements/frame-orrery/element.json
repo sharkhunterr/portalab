@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_orrery",
+  "names": {
+    "en": "Orrery frame",
+    "fr": "Cadre planétaire"
+  },
+  "descriptions": {
+    "en": "Planets going round on their orbits, a little sun in the middle your avatar, drawn by the graphics chip.",
+    "fr": "Des planètes qui tournent sur leurs orbites, un petit soleil au milieu de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 11,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "orrery"
+}

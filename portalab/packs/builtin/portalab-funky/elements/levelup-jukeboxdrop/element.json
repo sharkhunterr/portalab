@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_jukeboxdrop",
+  "names": {
+    "en": "Jukebox level-up",
+    "fr": "Passage de niveau juke-box"
+  },
+  "descriptions": {
+    "en": "A record drops on the jukebox, the bubbles rise in its tubes: FUNKY!",
+    "fr": "Un disque tombe sur le juke-box, les bulles montent dans ses tubes : FUNKY !"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "jukeboxdrop"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_sugar_rush",
+  "names": {
+    "en": "Title: Sugar rush",
+    "fr": "Titre : Overdose de sucre"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "candy",
+  "payload": {
+    "label": "Sugar rush"
+  }
+}

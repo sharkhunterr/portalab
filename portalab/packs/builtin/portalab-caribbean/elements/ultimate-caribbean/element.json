@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_caribbean",
+  "names": {
+    "en": "Caribbean theme pack",
+    "fr": "Pack de thème Caraïbes"
+  },
+  "descriptions": {
+    "en": "The whole Caribbean theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1340 Coins saved.",
+    "fr": "Tout le thème Caraïbes : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1340 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5360,
+    "rarity": "epic",
+    "level": 30,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_caribbean",
+      "banner_jollyship",
+      "frame_shipwheel",
+      "name_pirata",
+      "notif_bottle",
+      "effect_cannonball",
+      "ambient_cannonsmoke",
+      "badge_captain",
+      "title_terror_of_the_seven_seas",
+      "banner_live_cannonsmoke",
+      "palette_rum",
+      "level_doubloon",
+      "notif_anchor",
+      "levelup_plunder"
+    ]
+  }
+}

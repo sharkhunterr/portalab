@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "spin",
+  "names": {
+    "en": "spin",
+    "fr": "spin"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

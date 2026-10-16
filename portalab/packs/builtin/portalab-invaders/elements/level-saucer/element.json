@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_saucer",
+  "names": {
+    "en": "Saucer level badge",
+    "fr": "Badge de niveau soucoupe"
+  },
+  "descriptions": {
+    "en": "Your level on a mystery saucer, its lights blinking.",
+    "fr": "Votre niveau sur une soucoupe mystère, ses feux qui clignotent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "saucer"
+}

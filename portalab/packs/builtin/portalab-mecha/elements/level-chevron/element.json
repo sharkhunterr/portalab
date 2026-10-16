@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_chevron",
+  "names": {
+    "en": "Chevron level badge",
+    "fr": "Badge de niveau chevron"
+  },
+  "descriptions": {
+    "en": "Your level on a steel chevron.",
+    "fr": "Votre niveau sur un chevron d'acier."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "chevron"
+}

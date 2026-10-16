@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_chrono",
+  "names": {
+    "en": "Time portal notifications",
+    "fr": "Notifications portail temporel"
+  },
+  "descriptions": {
+    "en": "Each notification steps out of a triangular time portal that opens, then closes behind it as it leaves.",
+    "fr": "Chaque notification sort d'un portail temporel triangulaire qui s'ouvre, puis se referme derrière elle quand elle part."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "chrono"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_legend",
+  "names": {
+    "en": "Title: Legend",
+    "fr": "Titre : Légende"
+  },
+  "descriptions": {
+    "en": "A legendary title under your name.",
+    "fr": "Un titre légendaire sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "gold",
+  "payload": {
+    "label": "Legend"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_server_room",
+  "names": {
+    "en": "Server room pack",
+    "fr": "Pack Salle des serveurs"
+  },
+  "descriptions": {
+    "en": "For the community's pillars: the « Server », « Containers » and « Downloads » widgets and every series of « Chart » (temperatures, network, storage over time, a week of history). — 1410 Coins saved.",
+    "fr": "Pour les piliers de la communauté : les widgets « Serveur », « Conteneurs » et « Téléchargements » et toutes les séries du « Graphique » (températures, réseau, stockage dans le temps, une semaine d'historique). — 1410 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5640,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "packs",
+    "icon": "server",
+    "contribution": 30
+  },
+  "payload": {
+    "products": [
+      "widget_server",
+      "widget_containers",
+      "widget_downloads",
+      "opt_chart_network",
+      "opt_chart_temperature",
+      "opt_chart_storage",
+      "opt_chart_week"
+    ]
+  }
+}

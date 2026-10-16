@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_invasion",
+  "names": {
+    "en": "Invasion notifications",
+    "fr": "Notifications invasion"
+  },
+  "descriptions": {
+    "en": "Notifications under a pixel invader, framed like a phosphor screen.",
+    "fr": "Des notifications sous un envahisseur en pixels, encadrées comme un écran au phosphore."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "invasion"
+}

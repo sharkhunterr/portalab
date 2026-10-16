@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_volcano_heart",
+  "names": {
+    "en": "Title: Heart of the volcano",
+    "fr": "Titre : Cœur du volcan"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "magma",
+  "payload": {
+    "label": "Heart of the volcano"
+  }
+}

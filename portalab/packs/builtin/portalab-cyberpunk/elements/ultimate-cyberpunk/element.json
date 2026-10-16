@@ -1,0 +1,46 @@
+{
+  "type": "bundle",
+  "product": "ultimate_cyberpunk",
+  "names": {
+    "en": "Cyberpunk theme pack",
+    "fr": "Pack de thème Cyberpunk"
+  },
+  "descriptions": {
+    "en": "The whole Cyberpunk theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1890 Coins saved.",
+    "fr": "Tout le thème Cyberpunk : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1890 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7560,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown",
+    "featured": true
+  },
+  "payload": {
+    "products": [
+      "theme_cyberpunk",
+      "banner_night_city",
+      "frame_cyber",
+      "name_cyberpunk",
+      "notif_glitch",
+      "effect_glitch",
+      "ambient_rain",
+      "badge_netrunner",
+      "title_night_city",
+      "level_neon",
+      "notif_vhs",
+      "levelup_arcade",
+      "levelup_glitch",
+      "notif_neon",
+      "opt_style_services_pulse",
+      "opt_style_activity_live",
+      "opt_style_stats_countup"
+    ]
+  }
+}

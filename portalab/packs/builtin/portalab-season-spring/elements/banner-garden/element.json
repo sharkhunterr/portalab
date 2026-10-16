@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_garden",
+  "names": {
+    "en": "Garden banner",
+    "fr": "Bannière jardin"
+  },
+  "descriptions": {
+    "en": "A garden in bloom under a clear sky.",
+    "fr": "Un jardin en fleurs sous un ciel clair."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "spring"
+  },
+  "look": "garden"
+}

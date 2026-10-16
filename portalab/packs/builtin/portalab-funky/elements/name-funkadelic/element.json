@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_funkadelic",
+  "names": {
+    "en": "Funkadelic name style",
+    "fr": "Style de nom funkadélique"
+  },
+  "descriptions": {
+    "en": "A name in round seventies letters with stacked orange, mustard and brown shadows.",
+    "fr": "Un nom en lettres rondes des années 70 aux ombres empilées orange, moutarde et marron."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "funkadelic"
+}

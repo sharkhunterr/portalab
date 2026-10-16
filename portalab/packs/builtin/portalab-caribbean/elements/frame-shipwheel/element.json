@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_shipwheel",
+  "names": {
+    "en": "Ship's wheel frame",
+    "fr": "Cadre barre de navire"
+  },
+  "descriptions": {
+    "en": "Your avatar at the helm, the wheel turning slowly.",
+    "fr": "Votre avatar à la barre, la roue qui tourne lentement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "shipwheel"
+}

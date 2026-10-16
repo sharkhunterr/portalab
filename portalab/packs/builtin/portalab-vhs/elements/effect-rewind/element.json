@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_rewind",
+  "names": {
+    "en": "Rewind celebration",
+    "fr": "Célébration rembobinage"
+  },
+  "descriptions": {
+    "en": "Rewind burst out when you earn a reward or level up.",
+    "fr": "Rembobinage jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "rewind"
+}

@@ -1,0 +1,49 @@
+{
+  "type": "bundle",
+  "product": "ultimate_nostromo",
+  "names": {
+    "en": "Nostromo theme pack",
+    "fr": "Pack de thème Nostromo"
+  },
+  "descriptions": {
+    "en": "The whole Nostromo theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 2300 Coins saved.",
+    "fr": "Tout le thème Nostromo : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 2300 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 9200,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_nostromo",
+      "banner_nostromo",
+      "frame_tracker",
+      "name_nostromo",
+      "notif_nostromo",
+      "effect_tracker",
+      "ambient_nostromo",
+      "badge_last_survivor",
+      "title_crew_expendable",
+      "level_tracker",
+      "notif_uplink",
+      "levelup_nostromo",
+      "banner_live_nostromo",
+      "palette_nostromo",
+      "badge_interface_2037",
+      "badge_space_trucker",
+      "title_perfect_organism",
+      "opt_style_services_pulse",
+      "widget_countdown",
+      "opt_style_countdown_flip",
+      "opt_style_activity_live"
+    ]
+  }
+}

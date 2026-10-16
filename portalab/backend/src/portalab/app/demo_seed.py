@@ -525,6 +525,7 @@ class DemoSeeder:
         await self._step("members", self.members)
         await self._step("gamification definitions", self.gamification_definitions)
         await self._step("marketplace catalog", self.catalog)
+        await self._step("visual packs", self.visual_packs)
         await self._step("community projects", self.projects)
         await self._step("campaign", self.campaign)
         await self._step("economy", self.economy)
@@ -656,6 +657,33 @@ class DemoSeeder:
                 await catalog.move(self.admin, key, "archived")
                 retired += 1
         return f"{made} products published, {revised} revised, {retired} retired"
+
+    async def visual_packs(self) -> str:
+        """028: Portalab's own packs synchronised, then all of them switched on (the demo shows the whole
+        catalog; an administrator switches off what they do not want)."""
+        from sqlalchemy import select
+
+        from portalab.modules.visuals.builtin import BuiltinSync
+        from portalab.modules.visuals.models import Pack
+
+        visuals = self.platform.visuals
+        if visuals is None:
+            return "no visual packs"
+        await BuiltinSync(visuals.packs, visuals.builtin_root).run(self.admin)
+        async with visuals.database.session() as session:
+            off = [
+                p.id
+                for p in (
+                    await session.execute(
+                        select(Pack).where(
+                            Pack.builtin, Pack.state != "enabled", Pack.current_version_id.is_not(None)
+                        )
+                    )
+                ).scalars()
+            ]
+        for pack in off:
+            await visuals.packs.set_state(self.admin, pack, True)
+        return f"{len(off)} built-in packs switched on"
 
     async def projects(self) -> str:
         marketplace = self.platform.marketplace

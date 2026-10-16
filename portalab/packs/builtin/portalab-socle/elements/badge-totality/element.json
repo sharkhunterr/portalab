@@ -1,0 +1,13 @@
+{
+  "type": "badge",
+  "look": "totality",
+  "names": {
+    "en": "totality",
+    "fr": "totality"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

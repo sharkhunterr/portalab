@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "ultimate_spacestation",
+  "names": {
+    "en": "Space station theme pack",
+    "fr": "Pack de thème Station spatiale"
+  },
+  "descriptions": {
+    "en": "The whole Space station theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 3070 Coins saved.",
+    "fr": "Tout le thème Station spatiale : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 3070 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 12280,
+    "rarity": "legendary",
+    "level": 40,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_spacestation",
+      "banner_orbits",
+      "frame_orrery",
+      "name_spaceage",
+      "notif_orrery",
+      "effect_bigbang",
+      "ambient_solarsystem",
+      "badge_ringed_planet",
+      "title_cosmonaut",
+      "banner_live_solarsystem",
+      "level_orrery",
+      "palette_deepspace",
+      "badge_pulsar",
+      "title_comet_chaser",
+      "levelup_hyperjump",
+      "notif_nebulabloom"
+    ]
+  }
+}

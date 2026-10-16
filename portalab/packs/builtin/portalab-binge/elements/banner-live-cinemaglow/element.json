@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_cinemaglow",
+  "names": {
+    "en": "Cinema glow animated banner",
+    "fr": "Bannière animée lueurs de cinéma"
+  },
+  "descriptions": {
+    "en": "Cinema glow playing in your profile's banner, for every visitor to see.",
+    "fr": "Des lueurs de cinéma dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-cinemaglow"
+}

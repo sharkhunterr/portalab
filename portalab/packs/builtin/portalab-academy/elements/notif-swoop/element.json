@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_swoop",
+  "names": {
+    "en": "Owl swoop notification animation",
+    "fr": "Animation de notification piqué du hibou"
+  },
+  "descriptions": {
+    "en": "Notifications swooping in like an owl bringing the mail.",
+    "fr": "Des notifications qui arrivent en piqué comme un hibou qui apporte le courrier."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "swoop"
+}

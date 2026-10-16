@@ -1,0 +1,31 @@
+{
+  "type": "bundle",
+  "product": "pack_city_lights",
+  "names": {
+    "en": "City lights pack",
+    "fr": "Pack Lumières de la ville"
+  },
+  "descriptions": {
+    "en": "The city at night: the neon city, digital rain, liquid metal and fireworks. — 1000 Coins saved.",
+    "fr": "La ville la nuit : cité néon, pluie numérique, métal liquide et feu d'artifice. — 1000 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4000,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_neoncity",
+      "ambient_matrix",
+      "ambient_liquidmetal",
+      "ambient_fireworks"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "pulsar",
+  "names": {
+    "en": "pulsar",
+    "fr": "pulsar"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

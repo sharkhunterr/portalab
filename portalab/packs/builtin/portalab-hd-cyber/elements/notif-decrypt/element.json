@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_decrypt",
+  "names": {
+    "en": "Decrypt notifications",
+    "fr": "Notifications décryptage"
+  },
+  "descriptions": {
+    "en": "Digital rain decrypts them — and encrypts them away. Drawn by the graphics chip.",
+    "fr": "La pluie numérique les décrypte — puis les chiffre en partant. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1000,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "decrypt"
+}

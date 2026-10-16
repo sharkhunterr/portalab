@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_hex",
+  "names": {
+    "en": "Hex notifications",
+    "fr": "Notifications sortilège"
+  },
+  "descriptions": {
+    "en": "Runes flare round them as they are summoned and dismissed. Drawn by the graphics chip.",
+    "fr": "Des runes s'embrasent quand elles sont invoquées puis renvoyées. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "hex"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_marathon",
+  "names": {
+    "en": "Marathon name style",
+    "fr": "Style de nom marathon"
+  },
+  "descriptions": {
+    "en": "A name in tall condensed red capitals, like a show's title.",
+    "fr": "Un nom en hautes capitales rouges condensées, comme le titre d'une série."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "marathon"
+}

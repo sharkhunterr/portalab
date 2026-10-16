@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_starship_captain",
+  "names": {
+    "en": "Starship captain badge",
+    "fr": "Badge Capitaine de vaisseau"
+  },
+  "descriptions": {
+    "en": "A « Starship captain » badge on your profile.",
+    "fr": "Un badge « Starship captain » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 34,
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Starship captain",
+    "icon": "crown",
+    "style": "gold"
+  }
+}

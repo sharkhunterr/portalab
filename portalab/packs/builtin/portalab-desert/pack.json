@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-desert",
+  "version": "1.0.0+910ede7b86",
+  "names": {
+    "en": "Dune interface",
+    "fr": "Interface Dune"
+  },
+  "descriptions": {
+    "en": "The « Dune interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Dune » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

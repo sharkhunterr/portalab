@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_pixels",
+  "names": {
+    "en": "Pixel burst celebration",
+    "fr": "Célébration explosion de pixels"
+  },
+  "descriptions": {
+    "en": "Pixel burst burst out when you earn a reward or level up.",
+    "fr": "Explosion de pixels jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "pixels"
+}

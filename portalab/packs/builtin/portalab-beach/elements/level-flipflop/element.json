@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_flipflop",
+  "names": {
+    "en": "Flip-flop level badge",
+    "fr": "Badge de niveau tong"
+  },
+  "descriptions": {
+    "en": "Your level on a flip-flop and its strap.",
+    "fr": "Votre niveau sur une tong et sa bride."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "flipflop"
+}

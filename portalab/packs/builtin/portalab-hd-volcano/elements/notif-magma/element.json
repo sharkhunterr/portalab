@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_magma",
+  "names": {
+    "en": "Molten notifications",
+    "fr": "Notifications en fusion"
+  },
+  "descriptions": {
+    "en": "Lava flowing under a cracked crust. Drawn by the graphics chip.",
+    "fr": "De la lave qui coule sous une croûte fissurée. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "magma"
+}

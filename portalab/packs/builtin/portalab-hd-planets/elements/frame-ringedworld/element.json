@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_ringedworld",
+  "names": {
+    "en": "Ringed planet frame",
+    "fr": "Cadre planète à anneaux"
+  },
+  "descriptions": {
+    "en": "A ringed planet, its banded clouds turning your avatar, drawn by the graphics chip.",
+    "fr": "Une planète à anneaux, ses nuages en bandes qui tournent de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "ringedworld"
+}

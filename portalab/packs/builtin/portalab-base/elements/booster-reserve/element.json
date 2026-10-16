@@ -1,0 +1,35 @@
+{
+  "type": "booster",
+  "product": "booster_reserve",
+  "names": {
+    "en": "Reserve booster",
+    "fr": "Booster Réserve"
+  },
+  "descriptions": {
+    "en": "Items to keep for later: extra requests, streak freezes, boosts, rescues… and maybe a film in 4K. They go to your reserve.",
+    "fr": "Des objets à garder pour plus tard : demandes en plus, gels de série, boosts, sauvetages… et peut-être un film en 4K. Ils vont dans votre réserve."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  },
+  "payload": {
+    "pool": "reserve",
+    "cards": 3,
+    "odds": {
+      "common": 60,
+      "rare": 30,
+      "epic": 9,
+      "legendary": 1
+    },
+    "guarantee": "rare",
+    "look": "reserve"
+  }
+}

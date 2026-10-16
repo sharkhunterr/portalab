@@ -1,0 +1,25 @@
+{
+  "type": "name_style",
+  "product": "name_namesunburst",
+  "names": {
+    "en": "Sunburst name style",
+    "fr": "Style de nom solaire"
+  },
+  "descriptions": {
+    "en": "An aura around your name. Drawn by the graphics chip.",
+    "fr": "Une aura autour de votre nom. Dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "names",
+    "icon": "feather",
+    "season": "summer"
+  },
+  "look": "namesunburst"
+}

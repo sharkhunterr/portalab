@@ -1,0 +1,36 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_time_portal",
+  "names": {
+    "en": "Time portal HD pack",
+    "fr": "Pack Portail temporel HD"
+  },
+  "descriptions": {
+    "en": "Step through time: the time rift level badge, time portal notifications and their time warp, the time gate frame, the time traveller title, the hourglass badge, the « out of time » name, the time portal level-up and the time rift celebration. — 2700 Coins saved.",
+    "fr": "Traversez le temps : badge de niveau faille temporelle, notifications portail temporel et leur distorsion, cadre porte du temps, titre voyageur temporel, badge sablier, nom « hors du temps », passage de niveau portail temporel et célébration faille temporelle. — 2700 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 10800,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_chrono",
+      "notif_chrono",
+      "frame_chronogate",
+      "title_time_traveller",
+      "badge_hourglass",
+      "levelup_timeportal",
+      "notif_warp",
+      "name_namechrono",
+      "effect_timerift"
+    ]
+  }
+}

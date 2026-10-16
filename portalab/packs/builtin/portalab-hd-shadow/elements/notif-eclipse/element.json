@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_eclipse",
+  "names": {
+    "en": "Eclipse notifications",
+    "fr": "Notifications éclipse"
+  },
+  "descriptions": {
+    "en": "Black smoke parts to let them out — and swallows them. Drawn by the graphics chip.",
+    "fr": "Une fumée noire s'écarte pour les laisser sortir — et les avale. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "eclipse"
+}

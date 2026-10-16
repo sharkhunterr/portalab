@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_rings",
+  "names": {
+    "en": "Activity rings frame",
+    "fr": "Cadre anneaux d'activité"
+  },
+  "descriptions": {
+    "en": "Three rings filling up around your avatar.",
+    "fr": "Trois anneaux qui se remplissent autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "rings"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_binge_watcher",
+  "names": {
+    "en": "Binge-watcher badge",
+    "fr": "Badge Binge-watcher"
+  },
+  "descriptions": {
+    "en": "One more episode. Then another.",
+    "fr": "Encore un épisode. Puis un autre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "popcorn"
+  },
+  "look": "flame",
+  "payload": {
+    "label": "Binge-watcher",
+    "icon": "popcorn"
+  }
+}

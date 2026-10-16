@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_gazette",
+  "names": {
+    "en": "The Gazette theme pack",
+    "fr": "Pack de thème La Gazette"
+  },
+  "descriptions": {
+    "en": "The whole The Gazette theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1280 Coins saved.",
+    "fr": "Tout le thème La Gazette : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1280 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5120,
+    "rarity": "epic",
+    "level": 24,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_gazette",
+      "banner_frontpage",
+      "frame_postage",
+      "name_typewriter",
+      "notif_telegram",
+      "effect_inkstamp",
+      "ambient_pages",
+      "badge_scoop",
+      "title_front_page",
+      "banner_live_pages",
+      "palette_newsprint",
+      "level_presscard",
+      "notif_spinpaper",
+      "levelup_extraedition"
+    ]
+  }
+}

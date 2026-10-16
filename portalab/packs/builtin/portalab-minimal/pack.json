@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-minimal",
+  "version": "1.0.0+e82b75d6a5",
+  "names": {
+    "en": "Minimal interface",
+    "fr": "Interface Minimal"
+  },
+  "descriptions": {
+    "en": "The « Minimal interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Minimal » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_presscard",
+  "names": {
+    "en": "Press pass level badge",
+    "fr": "Badge de niveau carte de presse"
+  },
+  "descriptions": {
+    "en": "Your level on a press pass tucked in a hatband.",
+    "fr": "Votre niveau sur une carte de presse glissée dans un ruban de chapeau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "presscard"
+}

@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_clockmaker",
+  "names": {
+    "en": "Clockmaker pack",
+    "fr": "Pack Horloger"
+  },
+  "descriptions": {
+    "en": "The clock with its analog face and the countdown with its flip digits. — 170 Coins saved.",
+    "fr": "L'horloge et son cadran analogique, le compte à rebours et ses chiffres à palettes. — 170 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "widget_clock",
+      "opt_style_clock_analog",
+      "widget_countdown",
+      "opt_style_countdown_flip"
+    ]
+  }
+}

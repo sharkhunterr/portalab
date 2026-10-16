@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_toxic",
+  "names": {
+    "en": "Toxic notifications",
+    "fr": "Notifications toxiques"
+  },
+  "descriptions": {
+    "en": "Acid bubbling, drops dripping. Drawn by the graphics chip.",
+    "fr": "De l'acide qui bouillonne, des gouttes qui tombent. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "toxic"
+}

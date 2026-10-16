@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_seeker",
+  "names": {
+    "en": "Seeker badge",
+    "fr": "Badge Attrapeur"
+  },
+  "descriptions": {
+    "en": "A « Seeker » badge on your profile.",
+    "fr": "Un badge « Seeker » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "gold",
+  "payload": {
+    "label": "Seeker",
+    "icon": "sparkle"
+  }
+}

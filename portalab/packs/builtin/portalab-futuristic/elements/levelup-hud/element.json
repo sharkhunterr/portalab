@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_hud",
+  "names": {
+    "en": "Holographic HUD level-up",
+    "fr": "Passage de niveau interface holographique"
+  },
+  "descriptions": {
+    "en": "A scanning line, corner brackets and a grid.",
+    "fr": "Une ligne de balayage, des coins d'interface et une grille."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "hud"
+}

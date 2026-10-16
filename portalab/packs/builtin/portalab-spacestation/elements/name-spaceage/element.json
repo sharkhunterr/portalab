@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_spaceage",
+  "names": {
+    "en": "Space age name style",
+    "fr": "Style de nom ère spatiale"
+  },
+  "descriptions": {
+    "en": "A name in rounded space-age letters, silver turning to sky blue, glowing softly.",
+    "fr": "Un nom en lettres arrondies de l'ère spatiale, l'argent qui vire au bleu ciel, d'un éclat doux."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "spaceage"
+}

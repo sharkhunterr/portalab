@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_veins",
+  "names": {
+    "en": "Red veins level badge",
+    "fr": "Badge de niveau veines rouges"
+  },
+  "descriptions": {
+    "en": "Red veins pulsing across your level.",
+    "fr": "Des veines rouges qui pulsent sur votre niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "veins"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_saturday_fever",
+  "names": {
+    "en": "Title: Saturday night fever",
+    "fr": "Titre : Fièvre du samedi soir"
+  },
+  "descriptions": {
+    "en": "Can't stop dancing.",
+    "fr": "Impossible d'arrêter de danser."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Saturday night fever",
+    "style": "rainbow"
+  }
+}

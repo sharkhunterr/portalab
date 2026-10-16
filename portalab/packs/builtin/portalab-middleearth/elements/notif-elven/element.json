@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_elven",
+  "names": {
+    "en": "Elven notifications",
+    "fr": "Notifications elfiques"
+  },
+  "descriptions": {
+    "en": "A silver-green leaf written in fine capitals.",
+    "fr": "Une feuille vert argent écrite en fines capitales."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "elven"
+}

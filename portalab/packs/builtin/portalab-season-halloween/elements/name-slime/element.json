@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_slime",
+  "names": {
+    "en": "Slime name style",
+    "fr": "Style de nom gluant"
+  },
+  "descriptions": {
+    "en": "A name dripping with green slime.",
+    "fr": "Un nom qui dégouline de bave verte."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather",
+    "season": "halloween"
+  },
+  "look": "slime"
+}

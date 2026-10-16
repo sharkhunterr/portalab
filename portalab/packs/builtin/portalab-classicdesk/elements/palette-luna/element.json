@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_luna",
+  "names": {
+    "en": "Desktop blue palette",
+    "fr": "Palette bleu bureau"
+  },
+  "descriptions": {
+    "en": "Title-bar blue and Start-button green over the theme.",
+    "fr": "Le bleu des barres de titre et le vert du bouton Démarrer sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "luna"
+}

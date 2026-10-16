@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_dancing_king",
+  "names": {
+    "en": "Dancing king badge",
+    "fr": "Badge Roi de la piste"
+  },
+  "descriptions": {
+    "en": "Owns the dance floor.",
+    "fr": "Règne sur la piste de danse."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "disc"
+  },
+  "payload": {
+    "label": "Dancing king",
+    "icon": "disc",
+    "style": "rainbow"
+  }
+}

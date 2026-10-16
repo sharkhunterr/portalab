@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-season-halloween",
+  "version": "1.0.0+c3629f79f4",
+  "names": {
+    "en": "Halloween",
+    "fr": "Halloween"
+  },
+  "descriptions": {
+    "en": "The looks of Halloween.",
+    "fr": "Les looks de la saison : Halloween."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

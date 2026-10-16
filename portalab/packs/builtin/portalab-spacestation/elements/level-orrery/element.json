@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_orrery",
+  "names": {
+    "en": "Orrery level badge",
+    "fr": "Badge de niveau planétaire"
+  },
+  "descriptions": {
+    "en": "Your level inside: planets going round on their orbits, a little sun in the middle, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : des planètes qui tournent sur leurs orbites, un petit soleil au milieu, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 24,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "orrery"
+}

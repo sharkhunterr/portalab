@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_chronogate",
+  "names": {
+    "en": "Time gate frame",
+    "fr": "Cadre porte du temps"
+  },
+  "descriptions": {
+    "en": "Your avatar framed in a triangular time portal.",
+    "fr": "Votre avatar dans un portail temporel triangulaire."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "chronogate"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_video_club",
+  "names": {
+    "en": "Video club member badge",
+    "fr": "Badge Membre du vidéoclub"
+  },
+  "descriptions": {
+    "en": "Card number 0042, valid for life.",
+    "fr": "Carte n° 0042, valable à vie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "store"
+  },
+  "payload": {
+    "label": "Video club member",
+    "icon": "store",
+    "style": "vhs"
+  }
+}

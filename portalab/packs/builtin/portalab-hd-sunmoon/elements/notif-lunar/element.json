@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_lunar",
+  "names": {
+    "en": "Moon notifications",
+    "fr": "Notifications lune"
+  },
+  "descriptions": {
+    "en": "Notifications drawn as the moon's seas and craters, its phases sweeping across, drawn by the graphics chip.",
+    "fr": "Des notifications dessinées comme les mers et les cratères de la lune, ses phases qui défilent, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1000,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "lunar"
+}

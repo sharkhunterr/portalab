@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_sunrays",
+  "names": {
+    "en": "Sun rays frame",
+    "fr": "Cadre rayons de soleil"
+  },
+  "descriptions": {
+    "en": "Golden rays turning slowly round your avatar.",
+    "fr": "Des rayons dorés qui tournent lentement autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 5,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "sunrays"
+}

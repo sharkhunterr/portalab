@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_cometring",
+  "names": {
+    "en": "Comet frame",
+    "fr": "Cadre comète"
+  },
+  "descriptions": {
+    "en": "A comet going round, its tails streaming behind your avatar, drawn by the graphics chip.",
+    "fr": "Une comète qui fait le tour, ses queues derrière elle de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 850,
+    "rarity": "rare",
+    "level": 5,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "cometring"
+}

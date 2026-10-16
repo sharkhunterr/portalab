@@ -1,0 +1,13 @@
+{
+  "type": "notification_animation",
+  "look": "zoom",
+  "names": {
+    "en": "Zoom",
+    "fr": "Zoom"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

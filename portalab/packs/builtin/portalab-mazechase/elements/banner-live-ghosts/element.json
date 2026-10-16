@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_ghosts",
+  "names": {
+    "en": "Ghosts animated banner",
+    "fr": "Bannière animée fantômes"
+  },
+  "descriptions": {
+    "en": "Ghosts playing in your profile's banner, for every visitor to see.",
+    "fr": "Des fantômes dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-ghosts"
+}

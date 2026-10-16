@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_nowplaying",
+  "names": {
+    "en": "Now playing notifications",
+    "fr": "Notifications en cours de lecture"
+  },
+  "descriptions": {
+    "en": "Notifications like the track playing: a cover, its title, a green progress bar.",
+    "fr": "Des notifications comme le titre en cours : une pochette, son nom, une barre de progression verte."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "nowplaying"
+}

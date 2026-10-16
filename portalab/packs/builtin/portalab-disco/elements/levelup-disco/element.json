@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_disco",
+  "names": {
+    "en": "Mirror ball level-up",
+    "fr": "Passage de niveau boule à facettes"
+  },
+  "descriptions": {
+    "en": "The mirror ball's spots sweep the room.",
+    "fr": "Les éclats de la boule à facettes balaient la pièce."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "disco"
+}

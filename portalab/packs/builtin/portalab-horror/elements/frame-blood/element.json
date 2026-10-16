@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_blood",
+  "names": {
+    "en": "Bloody frame",
+    "fr": "Cadre sanglant"
+  },
+  "descriptions": {
+    "en": "It drips.",
+    "fr": "Ça goutte."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "blood"
+}

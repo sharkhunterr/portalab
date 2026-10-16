@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_aqua",
+  "names": {
+    "en": "Water glass level badge",
+    "fr": "Badge de niveau verre d'eau"
+  },
+  "descriptions": {
+    "en": "A glass badge half full of water sloshing from side to side, caustics and rising bubbles.",
+    "fr": "Un badge de verre à moitié rempli d'eau qui tangue, des reflets et des bulles qui montent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "aqua"
+}

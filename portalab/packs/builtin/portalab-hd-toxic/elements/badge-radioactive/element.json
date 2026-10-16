@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_radioactive",
+  "names": {
+    "en": "Radioactive badge",
+    "fr": "Badge Radioactif"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "radiation"
+  },
+  "look": "toxic",
+  "payload": {
+    "label": "Radioactive",
+    "icon": "radiation"
+  }
+}

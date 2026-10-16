@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_easteregg",
+  "names": {
+    "en": "Easter egg level badge",
+    "fr": "Badge de niveau œuf de pâques"
+  },
+  "descriptions": {
+    "en": "Your level on a painted egg.",
+    "fr": "Votre niveau sur un œuf peint."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "spring"
+  },
+  "look": "easteregg"
+}

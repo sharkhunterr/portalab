@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_starshower",
+  "names": {
+    "en": "Meteor storm celebration",
+    "fr": "Célébration Pluie d'étoiles filantes"
+  },
+  "descriptions": {
+    "en": "Dozens of shooting stars streaking out of the reward, fireballs flaring green and gold.",
+    "fr": "Des dizaines d'étoiles filantes qui jaillissent de la récompense, des bolides verts et dorés."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "starshower"
+}

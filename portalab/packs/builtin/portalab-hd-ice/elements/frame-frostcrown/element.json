@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_frostcrown",
+  "names": {
+    "en": "Frost crown frame",
+    "fr": "Cadre couronne de givre"
+  },
+  "descriptions": {
+    "en": "A star of ice around your avatar.",
+    "fr": "Une étoile de glace autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user",
+    "season": "christmas"
+  },
+  "look": "frostcrown"
+}

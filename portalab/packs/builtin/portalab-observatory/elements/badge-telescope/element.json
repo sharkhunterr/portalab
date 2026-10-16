@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_telescope",
+  "names": {
+    "en": "Telescope badge",
+    "fr": "Badge Télescope"
+  },
+  "descriptions": {
+    "en": "A « Telescope » badge on your profile, drawn by the graphics chip.",
+    "fr": "Un badge « Telescope » sur votre profil, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 6,
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Telescope",
+    "icon": "telescope",
+    "style": "stellar"
+  }
+}

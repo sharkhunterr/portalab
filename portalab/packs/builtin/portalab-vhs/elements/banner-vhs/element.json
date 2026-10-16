@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_vhs",
+  "names": {
+    "en": "VHS blue screen banner",
+    "fr": "Bannière écran bleu VHS"
+  },
+  "descriptions": {
+    "en": "PLAY ▶ on a blue screen, a tracking band and the tape's rainbow.",
+    "fr": "PLAY ▶ sur écran bleu, une bande de tracking et l'arc-en-ciel de la cassette."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "vhs"
+}

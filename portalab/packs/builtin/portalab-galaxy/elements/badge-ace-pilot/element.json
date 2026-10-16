@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_ace_pilot",
+  "names": {
+    "en": "Ace pilot badge",
+    "fr": "Badge Pilote d'élite"
+  },
+  "descriptions": {
+    "en": "Fastest ship of the fleet.",
+    "fr": "Le vaisseau le plus rapide de la flotte."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "rocket"
+  },
+  "payload": {
+    "label": "Ace pilot",
+    "icon": "rocket",
+    "style": "neon"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_blizzard",
+  "names": {
+    "en": "Blizzard ambience",
+    "fr": "Ambiance blizzard"
+  },
+  "descriptions": {
+    "en": "Blizzard drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Blizzard derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "blizzard"
+}

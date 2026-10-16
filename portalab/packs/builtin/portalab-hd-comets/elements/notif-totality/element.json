@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_totality",
+  "names": {
+    "en": "Total eclipse notifications",
+    "fr": "Notifications éclipse totale"
+  },
+  "descriptions": {
+    "en": "Notifications in a shape of their own: the corona of a total eclipse, the diamond ring flashing, drawn by the graphics chip.",
+    "fr": "Des notifications à la forme bien à elles : la couronne d'une éclipse totale, l'anneau de diamant qui étincelle, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 16,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "totality"
+}

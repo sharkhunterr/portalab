@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_dunes",
+  "names": {
+    "en": "Dunes banner",
+    "fr": "Bannière dunes"
+  },
+  "descriptions": {
+    "en": "Two suns over the dunes.",
+    "fr": "Deux soleils sur les dunes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "dunes"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_arcade_king",
+  "names": {
+    "en": "Arcade king badge",
+    "fr": "Badge Roi de l'arcade"
+  },
+  "descriptions": {
+    "en": "High score on every machine.",
+    "fr": "Record sur toutes les bornes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "joystick"
+  },
+  "payload": {
+    "label": "Arcade king",
+    "icon": "joystick",
+    "style": "rainbow"
+  }
+}

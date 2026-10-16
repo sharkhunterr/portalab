@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "product": "palette_pumpkinspice",
+  "names": {
+    "en": "Pumpkin spice palette",
+    "fr": "Palette épices de citrouille"
+  },
+  "descriptions": {
+    "en": "Pumpkin orange and cinnamon over the theme.",
+    "fr": "Orange citrouille et cannelle sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette",
+    "season": "halloween"
+  },
+  "look": "pumpkinspice"
+}

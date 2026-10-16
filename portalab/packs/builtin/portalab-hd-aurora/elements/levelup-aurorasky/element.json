@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_aurorasky",
+  "names": {
+    "en": "Aurora sky level-up",
+    "fr": "Passage de niveau ciel d'aurore"
+  },
+  "descriptions": {
+    "en": "The night opens on waving curtains of light.",
+    "fr": "La nuit s'ouvre sur des voiles de lumière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "aurorasky"
+}

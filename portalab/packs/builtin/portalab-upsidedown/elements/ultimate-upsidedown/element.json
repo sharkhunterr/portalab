@@ -1,0 +1,56 @@
+{
+  "type": "bundle",
+  "product": "ultimate_upsidedown",
+  "names": {
+    "en": "Upside Down theme pack",
+    "fr": "Pack de thème Monde à l'envers"
+  },
+  "descriptions": {
+    "en": "The whole Upside Down theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 3300 Coins saved.",
+    "fr": "Tout le thème Monde à l'envers : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 3300 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 13200,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_upsidedown",
+      "banner_upsidedown",
+      "frame_veins",
+      "name_upsidedown",
+      "notif_upsidedown",
+      "effect_flicker",
+      "ambient_upsidedown",
+      "badge_demohunter",
+      "title_friends_dont_lie",
+      "level_upsidedown",
+      "level_veins",
+      "level_lights",
+      "notif_flipup",
+      "levelup_upsidedown",
+      "levelup_rift",
+      "banner_hawkins",
+      "frame_lights",
+      "banner_live_upsidedown",
+      "ambient_veins",
+      "palette_hawkins",
+      "badge_upside_survivor",
+      "badge_party",
+      "badge_walkie",
+      "title_mouth_breather",
+      "title_hawkins_hero",
+      "opt_style_services_pulse",
+      "opt_style_continue_ambient",
+      "opt_style_activity_live"
+    ]
+  }
+}

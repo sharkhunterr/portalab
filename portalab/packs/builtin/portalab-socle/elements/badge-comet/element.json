@@ -1,0 +1,13 @@
+{
+  "type": "badge",
+  "look": "comet",
+  "names": {
+    "en": "comet",
+    "fr": "comet"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

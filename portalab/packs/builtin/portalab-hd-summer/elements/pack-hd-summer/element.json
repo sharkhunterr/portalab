@@ -1,0 +1,29 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_summer",
+  "names": {
+    "en": "Summer HD pack",
+    "fr": "Pack Été HD"
+  },
+  "descriptions": {
+    "en": "The season's looks drawn by the graphics chip. — 580 Coins saved.",
+    "fr": "Les looks de la saison dessinés par la puce graphique. — 580 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2320,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop",
+    "season": "summer"
+  },
+  "payload": {
+    "products": [
+      "frame_sunburst",
+      "name_namesunburst"
+    ]
+  }
+}

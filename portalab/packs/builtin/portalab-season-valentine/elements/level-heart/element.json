@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_heart",
+  "names": {
+    "en": "Heart level badge",
+    "fr": "Badge de niveau cœur"
+  },
+  "descriptions": {
+    "en": "Your level in a glossy heart.",
+    "fr": "Votre niveau dans un cœur verni."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "valentine"
+  },
+  "look": "heart"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_bloom",
+  "names": {
+    "en": "Bloom notifications",
+    "fr": "Notifications floraison"
+  },
+  "descriptions": {
+    "en": "Notifications framed with fresh leaves and flowers.",
+    "fr": "Des notifications encadrées de feuilles et de fleurs fraîches."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell",
+    "season": "spring"
+  },
+  "look": "bloom"
+}

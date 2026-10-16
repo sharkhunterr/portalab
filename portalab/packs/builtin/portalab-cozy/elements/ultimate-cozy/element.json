@@ -1,0 +1,43 @@
+{
+  "type": "bundle",
+  "product": "ultimate_cozy",
+  "names": {
+    "en": "Cozy theme pack",
+    "fr": "Pack de thème Cosy"
+  },
+  "descriptions": {
+    "en": "The whole Cozy theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1040 Coins saved.",
+    "fr": "Tout le thème Cosy : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1040 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4160,
+    "rarity": "rare",
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_cozy",
+      "banner_cabin",
+      "frame_sakura",
+      "name_cozy",
+      "notif_paper",
+      "effect_hearts",
+      "ambient_leaves",
+      "badge_golden_blanket",
+      "title_nap_champion",
+      "level_crest",
+      "ambient_lanterns",
+      "levelup_hearth",
+      "opt_style_continue_ambient",
+      "widget_clock",
+      "opt_style_clock_analog",
+      "opt_style_daily_liquid"
+    ]
+  }
+}

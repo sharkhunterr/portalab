@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_big_spender",
+  "names": {
+    "en": "Title: Big spender",
+    "fr": "Titre : Flambeur"
+  },
+  "descriptions": {
+    "en": "Given for 25 purchases.",
+    "fr": "Offert pour 25 achats."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Big spender",
+    "style": "gold"
+  }
+}

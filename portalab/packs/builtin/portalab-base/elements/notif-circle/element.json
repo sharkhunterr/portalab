@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_circle",
+  "names": {
+    "en": "Bubble notifications",
+    "fr": "Notifications bulle"
+  },
+  "descriptions": {
+    "en": "A round bubble with a glowing ring in the colour of the notification.",
+    "fr": "Une bulle ronde cerclée de la couleur de la notification."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "circle"
+}

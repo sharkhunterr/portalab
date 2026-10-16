@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_space_trucker",
+  "names": {
+    "en": "Space trucker badge",
+    "fr": "Badge Routier de l'espace"
+  },
+  "descriptions": {
+    "en": "Twenty million tons of ore, and a share of the bonus.",
+    "fr": "Vingt millions de tonnes de minerai, et sa part de la prime."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "package"
+  },
+  "payload": {
+    "label": "Space trucker",
+    "icon": "package",
+    "style": "hazard"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_prism",
+  "names": {
+    "en": "Prism frame",
+    "fr": "Cadre prisme"
+  },
+  "descriptions": {
+    "en": "A diamond of holographic foil.",
+    "fr": "Un losange de film holographique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "prism"
+}

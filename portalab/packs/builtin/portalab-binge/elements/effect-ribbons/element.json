@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_ribbons",
+  "names": {
+    "en": "Red ribbons celebration",
+    "fr": "Célébration rubans rouges"
+  },
+  "descriptions": {
+    "en": "Red ribbons of light streaking across the screen.",
+    "fr": "Des rubans de lumière rouge qui traversent l'écran."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "ribbons"
+}

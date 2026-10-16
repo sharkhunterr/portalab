@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_be_kind_rewind",
+  "names": {
+    "en": "Be kind, rewind badge",
+    "fr": "Badge Rembobinez, svp"
+  },
+  "descriptions": {
+    "en": "Always brings the tape back rewound.",
+    "fr": "Rend toujours la cassette rembobinée."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "disc"
+  },
+  "payload": {
+    "label": "Be kind, rewind",
+    "icon": "disc",
+    "style": "vhs"
+  }
+}

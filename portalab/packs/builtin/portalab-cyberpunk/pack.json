@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-cyberpunk",
+  "version": "1.0.0+a507d05dcb",
+  "names": {
+    "en": "Cyberpunk interface",
+    "fr": "Interface Cyberpunk"
+  },
+  "descriptions": {
+    "en": "The « Cyberpunk interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Cyberpunk » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

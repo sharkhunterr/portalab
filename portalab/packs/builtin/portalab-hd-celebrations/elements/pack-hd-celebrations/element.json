@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_celebrations",
+  "names": {
+    "en": "HD celebrations pack",
+    "fr": "Pack Célébrations HD"
+  },
+  "descriptions": {
+    "en": "Every reward celebration drawn by the graphics chip, over the whole screen. — 2180 Coins saved.",
+    "fr": "Toutes les célébrations de récompense dessinées par la puce graphique, sur tout l'écran. — 2180 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8720,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "effect_nova",
+      "effect_goldshower",
+      "effect_petalstorm",
+      "effect_rebirth",
+      "effect_stormstrike",
+      "effect_skyveil",
+      "effect_arcana",
+      "effect_timerift"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_petals",
+  "names": {
+    "en": "Petals celebration",
+    "fr": "Célébration pétales"
+  },
+  "descriptions": {
+    "en": "Petals burst out when you earn a reward or level up.",
+    "fr": "Pétales jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "spring"
+  },
+  "look": "petals"
+}

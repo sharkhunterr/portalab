@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_speedlines",
+  "names": {
+    "en": "Speed lines banner",
+    "fr": "Bannière lignes de vitesse"
+  },
+  "descriptions": {
+    "en": "Manga speed lines.",
+    "fr": "Les lignes de vitesse des mangas."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "speedlines"
+}

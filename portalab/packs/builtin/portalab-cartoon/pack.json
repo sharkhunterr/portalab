@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-cartoon",
+  "version": "1.0.0+1eb22dec98",
+  "names": {
+    "en": "Cartoon interface",
+    "fr": "Interface Dessin animé"
+  },
+  "descriptions": {
+    "en": "The « Cartoon interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Dessin animé » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

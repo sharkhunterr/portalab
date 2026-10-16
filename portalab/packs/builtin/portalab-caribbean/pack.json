@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-caribbean",
+  "version": "1.0.0+f596068dc6",
+  "names": {
+    "en": "Caribbean interface",
+    "fr": "Interface Caraïbes"
+  },
+  "descriptions": {
+    "en": "The « Caribbean interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Caraïbes » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_lights",
+  "names": {
+    "en": "Christmas lights frame",
+    "fr": "Cadre guirlande"
+  },
+  "descriptions": {
+    "en": "A ring of blinking bulbs.",
+    "fr": "Un cercle d'ampoules qui clignotent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user",
+    "season": "christmas"
+  },
+  "look": "lights"
+}

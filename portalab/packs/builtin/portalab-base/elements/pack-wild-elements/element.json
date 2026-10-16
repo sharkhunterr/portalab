@@ -1,0 +1,35 @@
+{
+  "type": "bundle",
+  "product": "pack_wild_elements",
+  "names": {
+    "en": "Wild elements pack",
+    "fr": "Pack Éléments déchaînés"
+  },
+  "descriptions": {
+    "en": "Nature unleashed: a thunderstorm, a downpour, blizzards by day and night, a desert storm, a firestorm, the inferno and the volcano. — 2000 Coins saved.",
+    "fr": "La nature déchaînée : orage, averse, blizzards de jour et de nuit, tempête du désert, tempête de feu, brasier et volcan. — 2000 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8000,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_thunderstorm",
+      "ambient_downpour",
+      "ambient_blizzard",
+      "ambient_whiteout",
+      "ambient_sandstorm",
+      "ambient_firestorm",
+      "ambient_inferno",
+      "ambient_volcano"
+    ]
+  }
+}

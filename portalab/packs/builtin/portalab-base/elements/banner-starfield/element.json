@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_starfield",
+  "names": {
+    "en": "Starfield banner",
+    "fr": "Bannière champ d'étoiles"
+  },
+  "descriptions": {
+    "en": "A slowly drifting field of stars.",
+    "fr": "Un champ d'étoiles qui dérive lentement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "starfield"
+}

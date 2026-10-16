@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_animated_profile",
+  "names": {
+    "en": "Living profile pack",
+    "fr": "Pack Profil vivant"
+  },
+  "descriptions": {
+    "en": "An animated aurora banner, the hologram frame, the rainbow name and the nebula banner. — 860 Coins saved.",
+    "fr": "Une bannière animée aurore boréale, le cadre hologramme, le nom arc-en-ciel et la bannière nébuleuse. — 860 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3440,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "banner_live_aurora",
+      "frame_hologram",
+      "name_rainbow",
+      "banner_nebula"
+    ]
+  }
+}

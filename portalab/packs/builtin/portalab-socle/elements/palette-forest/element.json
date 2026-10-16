@@ -1,0 +1,13 @@
+{
+  "type": "palette",
+  "look": "forest",
+  "names": {
+    "en": "Forest",
+    "fr": "Forêt"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

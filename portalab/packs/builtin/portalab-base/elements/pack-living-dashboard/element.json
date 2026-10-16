@@ -1,0 +1,32 @@
+{
+  "type": "bundle",
+  "product": "pack_living_dashboard",
+  "names": {
+    "en": "Living dashboard pack",
+    "fr": "Pack Tableau de bord vivant"
+  },
+  "descriptions": {
+    "en": "The dashboard comes alive: heartbeat services, the progression odometer, liquid objectives, the live community feed, the news carousel and counting statistics. — 330 Coins saved.",
+    "fr": "Le tableau de bord prend vie : services qui battent, compteur de progression, objectifs liquides, fil communautaire en direct, carrousel d'actualités et statistiques animées. — 330 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1320,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "opt_style_services_pulse",
+      "opt_style_progress_odometer",
+      "opt_style_daily_liquid",
+      "opt_style_activity_live",
+      "opt_style_news_ticker",
+      "opt_style_stats_countup"
+    ]
+  }
+}

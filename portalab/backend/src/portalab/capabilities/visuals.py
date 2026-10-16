@@ -118,8 +118,12 @@ class CatalogWriter(Protocol):
         """Creates or revises the product (``created``, ``revised`` or ``unchanged``) and puts it on sale."""
         ...
 
-    async def withdraw(self, actor: Principal, key: str) -> None:
-        """Off sale (its owners keep it)."""
+    async def withdraw(self, actor: Principal, key: str) -> bool:
+        """Off sale (its owners keep it); whether it was on sale until now."""
+        ...
+
+    async def existing(self, keys: Iterable[str]) -> frozenset[str]:
+        """Which of these products the catalog has."""
         ...
 
     async def owners(self, keys: Iterable[str]) -> int:

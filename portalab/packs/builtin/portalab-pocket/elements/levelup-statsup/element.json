@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_statsup",
+  "names": {
+    "en": "Stats up level-up",
+    "fr": "Passage de niveau statistiques en hausse"
+  },
+  "descriptions": {
+    "en": "A text box announces it: your new level, every stat going up in pixels.",
+    "fr": "Une boîte de texte l'annonce : votre nouveau niveau, toutes les statistiques qui montent en pixels."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "statsup"
+}

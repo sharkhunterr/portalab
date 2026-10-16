@@ -1,0 +1,47 @@
+{
+  "type": "booster",
+  "product": "booster_celestial",
+  "names": {
+    "en": "Celestial booster",
+    "fr": "Booster Céleste"
+  },
+  "descriptions": {
+    "en": "Five looks of the cosmos drawn at random — nebulae, planets, comets, constellations, the zodiac… at least one rare.",
+    "fr": "Cinq looks du cosmos tirés au hasard — nébuleuses, planètes, comètes, constellations, zodiaque… dont au moins un rare."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "epic",
+    "level": 5,
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  },
+  "payload": {
+    "pool": "looks",
+    "packs": [
+      "pack_astro",
+      "pack_hd_nebulae",
+      "pack_hd_planets",
+      "pack_hd_stars",
+      "pack_hd_comets",
+      "pack_zodiac",
+      "pack_hd_sunmoon",
+      "pack_spacecrew",
+      "pack_sunmoon"
+    ],
+    "cards": 5,
+    "odds": {
+      "common": 50,
+      "rare": 32,
+      "epic": 15,
+      "legendary": 3
+    },
+    "guarantee": "rare",
+    "look": "celestial"
+  }
+}

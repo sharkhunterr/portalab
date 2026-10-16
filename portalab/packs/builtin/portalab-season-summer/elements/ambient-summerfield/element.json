@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_summerfield",
+  "names": {
+    "en": "Summer field ambience",
+    "fr": "Ambiance champ d'été"
+  },
+  "descriptions": {
+    "en": "Summer field drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Champ d'été derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "summer"
+  },
+  "look": "summerfield"
+}

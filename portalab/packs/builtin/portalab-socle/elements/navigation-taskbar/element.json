@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "taskbar",
+  "names": {
+    "en": "taskbar",
+    "fr": "taskbar"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:taskbar"
+  },
+  "free": true
+}

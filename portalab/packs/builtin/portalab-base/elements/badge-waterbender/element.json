@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_waterbender",
+  "names": {
+    "en": "Waterbender badge",
+    "fr": "Badge Maître de l'eau"
+  },
+  "descriptions": {
+    "en": "Flows around every obstacle.",
+    "fr": "Contourne chaque obstacle comme l'eau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "droplets"
+  },
+  "look": "water",
+  "payload": {
+    "label": "Waterbender",
+    "icon": "droplets"
+  }
+}

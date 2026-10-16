@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-classicdesk",
+  "version": "1.0.0+cd667e4562",
+  "names": {
+    "en": "Desktop 2001 interface",
+    "fr": "Interface Bureau 2001"
+  },
+  "descriptions": {
+    "en": "The « Desktop 2001 interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Bureau 2001 » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_orionpink",
+  "names": {
+    "en": "Orion pink palette",
+    "fr": "Palette rose d'orion"
+  },
+  "descriptions": {
+    "en": "Orion's magenta and violet over the theme.",
+    "fr": "Le magenta et le violet d'Orion sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "orionpink"
+}

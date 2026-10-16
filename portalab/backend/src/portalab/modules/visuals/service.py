@@ -50,7 +50,7 @@ from portalab.modules.visuals.store import Files, PackageError, Store, read_fold
 
 SOCLE = "portalab-socle"
 RESERVED_PREFIX = "portalab-"
-ECONOMY_FIELDS = ("price", "rarity", "level", "supply", "collection", "icon", "season")
+ECONOMY_FIELDS = ("price", "rarity", "level", "supply", "collection", "icon", "season", "limit", "featured")
 DEFAULT_COLLECTIONS = {
     "level_up": "levels",
     "level_badge": "levels",
@@ -123,8 +123,9 @@ class VisualPacks:
         self.audit = audit  # every action on a pack, in Portalab's audit log (sensitive)
         self.announce = announce  # the module's domain event (``visuals.pack.changed``)
         self.clock = clock
-        self._manifest: dict[str, Any] = {"epoch": -1, "elements": []}
+        self._manifest: dict[str, Any] = {"epoch": -1, "elements": [], "withheld": {}}
         self._live: dict[tuple[str, str], str] = {}  # (pack, fingerprint's first 16) → fingerprint, live ones
+        self.withheld: dict[str, frozenset[str]] = {}  # Portalab's own looks whose pack is off, per type
         self._checked = 0.0
         self._refreshing = asyncio.Lock()
 
@@ -261,7 +262,8 @@ class VisualPacks:
                 )
             )
         ).scalar_one_or_none()
-        if known is not None and known.sha256 == sha and known.step != "purged":
+        retry = builtin and known is not None and not known.ever_published  # a built-in version that failed
+        if known is not None and known.sha256 == sha and known.step != "purged" and not retry:
             return Imported(manifest.id, manifest.version, sha, False)
         if known is not None and known.ever_published:
             # a published version is never changed in place: the same number with other content is refused
@@ -299,13 +301,17 @@ class VisualPacks:
         known.detected_at = now
         await session.flush()
         for element in report["elements"]:
+            if builtin:
+                element["builtin"] = True  # its product, once it exists, is the administrators'
             session.add(
                 Element(
                     version_id=known.id,
                     folder=element["folder"],
                     type=element["type"],
                     look=element.get("look"),
-                    product_key=None if element["type"] in NOT_SOLD else element["product"],
+                    product_key=None
+                    if element["type"] in NOT_SOLD or element.get("free")
+                    else element["product"],
                     kind=element["kind"],
                     data=element,
                 )
@@ -492,13 +498,17 @@ class VisualPacks:
             "payload": payload,
             "collection": economy.get("collection") or DEFAULT_COLLECTIONS.get(element["type"], "looks"),
             "icon": economy.get("icon"),
-            "featured": False,
+            "featured": bool(economy.get("featured")),
             "level": economy.get("level"),
             "supply": economy.get("supply"),
-            "limit": None,
+            "limit": tuple(economy["limit"]) if economy.get("limit") else None,
             "repeatable": bool(economy.get("repeatable")),
-            "reward_only": economy.get("price") is None and element["type"] not in ("bundle", "theme_pack"),
+            "reward_only": bool(economy.get("reward_only"))
+            or (economy.get("price") is None and element["type"] not in ("bundle", "theme_pack")),
             "season": economy.get("season"),
+            **({"contribution": economy["contribution"]} if economy.get("contribution") else {}),
+            # 028: Portalab's own products, once they exist, are the administrators' (never revised)
+            **({"keep_existing": True} if element.get("builtin") else {}),
         }
 
     async def _interface(
@@ -511,6 +521,11 @@ class VisualPacks:
         interfaces = self.interfaces()
         if interfaces is None:
             raise Unavailable("Interfaces are not available.", code="ui.visual_pack_interfaces_unavailable")
+        if element.get("builtin") and element["kind"] == "renderer":
+            # one of Portalab's own interfaces (UI registers it): only switched on and off with its pack
+            # (never the fallbacks: the socle is always on)
+            await interfaces.set_enabled(actor, element["look"], enabled)
+            return
         if not enabled:
             if await interfaces.source_of(element["look"]) == f"visuals:{pack}":
                 await interfaces.set_enabled(actor, element["look"], False)
@@ -611,13 +626,19 @@ class VisualPacks:
         await self._claim(session, holder.id, elements, set(replaces), trusted=trusted)
         writer = self._writer()
         outcomes: dict[str, str] = {}
+        # what switching the pack off took off sale goes back on sale — and only that: a product of Portalab's
+        # own catalog the administrators had taken off sale stays off
+        withdrawn = set((version.decision or {}).get("withdrawn") or [])
         for element in elements:
             await self._interface(actor, holder.id, version, element.data, enabled=True)
             if element.product_key is None:
                 continue
-            outcomes[element.product_key] = await writer.publish(
-                actor, self.product_of(element.data, economy.get(element.product_key, {}))
-            )
+            product = self.product_of(element.data, economy.get(element.product_key, {}))
+            if holder.builtin:
+                product["resume"] = element.product_key in withdrawn
+            outcomes[element.product_key] = await writer.publish(actor, product)
+        if withdrawn:
+            version.decision = {**(version.decision or {}), "withdrawn": []}
         if previous is not None and previous.id != version.id:
             for element in await self._elements(session, previous.id):
                 if element.product_key and element.product_key not in outcomes:
@@ -633,10 +654,13 @@ class VisualPacks:
     ) -> None:
         await self._release(session, holder.id)
         writer = self._writer()
+        withdrawn: list[str] = []
         for element in await self._elements(session, version.id):
             await self._interface(actor, holder.id, version, element.data, enabled=False)
-            if element.product_key is not None:
-                await writer.withdraw(actor, element.product_key)
+            if element.product_key is not None and await writer.withdraw(actor, element.product_key):
+                withdrawn.append(element.product_key)  # on sale until now: back on sale when switched on
+        previous = set((version.decision or {}).get("withdrawn") or [])
+        version.decision = {**(version.decision or {}), "withdrawn": sorted(previous | set(withdrawn))}
 
     @staticmethod
     def _missing_confirmations(
@@ -784,6 +808,27 @@ class VisualPacks:
         await self._audited(
             actor, "switched_on" if enabled else "switched_off", pack=pack, version=version.version
         )
+
+    async def set_builtin_state(self, actor: Principal, enabled: bool) -> list[str]:
+        """Every one of Portalab's own packs switched on (the whole catalog) or off (the socle stays on);
+        returns the packs changed."""
+        async with self.database.session() as session:
+            packs = [
+                p.id
+                for p in (
+                    await session.execute(
+                        select(Pack).where(
+                            Pack.builtin,
+                            Pack.socle.is_(False),
+                            Pack.current_version_id.is_not(None),
+                            Pack.state.in_(("disabled", "archived") if enabled else ("enabled",)),
+                        )
+                    )
+                ).scalars()
+            ]
+        for pack in packs:
+            await self.set_state(actor, pack, enabled)
+        return packs
 
     async def rollback(self, actor: Principal, pack: str, version: str) -> dict[str, Any]:
         """Back to a version validated before, with the economy decided then."""
@@ -1004,15 +1049,36 @@ class VisualPacks:
                     )
                 ).all()
                 claims = list((await session.execute(select(LookClaim))).scalars())
+                # Portalab's own looks whose pack is off: their wearers see the default instead
+                withheld_rows = (
+                    await session.execute(
+                        select(Element.type, Element.look)
+                        .join(PackVersion, PackVersion.id == Element.version_id)
+                        .join(Pack, Pack.current_version_id == PackVersion.id)
+                        .where(Pack.builtin, Pack.state != "enabled", Element.look.is_not(None))
+                    )
+                ).all()
             elements: list[dict[str, Any]] = []
             for pack_id, version, element in rows:
+                if element.data.get("builtin") and element.kind == "renderer":
+                    continue  # drawn by the interface's own code: nothing to load
                 elements.extend(self.render_list(pack_id, version, [element.data]))
             by_type: dict[str, list[str]] = {}
             for claim in claims:
                 by_type.setdefault(claim.type, []).append(claim.look)
+            live = {(claim.type, claim.look) for claim in claims}
+            withheld: dict[str, list[str]] = {}
+            for kind, look in withheld_rows:
+                if (kind, look) not in live:
+                    withheld.setdefault(str(kind), []).append(str(look))
             live_looks.replace(by_type, epoch)
+            self.withheld = {kind: frozenset(looks) for kind, looks in withheld.items()}
             self._live = {(pack_id, version.sha256[:16]): version.sha256 for pack_id, version, _ in rows}
-            self._manifest = {"epoch": epoch, "elements": elements}
+            self._manifest = {
+                "epoch": epoch,
+                "elements": elements,
+                "withheld": {kind: sorted(looks) for kind, looks in withheld.items()},
+            }
 
     async def active(self) -> dict[str, Any]:
         """What every member's interface loads: the elements of the live packs (cached per epoch)."""

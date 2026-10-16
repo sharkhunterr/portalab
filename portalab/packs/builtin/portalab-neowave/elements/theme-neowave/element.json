@@ -1,0 +1,24 @@
+{
+  "type": "theme",
+  "product": "theme_neowave",
+  "names": {
+    "en": "Neowave interface",
+    "fr": "Interface Néo-wave"
+  },
+  "descriptions": {
+    "en": "Retro 80s: neon titles, a grid horizon, header at the bottom and chiptune. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Rétro 80 : titres néon, horizon en grille, en-tête en bas et chiptune. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "supply": 25,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "neowave"
+}

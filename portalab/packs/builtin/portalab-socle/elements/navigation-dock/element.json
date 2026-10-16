@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "dock",
+  "names": {
+    "en": "dock",
+    "fr": "dock"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:dock"
+  },
+  "free": true
+}

@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_constellations",
+  "names": {
+    "en": "Constellations animated banner",
+    "fr": "Bannière animée Constellations"
+  },
+  "descriptions": {
+    "en": "Constellations in your profile's banner, drawn by the graphics chip, for every visitor to see.",
+    "fr": "Constellations dans la bannière de votre profil, dessiné par la puce graphique, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 6,
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-constellations"
+}

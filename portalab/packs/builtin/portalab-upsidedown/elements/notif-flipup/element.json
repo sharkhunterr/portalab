@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_flipup",
+  "names": {
+    "en": "Flip-up notifications",
+    "fr": "Notifications retournées"
+  },
+  "descriptions": {
+    "en": "They rise from below and flip up, as if turned over from the other side.",
+    "fr": "Elles montent d'en bas et se retournent, comme venues de l'autre côté."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "flipup"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_completionist",
+  "names": {
+    "en": "Title: The Collector",
+    "fr": "Titre : Le Collectionneur"
+  },
+  "descriptions": {
+    "en": "Unique: for those who bought 150 things in the shop.",
+    "fr": "Unique : pour qui a acheté 150 objets dans la boutique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "look": "rainbow",
+  "payload": {
+    "label": "The Collector"
+  }
+}

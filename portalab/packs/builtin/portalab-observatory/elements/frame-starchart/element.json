@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_starchart",
+  "names": {
+    "en": "Star chart frame",
+    "fr": "Cadre carte du ciel"
+  },
+  "descriptions": {
+    "en": "A constellation drawing itself on a star chart your avatar, drawn by the graphics chip.",
+    "fr": "Une constellation qui se dessine sur une carte du ciel de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "level": 6,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "starchart"
+}

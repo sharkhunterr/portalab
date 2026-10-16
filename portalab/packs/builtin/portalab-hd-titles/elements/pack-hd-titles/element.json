@@ -1,0 +1,61 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_titles",
+  "names": {
+    "en": "HD titles and badges pack",
+    "fr": "Pack Titres et badges HD"
+  },
+  "descriptions": {
+    "en": "Every title and badge drawn by the graphics chip. — 5860 Coins saved.",
+    "fr": "Tous les titres et badges dessinés par la puce graphique. — 5860 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 23440,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "title_firebrand",
+      "title_stormcaller",
+      "title_deep_diver",
+      "title_volcano_heart",
+      "title_frostborn",
+      "title_stargazer",
+      "title_golden_one",
+      "title_mad_scientist",
+      "title_netrunner",
+      "title_runemaster",
+      "title_root_access",
+      "title_spring_spirit",
+      "title_shadow_walker",
+      "title_sugar_rush",
+      "title_northern_light",
+      "title_plasma_core",
+      "badge_phoenix_feather",
+      "badge_thunderbolt",
+      "badge_trident",
+      "badge_lava_stone",
+      "badge_snowflake",
+      "badge_comet",
+      "badge_golden_crown",
+      "badge_radioactive",
+      "badge_chrome_chip",
+      "badge_grimoire",
+      "badge_backdoor",
+      "badge_blossom",
+      "badge_watcher",
+      "badge_lollipop",
+      "badge_north_star",
+      "badge_atom",
+      "title_time_traveller",
+      "badge_hourglass"
+    ]
+  }
+}

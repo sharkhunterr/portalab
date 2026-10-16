@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_leaves",
+  "names": {
+    "en": "Autumn leaves ambience",
+    "fr": "Ambiance feuilles d'automne"
+  },
+  "descriptions": {
+    "en": "Autumn leaves drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Feuilles d'automne derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "halloween"
+  },
+  "look": "leaves"
+}

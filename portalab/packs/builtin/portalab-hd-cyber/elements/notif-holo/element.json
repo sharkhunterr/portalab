@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_holo",
+  "names": {
+    "en": "Holographic notifications",
+    "fr": "Notifications holographiques"
+  },
+  "descriptions": {
+    "en": "Rainbow foil and a neon edge. Drawn by the graphics chip.",
+    "fr": "Un film arc-en-ciel et un bord néon. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "holo"
+}

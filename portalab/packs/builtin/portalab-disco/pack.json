@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-disco",
+  "version": "1.0.0+9199fae5b1",
+  "names": {
+    "en": "Disco interface",
+    "fr": "Interface Disco"
+  },
+  "descriptions": {
+    "en": "The « Disco interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Disco » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_mouth_breather",
+  "names": {
+    "en": "Title: Mouth breather",
+    "fr": "Titre : Respire-par-la-bouche"
+  },
+  "descriptions": {
+    "en": "Said with affection. Mostly.",
+    "fr": "Dit avec affection. En général."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "mirror",
+  "payload": {
+    "label": "Mouth breather"
+  }
+}

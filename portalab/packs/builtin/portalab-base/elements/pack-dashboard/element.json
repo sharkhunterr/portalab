@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_dashboard",
+  "names": {
+    "en": "Dashboard pack",
+    "fr": "Pack Tableau de bord"
+  },
+  "descriptions": {
+    "en": "The top of the week, upcoming releases, coming-soon and next releases widgets. — 290 Coins saved.",
+    "fr": "Les widgets top de la semaine, sorties à venir, demandes bientôt là et prochaines sorties. — 290 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1160,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "widget_media_top",
+      "widget_media_upcoming",
+      "widget_my_soon",
+      "widget_next_releases"
+    ]
+  }
+}

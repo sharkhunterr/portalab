@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_onering",
+  "names": {
+    "en": "The One Ring level-up",
+    "fr": "Passage de niveau l'anneau unique"
+  },
+  "descriptions": {
+    "en": "A golden ring turns in the dark; the scroll of your journey unrolls.",
+    "fr": "Un anneau d'or tourne dans l'ombre ; le parchemin de votre voyage se déroule."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "onering"
+}

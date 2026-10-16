@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_pumpkin",
+  "names": {
+    "en": "Bat swarm celebration",
+    "fr": "Célébration nuée de chauves-souris"
+  },
+  "descriptions": {
+    "en": "Bat swarm burst out when you earn a reward or level up.",
+    "fr": "Nuée de chauves-souris jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "halloween"
+  },
+  "look": "bats"
+}

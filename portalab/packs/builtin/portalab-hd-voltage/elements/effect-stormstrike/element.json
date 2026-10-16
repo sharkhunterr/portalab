@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_stormstrike",
+  "names": {
+    "en": "Storm strike celebration",
+    "fr": "Célébration coup de tonnerre"
+  },
+  "descriptions": {
+    "en": "Storm strike burst out when you earn a reward or level up.",
+    "fr": "Coup de tonnerre jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "stormstrike"
+}

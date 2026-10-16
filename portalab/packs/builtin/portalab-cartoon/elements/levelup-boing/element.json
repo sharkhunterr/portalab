@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_boing",
+  "names": {
+    "en": "Boing! level-up",
+    "fr": "Passage de niveau boing !"
+  },
+  "descriptions": {
+    "en": "Your level bounces in, stars spinning round.",
+    "fr": "Votre niveau arrive en rebondissant, des étoiles tout autour."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "boing"
+}

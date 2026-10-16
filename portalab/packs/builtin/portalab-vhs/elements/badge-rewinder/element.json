@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_rewinder",
+  "names": {
+    "en": "Be kind, rewind badge",
+    "fr": "Badge Rembobineur"
+  },
+  "descriptions": {
+    "en": "You still remember the video club.",
+    "fr": "Vous vous souvenez encore du vidéoclub."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "tv"
+  },
+  "payload": {
+    "label": "Be kind, rewind",
+    "icon": "tv",
+    "style": "vhs"
+  }
+}

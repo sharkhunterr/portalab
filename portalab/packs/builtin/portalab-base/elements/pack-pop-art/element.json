@@ -1,0 +1,34 @@
+{
+  "type": "bundle",
+  "product": "pack_pop_art",
+  "names": {
+    "en": "Pop art pack",
+    "fr": "Pack Pop art"
+  },
+  "descriptions": {
+    "en": "Colours straight from the tube: pop paint, pour, watercolour and marbling, ribbons of paint, thick glossy paint and the lava lamp. — 1600 Coins saved.",
+    "fr": "Des couleurs sorties du tube : peinture, coulée, aquarelle et marbré pop, rubans de peinture, peinture épaisse et la lampe à lave. — 1600 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6400,
+    "rarity": "epic",
+    "level": 15,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_poppaint",
+      "ambient_poppour",
+      "ambient_popwatercolor",
+      "ambient_popmarbling",
+      "ambient_paintribbon",
+      "ambient_impasto",
+      "ambient_lavalamp"
+    ]
+  }
+}

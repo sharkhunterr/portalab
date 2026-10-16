@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_christmas",
+  "names": {
+    "en": "Candy cane name style",
+    "fr": "Style de nom sucre d'orge"
+  },
+  "descriptions": {
+    "en": "A font and an effect for your name on your profile.",
+    "fr": "Une police et un effet pour votre nom sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather",
+    "season": "christmas"
+  },
+  "look": "christmas"
+}

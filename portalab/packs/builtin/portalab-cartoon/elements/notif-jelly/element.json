@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_jelly",
+  "names": {
+    "en": "Jelly notifications",
+    "fr": "Notifications gelée"
+  },
+  "descriptions": {
+    "en": "They squash and stretch into place.",
+    "fr": "Elles s'écrasent et s'étirent avant de se poser."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "jelly"
+}

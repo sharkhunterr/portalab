@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_powerup",
+  "names": {
+    "en": "Power pellet level-up",
+    "fr": "Passage de niveau super gomme"
+  },
+  "descriptions": {
+    "en": "READY! The ghosts turn blue and flee, and your new level gobbles the screen.",
+    "fr": "READY ! Les fantômes virent au bleu et s'enfuient, et votre nouveau niveau dévore l'écran."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "powerup"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_crab",
+  "names": {
+    "en": "Invader frame",
+    "fr": "Cadre envahisseur"
+  },
+  "descriptions": {
+    "en": "Your avatar in a stepped pixel frame, an invader perched on top.",
+    "fr": "Votre avatar dans un cadre en pixels, un envahisseur perché dessus."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "crab"
+}

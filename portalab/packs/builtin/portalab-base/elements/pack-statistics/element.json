@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "pack_statistics",
+  "names": {
+    "en": "Statistician pack",
+    "fr": "Pack Statisticien"
+  },
+  "descriptions": {
+    "en": "Every Media statistic, every setting of « My statistics », its counting figures and the curves of « My progression ». — 1040 Coins saved.",
+    "fr": "Toutes les statistiques Médias, toutes les options de « Mes statistiques », ses chiffres animés et les courbes de « Ma progression ». — 1040 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 4160,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "stat_when",
+      "stat_genres",
+      "stat_people",
+      "stat_decades",
+      "stat_records",
+      "stat_box_office",
+      "stat_platforms",
+      "opt_stats_area",
+      "opt_stats_donut",
+      "opt_stats_top",
+      "opt_stats_year",
+      "opt_stats_all",
+      "opt_stats_server",
+      "opt_style_stats_countup",
+      "opt_style_progress_chart"
+    ]
+  }
+}

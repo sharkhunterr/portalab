@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_sweetie",
+  "names": {
+    "en": "Sweetie frame",
+    "fr": "Cadre friandise"
+  },
+  "descriptions": {
+    "en": "A square of swirling candy.",
+    "fr": "Un carré de bonbon qui tourbillonne."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "sweetie"
+}

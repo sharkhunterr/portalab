@@ -1,0 +1,29 @@
+{
+  "type": "bundle",
+  "product": "pack_explorer",
+  "names": {
+    "en": "Explorer pack",
+    "fr": "Pack Explorateur"
+  },
+  "descriptions": {
+    "en": "The widgets to discover: next releases with their countdown, a year ago and the living wall. — 320 Coins saved.",
+    "fr": "Les widgets pour découvrir : prochaines sorties et leur décompte, il y a un an et le mur vivant. — 320 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1280,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "widget_next_releases",
+      "widget_on_this_day",
+      "widget_living_wall"
+    ]
+  }
+}

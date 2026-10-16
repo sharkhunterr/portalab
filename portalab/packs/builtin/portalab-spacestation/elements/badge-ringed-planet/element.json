@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_ringed_planet",
+  "names": {
+    "en": "Ringed planet badge",
+    "fr": "Badge Planète à anneaux"
+  },
+  "descriptions": {
+    "en": "A « Ringed planet » badge on your profile, drawn by the graphics chip.",
+    "fr": "Un badge « Ringed planet » sur votre profil, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "level": 7,
+    "collection": "badges",
+    "icon": "star"
+  },
+  "look": "ringworld",
+  "payload": {
+    "label": "Ringed planet",
+    "icon": "orbit"
+  }
+}

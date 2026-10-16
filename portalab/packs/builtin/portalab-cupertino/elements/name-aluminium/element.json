@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_aluminium",
+  "names": {
+    "en": "Aluminium name style",
+    "fr": "Style de nom aluminium"
+  },
+  "descriptions": {
+    "en": "A name in brushed aluminium, a light sweeping across it.",
+    "fr": "Un nom en aluminium brossé, une lumière qui le parcourt."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "aluminium"
+}

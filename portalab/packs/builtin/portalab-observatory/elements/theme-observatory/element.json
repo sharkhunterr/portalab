@@ -1,0 +1,25 @@
+{
+  "type": "theme",
+  "product": "theme_observatory",
+  "names": {
+    "en": "Observatory interface",
+    "fr": "Interface Observatoire"
+  },
+  "descriptions": {
+    "en": "A night at the observatory: navy and brass, a round star chart that turns to choose your section — each a constellation, each page a star — constellations drawing themselves behind, shooting-star notifications. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Une nuit à l'observatoire : bleu nuit et laiton, une carte du ciel ronde qui tourne pour choisir sa rubrique — chacune une constellation, chaque page une étoile —, des constellations qui se dessinent derrière, des notifications en étoiles filantes. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "supply": 10,
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "observatory"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_finale",
+  "names": {
+    "en": "Season finale level-up",
+    "fr": "Passage de niveau final de saison"
+  },
+  "descriptions": {
+    "en": "Red ribbons sweep the screen, then your new level appears like a new season's title.",
+    "fr": "Des rubans rouges balaient l'écran, puis votre nouveau niveau apparaît comme le titre d'une nouvelle saison."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "finale"
+}

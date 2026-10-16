@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-neowave",
+  "version": "1.0.0+2bb83b0112",
+  "names": {
+    "en": "Neowave interface",
+    "fr": "Interface Néo-wave"
+  },
+  "descriptions": {
+    "en": "The « Neowave interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Néo-wave » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

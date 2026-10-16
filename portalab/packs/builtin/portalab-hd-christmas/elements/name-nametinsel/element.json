@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_nametinsel",
+  "names": {
+    "en": "Tinsel name style",
+    "fr": "Style de nom guirlande"
+  },
+  "descriptions": {
+    "en": "An aura around your name. Drawn by the graphics chip.",
+    "fr": "Une aura autour de votre nom. Dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "names",
+    "icon": "feather",
+    "season": "christmas"
+  },
+  "look": "nametinsel"
+}

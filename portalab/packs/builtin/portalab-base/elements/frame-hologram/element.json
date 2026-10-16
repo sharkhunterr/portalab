@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_hologram",
+  "names": {
+    "en": "Hologram frame",
+    "fr": "Cadre hologramme"
+  },
+  "descriptions": {
+    "en": "Ever-shifting iridescent light.",
+    "fr": "Une lumière irisée en perpétuel mouvement."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "hologram"
+}

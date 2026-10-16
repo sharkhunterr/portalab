@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_matrix",
+  "names": {
+    "en": "Hacked notifications",
+    "fr": "Notifications piratées"
+  },
+  "descriptions": {
+    "en": "Digital rain behind each notification. Drawn by the graphics chip.",
+    "fr": "De la pluie numérique derrière chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "matrix"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_lunar",
+  "names": {
+    "en": "Lunar palette",
+    "fr": "Palette lunaire"
+  },
+  "descriptions": {
+    "en": "The moon's silver and blue over the theme.",
+    "fr": "L'argent et le bleu de la lune sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "lunar"
+}

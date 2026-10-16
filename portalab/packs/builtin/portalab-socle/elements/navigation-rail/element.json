@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "rail",
+  "names": {
+    "en": "rail",
+    "fr": "rail"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:rail"
+  },
+  "free": true
+}

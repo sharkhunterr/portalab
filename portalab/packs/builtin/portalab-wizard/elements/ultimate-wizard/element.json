@@ -1,0 +1,46 @@
+{
+  "type": "bundle",
+  "product": "ultimate_wizard",
+  "names": {
+    "en": "Grimoire theme pack",
+    "fr": "Pack de thème Grimoire"
+  },
+  "descriptions": {
+    "en": "The whole Grimoire theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 2070 Coins saved.",
+    "fr": "Tout le thème Grimoire : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 2070 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8300,
+    "rarity": "legendary",
+    "level": 50,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown",
+    "featured": true
+  },
+  "payload": {
+    "products": [
+      "theme_wizard",
+      "banner_castle",
+      "frame_runes",
+      "name_wizard",
+      "notif_parchment",
+      "effect_aurora",
+      "ambient_sparkles",
+      "badge_archmage",
+      "title_archmage",
+      "level_crest",
+      "notif_portal",
+      "levelup_spell",
+      "notif_drop",
+      "opt_style_daily_liquid",
+      "opt_style_added_deck",
+      "widget_clock",
+      "opt_style_clock_analog"
+    ]
+  }
+}

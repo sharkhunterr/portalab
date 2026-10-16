@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_warppipe",
+  "names": {
+    "en": "Warp pipe frame",
+    "fr": "Cadre tuyau"
+  },
+  "descriptions": {
+    "en": "Your avatar popping out of a green warp pipe.",
+    "fr": "Votre avatar qui sort d'un tuyau vert."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "warppipe"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_crate_digger",
+  "names": {
+    "en": "Crate digger badge",
+    "fr": "Badge Fouilleur de bacs"
+  },
+  "descriptions": {
+    "en": "A « Crate digger » badge on your profile.",
+    "fr": "Un badge « Crate digger » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Crate digger",
+    "icon": "music",
+    "style": "pulse"
+  }
+}

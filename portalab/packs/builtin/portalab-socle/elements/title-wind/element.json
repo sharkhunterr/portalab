@@ -1,0 +1,13 @@
+{
+  "type": "title",
+  "look": "wind",
+  "names": {
+    "en": "wind",
+    "fr": "wind"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

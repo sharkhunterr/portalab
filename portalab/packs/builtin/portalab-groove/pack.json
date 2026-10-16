@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-groove",
+  "version": "1.0.0+e88a6f6c81",
+  "names": {
+    "en": "Groove interface",
+    "fr": "Interface Groove"
+  },
+  "descriptions": {
+    "en": "The « Groove interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Groove » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

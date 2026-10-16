@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_cupid",
+  "names": {
+    "en": "Cupid's arrows celebration",
+    "fr": "Célébration flèches de cupidon"
+  },
+  "descriptions": {
+    "en": "Arrows with heart tips shooting out of the reward.",
+    "fr": "Des flèches à pointe de cœur qui partent de la récompense."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "valentine"
+  },
+  "look": "cupid"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_night_city",
+  "names": {
+    "en": "Title: Legend of Night City",
+    "fr": "Titre : Légende de Night City"
+  },
+  "descriptions": {
+    "en": "Everyone in the city knows your name.",
+    "fr": "Toute la ville connaît votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "glitch",
+  "payload": {
+    "label": "Legend of Night City"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "type": "bundle",
+  "product": "ultimate_christmas",
+  "names": {
+    "en": "Noël theme pack",
+    "fr": "Pack de thème Noël"
+  },
+  "descriptions": {
+    "en": "The whole Noël theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1280 Coins saved.",
+    "fr": "Tout le thème Noël : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1280 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5120,
+    "rarity": "epic",
+    "level": 23,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_christmas",
+      "banner_snowfall",
+      "frame_holly",
+      "name_christmas",
+      "notif_paper",
+      "effect_snow",
+      "ambient_snow",
+      "badge_elf",
+      "title_head_elf",
+      "level_gem",
+      "notif_air",
+      "levelup_gift",
+      "notif_drop",
+      "widget_countdown",
+      "opt_style_countdown_flip",
+      "opt_style_continue_ambient",
+      "opt_style_added_deck"
+    ]
+  }
+}

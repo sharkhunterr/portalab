@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_bug_hunter",
+  "names": {
+    "en": "Bug hunter badge",
+    "fr": "Badge Chasseur de bugs"
+  },
+  "descriptions": {
+    "en": "Given for three pieces of feedback.",
+    "fr": "Offert pour trois retours."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "bug",
+    "reward_only": true
+  },
+  "look": "glitch",
+  "payload": {
+    "label": "Bug hunter",
+    "icon": "bug"
+  }
+}

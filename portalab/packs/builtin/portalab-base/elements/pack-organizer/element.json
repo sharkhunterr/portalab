@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_organizer",
+  "names": {
+    "en": "Organizer pack",
+    "fr": "Pack Organisation"
+  },
+  "descriptions": {
+    "en": "Everything to lay out a dashboard: separators with a label, sticky notes, progress bars and columns. — 120 Coins saved.",
+    "fr": "Tout pour organiser un tableau de bord : séparateurs avec titre, post-it, barres et colonnes de progression. — 120 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "widget_separator",
+      "widget_note",
+      "widget_progress",
+      "widget_progress_vertical"
+    ]
+  }
+}

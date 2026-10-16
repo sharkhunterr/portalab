@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_sakura",
+  "names": {
+    "en": "Sakura notifications",
+    "fr": "Notifications sakura"
+  },
+  "descriptions": {
+    "en": "Petals drifting across each notification. Drawn by the graphics chip.",
+    "fr": "Des pétales qui traversent chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell",
+    "season": "spring"
+  },
+  "look": "sakura"
+}

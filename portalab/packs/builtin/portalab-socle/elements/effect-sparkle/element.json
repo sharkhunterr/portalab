@@ -1,0 +1,13 @@
+{
+  "type": "effect",
+  "look": "sparkle",
+  "names": {
+    "en": "Sparkles",
+    "fr": "Étincelles"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

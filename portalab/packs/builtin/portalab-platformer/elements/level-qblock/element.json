@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_qblock",
+  "names": {
+    "en": "Mystery block level badge",
+    "fr": "Badge de niveau bloc mystère"
+  },
+  "descriptions": {
+    "en": "Your level on a golden mystery block with its rivets.",
+    "fr": "Votre niveau sur un bloc mystère doré et ses rivets."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "qblock"
+}

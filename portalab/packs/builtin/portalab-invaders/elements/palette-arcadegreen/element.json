@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_arcadegreen",
+  "names": {
+    "en": "Arcade green palette",
+    "fr": "Palette vert arcade"
+  },
+  "descriptions": {
+    "en": "Phosphor green and a red alert over the theme.",
+    "fr": "Vert phosphore et rouge d'alerte sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "arcadegreen"
+}

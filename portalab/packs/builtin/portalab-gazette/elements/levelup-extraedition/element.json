@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_extraedition",
+  "names": {
+    "en": "Extra edition level-up",
+    "fr": "Passage de niveau édition spéciale"
+  },
+  "descriptions": {
+    "en": "A newspaper spins up to the screen: EXTRA! EXTRA! your new level on the front page.",
+    "fr": "Un journal arrive en tournant : EXTRA ! EXTRA ! votre nouveau niveau à la une."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "extraedition"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_tracker",
+  "names": {
+    "en": "Motion tracker celebration",
+    "fr": "Célébration détecteur de mouvement"
+  },
+  "descriptions": {
+    "en": "Motion tracker burst out when you earn a reward or level up.",
+    "fr": "Détecteur de mouvement jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "tracker"
+}

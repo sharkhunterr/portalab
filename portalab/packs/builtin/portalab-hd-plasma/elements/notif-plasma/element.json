@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_plasma",
+  "names": {
+    "en": "Plasma notifications",
+    "fr": "Notifications plasma"
+  },
+  "descriptions": {
+    "en": "Plasma filaments behind each notification. Drawn by the graphics chip.",
+    "fr": "Des filaments de plasma derrière chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "plasma"
+}

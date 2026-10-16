@@ -102,8 +102,8 @@ PAYLOAD_FIELDS: dict[str, frozenset[str]] = {
 
 class Texts(BaseModel):
     model_config = ConfigDict(extra="allow")
-    fr: str = Field(default="", max_length=400)
-    en: str = Field(default="", max_length=400)
+    fr: str = Field(default="", max_length=1000)
+    en: str = Field(default="", max_length=1000)
 
 
 class NavLayout(BaseModel):
@@ -147,6 +147,11 @@ class Economy(BaseModel):
     icon: str | None = Field(default=None, max_length=40)
     repeatable: bool = False
     season: str | None = Field(default=None, max_length=20)
+    # 028: what Portalab's own catalog needs to recreate its products as they are
+    limit: tuple[int, int] | None = None  # purchases per member, per days
+    featured: bool = False
+    reward_only: bool = False  # given by an achievement or a level, never sold
+    contribution: int | None = Field(default=None, ge=0)
 
 
 class Element(BaseModel):
@@ -163,6 +168,7 @@ class Element(BaseModel):
     preview: str | None = None
     replaces: bool = False  # takes over a look of the same key held elsewhere (the administrator decides)
     contracts: list[str] = Field(default_factory=list, max_length=8)  # widgets: the data they ask for
+    free: bool = False  # 028: a look everyone wears — never a shop product
 
     @field_validator("look", "product")
     @classmethod
@@ -177,6 +183,10 @@ class Element(BaseModel):
             return self.product
         prefix = TYPES.get(self.type, (frozenset(), self.type))[1]
         return f"{prefix}_{(self.look or 'item').replace('-', '_')}"
+
+    @property
+    def sold(self) -> bool:
+        return not self.free and self.type not in NOT_SOLD
 
     def files(self) -> list[str]:
         return [f for f in (self.render.file, *self.render.css, self.preview) if f]

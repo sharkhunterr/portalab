@@ -1,0 +1,24 @@
+{
+  "type": "level_up",
+  "product": "levelup_timeportal",
+  "names": {
+    "en": "Time portal level-up",
+    "fr": "Passage de niveau portail temporel"
+  },
+  "descriptions": {
+    "en": "A triangular portal draws itself, tears open on the vortex of time, flashes and closes again.",
+    "fr": "Un portail triangulaire se trace, s'ouvre sur le vortex du temps, éclate de lumière et se referme."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 40,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "timeportal"
+}

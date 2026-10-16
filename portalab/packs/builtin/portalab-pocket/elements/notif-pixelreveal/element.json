@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_pixelreveal",
+  "names": {
+    "en": "Text appearing notification animation",
+    "fr": "Animation de notification texte qui s'affiche"
+  },
+  "descriptions": {
+    "en": "Notifications appearing line by line, like a game's text.",
+    "fr": "Des notifications qui s'affichent ligne par ligne, comme le texte d'un jeu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "pixelreveal"
+}

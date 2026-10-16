@@ -1,0 +1,24 @@
+{
+  "type": "notification_style",
+  "product": "notif_transmission",
+  "names": {
+    "en": "Transmission notifications",
+    "fr": "Notifications transmission"
+  },
+  "descriptions": {
+    "en": "Notifications coming in as a radio transmission, green on black.",
+    "fr": "Des notifications qui arrivent en transmission radio, vert sur noir."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "transmission"
+}

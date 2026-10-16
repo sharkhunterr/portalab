@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_chrome",
+  "names": {
+    "en": "Chrome frame",
+    "fr": "Cadre chrome"
+  },
+  "descriptions": {
+    "en": "Polished metal.",
+    "fr": "Du métal poli."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "chrome"
+}

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { isWithheld, useExternalRevision } from "../visuals/registry";
 import {
   DEFAULT_POLICY,
   DEFAULT_PREFERENCES,
@@ -22,6 +23,22 @@ import {
  * an instant first paint and synchronized with ``/me/preferences`` (020). Conflicts are resolved by a local
  * ``change_seq``: unsynced local changes are pushed, otherwise the server (other devices) wins.
  */
+
+/** 028: the looks chosen in the preferences, as they show — a look of a pack switched off shows the default
+ * (the choice itself is kept). */
+function shown(preferences: UiPreferences): UiPreferences {
+  const look = <K extends keyof UiPreferences>(key: K, type: string): UiPreferences[K] =>
+    isWithheld(type, String(preferences[key])) ? DEFAULT_PREFERENCES[key] : preferences[key];
+  return {
+    ...preferences,
+    notificationStyle: look("notificationStyle", "notification_style"),
+    notificationAnimation: look("notificationAnimation", "notification_animation"),
+    ambient: look("ambient", "ambient"),
+    celebration: look("celebration", "effect"),
+    palette: look("palette", "palette"),
+    levelUp: look("levelUp", "level_up"),
+  };
+}
 
 export const MIRROR_KEY = "portalab.ui";
 
@@ -156,10 +173,11 @@ export function PreferencesProvider({
   );
 
   const [preview, setPreview] = useState<Partial<UiPreferences> | null>(null);
-  const preferences = useMemo(
-    () => (preview ? { ...state.preferences, ...preview } : state.preferences),
-    [state.preferences, preview],
-  );
+  const revision = useExternalRevision();
+  const preferences = useMemo(() => {
+    void revision; // 028: a pack switched off or on changes what shows
+    return shown(preview ? { ...state.preferences, ...preview } : state.preferences);
+  }, [state.preferences, preview, revision]);
   const value = useMemo(
     () => ({ preferences, policy, setPreference, synced: state.synced, preview, setPreview }),
     [preferences, policy, setPreference, state.synced, preview],

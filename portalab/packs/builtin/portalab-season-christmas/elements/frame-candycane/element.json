@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_candycane",
+  "names": {
+    "en": "Candy cane frame",
+    "fr": "Cadre sucre d'orge"
+  },
+  "descriptions": {
+    "en": "Red and white stripes winding around your avatar.",
+    "fr": "Des rayures rouges et blanches qui s'enroulent autour de votre avatar."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user",
+    "season": "christmas"
+  },
+  "look": "candycane"
+}

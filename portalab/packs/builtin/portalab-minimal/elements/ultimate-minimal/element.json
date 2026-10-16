@@ -1,0 +1,41 @@
+{
+  "type": "bundle",
+  "product": "ultimate_minimal",
+  "names": {
+    "en": "Minimal theme pack",
+    "fr": "Pack de thème Minimal"
+  },
+  "descriptions": {
+    "en": "The whole Minimal theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 700 Coins saved.",
+    "fr": "Tout le thème Minimal : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 700 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2780,
+    "rarity": "rare",
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_minimal",
+      "banner_mono",
+      "frame_chrome",
+      "name_minimal",
+      "notif_drop",
+      "badge_purist",
+      "title_less_is_more",
+      "level_neon",
+      "notif_focus",
+      "levelup_minimal",
+      "widget_clock",
+      "opt_style_clock_analog",
+      "opt_style_stats_countup",
+      "opt_style_progress_chart"
+    ]
+  }
+}

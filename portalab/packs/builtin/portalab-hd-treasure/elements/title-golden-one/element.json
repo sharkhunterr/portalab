@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_golden_one",
+  "names": {
+    "en": "Title: The Golden One",
+    "fr": "Titre : L'Être doré"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "aurum",
+  "payload": {
+    "label": "The Golden One"
+  }
+}

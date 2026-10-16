@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_coastline",
+  "names": {
+    "en": "Coast at dusk banner",
+    "fr": "Bannière côte au crépuscule"
+  },
+  "descriptions": {
+    "en": "Cliffs over the ocean at dusk, the sky turning pink and violet.",
+    "fr": "Des falaises au-dessus de l'océan au crépuscule, le ciel qui vire au rose et au violet."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "coastline"
+}

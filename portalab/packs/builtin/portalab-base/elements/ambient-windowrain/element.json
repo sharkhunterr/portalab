@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_windowrain",
+  "names": {
+    "en": "Rain on the window ambience",
+    "fr": "Ambiance pluie à la fenêtre"
+  },
+  "descriptions": {
+    "en": "Rain on the window drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Pluie à la fenêtre derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "windowrain"
+}

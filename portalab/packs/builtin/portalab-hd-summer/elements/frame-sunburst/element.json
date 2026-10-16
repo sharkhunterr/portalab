@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_sunburst",
+  "names": {
+    "en": "Sunburst frame",
+    "fr": "Cadre soleil ardent"
+  },
+  "descriptions": {
+    "en": "A blazing summer sun flaring around your avatar, drawn by the graphics chip.",
+    "fr": "Un soleil d'été qui flamboie autour de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user",
+    "season": "summer"
+  },
+  "look": "sunburst"
+}

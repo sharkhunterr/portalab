@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_power_pellet",
+  "names": {
+    "en": "Title: Power pellet",
+    "fr": "Titre : Super gomme"
+  },
+  "descriptions": {
+    "en": "« Power pellet » under your name.",
+    "fr": "« Power pellet » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Power pellet",
+    "style": "neon"
+  }
+}

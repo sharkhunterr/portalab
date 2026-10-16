@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_wish_master",
+  "names": {
+    "en": "Title: Wish master",
+    "fr": "Titre : Maître des souhaits"
+  },
+  "descriptions": {
+    "en": "Given for 25 requests.",
+    "fr": "Offert pour 25 demandes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "trophy",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Wish master",
+    "style": "shimmer"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_hobbit",
+  "names": {
+    "en": "Hobbit of the Shire badge",
+    "fr": "Badge Hobbit de la Comté"
+  },
+  "descriptions": {
+    "en": "Fond of good food and quiet.",
+    "fr": "Amateur de bonne chère et de calme."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "sprout"
+  },
+  "payload": {
+    "label": "Hobbit of the Shire",
+    "icon": "sprout",
+    "style": "float"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_treasure",
+  "names": {
+    "en": "Treasure HD pack",
+    "fr": "Pack Trésor HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 2140 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 2140 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8560,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_aurum",
+      "notif_aurum",
+      "frame_regalia",
+      "title_golden_one",
+      "badge_golden_crown",
+      "levelup_goldrush",
+      "banner_live_liquidmetal",
+      "name_namegold",
+      "effect_goldshower"
+    ]
+  }
+}

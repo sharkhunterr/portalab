@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_projectionist",
+  "names": {
+    "en": "Title: Projectionist",
+    "fr": "Titre : Projectionniste"
+  },
+  "descriptions": {
+    "en": "Given for 25 titles cast to a TV.",
+    "fr": "Offert pour 25 titres envoyés sur la télé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "tv",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Projectionist",
+    "style": "flame"
+  }
+}

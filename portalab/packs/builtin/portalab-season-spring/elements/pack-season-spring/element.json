@@ -1,0 +1,57 @@
+{
+  "type": "bundle",
+  "product": "pack_season_spring",
+  "names": {
+    "en": "Spring pack",
+    "fr": "Pack Printemps"
+  },
+  "descriptions": {
+    "en": "Every look of spring together: blossom, meadows, fresh colours. — 3550 Coins saved.",
+    "fr": "Tous les looks du printemps réunis : fleurs, prairies, couleurs fraîches. — 3550 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 14200,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "packs",
+    "icon": "flower",
+    "season": "spring"
+  },
+  "payload": {
+    "products": [
+      "badge_blossom",
+      "title_spring_spirit",
+      "notif_sakura",
+      "notif_petalfall",
+      "effect_petals",
+      "effect_bloom",
+      "effect_petalstorm",
+      "ambient_petals",
+      "ambient_meadow",
+      "banner_live_petals",
+      "banner_live_meadow",
+      "banner_sakura",
+      "frame_sakura",
+      "name_namesakura",
+      "level_sakura",
+      "levelup_sakurastorm",
+      "ambient_butterflies",
+      "banner_live_butterflies",
+      "effect_eggs",
+      "palette_pastel",
+      "name_springtime",
+      "banner_garden",
+      "title_april_showers",
+      "badge_easter_bunny",
+      "frame_daisy",
+      "level_easteregg",
+      "notif_bloom",
+      "frame_verdant",
+      "level_verdant"
+    ]
+  }
+}

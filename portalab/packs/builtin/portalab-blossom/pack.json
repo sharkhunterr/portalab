@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-blossom",
+  "version": "1.0.0+bc2924a3fc",
+  "names": {
+    "en": "Spring interface",
+    "fr": "Interface Printemps"
+  },
+  "descriptions": {
+    "en": "The « Spring interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Printemps » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

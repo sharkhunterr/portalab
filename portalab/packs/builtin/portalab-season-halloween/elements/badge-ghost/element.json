@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "product": "badge_ghost",
+  "names": {
+    "en": "Ghost badge",
+    "fr": "Badge Fantôme"
+  },
+  "descriptions": {
+    "en": "Only the bravest haunt the portal at night — a single copy exists.",
+    "fr": "Seuls les plus braves hantent le portail la nuit — un seul exemplaire existe."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "supply": 1,
+    "collection": "badges",
+    "icon": "ghost",
+    "season": "halloween"
+  },
+  "payload": {
+    "label": "Ghost",
+    "icon": "ghost",
+    "style": "pulse"
+  }
+}

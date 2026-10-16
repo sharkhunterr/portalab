@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_perseids",
+  "names": {
+    "en": "Perseids ambience",
+    "fr": "Ambiance Perséides"
+  },
+  "descriptions": {
+    "en": "A summer night over the hills, shooting stars streaking from their radiant, now and then a fireball.",
+    "fr": "Une nuit d'été au-dessus des collines, des étoiles filantes qui jaillissent de leur radiant, parfois un bolide."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 950,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "perseids"
+}

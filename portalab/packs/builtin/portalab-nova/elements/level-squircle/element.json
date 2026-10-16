@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_squircle",
+  "names": {
+    "en": "App icon level badge",
+    "fr": "Badge de niveau icône d'app"
+  },
+  "descriptions": {
+    "en": "Your level as a glossy app icon.",
+    "fr": "Votre niveau en icône d'application brillante."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "squircle"
+}

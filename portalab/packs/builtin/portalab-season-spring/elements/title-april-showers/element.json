@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_april_showers",
+  "names": {
+    "en": "Title: April showers",
+    "fr": "Titre : Giboulées d'avril"
+  },
+  "descriptions": {
+    "en": "« April showers » under your name.",
+    "fr": "« April showers » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "spring"
+  },
+  "payload": {
+    "label": "April showers",
+    "style": "float"
+  }
+}

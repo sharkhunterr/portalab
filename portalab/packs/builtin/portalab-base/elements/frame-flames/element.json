@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_flames",
+  "names": {
+    "en": "Flame frame",
+    "fr": "Cadre de flammes"
+  },
+  "descriptions": {
+    "en": "Your avatar surrounded by flames.",
+    "fr": "Votre avatar entouré de flammes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "flames"
+}

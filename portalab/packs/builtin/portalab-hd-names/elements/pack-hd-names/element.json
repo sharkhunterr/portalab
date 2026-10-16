@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_names",
+  "names": {
+    "en": "HD name styles pack",
+    "fr": "Pack Styles de nom HD"
+  },
+  "descriptions": {
+    "en": "Every name style drawn by the graphics chip: an aura around your name. — 2320 Coins saved.",
+    "fr": "Tous les styles de nom dessinés par la puce graphique : une aura autour de votre nom. — 2320 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 9280,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "name_nameblaze",
+      "name_namevolt",
+      "name_namefrost",
+      "name_namegalaxy",
+      "name_namegold",
+      "name_nameshadow",
+      "name_namesakura",
+      "name_nameplasma",
+      "name_nameaurora",
+      "name_namechrono"
+    ]
+  }
+}

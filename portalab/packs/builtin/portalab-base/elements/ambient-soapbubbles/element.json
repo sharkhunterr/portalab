@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_soapbubbles",
+  "names": {
+    "en": "Soap bubbles ambience",
+    "fr": "Ambiance bulles de savon"
+  },
+  "descriptions": {
+    "en": "Soap bubbles drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Bulles de savon derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "soapbubbles"
+}

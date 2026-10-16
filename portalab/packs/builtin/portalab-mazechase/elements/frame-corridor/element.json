@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_corridor",
+  "names": {
+    "en": "Maze corridor frame",
+    "fr": "Cadre couloir du labyrinthe"
+  },
+  "descriptions": {
+    "en": "Your avatar inside a corridor of the maze, its double blue walls.",
+    "fr": "Votre avatar dans un couloir du labyrinthe, ses doubles murs bleus."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "corridor"
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_moonwalker",
+  "names": {
+    "en": "Title: Moonwalker",
+    "fr": "Titre : Marcheur lunaire"
+  },
+  "descriptions": {
+    "en": "« Moonwalker » under your name.",
+    "fr": "« Moonwalker » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "float",
+  "payload": {
+    "label": "Moonwalker"
+  }
+}

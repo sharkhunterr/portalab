@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_comic",
+  "names": {
+    "en": "Comic book level-up",
+    "fr": "Passage de niveau bande dessinée"
+  },
+  "descriptions": {
+    "en": "A splash page: KAPOW!, halftone and speed lines.",
+    "fr": "Une page de BD : KAPOW !, trame et lignes de vitesse."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "comic"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "feed",
+  "names": {
+    "en": "feed",
+    "fr": "feed"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:feed"
+  },
+  "free": true
+}

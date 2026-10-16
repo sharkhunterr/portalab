@@ -64,6 +64,9 @@ underlying data (`009` and the owning modules). It chooses no technology.
 - Q: What does the intrusion guard do when a session of the Admin crosses the threshold? → A: the Admin is
   blocked like anyone else; an intervention on the server's own console lifts any block easily (the Admin's
   included).
+- Q: Must the default looks still be written in the code? → A: yes — the default interfaces (Portalab, light,
+  dark, high contrast) and every family's base look stay in the code as the fallback when packs fail; the
+  socle only references them; optional looks move to packs.
 - Q: Can a pack (and its files) be removed for good? → A: a pack some member owns a product of is only
   archived (switched off, its files and versions kept, can be enabled again); it can be removed for good only
   once no member owns any of its products; versions never published can be purged at any time.
@@ -337,8 +340,13 @@ analysis reports no blocking finding; it imports and publishes.
   naming a look and every price, rarity, level and availability; members MUST notice no change.
 - **FR-007**: The socle pack MUST always be enabled; the administrator MUST be able to enable or disable each
   other built-in pack like an imported one.
-- **FR-008**: The portal's code MUST NOT hold looks outside these packs once migrated (renderers and contracts
-  only), so that adding, changing or removing a look never requires a release.
+- **FR-008**: The portal's code MUST NOT hold optional looks once migrated (renderers and contracts only), so
+  that adding, changing or removing a look never requires a release. The **fallbacks stay in the code**: the
+  default interfaces (Portalab dark and light, light, dark, high contrast) and the default look of every
+  family (frame, banner, name, level badge, level-up, celebration, notification, palette, ambience, the
+  built-in navigations, the default booster scene) — the socle references them, and whatever fails or is off
+  (a pack missing, switched off, broken, a script not answering) falls back to them; the sign-in page needs
+  no pack at all.
 - **FR-008a**: When a release of the portal changes its built-in packs, the existing ones MUST be updated with
   the release (keys, owners and the administrator's enable/disable choices kept) and the administration MUST
   show what changed; a built-in pack new in that release MUST arrive disabled.

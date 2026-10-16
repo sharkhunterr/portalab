@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_starlines",
+  "names": {
+    "en": "Star lines name style",
+    "fr": "Style de nom lignes d'étoiles"
+  },
+  "descriptions": {
+    "en": "A name drawn in fine lines like a constellation's, a star twinkling at its end.",
+    "fr": "Un nom tracé en traits fins comme ceux d'une constellation, une étoile qui scintille au bout."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "starlines"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_cloud",
+  "names": {
+    "en": "Cloud notifications",
+    "fr": "Notifications nuage"
+  },
+  "descriptions": {
+    "en": "A thought cloud with its little puffs.",
+    "fr": "Un nuage de pensée avec ses petites bulles."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "cloud"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_noir",
+  "names": {
+    "en": "Film noir notifications",
+    "fr": "Notifications film noir"
+  },
+  "descriptions": {
+    "en": "Black and white, hard light — only its colour bleeds in.",
+    "fr": "Noir et blanc, lumière crue — seule sa couleur transparaît."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "noir"
+}

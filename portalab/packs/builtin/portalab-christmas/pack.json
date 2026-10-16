@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-christmas",
+  "version": "1.0.0+1be7601bc7",
+  "names": {
+    "en": "Noël interface",
+    "fr": "Interface Noël"
+  },
+  "descriptions": {
+    "en": "The « Noël interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Noël » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

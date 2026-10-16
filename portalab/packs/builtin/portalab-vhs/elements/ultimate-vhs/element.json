@@ -1,0 +1,51 @@
+{
+  "type": "bundle",
+  "product": "ultimate_vhs",
+  "names": {
+    "en": "VHS theme pack",
+    "fr": "Pack de thème VHS"
+  },
+  "descriptions": {
+    "en": "The whole VHS theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1850 Coins saved.",
+    "fr": "Tout le thème VHS : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1850 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7400,
+    "rarity": "epic",
+    "level": 43,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_vhs",
+      "banner_vhs",
+      "frame_vhs",
+      "name_vhs",
+      "notif_vhs",
+      "effect_rewind",
+      "ambient_vhs",
+      "badge_video_club",
+      "title_be_kind_rewind",
+      "level_vhs",
+      "level_cassette",
+      "notif_tracking",
+      "levelup_vhs",
+      "banner_live_vhs",
+      "palette_vhs",
+      "badge_rewinder",
+      "badge_be_kind_rewind",
+      "title_late_fees",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "widget_countdown",
+      "opt_style_countdown_flip",
+      "opt_style_news_ticker"
+    ]
+  }
+}

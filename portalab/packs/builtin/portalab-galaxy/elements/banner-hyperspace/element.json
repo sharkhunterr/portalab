@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_hyperspace",
+  "names": {
+    "en": "Hyperspace banner",
+    "fr": "Bannière hyperespace"
+  },
+  "descriptions": {
+    "en": "Stars stretching into light.",
+    "fr": "Des étoiles qui s'étirent en lumière."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "hyperspace"
+}

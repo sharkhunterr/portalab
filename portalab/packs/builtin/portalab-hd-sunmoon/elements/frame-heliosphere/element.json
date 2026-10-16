@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_heliosphere",
+  "names": {
+    "en": "Sun frame",
+    "fr": "Cadre soleil"
+  },
+  "descriptions": {
+    "en": "The sun's boiling surface, its corona and its prominences round your avatar, drawn by the graphics chip.",
+    "fr": "La surface en ébullition du soleil, sa couronne et ses protubérances autour de votre avatar, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 28,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "heliosphere"
+}

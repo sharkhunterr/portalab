@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_fourlines",
+  "names": {
+    "en": "Four lines level-up",
+    "fr": "Passage de niveau quatre lignes"
+  },
+  "descriptions": {
+    "en": "Four lines flash and clear at once: 4 LINES! and your new level drops in.",
+    "fr": "Quatre lignes clignotent et s'effacent d'un coup : 4 LIGNES ! et votre nouveau niveau tombe à sa place."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "fourlines"
+}

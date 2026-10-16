@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-hd-comets",
+  "version": "1.0.0+842db6fab3",
+  "names": {
+    "en": "Comets and eclipses HD pack",
+    "fr": "Pack Comètes et éclipses HD"
+  },
+  "descriptions": {
+    "en": "An HD collection: looks drawn by the graphics chip.",
+    "fr": "Une collection HD : des looks dessinés par la carte graphique."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

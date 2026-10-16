@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-middleearth",
+  "version": "1.0.0+ae2483dfb0",
+  "names": {
+    "en": "Middle-earth interface",
+    "fr": "Interface Terre du Milieu"
+  },
+  "descriptions": {
+    "en": "The « Middle-earth interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Terre du Milieu » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

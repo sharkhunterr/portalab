@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_snitch",
+  "names": {
+    "en": "Golden snitch level badge",
+    "fr": "Badge de niveau balle dorée ailée"
+  },
+  "descriptions": {
+    "en": "Your level on a golden ball beating its little wings.",
+    "fr": "Votre niveau sur une balle dorée qui bat de ses petites ailes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "snitch"
+}

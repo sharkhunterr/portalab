@@ -1,0 +1,23 @@
+{
+  "type": "palette",
+  "product": "palette_dotmatrix",
+  "names": {
+    "en": "Green screen palette",
+    "fr": "Palette écran vert"
+  },
+  "descriptions": {
+    "en": "The four greens of a pocket screen over the theme.",
+    "fr": "Les quatre verts d'un écran de poche sur le thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  },
+  "look": "dotmatrix"
+}

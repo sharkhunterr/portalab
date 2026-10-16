@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_pellets",
+  "names": {
+    "en": "Pellets celebration",
+    "fr": "Célébration gommes"
+  },
+  "descriptions": {
+    "en": "Pellets popping out of the reward, a big one blinking.",
+    "fr": "Des gommes qui jaillissent de la récompense, une grosse qui clignote."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "pellets"
+}

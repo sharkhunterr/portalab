@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_crescent",
+  "names": {
+    "en": "Crescent moon frame",
+    "fr": "Cadre croissant de lune"
+  },
+  "descriptions": {
+    "en": "Your avatar lit on one side like a crescent moon.",
+    "fr": "Votre avatar éclairé d'un côté comme un croissant de lune."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "level": 4,
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "crescent"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_liftoff",
+  "names": {
+    "en": "Lift-off notification animation",
+    "fr": "Animation de notification décollage"
+  },
+  "descriptions": {
+    "en": "Notifications shaking on the pad, then lifting off.",
+    "fr": "Des notifications qui tremblent sur le pas de tir puis décollent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "liftoff"
+}

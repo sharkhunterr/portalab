@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_root_access",
+  "names": {
+    "en": "Title: Root access",
+    "fr": "Titre : Accès root"
+  },
+  "descriptions": {
+    "en": "A title drawn by the graphics chip.",
+    "fr": "Un titre dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "look": "matrix",
+  "payload": {
+    "label": "Root access"
+  }
+}

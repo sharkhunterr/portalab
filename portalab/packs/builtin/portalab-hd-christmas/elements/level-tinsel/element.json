@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_tinsel",
+  "names": {
+    "en": "Tinsel level badge",
+    "fr": "Badge de niveau guirlande"
+  },
+  "descriptions": {
+    "en": "Your level wrapped in sparkling tinsel, drawn by the graphics chip.",
+    "fr": "Votre niveau enveloppé d'une guirlande scintillante, dessinée par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "christmas"
+  },
+  "look": "tinsel"
+}

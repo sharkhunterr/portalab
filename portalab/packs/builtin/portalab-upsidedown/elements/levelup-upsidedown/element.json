@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_upsidedown",
+  "names": {
+    "en": "Upside Down level-up",
+    "fr": "Passage de niveau monde à l'envers"
+  },
+  "descriptions": {
+    "en": "The world turns over, spores drift up, red lightning flashes.",
+    "fr": "Le monde se retourne, les spores remontent, des éclairs rouges."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "upsidedown"
+}

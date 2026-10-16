@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_cosmic",
+  "names": {
+    "en": "Cosmic level-up",
+    "fr": "Passage de niveau cosmique"
+  },
+  "descriptions": {
+    "en": "Your new level is born from a black hole, in a ring of stars.",
+    "fr": "Votre nouveau niveau naît d'un trou noir, dans un anneau d'étoiles."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "cosmic"
+}

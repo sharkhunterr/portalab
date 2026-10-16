@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_bounce",
+  "names": {
+    "en": "Bouncing notifications",
+    "fr": "Notifs rebondissantes"
+  },
+  "descriptions": {
+    "en": "Notifications arrive with a little bounce.",
+    "fr": "Les notifications arrivent avec un petit rebond."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "bounce"
+}

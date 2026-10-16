@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-season-christmas",
+  "version": "1.0.0+f4aa6c8aee",
+  "names": {
+    "en": "Christmas",
+    "fr": "Noël"
+  },
+  "descriptions": {
+    "en": "The looks of Christmas.",
+    "fr": "Les looks de la saison : Noël."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

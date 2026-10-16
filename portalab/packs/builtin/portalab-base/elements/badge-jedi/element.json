@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_jedi",
+  "names": {
+    "en": "Light blade master badge",
+    "fr": "Badge Maître de la lame de lumière"
+  },
+  "descriptions": {
+    "en": "The force is strong with this one.",
+    "fr": "La force est puissante chez celui-ci."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 43,
+    "collection": "badges",
+    "icon": "sword"
+  },
+  "look": "saber",
+  "payload": {
+    "label": "Light blade master",
+    "icon": "sword"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "type": "booster",
+  "product": "booster_legend",
+  "names": {
+    "en": "Legendary booster",
+    "fr": "Booster Légendaire"
+  },
+  "descriptions": {
+    "en": "Three cards, none below epic, and a legendary one for sure.",
+    "fr": "Trois cartes, pas une en dessous d'épique, et une légendaire assurée."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3000,
+    "rarity": "legendary",
+    "level": 30,
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  },
+  "payload": {
+    "pool": "looks",
+    "cards": 3,
+    "odds": {
+      "epic": 70,
+      "legendary": 30
+    },
+    "guarantee": "legendary",
+    "look": "legend"
+  }
+}

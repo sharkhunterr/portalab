@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_shatter",
+  "names": {
+    "en": "Shatter celebration",
+    "fr": "Célébration éclats"
+  },
+  "descriptions": {
+    "en": "Shatter burst out when you earn a reward or level up.",
+    "fr": "Éclats jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "shatter"
+}

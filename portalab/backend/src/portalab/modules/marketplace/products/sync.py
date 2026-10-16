@@ -55,6 +55,12 @@ async def sync_product(catalog: Catalog, actor: Principal, product: Entry, *, re
         await catalog.move(actor, product["key"], "available")
         current, version = await catalog.get(product["key"])
         outcome = "created"
+    if outcome != "created" and product.get("keep_existing"):
+        # 028: one of Portalab's own products — once it exists, it is the administrators' (prices, texts,
+        # availability); a release never writes over it, it is only put back on sale
+        if resume and current.state == "unavailable":
+            await catalog.move(actor, product["key"], "available")
+        return outcome
     if outcome != "created" and product["type"] == "booster":
         pass  # #81: its odds and refunds are the administrators' — never written back over them
     elif product.get("reward_only"):  # 027: given by an achievement, never sold
@@ -113,15 +119,25 @@ class MarketplaceCatalogWriter:
         self.catalog = catalog
 
     async def publish(self, actor: Principal, product: Entry) -> str:
-        return await sync_product(self.catalog, actor, product, resume=True)
+        return await sync_product(self.catalog, actor, product, resume=bool(product.get("resume", True)))
 
-    async def withdraw(self, actor: Principal, key: str) -> None:
+    async def withdraw(self, actor: Principal, key: str) -> bool:
         try:
             current, _ = await self.catalog.get(key)
         except ProductNotFound:
-            return
+            return False
         if current.state == "available":
             await self.catalog.move(actor, key, "unavailable")
+            return True
+        return False
+
+    async def existing(self, keys: Iterable[str]) -> frozenset[str]:
+        wanted = list(keys)
+        if not wanted:
+            return frozenset()
+        async with self.catalog.database.session() as session:
+            rows = await session.scalars(select(Product.key).where(Product.key.in_(wanted)))
+            return frozenset(rows)
 
     async def owners(self, keys: Iterable[str]) -> int:
         wanted = list(keys)

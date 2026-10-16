@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_tag",
+  "names": {
+    "en": "Label notifications",
+    "fr": "Notifications étiquette"
+  },
+  "descriptions": {
+    "en": "A luggage label with its eyelet.",
+    "fr": "Une étiquette de bagage avec son œillet."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "tag"
+}

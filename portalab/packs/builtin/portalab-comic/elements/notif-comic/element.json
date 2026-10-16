@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_comic",
+  "names": {
+    "en": "Comic notifications",
+    "fr": "Notifications BD"
+  },
+  "descriptions": {
+    "en": "Thick ink, a hard shadow and a comic title.",
+    "fr": "Encre épaisse, ombre franche et titre de BD."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "comic"
+}

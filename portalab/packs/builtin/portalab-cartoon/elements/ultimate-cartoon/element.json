@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_cartoon",
+  "names": {
+    "en": "Cartoon theme pack",
+    "fr": "Pack de thème Dessin animé"
+  },
+  "descriptions": {
+    "en": "The whole Cartoon theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 890 Coins saved.",
+    "fr": "Tout le thème Dessin animé : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 890 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3570,
+    "rarity": "rare",
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_cartoon",
+      "banner_toon",
+      "frame_rainbow",
+      "name_cartoon",
+      "notif_bounce",
+      "effect_bubbles",
+      "ambient_bubbles",
+      "badge_prankster",
+      "title_toon_star",
+      "level_pixel",
+      "notif_jelly",
+      "levelup_boing",
+      "opt_style_daily_liquid",
+      "opt_style_added_deck",
+      "opt_style_progress_odometer"
+    ]
+  }
+}

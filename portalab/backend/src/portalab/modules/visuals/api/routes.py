@@ -106,6 +106,9 @@ async def sandbox(_: Member) -> HTMLResponse:
 class ActiveOut(BaseModel):
     epoch: int
     elements: list[dict[str, Any]]
+    withheld: dict[
+        str, list[str]
+    ] = {}  # Portalab's own looks whose pack is off: their wearers see the default
 
 
 @members.get("/visuals/active", response_model=ActiveOut)
@@ -238,6 +241,12 @@ async def refuse(principal: Manager, packs: Packs, pack: str, version: str, body
 class StateIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     state: Literal["enabled", "disabled"]
+
+
+@admin.post("/admin/visuals/builtin/state")
+async def builtin_state(principal: Manager, packs: Packs, body: StateIn) -> dict[str, Any]:
+    """Portalab's whole catalog switched on — or off, the socle staying on."""
+    return {"changed": await packs.set_builtin_state(principal, body.state == "enabled")}
 
 
 @admin.post("/admin/visuals/{pack}/state", status_code=204)

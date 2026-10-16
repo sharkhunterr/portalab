@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_gears",
+  "names": {
+    "en": "Gears ambience",
+    "fr": "Ambiance engrenages"
+  },
+  "descriptions": {
+    "en": "Steel gears turning one way and the other.",
+    "fr": "Des engrenages d'acier qui tournent dans un sens et dans l'autre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "gears"
+}

@@ -242,3 +242,30 @@ export function externalPalette(
   if (!colours?.accent || !colours.accentAlt) return null;
   return { accent: colours.accent, accentAlt: colours.accentAlt, contrast: colours.contrast ?? null };
 }
+
+// --- 028: Portalab's own looks whose pack the administrator switched off ---------------------------------
+// They are drawn by the interface's own code, so it must be told: whoever wears one sees the default instead
+// (their choice is kept, and comes back when the pack does).
+let withheld = new Map<string, Set<string>>();
+
+export function setWithheld(byType: Record<string, string[]> | undefined): void {
+  const next = new Map(Object.entries(byType ?? {}).map(([type, looks]) => [type, new Set(looks)]));
+  const same =
+    next.size === withheld.size &&
+    [...next].every(([type, looks]) => {
+      const before = withheld.get(type);
+      return before?.size === looks.size && [...looks].every((look) => before.has(look));
+    });
+  if (same) return;
+  withheld = next;
+  notify();
+}
+
+export function isWithheld(type: string, look: string | null | undefined): boolean {
+  return Boolean(look && withheld.get(type)?.has(look));
+}
+
+/** A look as it shows: the default when its pack is off. */
+export function shownLook<T extends string | null | undefined>(type: string, look: T, fallback: T): T {
+  return isWithheld(type, look) ? fallback : look;
+}

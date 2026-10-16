@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_polar",
+  "names": {
+    "en": "Polar lights ambience",
+    "fr": "Ambiance lumières polaires"
+  },
+  "descriptions": {
+    "en": "Polar lights drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Lumières polaires derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "polar"
+}

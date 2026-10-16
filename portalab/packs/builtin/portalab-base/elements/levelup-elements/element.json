@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_elements",
+  "names": {
+    "en": "Four elements level-up",
+    "fr": "Passage de niveau quatre éléments"
+  },
+  "descriptions": {
+    "en": "Fire, water, earth and air swirl together into your new level.",
+    "fr": "Le feu, l'eau, la terre et l'air tourbillonnent pour former votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "elements"
+}

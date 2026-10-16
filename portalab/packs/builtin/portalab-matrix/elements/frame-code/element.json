@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_code",
+  "names": {
+    "en": "Code frame",
+    "fr": "Cadre code"
+  },
+  "descriptions": {
+    "en": "Flickering green code.",
+    "fr": "Du code vert qui scintille."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "code"
+}

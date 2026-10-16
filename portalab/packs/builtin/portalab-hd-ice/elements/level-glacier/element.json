@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_glacier",
+  "names": {
+    "en": "Glacier level badge",
+    "fr": "Badge de niveau glacier"
+  },
+  "descriptions": {
+    "en": "A frozen badge of facets, frost spikes growing from it, glints.",
+    "fr": "Un badge gelé à facettes, des pointes de givre qui poussent, des éclats."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "glacier"
+}

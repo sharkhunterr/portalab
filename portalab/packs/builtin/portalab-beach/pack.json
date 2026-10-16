@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-beach",
+  "version": "1.0.0+be9574df85",
+  "names": {
+    "en": "Beach interface",
+    "fr": "Interface Plage"
+  },
+  "descriptions": {
+    "en": "The « Beach interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Plage » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

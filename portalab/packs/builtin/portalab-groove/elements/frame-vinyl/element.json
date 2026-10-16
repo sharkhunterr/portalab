@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_vinyl",
+  "names": {
+    "en": "Vinyl frame",
+    "fr": "Cadre vinyle"
+  },
+  "descriptions": {
+    "en": "Your avatar as the label of a spinning record, its grooves shining.",
+    "fr": "Votre avatar en étiquette d'un disque qui tourne, ses sillons qui brillent."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "vinyl"
+}

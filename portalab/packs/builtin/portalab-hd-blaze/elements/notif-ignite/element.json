@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_ignite",
+  "names": {
+    "en": "Ignite notifications",
+    "fr": "Notifications embrasement"
+  },
+  "descriptions": {
+    "en": "They burst out of flames — and go up in flames. Drawn by the graphics chip.",
+    "fr": "Elles jaillissent des flammes — et partent en fumée. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "sparkles"
+  },
+  "look": "ignite"
+}

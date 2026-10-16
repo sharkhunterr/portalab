@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_nostromo",
+  "names": {
+    "en": "Onboard computer animated banner",
+    "fr": "Bannière animée ordinateur de bord"
+  },
+  "descriptions": {
+    "en": "Onboard computer playing in your profile's banner, for every visitor to see.",
+    "fr": "Ordinateur de bord dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-nostromo"
+}

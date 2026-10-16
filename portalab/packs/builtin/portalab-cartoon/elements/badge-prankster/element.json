@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_prankster",
+  "names": {
+    "en": "Prankster badge",
+    "fr": "Badge Farceur"
+  },
+  "descriptions": {
+    "en": "Always up to something.",
+    "fr": "Toujours un mauvais coup en tête."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 150,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "smile"
+  },
+  "payload": {
+    "label": "Prankster",
+    "icon": "smile",
+    "style": "float"
+  }
+}

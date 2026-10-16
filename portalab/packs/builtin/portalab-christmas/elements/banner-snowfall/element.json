@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_snowfall",
+  "names": {
+    "en": "Snowy night banner",
+    "fr": "Bannière nuit de neige"
+  },
+  "descriptions": {
+    "en": "Snow falling on the village.",
+    "fr": "La neige tombe sur le village."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "christmas"
+  },
+  "look": "snowfall"
+}

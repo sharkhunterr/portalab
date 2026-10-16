@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_plasma",
+  "names": {
+    "en": "Plasma storm ambience",
+    "fr": "Ambiance tempête de plasma"
+  },
+  "descriptions": {
+    "en": "Plasma storm drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Tempête de plasma derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "plasma"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_noir",
+  "names": {
+    "en": "Film noir level-up",
+    "fr": "Passage de niveau film noir"
+  },
+  "descriptions": {
+    "en": "Rain in black and white, your number in red.",
+    "fr": "La pluie en noir et blanc, votre niveau en rouge."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "noir"
+}

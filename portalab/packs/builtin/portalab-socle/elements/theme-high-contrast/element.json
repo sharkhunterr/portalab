@@ -1,0 +1,13 @@
+{
+  "type": "theme",
+  "look": "high-contrast",
+  "names": {
+    "en": "High contrast",
+    "fr": "High contrast"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

@@ -1,0 +1,24 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_meadow",
+  "names": {
+    "en": "Shire meadow animated banner",
+    "fr": "Bannière animée prairie de la comté"
+  },
+  "descriptions": {
+    "en": "Shire meadow playing in your profile's banner, for every visitor to see.",
+    "fr": "Prairie de la Comté dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image",
+    "season": "spring"
+  },
+  "look": "live-meadow"
+}

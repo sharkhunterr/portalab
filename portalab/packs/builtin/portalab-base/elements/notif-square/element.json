@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_square",
+  "names": {
+    "en": "Square tile notifications",
+    "fr": "Notifications tuile carrée"
+  },
+  "descriptions": {
+    "en": "A square tile: a big icon and the title under it.",
+    "fr": "Une tuile carrée : une grande icône et le titre dessous."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "square"
+}

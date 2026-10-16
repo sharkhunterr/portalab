@@ -1,0 +1,13 @@
+{
+  "type": "avatar_frame",
+  "look": "frost",
+  "names": {
+    "en": "Frost",
+    "fr": "Givre"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

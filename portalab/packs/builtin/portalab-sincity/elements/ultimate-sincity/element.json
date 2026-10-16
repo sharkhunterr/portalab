@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "ultimate_sincity",
+  "names": {
+    "en": "Sin City theme pack",
+    "fr": "Pack de thème Sin City"
+  },
+  "descriptions": {
+    "en": "The whole Sin City theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1770 Coins saved.",
+    "fr": "Tout le thème Sin City : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1770 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 7100,
+    "rarity": "epic",
+    "level": 49,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_sincity",
+      "banner_mono",
+      "frame_blood",
+      "name_minimal",
+      "notif_noir",
+      "effect_shatter",
+      "ambient_fog",
+      "badge_vigilante",
+      "title_night_city",
+      "level_melt",
+      "notif_filmwipe",
+      "levelup_noir",
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "opt_style_continue_ambient",
+      "opt_style_news_ticker"
+    ]
+  }
+}

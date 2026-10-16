@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_damned",
+  "names": {
+    "en": "Title: Damned soul",
+    "fr": "Titre : Âme damnée"
+  },
+  "descriptions": {
+    "en": "Wanders the manor at midnight.",
+    "fr": "Erre dans le manoir à minuit."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Damned soul",
+    "style": "flame"
+  }
+}

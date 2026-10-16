@@ -1,0 +1,13 @@
+{
+  "type": "profile_banner",
+  "look": "aurora",
+  "names": {
+    "en": "Aurora",
+    "fr": "Aurore"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

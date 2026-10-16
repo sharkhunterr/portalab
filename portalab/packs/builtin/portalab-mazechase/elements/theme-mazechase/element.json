@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_mazechase",
+  "names": {
+    "en": "Maze interface",
+    "fr": "Interface Labyrinthe"
+  },
+  "descriptions": {
+    "en": "The maze chase: blue corridors on black, the sections as a row of pellets with the eater on the current one, ghosts drifting, notifications chomped in. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "La poursuite dans le labyrinthe : des couloirs bleus sur noir, les rubriques en rangée de gommes avec le glouton sur la rubrique courante, des fantômes qui flottent, des notifications croquées. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "mazechase"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-social",
+  "version": "1.0.0+cf4bb76f20",
+  "names": {
+    "en": "Social interface",
+    "fr": "Interface Réseau social"
+  },
+  "descriptions": {
+    "en": "The « Social interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Réseau social » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

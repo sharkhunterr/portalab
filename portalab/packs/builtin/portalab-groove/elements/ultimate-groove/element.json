@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_groove",
+  "names": {
+    "en": "Groove theme pack",
+    "fr": "Pack de thème Groove"
+  },
+  "descriptions": {
+    "en": "The whole Groove theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1340 Coins saved.",
+    "fr": "Tout le thème Groove : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1340 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5360,
+    "rarity": "epic",
+    "level": 33,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_groove",
+      "banner_soundwave",
+      "frame_vinyl",
+      "name_recap",
+      "notif_nowplaying",
+      "effect_musicnotes",
+      "ambient_equalizer",
+      "badge_crate_digger",
+      "title_on_repeat",
+      "banner_live_equalizer",
+      "palette_groove",
+      "level_eqbars",
+      "notif_beatdrop",
+      "levelup_encore"
+    ]
+  }
+}

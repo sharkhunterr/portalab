@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_sand_lord",
+  "names": {
+    "en": "Title: Lord of the sands",
+    "fr": "Titre : Seigneur des sables"
+  },
+  "descriptions": {
+    "en": "Rides the great worms.",
+    "fr": "Chevauche les grands vers."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy",
+    "season": "summer"
+  },
+  "payload": {
+    "label": "Lord of the sands",
+    "style": "gold"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "launcher",
+  "names": {
+    "en": "launcher",
+    "fr": "launcher"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:launcher"
+  },
+  "free": true
+}

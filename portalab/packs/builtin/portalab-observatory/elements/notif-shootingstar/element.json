@@ -1,0 +1,24 @@
+{
+  "type": "notification_animation",
+  "product": "notif_shootingstar",
+  "names": {
+    "en": "Shooting star notification animation",
+    "fr": "Animation de notification étoile filante"
+  },
+  "descriptions": {
+    "en": "Notifications streaking in like a shooting star.",
+    "fr": "Des notifications qui arrivent comme une étoile filante."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 750,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "shootingstar"
+}

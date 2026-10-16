@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_aqua",
+  "names": {
+    "en": "Tidal notifications",
+    "fr": "Notifications marée"
+  },
+  "descriptions": {
+    "en": "Water sloshing inside each notification. Drawn by the graphics chip.",
+    "fr": "De l'eau qui tangue dans chaque notification. Dessinées par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "aqua"
+}

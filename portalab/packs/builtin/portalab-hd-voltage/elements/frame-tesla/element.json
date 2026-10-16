@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_tesla",
+  "names": {
+    "en": "Tesla coil frame",
+    "fr": "Cadre bobine Tesla"
+  },
+  "descriptions": {
+    "en": "A diamond crackling with electricity.",
+    "fr": "Un losange qui crépite d'électricité."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "tesla"
+}

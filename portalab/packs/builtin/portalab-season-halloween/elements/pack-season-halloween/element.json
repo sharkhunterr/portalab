@@ -1,0 +1,55 @@
+{
+  "type": "bundle",
+  "product": "pack_season_halloween",
+  "names": {
+    "en": "Halloween pack",
+    "fr": "Pack Halloween"
+  },
+  "descriptions": {
+    "en": "Every look of Halloween together: pumpkins, ghosts, bats and chills. — 3250 Coins saved.",
+    "fr": "Tous les looks d'Halloween réunis : citrouilles, fantômes, chauves-souris et frissons. — 3250 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 13000,
+    "rarity": "legendary",
+    "level": 10,
+    "collection": "packs",
+    "icon": "ghost",
+    "season": "halloween"
+  },
+  "payload": {
+    "products": [
+      "badge_ghost",
+      "badge_pumpkin_king",
+      "effect_pumpkin",
+      "ambient_bats",
+      "ambient_leaves",
+      "ambient_haunted",
+      "ambient_autumnlane",
+      "banner_live_bats",
+      "banner_halloween",
+      "frame_pumpkin",
+      "name_horror",
+      "name_halloween",
+      "levelup_pumpkin",
+      "ambient_cobwebs",
+      "banner_live_cobwebs",
+      "effect_candy",
+      "palette_pumpkinspice",
+      "name_slime",
+      "banner_graveyard",
+      "title_ghost_hunter",
+      "badge_trick_or_treat",
+      "frame_cauldron",
+      "level_jackolantern",
+      "notif_tombstone",
+      "frame_spectre",
+      "name_namespectre",
+      "level_spectre"
+    ]
+  }
+}

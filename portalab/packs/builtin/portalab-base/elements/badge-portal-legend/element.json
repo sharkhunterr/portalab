@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_portal_legend",
+  "names": {
+    "en": "Legend badge",
+    "fr": "Badge Légende"
+  },
+  "descriptions": {
+    "en": "Given at level 50, the highest.",
+    "fr": "Offert au niveau 50, le plus haut."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "crown",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Legend",
+    "icon": "crown",
+    "style": "rainbow"
+  }
+}

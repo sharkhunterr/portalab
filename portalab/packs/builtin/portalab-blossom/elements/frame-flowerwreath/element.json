@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_flowerwreath",
+  "names": {
+    "en": "Flower wreath frame",
+    "fr": "Cadre couronne de fleurs"
+  },
+  "descriptions": {
+    "en": "Your avatar crowned with a wreath of spring flowers.",
+    "fr": "Votre avatar couronné de fleurs de printemps."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "flowerwreath"
+}

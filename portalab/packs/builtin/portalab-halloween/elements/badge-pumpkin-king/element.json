@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_pumpkin_king",
+  "names": {
+    "en": "Pumpkin king badge",
+    "fr": "Badge Roi citrouille"
+  },
+  "descriptions": {
+    "en": "King of the spooky season.",
+    "fr": "Le roi de la saison des frissons."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "cookie",
+    "season": "halloween"
+  },
+  "payload": {
+    "label": "Pumpkin king",
+    "icon": "cookie",
+    "style": "flame"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "product": "badge_ringbearer",
+  "names": {
+    "en": "Ringbearer badge",
+    "fr": "Badge Porteur de l'Anneau"
+  },
+  "descriptions": {
+    "en": "Carried it all the way — a single copy.",
+    "fr": "L'a porté jusqu'au bout — exemplaire unique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 45,
+    "supply": 1,
+    "collection": "badges",
+    "icon": "gem"
+  },
+  "look": "ring",
+  "payload": {
+    "label": "Ringbearer",
+    "icon": "gem"
+  }
+}

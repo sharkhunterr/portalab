@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_lava_stone",
+  "names": {
+    "en": "Lava stone badge",
+    "fr": "Badge Pierre de lave"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "mountain"
+  },
+  "look": "magma",
+  "payload": {
+    "label": "Lava stone",
+    "icon": "mountain"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_pixel_quest",
+  "names": {
+    "en": "Pixel quest badge",
+    "fr": "Badge Quête pixel"
+  },
+  "descriptions": {
+    "en": "The fellowship in 8-bit.",
+    "fr": "La communauté en 8 bits."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "sword"
+  },
+  "payload": {
+    "label": "Pixel quest",
+    "icon": "sword",
+    "style": "pixel"
+  }
+}

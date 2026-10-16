@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_meshwave",
+  "names": {
+    "en": "Moving mesh network ambience",
+    "fr": "Ambiance réseau maillé en mouvement"
+  },
+  "descriptions": {
+    "en": "Moving mesh network drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Réseau maillé en mouvement derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "meshwave"
+}

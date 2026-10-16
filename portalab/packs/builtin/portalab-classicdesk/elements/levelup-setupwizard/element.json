@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_setupwizard",
+  "names": {
+    "en": "Setup wizard level-up",
+    "fr": "Passage de niveau assistant d'installation"
+  },
+  "descriptions": {
+    "en": "A setup wizard installs your new level: its progress bar fills block by block, then Finish.",
+    "fr": "Un assistant d'installation installe votre nouveau niveau : sa barre de progression se remplit bloc par bloc, puis Terminer."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "setupwizard"
+}

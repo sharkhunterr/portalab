@@ -1,0 +1,27 @@
+{
+  "type": "title",
+  "product": "title_starship_captain",
+  "names": {
+    "en": "Title: Starship captain",
+    "fr": "Titre : Capitaine de vaisseau"
+  },
+  "descriptions": {
+    "en": "« Starship captain » under your name.",
+    "fr": "« Starship captain » sous votre nom."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "level": 38,
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Starship captain",
+    "style": "gold"
+  }
+}

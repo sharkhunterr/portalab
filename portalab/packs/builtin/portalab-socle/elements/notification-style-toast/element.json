@@ -1,0 +1,13 @@
+{
+  "type": "notification_style",
+  "look": "toast",
+  "names": {
+    "en": "Card",
+    "fr": "Carte"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

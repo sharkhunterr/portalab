@@ -1,0 +1,43 @@
+{
+  "type": "bundle",
+  "product": "ultimate_horror",
+  "names": {
+    "en": "Horror theme pack",
+    "fr": "Pack de thème Horreur"
+  },
+  "descriptions": {
+    "en": "The whole Horror theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1410 Coins saved.",
+    "fr": "Tout le thème Horreur : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1410 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5640,
+    "rarity": "epic",
+    "level": 37,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_horror",
+      "banner_bloodmoon",
+      "frame_blood",
+      "name_horror",
+      "notif_glitch",
+      "effect_burn",
+      "ambient_fog",
+      "badge_survivor",
+      "title_damned",
+      "level_melt",
+      "notif_melt",
+      "levelup_bloodmoon",
+      "notif_parchment",
+      "opt_style_services_pulse",
+      "opt_style_continue_ambient"
+    ]
+  }
+}

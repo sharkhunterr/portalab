@@ -1,0 +1,13 @@
+{
+  "type": "notification_animation",
+  "look": "pop",
+  "names": {
+    "en": "Pop",
+    "fr": "Apparition"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

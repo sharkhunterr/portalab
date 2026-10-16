@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_beatdrop",
+  "names": {
+    "en": "Beat drop notification animation",
+    "fr": "Animation de notification drop de basse"
+  },
+  "descriptions": {
+    "en": "Notifications dropping in on the beat, thumping twice.",
+    "fr": "Des notifications qui tombent sur le temps et cognent deux fois."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "beatdrop"
+}

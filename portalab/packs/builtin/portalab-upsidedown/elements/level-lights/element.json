@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_lights",
+  "names": {
+    "en": "Christmas lights level badge",
+    "fr": "Badge de niveau guirlande"
+  },
+  "descriptions": {
+    "en": "A string of bulbs blinking over your level.",
+    "fr": "Une guirlande qui clignote au-dessus de votre niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "star",
+    "season": "christmas"
+  },
+  "look": "lights"
+}

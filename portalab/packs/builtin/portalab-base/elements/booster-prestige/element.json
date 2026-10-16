@@ -1,0 +1,35 @@
+{
+  "type": "booster",
+  "product": "booster_prestige",
+  "names": {
+    "en": "Prestige HD booster",
+    "fr": "Booster Prestige HD"
+  },
+  "descriptions": {
+    "en": "Only looks drawn by the graphics chip — flames, plasma, liquid gold… Three cards, at least one epic.",
+    "fr": "Uniquement des looks dessinés par la puce graphique — flammes, plasma, or liquide… Trois cartes, dont au moins une épique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 15,
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  },
+  "payload": {
+    "pool": "hd",
+    "cards": 3,
+    "odds": {
+      "rare": 20,
+      "epic": 62,
+      "legendary": 18
+    },
+    "guarantee": "epic",
+    "look": "prestige"
+  }
+}

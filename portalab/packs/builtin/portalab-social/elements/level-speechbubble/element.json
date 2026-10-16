@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_speechbubble",
+  "names": {
+    "en": "Speech bubble level badge",
+    "fr": "Badge de niveau bulle de discussion"
+  },
+  "descriptions": {
+    "en": "Your level in a blue speech bubble with its little tail.",
+    "fr": "Votre niveau dans une bulle de discussion bleue avec sa petite pointe."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "speechbubble"
+}

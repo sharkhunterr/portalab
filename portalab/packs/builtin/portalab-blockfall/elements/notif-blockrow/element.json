@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_blockrow",
+  "names": {
+    "en": "Row of blocks notifications",
+    "fr": "Notifications ligne de blocs"
+  },
+  "descriptions": {
+    "en": "Notifications framed in a row of bevelled blocks.",
+    "fr": "Des notifications encadrées d'une ligne de blocs biseautés."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "blockrow"
+}

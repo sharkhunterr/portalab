@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_perfect_clear",
+  "names": {
+    "en": "Perfect clear badge",
+    "fr": "Badge Plateau vide"
+  },
+  "descriptions": {
+    "en": "A « Perfect clear » badge on your profile.",
+    "fr": "Un badge « Perfect clear » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Perfect clear",
+    "icon": "blocks",
+    "style": "rainbow"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_one_more_thing",
+  "names": {
+    "en": "Title: One more thing",
+    "fr": "Titre : Encore une chose"
+  },
+  "descriptions": {
+    "en": "Always a last surprise.",
+    "fr": "Toujours une dernière surprise."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 400,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "One more thing",
+    "style": "glass"
+  }
+}

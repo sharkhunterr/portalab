@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-hd-voltage",
+  "version": "1.0.0+473d74edc5",
+  "names": {
+    "en": "High voltage HD pack",
+    "fr": "Pack Haute tension HD"
+  },
+  "descriptions": {
+    "en": "An HD collection: looks drawn by the graphics chip.",
+    "fr": "Une collection HD : des looks dessinés par la carte graphique."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

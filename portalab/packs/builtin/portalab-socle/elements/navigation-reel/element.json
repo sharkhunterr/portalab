@@ -1,0 +1,13 @@
+{
+  "type": "navigation",
+  "look": "reel",
+  "names": {
+    "en": "reel",
+    "fr": "reel"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "nav:reel"
+  },
+  "free": true
+}

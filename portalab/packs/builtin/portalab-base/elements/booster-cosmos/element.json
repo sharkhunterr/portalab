@@ -1,0 +1,35 @@
+{
+  "type": "booster",
+  "product": "booster_cosmos",
+  "names": {
+    "en": "Cosmos booster",
+    "fr": "Booster Cosmos"
+  },
+  "descriptions": {
+    "en": "The classic: five looks drawn at random — ambiences, frames, banners, titles, badges, styles… at least one rare.",
+    "fr": "Le classique : cinq looks tirés au hasard — ambiances, cadres, bannières, titres, badges, styles… dont au moins un rare."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "rare",
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  },
+  "payload": {
+    "pool": "looks",
+    "cards": 5,
+    "odds": {
+      "common": 62,
+      "rare": 26,
+      "epic": 10,
+      "legendary": 2
+    },
+    "guarantee": "rare",
+    "look": "cosmos"
+  }
+}

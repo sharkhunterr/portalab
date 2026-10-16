@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_wavecleared",
+  "names": {
+    "en": "Wave cleared level-up",
+    "fr": "Passage de niveau vague repoussée"
+  },
+  "descriptions": {
+    "en": "The fleet bursts into pixels: WAVE CLEARED, and your new level.",
+    "fr": "La flotte éclate en pixels : VAGUE REPOUSSÉE, et votre nouveau niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "wavecleared"
+}

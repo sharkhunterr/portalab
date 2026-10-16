@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_hundred_thousand",
+  "names": {
+    "en": "Title: Hundred thousand",
+    "fr": "Titre : Cent mille"
+  },
+  "descriptions": {
+    "en": "Given for 100,000 XP.",
+    "fr": "Offert pour 100 000 XP."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "zap",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Hundred thousand",
+    "style": "flame"
+  }
+}

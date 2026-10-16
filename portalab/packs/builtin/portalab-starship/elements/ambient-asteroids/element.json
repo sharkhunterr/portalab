@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_asteroids",
+  "names": {
+    "en": "Asteroid belt ambience",
+    "fr": "Ambiance ceinture d'astéroïdes"
+  },
+  "descriptions": {
+    "en": "Rocks of every size tumbling past in three depths, lit by a far sun, dust glittering between them.",
+    "fr": "Des rochers de toutes tailles qui tournoient sur trois plans, éclairés par un soleil lointain, de la poussière qui scintille."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "level": 3,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "asteroids"
+}

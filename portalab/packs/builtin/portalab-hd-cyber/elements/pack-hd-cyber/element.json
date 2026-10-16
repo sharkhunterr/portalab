@@ -1,0 +1,40 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_cyber",
+  "names": {
+    "en": "Cyber HD pack",
+    "fr": "Pack Cyber HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge and animated banner. — 2720 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge et bannière animée. — 2720 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 10880,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_holo",
+      "notif_holo",
+      "frame_prism",
+      "title_netrunner",
+      "badge_chrome_chip",
+      "banner_live_neoncity",
+      "level_matrix",
+      "notif_matrix",
+      "frame_mainframe",
+      "title_root_access",
+      "badge_backdoor",
+      "banner_live_matrix",
+      "notif_decrypt"
+    ]
+  }
+}

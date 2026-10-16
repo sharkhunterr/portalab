@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_cinemaglow",
+  "names": {
+    "en": "Cinema glow ambience",
+    "fr": "Ambiance lueurs de cinéma"
+  },
+  "descriptions": {
+    "en": "Soft red glows sweeping slowly, like the light of a screen in the dark.",
+    "fr": "De douces lueurs rouges qui balaient lentement, comme la lumière d'un écran dans le noir."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "cinemaglow"
+}

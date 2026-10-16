@@ -1,0 +1,39 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_sunmoon",
+  "names": {
+    "en": "Sun and Moon HD pack",
+    "fr": "Pack Soleil et Lune HD"
+  },
+  "descriptions": {
+    "en": "The solar flare and the moonrise, the asteroid belt — behind the portal and in your banner — with the sun's and the moon's frames, level badges and notifications. — 2810 Coins saved.",
+    "fr": "L'éruption solaire et le lever de lune, la ceinture d'astéroïdes — derrière le portail et dans votre bannière — avec les cadres, badges de niveau et notifications du soleil et de la lune. — 2810 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 11240,
+    "rarity": "legendary",
+    "level": 50,
+    "collection": "packs",
+    "icon": "sun"
+  },
+  "payload": {
+    "products": [
+      "ambient_solarflare",
+      "banner_live_solarflare",
+      "ambient_moonrise",
+      "banner_live_moonrise",
+      "ambient_asteroids",
+      "banner_live_asteroids",
+      "frame_heliosphere",
+      "level_solar",
+      "notif_solar",
+      "frame_lunarhalo",
+      "level_lunar",
+      "notif_lunar"
+    ]
+  }
+}

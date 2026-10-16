@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_arcade",
+  "names": {
+    "en": "Arcade level-up",
+    "fr": "Passage de niveau arcade"
+  },
+  "descriptions": {
+    "en": "LEVEL UP! in 8-bit, blinking stars and a coin sound.",
+    "fr": "LEVEL UP ! en 8 bits, étoiles clignotantes et bruit de pièce."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "arcade"
+}

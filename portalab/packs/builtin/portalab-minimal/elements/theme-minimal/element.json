@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_minimal",
+  "names": {
+    "en": "Minimal interface",
+    "fr": "Interface Minimal"
+  },
+  "descriptions": {
+    "en": "Nothing but the essential: top bar, flat cards, narrow page, one word per place. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Rien que l'essentiel : barre du haut, cartes plates, page étroite, un mot par lieu. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "minimal"
+}

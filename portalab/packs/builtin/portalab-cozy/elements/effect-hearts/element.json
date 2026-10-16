@@ -1,0 +1,24 @@
+{
+  "type": "effect",
+  "product": "effect_hearts",
+  "names": {
+    "en": "Hearts celebration",
+    "fr": "Célébration cœurs"
+  },
+  "descriptions": {
+    "en": "Hearts burst out when you earn a reward or level up.",
+    "fr": "Cœurs jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 180,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party",
+    "season": "valentine"
+  },
+  "look": "hearts"
+}

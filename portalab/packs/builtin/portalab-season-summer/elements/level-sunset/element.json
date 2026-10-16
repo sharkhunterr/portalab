@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_sunset",
+  "names": {
+    "en": "Sunset level badge",
+    "fr": "Badge de niveau coucher de soleil"
+  },
+  "descriptions": {
+    "en": "Your level over the sun setting on the sea.",
+    "fr": "Votre niveau sur le soleil couchant sur la mer."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy",
+    "season": "summer"
+  },
+  "look": "sunset"
+}

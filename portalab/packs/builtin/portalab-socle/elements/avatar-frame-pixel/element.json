@@ -1,0 +1,13 @@
+{
+  "type": "avatar_frame",
+  "look": "pixel",
+  "names": {
+    "en": "Pixel",
+    "fr": "Pixel"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

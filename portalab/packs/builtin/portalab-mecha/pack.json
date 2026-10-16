@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-mecha",
+  "version": "1.0.0+c11c82351a",
+  "names": {
+    "en": "Mecha interface",
+    "fr": "Interface Méca"
+  },
+  "descriptions": {
+    "en": "The « Mecha interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Méca » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

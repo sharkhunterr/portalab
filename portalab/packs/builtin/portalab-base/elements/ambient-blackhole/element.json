@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_blackhole",
+  "names": {
+    "en": "Black hole ambience",
+    "fr": "Ambiance trou noir"
+  },
+  "descriptions": {
+    "en": "Black hole drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Trou noir derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1800,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ambients",
+    "icon": "snowflake"
+  },
+  "look": "blackhole"
+}

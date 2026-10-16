@@ -1,0 +1,35 @@
+{
+  "type": "booster",
+  "product": "booster_discovery",
+  "names": {
+    "en": "Discovery booster",
+    "fr": "Booster Découverte"
+  },
+  "descriptions": {
+    "en": "To get started: three looks for a small price. Three openings per member.",
+    "fr": "Pour commencer : trois looks pour un petit prix. Trois ouvertures par membre."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 120,
+    "rarity": "common",
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  },
+  "payload": {
+    "pool": "looks",
+    "cards": 3,
+    "odds": {
+      "common": 72,
+      "rare": 25,
+      "epic": 3
+    },
+    "guarantee": "common",
+    "per_member": 3,
+    "look": "discovery"
+  }
+}

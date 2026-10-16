@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_head_elf",
+  "names": {
+    "en": "Title: Head elf",
+    "fr": "Titre : Lutin en chef"
+  },
+  "descriptions": {
+    "en": "Runs the toy workshop.",
+    "fr": "Dirige l'atelier des jouets."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Head elf",
+    "style": "shimmer"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_up",
+  "product": "levelup_vhs",
+  "names": {
+    "en": "VHS tape level-up",
+    "fr": "Passage de niveau magnétoscope"
+  },
+  "descriptions": {
+    "en": "The TV comes on: a blue screen, PLAY ▶ and your level in the VCR's letters.",
+    "fr": "La télé s'allume : écran bleu, PLAY ▶ et votre niveau en lettres de magnétoscope."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "vhs"
+}

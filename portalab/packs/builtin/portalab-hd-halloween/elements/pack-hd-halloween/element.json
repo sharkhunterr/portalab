@@ -1,0 +1,30 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_halloween",
+  "names": {
+    "en": "Halloween HD pack",
+    "fr": "Pack Halloween HD"
+  },
+  "descriptions": {
+    "en": "The season's looks drawn by the graphics chip. — 800 Coins saved.",
+    "fr": "Les looks de la saison dessinés par la puce graphique. — 800 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3200,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop",
+    "season": "halloween"
+  },
+  "payload": {
+    "products": [
+      "frame_spectre",
+      "name_namespectre",
+      "level_spectre"
+    ]
+  }
+}

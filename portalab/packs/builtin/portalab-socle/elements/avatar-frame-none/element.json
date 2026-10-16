@@ -1,0 +1,13 @@
+{
+  "type": "avatar_frame",
+  "look": "none",
+  "names": {
+    "en": "None",
+    "fr": "Aucun"
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "free": true
+}

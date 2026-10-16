@@ -1,0 +1,23 @@
+{
+  "type": "notification_animation",
+  "product": "notif_surfin",
+  "names": {
+    "en": "Riding the wave notification animation",
+    "fr": "Animation de notification sur la vague"
+  },
+  "descriptions": {
+    "en": "Notifications riding in on a wave.",
+    "fr": "Des notifications qui arrivent sur une vague."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  },
+  "look": "surfin"
+}

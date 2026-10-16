@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_elder",
+  "names": {
+    "en": "Elder badge",
+    "fr": "Badge Ancien"
+  },
+  "descriptions": {
+    "en": "Given at level 40.",
+    "fr": "Offert au niveau 40."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "common",
+    "collection": "rewards",
+    "icon": "mountain",
+    "reward_only": true
+  },
+  "payload": {
+    "label": "Elder",
+    "icon": "mountain",
+    "style": "gold"
+  }
+}

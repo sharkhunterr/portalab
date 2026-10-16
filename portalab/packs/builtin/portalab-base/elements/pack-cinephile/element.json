@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "product": "pack_cinephile",
+  "names": {
+    "en": "Cinephile pack",
+    "fr": "Pack Cinéphile"
+  },
+  "descriptions": {
+    "en": "The poster wall widget and its travelling camera, the ambient light of « Continue », the Cinephile title, the Binge-watcher badge and the film backdrop banner. — 760 Coins saved.",
+    "fr": "Le widget mur d'affiches et son travelling, la lumière d'ambiance de « Continuer », le titre Cinéphile, le badge Binge-watcher et la bannière de film. — 760 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3040,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop",
+    "featured": true
+  },
+  "payload": {
+    "products": [
+      "widget_poster_wall",
+      "opt_style_wall_kenburns",
+      "opt_style_continue_ambient",
+      "title_cinephile",
+      "badge_binge_watcher",
+      "backdrop_banner"
+    ]
+  }
+}

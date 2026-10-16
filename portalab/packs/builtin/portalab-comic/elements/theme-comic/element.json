@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_comic",
+  "names": {
+    "en": "Comic interface",
+    "fr": "Interface BD"
+  },
+  "descriptions": {
+    "en": "Ink and halftone: comic cards with hard shadows, BANG! titles and boing sounds. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Encre et trame : cartes BD aux ombres franches, titres BANG ! et sons de cartoon. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "comic"
+}

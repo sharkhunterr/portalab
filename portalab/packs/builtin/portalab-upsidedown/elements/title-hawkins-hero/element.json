@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_hawkins_hero",
+  "names": {
+    "en": "Title: Hero of Hawkins",
+    "fr": "Titre : Héros de Hawkins"
+  },
+  "descriptions": {
+    "en": "Closed the gate.",
+    "fr": "A refermé le portail."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Hero of Hawkins",
+    "style": "neon"
+  }
+}

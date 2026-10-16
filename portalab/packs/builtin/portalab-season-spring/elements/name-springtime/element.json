@@ -1,0 +1,24 @@
+{
+  "type": "name_style",
+  "product": "name_springtime",
+  "names": {
+    "en": "Springtime name style",
+    "fr": "Style de nom printanier"
+  },
+  "descriptions": {
+    "en": "A name in pastel colours, a small flower blooming beside it.",
+    "fr": "Un nom aux couleurs pastel, une petite fleur qui éclot à côté."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather",
+    "season": "spring"
+  },
+  "look": "springtime"
+}

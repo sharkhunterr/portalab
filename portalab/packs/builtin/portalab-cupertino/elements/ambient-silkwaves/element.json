@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_silkwaves",
+  "names": {
+    "en": "Silk waves ambience",
+    "fr": "Ambiance vagues de soie"
+  },
+  "descriptions": {
+    "en": "Soft coloured waves of light gliding slowly behind the page.",
+    "fr": "De douces vagues de lumière colorée qui glissent lentement derrière la page."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "silkwaves"
+}

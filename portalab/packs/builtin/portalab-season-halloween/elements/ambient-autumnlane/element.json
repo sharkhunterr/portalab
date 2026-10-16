@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_autumnlane",
+  "names": {
+    "en": "Autumn lane ambience",
+    "fr": "Ambiance allée d'automne"
+  },
+  "descriptions": {
+    "en": "Autumn lane drifting behind the whole portal. Chosen in Appearance; off with reduced motion.",
+    "fr": "Allée d'automne derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake",
+    "season": "halloween"
+  },
+  "look": "autumnlane"
+}

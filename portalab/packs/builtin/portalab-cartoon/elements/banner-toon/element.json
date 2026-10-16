@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_toon",
+  "names": {
+    "en": "Toon banner",
+    "fr": "Bannière cartoon"
+  },
+  "descriptions": {
+    "en": "Clouds and green hills.",
+    "fr": "Nuages et collines vertes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 180,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "toon"
+}

@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
-import { type ExternalElement, installElements, uninstallScope } from "./registry";
+import { type ExternalElement, installElements, setWithheld, uninstallScope } from "./registry";
 
 export const ACTIVE_VISUALS_KEY = ["visuals", "active"] as const;
 
@@ -22,6 +22,7 @@ export function ExternalVisualsLoader({ live = typeof EventSource !== "undefined
       (await api.GET("/api/v1/visuals/active")).data as unknown as {
         elements: ExternalElement[];
         epoch: number;
+        withheld?: Record<string, string[]>;
       },
   });
   useEffect(() => {
@@ -35,7 +36,9 @@ export function ExternalVisualsLoader({ live = typeof EventSource !== "undefined
   const epoch = active.data?.epoch;
   // biome-ignore lint/correctness/useExhaustiveDependencies: installed again only when the registry changes
   useEffect(() => {
-    if (active.data) void installElements(active.data.elements, "live");
+    if (!active.data) return;
+    setWithheld(active.data.withheld);
+    void installElements(active.data.elements, "live");
   }, [epoch]);
   useEffect(() => () => uninstallScope("live"), []);
   return null;

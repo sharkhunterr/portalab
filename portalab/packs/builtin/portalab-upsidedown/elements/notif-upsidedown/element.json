@@ -1,0 +1,23 @@
+{
+  "type": "notification_style",
+  "product": "notif_upsidedown",
+  "names": {
+    "en": "Upside Down notifications",
+    "fr": "Notifications monde à l'envers"
+  },
+  "descriptions": {
+    "en": "The title sequence: hollow red neon letters closing in between two growing bars, the message typed like a lab report.",
+    "fr": "Le générique : des lettres de néon rouge creuses qui se resserrent entre deux barres, le message tapé comme un rapport de labo."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  },
+  "look": "upsidedown"
+}

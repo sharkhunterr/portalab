@@ -1,0 +1,23 @@
+{
+  "type": "name_style",
+  "product": "name_steelplate",
+  "names": {
+    "en": "Steel plate name style",
+    "fr": "Style de nom plaque d'acier"
+  },
+  "descriptions": {
+    "en": "A name stamped in chrome stencil.",
+    "fr": "Un nom frappé au pochoir chromé."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "names",
+    "icon": "feather"
+  },
+  "look": "steelplate"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ambient",
+  "product": "ambient_skyclouds",
+  "names": {
+    "en": "Clouds in the sky ambience",
+    "fr": "Ambiance nuages dans le ciel"
+  },
+  "descriptions": {
+    "en": "Fluffy white clouds drifting across a blue sky.",
+    "fr": "Des nuages blancs et cotonneux qui traversent un ciel bleu."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles"
+  },
+  "look": "skyclouds"
+}

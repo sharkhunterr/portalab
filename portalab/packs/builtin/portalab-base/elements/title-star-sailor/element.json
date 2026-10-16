@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_star_sailor",
+  "names": {
+    "en": "Title: Star sailor",
+    "fr": "Titre : Navigateur des étoiles"
+  },
+  "descriptions": {
+    "en": "Given at level 26 (Or II).",
+    "fr": "Offert au niveau 26 (Or II)."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "rarity": "legendary",
+    "collection": "rewards",
+    "icon": "rocket",
+    "reward_only": true
+  },
+  "look": "comet",
+  "payload": {
+    "label": "Star sailor"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_hologram",
+  "names": {
+    "en": "Hologram level badge",
+    "fr": "Badge de niveau hologramme"
+  },
+  "descriptions": {
+    "en": "Iridescent colours drifting across it.",
+    "fr": "Des couleurs irisées qui glissent dessus."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "hologram"
+}

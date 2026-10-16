@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-hd-cosmos",
+  "version": "1.0.0+78606ad1cf",
+  "names": {
+    "en": "Cosmos HD pack",
+    "fr": "Pack Cosmos HD"
+  },
+  "descriptions": {
+    "en": "An HD collection: looks drawn by the graphics chip.",
+    "fr": "Une collection HD : des looks dessinés par la carte graphique."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

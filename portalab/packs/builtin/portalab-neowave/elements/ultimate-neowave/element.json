@@ -1,0 +1,42 @@
+{
+  "type": "bundle",
+  "product": "ultimate_neowave",
+  "names": {
+    "en": "Neowave theme pack",
+    "fr": "Pack de thème Néo-wave"
+  },
+  "descriptions": {
+    "en": "The whole Neowave theme: its interface and everything that goes with it — animated background, notifications, celebration, level-up, banner, frame, name style, level badge, its badges and its dashboard looks. — 1320 Coins saved.",
+    "fr": "Tout le thème Néo-wave : son interface et tout ce qui va avec — fond animé, notifications, célébration, passage de niveau, bannière, cadre, style de nom, badge de niveau, ses badges et ses visuels de tableau de bord. — 1320 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 5280,
+    "rarity": "epic",
+    "level": 28,
+    "supply": 5,
+    "collection": "ultimate",
+    "icon": "crown"
+  },
+  "payload": {
+    "products": [
+      "theme_neowave",
+      "banner_synthwave",
+      "frame_neon",
+      "name_neowave",
+      "notif_neon",
+      "effect_aurora",
+      "badge_arcade_king",
+      "level_vhs",
+      "ambient_vhs",
+      "levelup_synthwave",
+      "widget_countdown",
+      "opt_style_countdown_flip",
+      "opt_style_services_pulse",
+      "opt_style_continue_ambient"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "bundle",
+  "product": "pack_paint_studio",
+  "names": {
+    "en": "Paint studio pack",
+    "fr": "Pack Atelier de peinture"
+  },
+  "descriptions": {
+    "en": "Warm paints that mix: stirred paint, an acrylic pour, warm watercolour, marbled paper and warm silk. — 860 Coins saved.",
+    "fr": "Des peintures chaudes qui se mêlent : peinture mêlée, coulée acrylique, aquarelle chaude, papier marbré et soie chaude. — 860 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3440,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_paintmix",
+      "ambient_acrylicpour",
+      "ambient_watercolor",
+      "ambient_marbling",
+      "ambient_warmsilk"
+    ]
+  }
+}

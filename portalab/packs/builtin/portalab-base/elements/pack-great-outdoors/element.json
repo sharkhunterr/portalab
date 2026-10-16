@@ -1,0 +1,34 @@
+{
+  "type": "bundle",
+  "product": "pack_great_outdoors",
+  "names": {
+    "en": "Great outdoors pack",
+    "fr": "Pack Grand air"
+  },
+  "descriptions": {
+    "en": "Out in the open: the living forest, a summer field, an autumn lane, golden hour, lanterns over the lake, soap bubbles and the reef. — 1520 Coins saved.",
+    "fr": "Au grand air : forêt vivante, champ d'été, allée d'automne, heure dorée, lanternes sur le lac, bulles de savon et le récif. — 1520 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 6080,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "ambient_forest",
+      "ambient_summerfield",
+      "ambient_autumnlane",
+      "ambient_goldenhour",
+      "ambient_skylanterns",
+      "ambient_soapbubbles",
+      "ambient_reef"
+    ]
+  }
+}

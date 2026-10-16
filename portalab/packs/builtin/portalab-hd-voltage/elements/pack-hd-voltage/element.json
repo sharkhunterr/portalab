@@ -1,0 +1,37 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_voltage",
+  "names": {
+    "en": "High voltage HD pack",
+    "fr": "Pack Haute tension HD"
+  },
+  "descriptions": {
+    "en": "Everything of this world, drawn by the graphics chip: level badge, notifications, avatar frame, title and badge, level-up and animated banner. — 2200 Coins saved.",
+    "fr": "Tout cet univers, dessiné par la puce graphique : badge de niveau, notifications, cadre d'avatar, titre et badge, passage de niveau et bannière animée. — 2200 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 8800,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "level_voltage",
+      "notif_voltage",
+      "frame_tesla",
+      "title_stormcaller",
+      "badge_thunderbolt",
+      "levelup_thunderstrike",
+      "banner_live_thunderstorm",
+      "notif_surge",
+      "name_namevolt",
+      "effect_stormstrike"
+    ]
+  }
+}

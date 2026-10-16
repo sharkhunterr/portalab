@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_cobwebs",
+  "names": {
+    "en": "Cobwebs ambience",
+    "fr": "Ambiance toiles d'araignée"
+  },
+  "descriptions": {
+    "en": "Spiders lowering themselves on their threads, webs in the corners.",
+    "fr": "Des araignées qui descendent au bout de leur fil, des toiles dans les coins."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "ambients",
+    "icon": "sparkles",
+    "season": "halloween"
+  },
+  "look": "cobwebs"
+}

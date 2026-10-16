@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_golden_blanket",
+  "names": {
+    "en": "Golden blanket badge",
+    "fr": "Badge Plaid d'or"
+  },
+  "descriptions": {
+    "en": "Champion of cosy evenings.",
+    "fr": "Champion des soirées douillettes."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "coffee"
+  },
+  "payload": {
+    "label": "Golden blanket",
+    "icon": "coffee",
+    "style": "pulse"
+  }
+}

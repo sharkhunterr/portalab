@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "product": "level_ringworld",
+  "names": {
+    "en": "Ringed planet level badge",
+    "fr": "Badge de niveau planète à anneaux"
+  },
+  "descriptions": {
+    "en": "Your level inside: a ringed planet, its banded clouds turning, drawn by the graphics chip.",
+    "fr": "Votre niveau au cœur : une planète à anneaux, ses nuages en bandes qui tournent, dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1700,
+    "rarity": "epic",
+    "level": 44,
+    "collection": "levels",
+    "icon": "trophy"
+  },
+  "look": "ringworld"
+}

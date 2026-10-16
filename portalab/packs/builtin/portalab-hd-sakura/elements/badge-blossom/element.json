@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_blossom",
+  "names": {
+    "en": "Blossom badge",
+    "fr": "Badge Fleur de cerisier"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "flower",
+    "season": "spring"
+  },
+  "look": "sakura",
+  "payload": {
+    "label": "Blossom",
+    "icon": "flower"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "bundle",
+  "product": "pack_comics",
+  "names": {
+    "en": "Comics pack",
+    "fr": "Pack Comics"
+  },
+  "descriptions": {
+    "en": "KAPOW! notifications and level badge, the comic book level-up, manga panels and the POW banner. — 570 Coins saved.",
+    "fr": "Notifications et badge de niveau KAPOW !, passage de niveau BD, cases de manga et bannière POW. — 570 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2280,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "notif_kapow",
+      "level_kapow",
+      "levelup_comic",
+      "notif_manga",
+      "banner_pow"
+    ]
+  }
+}

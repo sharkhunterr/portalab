@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-manga",
+  "version": "1.0.0+21ea114678",
+  "names": {
+    "en": "Manga interface",
+    "fr": "Interface Manga"
+  },
+  "descriptions": {
+    "en": "The « Manga interface » universe: its interface and everything its ultimate pack holds.",
+    "fr": "L'univers « Interface Manga » : son interface et tout ce que contient son pack ultime."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,38 @@
+{
+  "type": "bundle",
+  "product": "pack_zodiac",
+  "names": {
+    "en": "Zodiac pack",
+    "fr": "Pack Zodiaque"
+  },
+  "descriptions": {
+    "en": "The twelve constellations of the zodiac as badges, drawn by the graphics chip. — 720 Coins saved.",
+    "fr": "Les douze constellations du zodiaque en badges, dessinées par la puce graphique. — 720 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 2880,
+    "rarity": "rare",
+    "collection": "packs",
+    "icon": "zodiac-leo"
+  },
+  "payload": {
+    "products": [
+      "badge_zodiac_aries",
+      "badge_zodiac_taurus",
+      "badge_zodiac_gemini",
+      "badge_zodiac_cancer",
+      "badge_zodiac_leo",
+      "badge_zodiac_virgo",
+      "badge_zodiac_libra",
+      "badge_zodiac_scorpio",
+      "badge_zodiac_sagittarius",
+      "badge_zodiac_capricorn",
+      "badge_zodiac_aquarius",
+      "badge_zodiac_pisces"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "title",
+  "product": "title_otaku",
+  "names": {
+    "en": "Title: Certified otaku",
+    "fr": "Titre : Otaku certifié"
+  },
+  "descriptions": {
+    "en": "Seen every episode, twice.",
+    "fr": "A vu chaque épisode, deux fois."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "titles",
+    "icon": "trophy"
+  },
+  "payload": {
+    "label": "Certified otaku",
+    "style": "rainbow"
+  }
+}

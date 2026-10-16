@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_senpai",
+  "names": {
+    "en": "Senpai badge",
+    "fr": "Badge Senpai"
+  },
+  "descriptions": {
+    "en": "Finally noticed.",
+    "fr": "Enfin remarqué."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "sword"
+  },
+  "payload": {
+    "label": "Senpai",
+    "icon": "sword",
+    "style": "float"
+  }
+}

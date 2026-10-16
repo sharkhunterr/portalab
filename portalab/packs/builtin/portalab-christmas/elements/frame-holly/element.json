@@ -1,0 +1,24 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_holly",
+  "names": {
+    "en": "Holly frame",
+    "fr": "Cadre de houx"
+  },
+  "descriptions": {
+    "en": "Holly leaves and red berries.",
+    "fr": "Feuilles de houx et baies rouges."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "user",
+    "season": "christmas"
+  },
+  "look": "holly"
+}

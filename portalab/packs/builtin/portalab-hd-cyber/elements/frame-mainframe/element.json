@@ -1,0 +1,23 @@
+{
+  "type": "avatar_frame",
+  "product": "frame_mainframe",
+  "names": {
+    "en": "Mainframe frame",
+    "fr": "Cadre ordinateur central"
+  },
+  "descriptions": {
+    "en": "A square of falling code.",
+    "fr": "Un carré de code qui tombe."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "collection": "profile",
+    "icon": "user"
+  },
+  "look": "mainframe"
+}

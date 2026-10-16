@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "product": "ambient_constellations",
+  "names": {
+    "en": "Constellations ambience",
+    "fr": "Ambiance Constellations"
+  },
+  "descriptions": {
+    "en": "Orion, Cassiopeia, the Plough, the Swan, the Lion and the Scorpion drawing themselves in turn, star after star.",
+    "fr": "Orion, Cassiopée, la Grande Ourse, le Cygne, le Lion et le Scorpion qui se dessinent tour à tour, étoile après étoile."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 5,
+    "collection": "ambients",
+    "icon": "telescope"
+  },
+  "look": "constellations"
+}

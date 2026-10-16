@@ -1,0 +1,27 @@
+{
+  "type": "badge",
+  "product": "badge_watcher",
+  "names": {
+    "en": "The watcher badge",
+    "fr": "Badge L'Observateur"
+  },
+  "descriptions": {
+    "en": "A badge drawn by the graphics chip.",
+    "fr": "Un badge dessiné par la puce graphique."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "eye"
+  },
+  "look": "shadow",
+  "payload": {
+    "label": "The watcher",
+    "icon": "eye"
+  }
+}

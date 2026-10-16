@@ -1,0 +1,23 @@
+{
+  "type": "level_badge",
+  "product": "level_kapow",
+  "names": {
+    "en": "KAPOW! level badge",
+    "fr": "Badge de niveau kapow !"
+  },
+  "descriptions": {
+    "en": "A comic starburst behind your level, punching now and then.",
+    "fr": "Une explosion de BD derrière votre niveau, qui frappe de temps en temps."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 650,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "star"
+  },
+  "look": "kapow"
+}

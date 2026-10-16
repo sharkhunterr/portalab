@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_jollyship",
+  "names": {
+    "en": "Ship at night banner",
+    "fr": "Bannière navire de nuit"
+  },
+  "descriptions": {
+    "en": "A ship under full sail on a moonlit sea.",
+    "fr": "Un navire toutes voiles dehors sur une mer sous la lune."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "jollyship"
+}

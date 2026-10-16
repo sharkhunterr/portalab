@@ -1,0 +1,23 @@
+{
+  "type": "effect",
+  "product": "effect_aurora",
+  "names": {
+    "en": "Shooting stars celebration",
+    "fr": "Célébration étoiles filantes"
+  },
+  "descriptions": {
+    "en": "Shooting stars burst out when you earn a reward or level up.",
+    "fr": "Étoiles filantes jaillissent quand vous gagnez une récompense ou un niveau."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "common",
+    "collection": "celebrations",
+    "icon": "party"
+  },
+  "look": "stars"
+}

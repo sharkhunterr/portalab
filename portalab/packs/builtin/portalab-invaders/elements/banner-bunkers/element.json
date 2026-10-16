@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_bunkers",
+  "names": {
+    "en": "Bunkers banner",
+    "fr": "Bannière bunkers"
+  },
+  "descriptions": {
+    "en": "Green bunkers on the ground line, a fleet overhead.",
+    "fr": "Des bunkers verts sur la ligne de sol, une flotte au-dessus."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "bunkers"
+}

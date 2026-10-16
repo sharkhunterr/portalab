@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_linestack",
+  "names": {
+    "en": "Stack of blocks banner",
+    "fr": "Bannière pile de blocs"
+  },
+  "descriptions": {
+    "en": "A stack of bevelled blocks, one line about to clear.",
+    "fr": "Une pile de blocs biseautés, une ligne sur le point de s'effacer."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "linestack"
+}

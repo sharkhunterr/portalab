@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_disco",
+  "names": {
+    "en": "Disco lights animated banner",
+    "fr": "Bannière animée lumières disco"
+  },
+  "descriptions": {
+    "en": "Disco lights playing in your profile's banner, for every visitor to see.",
+    "fr": "Lumières disco dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-disco"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "profile_banner",
+  "product": "banner_live_starfield",
+  "names": {
+    "en": "Starry sky animated banner",
+    "fr": "Bannière animée ciel étoilé"
+  },
+  "descriptions": {
+    "en": "Starry sky playing in your profile's banner, for every visitor to see.",
+    "fr": "Ciel étoilé dans la bannière de votre profil, pour tous vos visiteurs."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  },
+  "look": "live-starfield"
+}

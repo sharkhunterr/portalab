@@ -1,0 +1,23 @@
+{
+  "type": "theme",
+  "product": "theme_manga",
+  "names": {
+    "en": "Manga interface",
+    "fr": "Interface Manga"
+  },
+  "descriptions": {
+    "en": "Speed lines, sakura petals and chapter tabs, on white paper. The interface only: its animated background, notifications, celebration and level-up come with its theme pack.",
+    "fr": "Lignes de vitesse, pétales de sakura et onglets de chapitres, sur papier blanc. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "themes",
+    "icon": "palette"
+  },
+  "look": "manga"
+}

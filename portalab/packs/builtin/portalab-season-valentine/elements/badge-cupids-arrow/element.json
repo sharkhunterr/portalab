@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "product": "badge_cupids_arrow",
+  "names": {
+    "en": "Cupid's arrow badge",
+    "fr": "Badge Flèche de Cupidon"
+  },
+  "descriptions": {
+    "en": "A « Cupid's arrow » badge on your profile.",
+    "fr": "Un badge « Cupid's arrow » sur votre profil."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 200,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star",
+    "season": "valentine"
+  },
+  "payload": {
+    "label": "Cupid's arrow",
+    "icon": "heart",
+    "style": "float"
+  }
+}
