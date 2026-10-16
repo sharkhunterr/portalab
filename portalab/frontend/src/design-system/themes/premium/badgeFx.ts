@@ -12,7 +12,7 @@
  */
 
 import { frameInterval, liveLooks, motionBudget } from "../../motion/budget";
-import { externalFx } from "../external/external";
+import { externalFx } from "../../visuals/registry";
 import { COSMOS_BADGE_EFFECTS, COSMOS_EFFECTS, COSMOS_STAGE_EFFECTS } from "./cosmosFx";
 
 export const FX_EFFECTS = [

@@ -78,6 +78,28 @@
         "title": "AchievementIn",
         "type": "object"
       },
+      "ActiveOut": {
+        "properties": {
+          "elements": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "epoch": {
+            "title": "Epoch",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "epoch",
+          "elements"
+        ],
+        "title": "ActiveOut",
+        "type": "object"
+      },
       "ActivityOut": {
         "properties": {
           "at": {
@@ -1307,26 +1329,6 @@
           }
         },
         "title": "ApplySuggestionsIn",
-        "type": "object"
-      },
-      "ApproveIn": {
-        "additionalProperties": false,
-        "properties": {
-          "accept_script": {
-            "default": false,
-            "title": "Accept Script",
-            "type": "boolean"
-          },
-          "economy": {
-            "additionalProperties": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "title": "Economy",
-            "type": "object"
-          }
-        },
-        "title": "ApproveIn",
         "type": "object"
       },
       "ArrangementIn": {
@@ -4256,6 +4258,34 @@
         "title": "CommunityVoteOut",
         "type": "object"
       },
+      "Confirmations": {
+        "additionalProperties": false,
+        "properties": {
+          "contracts": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Contracts",
+            "type": "array"
+          },
+          "replaces": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 200,
+            "title": "Replaces",
+            "type": "array"
+          },
+          "scripts": {
+            "default": false,
+            "title": "Scripts",
+            "type": "boolean"
+          }
+        },
+        "title": "Confirmations",
+        "type": "object"
+      },
       "ContentAssetOut": {
         "properties": {
           "content_type": {
@@ -4753,6 +4783,38 @@
           "targets"
         ],
         "title": "DiscoverIn",
+        "type": "object"
+      },
+      "DraftIn": {
+        "additionalProperties": false,
+        "properties": {
+          "bindings": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Bindings",
+            "type": "object"
+          },
+          "confirmations": {
+            "$ref": "#/components/schemas/Confirmations"
+          },
+          "economy": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Economy",
+            "type": "object"
+          }
+        },
+        "title": "DraftIn",
         "type": "object"
       },
       "DraftTestIn": {
@@ -7309,6 +7371,18 @@
       "LiftIn": {
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
           "key": {
             "anyOf": [
               {
@@ -8772,6 +8846,25 @@
           "onboarding"
         ],
         "title": "Me",
+        "type": "object"
+      },
+      "MeasuresIn": {
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "maxItems": 200,
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "title": "MeasuresIn",
         "type": "object"
       },
       "MediaCard": {
@@ -13453,40 +13546,6 @@
         "title": "ProjectValidateIn",
         "type": "object"
       },
-      "PublishIn": {
-        "additionalProperties": false,
-        "properties": {
-          "body_md": {
-            "maxLength": 200000,
-            "minLength": 1,
-            "title": "Body Md",
-            "type": "string"
-          },
-          "requires_acceptance": {
-            "default": true,
-            "title": "Requires Acceptance",
-            "type": "boolean"
-          },
-          "summary": {
-            "default": "",
-            "maxLength": 1000,
-            "title": "Summary",
-            "type": "string"
-          },
-          "title": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "title",
-          "body_md"
-        ],
-        "title": "PublishIn",
-        "type": "object"
-      },
       "PurgeIn": {
         "additionalProperties": false,
         "properties": {
@@ -13748,6 +13807,25 @@
         "title": "ReadingPositionOut",
         "type": "object"
       },
+      "RefuseIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "RefuseIn",
+        "type": "object"
+      },
       "RegisterRequest": {
         "additionalProperties": false,
         "properties": {
@@ -13811,25 +13889,6 @@
           }
         },
         "title": "ReindexIn",
-        "type": "object"
-      },
-      "RejectIn": {
-        "additionalProperties": false,
-        "properties": {
-          "reason": {
-            "anyOf": [
-              {
-                "maxLength": 500,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reason"
-          }
-        },
-        "title": "RejectIn",
         "type": "object"
       },
       "RemoveIn": {
@@ -14832,25 +14891,6 @@
         "title": "SessionInfo",
         "type": "object"
       },
-      "SimulationIn": {
-        "additionalProperties": false,
-        "properties": {
-          "results": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "maxItems": 200,
-            "title": "Results",
-            "type": "array"
-          }
-        },
-        "required": [
-          "results"
-        ],
-        "title": "SimulationIn",
-        "type": "object"
-      },
       "SingleSignOn": {
         "description": "027: whether the sign-in page offers the single sign-on, and under which name.",
         "properties": {
@@ -15043,6 +15083,24 @@
           "period_end"
         ],
         "title": "StatResultOut",
+        "type": "object"
+      },
+      "StateIn": {
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "enum": [
+              "enabled",
+              "disabled"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "StateIn",
         "type": "object"
       },
       "StatisticConfirmIn": {
@@ -16222,20 +16280,6 @@
           "definition"
         ],
         "title": "SupportWorkflowOut",
-        "type": "object"
-      },
-      "SwitchIn": {
-        "additionalProperties": false,
-        "properties": {
-          "enabled": {
-            "title": "Enabled",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "enabled"
-        ],
-        "title": "SwitchIn",
         "type": "object"
       },
       "TermsAdminOut": {
@@ -18968,6 +19012,58 @@
           "reason"
         ],
         "title": "PolicyIn",
+        "type": "object"
+      },
+      "portalab__modules__privacy__api__terms__PublishIn": {
+        "additionalProperties": false,
+        "properties": {
+          "body_md": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "title": "Body Md",
+            "type": "string"
+          },
+          "requires_acceptance": {
+            "default": true,
+            "title": "Requires Acceptance",
+            "type": "boolean"
+          },
+          "summary": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "body_md"
+        ],
+        "title": "PublishIn",
+        "type": "object"
+      },
+      "portalab__modules__visuals__api__routes__PublishIn": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmations": {
+            "$ref": "#/components/schemas/Confirmations"
+          },
+          "economy": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Economy",
+            "type": "object"
+          }
+        },
+        "title": "PublishIn",
         "type": "object"
       }
     }
@@ -21737,6 +21833,7 @@
     },
     "/api/v1/admin/first-run": {
       "get": {
+        "description": "028: answers a visitor only while the portal is not set up (then the same answer as any address).",
         "operationId": "first_run_status_api_v1_admin_first_run_get",
         "responses": {
           "200": {
@@ -28486,6 +28583,7 @@
     },
     "/api/v1/admin/security/blocks/lift": {
       "post": {
+        "description": "One block (its ``id`` or its ``key``), or every block when neither is given.",
         "operationId": "lift_api_v1_admin_security_blocks_lift_post",
         "requestBody": {
           "content": {
@@ -29334,7 +29432,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PublishIn"
+                "$ref": "#/components/schemas/portalab__modules__privacy__api__terms__PublishIn"
               }
             }
           },
@@ -29734,7 +29832,7 @@
         },
         "summary": "Listing",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -29792,7 +29890,7 @@
         },
         "summary": "Any File",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -29835,7 +29933,7 @@
         },
         "summary": "Github",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -29858,7 +29956,7 @@
         },
         "summary": "Scan",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -29881,13 +29979,13 @@
         },
         "summary": "Updates",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
     "/api/v1/admin/visuals/upload": {
       "post": {
-        "description": "A raw ``application/zip`` body (no multipart).",
+        "description": "A raw ``application/zip`` body (no multipart), 20 MB at most.",
         "operationId": "upload_api_v1_admin_visuals_upload_post",
         "parameters": [
           {
@@ -29937,13 +30035,57 @@
         },
         "summary": "Upload",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
-    "/api/v1/admin/visuals/{pack}/switch": {
+    "/api/v1/admin/visuals/{pack}/remove": {
       "post": {
-        "operationId": "switch_api_v1_admin_visuals__pack__switch_post",
+        "operationId": "remove_api_v1_admin_visuals__pack__remove_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack",
+            "required": true,
+            "schema": {
+              "title": "Pack",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Remove Api V1 Admin Visuals  Pack  Remove Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/admin/visuals/{pack}/state": {
+      "post": {
+        "operationId": "state_api_v1_admin_visuals__pack__state_post",
         "parameters": [
           {
             "in": "path",
@@ -29959,7 +30101,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SwitchIn"
+                "$ref": "#/components/schemas/StateIn"
               }
             }
           },
@@ -29980,9 +30122,9 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Switch",
+        "summary": "State",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -30035,13 +30177,13 @@
         },
         "summary": "Detail",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
-    "/api/v1/admin/visuals/{pack}/{version}/approve": {
-      "post": {
-        "operationId": "approve_api_v1_admin_visuals__pack___version__approve_post",
+    "/api/v1/admin/visuals/{pack}/{version}/draft": {
+      "put": {
+        "operationId": "draft_api_v1_admin_visuals__pack___version__draft_put",
         "parameters": [
           {
             "in": "path",
@@ -30066,7 +30208,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApproveIn"
+                "$ref": "#/components/schemas/DraftIn"
               }
             }
           },
@@ -30078,7 +30220,7 @@
               "application/json": {
                 "schema": {
                   "additionalProperties": true,
-                  "title": "Response Approve Api V1 Admin Visuals  Pack   Version  Approve Post",
+                  "title": "Response Draft Api V1 Admin Visuals  Pack   Version  Draft Put",
                   "type": "object"
                 }
               }
@@ -30096,15 +30238,15 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Approve",
+        "summary": "Draft",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
-    "/api/v1/admin/visuals/{pack}/{version}/reject": {
+    "/api/v1/admin/visuals/{pack}/{version}/measures": {
       "post": {
-        "operationId": "reject_api_v1_admin_visuals__pack___version__reject_post",
+        "operationId": "measures_api_v1_admin_visuals__pack___version__measures_post",
         "parameters": [
           {
             "in": "path",
@@ -30129,7 +30271,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RejectIn"
+                "$ref": "#/components/schemas/MeasuresIn"
               }
             }
           },
@@ -30150,9 +30292,170 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Reject",
+        "summary": "Measures",
         "tags": [
-          "ui"
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/admin/visuals/{pack}/{version}/publish": {
+      "post": {
+        "operationId": "publish_api_v1_admin_visuals__pack___version__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack",
+            "required": true,
+            "schema": {
+              "title": "Pack",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/portalab__modules__visuals__api__routes__PublishIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Publish Api V1 Admin Visuals  Pack   Version  Publish Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Publish",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/admin/visuals/{pack}/{version}/purge": {
+      "post": {
+        "operationId": "purge_api_v1_admin_visuals__pack___version__purge_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack",
+            "required": true,
+            "schema": {
+              "title": "Pack",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Purge",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/admin/visuals/{pack}/{version}/refuse": {
+      "post": {
+        "operationId": "refuse_api_v1_admin_visuals__pack___version__refuse_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack",
+            "required": true,
+            "schema": {
+              "title": "Pack",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefuseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refuse",
+        "tags": [
+          "visuals"
         ]
       }
     },
@@ -30205,61 +30508,7 @@
         },
         "summary": "Rollback",
         "tags": [
-          "ui"
-        ]
-      }
-    },
-    "/api/v1/admin/visuals/{pack}/{version}/simulation": {
-      "post": {
-        "operationId": "simulation_api_v1_admin_visuals__pack___version__simulation_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "pack",
-            "required": true,
-            "schema": {
-              "title": "Pack",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "version",
-            "required": true,
-            "schema": {
-              "title": "Version",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SimulationIn"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Simulation",
-        "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -43410,6 +43659,7 @@
     },
     "/api/v1/terms": {
       "get": {
+        "description": "028: read once signed in (the acceptance gate shows them): nothing answers a visitor but sign-in.",
         "operationId": "current_terms_api_v1_terms_get",
         "responses": {
           "200": {
@@ -45055,9 +45305,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Active Api V1 Visuals Active Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActiveOut"
                 }
               }
             },
@@ -45066,7 +45314,7 @@
         },
         "summary": "Active",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },
@@ -45124,7 +45372,7 @@
         },
         "summary": "Live File",
         "tags": [
-          "ui"
+          "visuals"
         ]
       }
     },

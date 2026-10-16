@@ -1,9 +1,9 @@
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate, useNavigationType } from "react-router";
 import { Dialog, Drawer } from "../design-system/components/Overlays";
-import { ExternalVisualsLoader } from "../design-system/themes/external/ExternalVisualsLoader";
-import { externalLook, useExternalRevision } from "../design-system/themes/external/external";
 import { NAV_DESKTOP, NAV_PHONE, NAV_TABLET } from "../design-system/themes/schema";
+import { ExternalVisualsLoader } from "../design-system/visuals/ExternalVisualsLoader";
+import { externalLook, useExternalRevision } from "../design-system/visuals/registry";
 import { useWornLevelBadge } from "../features/community/profile/looks";
 import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";

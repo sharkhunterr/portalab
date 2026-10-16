@@ -223,8 +223,12 @@ async def import_config(
 
 @router.get("/admin/first-run")
 @public
-async def first_run_status(module: Module) -> dict[str, Any]:
-    return {"completed": await module.first_run.completed(), "steps": module.first_run.steps()}
+async def first_run_status(module: Module, request: Request) -> dict[str, Any]:
+    """028: answers a visitor only while the portal is not set up (then the same answer as any address)."""
+    completed = await module.first_run.completed()
+    if completed and not (await current_principal(request)).is_authenticated:
+        raise Unauthorized()
+    return {"completed": completed, "steps": module.first_run.steps()}
 
 
 @router.post(
@@ -234,6 +238,8 @@ async def first_run_status(module: Module) -> dict[str, Any]:
 async def first_run(body: WizardIn, request: Request, module: Module) -> dict[str, Any]:
     """Public only while the portal has no Admin; when reopened later, it needs ``configuration.manage``."""
     if await module.first_run.completed():
+        if not (await current_principal(request)).is_authenticated:
+            raise Unauthorized()  # 028: nothing to tell a visitor once the portal is set up
         raise FirstRunClosed("The portal is already set up.")
     existing_admin = None
     if await module.first_run.admin_exists():  # reopened wizard: only for configuration managers

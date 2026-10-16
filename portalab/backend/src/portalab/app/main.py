@@ -20,10 +20,15 @@ from starlette.responses import Response
 import portalab
 from portalab.app.composition import BACKEND_DIR
 from portalab.app.health import router as health_router
-from portalab.app.intrusion import IntrusionGuard
-from portalab.app.intrusion import router as intrusion_router
 from portalab.app.migrations import expected_heads
-from portalab.app.security import PrincipalResolver, SecurityMiddleware, enforce_default_deny, enforce_terms
+from portalab.app.security import (
+    DEFAULT_HEALTH_NETWORKS,
+    PrincipalResolver,
+    SecurityMiddleware,
+    enforce_default_deny,
+    enforce_terms,
+    public_assets_of,
+)
 from portalab.app.spa import SPAStaticFiles, spa_directory
 from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
@@ -79,6 +84,9 @@ from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.api import routers as identity_routers
 from portalab.modules.identity.api.middleware import SessionPrincipalResolver
 from portalab.modules.identity.context import IdentityContext
+from portalab.modules.identity.guard import BlockStore, IntrusionGuard, stored_kind
+from portalab.modules.identity.guard.api import router as intrusion_router
+from portalab.modules.identity.settings import GUARD_BOUNDS, GUARD_SETTINGS
 from portalab.modules.marketplace.api import routers as marketplace_routers
 from portalab.modules.marketplace.module import MarketplaceModule
 from portalab.modules.media.api import routers as media_routers
@@ -104,6 +112,8 @@ from portalab.modules.support.api import routers as support_routers
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.api import routers as ui_routers
 from portalab.modules.ui.module import UiModule
+from portalab.modules.visuals.api import routers as visuals_routers
+from portalab.modules.visuals.module import VisualsModule
 from portalab.modules.wiki.api import routers as wiki_routers
 from portalab.modules.wiki.module import WikiModule
 
@@ -134,14 +144,53 @@ def guard_of(app: FastAPI) -> IntrusionGuard:
     return guard
 
 
+GUARD_RELOAD_SECONDS = 5.0
+
+
+async def _guard_loop(
+    guard: IntrusionGuard, store: BlockStore, config: Any = None, interval: float = GUARD_RELOAD_SECONDS
+) -> None:
+    """028: the blocks every process stored (and the ones lifted, from the console too) followed here, and the
+    administrator's thresholds (read every few rounds)."""
+    rounds = 0
+    while True:
+        with contextlib.suppress(Exception):
+            guard.load(await store.active())
+        if config is not None and rounds % 6 == 0:
+            with contextlib.suppress(Exception):
+                guard.configure(**await guard_thresholds(config))
+        rounds += 1
+        await asyncio.sleep(interval)
+
+
+async def guard_thresholds(config: Any) -> dict[str, int]:
+    """The guard's thresholds as the administrator set them, kept within their bounds."""
+    out: dict[str, int] = {}
+    for field, key in GUARD_SETTINGS.items():
+        low, high = GUARD_BOUNDS[field]
+        out[field] = min(high, max(low, int((await config.get(key)).value)))
+    return out
+
+
 def security_alert(
-    db: Database, platform: Any, guard: IntrusionGuard
+    db: Database, platform: Any, guard: IntrusionGuard, store: BlockStore | None = None
 ) -> Callable[[dict[str, Any]], Awaitable[None]]:
-    """issue 1: a session or an address just blocked — the session signed out, the audit log written, the
-    holders of ``security.manage`` alerted (never fails the request that tripped it)."""
+    """issue 1: a session or an address just blocked — the session signed out, the block stored (028: every
+    process enforces it, a restart keeps it), the audit log written, the holders of ``security.manage``
+    alerted (never fails the request that tripped it)."""
 
     async def alert(block: dict[str, Any]) -> None:
         try:
+            if store is not None:
+                kind, subject = stored_kind(block["key"])
+                seconds = max(1.0, float(block["until"]) - guard.clock())
+                stored = await store.record(
+                    kind, subject, reason=block["reason"], seconds=seconds, points=block["points"],
+                    paths=block["paths"], label=subject if kind == "address" else None,
+                )  # fmt: skip
+                held = guard._blocks.get(block["key"])
+                if held is not None:
+                    held.id = str(stored)
             session_hash = next((k.split(":", 1)[1] for k in block["keys"] if k.startswith("session:")), None)
             address = next((k.split(":", 1)[1] for k in block["keys"] if k.startswith("ip:")), "?")
             user_id, login = None, None
@@ -166,7 +215,15 @@ def security_alert(
                             ),
                             {"u": user_id},
                         )
-                        guard.block_user(str(user_id), login or str(user_id))
+                        account = None
+                        if store is not None:
+                            account = await store.record(
+                                "account", str(user_id), reason=block["reason"], label=login,
+                                seconds=guard.block_seconds, points=block["points"], paths=block["paths"],
+                            )  # fmt: skip
+                        guard.block_user(
+                            str(user_id), login or str(user_id), str(account) if account else None
+                        )
                 await platform.authz.audit.record(
                     uow.session,
                     AuditRecord(
@@ -242,6 +299,7 @@ def create_app(
     automations: AutomationsModule | None = None,
     community: CommunityModule | None = None,
     marketplace: MarketplaceModule | None = None,
+    visuals: VisualsModule | None = None,
     plugins: PluginsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
@@ -284,13 +342,15 @@ def create_app(
         app.state.automations_module = platform.automations
         app.state.community_module = platform.community
         app.state.marketplace_module = platform.marketplace
+        app.state.visuals_module = platform.visuals
         app.state.plugins_module = platform.plugins
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
         if isinstance(app.state.authorizer, DeferredAuthorizer):
             app.state.authorizer.target = platform.authz.engine
-        app.state.security_alert = security_alert(db, platform, guard_of(app))
+        app.state.security_blocks = BlockStore(db)
+        app.state.security_alert = security_alert(db, platform, guard_of(app), app.state.security_blocks)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -300,14 +360,29 @@ def create_app(
         if app.state.platform is not None:
             await app.state.platform.refresh_config()
             await app.state.platform.start_services()
+            if app.state.platform.visuals is not None:
+                await app.state.platform.visuals.start()
         flusher = (
             asyncio.create_task(_flush_loop(app.state.platform.observability))
             if app.state.platform is not None
             else None
         )
+        blocks: BlockStore | None = app.state._state.get("security_blocks")
+        platform = app.state._state.get("platform")
+        config = platform.administration.config if platform is not None else None
+        guarding = (
+            asyncio.create_task(_guard_loop(guard_of(app), blocks, config)) if blocks is not None else None
+        )
         try:
             yield
         finally:
+            visuals_module = app.state._state.get("visuals_module")
+            if visuals_module is not None:
+                await visuals_module.stop()
+            if guarding is not None:
+                guarding.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await guarding
             if flusher is not None:
                 flusher.cancel()
                 with contextlib.suppress(asyncio.CancelledError):
@@ -355,6 +430,7 @@ def create_app(
     app.state.automations_module = automations
     app.state.community_module = community
     app.state.marketplace_module = marketplace
+    app.state.visuals_module = visuals
     app.state.plugins_module = plugins
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
@@ -445,6 +521,10 @@ def create_app(
         per_ip_per_minute=security.rate_limit_per_ip_per_minute,
         per_user_per_minute=security.rate_limit_per_user_per_minute,
         guard=guard_of(app),
+        # 028: without a session, nothing answers but signing in (the sign-in page and its own files)
+        anonymous_gate=True,
+        health_networks=settings.health_networks if settings else DEFAULT_HEALTH_NETWORKS,
+        public_assets=public_assets_of(static_dir),
     )
     app.include_router(health_router)
     app.include_router(stream_router)
@@ -477,6 +557,7 @@ def create_app(
         *automations_routers(),
         *community_routers(),
         *marketplace_routers(),
+        *visuals_routers(),
         *plugins_routers(),
     ]:
         app.include_router(router)

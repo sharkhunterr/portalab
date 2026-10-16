@@ -51,6 +51,7 @@ from portalab.modules.shell.module import ShellModule
 from portalab.modules.statistics.module import StatisticsModule
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.module import UiModule
+from portalab.modules.visuals.module import VisualsModule
 from portalab.modules.wiki.module import WikiModule
 
 
@@ -130,6 +131,7 @@ class Platform:
     marketplace: MarketplaceModule
     plugins: PluginsModule
     seeds: list[Callable[[], Awaitable[None]]]
+    visuals: VisualsModule | None = None  # 028: visual packs
 
     async def seed_periodic_jobs(self) -> None:
         for seed in self.seeds:
@@ -189,7 +191,7 @@ def wire_platform(
     health.register_capabilities()
     observability = ObservabilityModule(database, events, authz.audit, capabilities)
     observability.register_capabilities()
-    ui = UiModule(database, events, authz.audit, capabilities, visuals_root=data_dir / "visuals")
+    ui = UiModule(database, events, authz.audit, capabilities)
     ui.register()
     administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     for setting in ui.looks.SETTINGS:  # 027: shop cosmetics (notifications, palette, ambient, celebration)
@@ -257,6 +259,7 @@ def wire_platform(
     community.register()
     marketplace = MarketplaceModule(database, events, authz.audit, capabilities, authz.engine)
     marketplace.register()
+    visuals = VisualsModule(database, events, authz.audit, capabilities, root=data_dir / "visuals")
     plugins = PluginsModule(
         database, events, authz.audit, capabilities, authz.engine, root=data_dir / "plugins"
     )
@@ -332,6 +335,7 @@ def wire_platform(
         marketplace,
         plugins,
         seeds,
+        visuals,
     )
     from portalab.app.config_bindings import bind
 

@@ -1,9 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, CSRF_COOKIE, CSRF_HEADER } from "../../api/client";
-import { ACTIVE_VISUALS_KEY } from "../../design-system/themes/external/ExternalVisualsLoader";
-import type { ExternalElement } from "../../design-system/themes/external/external";
+import { ACTIVE_VISUALS_KEY } from "../../design-system/visuals/ExternalVisualsLoader";
+import type { ExternalElement } from "../../design-system/visuals/registry";
 
-/** issue 1 (POC): the administration of imported visual packs. */
+/** 028: the administration of visual packs — their registry and the six steps of a version. */
+
+export type Step =
+  | "imported"
+  | "analysed"
+  | "tested"
+  | "reviewed"
+  | "published"
+  | "refused"
+  | "superseded"
+  | "purged";
+export type Outcome = "done" | "warning" | "blocking";
+export type PackState = "enabled" | "disabled" | "archived";
 
 export interface Summary {
   blocking: number;
@@ -13,35 +25,69 @@ export interface Summary {
   hd: boolean;
   script: boolean;
   publishable: boolean;
+  security?: { blocking: number; warning: number; info: number };
+}
+
+export interface Confirmations {
+  scripts: boolean;
+  replaces: string[];
+  contracts: string[];
+}
+
+export interface Decision {
+  by?: string | null;
+  at?: string;
+  economy?: Record<string, Partial<Economy>>;
+  confirmations?: Partial<Confirmations>;
+  reason?: string;
+  trusted?: boolean;
 }
 
 export interface VersionRow {
   version: string;
   sha: string;
-  status: "pending" | "approved" | "rejected";
-  detected_at: string | null;
-  summary: Summary;
+  step: Step;
+  outcomes: Partial<Record<"import" | "analysis" | "security" | "test" | "review" | "validation", Outcome>>;
+  summary: Summary | null;
   names: Record<string, string> | null;
   author: string | null;
   license: string | null;
-  decision: Record<string, unknown> | null;
-  simulated: boolean;
+  decision: Decision | null;
+  tested: boolean;
+  detected_at: string | null;
+  published_at: string | null;
+  ever_published: boolean;
 }
 
 export interface PackRow {
   id: string;
+  names: Record<string, string>;
+  builtin: boolean;
+  socle: boolean;
   source: { kind: string; path?: string; url?: string } | null;
+  state: PackState;
   current: string | null;
-  enabled: boolean;
   remote: { version: string; ref: string; release: boolean; checked_at: string } | null;
+  update: boolean;
   versions: VersionRow[];
 }
 
 export interface Finding {
   level: "blocking" | "warning" | "info";
   code: string;
+  category: "analysis" | "security";
   element: string | null;
   params: Record<string, unknown>;
+}
+
+export interface Economy {
+  price: number | null;
+  rarity: string;
+  level: number | null;
+  supply: number | null;
+  collection: string | null;
+  icon: string | null;
+  season?: string | null;
 }
 
 export interface ElementReport {
@@ -56,52 +102,47 @@ export interface ElementReport {
   descriptions: Record<string, string>;
   economy: Economy;
   payload: Record<string, unknown>;
+  replaces?: boolean;
+  contracts?: string[];
   bytes: number;
 }
 
-export interface Economy {
-  price: number | null;
-  rarity: string;
-  level: number | null;
-  supply: number | null;
-  collection: string | null;
-  icon: string | null;
+export interface Measure {
+  element: string;
+  kind: string;
+  compiled?: boolean;
+  fps?: number;
+  ready_ms?: number;
+  errors?: string[];
 }
 
-export interface VersionDetail {
+export interface VersionDetail extends VersionRow {
   pack: string;
-  version: string;
-  sha: string;
-  status: string;
+  builtin: boolean;
+  current: boolean;
   report: {
     summary: Summary;
     items: Finding[];
     elements: ElementReport[];
     pack: Record<string, unknown> | null;
   };
-  simulation: { at: string; results: SimulationResult[] } | null;
-  decision: { economy?: Record<string, Partial<Economy>> } | null;
+  measures: { at: string; by: string | null; results: Measure[] } | null;
+  draft: { economy?: Record<string, Partial<Economy>>; confirmations?: Partial<Confirmations> } | null;
+  changes: { added?: string[]; removed?: string[]; changed?: string[] } | null;
   elements: ExternalElement[];
 }
 
-export interface SimulationResult {
-  product: string;
-  ok: boolean;
-  detail?: string;
-  fps?: number;
-}
-
-const LIST = ["visuals", "admin"] as const;
+export const VISUALS = ["visuals", "admin"] as const;
 
 export function useVisualPacks() {
   return useQuery({
-    queryKey: LIST,
+    queryKey: VISUALS,
     queryFn: async () =>
       (await api.GET("/api/v1/admin/visuals")).data as unknown as { packs: PackRow[]; inbox: string },
   });
 }
 
-export function useVersionDetail(pack: string | null, version: string | null) {
+export function useVersionDetail(pack: string | undefined, version: string | undefined) {
   return useQuery({
     queryKey: ["visuals", "detail", pack, version],
     enabled: Boolean(pack && version),
@@ -114,17 +155,37 @@ export function useVersionDetail(pack: string | null, version: string | null) {
   });
 }
 
+/** An error the API answered (its own words, and its code for the interface to translate). */
+export class VisualsError extends Error {
+  readonly code: string | null;
+
+  constructor(message: string, code: string | null) {
+    super(message);
+    this.code = code;
+  }
+}
+
 /** Any of the administration's calls: the list, the detail and what members load follow. */
 export function useVisualAction() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ path, body, raw }: { path: string; body?: unknown; raw?: Blob }) => {
+    mutationFn: async ({
+      path,
+      body,
+      raw,
+      method = "POST",
+    }: {
+      path: string;
+      body?: unknown;
+      raw?: Blob;
+      method?: "POST" | "PUT";
+    }) => {
       const token = document.cookie
         .split("; ")
         .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
         ?.slice(CSRF_COOKIE.length + 1);
       const response = await fetch(path, {
-        method: "POST",
+        method,
         credentials: "same-origin",
         headers: {
           "Content-Type": raw ? "application/zip" : "application/json",
@@ -134,7 +195,12 @@ export function useVisualAction() {
       });
       const text = await response.text();
       const data = text ? (JSON.parse(text) as Record<string, unknown>) : {};
-      if (!response.ok) throw new Error(String(data.detail ?? data.title ?? response.statusText));
+      if (!response.ok) {
+        throw new VisualsError(
+          String(data.detail ?? data.title ?? response.statusText),
+          typeof data.code === "string" ? data.code : null,
+        );
+      }
       return data;
     },
     onSettled: () => {
@@ -144,3 +210,24 @@ export function useVisualAction() {
     },
   });
 }
+
+/** The administration's address of a pack (and of one of its versions). */
+export function packPath(pack: string, version?: string): string {
+  const head = `/api/v1/admin/visuals/${encodeURIComponent(pack)}`;
+  return version ? `${head}/${encodeURIComponent(version)}` : head;
+}
+
+/** The step a version waits at: the first not done yet (its last one once published or closed). */
+export function nextStep(version: Pick<VersionRow, "step" | "outcomes">): StepKey {
+  const { step, outcomes } = version;
+  if (step === "published" || step === "superseded") return "validation";
+  if (step === "refused" || step === "purged") return "validation";
+  if (outcomes.analysis === "blocking") return "analysis";
+  if (outcomes.security === "blocking") return "security";
+  if (step === "analysed") return "test";
+  if (step === "tested") return "review";
+  return "validation";
+}
+
+export const STEPS = ["import", "analysis", "security", "test", "review", "validation"] as const;
+export type StepKey = (typeof STEPS)[number];

@@ -739,7 +739,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 9,
         "required_permission": "security.manage",
     },
-    {  # issue 1 (POC): imported visual packs
+    {  # 028: visual packs — reserved to the Admin
         "key": "ui.visual_packs",
         "owner": "module:ui",
         "kind": "entry",
@@ -749,7 +749,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "group": "admin",
         "topic": "shop",
         "order_hint": 9,
-        "required_permission": "appearance.manage",
+        "required_permission": "visuals.manage",
     },
     {
         "key": "administration.config",

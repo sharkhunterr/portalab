@@ -1,10 +1,11 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
+import { publicAssets } from "./vite/public-assets";
 
 // The backend serves the built SPA as static files (single image, spec 001 R14).
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), publicAssets()],
   server: {
     proxy: {
       "/api": "http://localhost:8080",

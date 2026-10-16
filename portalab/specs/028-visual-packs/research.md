@@ -51,3 +51,25 @@ route, the single-page admin screen.
 | R33 | **Isolation campaign (SC-004)**: Playwright suite `frontend/tests/e2e/visual-packs/isolation.spec.ts` loads probe elements (test-only fixtures, never shipped) — each attempts one forbidden capability (read cookies, storage, network, parent DOM, top navigation, popup, form, a protected surface by CSS) and reports through the sandbox's own message channel whether it succeeded; the suite asserts every probe reports « refused ». Server side, `tests/security/visuals/` sends malformed archives (traversal, links, null bytes, sizes, kinds) and asserts nothing is stored | SC-004 measured, not argued | Manual review only |
 | R34 | **Anonymous sweep (SC-005)**: `tests/security/test_anonymous_surface.py` walks every registered route (and a list of non-existent ones) without a session and asserts: allow-listed → their normal answer; everything else → byte-identical generic 401. A frontend build check asserts `public-assets.json` holds only the sign-in closure | SC-005 | — |
 | R35 | **Testing layout** reuses the project's: backend `tests/unit/visuals/`, `tests/integration/visuals/`, `tests/migrations/test_visuals_0001.py`, `tests/security/visuals/`; frontend `tests/unit/visuals/`, `tests/e2e/visual-packs/` (workflow, navigation, booster scene, widget, isolation, anonymous) | VIII | — |
+
+## Implementation notes (decisions refined while building slice A)
+
+- **R3**: the claim family is the element **type** (`avatar_frame`, `level_up`, `theme`…), which already
+  separates looks the shop sells under one product type (a badge style and a title style may share a key).
+- **R2**: an element's analysed description (texts, render, economy, payload, contracts) is kept whole in
+  `visuals.elements.data` (`jsonb`); only what is queried has a column (type, look, product, kind).
+- **R15**: keyframes are suffixed per element as planned; font families are **not** renamed (interfaces name
+  their fonts in their definition) — a pack's `@font-face` taking the name of one of Portalab's fonts is
+  dropped instead.
+- **R28**: `HEALTH_NETWORKS` and `TRUSTED_PROXIES` are **bootstrap** settings (environment), not
+  administration settings: the health checks must answer when the database does not. Default networks: the
+  machine itself and the private ranges (`127.0.0.0/8, ::1, 10/8, 172.16/12, 192.168/16, fc00::/7`), so a
+  container's health check from its host keeps working; behind a reverse proxy, list it in `TRUSTED_PROXIES`.
+- **R29/R31**: the guard's thresholds are the global settings `security.guard.sessionLimit`, `addressLimit`,
+  `windowSeconds`, `blockSeconds`, read by each process every 30 s; a new block is stored and alerted by the
+  process that started it (the POC's direct notification to `security.manage` holders, kept), every process
+  reloads the stored blocks every 5 s.
+- **R27**: anonymous `/api/v1/i18n/catalogs/{auth,common,errors}` only — the SPA bundles its messages, so the
+  sign-in page needs no other catalog; the generic answer is `401 {"code": "unauthorized"}` (the code every
+  route already used for a missing session), answered before routing.
+

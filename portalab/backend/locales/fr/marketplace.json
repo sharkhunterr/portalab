@@ -730,5 +730,14 @@
   "what.xp_boost": "Multiplie l'XP que vous gagnez pendant un temps, en plus des séries et des événements (dans la limite du portail). Acheté pendant qu'un autre est actif, il démarre à sa fin.",
   "widget.featured.all": "{count, plural, one {Voir le produit} other {Voir les # produits}} de la boutique",
   "widget.featured.description": "Quelques produits à obtenir avec vos Coins.",
-  "widget.featured.title": "Boutique"
+  "widget.featured.title": "Boutique",
+  "type.navigation": "Navigation",
+  "type.booster_scene": "Scène de booster",
+  "type.booster_look": "Apparence de booster",
+  "type.booster_opening": "Ouverture de booster",
+  "type.card_reveal": "Révélation de carte",
+  "type.card_face": "Face de carte",
+  "type.card_back": "Dos de carte",
+  "type.widget_style": "Style de widget",
+  "type.theme_pack": "Pack de thème"
 }

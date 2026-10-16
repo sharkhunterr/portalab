@@ -23,7 +23,6 @@ export const authStrings = {
   ssoOr: "or with your portal password",
   ssoFailed: "The single sign-on did not succeed. Try again, or sign in with your password.",
   ssoUnavailable: "This account cannot sign in right now.",
-  termsLink: "Terms of use", // 027: shown when the administrators published some
   close: "Close",
   verifyTitle: "Activate your account",
   tokenField: "Activation code",

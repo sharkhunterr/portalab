@@ -730,5 +730,14 @@
   "what.xp_boost": "Multiplies the XP you earn for a while, on top of streaks and events (within the portal's limit). Bought while another runs, it starts when that one ends.",
   "widget.featured.all": "{count, plural, one {See the product} other {See all # products}} in the shop",
   "widget.featured.description": "A few products you can acquire with Coins.",
-  "widget.featured.title": "Marketplace"
+  "widget.featured.title": "Marketplace",
+  "type.navigation": "Navigation",
+  "type.booster_scene": "Booster scene",
+  "type.booster_look": "Booster look",
+  "type.booster_opening": "Booster opening",
+  "type.card_reveal": "Card reveal",
+  "type.card_face": "Card face",
+  "type.card_back": "Card back",
+  "type.widget_style": "Widget style",
+  "type.theme_pack": "Theme pack"
 }

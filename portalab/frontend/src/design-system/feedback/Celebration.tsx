@@ -13,10 +13,10 @@ import { useAnnounce } from "../a11y/Announce";
 import { FxLayer } from "../components/Fx";
 import { Icon } from "../components/Icon";
 import { sound } from "../sound/SoundService";
-import { ExternalScript } from "../themes/external/ExternalScript";
-import { externalLook, fxName } from "../themes/external/external";
 import { FX_CELEBRATIONS } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
+import { ExternalScript } from "../visuals/ExternalScript";
+import { externalLook, fxName } from "../visuals/registry";
 import "../themes/celebration.css";
 
 /**

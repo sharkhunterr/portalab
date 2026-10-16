@@ -157,6 +157,38 @@ _ONBOARDING: tuple[tuple[str, Any, Any, str], ...] = (
 )
 
 
+# 028 (FR-041): the intrusion guard's thresholds — points within the window before a session (and its account)
+# or an address is blocked, and for how long
+GUARD_SETTINGS = {
+    "session_limit": "security.guard.sessionLimit",
+    "address_limit": "security.guard.addressLimit",
+    "window": "security.guard.windowSeconds",
+    "block_seconds": "security.guard.blockSeconds",
+}
+GUARD_BOUNDS = {
+    "session_limit": (5, 200),
+    "address_limit": (10, 1000),
+    "window": (60, 3600),
+    "block_seconds": (60, 86400),
+}
+_GUARD: tuple[tuple[str, type, int, str], ...] = (
+    (
+        GUARD_SETTINGS["session_limit"],
+        int,
+        20,
+        "Suspicion points of a session before it is blocked (5 to 200).",
+    ),
+    (
+        GUARD_SETTINGS["address_limit"],
+        int,
+        60,
+        "Suspicion points of an address before it is blocked (10 to 1000).",
+    ),
+    (GUARD_SETTINGS["window"], int, 600, "Seconds the suspicion points are kept (60 to 3600)."),
+    (GUARD_SETTINGS["block_seconds"], int, 900, "Seconds a block lasts (60 to 86400)."),
+)
+
+
 def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None:
     """Declare the identity keys through the kernel ``declare_setting`` (idempotent per catalog)."""
     declare = declare_setting if catalog is default_catalog else catalog.declare
@@ -173,6 +205,11 @@ def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None
             description=description,
         )
     for key, schema, default, description in _ONBOARDING:
+        if key not in known:
+            declare(
+                scope="global", key=key, schema=schema, default=default, owner=OWNER, description=description
+            )
+    for key, schema, default, description in _GUARD:
         if key not in known:
             declare(
                 scope="global", key=key, schema=schema, default=default, owner=OWNER, description=description

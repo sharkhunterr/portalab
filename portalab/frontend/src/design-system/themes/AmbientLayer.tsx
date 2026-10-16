@@ -1,7 +1,7 @@
 import { type CSSProperties, memo } from "react";
 import type { Ambient } from "../a11y/preferences";
 import "./ambient.css";
-import { useExternalRevision } from "./external/external";
+import { useExternalRevision } from "../visuals/registry";
 import { isPremiumAmbient, PREMIUM_FALLBACK, PremiumAmbient } from "./premium/PremiumAmbient";
 import { WeatherAmbient } from "./premium/WeatherAmbient";
 

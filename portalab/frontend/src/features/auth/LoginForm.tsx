@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { api } from "../../api/client";
-import { Dialog } from "../../design-system/components/Overlays";
 import { ApiError } from "../../state/regions";
-import { usePublicTerms } from "../terms/api";
 import "../content/content.css";
 import { FormMessage } from "./FormMessage";
 import { authStrings as t } from "./strings";
@@ -46,32 +44,6 @@ function SingleSignOn() {
       </a>
       <p className="auth-sso__or">{t.ssoOr}</p>
     </div>
-  );
-}
-
-/** 027: the terms of use in force, readable before signing in (only when the administrators publish some). */
-function TermsLink() {
-  const terms = usePublicTerms();
-  if (!terms.data) return null;
-  return (
-    <p className="auth-terms">
-      <Dialog
-        size="lg"
-        title={terms.data.title}
-        closeLabel={t.close}
-        trigger={
-          <button type="button" className="auth-terms__link">
-            {t.termsLink}
-          </button>
-        }
-      >
-        <div
-          className="content-body"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: server-sanitized by the single Markdown pipeline (nh3 allowlist)
-          dangerouslySetInnerHTML={{ __html: terms.data.html }}
-        />
-      </Dialog>
-    </p>
   );
 }
 
@@ -148,7 +120,6 @@ export function LoginForm() {
           {t.cancelDeletion}
         </button>
       ) : null}
-      <TermsLink />
     </form>
   );
 }

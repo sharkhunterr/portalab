@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { usePreferences } from "../a11y/PreferencesProvider";
 import { sound } from "../sound/SoundService";
+import { externalTheme, useExternalRevision } from "../visuals/registry";
 import {
   applyToDocument,
   type CampaignOverlay,
@@ -11,7 +12,6 @@ import {
   resolveLooks,
 } from "./apply";
 import { BUILTIN_THEMES, builtinTheme } from "./builtin";
-import { externalTheme, useExternalRevision } from "./external/external";
 import { parseTheme, type ThemeDefinition } from "./schema";
 
 /**

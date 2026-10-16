@@ -27,8 +27,6 @@ ALLOW_LISTED = {
     "/api/v1/auth/oidc",  # 027: the single sign-on (whether offered, start, the provider's way back)
     "/api/v1/auth/oidc/start",
     "/api/v1/auth/oidc/callback",
-    "/api/v1/terms",  # 027: the terms of use in force (the sign-in page links them)
-    "/api/v1/visuals/sandbox",  # issue 1: the empty page a pack's script runs in (sandboxed, holds nothing)
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check
@@ -103,6 +101,7 @@ async def test_every_non_public_route_is_denied_by_default(
             authorizer=DenyAllAuthorizer(),  # structure test; real grants: tests/security/authz matrix
         )
     )
+    app.state.intrusion_guard.enabled = False  # 028: probing every route on purpose
     expected = 403 if authenticated else 401
     checked = 0
     for route in _api_routes(app):
@@ -140,6 +139,7 @@ async def test_unknown_route_is_a_problem_document(database: Database, heads: se
     app = create_app(database=database, migration_heads=heads)
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get("/api/v1/does-not-exist")
-    assert response.status_code == 404
-    assert response.json()["code"] == "not_found"
-    assert response.headers["X-Correlation-Id"]
+    # 028: without a session an unknown address answers like any other one — sign in first
+    assert response.status_code == 401
+    assert response.json()["code"] == "unauthorized"
+    assert response.headers["content-type"].startswith("application/problem+json")

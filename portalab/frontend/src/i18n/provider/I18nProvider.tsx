@@ -2,7 +2,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useMemo } from "react";
 import { IntlProvider } from "react-intl";
 import { api } from "../../api/client";
-import { externalMessages, useExternalRevision } from "../../design-system/themes/external/external";
+import { externalMessages, useExternalRevision } from "../../design-system/visuals/registry";
 import { BUNDLED_MESSAGES, DEFAULT_NAMESPACES, flatten } from "../bundled";
 import { type PseudoLocale, pseudoCatalog } from "../pseudo/pseudo";
 

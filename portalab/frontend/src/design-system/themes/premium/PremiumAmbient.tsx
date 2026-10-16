@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { liveAmbiences } from "../../motion/budget";
-import { externalFx, externalLook, fxName } from "../external/external";
+import { externalFx, externalLook, fxName } from "../../visuals/registry";
 import type { Uniforms } from "./shaderRunner";
 
 /**

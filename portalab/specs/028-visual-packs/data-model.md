@@ -46,6 +46,7 @@ builtin new in a release: disabled (FR-008a); first migration: enabled when its 
 | `draft` | `jsonb` NULL | Review in progress: economy per product, scene bindings, confirmations |
 | `decision` | `jsonb` NULL | `{by, at, economy{product: {price, rarity, level, supply, collection}}, confirmations{scripts, replaces[], contracts[]}, bindings{}, reason?}` |
 | `changes` | `jsonb` NULL | built-in « what changed » vs the previous version: `{added[], removed[], changed[]}` (R6) |
+| `ever_published` | `bool` | once published, never purged and never changed in place |
 | `detected_at`, `published_at` | `timestamptz` | |
 
 ```text
@@ -64,23 +65,18 @@ rollback: a superseded version that was published becomes published again (its d
 | `version_id` | `uuid` → `pack_versions.id` | |
 | `folder` | `text` | element folder in the pack |
 | `type` | `text` | FR-002 vocabulary: `theme` (interface), `navigation`, `palette`, `ambient`, `profile_background`, `avatar_frame`, `profile_banner`, `name_style`, `level_badge`, `badge`, `title`, `level_up`, `effect` (celebration), `notification_style`, `notification_animation`, `booster_scene`, `booster_look`, `booster_opening`, `card_reveal`, `card_face`, `card_back`, `booster`, `widget_style`, `widget`, `bundle` (product pack), `theme_pack` |
-| `family` | `text` NULL | claim family (R3); NULL for data-only elements without a look |
 | `look` | `text` NULL | `^[a-z0-9][a-z0-9-]{0,47}$` |
 | `product_key` | `text` NULL | shop product; NULL for elements never sold (`navigation`, scene parts, `widget` code is sold through its `widget` product only when priced) |
 | `kind` | `text` | `css`, `glsl`, `js`, `theme`, `data`, `renderer` (R9) |
-| `render` | `jsonb` | `{file, css[], stage, shape, radius, reveal, duration, nav{position,size,expands}, renderer, params, rarity}` |
-| `names`, `descriptions` | `jsonb` | `{fr, en}` |
-| `proposed` | `jsonb` | economy proposed by the pack `{price, rarity, level, supply, collection, icon, repeatable, season}` |
-| `payload` | `jsonb` | bundle `products[]`; booster `pool, packs, cards, odds, guarantee`; badge/title `label, icon, style`; scene `parts{}`; widget `contracts[], sizes[], refresh` |
-| `replaces` | `bool` | declares taking over a look of the same key |
+| `data` | `jsonb` | the analysed element: `render`, `names`, `descriptions`, `economy` (proposed), `payload`, `palette`, `preview`, `replaces`, `contracts`, `bytes` |
 
-Index: `(version_id)`, `(family, look)`, `(product_key)`.
+Index: `(version_id)`, `(type, look)`, `(product_key)`.
 
 ## visuals.look_claims
 
 | column | type | rules |
 |---|---|---|
-| `family`, `look` | `text` | PK `(family, look)` |
+| `type`, `look` | `text` | PK `(type, look)` (the element type is the claim's family) |
 | `pack_id` | `text` | claiming pack |
 | `element_id` | `uuid` | |
 | `replaced_from` | `text` NULL | pack that held it before a `replaces` decision (restored on rollback/switch off) |
@@ -121,12 +117,12 @@ Active block = `lifted_at IS NULL AND until > now()`; partial index on `(kind, s
 
 | key | tier | default | rule |
 |---|---|---|---|
-| `security.guard.session_limit` | global | 20 | 5–200 |
-| `security.guard.address_limit` | global | 60 | 10–1000 |
-| `security.guard.window_s` | global | 600 | 60–3600 |
-| `security.guard.block_s` | global | 900 | 60–86400 |
-| `observability.health.networks` | global | `["127.0.0.0/8", "::1/128"]` | CIDR list |
-| `server.trusted_proxies` | bootstrap (env) | `[]` | CIDR list (R28) |
+| `security.guard.sessionLimit` | global | 20 | 5–200 |
+| `security.guard.addressLimit` | global | 60 | 10–1000 |
+| `security.guard.windowSeconds` | global | 600 | 60–3600 |
+| `security.guard.blockSeconds` | global | 900 | 60–86400 |
+| `HEALTH_NETWORKS` | bootstrap (env) | loopback + private ranges | CIDR list (R28) |
+| `TRUSTED_PROXIES` | bootstrap (env) | `127.0.0.1` | CIDR list (R28) |
 | `visuals.github.enabled` | global | true | |
 | `visuals.limits` | global | `{archive_mb: 20, files: 400, file_mb: 5}` | |
 

@@ -1,4 +1,4 @@
-/* issue 1 (POC): the visual packs' administration */
+/* 028: the visual packs' administration — the pack list and the six steps of a version */
 .visuals-sources {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -274,4 +274,185 @@
   .visuals-element {
     grid-template-columns: 1fr;
   }
+}
+
+/* 028: the steps of a version — a line of six on wide screens, a column on phones */
+.visuals-stepper ol {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.visuals-stepper a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.visuals-stepper a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.visuals-stepper li[data-current] a {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 -3px 0 var(--color-accent);
+}
+.visuals-stepper__number {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.visuals-stepper li[data-outcome="done"] .visuals-stepper__number {
+  border-color: var(--state-available-fg);
+  color: var(--state-available-fg);
+}
+.visuals-stepper li[data-outcome="warning"] .visuals-stepper__number {
+  border-color: var(--state-partial-fg);
+  color: var(--state-partial-fg);
+}
+.visuals-stepper li[data-outcome="blocking"] .visuals-stepper__number {
+  border-color: var(--state-error-fg);
+  color: var(--state-error-fg);
+}
+.visuals-stepper__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+@media (max-width: 760px) {
+  .visuals-stepper ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.visuals-step {
+  display: grid;
+  gap: var(--space-4);
+}
+.visuals-step__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+.visuals-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.85rem;
+}
+.visuals-filter label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.visuals-version__next {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.visuals-pack__outcome {
+  margin: var(--space-2) 0 0;
+  font-size: 0.9rem;
+}
+.visuals-economy-table {
+  overflow-x: auto;
+}
+.visuals-economy-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.visuals-economy-table th,
+.visuals-economy-table td {
+  padding: var(--space-2) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: middle;
+}
+.visuals-economy-table th[scope="row"] {
+  font-weight: 600;
+}
+.visuals-economy-table input,
+.visuals-economy-table select {
+  width: 100%;
+  min-width: 6rem;
+  min-height: 2.5rem;
+}
+.visuals-economy-table td[data-changed] input,
+.visuals-economy-table td[data-changed] select {
+  border-color: var(--color-accent);
+}
+.visuals-confirmations {
+  display: grid;
+  gap: var(--space-3);
+}
+.visuals-confirmations label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.visuals-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+.visuals-rules__title {
+  margin: 0 0 var(--space-1);
+  font-weight: 700;
+}
+.visuals-refuse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+.visuals-changes {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+}
+.visuals-element__meta[data-failed] {
+  color: var(--state-error-fg);
+}
+.visuals-economy-table th[scope="row"] {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+.visuals-economy-table th[scope="row"] .visuals-element__type {
+  display: block;
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.visuals-economy-table input,
+.visuals-economy-table select {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
 }

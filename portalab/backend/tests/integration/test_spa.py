@@ -18,7 +18,7 @@ async def test_spa_is_served_with_client_side_fallback(tmp_path: Path, heads: se
         deep = await client.get("/media/some-client-route")
         assert deep.status_code == 200 and "Portalab" in deep.text
         api = await client.get("/api/v1/unknown")
-        assert api.status_code == 404
+        assert api.status_code == 401  # 028: without a session, an unknown address is not told apart
         assert api.headers["content-type"].startswith("application/problem+json")
         assert (await client.get("/healthz")).json() == {"status": "ok"}
         # a file of a previous build is a 404, never the page taken for code; the page is never cached

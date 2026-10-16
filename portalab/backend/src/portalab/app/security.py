@@ -7,17 +7,19 @@ route declaring neither, and re-exports the dependencies for the composition roo
 
 import asyncio
 import hashlib
+import ipaddress
 import json
 import threading
 import time
 from collections import deque
-from collections.abc import Awaitable, Callable, MutableMapping
+from collections.abc import Awaitable, Callable, Iterable, MutableMapping
+from pathlib import Path
 from typing import Any
 
 from fastapi import Request
 from fastapi.routing import APIRoute
+from starlette.requests import Request as StarletteRequest
 
-from portalab.app.intrusion import IntrusionGuard, weigh
 from portalab.core.authorization import (
     PUBLIC_MARKER,
     AnonymousResolver,
@@ -30,6 +32,7 @@ from portalab.core.authorization import (
     route_access,
 )
 from portalab.core.errors import PROBLEM_CONTENT_TYPE, Forbidden, Unauthorized
+from portalab.modules.identity.guard import IntrusionGuard, weigh
 
 __all__ = [
     "PUBLIC_MARKER",
@@ -134,9 +137,75 @@ SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
 EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # Read-only, cacheable documents the SPA fetches by the dozen on every full load (one catalog per i18n
 # namespace): counting them would rate-limit a member who simply reloads a few pages (027).
-EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/",)
+# 028: and the files of the live visual packs (immutable, fingerprinted, a page shows dozens of them)
+EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/", "/api/v1/visuals/files/")
 SESSION_COOKIE_NAME = "__Host-portalab_session"
 _ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until done)
+
+# --- the minimal public surface (spec 028 FR-036/FR-037, issue 135) -----------------------------------------
+# Without a session, only these answer: signing in and out, the single sign-on, the single-purpose links sent
+# by e-mail or to a device, the words of the sign-in page — and the first run while nobody has set the portal
+# up (its route answers nothing once it has). Every other address, existing or not, gets the very same answer.
+ANONYMOUS_PATHS = frozenset(
+    {
+        "/api/v1/auth/login",
+        "/api/v1/auth/logout",
+        "/api/v1/auth/oidc",
+        "/api/v1/auth/oidc/start",
+        "/api/v1/auth/oidc/callback",
+        "/api/v1/auth/register",
+        "/api/v1/auth/verify",
+        "/api/v1/auth/deletion/cancel",
+        "/api/v1/admin/first-run",
+    }
+)
+ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by its ticket
+ANONYMOUS_CATALOGS = frozenset({"auth", "common", "errors"})  # the sign-in page's words
+HEALTH_PATHS = frozenset({"/healthz", "/readyz", "/metrics"})
+# who may ask the health checks: the machine itself and the local networks (the administrator narrows it)
+DEFAULT_HEALTH_NETWORKS = (
+    "127.0.0.0/8",
+    "::1/128",
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+    "fc00::/7",
+)
+SIGN_IN_REQUIRED = (401, "unauthorized", "Authentication required")
+
+
+def anonymous_allowed(path: str) -> bool:
+    """Whether a request without a session may reach ``path`` (API addresses; the SPA's pages always load —
+    they are the sign-in page — and its static files are gated apart)."""
+    if path in ANONYMOUS_PATHS or path.startswith(ANONYMOUS_PREFIXES):
+        return True
+    if path.startswith("/api/v1/i18n/catalogs/"):
+        return path.rsplit("/", 1)[-1] in ANONYMOUS_CATALOGS
+    return not path.startswith("/api/")
+
+
+def public_assets_of(static_dir: Path | None) -> frozenset[str] | None:
+    """The static files of the sign-in page (``public-assets.json``, written by the SPA's build): the only
+    ones a visitor may load. ``None`` when the build wrote none (development): every file loads."""
+    if static_dir is None:
+        return None
+    try:
+        names = json.loads((static_dir / "public-assets.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return frozenset(str(n) for n in names) if isinstance(names, list) else None
+
+
+def networks_of(cidrs: Iterable[str]) -> tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]:
+    return tuple(ipaddress.ip_network(c.strip(), strict=False) for c in cidrs if c.strip())
+
+
+def address_in(address: str, networks: Iterable[ipaddress.IPv4Network | ipaddress.IPv6Network]) -> bool:
+    try:
+        ip = ipaddress.ip_address(address)
+    except ValueError:
+        return False
+    return any(ip in network for network in networks)
 
 
 class SlidingWindowLimiter:
@@ -200,9 +269,15 @@ class SecurityMiddleware:
         per_user_per_minute: int,
         clock: Callable[[], float] = time.monotonic,
         guard: IntrusionGuard | None = None,
+        anonymous_gate: bool = False,
+        health_networks: Iterable[str] = DEFAULT_HEALTH_NETWORKS,
+        public_assets: frozenset[str] | None = None,
     ) -> None:
         self.app = app
         self.guard = guard  # issue 1: who probes what they may not reach is blocked
+        self.anonymous_gate = anonymous_gate  # 028: nothing answers a visitor but signing in
+        self.health_networks = networks_of(health_networks)
+        self.public_assets = public_assets  # 028: the static files the sign-in page needs (None: all)
         self.max_body_bytes = max_body_bytes
         self.per_ip = SlidingWindowLimiter(per_ip_per_minute, clock=clock)
         self.per_user = SlidingWindowLimiter(per_user_per_minute, clock=clock)
@@ -235,6 +310,9 @@ class SecurityMiddleware:
                     [(b"retry-after", retry)],
                 )
                 return
+        if path in HEALTH_PATHS and not address_in(str(client[0]), self.health_networks):
+            await self._refuse_anonymous(scope, send, keys, path)
+            return
         if path.startswith("/api/") and not exempt:
             wait = self.per_ip.hit(f"ip:{client[0]}")
             session = _session_key(scope)
@@ -244,6 +322,9 @@ class SecurityMiddleware:
                 retry = str(max(1, int(wait + 0.999))).encode()
                 await _problem(send, 429, "rate_limited", "Too many requests", [(b"retry-after", retry)])
                 return
+        if self.anonymous_gate and not await self._may_pass(scope, path):
+            await self._refuse_anonymous(scope, send, keys, path)
+            return
         declared = next(
             (value for name, value in scope.get("headers", ()) if name == b"content-length"), None
         )
@@ -282,15 +363,42 @@ class SecurityMiddleware:
         await self.app(scope, limited_receive, secured_send)
         if too_large and not started:
             await _problem(send, 413, "request.too_large", "Request body too large", [])
-        if self.guard is not None and path.startswith("/api/"):
-            raw = scope.get("raw_path") or path.encode()
-            query = (scope.get("query_string") or b"").decode("latin-1")
-            verdict = weigh(raw.decode("latin-1"), query, status)
-            if verdict is not None:
-                for block in self.guard.strike(keys, verdict[0], verdict[1], raw.decode("latin-1")):
-                    app_state = getattr(scope.get("app"), "state", None)
-                    alert = app_state._state.get("security_alert") if app_state is not None else None
-                    if alert is not None:
-                        task = asyncio.create_task(alert({**block.__dict__, "keys": keys}))
-                        _ALERTS.add(task)
-                        task.add_done_callback(_ALERTS.discard)
+        self._weigh(scope, keys, path, status)
+
+    async def _may_pass(self, scope: Scope, path: str) -> bool:
+        """028: a request without a valid session reaches only the public surface."""
+        if path.startswith("/assets/") and self.public_assets is not None:
+            # the SPA's chunks: those of the sign-in page for everyone, the rest once signed in (by its
+            # cookie: code, no data — checking the session for dozens of files would cost more than it saves)
+            return path.rsplit("/", 1)[-1] in self.public_assets or _session_key(scope) is not None
+        if anonymous_allowed(path):
+            return True
+        app_state = getattr(scope.get("app"), "state", None)
+        if app_state is None or app_state._state.get("principal_resolver") is None:
+            return True  # no identity wired (tests of a bare app): the routes answer for themselves
+        try:
+            principal = await current_principal(StarletteRequest(scope))  # cached for the routes after it
+        except Exception:
+            return True  # a session that resolves but fails a check (CSRF…): the route answers precisely
+        return bool(principal.is_authenticated)
+
+    async def _refuse_anonymous(self, scope: Scope, send: Send, keys: list[str], path: str) -> None:
+        status, code, title = SIGN_IN_REQUIRED
+        await _problem(send, status, code, title, [])
+        self._weigh(scope, keys, path, status)
+
+    def _weigh(self, scope: Scope, keys: list[str], path: str, status: int) -> None:
+        if self.guard is None or not path.startswith("/api/"):
+            return
+        raw = scope.get("raw_path") or path.encode()
+        query = (scope.get("query_string") or b"").decode("latin-1")
+        verdict = weigh(raw.decode("latin-1"), query, status)
+        if verdict is None:
+            return
+        for block in self.guard.strike(keys, verdict[0], verdict[1], raw.decode("latin-1")):
+            app_state = getattr(scope.get("app"), "state", None)
+            alert = app_state._state.get("security_alert") if app_state is not None else None
+            if alert is not None:
+                task = asyncio.create_task(alert({**block.__dict__, "keys": keys}))
+                _ALERTS.add(task)
+                task.add_done_callback(_ALERTS.discard)

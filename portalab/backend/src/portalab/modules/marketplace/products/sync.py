@@ -3,10 +3,13 @@ visual packs — brought into the catalog: created and put on sale when new, rev
 contents or level changed (purchases keep their snapshot), then its presentation and availability (copies,
 purchase limit) follow the description. A booster's odds stay the administrators' once it exists."""
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import Any
 
+from sqlalchemy import func, select
+
 from portalab.core.authz_port import Principal
+from portalab.modules.marketplace.models import Ownership, Product
 from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
 from portalab.modules.marketplace.products.service import Catalog, ProductNotFound
 
@@ -99,8 +102,12 @@ async def sync_product(catalog: Catalog, actor: Principal, product: Entry, *, re
     return outcome
 
 
+# an ownership a member still has (a refunded, revoked or expired one is not)
+LIVE_OWNERSHIP = ("active", "needs_configuration", "activation_failed", "locked")
+
+
 class MarketplaceCatalogWriter:
-    """issue 1 (``marketplace.catalog_writer``): imported elements published through the same path."""
+    """028 (``marketplace.catalog_writer``): the elements of visual packs published through the same path."""
 
     def __init__(self, catalog: Catalog) -> None:
         self.catalog = catalog
@@ -115,3 +122,24 @@ class MarketplaceCatalogWriter:
             return
         if current.state == "available":
             await self.catalog.move(actor, key, "unavailable")
+
+    async def owners(self, keys: Iterable[str]) -> int:
+        wanted = list(keys)
+        if not wanted:
+            return 0
+        async with self.catalog.database.session() as session:
+            count = await session.scalar(
+                select(func.count(Ownership.id))
+                .join(Product, Product.id == Ownership.product_id)
+                .where(Product.key.in_(wanted), Ownership.state.in_(LIVE_OWNERSHIP))
+            )
+        return int(count or 0)
+
+    async def retire(self, actor: Principal, key: str) -> None:
+        """Off sale for good: archived (the catalog keeps its versions and its purchases' history)."""
+        try:
+            current, _ = await self.catalog.get(key)
+        except ProductNotFound:
+            return
+        if current.state != "archived":
+            await self.catalog.move(actor, key, "archived")

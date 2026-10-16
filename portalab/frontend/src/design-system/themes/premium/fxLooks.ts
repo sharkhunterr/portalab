@@ -3,7 +3,7 @@
  * frames the shape (0 rounded box, 1 hexagon, 2 diamond, 3 shield, 4 star, 5 triangle) and corner radius. Plain data:
  * the renderer itself (``badgeFx``) is only loaded when one of them is shown.
  */
-import { externalLook, fxName } from "../external/external";
+import { externalLook, fxName } from "../../visuals/registry";
 
 export interface FxSpec {
   effect: string;

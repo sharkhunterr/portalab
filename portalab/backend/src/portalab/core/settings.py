@@ -4,6 +4,7 @@ Everything else is declared to the Administration configuration system (spec 020
 from ``*_FILE`` paths; values are validated at start-up and errors never echo secret values.
 """
 
+import ipaddress
 import os
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -20,6 +21,11 @@ class SettingsError(ValueError):
     """Invalid or missing bootstrap setting (message never contains secret values)."""
 
 
+# 028: the machine itself and the local networks; the proxy on the machine itself
+HEALTH_NETWORKS = ("127.0.0.0/8", "::1/128", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "fc00::/7")
+TRUSTED_PROXIES = ("127.0.0.1",)
+
+
 @dataclass(frozen=True, slots=True)
 class BootstrapSettings:
     database_url: SecretValue
@@ -28,6 +34,9 @@ class BootstrapSettings:
     bind_port: int = 8080
     log_level: str = "INFO"
     data_dir: Path = Path("/var/lib/portalab")  # filesystem blob storage root (core.blobstore)
+    # 028: who may ask the health checks, and the reverse proxies whose X-Forwarded-For is believed
+    health_networks: tuple[str, ...] = HEALTH_NETWORKS
+    trusted_proxies: tuple[str, ...] = TRUSTED_PROXIES
 
 
 def normalize_database_url(url: str) -> str:
@@ -47,6 +56,19 @@ def _read_file(name: str, path: str) -> str:
         return Path(path).read_text(encoding="utf-8").strip()
     except OSError as exc:
         raise SettingsError(f"{name} points to an unreadable file") from exc
+
+
+def _networks(env: Mapping[str, str], name: str, default: tuple[str, ...]) -> tuple[str, ...]:
+    raw = env.get(name)
+    if raw is None:
+        return default
+    values = tuple(v.strip() for v in raw.split(",") if v.strip())
+    for value in values:
+        try:
+            ipaddress.ip_network(value, strict=False)
+        except ValueError as exc:
+            raise SettingsError(f"{name} must be a comma-separated list of addresses or networks") from exc
+    return values
 
 
 def load_settings(env: Mapping[str, str] | None = None) -> BootstrapSettings:
@@ -89,7 +111,12 @@ def load_settings(env: Mapping[str, str] | None = None) -> BootstrapSettings:
     if not data_dir.is_absolute():
         raise SettingsError("DATA_DIR must be an absolute path")
 
+    health_networks = _networks(env, "HEALTH_NETWORKS", HEALTH_NETWORKS)
+    trusted_proxies = _networks(env, "TRUSTED_PROXIES", TRUSTED_PROXIES)
+
     return BootstrapSettings(
+        health_networks=health_networks,
+        trusted_proxies=trusted_proxies,
         database_url=database_url,
         secret_key=secret_key,
         bind_host=bind_host,

@@ -1,6 +1,6 @@
-"""020 T021 — the wizard validates base settings, creates the sole Admin through ``IdentityBootstrap``,
-runs the
-registered optional steps (skippable), then answers 410; reopening needs an explicit audited action."""
+"""020 T021 — the wizard validates base settings, creates the sole Admin through ``IdentityBootstrap``, runs
+the registered optional steps (skippable), then answers nothing to a visitor (028); reopening needs an
+explicit audited action."""
 
 from collections.abc import Mapping
 from typing import Any
@@ -55,7 +55,8 @@ async def test_wizard_once(app: FastAPI, client: httpx.AsyncClient, full: FullPl
     assert step.payloads == [{"services": ["plex"]}]
     assert (await full.administration.config.get("identity.registrationMode")).value == "open"
     again = await client.post("/api/v1/admin/first-run", json={"login": "evil", "password": PASSWORD})
-    assert again.status_code == 410 and again.json()["code"] == "admin.first_run_completed"
+    # 028: once set up, the first run answers a visitor like any other address — nothing to tell
+    assert again.status_code == 401 and again.json()["code"] == "unauthorized"
 
     await login(client, "root")
     reopened = await client.post("/api/v1/admin/first-run/reopen", json={"reason": "add services"})

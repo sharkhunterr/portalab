@@ -286,3 +286,29 @@ class OidcLogin(IdentityBase):
     verifier: Mapped[str] = mapped_column(String(128), nullable=False, info=not_personal("a random token"))
     next_path: Mapped[str] = mapped_column(String(512), nullable=False, info=not_personal("a portal route"))
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class SecurityBlock(IdentityBase):
+    """028: what the intrusion guard blocked — an account (every session of a member), a session, or a
+    network address (for requests without a session) — until when, why; kept across restarts, liftable by the
+    holders of ``security.manage`` or from the server's console."""
+
+    __tablename__ = "security_blocks"
+    __table_args__ = (
+        CheckConstraint("kind IN ('account', 'session', 'address')", name="kind"),
+        Index("ix_security_blocks_active", "kind", "subject", postgresql_where=text("lifted_at IS NULL")),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    subject: Mapped[str] = mapped_column(String(128), nullable=False, info=pii("technical", tombstone="-"))
+    label: Mapped[str | None] = mapped_column(String(128), info=pii("identifier"))
+    reason: Mapped[str] = mapped_column(String(64), nullable=False)
+    points: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    paths: Mapped[list[str]] = mapped_column(
+        JSONB, nullable=False, default=list, info=pii("activity", tombstone=[])
+    )
+    started_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    until: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    lifted_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    lifted_by: Mapped[str | None] = mapped_column(String(128))

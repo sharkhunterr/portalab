@@ -943,7 +943,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** First Run Status */
+        /**
+         * First Run Status
+         * @description 028: answers a visitor only while the portal is not set up (then the same answer as any address).
+         */
         get: operations["first_run_status_api_v1_admin_first_run_get"];
         put?: never;
         /**
@@ -3271,6 +3274,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/security/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Blocks */
+        get: operations["blocks_api_v1_admin_security_blocks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/security/blocks/lift": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lift
+         * @description One block (its ``id`` or its ``key``), or every block when neither is given.
+         */
+        post: operations["lift_api_v1_admin_security_blocks_lift_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/shell/contribution-errors": {
         parameters: {
             query?: never;
@@ -3801,7 +3841,7 @@ export interface paths {
         put?: never;
         /**
          * Upload
-         * @description A raw ``application/zip`` body (no multipart).
+         * @description A raw ``application/zip`` body (no multipart), 20 MB at most.
          */
         post: operations["upload_api_v1_admin_visuals_upload_post"];
         delete?: never;
@@ -3810,7 +3850,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/visuals/{pack}/switch": {
+    "/api/v1/admin/visuals/{pack}/remove": {
         parameters: {
             query?: never;
             header?: never;
@@ -3819,8 +3859,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Switch */
-        post: operations["switch_api_v1_admin_visuals__pack__switch_post"];
+        /** Remove */
+        post: operations["remove_api_v1_admin_visuals__pack__remove_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/visuals/{pack}/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** State */
+        post: operations["state_api_v1_admin_visuals__pack__state_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3844,7 +3901,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/visuals/{pack}/{version}/approve": {
+    "/api/v1/admin/visuals/{pack}/{version}/draft": {
         parameters: {
             query?: never;
             header?: never;
@@ -3852,16 +3909,16 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
-        /** Approve */
-        post: operations["approve_api_v1_admin_visuals__pack___version__approve_post"];
+        /** Draft */
+        put: operations["draft_api_v1_admin_visuals__pack___version__draft_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/visuals/{pack}/{version}/reject": {
+    "/api/v1/admin/visuals/{pack}/{version}/measures": {
         parameters: {
             query?: never;
             header?: never;
@@ -3870,8 +3927,59 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reject */
-        post: operations["reject_api_v1_admin_visuals__pack___version__reject_post"];
+        /** Measures */
+        post: operations["measures_api_v1_admin_visuals__pack___version__measures_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/visuals/{pack}/{version}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish */
+        post: operations["publish_api_v1_admin_visuals__pack___version__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/visuals/{pack}/{version}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Purge */
+        post: operations["purge_api_v1_admin_visuals__pack___version__purge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/visuals/{pack}/{version}/refuse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuse */
+        post: operations["refuse_api_v1_admin_visuals__pack___version__refuse_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3889,23 +3997,6 @@ export interface paths {
         put?: never;
         /** Rollback */
         post: operations["rollback_api_v1_admin_visuals__pack___version__rollback_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/visuals/{pack}/{version}/simulation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Simulation */
-        post: operations["simulation_api_v1_admin_visuals__pack___version__simulation_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8459,7 +8550,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Current Terms */
+        /**
+         * Current Terms
+         * @description 028: read once signed in (the acceptance gate shows them): nothing answers a visitor but sign-in.
+         */
         get: operations["current_terms_api_v1_terms_get"];
         put?: never;
         post?: never;
@@ -9354,6 +9448,15 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** ActiveOut */
+        ActiveOut: {
+            /** Elements */
+            elements: {
+                [key: string]: unknown;
+            }[];
+            /** Epoch */
+            epoch: number;
+        };
         /** ActivityOut */
         ActivityOut: {
             /**
@@ -9756,20 +9859,6 @@ export interface components {
         ApplySuggestionsIn: {
             /** Service Id */
             service_id?: string | null;
-        };
-        /** ApproveIn */
-        ApproveIn: {
-            /**
-             * Accept Script
-             * @default false
-             */
-            accept_script: boolean;
-            /** Economy */
-            economy?: {
-                [key: string]: {
-                    [key: string]: unknown;
-                };
-            };
         };
         /** ArrangementIn */
         ArrangementIn: {
@@ -10858,6 +10947,18 @@ export interface components {
             /** Votes */
             votes: number;
         };
+        /** Confirmations */
+        Confirmations: {
+            /** Contracts */
+            contracts?: string[];
+            /** Replaces */
+            replaces?: string[];
+            /**
+             * Scripts
+             * @default false
+             */
+            scripts: boolean;
+        };
         /** ContentAssetOut */
         ContentAssetOut: {
             /** Content Type */
@@ -11037,6 +11138,20 @@ export interface components {
         DiscoverIn: {
             /** Targets */
             targets: string[];
+        };
+        /** DraftIn */
+        DraftIn: {
+            /** Bindings */
+            bindings?: {
+                [key: string]: string | null;
+            };
+            confirmations?: components["schemas"]["Confirmations"];
+            /** Economy */
+            economy?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
         };
         /** DraftTestIn */
         DraftTestIn: {
@@ -11936,6 +12051,13 @@ export interface components {
             /** Level */
             level: number;
         };
+        /** LiftIn */
+        LiftIn: {
+            /** Id */
+            id?: string | null;
+            /** Key */
+            key?: string | null;
+        };
         /** ListenOut */
         ListenOut: {
             item: components["schemas"]["AudioItemOut"];
@@ -12431,6 +12553,13 @@ export interface components {
             state: string;
             /** Verified At */
             verified_at: string | null;
+        };
+        /** MeasuresIn */
+        MeasuresIn: {
+            /** Results */
+            results: {
+                [key: string]: unknown;
+            }[];
         };
         /** MediaCard */
         MediaCard: {
@@ -14154,23 +14283,6 @@ export interface components {
             /** Version */
             version?: number | null;
         };
-        /** PublishIn */
-        PublishIn: {
-            /** Body Md */
-            body_md: string;
-            /**
-             * Requires Acceptance
-             * @default true
-             */
-            requires_acceptance: boolean;
-            /**
-             * Summary
-             * @default
-             */
-            summary: string;
-            /** Title */
-            title: string;
-        };
         /** PurgeIn */
         PurgeIn: {
             /** Confirmation */
@@ -14252,6 +14364,11 @@ export interface components {
             /** Position */
             position: string;
         };
+        /** RefuseIn */
+        RefuseIn: {
+            /** Reason */
+            reason?: string | null;
+        };
         /** RegisterRequest */
         RegisterRequest: {
             /** Display Name */
@@ -14267,11 +14384,6 @@ export interface components {
         ReindexIn: {
             /** Kinds */
             kinds?: string[] | null;
-        };
-        /** RejectIn */
-        RejectIn: {
-            /** Reason */
-            reason?: string | null;
         };
         /** RemoveIn */
         RemoveIn: {
@@ -14615,13 +14727,6 @@ export interface components {
              */
             user_id: string;
         };
-        /** SimulationIn */
-        SimulationIn: {
-            /** Results */
-            results: {
-                [key: string]: unknown;
-            }[];
-        };
         /**
          * SingleSignOn
          * @description 027: whether the sign-in page offers the single sign-on, and under which name.
@@ -14682,6 +14787,14 @@ export interface components {
             unlock_hint: string | null;
             /** Value */
             value: number | null;
+        };
+        /** StateIn */
+        StateIn: {
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "enabled" | "disabled";
         };
         /** StatisticConfirmIn */
         StatisticConfirmIn: {
@@ -15101,11 +15214,6 @@ export interface components {
             key: string;
             /** Version */
             version: number;
-        };
-        /** SwitchIn */
-        SwitchIn: {
-            /** Enabled */
-            enabled: boolean;
         };
         /** TermsAdminOut */
         TermsAdminOut: {
@@ -16061,6 +16169,33 @@ export interface components {
             reason: string;
             /** Subject User Id */
             subject_user_id?: string | null;
+        };
+        /** PublishIn */
+        portalab__modules__privacy__api__terms__PublishIn: {
+            /** Body Md */
+            body_md: string;
+            /**
+             * Requires Acceptance
+             * @default true
+             */
+            requires_acceptance: boolean;
+            /**
+             * Summary
+             * @default
+             */
+            summary: string;
+            /** Title */
+            title: string;
+        };
+        /** PublishIn */
+        portalab__modules__visuals__api__routes__PublishIn: {
+            confirmations?: components["schemas"]["Confirmations"];
+            /** Economy */
+            economy?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
         };
     };
     responses: never;
@@ -22637,6 +22772,63 @@ export interface operations {
             };
         };
     };
+    blocks_api_v1_admin_security_blocks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    lift_api_v1_admin_security_blocks_lift_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LiftIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     contribution_errors_api_v1_admin_shell_contribution_errors_get: {
         parameters: {
             query?: never;
@@ -23267,7 +23459,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PublishIn"];
+                "application/json": components["schemas"]["portalab__modules__privacy__api__terms__PublishIn"];
             };
         };
         responses: {
@@ -23731,7 +23923,40 @@ export interface operations {
             };
         };
     };
-    switch_api_v1_admin_visuals__pack__switch_post: {
+    remove_api_v1_admin_visuals__pack__remove_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pack: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    state_api_v1_admin_visuals__pack__state_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -23742,7 +23967,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SwitchIn"];
+                "application/json": components["schemas"]["StateIn"];
             };
         };
         responses: {
@@ -23798,7 +24023,7 @@ export interface operations {
             };
         };
     };
-    approve_api_v1_admin_visuals__pack___version__approve_post: {
+    draft_api_v1_admin_visuals__pack___version__draft_put: {
         parameters: {
             query?: never;
             header?: never;
@@ -23810,7 +24035,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ApproveIn"];
+                "application/json": components["schemas"]["DraftIn"];
             };
         };
         responses: {
@@ -23836,7 +24061,7 @@ export interface operations {
             };
         };
     };
-    reject_api_v1_admin_visuals__pack___version__reject_post: {
+    measures_api_v1_admin_visuals__pack___version__measures_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -23848,7 +24073,109 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RejectIn"];
+                "application/json": components["schemas"]["MeasuresIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_api_v1_admin_visuals__pack___version__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pack: string;
+                version: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__visuals__api__routes__PublishIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purge_api_v1_admin_visuals__pack___version__purge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pack: string;
+                version: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuse_api_v1_admin_visuals__pack___version__refuse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pack: string;
+                version: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefuseIn"];
             };
         };
         responses: {
@@ -23892,40 +24219,6 @@ export interface operations {
                         [key: string]: unknown;
                     };
                 };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    simulation_api_v1_admin_visuals__pack___version__simulation_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                pack: string;
-                version: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SimulationIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -33645,9 +33938,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["ActiveOut"];
                 };
             };
         };

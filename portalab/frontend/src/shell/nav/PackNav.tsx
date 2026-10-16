@@ -1,14 +1,14 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
-import type { ExternalElement } from "../../design-system/themes/external/external";
-import { runSandbox, type Sandbox } from "../../design-system/themes/external/sandbox";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
+import type { ExternalElement } from "../../design-system/visuals/registry";
+import { runSandbox, type Sandbox } from "../../design-system/visuals/sandbox";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
 import type { NavSection } from "./NavigationProvider";
 import { destinationsOf, useCurrent } from "./PrincipleNavs";
-import "../../design-system/themes/external/external.css";
+import "../../design-system/visuals/external.css";
 
 /**
  * issue 1: a navigation an imported pack brings — drawn by its own script in a sandbox (an iframe of an opaque
@@ -43,7 +43,7 @@ export interface PackNavLayout {
 }
 
 export function packNavLayout(element: ExternalElement): PackNavLayout {
-  const nav = (element as ExternalElement & { nav?: Partial<PackNavLayout> | null }).nav ?? {};
+  const nav: Partial<PackNavLayout> = element.nav ?? {};
   return {
     position: nav.position ?? "bottom",
     size: Math.min(320, Math.max(40, Number(nav.size) || 72)),

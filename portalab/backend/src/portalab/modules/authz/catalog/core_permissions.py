@@ -60,6 +60,8 @@ CORE_PERMISSIONS: tuple[tuple[str, str, bool, bool, bool, tuple[str | tuple[str,
     ("automation.manage", "Author and manage automations", True, False, False, ()),
     # security / audit / live stream
     ("security.manage", "Change security and visibility policies", True, True, False, ()),
+    # 028: visual packs may hold code — only the Admin imports, reviews, publishes, switches them off
+    ("visuals.manage", "Manage visual packs (import, review, publish, switch off)", True, True, True, ()),
     ("audit.read", "Read the audit log", True, False, False, ()),
     ("stream.subscribe", "Receive live updates", False, False, False, ("user",)),
 )

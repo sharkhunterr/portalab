@@ -1,12 +1,13 @@
-"""Terms of use API (027): the version in force (public — the sign-in page links it), the member's own
+"""Terms of use API (027): the version in force (028: once signed in), the member's own
 standing and acceptance, and the administrators' publication with the history of versions."""
 
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from portalab.core.authorization import public, require
+from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.modules.privacy.api.routes import Module
 from portalab.modules.privacy.models import TermsVersion
@@ -86,8 +87,8 @@ def _mine(standing: TermsStatus) -> MyTermsOut:
 
 
 @router.get("/terms", response_model=TermsPublic)
-@public
-async def current_terms(module: Module) -> TermsPublic:
+async def current_terms(_: Annotated[Principal, require("users.self.manage")], module: Module) -> TermsPublic:
+    """028: read once signed in (the acceptance gate shows them): nothing answers a visitor but sign-in."""
     current = await module.terms.current() if await module.terms.enabled() else None
     return TermsPublic(terms=_out(current) if current else None)
 

@@ -29,7 +29,10 @@ export function FirstRunWizard() {
   });
 
   if (status.isPending) return <FunctionalState state="loading" detail={t.wizardTitle} />;
-  if (status.data?.completed || (mutation.error instanceof ApiError && mutation.error.status === 410)) {
+  // 028: once the portal is set up, its first run answers nothing to a visitor (an error, read as closed)
+  const closed =
+    mutation.error instanceof ApiError && (mutation.error.status === 410 || mutation.error.status === 401);
+  if (status.data?.completed || status.isError || closed) {
     return <p role="status">{t.closed}</p>;
   }
   if (mutation.isSuccess) return <p role="status">{t.finished}</p>;

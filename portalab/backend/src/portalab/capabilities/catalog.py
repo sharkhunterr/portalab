@@ -78,7 +78,8 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     themes.SPEC,
     themes.ENTITLEMENTS_SPEC,
     themes.COSMETICS_SPEC,
-    visuals.CATALOG_WRITER_SPEC,  # issue 1: imported visual packs
+    visuals.CATALOG_WRITER_SPEC,  # 028: visual packs
+    visuals.INTERFACE_REGISTRY_SPEC,
 )
 
 

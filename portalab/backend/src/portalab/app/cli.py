@@ -9,6 +9,7 @@ import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from portalab.core.logging import configure_logging, get_logger
 from portalab.core.settings import SettingsError, load_settings
@@ -31,6 +32,7 @@ def _cmd_serve(_: argparse.Namespace) -> int:
         log_config=None,
         access_log=False,  # one structured, correlated line per request is logged by the app
         proxy_headers=True,
+        forwarded_allow_ips=list(settings.trusted_proxies),  # 028: only these proxies say who the client is
     )
     return 0
 
@@ -316,6 +318,44 @@ def _cmd_i18n(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _security_blocks(args: argparse.Namespace) -> int:
+    from portalab.core.audit_port import AuditRecord
+    from portalab.core.authz_port import Principal, ResourceRef
+    from portalab.core.db import Database
+    from portalab.modules.authz.audit.store import DatabaseAuditSink
+    from portalab.modules.identity.guard.cli import lift_blocks, list_blocks
+
+    settings = load_settings()
+    database = Database.from_url(settings.database_url.reveal())
+
+    async def audit(action: str, context: dict[str, Any]) -> None:
+        await DatabaseAuditSink(database).record(
+            None,
+            AuditRecord(
+                action=action,
+                actor=Principal(channel="system"),
+                resource=ResourceRef("security_block", str(context.get("target", "all"))),
+                decision="allow",
+                result="success",
+                context=context,
+                sensitive=True,
+            ),
+        )
+
+    try:
+        if args.action == "list":
+            return await list_blocks(database)
+        return await lift_blocks(database, args.target, everything=args.all, audit=audit)
+    finally:
+        await database.dispose()
+
+
+def _cmd_security_blocks(args: argparse.Namespace) -> int:
+    """028 (FR-040a): list or lift the intrusion guard's blocks from the server's console."""
+    configure_logging(load_settings().log_level)
+    return asyncio.run(_security_blocks(args))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="portalab", description="Portalab — personal extensible portal")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -384,6 +424,14 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "pseudo":
             command.add_argument("--code", default="en-XA", choices=["en-XA", "ar-XB"])
         command.set_defaults(func=_cmd_i18n)
+    security = sub.add_parser("security", help="security commands (operator)").add_subparsers(
+        dest="security_command", required=True
+    )
+    blocks = security.add_parser("blocks", help="the intrusion guard's blocks: list or lift them")
+    blocks.add_argument("action", choices=("list", "lift"))
+    blocks.add_argument("target", nargs="?", help="a block's id, a login, a user id or an address")
+    blocks.add_argument("--all", action="store_true", help="lift every block in force")
+    blocks.set_defaults(func=_cmd_security_blocks)
     openapi = sub.add_parser("openapi", help="export the OpenAPI schema")
     openapi.add_argument("--output", "-o", default="-")
     openapi.set_defaults(func=_cmd_openapi)

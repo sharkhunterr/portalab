@@ -21,6 +21,7 @@ TABLES = {
     "deletion_requests",
     "onboarding_progress",
     "export_jobs",
+    "security_blocks",  # 028: the intrusion guard's blocks, kept across restarts
     "external_identities",  # 027: single sign-on accounts linked to members
     "oidc_logins",  # 027: single sign-ons in progress
 }
