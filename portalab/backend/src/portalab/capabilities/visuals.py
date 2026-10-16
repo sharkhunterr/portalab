@@ -171,11 +171,28 @@ class LiveLooks:
 
     def __init__(self) -> None:
         self._by_type: dict[str, tuple[str, ...]] = {}
+        self._held: dict[str, frozenset[str]] = {}
         self.epoch = -1
 
-    def replace(self, by_type: Mapping[str, Iterable[str]], epoch: int = -1) -> None:
+    def replace(
+        self,
+        by_type: Mapping[str, Iterable[str]],
+        epoch: int = -1,
+        held: Mapping[str, Iterable[str]] | None = None,
+    ) -> None:
         self._by_type = {kind: tuple(dict.fromkeys(keys)) for kind, keys in by_type.items()}
+        self._held = {kind: frozenset(keys) for kind, keys in (held or {}).items()}
         self.epoch = epoch
+
+    def held(self, element_type: str) -> frozenset[str]:
+        """028 (T081): the looks of this type whose pack is switched off — their owners keep them, shown as
+        « currently unavailable », and wear them again when the pack comes back."""
+        return self._held.get(element_type, frozenset())
+
+    def listed(self, element_type: str) -> tuple[str, ...]:
+        """What owners' lists show: the looks one may wear, then those whose pack is off."""
+        known = self.known(element_type)
+        return (*known, *sorted(k for k in self.held(element_type) if k not in known))
 
     def of(self, element_type: str) -> tuple[str, ...]:
         return self._by_type.get(element_type, ())

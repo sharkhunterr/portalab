@@ -7,6 +7,7 @@ from uuid import UUID
 
 from sqlalchemy import Select, select
 
+from portalab.capabilities.visuals import live_looks
 from portalab.core.db import Database
 from portalab.modules.marketplace.activation.service import USABLE
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
@@ -150,7 +151,8 @@ class CosmeticsReader:
 
     async def waiting(self, user_id: UUID, kind: str, field: str) -> dict[str, dict[str, int]]:
         """#99: the choices a member won (a booster) but may not wear yet — their level, or Contribution, is
-        not reached: what each one waits for (``{"level": 7}``), to show them locked with the reason."""
+        not reached: what each one waits for (``{"level": 7}``), to show them locked with the reason; and
+        (028) those whose visual pack is off (``{"unavailable": 1}``)."""
         async with self.database.session() as session:
             rows = await session.execute(
                 self._choices(kind, field)
@@ -158,7 +160,13 @@ class CosmeticsReader:
                 .join(Ownership, Ownership.product_id == Product.id)
                 .where(Ownership.user_id == user_id, Ownership.state == "locked")
             )
-            return {choice: waits_for(conditions) for choice, conditions in rows.all() if choice}
+            out = {choice: waits_for(conditions) for choice, conditions in rows.all() if choice}
+        # 028 (T081): what the member owns but its pack is switched off — kept, « currently unavailable »
+        held = live_looks.held(kind)
+        if held:
+            for choice in (await self.owned(user_id, kind, field)) & held:
+                out[choice] = {"unavailable": 1}
+        return out
 
     async def details(self, kind: str, field: str) -> dict[str, dict[str, Any]]:
         """#71: for each choice sold, the product selling it: its key, rarity and price."""

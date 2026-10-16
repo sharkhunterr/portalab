@@ -193,3 +193,26 @@ async def test_an_ambience_sold_only_as_ambience_is_no_free_profile_background(m
         await looks.equip(user, "background", "lavalamp")
     await mk.module.purchases.acquire(ursula, "ambient_lavalamp", "k-lava")
     assert (await looks.equip(user, "background", "lavalamp"))["background"] == "lavalamp"
+
+
+async def test_a_look_whose_visual_pack_is_off_shows_to_its_owners_as_unavailable(mk: MkHarness) -> None:
+    """028 (T081): a frame of a pack switched off — its owner sees it « currently unavailable » (kept, back
+    with the pack), may not put it on; another member does not see it at all."""
+    from portalab.capabilities.visuals import live_looks
+    from portalab.modules.marketplace.looks.service import LookLocked
+
+    await published(mk, "frame_tide", "avatar_frame", payload={"frame": "tide"})
+    owner, other = mk.p("ursula"), mk.p("ulrich")
+    assert owner.user_id is not None and other.user_id is not None
+    await mk.module.purchases.acquire(owner, "frame_tide", "t1")
+    live_looks.replace({"avatar_frame": ["tide"]})
+    try:
+        assert (await mk.module.looks.equip(owner.user_id, "frame", "tide"))["frame"] == "tide"
+        live_looks.replace({}, held={"avatar_frame": ["tide"]})  # its pack switched off
+        mine = {f["key"]: f for f in (await mk.module.looks.catalog(owner.user_id))["frames"]}
+        assert mine["tide"]["waiting"] == {"unavailable": 1}
+        assert "tide" not in {f["key"] for f in (await mk.module.looks.catalog(other.user_id))["frames"]}
+        with pytest.raises((LookLocked, Exception)):
+            await mk.module.looks.equip(owner.user_id, "frame", "tide")
+    finally:
+        live_looks.replace({})

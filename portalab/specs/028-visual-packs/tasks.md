@@ -209,7 +209,7 @@ v1; switch off/on; remove with owners archives; remove without owners removes.
 - [X] T078 [US7] Lifecycle service `backend/src/portalab/modules/visuals/lifecycle.py`: rollback †, remove † (archive/remove), purge, superseding; claims and interfaces kept consistent in one transaction; audit and events
 - [X] T079 [US7] Admin API rollback/remove/purge/updates in `modules/visuals/api/admin.py`
 - [X] T080 [US7] Pack actions UI `frontend/src/features/visuals/PackActions.tsx` (switch, rollback picker, remove dialog with owners and archive explanation, purge) and « update available » in `PackList.tsx`
-- [ ] T081 [US7] Owners' lists show a look whose pack is off as « currently unavailable » (`frontend/src/features/community/profile/ProfileCustomizer.tsx`, appearance page)
+- [X] T081 [US7] Owners' lists show a look whose pack is off as « currently unavailable » (`frontend/src/features/community/profile/ProfileCustomizer.tsx`, appearance page) — `live_looks.held`, the cosmetics reader's `waiting: {unavailable}`, shown to owners only, never put on again until the pack is back
 
 **Checkpoint**: SC-010 holds.
 
@@ -224,7 +224,7 @@ widget shows the member's own progression only; an undeclared or forbidden contr
 
 - [X] T082 [P] [US6] `frontend/tests/unit/visuals/widget-contracts.test.ts`: projection per contract (only schema fields), forbidden → `{state: "forbidden"}`, undeclared contract never fetched
 - [X] T083 [P] [US6] `backend/tests/unit/visuals/test_widget_contracts.py`: analysis refuses unknown contracts; Review requires each contract's acceptance; `GET /admin/visuals/contracts`
-- [ ] T084 [P] [US6] `frontend/tests/e2e/visual-packs/widgets.spec.ts`
+- [X] T084 [P] [US6] `frontend/tests/e2e/visual-packs/widgets.spec.ts` (the real Vigie pack and sandbox bootstrap, API stubbed: readable contracts only, settings, line/block forms, an option replacing a Portalab widget, a frame look)
 - [X] T085 [US6] `WIDGET_CONTRACTS` catalog in `backend/src/portalab/capabilities/visuals.py` (`me.progression`, `me.watching`, `media.recently_added`, `me.statistics`: permission, refresh, fields, plain-words description) + `GET /admin/visuals/contracts` (R26)
 - [X] T086 [US6] Element types `widget`, `widget_style` and `widget_option` (add-ons worn through `_options`, css and/or sandboxed js `replace`/`overlay`; values of a pack widget's own settings) in `manifest.py`/`analysis.py`; `economy.sold: false` offers them to everyone; `widget_style` and `widget_option` published as `widget_option` products; `skins.css` looks extracted to built-in packs (T036) with hook `[data-widget-style="<look>"]` set by the widget frame (`frontend/src/features/dashboard/frame/`) (R25)
 - [X] T087 [US6] Contract projections `frontend/src/features/dashboard/contracts/{index.ts,progression.ts,watching.ts,recentlyAdded.ts,statistics.ts,widgetData.ts}` (zod schemas over the existing query hooks; `widget:<key>`: any dashboard widget's data)

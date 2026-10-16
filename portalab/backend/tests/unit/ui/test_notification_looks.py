@@ -119,3 +119,28 @@ async def test_ambiences_carry_their_rarity() -> None:
     plain.declare(COSMETICS_SPEC)
     plain.provide(COSMETICS, _Shop(), instance_ref="shop", owner="test")
     assert "rarity" not in (await NotificationLooks(plain).catalog(OWNER))["ambients"][0]
+
+
+async def test_a_style_whose_pack_is_off_shows_to_its_owner_only() -> None:
+    """028 (T081): a style of a visual pack switched off — listed for its owner, « currently unavailable »;
+    hidden from the others (nobody may pick it until the pack comes back)."""
+    from portalab.capabilities.visuals import live_looks
+
+    class _Held(_Shop):
+        async def waiting(self, user_id: UUID, kind: str, field: str) -> dict[str, dict[str, int]]:
+            owner = user_id == OWNER and kind == "notification_style"
+            return {"tide": {"unavailable": 1}} if owner else {}
+
+    registry = CapabilityRegistry()
+    registry.declare(COSMETICS_SPEC)
+    registry.provide(COSMETICS, _Held(), instance_ref="shop", owner="test")
+    looks = NotificationLooks(registry)
+    live_looks.replace({}, held={"notification_style": ["tide"]})
+    try:
+        mine = {s["key"]: s for s in (await looks.catalog(OWNER))["styles"]}
+        assert mine["tide"]["waiting"] == {"unavailable": 1}
+        assert "tide" not in {s["key"] for s in (await looks.catalog(UUID(int=2)))["styles"]}
+        assert await looks.validator("ui.notificationStyle")("tide", str(OWNER)) != []
+        assert live_looks.listed("notification_style")[-1] == "tide"
+    finally:
+        live_looks.replace({})

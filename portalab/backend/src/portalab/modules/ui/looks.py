@@ -71,6 +71,7 @@ class NotificationLooks:
             kind, field, _ = KINDS[setting]
             sold = await self.details(kind, field)
             waiting = await self.waiting(user_id, kind, field)  # #99: won, waiting for a level
+            held = external_looks.held(kind)
             return [
                 {
                     "key": k,
@@ -78,7 +79,9 @@ class NotificationLooks:
                     **sold.get(k, {}),
                     **({"waiting": waiting[k]} if k in waiting else {}),
                 }
-                for k in keys
+                # 028: with the looks whose pack is off — to their owners only (« currently unavailable »)
+                for k in (*keys, *sorted(held - set(keys)))
+                if k not in held or k in waiting
             ]
 
         return {

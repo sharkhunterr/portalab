@@ -1237,13 +1237,14 @@ class VisualPacks:
                     )
                 ).all()
                 claims = list((await session.execute(select(LookClaim))).scalars())
-                # Portalab's own looks whose pack is off: their wearers see the default instead
+                # the looks whose pack is off (Portalab's or imported): their wearers see the default instead,
+                # their owners see them « currently unavailable »
                 withheld_rows = (
                     await session.execute(
                         select(Element.type, Element.look)
                         .join(PackVersion, PackVersion.id == Element.version_id)
                         .join(Pack, Pack.current_version_id == PackVersion.id)
-                        .where(Pack.builtin, Pack.state != "enabled", Element.look.is_not(None))
+                        .where(Pack.state != "enabled", Element.look.is_not(None))
                     )
                 ).all()
             elements: list[dict[str, Any]] = []
@@ -1259,7 +1260,7 @@ class VisualPacks:
             for kind, look in withheld_rows:
                 if (kind, look) not in live:
                     withheld.setdefault(str(kind), []).append(str(look))
-            live_looks.replace(by_type, epoch)
+            live_looks.replace(by_type, epoch, held=withheld)
             if self.widgets is not None:
                 self.widgets.sync(
                     {

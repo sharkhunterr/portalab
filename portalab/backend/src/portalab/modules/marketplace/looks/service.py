@@ -21,7 +21,7 @@ from portalab.capabilities.themes import (
     PROFILE_BANNERS,
     PROFILE_SLOTS,
 )
-from portalab.capabilities.visuals import external_looks
+from portalab.capabilities.visuals import external_looks, live_looks
 from portalab.core.db import Database
 from portalab.core.errors import ValidationFailed
 from portalab.core.time import Clock, utc_now
@@ -39,13 +39,16 @@ CHOICES = {
 }
 
 
-def choices(slot: str) -> tuple[str, ...]:
+def choices(slot: str, *, held: bool = False) -> tuple[str, ...]:
     """issue 1: a slot's built-in designs, then those of the published visual packs (an imported ambience is
-    also a profile background, as the built-in ones are)."""
+    also a profile background, as the built-in ones are); ``held`` (028): with those whose pack is off, for
+    the owners' lists."""
     kind = PROFILE_SLOTS[slot][0]
-    known = external_looks.known(kind)
+    known = external_looks.listed(kind) if held else external_looks.known(kind)
     if slot == "background":
         known = (*known, *(k for k in external_looks.of("ambient") if k not in known))
+        if held:
+            known = (*known, *sorted(k for k in external_looks.held("ambient") if k not in known))
     return known
 
 
@@ -163,6 +166,9 @@ class ProfileLooks:
         waiting = {slot: await self.waiting(user, slot) for slot in CHOICES}
 
         def listed(slot: str, keys: tuple[str, ...]) -> list[dict[str, Any]]:
+            held = live_looks.held(PROFILE_SLOTS[slot][0]) | (
+                live_looks.held("ambient") if slot == "background" else frozenset()
+            )
             return [
                 {
                     "key": k,
@@ -171,14 +177,16 @@ class ProfileLooks:
                     **({"waiting": waiting[slot][k]} if k in waiting[slot] else {}),
                 }
                 for k in keys
+                # 028: a look whose pack is off shows to its owners only (« currently unavailable »)
+                if k not in held or k in waiting[slot]
             ]
 
         return {
-            "banners": listed("banner", choices("banner")),
-            "frames": listed("frame", choices("frame")),
-            "backgrounds": listed("background", choices("background")),
-            "names": listed("name", choices("name")),
-            "levels": listed("level", choices("level")),
+            "banners": listed("banner", choices("banner", held=True)),
+            "frames": listed("frame", choices("frame", held=True)),
+            "backgrounds": listed("background", choices("background", held=True)),
+            "names": listed("name", choices("name", held=True)),
+            "levels": listed("level", choices("level", held=True)),
             "titles": await self.owned_items(user, "title"),
             "badges": await self.owned_items(user, "badge"),
             # #79: how many more the shop sells (shown in one line, never listed)
