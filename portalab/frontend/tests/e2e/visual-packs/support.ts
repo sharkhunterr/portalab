@@ -52,3 +52,8 @@ export async function sandboxTexts(page: Page): Promise<string[]> {
   }
   return texts;
 }
+
+/** A file of an example pack, read from disk (an interface's definition the server would list). */
+export function packFile(folder: string, path: string): string {
+  return readFileSync(resolve(ROOT, "examples/visual-packs", folder, "elements", path), "utf8");
+}

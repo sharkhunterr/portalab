@@ -167,7 +167,7 @@ and lifts the block; as a visitor, every route but sign-in answers that a sessio
 **Independent Test**: publish Abysses; its sonar reaches every section on phone/tablet/desktop and with the
 keyboard; a failing navigation is replaced within 5 s; administration shows the built-in navigation.
 
-- [ ] T063 [P] [US4] `frontend/tests/e2e/visual-packs/navigation.spec.ts`: every section/page reachable at 390/820/1280 px and by keyboard; failing fixture → built-in within 5 s; `/admin/*` built-in; navigate to an ungiven key does nothing
+- [X] T063 [P] [US4] `frontend/tests/e2e/visual-packs/navigation.spec.ts`: every section/page reachable at 390/820/1280 px and by keyboard; failing fixture → built-in within 5 s; `/admin/*` built-in; navigate to an ungiven key does nothing
 - [X] T064 [P] [US4] `frontend/tests/unit/visuals/pack-nav.test.ts`: key check, rate limit, expand within `nav.expands`, landmark/skip link kept
 - [X] T065 [US4] Heartbeat in the sandbox bootstrap (`backend/src/portalab/modules/visuals/sandbox.py`: `ping`/`pong`) and in `frontend/src/design-system/visuals/sandbox.ts` (stop after 3 misses; `ready` within 4 s), reports `POST /visuals/reports` (R14)
 - [X] T066 [US4] `POST /visuals/reports` (rate-limited) and element health counts in `modules/visuals/api/members.py` + `registry.py`; event `visuals.element.failed`
