@@ -124,6 +124,7 @@ class VisualPacks:
         self.announce = announce  # the module's domain event (``visuals.pack.changed``)
         self.clock = clock
         self._manifest: dict[str, Any] = {"epoch": -1, "elements": [], "withheld": {}}
+        self._reports: dict[tuple[str, str, str], float] = {}  # who reported what, when (an hour apart)
         self._live: dict[tuple[str, str], str] = {}  # (pack, fingerprint's first 16) → fingerprint, live ones
         self.withheld: dict[str, frozenset[str]] = {}  # Portalab's own looks whose pack is off, per type
         self._checked = 0.0
@@ -938,6 +939,17 @@ class VisualPacks:
                 ).scalars()
             )
             versions = list((await session.execute(select(PackVersion))).scalars())
+            failures = {
+                version_id: int(count or 0)
+                for version_id, count in (
+                    await session.execute(
+                        text(
+                            "SELECT version_id, sum((data->>'failures')::int) FROM visuals.elements "
+                            "WHERE data ? 'failures' GROUP BY version_id"
+                        )
+                    )
+                ).all()
+            }
         by_pack: dict[str, list[PackVersion]] = {}
         for version in versions:
             by_pack.setdefault(version.pack_id, []).append(version)
@@ -960,6 +972,7 @@ class VisualPacks:
                         and (not mine or version_key(pack.remote["version"]) > version_key(mine[0].version))
                     ),
                     "versions": [_version_row(v) for v in mine if v.step != "purged"],
+                    "failures": failures.get(pack.current_version_id, 0) if pack.current_version_id else 0,
                 }
             )
         return out
@@ -1020,6 +1033,37 @@ class VisualPacks:
                 {k: v for k, v in entry.items() if v not in (None, [], {})} | {"names": element["names"]}
             )
         return out
+
+    async def report_failure(self, actor: Principal, pack: str, sha: str, element: str, reason: str) -> bool:
+        """A live element failed in a member's page (a script that did not answer, or broke): counted on the
+        element, for the administrators — at most once an hour per member and element."""
+        await self.refresh()
+        full = self._live.get((pack, sha.lower()[:16]))
+        if full is None:
+            return False
+        key = (str(actor.user_id), pack, element)
+        now = time.monotonic()
+        if now - self._reports.get(key, -3600.0) < 3600:
+            return False
+        self._reports[key] = now
+        if len(self._reports) > 10_000:
+            self._reports = {k: v for k, v in self._reports.items() if now - v < 3600}
+        async with self.database.unit_of_work() as uow:
+            result = await uow.session.execute(
+                text(
+                    "UPDATE visuals.elements e SET data = jsonb_set(e.data, '{failures}', "
+                    "to_jsonb(coalesce((e.data->>'failures')::int, 0) + 1)) "
+                    "FROM visuals.pack_versions v WHERE v.id = e.version_id AND v.pack_id = :pack "
+                    "AND v.sha256 = :sha AND (e.product_key = :element OR e.data->>'product' = :element)"
+                ),
+                {"pack": pack, "sha": full, "element": element[:64]},
+            )
+            if not result.rowcount:  # type: ignore[attr-defined]
+                return False
+            await self._announce(
+                uow.session, "element_failed", actor, pack=pack, element=element[:64], reason=reason[:20]
+            )
+        return True
 
     async def epoch(self) -> int:
         async with self.database.session() as session:

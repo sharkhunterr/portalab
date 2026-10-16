@@ -12,6 +12,31 @@ import type { ExternalElement } from "./registry";
  */
 
 export const SANDBOX_URL = "/api/v1/visuals/sandbox";
+/** 028: once ready, the script is asked every few seconds whether it still answers; after a few silences it
+ * is stopped (its default takes over) and reported to the administrators. */
+export const PING_MS = 2000;
+export const MISSES = 3;
+const REPORTED = new Set<string>();
+
+/** Tells the administrators an element failed in this page (once per element and page load). */
+export function reportFailure(element: ExternalElement, reason: "timeout" | "error" | "unresponsive"): void {
+  const key = `${element.pack}:${element.sha}:${element.product}`;
+  if (REPORTED.has(key) || typeof fetch === "undefined") return;
+  REPORTED.add(key);
+  const csrf =
+    typeof document === "undefined"
+      ? ""
+      : (document.cookie
+          .split("; ")
+          .find((c) => c.startsWith("__Host-portalab_csrf="))
+          ?.split("=")[1] ?? "");
+  void fetch("/api/v1/visuals/reports", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": decodeURIComponent(csrf) },
+    body: JSON.stringify({ pack: element.pack, sha: element.sha, element: element.product, reason }),
+  }).catch(() => undefined);
+}
 
 export interface SandboxHandlers {
   onReady?: () => void;
@@ -60,6 +85,14 @@ export function runSandbox(
   let stopped = false;
   let started = false;
   let lastNavigation = 0;
+  let pinged = 0;
+  let answered = 0;
+  let heartbeat: ReturnType<typeof setInterval> | null = null;
+  const fail = (reason: "error" | "unresponsive", message: string) => {
+    if (stopped) return;
+    reportFailure(element, reason);
+    handlers.onError?.(message);
+  };
   const base = element.file ? element.file.slice(0, element.file.lastIndexOf("/") + 1) : "";
   const post = (message: Record<string, unknown>, transfer: Transferable[] = []) => {
     // an opaque origin cannot be named: the message goes to this frame's window only
@@ -84,9 +117,23 @@ export function runSandbox(
       }
       case "ready":
         handlers.onReady?.();
+        if (!heartbeat) {
+          heartbeat = setInterval(() => {
+            if (pinged - answered >= MISSES) {
+              if (heartbeat) clearInterval(heartbeat);
+              fail("unresponsive", "the script stopped answering");
+              return;
+            }
+            pinged += 1;
+            post({ type: "ping", n: pinged });
+          }, PING_MS);
+        }
+        return;
+      case "pong":
+        answered = Math.max(answered, Number(data.n) || 0);
         return;
       case "error":
-        handlers.onError?.(String(data.message ?? "error").slice(0, 300));
+        fail("error", String(data.message ?? "error").slice(0, 300));
         return;
       case "asset": {
         const path = safeAssetPath(data.path);
@@ -132,6 +179,7 @@ export function runSandbox(
     },
     stop: () => {
       stopped = true;
+      if (heartbeat) clearInterval(heartbeat);
       window.removeEventListener("message", listener);
       frame.removeAttribute("src");
     },

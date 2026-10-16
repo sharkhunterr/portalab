@@ -169,10 +169,10 @@ keyboard; a failing navigation is replaced within 5 s; administration shows the 
 
 - [ ] T063 [P] [US4] `frontend/tests/e2e/visual-packs/navigation.spec.ts`: every section/page reachable at 390/820/1280 px and by keyboard; failing fixture → built-in within 5 s; `/admin/*` built-in; navigate to an ungiven key does nothing
 - [ ] T064 [P] [US4] `frontend/tests/unit/visuals/pack-nav.test.ts`: key check, rate limit, expand within `nav.expands`, landmark/skip link kept
-- [ ] T065 [US4] Heartbeat in the sandbox bootstrap (`backend/src/portalab/modules/visuals/sandbox.py`: `ping`/`pong`) and in `frontend/src/design-system/visuals/sandbox.ts` (stop after 3 misses; `ready` within 4 s), reports `POST /visuals/reports` (R14)
-- [ ] T066 [US4] `POST /visuals/reports` (rate-limited) and element health counts in `modules/visuals/api/members.py` + `registry.py`; event `visuals.element.failed`
-- [ ] T067 [US4] Harden `frontend/src/shell/nav/PackNav.tsx`: room reserved from `render.nav` before start, fallback to the interface's built-in variant, never mounted under the administration frame, context per sandbox-protocol.md
-- [ ] T068 [US4] Analysis: an interface naming a navigation its pack does not hold and no live pack provides → blocking (`theme.unknown_reference`) in `modules/visuals/analysis.py` (R22)
+- [X] T065 [US4] Heartbeat in the sandbox bootstrap (`backend/src/portalab/modules/visuals/sandbox.py`: `ping`/`pong`) and in `frontend/src/design-system/visuals/sandbox.ts` (stop after 3 misses; `ready` within 4 s), reports `POST /visuals/reports` (R14)
+- [X] T066 [US4] `POST /visuals/reports` (rate-limited) and element health counts in `modules/visuals/api/members.py` + `registry.py`; event `visuals.element.failed`
+- [X] T067 [US4] Harden `frontend/src/shell/nav/PackNav.tsx`: room reserved from `render.nav` before start, fallback to the interface's built-in variant, never mounted under the administration frame, context per sandbox-protocol.md
+- [X] T068 [US4] Analysis: an interface naming a navigation its pack does not hold and no live pack provides → blocking (`theme.unknown_reference`) in `modules/visuals/analysis.py` (R22)
 
 **Checkpoint**: SC-007 holds.
 
@@ -204,11 +204,11 @@ cards and rarities equal the draw; another booster opens with the default; reduc
 **Independent Test**: v1 → v2 removing an element; the element leaves the shop, owners keep it; roll back to
 v1; switch off/on; remove with owners archives; remove without owners removes.
 
-- [ ] T076 [P] [US7] `backend/tests/integration/visuals/test_lifecycle.py`: updates check (mocked GitHub), publish v2 withdraws the dropped element (owners keep it), rollback restores v1 economy and claims (`replaced_from` restored), switch off → files 404 + products off sale + epoch event, archive when owners > 0, removal when 0 (files deleted, tombstone, products retired), purge never-published, socle refused
-- [ ] T077 [US7] `CatalogWriter.owners(keys)` and `retire(actor, key)` in `backend/src/portalab/capabilities/visuals.py` + `backend/src/portalab/modules/marketplace/products/sync.py` (R21)
-- [ ] T078 [US7] Lifecycle service `backend/src/portalab/modules/visuals/lifecycle.py`: rollback †, remove † (archive/remove), purge, superseding; claims and interfaces kept consistent in one transaction; audit and events
-- [ ] T079 [US7] Admin API rollback/remove/purge/updates in `modules/visuals/api/admin.py`
-- [ ] T080 [US7] Pack actions UI `frontend/src/features/visuals/PackActions.tsx` (switch, rollback picker, remove dialog with owners and archive explanation, purge) and « update available » in `PackList.tsx`
+- [X] T076 [P] [US7] `backend/tests/integration/visuals/test_lifecycle.py`: updates check (mocked GitHub), publish v2 withdraws the dropped element (owners keep it), rollback restores v1 economy and claims (`replaced_from` restored), switch off → files 404 + products off sale + epoch event, archive when owners > 0, removal when 0 (files deleted, tombstone, products retired), purge never-published, socle refused
+- [X] T077 [US7] `CatalogWriter.owners(keys)` and `retire(actor, key)` in `backend/src/portalab/capabilities/visuals.py` + `backend/src/portalab/modules/marketplace/products/sync.py` (R21)
+- [X] T078 [US7] Lifecycle service `backend/src/portalab/modules/visuals/lifecycle.py`: rollback †, remove † (archive/remove), purge, superseding; claims and interfaces kept consistent in one transaction; audit and events
+- [X] T079 [US7] Admin API rollback/remove/purge/updates in `modules/visuals/api/admin.py`
+- [X] T080 [US7] Pack actions UI `frontend/src/features/visuals/PackActions.tsx` (switch, rollback picker, remove dialog with owners and archive explanation, purge) and « update available » in `PackList.tsx`
 - [ ] T081 [US7] Owners' lists show a look whose pack is off as « currently unavailable » (`frontend/src/features/community/profile/ProfileCustomizer.tsx`, appearance page)
 
 **Checkpoint**: SC-010 holds.

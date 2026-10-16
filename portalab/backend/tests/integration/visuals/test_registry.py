@@ -233,3 +233,18 @@ async def test_the_proof_of_concept_registry_is_imported_once(database: Database
     assert await service.import_poc_state(ADMIN) == 1
     assert writer.products["frame_tiny"]["price"] == 777
     assert not service.store.state_file.exists() and (tmp_path / "state.json.migrated").exists()
+
+
+async def test_a_failing_element_is_counted_for_the_administrators(
+    database: Database, tmp_path: Path
+) -> None:
+    service, _, _ = _service(database, tmp_path)
+    imported = await service.upload("tiny.zip", zip_of(tiny_pack()))
+    await service.publish(ADMIN, imported.pack, imported.version)
+    member = Principal(user_id=uuid4(), channel="user")
+    assert await service.report_failure(member, "tiny", imported.sha[:16], "frame_tiny", "timeout")
+    assert not await service.report_failure(
+        member, "tiny", imported.sha[:16], "frame_tiny", "timeout"
+    )  # an hour
+    assert not await service.report_failure(member, "tiny", "0" * 16, "frame_tiny", "error")  # not live
+    assert (await service.listing())[0]["failures"] == 1

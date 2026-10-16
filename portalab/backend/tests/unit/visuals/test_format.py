@@ -203,3 +203,18 @@ def test_a_link_in_a_dropped_folder_is_never_followed(tmp_path: Path) -> None:
     (pack / "pack.json").write_text("{}")
     (pack / "stolen.txt").symlink_to(secret)
     assert "stolen.txt" not in read_source(pack).entries
+
+
+def test_an_interface_naming_a_navigation_nobody_brings_is_refused(tmp_path: Path) -> None:
+    import shutil
+
+    pack = tmp_path / "abysses"
+    shutil.copytree(EXAMPLES / "abysses", pack)
+    definition = pack / "elements" / "interface-abysses" / "interface.json"
+    document = json.loads(definition.read_text())
+    document["layout"]["nav"] = {"desktop": "nowhere", "tablet": "nowhere", "phone": "nowhere"}
+    definition.write_text(json.dumps(document))
+    report = analyse(read_source(pack), interfaces=FakeInterfaces())
+    assert "theme.invalid" in {i["code"] for i in report["items"] if i["level"] == "blocking"}
+    # its own navigation (« sonar ») is fine
+    assert analyse(read_source(EXAMPLES / "abysses"), interfaces=FakeInterfaces())["summary"]["publishable"]

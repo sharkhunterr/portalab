@@ -886,5 +886,6 @@
   "visuals.type.theme_pack": "Pack de thème",
   "visuals.builtinOn": "Allumer tous ceux de Portalab",
   "visuals.builtinOff": "Tout couper sauf le socle",
-  "visuals.builtinChanged": "{count, plural, =0 {Rien à changer} one {# pack modifié} other {# packs modifiés}}"
+  "visuals.builtinChanged": "{count, plural, =0 {Rien à changer} one {# pack modifié} other {# packs modifiés}}",
+  "visuals.failures": "{count, plural, one {# échec chez les membres} other {# échecs chez les membres}}"
 }

@@ -280,6 +280,9 @@ function PackItem({
             <StatusBadge tone="neutral">{t("admin:visuals.unpublished")}</StatusBadge>
           )}
           {pack.socle ? <StatusBadge tone="info">{t("admin:visuals.socle")}</StatusBadge> : null}
+          {pack.failures ? (
+            <StatusBadge tone="warn">{t("admin:visuals.failures", { count: pack.failures })}</StatusBadge>
+          ) : null}
           {pack.update && pack.remote ? (
             <StatusBadge tone="info">
               {t("admin:visuals.remote", { version: pack.remote.version })}

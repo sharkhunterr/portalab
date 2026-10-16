@@ -70,6 +70,8 @@ export interface PackRow {
   remote: { version: string; ref: string; release: boolean; checked_at: string } | null;
   update: boolean;
   versions: VersionRow[];
+  /** how many times its elements failed in members' pages (a script not answering, or breaking) */
+  failures?: number;
 }
 
 export interface Finding {

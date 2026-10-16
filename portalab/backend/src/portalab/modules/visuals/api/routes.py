@@ -122,6 +122,20 @@ async def active(_: Member, packs: Packs, request: Request, response: Response) 
     return manifest
 
 
+class ReportIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    pack: str = Field(max_length=48)
+    sha: str = Field(min_length=16, max_length=64)
+    element: str = Field(max_length=64)
+    reason: Literal["timeout", "error", "unresponsive"]
+
+
+@members.post("/visuals/reports", status_code=204)
+async def report(principal: Member, packs: Packs, body: ReportIn) -> None:
+    """A pack's element failed in this member's page (counted for the administrators, an hour apart)."""
+    await packs.report_failure(principal, body.pack, body.sha, body.element, body.reason)
+
+
 @members.get("/visuals/files/{pack}/{sha}/{name:path}")
 async def live_file(_: Member, packs: Packs, pack: str, sha: str, name: str) -> FileResponse:
     return _file(await packs.served(pack, sha, name, manager=False), live=True)

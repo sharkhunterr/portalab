@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import type { ExternalElement } from "../../design-system/visuals/registry";
-import { runSandbox, type Sandbox } from "../../design-system/visuals/sandbox";
+import { reportFailure, runSandbox, type Sandbox } from "../../design-system/visuals/sandbox";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
 import type { NavSection } from "./NavigationProvider";
@@ -163,7 +163,9 @@ export function PackNav({
     if (!target) return;
     let ready = false;
     const timer = window.setTimeout(() => {
-      if (!ready) failed.current();
+      if (ready) return;
+      reportFailure(element, "timeout");
+      failed.current();
     }, READY_MS);
     sandbox.current = runSandbox(target, element, latest.current(), {
       onReady: () => {

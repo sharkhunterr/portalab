@@ -14,6 +14,8 @@ The bootstrap speaks to the interface by messages only, from and to the window t
   ``{type: "context", context}`` — that knowledge changed (another page);
   ``{type: "asset", id, buffer, mime, error}`` — a file of its own element it asked for (its bytes: it makes
   its own ``blob:`` URL);
+- in: ``{type: "ping", n}`` every few seconds once it is ready — it answers ``pong`` (028: a script that
+  stops answering is stopped, its default takes over);
 - out: ``ready``, ``error``, ``asset`` (a file of its own element, by relative path), and for a navigation
   ``navigate`` (a page's key among those it was given — the interface checks it), ``expand`` (cover the screen
   while open), ``size``.
@@ -49,6 +51,10 @@ BOOTSTRAP = r"""
       } else {
         job.reject(new Error(data.error || "not found"));
       }
+      return;
+    }
+    if (data.type === "ping") {
+      send({ type: "pong", n: data.n });
       return;
     }
     if (data.type === "context") {
