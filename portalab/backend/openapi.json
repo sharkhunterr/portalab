@@ -7532,6 +7532,52 @@
         "title": "LoginRequest",
         "type": "object"
       },
+      "LooksOut": {
+        "properties": {
+          "epoch": {
+            "title": "Epoch",
+            "type": "integer"
+          },
+          "free": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default": {},
+            "title": "Free",
+            "type": "object"
+          },
+          "held": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default": {},
+            "title": "Held",
+            "type": "object"
+          },
+          "looks": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Looks",
+            "type": "object"
+          }
+        },
+        "required": [
+          "epoch",
+          "looks"
+        ],
+        "title": "LooksOut",
+        "type": "object"
+      },
       "ManualGrantIn": {
         "additionalProperties": false,
         "properties": {
@@ -29960,6 +30006,55 @@
         ]
       }
     },
+    "/api/v1/admin/visuals/bundle/{pack}/{sha}": {
+      "get": {
+        "operationId": "any_bundle_api_v1_admin_visuals_bundle__pack___sha__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack",
+            "required": true,
+            "schema": {
+              "title": "Pack",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "sha",
+            "required": true,
+            "schema": {
+              "title": "Sha",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Any Bundle",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
     "/api/v1/admin/visuals/contracts": {
       "get": {
         "description": "The data contracts offered to packs' widgets: what each holds, the permission it needs, its pace \u2014\nand every dashboard widget's own data (``widget:<key>``: what that widget shows the member).",
@@ -45512,6 +45607,56 @@
         ]
       }
     },
+    "/api/v1/visuals/bundle/{pack}/{sha}": {
+      "get": {
+        "description": "A live version's stylesheets and shaders in one answer (immutable: its address is its fingerprint).",
+        "operationId": "live_bundle_api_v1_visuals_bundle__pack___sha__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack",
+            "required": true,
+            "schema": {
+              "title": "Pack",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "sha",
+            "required": true,
+            "schema": {
+              "title": "Sha",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Live Bundle",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
     "/api/v1/visuals/files/{pack}/{sha}/{name}": {
       "get": {
         "operationId": "live_file_api_v1_visuals_files__pack___sha___name__get",
@@ -45565,6 +45710,28 @@
           }
         },
         "summary": "Live File",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/visuals/looks": {
+      "get": {
+        "description": "028: the vocabulary of looks \u2014 what the interface's pickers and the shop's editor offer (none is\nwritten in the interface's code).",
+        "operationId": "looks_api_v1_visuals_looks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LooksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Looks",
         "tags": [
           "visuals"
         ]

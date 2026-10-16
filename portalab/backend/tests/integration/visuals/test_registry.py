@@ -74,6 +74,13 @@ async def test_the_workflow_from_the_inbox_to_the_shop(database: Database, tmp_p
     async with database.session() as session:
         topics = [e.topic for e in (await session.execute(select(LiveEvent))).scalars()]
     assert "visuals.changed" in topics
+    # the vocabulary the interface's pickers read (none is written in its code): Portalab's own looks first,
+    # then the live packs' — the socle's free for everyone
+    vocabulary = await service.looks()
+    assert vocabulary["looks"]["level_up"][0] == "classic" and "nordlys" in vocabulary["looks"]["level_up"]
+    assert "toast" in vocabulary["free"]["notification_style"] and "nordlys" not in vocabulary["free"].get(
+        "level_up", []
+    )
 
 
 async def test_switch_off_and_on_roll_back_and_withdraw_what_a_version_drops(

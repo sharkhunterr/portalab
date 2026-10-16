@@ -24,7 +24,13 @@ from collections.abc import Iterable, Mapping
 from pathlib import PurePosixPath
 from typing import Any
 
-from portalab.capabilities.visuals import LOOK_TYPES, PACK_LOOKS, InterfaceRegistry, contract_known
+from portalab.capabilities.visuals import (
+    LOOK_TYPES,
+    PACK_LOOKS,
+    InterfaceRegistry,
+    contract_known,
+    live_looks,
+)
 from portalab.modules.visuals.manifest import (
     GIVEABLE,
     LOOK_FIELD,
@@ -237,12 +243,12 @@ def _element(
         report.add("blocking", "render.no_renderer", key)
     if not element.preview and not builtin:
         report.add("info", "element.no_preview", key)
-    # the look: a built-in one or another pack's is a conflict
+    # the look: one of Portalab's own packs' or another pack's is a conflict
     if (
         element.look
         and element.type in LOOK_TYPES
         and not builtin
-        and element.look in LOOK_TYPES[element.type][1]
+        and element.look in live_looks.shipped(element.type)
     ):
         if element.replaces:
             report.add("warning", "look.replaces_builtin", key, look=element.look)

@@ -12,15 +12,7 @@ from uuid import UUID
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.themes import (
-    AMBIENTS,
-    AVATAR_FRAMES,
-    BADGE_STYLES,
-    LEVEL_BADGES,
-    NAME_STYLES,
-    PROFILE_BANNERS,
-    PROFILE_SLOTS,
-)
+from portalab.capabilities.themes import PROFILE_SLOTS
 from portalab.capabilities.visuals import external_looks, live_looks
 from portalab.core.db import Database
 from portalab.core.errors import ValidationFailed
@@ -30,19 +22,16 @@ from portalab.modules.marketplace.entitlements.reader import CosmeticsReader, wa
 from portalab.modules.marketplace.models import Equipped, Ownership, Product, ProductVersion
 
 BACKDROP_REF = re.compile(r"^/[A-Za-z0-9_-]{1,64}\.(jpg|jpeg|png)$")
-CHOICES = {
-    "banner": PROFILE_BANNERS,
-    "frame": AVATAR_FRAMES,
-    "background": AMBIENTS,  # 027: an animated background behind the profile
-    "name": NAME_STYLES,  # 027: the name's font and effect
-    "level": LEVEL_BADGES,  # 027: the level badge's look (``classic`` changes with the level)
-}
+# the slots a look is chosen in: a banner, an avatar frame, an animated background behind the profile (027),
+# the name's font and effect, the level badge's look (``classic`` changes with the level) — their looks come
+# from the packs (``live_looks``), none is written here
+CHOICES = ("banner", "frame", "background", "name", "level")
 
 
 def choices(slot: str, *, held: bool = False) -> tuple[str, ...]:
-    """issue 1: a slot's built-in designs, then those of the published visual packs (an imported ambience is
-    also a profile background, as the built-in ones are); ``held`` (028): with those whose pack is off, for
-    the owners' lists."""
+    """issue 1 / 028: a slot's designs — Portalab's own packs', then those of the published visual packs (an
+    ambience is also a profile background); ``held`` (028): with those whose pack is off, for the owners'
+    lists."""
     kind = PROFILE_SLOTS[slot][0]
     known = external_looks.listed(kind) if held else external_looks.known(kind)
     if slot == "background":
@@ -53,6 +42,13 @@ def choices(slot: str, *, held: bool = False) -> tuple[str, ...]:
 
 
 SLOTS = (*CHOICES, "backdrop", "title", "badges")
+
+
+def _badge_styles() -> frozenset[str]:
+    """The styles a badge or a title may wear (one vocabulary for both)."""
+    return frozenset((*live_looks.known("badge"), *live_looks.known("title")))
+
+
 SHOWCASE = 3  # badges shown next to the name
 
 
@@ -128,7 +124,7 @@ class ProfileLooks:
                         "key": key,
                         "label": str((payload or {}).get("label") or key)[:60],
                         "icon": (payload or {}).get("icon"),
-                        "style": style if style in BADGE_STYLES else "none",
+                        "style": style if style in _badge_styles() else "none",
                         "rarity": rarity,  # #79
                         **({"waiting": waiting} if waiting else {}),
                     }

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
-import { LEVEL_UPS, type LevelUpLook } from "../../design-system/a11y/preferences";
+import type { LevelUpLook } from "../../design-system/a11y/preferences";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
@@ -30,8 +30,10 @@ export function LevelUpPicker() {
       },
   });
   const locked = (key: string) => Boolean(catalog.data?.level_ups?.find((p) => p.key === key)?.locked);
+  // 028: the looks are the visual packs' (Portalab's own included): the server lists them
+  const all = (catalog.data?.level_ups ?? []).map((p) => p.key);
   // #99: those won but waiting for a level show too, locked
-  const owned = LEVEL_UPS.filter((key) => !locked(key) || waitingIn(catalog.data?.level_ups, key));
+  const owned = all.filter((key) => !locked(key) || waitingIn(catalog.data?.level_ups, key));
   return (
     <section className="looks appearance-card" aria-labelledby="level-up-picker">
       <h3 id="level-up-picker">{t("notifications:levelUp.title")}</h3>
@@ -80,7 +82,7 @@ export function LevelUpPicker() {
           {t("notifications:levelUp.try")}
         </Button>
       </p>
-      <InShop count={LEVEL_UPS.length - owned.length} type="level_up" />
+      <InShop count={all.length - owned.length} type="level_up" />
       {locked(effective.theme.motion?.levelUp ?? "classic") ? (
         <p className="looks__more">{t("notifications:universe.themeLookInPack")}</p>
       ) : null}

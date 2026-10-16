@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
 import { type ExternalElement, installElements, setWithheld, uninstallScope } from "./registry";
+import { LOOKS_KEY } from "./vocabulary";
 
 export const ACTIVE_VISUALS_KEY = ["visuals", "active"] as const;
 
@@ -29,7 +30,10 @@ export function ExternalVisualsLoader({ live = typeof EventSource !== "undefined
     if (!live) return;
     const handle = connectStream({
       topics: ["visuals.changed"],
-      onEvent: () => void client.invalidateQueries({ queryKey: ACTIVE_VISUALS_KEY }),
+      onEvent: () => {
+        void client.invalidateQueries({ queryKey: ACTIVE_VISUALS_KEY });
+        void client.invalidateQueries({ queryKey: LOOKS_KEY }); // the looks one may name with them
+      },
     });
     return () => handle.close();
   }, [live, client]);

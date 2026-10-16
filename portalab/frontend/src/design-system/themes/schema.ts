@@ -1,11 +1,4 @@
 import { z } from "zod";
-import {
-  AMBIENTS,
-  CELEBRATION_KEYS,
-  LEVEL_UPS,
-  NOTIFICATION_ANIMATIONS,
-  NOTIFICATION_STYLES,
-} from "../a11y/preferences";
 import { isColor } from "./contrast";
 
 /**
@@ -145,15 +138,18 @@ export const CONTENT_WIDTHS = ["narrow", "wide", "full"] as const;
 export const CORNER_STYLES = ["square", "soft", "round"] as const;
 export const WIDGET_FRAMES = ["card", "plain", "glass"] as const;
 export const MOTION_PROFILES = ["none", "subtle", "lively", "playful"] as const;
-/** issue 1: a look a theme names — a built-in one, or an imported pack's (the server checked it exists) */
+/** issue 1: a navigation a theme names — one Portalab draws on this screen, or an imported pack's (the server
+ * checked it exists) */
 function openLook<T extends readonly [string, ...string[]]>(builtin: T) {
-  return z.union([z.enum(builtin), z.string().regex(/^[a-z0-9][a-z0-9_.-]{0,63}$/)]) as unknown as z.ZodEnum<{
+  return z.union([z.enum(builtin), z.string().regex(LOOK_KEY)]) as unknown as z.ZodEnum<{
     [K in T[number]]: K;
   }>;
 }
+/** 028: a look a theme names — a visual pack's (Portalab's own included): none is listed here, the server
+ * checked it exists */
+const LOOK_KEY = /^[a-z0-9][a-z0-9_.-]{0,63}$/;
+const look = () => z.string().regex(LOOK_KEY);
 
-/** the celebrations a theme may play (the same keys as the shop's) */
-export const CELEBRATIONS = CELEBRATION_KEYS;
 /** 027: what a theme draws behind the portal — a static pattern and an animated ambient layer. */
 export const BACKDROP_PATTERNS = [
   "none",
@@ -288,8 +284,8 @@ export const themeDefinitionSchema = z.strictObject({
       fastMs: z.number().int().min(0).max(1000).optional(),
       normalMs: z.number().int().min(0).max(2000).optional(),
       profile: z.enum(MOTION_PROFILES).optional(),
-      celebration: openLook(CELEBRATIONS).optional(),
-      levelUp: openLook(LEVEL_UPS).optional(), // 027: how this theme celebrates a new level
+      celebration: look().optional(),
+      levelUp: look().optional(), // 027: how this theme celebrates a new level
     })
     .optional(),
   layout: layoutSchema.optional(),
@@ -308,7 +304,7 @@ export const themeDefinitionSchema = z.strictObject({
       image: z.union([asset, rasterDataUri]).optional(),
       fallback: color,
       pattern: z.enum(BACKDROP_PATTERNS).optional(),
-      ambient: openLook(AMBIENTS).optional(),
+      ambient: look().optional(),
     })
     .optional(),
   vocabulary: z
@@ -320,8 +316,8 @@ export const themeDefinitionSchema = z.strictObject({
     .strictObject({
       position: z.enum(["top-end", "top-start", "bottom-end", "bottom-start"]).optional(),
       durationSeconds: z.number().int().min(2).max(60).optional(),
-      style: openLook(NOTIFICATION_STYLES).optional(),
-      animation: openLook(NOTIFICATION_ANIMATIONS).optional(),
+      style: look().optional(),
+      animation: look().optional(),
     })
     .optional(),
 });
@@ -343,7 +339,7 @@ export interface ResolvedPresentation {
   corners: (typeof CORNER_STYLES)[number];
   widgetFrame: (typeof WIDGET_FRAMES)[number];
   motion: (typeof MOTION_PROFILES)[number];
-  celebration: (typeof CELEBRATIONS)[number];
+  celebration: string;
   fastMs: number;
   normalMs: number;
 }

@@ -1,4 +1,3 @@
-import { LEVEL_BADGES } from "../../design-system/a11y/preferences";
 import { LevelBadge as Badge } from "../../design-system/components/Badges";
 import { useNotify } from "../../design-system/components/Notification";
 import { useT } from "../../i18n/hooks/useT";
@@ -21,9 +20,11 @@ export function LevelBadgePicker() {
   const equip = useEquipLook();
   const progression = useProgression();
   const level = progression.data?.level ?? 12;
+  // 028: the looks are the visual packs' (Portalab's own included): the server lists them
+  const all = (looks.data?.levels ?? []).map((p) => p.key);
   const locked = (key: string) => Boolean(looks.data?.levels?.find((p) => p.key === key)?.locked);
   // #99: those won but waiting for a level show too, locked, with what they wait for
-  const owned = LEVEL_BADGES.filter((key) => !locked(key) || waitingIn(looks.data?.levels, key));
+  const owned = all.filter((key) => !locked(key) || waitingIn(looks.data?.levels, key));
   const worn = looks.data?.equipped?.level ?? "classic";
   return (
     <section className="looks appearance-card" aria-labelledby="level-badge-picker">
@@ -68,7 +69,7 @@ export function LevelBadgePicker() {
         })}
       </fieldset>
       <p className="ds-field__hint">{t("notifications:levelBadge.tiers")}</p>
-      <InShop count={LEVEL_BADGES.length - owned.length} type="level_badge" />
+      <InShop count={all.length - owned.length} type="level_badge" />
     </section>
   );
 }

@@ -16,7 +16,6 @@ import { DEFAULT_THEME_KEY } from "../../../design-system/themes/builtin";
 import { floorReport } from "../../../design-system/themes/floor";
 import {
   CARD_STYLES,
-  CELEBRATIONS,
   COLOR_PICKER_FALLBACK,
   CONTENT_WIDTHS,
   CORNER_STYLES,
@@ -33,6 +32,7 @@ import {
   type ThemeDefinition,
   WIDGET_FRAMES,
 } from "../../../design-system/themes/schema";
+import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { withConfirmation } from "../../marketplace/admin/confirm";
@@ -399,6 +399,8 @@ function ThemeEditor({
   onSaved: (key: string) => void;
 }) {
   const t = useT();
+  // 028: the celebrations are the visual packs' (Portalab's own included): the server lists them
+  const celebrations = looksOf(useLooks().data, "effect");
   const [draft, setDraft] = useState<ThemeDefinition>(initial);
   const [error, setError] = useState<string | null>(null);
   const p = presentationOf(draft);
@@ -553,7 +555,7 @@ function ThemeEditor({
             <Choice
               label={t("admin:studio.field.celebration")}
               value={p.celebration}
-              options={CELEBRATIONS}
+              options={celebrations}
               onChange={(celebration) => setMotion({ celebration })}
             />
             <SelectField

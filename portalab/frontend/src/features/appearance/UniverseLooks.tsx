@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
-import { AMBIENTS, CELEBRATION_KEYS, type CelebrationKey } from "../../design-system/a11y/preferences";
+import type { CelebrationKey } from "../../design-system/a11y/preferences";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useCelebrate } from "../../design-system/feedback/Celebration";
@@ -50,7 +50,9 @@ export function UniverseLooks() {
     locked(catalog.data?.ambients, ownAmbient) ||
     locked(catalog.data?.celebrations, effective.theme.motion?.celebration ?? "sparkle");
   const tryIt = () => celebrate({ kind: "reward", text: "+40 XP" });
-  const celebrations = (["theme", ...CELEBRATION_KEYS] as const).filter(
+  // 028: the looks are the visual packs' (Portalab's own included): the server lists them
+  const keys = (catalog.data?.celebrations ?? []).map((c) => c.key);
+  const celebrations = ["theme", ...keys].filter(
     // #99: those won but waiting for a level show too, locked
     (key) =>
       key === "theme" ||
@@ -72,10 +74,7 @@ export function UniverseLooks() {
             })
           : t("notifications:universe.renderer.css")}
       </p>
-      <AmbientChooser
-        choices={catalog.data?.ambients ?? AMBIENTS.map((key) => ({ key, locked: false }))}
-        themeAmbient={themeAmbient}
-      />
+      <AmbientChooser choices={catalog.data?.ambients ?? []} themeAmbient={themeAmbient} />
       <InShop count={lockedCount(catalog.data?.ambients)} type="ambient" />
       <fieldset className="looks__animations">
         <legend>{t("notifications:universe.celebration")}</legend>

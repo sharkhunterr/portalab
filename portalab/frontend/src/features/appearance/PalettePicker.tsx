@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
-import { PALETTE_KEYS, type PaletteKey } from "../../design-system/a11y/preferences";
+import type { PaletteKey } from "../../design-system/a11y/preferences";
 import { paletteFor } from "../../design-system/themes/palettes";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
 import { useT } from "../../i18n/hooks/useT";
@@ -27,8 +27,12 @@ export function PalettePicker() {
       },
   });
   const locked = (key: string) => Boolean(looks.data?.palettes?.find((p) => p.key === key)?.locked);
+  // 028: the palettes are the visual packs' (Portalab's own included): the server lists them — « theme »
+  // (the theme's own accents) first
+  const keys = (looks.data?.palettes ?? []).map((p) => p.key).filter((key) => key !== "theme");
+  const all = ["theme", ...keys];
   // #99: those won but waiting for a level show too, locked
-  const owned = PALETTE_KEYS.filter((key) => !locked(key) || waitingIn(looks.data?.palettes, key));
+  const owned = all.filter((key) => !locked(key) || waitingIn(looks.data?.palettes, key));
   return (
     <section className="looks appearance-card" aria-labelledby="palette-picker">
       <h3 id="palette-picker">{t("notifications:palette.title")}</h3>
@@ -66,7 +70,7 @@ export function PalettePicker() {
           );
         })}
       </fieldset>
-      <InShop count={PALETTE_KEYS.length - owned.length} type="palette" />
+      <InShop count={all.length - owned.length} type="palette" />
     </section>
   );
 }

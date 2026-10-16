@@ -70,8 +70,9 @@ async def _sync_builtin_packs(*, dry_run: bool) -> list[str]:
     from portalab.app.composition import import_all_models
     from portalab.app.wiring import wire_platform
     from portalab.capabilities.catalog import new_registry
+    from portalab.capabilities.visuals import builtin_root
     from portalab.core.db import Database
-    from portalab.modules.visuals.builtin import BuiltinSync, builtin_root
+    from portalab.modules.visuals.builtin import BuiltinSync
 
     settings = load_settings()
     import_all_models()

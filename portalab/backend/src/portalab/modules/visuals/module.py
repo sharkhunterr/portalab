@@ -10,13 +10,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.visuals import builtin_root
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Authorizer, Principal, ResourceRef
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
 from portalab.modules.visuals import event_types as _event_types  # noqa: F401 — declares event types
-from portalab.modules.visuals.builtin import BuiltinSync, builtin_root
+from portalab.modules.visuals.builtin import BuiltinSync
 from portalab.modules.visuals.github import GitHub
 from portalab.modules.visuals.service import VisualPacks
 from portalab.modules.visuals.widgets import PackWidgets

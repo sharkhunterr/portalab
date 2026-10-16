@@ -2,12 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
-import {
-  NOTIFICATION_ANIMATIONS,
-  NOTIFICATION_STYLES,
-  type NotificationAnimation,
-  type NotificationStyle,
-} from "../../design-system/a11y/preferences";
+import type { NotificationAnimation, NotificationStyle } from "../../design-system/a11y/preferences";
 import { Button } from "../../design-system/components/Button";
 import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
@@ -70,12 +65,14 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
     });
   const lockedCount = (list: Choice[] | undefined) =>
     (list ?? []).filter((c) => c.locked && !c.waiting).length;
+  // 028: the looks are the visual packs' (Portalab's own included): the server lists them
+  const keysOf = (list: Choice[] | undefined) => (list ?? []).map((c) => c.key);
   // #99: those won but waiting for a level show too, locked
-  const styles = (["theme", ...NOTIFICATION_STYLES] as const).filter(
+  const styles = ["theme", ...keysOf(looks.data?.styles)].filter(
     (style) =>
       style === "theme" || !locked(looks.data?.styles, style) || waitingIn(looks.data?.styles, style),
   );
-  const animations = (["theme", ...NOTIFICATION_ANIMATIONS] as const).filter(
+  const animations = ["theme", ...keysOf(looks.data?.animations)].filter(
     (animation) =>
       animation === "theme" ||
       !locked(looks.data?.animations, animation) ||

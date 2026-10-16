@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from portalab.app import demo_shop
-from portalab.capabilities.visuals import LOOK_TYPES
+from portalab.capabilities.visuals import shipped_looks
 from portalab.modules.visuals.manifest import LOOK_FIELD
 
 BACKEND = Path(__file__).resolve().parents[1]
@@ -193,11 +193,11 @@ def build(out: Path) -> dict[str, int]:
         field = LOOK_FIELD.get(product["type"])
         if field and product["payload"].get(field):
             sold[product["type"]].add(str(product["payload"][field]))
+    # the looks no product sells: those the packs already hold (the packs are their source — none is listed in
+    # the code), free in the socle
     free: list[dict[str, Any]] = []
-    for kind, (_, builtin) in LOOK_TYPES.items():
-        if kind in ("profile_background",):
-            continue  # a profile background is an ambience
-        for look in dict.fromkeys(builtin):
+    for kind, looks in shipped_looks(out).items():
+        for look in dict.fromkeys(looks):
             if look in sold[kind]:
                 continue
             names = look_names(texts, kind, look) if kind != "navigation" else {"en": look, "fr": look}

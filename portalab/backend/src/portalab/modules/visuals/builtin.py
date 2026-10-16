@@ -29,21 +29,6 @@ from portalab.modules.visuals.store import Files, PackageError, read_folder
 
 log = logging.getLogger(__name__)
 SYSTEM = Principal(channel="system")
-IMAGE_ROOT = Path("/app/packs/builtin")
-
-
-def builtin_root(env: dict[str, str] | None = None) -> Path | None:
-    """Where Portalab's own packs are: ``PORTALAB_BUILTIN_PACKS_DIR``, the image's folder, or the repository's
-    (development)."""
-    import os
-
-    configured = (env if env is not None else os.environ).get("PORTALAB_BUILTIN_PACKS_DIR")
-    if configured:
-        return Path(configured)
-    if IMAGE_ROOT.is_dir():
-        return IMAGE_ROOT
-    repository = Path(__file__).resolve().parents[5] / "packs" / "builtin"
-    return repository if repository.is_dir() else None
 
 
 @dataclass

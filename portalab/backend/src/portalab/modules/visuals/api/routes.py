@@ -113,6 +113,20 @@ class ActiveOut(BaseModel):
     ] = {}  # Portalab's own looks whose pack is off: their wearers see the default
 
 
+class LooksOut(BaseModel):
+    epoch: int
+    looks: dict[str, list[str]]  # per type: Portalab's own packs' looks, then the live packs'
+    free: dict[str, list[str]] = {}  # the socle's: everyone's
+    held: dict[str, list[str]] = {}  # whose pack is off: their owners keep them, « currently unavailable »
+
+
+@members.get("/visuals/looks", response_model=LooksOut)
+async def looks(_: Member, packs: Packs) -> Any:
+    """028: the vocabulary of looks — what the interface's pickers and the shop's editor offer (none is
+    written in the interface's code)."""
+    return await packs.looks()
+
+
 @members.get("/visuals/active", response_model=ActiveOut)
 async def active(_: Member, packs: Packs, request: Request, response: Response) -> Any:
     manifest = await packs.active()

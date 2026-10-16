@@ -1,10 +1,11 @@
 """Visual packs (spec 028, issue 1): the looks packs bring — their animations in their own files (CSS, GLSL,
 JS), never in the application's code.
 
-- ``live_looks``: the open vocabulary. The built-in lists (``capabilities.themes``) stay the base until the
-  built-in catalog is itself delivered as packs; the looks of the live packs are added to them at run time,
-  per element type, so a preference or a profile slot accepts them like a built-in one. Kept by the
-  ``visuals`` module from its look claims (every process refreshes it when the registry's epoch moves).
+- ``live_looks``: the open vocabulary — nothing of it is written in the code. Its base is what Portalab's own
+  packs hold (``ship``: read from the packs shipped with the release, switched on or not, by every process
+  at start — even ``portalab migrate``, before any database read); the looks of the live packs are added at
+  run time, per element type, so a preference or a profile slot accepts them like Portalab's own. Kept by
+  the ``visuals`` module from its look claims (every process refreshes it when the registry's epoch moves).
 - ``PACK_LOOKS``: while a pack is analysed or published, the looks it brings itself (an interface may wear
   them before they are live).
 - ``InterfaceRegistry`` (provided by UI 022): validates an interface definition, registers it, switches it on
@@ -18,56 +19,73 @@ JS), never in the application's code.
   Review step.
 """
 
+import json
+import os
 import re
 from collections.abc import Iterable, Mapping
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 from portalab.capabilities.registry import CapabilitySpec
-from portalab.capabilities.themes import (
-    AMBIENTS,
-    AVATAR_FRAMES,
-    BADGE_STYLES,
-    CELEBRATIONS,
-    LEVEL_BADGES,
-    LEVEL_UPS,
-    NAME_STYLES,
-    NOTIFICATION_ANIMATIONS,
-    NOTIFICATION_STYLES,
-    PALETTES,
-    PROFILE_BANNERS,
-)
 from portalab.core.authz_port import Principal
 
 CATALOG_WRITER = "marketplace.catalog_writer"
 INTERFACE_REGISTRY = "ui.interface_registry"
 
-# the navigations the interface draws itself (an imported interface may bring its own: element ``navigation``)
-NAVIGATIONS: tuple[str, ...] = (
-    "sidebar", "topbar", "rail", "drawer", "bottom-bar", "orbit", "dock", "tabs", "launcher", "terminal",
-    "reel", "lights", "vcr", "sheet", "console", "taskbar", "feed", "player", "masthead", "dpad",
-    "planisphere", "system", "deck",
-)  # fmt: skip
-
-# each look type: the product type selling it, the payload field naming the look, its built-in looks
-LOOK_TYPES: dict[str, tuple[str, tuple[str, ...]]] = {
-    "avatar_frame": ("frame", AVATAR_FRAMES),
-    "profile_banner": ("banner", PROFILE_BANNERS),
-    "profile_background": ("background", AMBIENTS),
-    "name_style": ("style", NAME_STYLES),
-    "level_badge": ("style", LEVEL_BADGES),
-    "level_up": ("animation", LEVEL_UPS),
-    "effect": ("effect", CELEBRATIONS),
-    "ambient": ("ambient", AMBIENTS),
-    "notification_style": ("style", NOTIFICATION_STYLES),
-    "notification_animation": ("animation", NOTIFICATION_ANIMATIONS),
-    "palette": ("palette", PALETTES),
-    "badge": ("style", BADGE_STYLES),
-    "title": ("style", BADGE_STYLES),
+# each look type and the payload field of the product selling it (the looks themselves: ``live_looks``)
+LOOK_TYPES: dict[str, str] = {
+    "avatar_frame": "frame",
+    "profile_banner": "banner",
+    "profile_background": "background",
+    "name_style": "style",
+    "level_badge": "style",
+    "level_up": "animation",
+    "effect": "effect",
+    "ambient": "ambient",
+    "notification_style": "style",
+    "notification_animation": "animation",
+    "palette": "palette",
+    "badge": "style",
+    "title": "style",
     # not sold on its own — an interface wears it
-    "navigation": ("nav", NAVIGATIONS),
+    "navigation": "nav",
 }
+# a profile background is an ambience: the looks of one are the other's
+ALIASES = {"profile_background": "ambient"}
+SOCLE = "portalab-socle"
+IMAGE_PACKS = Path("/app/packs/builtin")
+
+
+def builtin_root(env: Mapping[str, str] | None = None) -> Path | None:
+    """Where Portalab's own packs are: ``PORTALAB_BUILTIN_PACKS_DIR``, the image's folder, or the repository's
+    (development)."""
+    configured = (env if env is not None else os.environ).get("PORTALAB_BUILTIN_PACKS_DIR")
+    if configured:
+        return Path(configured)
+    if IMAGE_PACKS.is_dir():
+        return IMAGE_PACKS
+    repository = Path(__file__).resolve().parents[4] / "packs" / "builtin"
+    return repository if repository.is_dir() else None
+
+
+def shipped_looks(root: Path | None, pack: str = "*") -> dict[str, list[str]]:
+    """The looks Portalab's own packs hold (or one of them: ``pack``), per type — read from their elements
+    (the socle's first)."""
+    out: dict[str, list[str]] = {}
+    if root is None or not root.is_dir():
+        return out
+    files = sorted(root.glob(f"{pack}/elements/*/element.json"), key=lambda f: (f.parts[-4] != SOCLE, str(f)))
+    for file in files:
+        try:
+            element = json.loads(file.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        kind, look = element.get("type"), element.get("look")
+        if kind in LOOK_TYPES and isinstance(look, str) and look:
+            out.setdefault(ALIASES.get(kind, kind), []).append(look)
+    return out
 
 
 @dataclass(frozen=True, slots=True)
@@ -167,12 +185,38 @@ PACK_LOOKS: ContextVar[frozenset[tuple[str, str]]] = ContextVar("pack_looks", de
 
 
 class LiveLooks:
-    """The looks the live packs add, per element type (replaced as a whole on every change)."""
+    """The looks Portalab's own packs hold, and those the live packs add, per element type (replaced as a
+    whole on every change)."""
 
     def __init__(self) -> None:
+        self._shipped: dict[str, tuple[str, ...]] | None = None  # read on first use
+        self._socle: dict[str, frozenset[str]] | None = None
         self._by_type: dict[str, tuple[str, ...]] = {}
         self._held: dict[str, frozenset[str]] = {}
         self.epoch = -1
+
+    def ship(
+        self, by_type: Mapping[str, Iterable[str]], socle: Mapping[str, Iterable[str]] | None = None
+    ) -> None:
+        """The looks of Portalab's own packs (the release's, on or off), per type; ``socle``: those of the
+        always-on socle (everyone's, never sold to anyone)."""
+        self._shipped = {kind: tuple(dict.fromkeys(keys)) for kind, keys in by_type.items()}
+        self._socle = {kind: frozenset(keys) for kind, keys in (socle or {}).items()}
+
+    def free(self, element_type: str) -> frozenset[str]:
+        """The socle's looks of this type: free for everyone, whatever a product sells."""
+        if self._socle is None:
+            root = builtin_root()
+            self.ship(shipped_looks(root), shipped_looks(root, SOCLE))
+        assert self._socle is not None
+        return self._socle.get(ALIASES.get(element_type, element_type), frozenset())
+
+    def shipped(self, element_type: str) -> tuple[str, ...]:
+        if self._shipped is None:
+            root = builtin_root()
+            self.ship(shipped_looks(root), shipped_looks(root, SOCLE))
+        assert self._shipped is not None
+        return self._shipped.get(ALIASES.get(element_type, element_type), ())
 
     def replace(
         self,
@@ -198,9 +242,9 @@ class LiveLooks:
         return self._by_type.get(element_type, ())
 
     def known(self, element_type: str) -> tuple[str, ...]:
-        """The built-in looks of this type, then the live packs' ones."""
-        builtin = LOOK_TYPES[element_type][1] if element_type in LOOK_TYPES else ()
-        return (*builtin, *(k for k in self.of(element_type) if k not in builtin))
+        """Portalab's own looks of this type, then the live packs' ones."""
+        own = self.shipped(element_type)
+        return (*own, *(k for k in self.of(element_type) if k not in own))
 
 
 live_looks = LiveLooks()

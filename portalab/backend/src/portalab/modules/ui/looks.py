@@ -10,17 +10,21 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import COSMETICS
 from portalab.capabilities.visuals import external_looks
 
-FREE_STYLES = frozenset({"theme", "toast", "banner", "pill", "minimal"})
-FREE_ANIMATIONS = frozenset({"theme", "slide", "fade", "pop", "zoom"})
+# each setting: the product type selling its looks and the payload field naming them — the looks themselves
+# are the packs' (``live_looks``); the socle's are free for everyone, as is « theme » (the interface's own)
 KINDS = {
-    "ui.notificationStyle": ("notification_style", "style", FREE_STYLES),
-    "ui.notificationAnimation": ("notification_animation", "animation", FREE_ANIMATIONS),
-    "ui.palette": ("palette", "palette", frozenset({"theme"})),  # 027: colour palettes over the theme
+    "ui.notificationStyle": ("notification_style", "style"),
+    "ui.notificationAnimation": ("notification_animation", "animation"),
+    "ui.palette": ("palette", "palette"),  # 027: colour palettes over the theme
     # 027: animated layer behind the portal and celebration effect (product types ``ambient``/``effect``)
-    "ui.ambient": ("ambient", "ambient", frozenset({"theme", "none"})),
-    "ui.celebration": ("effect", "effect", frozenset({"theme", "none", "sparkle", "glow"})),
-    "ui.levelUp": ("level_up", "animation", frozenset({"theme", "classic"})),  # 027: the level-up moment
+    "ui.ambient": ("ambient", "ambient"),
+    "ui.celebration": ("effect", "effect"),
+    "ui.levelUp": ("level_up", "animation"),  # 027: the level-up moment
 }
+
+
+def free(setting: str) -> frozenset[str]:
+    return frozenset({"theme", *external_looks.free(KINDS[setting][0])})
 
 
 class NotificationLooks:
@@ -38,13 +42,13 @@ class NotificationLooks:
 
     async def locked(self, setting: str, user_id: UUID | None) -> frozenset[str]:
         """Choices of ``setting`` the user may not pick (sold, not owned, not free)."""
-        kind, field, free = KINDS[setting]
+        kind, field = KINDS[setting]
         entitlements = self._entitlements()
         if entitlements is None:
             return frozenset()
         sold = await entitlements.sold(kind, field)
         owned = await entitlements.owned(user_id, kind, field) if user_id else frozenset()
-        return frozenset(sold - owned - free)
+        return frozenset(sold - owned - free(setting))
 
     async def waiting(self, user_id: UUID | None, kind: str, field: str) -> dict[str, dict[str, int]]:
         """#99: the choices the user won (a booster) but may not pick yet, and what each waits for."""
@@ -68,7 +72,7 @@ class NotificationLooks:
 
         # #71, #72: each choice comes with the product selling it (its rarity, its price), shown with it
         async def listed(setting: str, keys: tuple[str, ...], locked: frozenset[str]) -> list[dict[str, Any]]:
-            kind, field, _ = KINDS[setting]
+            kind, field = KINDS[setting]
             sold = await self.details(kind, field)
             waiting = await self.waiting(user_id, kind, field)  # #99: won, waiting for a level
             held = external_looks.held(kind)
@@ -110,15 +114,14 @@ class NotificationLooks:
     @staticmethod
     def choices(setting: str) -> tuple[str, ...]:
         """issue 1: the built-in looks of this setting, then those of the published packs."""
-        kind, _, _ = KINDS[setting]
+        kind, _ = KINDS[setting]
         return external_looks.known(kind)
 
     def validator(self, setting: str) -> Any:
         async def errors(value: Any, user_ref: str | None = None) -> list[str]:
             if value is None:
                 return []
-            _, _, free = KINDS[setting]
-            if value != "theme" and value not in free and value not in self.choices(setting):
+            if value not in free(setting) and value not in self.choices(setting):
                 return [f"{value!r} is not a known look"]
             try:
                 user = UUID(user_ref) if user_ref else None

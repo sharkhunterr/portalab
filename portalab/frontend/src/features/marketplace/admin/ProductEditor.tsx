@@ -1,21 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../../../api/client";
-import {
-  AMBIENTS,
-  CELEBRATION_KEYS,
-  LEVEL_BADGES,
-  LEVEL_UPS,
-  NOTIFICATION_ANIMATIONS,
-  NOTIFICATION_STYLES,
-  PALETTE_KEYS,
-} from "../../../design-system/a11y/preferences";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { ICONS, Icon } from "../../../design-system/components/Icon";
 import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
-import { BANNER_KEYS, FRAME_KEYS, NAME_KEYS } from "../../../design-system/themes/cosmetics";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
+import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Category, Product } from "../api";
 import { ProductArt } from "../catalog/ProductArt";
@@ -61,73 +52,19 @@ const TYPES = [
 ] as const;
 /** #81: the seasons a product may belong to (its season's booster and pack draw from it). */
 export const SEASONS = ["valentine", "spring", "summer", "halloween", "christmas"] as const;
-/** 027: the designs each cosmetic type can sell (keys shared with the backend). */
-const DESIGNS: Partial<
-  Record<(typeof TYPES)[number], { field: string; values: readonly string[]; ns: string }>
-> = {
-  effect: { field: "effect", values: CELEBRATION_KEYS, ns: "notifications:universe.celebrations" },
-  ambient: { field: "ambient", values: AMBIENTS, ns: "notifications:universe.ambients" },
-  profile_background: { field: "background", values: AMBIENTS, ns: "notifications:universe.ambients" },
-  palette: { field: "palette", values: PALETTE_KEYS, ns: "notifications:palette.names" },
-  profile_banner: { field: "banner", values: BANNER_KEYS, ns: "community:looks.banner" },
-  avatar_frame: { field: "frame", values: FRAME_KEYS, ns: "community:looks.frame" },
-  name_style: { field: "style", values: NAME_KEYS, ns: "community:looks.name" },
-  level_badge: { field: "style", values: LEVEL_BADGES, ns: "notifications:levelBadge.names" },
-  level_up: { field: "animation", values: LEVEL_UPS, ns: "notifications:levelUp.names" },
+/** 027: the cosmetic types selling a design — the payload field naming it and where its names are; the
+ * designs themselves are the visual packs' (028: read from the server, none is listed here). */
+const DESIGNS: Partial<Record<(typeof TYPES)[number], { field: string; ns: string }>> = {
+  effect: { field: "effect", ns: "notifications:universe.celebrations" },
+  ambient: { field: "ambient", ns: "notifications:universe.ambients" },
+  profile_background: { field: "background", ns: "notifications:universe.ambients" },
+  palette: { field: "palette", ns: "notifications:palette.names" },
+  profile_banner: { field: "banner", ns: "community:looks.banner" },
+  avatar_frame: { field: "frame", ns: "community:looks.frame" },
+  name_style: { field: "style", ns: "community:looks.name" },
+  level_badge: { field: "style", ns: "notifications:levelBadge.names" },
+  level_up: { field: "animation", ns: "notifications:levelUp.names" },
 };
-const BADGE_STYLES = [
-  "none",
-  "shimmer",
-  "pulse",
-  "flame",
-  "glitch",
-  "rainbow",
-  "float",
-  "spin",
-  "frost",
-  "neon",
-  "gold",
-  "vhs",
-  "pixel",
-  "terminal",
-  "water",
-  "wind",
-  "saber",
-  "veins",
-  "mirror",
-  "ring",
-  "elven",
-  "glass",
-  "hazard",
-  "blaze",
-  "voltage",
-  "aqua",
-  "magma",
-  "glacier",
-  "galaxy",
-  "aurum",
-  "toxic",
-  "holo",
-  "runes",
-  "matrix",
-  "sakura",
-  "shadow",
-  "candy",
-  "aurora",
-  "plasma",
-  "chrono",
-  // issue 130: the cosmos
-  "stellar",
-  "orrery",
-  "starmap",
-  "comet",
-  "ringworld",
-  "pulsar",
-  "totality",
-  "meteor",
-  "solar",
-  "lunar",
-];
 const ICON_NAMES = Object.keys(ICONS).sort();
 
 export interface Presentation {
@@ -541,6 +478,7 @@ export function NewProductDialog({
   onCreated: () => void;
 }) {
   const t = useT();
+  const vocabulary = useLooks().data; // 028: the looks one may sell, the packs'
   const { themes } = useTheme();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<(typeof TYPES)[number]>("badge");
@@ -767,7 +705,7 @@ export function NewProductDialog({
               value={style}
               onChange={(e) => setStyle(e.target.value)}
             >
-              {BADGE_STYLES.map((value) => (
+              {looksOf(vocabulary, type).map((value) => (
                 <option key={value} value={value}>
                   {t(`marketplace:badgeStyle.${value}`)}
                 </option>
@@ -782,7 +720,7 @@ export function NewProductDialog({
               onChange={(e) => setDesign(e.target.value)}
             >
               <option value="">—</option>
-              {(DESIGNS[type]?.values ?? [])
+              {looksOf(vocabulary, type)
                 .filter((value) => value !== "none" && value !== "theme")
                 .map((value) => (
                   <option key={value} value={value}>
@@ -801,15 +739,13 @@ export function NewProductDialog({
               onChange={(e) => setLook(e.target.value)}
             >
               <option value="">—</option>
-              {(type === "notification_style" ? NOTIFICATION_STYLES : NOTIFICATION_ANIMATIONS).map(
-                (value) => (
-                  <option key={value} value={value}>
-                    {t(
-                      `notifications:looks.${type === "notification_style" ? "styles" : "animations"}.${value}`,
-                    )}
-                  </option>
-                ),
-              )}
+              {looksOf(vocabulary, type).map((value) => (
+                <option key={value} value={value}>
+                  {t(
+                    `notifications:looks.${type === "notification_style" ? "styles" : "animations"}.${value}`,
+                  )}
+                </option>
+              ))}
             </SelectField>
           ) : null}
           {type === "widget" ? (

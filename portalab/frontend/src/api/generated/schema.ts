@@ -3782,6 +3782,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/visuals/bundle/{pack}/{sha}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Any Bundle */
+        get: operations["any_bundle_api_v1_admin_visuals_bundle__pack___sha__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/visuals/contracts": {
         parameters: {
             query?: never;
@@ -9165,6 +9182,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/visuals/bundle/{pack}/{sha}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live Bundle
+         * @description A live version's stylesheets and shaders in one answer (immutable: its address is its fingerprint).
+         */
+        get: operations["live_bundle_api_v1_visuals_bundle__pack___sha__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/visuals/files/{pack}/{sha}/{name}": {
         parameters: {
             query?: never;
@@ -9174,6 +9211,27 @@ export interface paths {
         };
         /** Live File */
         get: operations["live_file_api_v1_visuals_files__pack___sha___name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/visuals/looks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Looks
+         * @description 028: the vocabulary of looks — what the interface's pickers and the shop's editor offer (none is
+         *     written in the interface's code).
+         */
+        get: operations["looks_api_v1_visuals_looks_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -12196,6 +12254,29 @@ export interface components {
             login: string;
             /** Password */
             password: string;
+        };
+        /** LooksOut */
+        LooksOut: {
+            /** Epoch */
+            epoch: number;
+            /**
+             * Free
+             * @default {}
+             */
+            free: {
+                [key: string]: string[];
+            };
+            /**
+             * Held
+             * @default {}
+             */
+            held: {
+                [key: string]: string[];
+            };
+            /** Looks */
+            looks: {
+                [key: string]: string[];
+            };
         };
         /** ManualGrantIn */
         ManualGrantIn: {
@@ -23938,6 +24019,38 @@ export interface operations {
             };
         };
     };
+    any_bundle_api_v1_admin_visuals_bundle__pack___sha__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pack: string;
+                sha: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     contracts_api_v1_admin_visuals_contracts_get: {
         parameters: {
             query?: never;
@@ -34162,6 +34275,38 @@ export interface operations {
             };
         };
     };
+    live_bundle_api_v1_visuals_bundle__pack___sha__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pack: string;
+                sha: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     live_file_api_v1_visuals_files__pack___sha___name__get: {
         parameters: {
             query?: never;
@@ -34191,6 +34336,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    looks_api_v1_visuals_looks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LooksOut"];
                 };
             };
         };

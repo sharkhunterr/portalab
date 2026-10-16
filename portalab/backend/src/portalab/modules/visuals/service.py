@@ -32,6 +32,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.visuals import (
     CATALOG_WRITER,
     INTERFACE_REGISTRY,
+    LOOK_TYPES,
     PACK_LOOKS,
     CatalogWriter,
     InterfaceRegistry,
@@ -1291,6 +1292,18 @@ class VisualPacks:
         """What every member's interface loads: the elements of the live packs (cached per epoch)."""
         await self.refresh()
         return self._manifest
+
+    async def looks(self) -> dict[str, Any]:
+        """028: the looks one may name, per type — Portalab's own packs', then the live packs'; the socle's
+        (free for everyone); those whose pack is off. None is written in the interface's code: its pickers
+        and the shop's editor read them here."""
+        await self.refresh()
+        return {
+            "epoch": live_looks.epoch,
+            "looks": {kind: list(live_looks.known(kind)) for kind in LOOK_TYPES},
+            "free": {kind: sorted(live_looks.free(kind)) for kind in LOOK_TYPES if live_looks.free(kind)},
+            "held": {kind: sorted(live_looks.held(kind)) for kind in LOOK_TYPES if live_looks.held(kind)},
+        }
 
     async def served(self, pack: str, sha: str, name: str, *, manager: bool) -> Path | None:
         """A file of a version: any member's for the live packs' current versions, a manager's for every

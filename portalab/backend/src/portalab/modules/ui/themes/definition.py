@@ -21,7 +21,7 @@ from pydantic import (
     field_validator,
 )
 
-from portalab.capabilities.visuals import PACK_LOOKS, external_looks
+from portalab.capabilities.visuals import PACK_LOOKS, live_looks
 
 FUNCTIONAL_STATES = (
     "loading",
@@ -182,346 +182,6 @@ VocabularyKey = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_-]*:[a-
 VocabularyText = Annotated[str, StringConstraints(min_length=1, max_length=60, pattern=r"^[^{}<>]+$")]
 Language = Annotated[str, StringConstraints(pattern=r"^[a-z]{2,3}$")]
 
-NOTIFICATION_STYLES = Literal[
-    "toast",
-    "banner",
-    "pill",
-    "minimal",
-    "glass",
-    "neon",
-    "comic",
-    "terminal",
-    "parchment",
-    "hologram",
-    "pixel",
-    "paper",
-    "square",
-    "circle",
-    "cloud",
-    "ticket",
-    "tag",
-    "split",
-    "saga",
-    "pirate",
-    "manga",
-    "noir",
-    "vhs",
-    "upsidedown",
-    "elven",
-    "onering",
-    "island",
-    "nostromo",
-    "blaze",
-    "voltage",
-    "aqua",
-    "magma",
-    "glacier",
-    "galaxy",
-    "aurum",
-    "toxic",
-    "holo",
-    "runes",
-    "matrix",
-    "sakura",
-    "shadow",
-    "candy",
-    "aurora",
-    "plasma",
-    "chrono",
-    # #81, #89: the seasons and the universes
-    "tombstone",
-    "giftwrap",
-    "loveletter",
-    "bloom",
-    "postcard",
-    "scroll",
-    "bottle",
-    "chamfer",
-    "balloon",
-    "trafficlights",
-    "chathead",
-    "nowplaying",
-    "nextepisode",
-    "telegram",
-    "rpgbox",
-    "blockrow",
-    "invasion",
-    "ghostly",
-    "bricks",
-    "jukebox",
-    "beachtowel",
-    "seedpacket",
-    # #130: the cosmos
-    "stellar",
-    "orrery",
-    "starmap",
-    "comet",
-    "ringworld",
-    "pulsar",
-    "totality",
-    "meteor",
-    "solar",
-    "lunar",
-    "transmission",
-    "missioncontrol",
-]
-NOTIFICATION_ANIMATIONS = Literal[
-    "slide",
-    "fade",
-    "pop",
-    "zoom",
-    "bounce",
-    "flip",
-    "swing",
-    "glitch",
-    "drop",
-    "spiral",
-    "slam",
-    "rise",
-    "wipe",
-    "focus",
-    "jelly",
-    "shake",
-    "filmwipe",
-    "iris",
-    "air",
-    "water",
-    "earth",
-    "fire",
-    "blackhole",
-    "melt",
-    "kapow",
-    "portal",
-    "flipup",
-    "balrog",
-    "eye",
-    "tracking",
-    "morph",
-    "uplink",
-    "ignite",
-    "surge",
-    "splash",
-    "frostbite",
-    "stardust",
-    "hex",
-    "decrypt",
-    "petalfall",
-    "eclipse",
-    "warp",
-    # #81, #89: the seasons and the universes
-    "swoop",
-    "anchor",
-    "transform",
-    "trayrise",
-    "genie",
-    "chatpop",
-    "beatdrop",
-    "curtainwipe",
-    "spinpaper",
-    "pixelreveal",
-    "harddrop",
-    "march",
-    "chomp",
-    "jumpin",
-    "funkwalk",
-    "surfin",
-    "sprout",
-    # #130: the cosmos
-    "shootingstar",
-    "nebulabloom",
-    "eclipsed",
-    "liftoff",
-    "orbitin",
-]
-AMBIENTS = Literal[
-    "none",
-    "snow",
-    "embers",
-    "code-rain",
-    "fireflies",
-    "starfield",
-    "warp",
-    "petals",
-    "bats",
-    "bubbles",
-    "rain",
-    "sparkles",
-    "disco",
-    "fog",
-    "sand",
-    "leaves",
-    "hearts",
-    "glitch",
-    "lights",
-    "spores",
-    "aurora",
-    "vhs",
-    "wind",
-    "tide",
-    "lanterns",
-    "pixelsky",
-    "upsidedown",
-    "veins",
-    "meadow",
-    "ash",
-    "bokeh",
-    "nostromo",
-    "inferno",
-    "thunderstorm",
-    "sandstorm",
-    "polar",
-    "cosmos",
-    "abyss",
-    "blizzard",
-    "fireworks",
-    "downpour",
-    "matrix",
-    "mesh",
-    "meshwave",
-    "volcano",
-    "blackhole",
-    "reef",
-    "firestorm",
-    "whiteout",
-    "liquidmetal",
-    "plasma",
-    "forest",
-    "neoncity",
-    "weather",
-    "haunted",
-    "darkness",
-    "lostsignal",
-    "garland",
-    "christmasnight",
-    "hearth",
-    "goldenhour",
-    "windowrain",
-    "summerfield",
-    "soapbubbles",
-    "skylanterns",
-    "autumnlane",
-    "pixelcamp",
-    "pixelbeach",
-    "pixelballoons",
-    "amberglow",
-    "candlelight",
-    "steam",
-    "fairybokeh",
-    "warmsilk",
-    "honey",
-    "knit",
-    "paintmix",
-    "acrylicpour",
-    "watercolor",
-    "marbling",
-    "poppaint",
-    "poppour",
-    "popwatercolor",
-    "popmarbling",
-    "lavalamp",
-    "impasto",
-    "paintribbon",
-    # #81, #89: the seasons and the universes
-    "cobwebs",
-    "ornaments",
-    "loveletters",
-    "butterflies",
-    "seagulls",
-    "floatingcandles",
-    "cannonsmoke",
-    "gears",
-    "skyclouds",
-    "silkwaves",
-    "reactions",
-    "equalizer",
-    "cinemaglow",
-    "pages",
-    "lcdstars",
-    "fallingblocks",
-    "fleet",
-    "ghosts",
-    "spincoins",
-    "groovywaves",
-    "beachballs",
-    "dandelion",
-    # #130: the cosmos
-    "orion",
-    "crab",
-    "helix",
-    "pillars",
-    "cliffs",
-    "solarsystem",
-    "saturnrise",
-    "perseids",
-    "constellations",
-    "milkyway",
-    "greatcomet",
-    "solarflare",
-    "moonrise",
-    "asteroids",
-]
-CELEBRATIONS = Literal[
-    "none",
-    "sparkle",
-    "confetti",
-    "glow",
-    "snow",
-    "bats",
-    "pixels",
-    "hearts",
-    "stars",
-    "coins",
-    "lightning",
-    "petals",
-    "bubbles",
-    "assemble",
-    "burn",
-    "shatter",
-    "freeze",
-    "glitch",
-    "portal",
-    "flicker",
-    "fireworks",
-    "rewind",
-    "bloom",
-    "tracker",
-    "nova",
-    "goldshower",
-    "petalstorm",
-    "rebirth",
-    "stormstrike",
-    "skyveil",
-    "arcana",
-    "timerift",
-    # #81, #89: the seasons and the universes
-    "candy",
-    "gifts",
-    "cupid",
-    "eggs",
-    "splash",
-    "wandsparks",
-    "cannonball",
-    "bolts",
-    "cardcascade",
-    "balloons",
-    "likes",
-    "musicnotes",
-    "ribbons",
-    "inkstamp",
-    "pixelhearts",
-    "lineclear",
-    "lasers",
-    "pellets",
-    "coinpop",
-    "flowerpower",
-    "seashells",
-    "songbirds",
-    # #130: the cosmos
-    "starshower",
-    "bigbang",
-    "comets",
-    "planets",
-]
 PATTERNS = Literal[
     "none",
     "stars",
@@ -560,36 +220,21 @@ class Radii(_Closed):
     md: Annotated[float, Field(ge=0, le=3)]
 
 
-LEVEL_UPS = Literal[
-    "classic", "arcade", "cosmic", "comic", "elements", "cinema", "crawl", "spell", "decode", "sandstorm",
-    "bloodmoon", "pumpkin", "gift", "manga", "boing", "hearth", "hud", "minimal", "abduction", "hero",
-    "synthwave", "disco", "glitch", "noir", "spotlight", "upsidedown", "onering",
-    "vhs",
-    "nova",
-    "nostromo",
-    "phoenix", "thunderstrike", "tidalwave", "supernova", "goldrush", "arcanum", "sakurastorm", "aurorasky",
-    "timeportal",
-    # #81, #89: the seasons and the universes
-    "owlpost", "plunder", "rollout",
-    "setupwizard", "unboxing", "viral",
-    "encore", "finale", "extraedition",
-    "statsup", "fourlines", "wavecleared", "powerup", "flagpole",
-    "jukeboxdrop", "sandcastle", "fullbloom",
-    "hyperjump", "constellate",  # #130: the cosmos
-    "rift",  # #133: the Upside Down's gate
-]  # fmt: skip
+# issue 1 / 028: the looks a theme names are packs' — none is written in the code: Portalab's own packs', a
+# published pack's, or (while a pack is analysed) the pack's own
 
 
-# issue 1: the looks a theme names may be imported ones — a published pack's, or (while a pack is analysed)
-# the pack's own; built-in ones stay the base
-
-
-def _open(literal: Any, product_type: str) -> Any:
-    builtin = frozenset(get_args(literal))
+def _open(product_type: str, fitting: Any = None) -> Any:
+    """``fitting``: for a navigation, the screens Portalab draws each of its own on (a pack's fits all)."""
+    fits = frozenset(get_args(fitting)) if fitting is not None else None
 
     def check(value: str) -> str:
-        known = value in builtin or value in external_looks.of(product_type)
-        if known or (product_type, value) in PACK_LOOKS.get():
+        if (product_type, value) in PACK_LOOKS.get():
+            return value
+        if fits is not None and value in live_looks.shipped(product_type):
+            if value in fits:
+                return value
+        elif value in live_looks.known(product_type):
             return value
         raise ValueError(f"{value!r} is not a known look")
 
@@ -600,10 +245,8 @@ class Motion(_Closed):
     fastMs: Annotated[int, Field(ge=0, le=1000)] | None = None
     normalMs: Annotated[int, Field(ge=0, le=2000)] | None = None
     profile: Literal["none", "subtle", "lively", "playful"] | None = None
-    celebration: Annotated[str, _open(CELEBRATIONS, "effect")] | None = None
-    levelUp: Annotated[str, _open(LEVEL_UPS, "level_up")] | None = (
-        None  # 027: how this theme celebrates a new level
-    )
+    celebration: Annotated[str, _open("effect")] | None = None
+    levelUp: Annotated[str, _open("level_up")] | None = None  # 027: how this theme celebrates a new level
 
 
 NAV_DESKTOP = Literal[
@@ -680,9 +323,9 @@ class Nav(_Closed):
     # 027: beyond the sidebar — orbit bubble, dock, book tabs, launcher screen, terminal line, film reel;
     # #89: a desktop's taskbar, a social feed, a music player, a newspaper's masthead, a console's d-pad;
     # issue 1: or a navigation an imported pack brings (its own script, in a sandbox)
-    desktop: Annotated[str, _open(NAV_DESKTOP, "navigation")] | None = None
-    tablet: Annotated[str, _open(NAV_TABLET, "navigation")] | None = None
-    phone: Annotated[str, _open(NAV_PHONE, "navigation")] | None = None
+    desktop: Annotated[str, _open("navigation", NAV_DESKTOP)] | None = None
+    tablet: Annotated[str, _open("navigation", NAV_TABLET)] | None = None
+    phone: Annotated[str, _open("navigation", NAV_PHONE)] | None = None
 
 
 class Layout(_Closed):
@@ -723,9 +366,7 @@ class Background(_Closed):
     image: Asset | RasterUri | None = None
     fallback: Color
     pattern: PATTERNS | None = None  # 027: a static pattern behind the portal
-    ambient: Annotated[str, _open(AMBIENTS, "ambient")] | None = (
-        None  # 027: an animated layer, off with reduced motion
-    )
+    ambient: Annotated[str, _open("ambient")] | None = None  # 027: an animated layer, off with reduced motion
 
     _colors = field_validator("fallback")(_check_color)
 
@@ -742,8 +383,8 @@ class Sounds(_Closed):
 class NotificationAppearance(_Closed):
     position: Literal["top-end", "top-start", "bottom-end", "bottom-start"] | None = None
     durationSeconds: Annotated[int, Field(ge=2, le=60)] | None = None
-    style: Annotated[str, _open(NOTIFICATION_STYLES, "notification_style")] | None = None
-    animation: Annotated[str, _open(NOTIFICATION_ANIMATIONS, "notification_animation")] | None = None
+    style: Annotated[str, _open("notification_style")] | None = None
+    animation: Annotated[str, _open("notification_animation")] | None = None
 
 
 class ThemeDefinition(_Closed):
