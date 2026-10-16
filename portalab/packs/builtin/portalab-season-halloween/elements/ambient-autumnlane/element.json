@@ -10,8 +10,14 @@
     "fr": "Allée d'automne derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "autumnlane.glsl",
+    "params": {
+      "flow": [
+        "motes"
+      ],
+      "fallback": "leaves"
+    }
   },
   "economy": {
     "price": 900,

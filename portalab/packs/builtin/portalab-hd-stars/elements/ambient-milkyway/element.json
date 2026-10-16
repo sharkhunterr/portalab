@@ -10,8 +10,12 @@
     "fr": "Une bande d'innombrables étoiles à travers le ciel, son cœur lumineux et ses traînées de poussière, au-dessus des montagnes."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "milkyway.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1300,

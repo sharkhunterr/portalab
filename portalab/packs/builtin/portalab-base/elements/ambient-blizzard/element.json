@@ -11,7 +11,13 @@
   },
   "render": {
     "kind": "renderer",
-    "renderer": "builtin"
+    "renderer": "layers",
+    "params": {
+      "flow": [
+        "snow"
+      ],
+      "fallback": "snow"
+    }
   },
   "economy": {
     "price": 800,

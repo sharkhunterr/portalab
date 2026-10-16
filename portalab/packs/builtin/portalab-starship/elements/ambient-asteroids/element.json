@@ -10,8 +10,12 @@
     "fr": "Des rochers de toutes tailles qui tournoient sur trois plans, éclairés par un soleil lointain, de la poussière qui scintille."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "asteroids.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 900,

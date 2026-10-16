@@ -10,8 +10,11 @@
     "fr": "Feu de camp pixel derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pixelcamp.glsl",
+    "params": {
+      "fallback": "pixelsky"
+    }
   },
   "economy": {
     "price": 1200,

@@ -88,12 +88,19 @@ describe("Portalab's looks in their packs", () => {
     const wrong: string[] = [];
     for (const element of drawn) {
       const body = readFileSync(join(element.folder, element.render.file ?? "-"), "utf8");
-      if (!/\bo\s*=/.test(body)) wrong.push(`${element.type}:${element.look} draws nothing`);
+      // an ambience is a whole program after the shared noise; any other look a shape's fragment
+      const draws =
+        element.type === "ambient"
+          ? /void main/.test(body) && /gl_FragColor/.test(body)
+          : /\bo\s*=/.test(body);
+      if (!draws) wrong.push(`${element.type}:${element.look} draws nothing`);
       if ((element.type === "level_up" || element.type === "effect") && !element.render.stage)
         wrong.push(`${element.type}:${element.look} is not a stage`);
     }
     expect(wrong).toEqual([]);
     const tables = readFileSync(join(THEMES, "premium", "fxLooks.ts"), "utf8");
     expect(tables).not.toMatch(/export const FX_/);
+    const ambiences = readFileSync(join(THEMES, "premium", "PremiumAmbient.tsx"), "utf8");
+    expect(ambiences).not.toMatch(/const (LAYERS|PREMIUM_FALLBACK)\b/);
   });
 });

@@ -10,8 +10,12 @@
     "fr": "Une grande comète qui traverse le ciel, sa queue de poussière dorée et courbe, sa queue d'ions bleue et droite."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "greatcomet.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 900,

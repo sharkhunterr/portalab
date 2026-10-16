@@ -23,7 +23,7 @@ RenderKind = Literal["css", "glsl", "js", "theme", "data", "renderer", "none"]  
 TYPES: dict[str, tuple[frozenset[str], str]] = {
     "level_up": (frozenset({"css", "glsl", "js"}), "levelup"),
     "effect": (frozenset({"css", "glsl", "js"}), "effect"),
-    "ambient": (frozenset({"css", "glsl"}), "ambient"),
+    "ambient": (frozenset({"css", "glsl", "renderer"}), "ambient"),  # renderer: Portalab's layers (flow…)
     "profile_background": (frozenset({"css", "glsl"}), "bg"),
     "avatar_frame": (frozenset({"css", "glsl"}), "frame"),
     "profile_banner": (frozenset({"css"}), "banner"),

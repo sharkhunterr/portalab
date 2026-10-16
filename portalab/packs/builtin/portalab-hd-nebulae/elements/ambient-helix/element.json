@@ -10,8 +10,12 @@
     "fr": "L'« œil de Dieu » : un anneau de gaz turquoise strié de nœuds cométaires autour d'un anneau rouge et d'un cœur bleu profond, qui tourne lentement."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "helix.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1400,

@@ -10,8 +10,14 @@
     "fr": "Hantise derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "haunted.glsl",
+    "params": {
+      "flow": [
+        "wisps"
+      ],
+      "fallback": "fog"
+    }
   },
   "economy": {
     "price": 1200,

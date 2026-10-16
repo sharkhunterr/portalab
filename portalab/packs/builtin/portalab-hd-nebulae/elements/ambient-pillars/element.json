@@ -10,8 +10,12 @@
     "fr": "Des colonnes de poussière dorée dressées sur un champ d'étoiles bleu, leurs sommets éclairés qui s'évaporent, des étoiles à six aigrettes."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pillars.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1800,

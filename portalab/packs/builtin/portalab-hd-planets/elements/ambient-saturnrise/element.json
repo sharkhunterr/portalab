@@ -10,8 +10,12 @@
     "fr": "Une géante aux anneaux qui se lève dans un coin : des nuages en bandes qui tournent, des anneaux et leur division, de petites lunes qui tournent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "saturnrise.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1200,

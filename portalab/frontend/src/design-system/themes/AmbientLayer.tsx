@@ -2,7 +2,7 @@ import { type CSSProperties, memo } from "react";
 import type { Ambient } from "../a11y/preferences";
 import "./ambient.css";
 import { useExternalRevision } from "../visuals/registry";
-import { isPremiumAmbient, PREMIUM_FALLBACK, PremiumAmbient } from "./premium/PremiumAmbient";
+import { isPremiumAmbient, PremiumAmbient, premiumFallback } from "./premium/PremiumAmbient";
 import { WeatherAmbient } from "./premium/WeatherAmbient";
 
 /**
@@ -122,7 +122,7 @@ export const AmbientLayer = memo(function AmbientLayer({
   }
   if (isPremiumAmbient(kind)) {
     // #68: drawn on a canvas (shader or particles); the CSS ambience stands in when it cannot be
-    const fallback = PREMIUM_FALLBACK[kind] as Ambient;
+    const fallback = premiumFallback(kind) as Ambient;
     return (
       <PremiumAmbient
         kind={kind}

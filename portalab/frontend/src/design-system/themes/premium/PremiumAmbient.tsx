@@ -15,167 +15,47 @@ interface Layers {
   flow?: string | string[];
   particles?: string;
   mesh?: boolean;
+  /** its shader is written after the noise safe on phones of lower precision */
+  safe?: boolean;
 }
 
-const LAYERS: Record<string, Layers> = {
-  inferno: { shader: "inferno", flow: "embers" },
-  thunderstorm: { shader: "thunderstorm", flow: "storm" },
-  sandstorm: { shader: "sandstorm", flow: "sand" },
-  polar: { shader: "polar" },
-  cosmos: { shader: "cosmos" },
-  abyss: { shader: "abyss" },
-  downpour: { shader: "downpour" },
-  matrix: { shader: "matrix" },
-  blizzard: { flow: "snow" },
-  fireworks: { particles: "fireworks" },
-  mesh: { particles: "mesh" },
-  meshwave: { mesh: true },
-  volcano: { shader: "volcano", flow: ["ash", "embers"] },
-  blackhole: { shader: "blackhole" },
-  reef: { shader: "reef", flow: ["plankton", "school"] },
-  firestorm: { shader: "firestorm", flow: "windash" },
-  whiteout: { shader: "whiteout", flow: "nightsnow" },
-  liquidmetal: { shader: "liquidmetal" },
-  plasma: { shader: "plasma" },
-  forest: { shader: "forest", flow: "fireflies" },
-  neoncity: { shader: "neoncity" },
-  haunted: { shader: "haunted", flow: "wisps" },
-  darkness: { shader: "darkness" },
-  lostsignal: { shader: "lostsignal" },
-  garland: { shader: "garland", flow: "gentlesnow" },
-  christmasnight: { shader: "christmasnight", flow: "gentlesnow" },
-  hearth: { shader: "hearth", flow: "crackle" },
-  goldenhour: { shader: "goldenhour", flow: "motes" },
-  windowrain: { shader: "windowrain" },
-  summerfield: { shader: "summerfield", flow: "butterflies" },
-  soapbubbles: { shader: "soapbubbles" },
-  skylanterns: { shader: "skylanterns" },
-  autumnlane: { shader: "autumnlane", flow: "motes" },
-  pixelcamp: { shader: "pixelcamp" },
-  pixelbeach: { shader: "pixelbeach" },
-  pixelballoons: { shader: "pixelballoons" },
-  amberglow: { shader: "amberglow" },
-  candlelight: { shader: "candlelight", flow: "motes" },
-  steam: { shader: "steam" },
-  fairybokeh: { shader: "fairybokeh" },
-  warmsilk: { shader: "warmsilk" },
-  honey: { shader: "honey" },
-  knit: { shader: "knit" },
-  paintmix: { shader: "paintmix" },
-  acrylicpour: { shader: "acrylicpour" },
-  watercolor: { shader: "watercolor" },
-  marbling: { shader: "marbling" },
-  poppaint: { shader: "poppaint" },
-  poppour: { shader: "poppour" },
-  popwatercolor: { shader: "popwatercolor" },
-  popmarbling: { shader: "popmarbling" },
-  lavalamp: { shader: "lavalamp" },
-  impasto: { shader: "impasto" },
-  paintribbon: { shader: "paintribbon" },
-  weathersky: { shader: "weathersky" }, // #88: « live weather », its numbers from the report
-  // issue 130: the cosmos
-  orion: { shader: "orion" },
-  crab: { shader: "crab" },
-  helix: { shader: "helix" },
-  pillars: { shader: "pillars" },
-  cliffs: { shader: "cliffs" },
-  solarsystem: { shader: "solarsystem" },
-  saturnrise: { shader: "saturnrise" },
-  perseids: { shader: "perseids" },
-  constellations: { shader: "constellations" },
-  milkyway: { shader: "milkyway" },
-  greatcomet: { shader: "greatcomet" },
-  solarflare: { shader: "solarflare" },
-  moonrise: { shader: "moonrise" },
-  asteroids: { shader: "asteroids" },
-};
+// 028 (B2): the premium ambiences are their packs' (Portalab's own included) — each element holds its shader
+// and its layers (``render.params``: flows, particles, a landscape, the CSS ambience standing in); what stays
+// here is « live weather », drawn from the weather report's numbers
+const WEATHER_SKY: Layers = { shader: "weathersky" };
 
-/** The CSS ambience standing in for each premium one. */
-export const PREMIUM_FALLBACK: Record<string, string> = {
-  inferno: "embers",
-  thunderstorm: "rain",
-  sandstorm: "sand",
-  polar: "aurora",
-  cosmos: "starfield",
-  abyss: "bubbles",
-  downpour: "rain",
-  matrix: "code-rain",
-  blizzard: "snow",
-  fireworks: "sparkles",
-  mesh: "fireflies",
-  meshwave: "starfield",
-  volcano: "ash",
-  blackhole: "starfield",
-  reef: "bubbles",
-  firestorm: "embers",
-  whiteout: "snow",
-  liquidmetal: "aurora",
-  plasma: "aurora",
-  forest: "fireflies",
-  neoncity: "lights",
-  haunted: "fog",
-  darkness: "veins",
-  lostsignal: "vhs",
-  garland: "lights",
-  christmasnight: "snow",
-  hearth: "embers",
-  goldenhour: "bokeh",
-  windowrain: "rain",
-  summerfield: "meadow",
-  soapbubbles: "bubbles",
-  skylanterns: "lanterns",
-  autumnlane: "leaves",
-  pixelcamp: "pixelsky",
-  pixelbeach: "pixelsky",
-  pixelballoons: "pixelsky",
-  amberglow: "bokeh",
-  candlelight: "embers",
-  steam: "fog",
-  fairybokeh: "bokeh",
-  warmsilk: "aurora",
-  honey: "aurora",
-  knit: "bokeh",
-  paintmix: "aurora",
-  acrylicpour: "aurora",
-  watercolor: "bokeh",
-  marbling: "aurora",
-  poppaint: "aurora",
-  poppour: "aurora",
-  popwatercolor: "bokeh",
-  popmarbling: "aurora",
-  lavalamp: "bubbles",
-  impasto: "aurora",
-  paintribbon: "aurora",
-  weathersky: "skyclouds",
-  // issue 130: the cosmos
-  orion: "starfield",
-  crab: "starfield",
-  helix: "starfield",
-  pillars: "starfield",
-  cliffs: "starfield",
-  solarsystem: "starfield",
-  saturnrise: "starfield",
-  perseids: "starfield",
-  constellations: "starfield",
-  milkyway: "starfield",
-  greatcomet: "starfield",
-  solarflare: "embers",
-  moonrise: "starfield",
-  asteroids: "starfield",
-};
-
-/** issue 1: an imported pack's ambience drawn by the GPU (its own shader, after ``COMMON``). */
-function importedLayers(kind: string): Layers | undefined {
+function packLayers(kind: string): Layers | undefined {
   const element = externalLook("ambient", kind) ?? externalLook("profile_background", kind);
-  return element?.kind === "glsl" ? { shader: fxName(element) } : undefined;
+  if (!element) return undefined;
+  const params = element.params ?? {};
+  const flow = Array.isArray(params.flow)
+    ? params.flow.filter((f): f is string => typeof f === "string")
+    : [];
+  const layers: Layers = {
+    ...(flow.length ? { flow } : {}),
+    ...(typeof params.particles === "string" ? { particles: params.particles } : {}),
+    ...(params.mesh === true ? { mesh: true } : {}),
+  };
+  if (element.kind === "glsl") return { shader: fxName(element), ...layers, safe: params.common === "safe" };
+  if (element.kind === "renderer" && element.renderer === "layers" && Object.keys(layers).length)
+    return layers;
+  return undefined;
 }
 
 function layersOf(kind: string): Layers | undefined {
-  return LAYERS[kind] ?? importedLayers(kind);
+  return kind === "weathersky" ? WEATHER_SKY : packLayers(kind);
 }
 
 export function isPremiumAmbient(kind: string): boolean {
-  return kind in LAYERS || importedLayers(kind) !== undefined;
+  return layersOf(kind) !== undefined;
+}
+
+/** The CSS ambience standing in for a premium one (its pack says which). */
+export function premiumFallback(kind: string): string {
+  if (kind === "weathersky") return "skyclouds";
+  const element = externalLook("ambient", kind) ?? externalLook("profile_background", kind);
+  const fallback = element?.params?.fallback;
+  return typeof fallback === "string" ? fallback : "none";
 }
 
 /** #68: whether this device draws the premium ambiences with its GPU, and which chip (when it says). */
@@ -225,30 +105,18 @@ async function start(layers: Layers, canvases: HTMLCanvasElement[], host: HTMLEl
   let index = 0;
   const next = () => canvases[index++] as HTMLCanvasElement;
   if (layers.shader) {
-    const [
-      { runShader },
-      { SHADERS, COMMON },
-      { COZY_SHADERS },
-      { WARM_SHADERS },
-      { WEATHER },
-      { COSMOS_SHADERS },
-    ] = await Promise.all([
+    const [{ runShader }, { COMMON }, { SAFE_COMMON, WEATHER }] = await Promise.all([
       import("./shaderRunner"),
       import("./shaders"),
-      import("./cozyShaders"),
-      import("./warmShaders"),
       import("./weatherShader"),
-      import("./cosmosShaders"),
     ]);
     const imported = externalFx(layers.shader);
     const source = imported
-      ? `${COMMON}${imported.body}`
+      ? `${layers.safe ? SAFE_COMMON : COMMON}${imported.body}`
       : layers.shader === "weathersky"
         ? WEATHER
-        : (SHADERS[layers.shader] ??
-          COZY_SHADERS[layers.shader] ??
-          WARM_SHADERS[layers.shader] ??
-          COSMOS_SHADERS[layers.shader]);
+        : null;
+    if (!source) return null;
     const stop = runShader(next(), source as string, uniforms, Boolean(imported));
     if (!stop) return null;
     stops.push(stop);

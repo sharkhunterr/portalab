@@ -10,10 +10,12 @@
     "fr": "Maillage constellation derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "css",
-    "css": [
-      "look.css"
-    ]
+    "kind": "renderer",
+    "renderer": "layers",
+    "params": {
+      "particles": "mesh",
+      "fallback": "fireflies"
+    }
   },
   "economy": {
     "price": 700,

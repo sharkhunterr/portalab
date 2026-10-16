@@ -10,8 +10,15 @@
     "fr": "Volcan derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "volcano.glsl",
+    "params": {
+      "flow": [
+        "ash",
+        "embers"
+      ],
+      "fallback": "ash"
+    }
   },
   "economy": {
     "price": 1700,

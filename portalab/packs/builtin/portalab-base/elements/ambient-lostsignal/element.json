@@ -10,8 +10,11 @@
     "fr": "Signal perdu derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "lostsignal.glsl",
+    "params": {
+      "fallback": "vhs"
+    }
   },
   "economy": {
     "price": 800,

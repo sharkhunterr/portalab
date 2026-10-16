@@ -10,8 +10,14 @@
     "fr": "Brasier derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "inferno.glsl",
+    "params": {
+      "flow": [
+        "embers"
+      ],
+      "fallback": "embers"
+    }
   },
   "economy": {
     "price": 1300,

@@ -10,8 +10,14 @@
     "fr": "Forêt vivante derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "forest.glsl",
+    "params": {
+      "flow": [
+        "fireflies"
+      ],
+      "fallback": "fireflies"
+    }
   },
   "economy": {
     "price": 1200,

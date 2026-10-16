@@ -10,8 +10,12 @@
     "fr": "Le soleil qui rayonne sur le côté, six planètes sur leurs orbites inclinées, la ceinture d'astéroïdes et une géante à anneaux."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "solarsystem.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1300,

@@ -10,8 +10,12 @@
     "fr": "Orion, Cassiopée, la Grande Ourse, le Cygne, le Lion et le Scorpion qui se dessinent tour à tour, étoile après étoile."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "constellations.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1100,

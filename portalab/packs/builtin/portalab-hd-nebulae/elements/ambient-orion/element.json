@@ -10,8 +10,12 @@
     "fr": "M42 : des nuages magenta et cramoisis autour d'un cœur blanc où brillent de jeunes étoiles, des ailes violettes et bleues, des baies de poussière — qui se replient lentement."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "orion.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1700,

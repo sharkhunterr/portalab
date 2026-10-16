@@ -147,6 +147,12 @@ def _later(step: str, than: str) -> str:
     return step if ORDER.index(step) >= ORDER.index(than) else than
 
 
+# 028 (T038): Portalab's renderers an element of its own packs is drawn by with the element's parameters (an
+# ambience's layers: flows, particles, a landscape) — sent like any pack's; the others (``builtin``, the
+# navigations) are the interface's own code, nothing to load
+SENT_RENDERERS = frozenset({"layers"})
+
+
 class VisualPacks:
     def __init__(
         self,
@@ -1257,7 +1263,11 @@ class VisualPacks:
                 ).all()
             elements: list[dict[str, Any]] = []
             for pack_id, version, element in rows:
-                if element.data.get("builtin") and element.kind == "renderer":
+                if (
+                    element.data.get("builtin")
+                    and element.kind == "renderer"
+                    and (element.data.get("render") or {}).get("renderer") not in SENT_RENDERERS
+                ):
                     continue  # drawn by the interface's own code: nothing to load
                 elements.extend(self.render_list(pack_id, version, [element.data]))
             by_type: dict[str, list[str]] = {}

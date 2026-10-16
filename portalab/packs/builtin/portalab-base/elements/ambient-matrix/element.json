@@ -10,10 +10,11 @@
     "fr": "Pluie numérique derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "css",
-    "css": [
-      "look.css"
-    ]
+    "kind": "glsl",
+    "file": "matrix.glsl",
+    "params": {
+      "fallback": "code-rain"
+    }
   },
   "economy": {
     "price": 1200,

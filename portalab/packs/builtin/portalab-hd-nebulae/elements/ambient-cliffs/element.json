@@ -10,8 +10,12 @@
     "fr": "La crête de poussière orangée de la Carène comme une chaîne de montagnes, de la vapeur qui s'élève de sa crête dans un ciel de gaz bleu."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "cliffs.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1300,

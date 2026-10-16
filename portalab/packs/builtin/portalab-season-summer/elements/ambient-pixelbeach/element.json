@@ -10,8 +10,11 @@
     "fr": "Plage pixel au couchant derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pixelbeach.glsl",
+    "params": {
+      "fallback": "pixelsky"
+    }
   },
   "economy": {
     "price": 1200,

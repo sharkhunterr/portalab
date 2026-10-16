@@ -10,8 +10,12 @@
     "fr": "Ce qu'a laissé une étoile en explosant : une toile de filaments orange et rouges autour d'une lueur cyan, son pulsar qui scintille au milieu."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "crab.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1400,

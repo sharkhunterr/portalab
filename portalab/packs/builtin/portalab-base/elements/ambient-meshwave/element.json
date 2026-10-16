@@ -11,7 +11,11 @@
   },
   "render": {
     "kind": "renderer",
-    "renderer": "builtin"
+    "renderer": "layers",
+    "params": {
+      "mesh": true,
+      "fallback": "starfield"
+    }
   },
   "economy": {
     "price": 1300,

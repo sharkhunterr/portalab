@@ -239,7 +239,7 @@ def build(out: Path) -> dict[str, int]:
                 kept.setdefault(str(file.parent.relative_to(out)), {})[file.name] = file.read_bytes()
             elif file.is_file():
                 render = json.loads(file.read_text(encoding="utf-8")).get("render") or {}
-                if render.get("kind") != "renderer":
+                if render.get("kind") != "renderer" or render.get("renderer") == "layers":
                     drawn[str(file.parent.relative_to(out))] = render
         shutil.rmtree(out)
     seen: set[tuple[str, str]] = set()
@@ -273,7 +273,7 @@ def build(out: Path) -> dict[str, int]:
             for file_name, content in sorted(files.items()):
                 (target / file_name).write_bytes(content)
                 contents.update(file_name.encode() + content)
-            if files and str(target.relative_to(out)) in drawn:
+            if str(target.relative_to(out)) in drawn:
                 element["render"] = drawn[str(target.relative_to(out))]
             (target / "element.json").write_text(json.dumps(element, ensure_ascii=False, indent=2) + "\n")
         # its version: the release's, and the content's fingerprint — a release changing a pack changes it

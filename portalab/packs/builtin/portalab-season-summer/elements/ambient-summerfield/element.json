@@ -10,8 +10,14 @@
     "fr": "Champ d'été derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "summerfield.glsl",
+    "params": {
+      "flow": [
+        "butterflies"
+      ],
+      "fallback": "meadow"
+    }
   },
   "economy": {
     "price": 900,

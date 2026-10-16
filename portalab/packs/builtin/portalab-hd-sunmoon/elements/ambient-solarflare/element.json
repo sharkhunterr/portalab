@@ -10,8 +10,12 @@
     "fr": "Le soleil de tout près : sa surface en ébullition, ses taches, des protubérances qui jaillissent de son bord, parfois une éruption."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "solarflare.glsl",
+    "params": {
+      "fallback": "embers",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 1700,

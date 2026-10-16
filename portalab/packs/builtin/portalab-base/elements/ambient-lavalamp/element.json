@@ -10,8 +10,11 @@
     "fr": "Lampe à lave derrière tout le portail. À choisir dans Apparence ; coupé si les animations sont réduites."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "lavalamp.glsl",
+    "params": {
+      "fallback": "bubbles"
+    }
   },
   "economy": {
     "price": 1600,

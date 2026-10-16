@@ -10,8 +10,12 @@
     "fr": "Une nuit d'été au-dessus des collines, des étoiles filantes qui jaillissent de leur radiant, parfois un bolide."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "perseids.glsl",
+    "params": {
+      "fallback": "starfield",
+      "common": "safe"
+    }
   },
   "economy": {
     "price": 950,
