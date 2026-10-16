@@ -3,8 +3,9 @@ import type { Plugin } from "vite";
 
 /**
  * 028 (issue 135): the static files a visitor may load — the sign-in page's. Written to
- * ``public-assets.json`` beside ``index.html``; the server serves every other script of the application to
- * signed-in members only (stylesheets, fonts, images and sounds stay readable: no code in them).
+ * ``public-assets.json`` beside ``index.html``; the server serves every other script of the application — and
+ * its source map — to signed-in members only (stylesheets, fonts, images and sounds stay readable: no code in
+ * them).
  *
  * The sign-in page is the entry chunk and what it imports statically; every page loaded lazily (the
  * administration, the shop, the dashboard…) is left out.
@@ -31,8 +32,11 @@ export function publicAssets(): Plugin {
         for (const asset of meta?.importedAssets ?? []) open.add(asset);
       };
       for (const chunk of chunks.values()) if (chunk.isEntry) visit(chunk.fileName);
+      // a script's source map tells its code: only the open scripts' maps are open
+      for (const name of [...open])
+        if (/\.m?js$/.test(name) && `${name}.map` in bundle) open.add(`${name}.map`);
       for (const output of Object.values(bundle)) {
-        if (output.type === "asset" && !/\.m?js$/.test(output.fileName)) open.add(output.fileName);
+        if (output.type === "asset" && !/\.m?js(\.map)?$/.test(output.fileName)) open.add(output.fileName);
       }
       const names = [...open]
         .filter((name) => name.startsWith("assets/"))

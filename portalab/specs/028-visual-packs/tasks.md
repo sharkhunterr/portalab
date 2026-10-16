@@ -140,7 +140,7 @@ and lifts the block; as a visitor, every route but sign-in answers that a sessio
 - [X] T048 [P] [US3] `backend/tests/integration/identity/test_guard.py`: weighing (POC unit tests moved from `tests/unit/app/test_intrusion_guard.py`), block persisted and enforced across a new process (restart), account blocked across new sign-ins, address blocked only without a session, settings thresholds, `security.block.started` → notification to `security.manage` holders, lift via API
 - [X] T049 [P] [US3] `backend/tests/integration/identity/test_guard_console.py`: `portalab security blocks list|lift` (Admin's own block lifted, audit actor `console:<user>`, running process drops the block within 5 s)
 - [X] T050 [P] [US3] `backend/tests/integration/test_health_networks.py`: `/healthz`, `/readyz`, `/metrics` only from configured networks; `server.trusted_proxies` honoured; first-run routes answer 401 once completed; `GET /terms` requires a session
-- [ ] T051 [P] [US3] `frontend/tests/e2e/visual-packs/anonymous.spec.ts`: sign-in page styled and usable without any API call but the allow-list; a guessed lazy chunk answers 401 without a session
+- [X] T051 [P] [US3] `frontend/tests/e2e/visual-packs/anonymous.spec.ts`: sign-in page styled and usable without any API call but the allow-list; a guessed lazy chunk answers 401 without a session
 
 ### Implementation for User Story 3
 
@@ -168,7 +168,7 @@ and lifts the block; as a visitor, every route but sign-in answers that a sessio
 keyboard; a failing navigation is replaced within 5 s; administration shows the built-in navigation.
 
 - [ ] T063 [P] [US4] `frontend/tests/e2e/visual-packs/navigation.spec.ts`: every section/page reachable at 390/820/1280 px and by keyboard; failing fixture → built-in within 5 s; `/admin/*` built-in; navigate to an ungiven key does nothing
-- [ ] T064 [P] [US4] `frontend/tests/unit/visuals/pack-nav.test.ts`: key check, rate limit, expand within `nav.expands`, landmark/skip link kept
+- [X] T064 [P] [US4] `frontend/tests/unit/visuals/pack-nav.test.ts`: key check, rate limit, expand within `nav.expands`, landmark/skip link kept
 - [X] T065 [US4] Heartbeat in the sandbox bootstrap (`backend/src/portalab/modules/visuals/sandbox.py`: `ping`/`pong`) and in `frontend/src/design-system/visuals/sandbox.ts` (stop after 3 misses; `ready` within 4 s), reports `POST /visuals/reports` (R14)
 - [X] T066 [US4] `POST /visuals/reports` (rate-limited) and element health counts in `modules/visuals/api/members.py` + `registry.py`; event `visuals.element.failed`
 - [X] T067 [US4] Harden `frontend/src/shell/nav/PackNav.tsx`: room reserved from `render.nav` before start, fallback to the interface's built-in variant, never mounted under the administration frame, context per sandbox-protocol.md
@@ -186,7 +186,7 @@ keyboard; a failing navigation is replaced within 5 s; administration shows the 
 cards and rarities equal the draw; another booster opens with the default; reduced motion: no animation.
 
 - [X] T069 [P] [US5] `backend/tests/integration/visuals/test_scenes.py`: scene analysis (unknown part, durations), binding API, `GET /visuals/scenes/{booster}` default when unbound, composition-only pack publishes a booster with its odds, admin-created boosters untouched
-- [ ] T070 [P] [US5] `frontend/tests/e2e/visual-packs/booster-scene.spec.ts`: 50 openings, displayed cards/rarities equal the API's draw; partial scene uses default parts; reduced motion
+- [X] T070 [P] [US5] `frontend/tests/e2e/visual-packs/booster-scene.spec.ts`: 50 openings, displayed cards/rarities equal the API's draw; partial scene uses default parts; reduced motion
 - [X] T071 [US5] Element types `booster_scene`, `booster_look`, `booster_opening`, `card_reveal`, `card_face`, `card_back` in `modules/visuals/manifest.py` and `analysis.py` (payload rules of pack-format.md, durations ≤ 4 s/3 s) (R23)
 - [X] T072 [US5] Scene bindings `modules/visuals/scenes.py` + `PUT /admin/visuals/scenes/{booster_key}` and Review step bindings (draft/publish) + `GET /visuals/scenes/{booster_key}`
 - [X] T073 [US5] `frontend/src/features/marketplace/boosters/scene/{SceneHost.tsx,parts.ts}`: resolves parts (pack or default), drives phases from `BoosterReveal.tsx` (which keeps drawing cards), renders css/glsl/js parts with context `{phase, rarity, index, count, reducedMotion}` only; default parts extracted from `boosters.css` into the socle (T036)
