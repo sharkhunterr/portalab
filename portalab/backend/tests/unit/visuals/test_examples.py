@@ -35,3 +35,17 @@ def test_the_examples_cover_every_kind_of_element_authors_may_bring() -> None:
         "widget",
         "widget_option",
     } <= types
+
+
+def test_the_workflow_journeys_fixtures_follow_the_analysis() -> None:
+    """The e2e journey of the six steps (T020) walks reports the analysis really gives: regenerate them with
+    ``uv run python scripts/e2e_visual_fixtures.py`` when the analysis changes."""
+    import json
+
+    fixtures = (
+        Path(__file__).resolve().parents[4] / "frontend" / "tests" / "e2e" / "visual-packs" / "fixtures"
+    )
+    saved = json.loads((fixtures / "nordlys.json").read_text())["report"]
+    fresh = analyse(read_folder(EXAMPLES / "nordlys"), interfaces=FakeInterfaces())
+    assert saved["summary"] == fresh["summary"]
+    assert [e["product"] for e in saved["elements"]] == [e["product"] for e in fresh["elements"]]

@@ -76,7 +76,12 @@ function fakeAdmin(page: Page, fx: { report: Record<string, any>; elements: unkn
         const path = url.pathname.replace("/api/v1/admin/visuals", "");
         if (path.startsWith("/files/")) {
           const file = path.split("/").slice(4).join("/");
-          const body = readFileSync(resolve(ROOT, "examples/visual-packs", pack, file), "utf8");
+          let body: string;
+          try {
+            body = readFileSync(resolve(ROOT, "examples/visual-packs", pack, file), "utf8");
+          } catch {
+            return route.fulfill({ status: 404, body: "" });
+          }
           const type = file.endsWith(".css")
             ? "text/css"
             : file.endsWith(".js")
@@ -138,18 +143,6 @@ function fakeAdmin(page: Page, fx: { report: Record<string, any>; elements: unkn
 }
 
 async function signIn(page: Page, width: number) {
-  page.on("pageerror", (error) => console.log("pageerror:", error.message.slice(0, 300)));
-  page.on("console", async (m) => {
-    if (m.type() !== "error") return;
-    const args = await Promise.all(
-      m
-        .args()
-        .map((a) =>
-          a.evaluate((v) => (v instanceof Error ? `${v.message}\n${v.stack}` : String(v))).catch(() => "?"),
-        ),
-    );
-    console.log("console:", args.join(" ").slice(0, 800));
-  });
   await page.setViewportSize({ width, height: 900 });
   await stubApi(page);
   await serveCatalogs(page);
@@ -196,9 +189,9 @@ for (const width of [1280, 390]) {
     await expect.poll(() => admin.state.step, { timeout: 30_000 }).toBe("tested");
     // Review: a price changed, the script accepted
     await goTo(page, `/admin/visuals/nordlys/1.0.0?step=review`);
-    const price = page.getByRole("spinbutton", { name: /Price — / }).first();
+    const price = page.getByRole("spinbutton", { name: /^Price.* — / }).first();
     await price.fill("1234");
-    const script = page.getByRole("checkbox").first();
+    const script = page.getByRole("checkbox", { name: /script/i });
     await script.check();
     await page.getByRole("button", { name: "Save the review" }).click();
     await expect.poll(() => admin.state.step).toBe("reviewed");

@@ -72,7 +72,7 @@ price changed; the elements appear in the shop with that price; a blocking versi
 
 - [X] T018 [P] [US1] `backend/tests/unit/visuals/test_workflow_states.py`: step transitions of data-model (imported → analysed → tested → reviewed → published; refused; blocking stays at analysed), confirmations required (scripts, replaces, contracts)
 - [X] T019 [P] [US1] `backend/tests/integration/visuals/test_workflow.py`: inbox scan, upload, GitHub (mocked httpx: hosts, redirects, sizes), measures, draft, publish with a changed price (product carries it, decision stored), refuse, same version other content refused, audit entries per step, every route refused without `visuals.manage`
-- [ ] T020 [P] [US1] `frontend/tests/e2e/visual-packs/workflow.spec.ts`: Nordlys from the inbox through the six steps on desktop and phone widths; blocking fixture stops at Analysis
+- [X] T020 [P] [US1] `frontend/tests/e2e/visual-packs/workflow.spec.ts`: Nordlys from the inbox through the six steps on desktop and phone widths; blocking fixture stops at Analysis
 
 ### Implementation for User Story 1
 
