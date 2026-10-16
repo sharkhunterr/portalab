@@ -38,13 +38,9 @@ ADMIN_TOPICS: tuple[dict[str, object], ...] = (
     {"key": "shop", "label_key": "nav.hub.shop", "icon": "shop", "order_hint": 70},
     # 027: automations are a hub of their own — overview, builder, history, templates, approvals
     {"key": "automations", "label_key": "nav.hub.automations", "icon": "zap", "order_hint": 75},
-    {
-        "key": "system",
-        "label_key": "nav.hub.system",
-        "icon": "settings",
-        "order_hint": 80,
-        "aliases": ("extensions",),
-    },
+    # 028: what extends Portalab, from outside — visual packs, widgets, plugins, modules — one hub, its tabs
+    {"key": "extensions", "label_key": "nav.hub.extensions", "icon": "plug", "order_hint": 78},
+    {"key": "system", "label_key": "nav.hub.system", "icon": "settings", "order_hint": 80},
 )
 
 
@@ -471,7 +467,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "plug",
         "route": "/admin/plugins",
         "group": "admin",
-        "topic": "system",
+        "topic": "extensions",
         "order_hint": 3,
         "required_permission": "plugins.read",
     },
@@ -483,8 +479,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "dashboard",
         "route": "/admin/modules",
         "group": "admin",
-        "topic": "system",
-        "order_hint": 2,
+        "topic": "extensions",
+        "order_hint": 4,
         "required_permission": "modules.manage",
     },
     {
@@ -747,8 +743,20 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "sparkles",
         "route": "/admin/visuals",
         "group": "admin",
-        "topic": "shop",
-        "order_hint": 9,
+        "topic": "extensions",
+        "order_hint": 1,
+        "required_permission": "visuals.manage",
+    },
+    {  # 028: the packs bringing widgets, their looks and their options
+        "key": "ui.widget_packs",
+        "owner": "module:ui",
+        "kind": "entry",
+        "label_key": "nav.admin.widgets",
+        "icon": "dashboard",
+        "route": "/admin/widgets",
+        "group": "admin",
+        "topic": "extensions",
+        "order_hint": 2,
         "required_permission": "visuals.manage",
     },
     {

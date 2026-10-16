@@ -1115,6 +1115,8 @@ class VisualPacks:
                     ),
                     "versions": [_version_row(v) for v in mine if v.step != "purged"],
                     "failures": failures.get(pack.current_version_id, 0) if pack.current_version_id else 0,
+                    # 028: what it brings for the dashboard (its live version's, else its latest's)
+                    "widgets": _widget_elements(current or (mine[0] if mine else None)),
                 }
             )
         return out
@@ -1351,6 +1353,33 @@ class VisualPacks:
                     continue
         path.rename(path.with_suffix(".json.migrated"))
         return count
+
+
+def _widget_elements(version: PackVersion | None) -> list[dict[str, Any]]:
+    """A version's widgets, widget looks and widget options, as the Extensions → Widgets tab lists them."""
+    if version is None:
+        return []
+    decided = (version.decision or {}).get("economy") or (version.draft or {}).get("economy") or {}
+    out = []
+    for element in (version.report or {}).get("elements") or []:
+        if element.get("type") not in GIVEABLE:
+            continue
+        economy = {**(element.get("economy") or {}), **(decided.get(element.get("product")) or {})}
+        out.append(
+            {
+                "product": element.get("product"),
+                "type": element["type"],
+                "look": element.get("look"),
+                "kind": element.get("kind"),
+                "names": element.get("names") or {},
+                "widget": widget_render(element),
+                "contracts": element.get("contracts") or [],
+                "sold": economy.get("sold", True),
+                "price": economy.get("price"),
+                "rarity": economy.get("rarity") or "common",
+            }
+        )
+    return out
 
 
 def _blocked(row: PackVersion) -> bool:

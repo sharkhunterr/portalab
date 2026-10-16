@@ -1,0 +1,150 @@
+/* 028 (issue 138): Extensions — the import tiles every tab opens with, and the compact lists below them
+   (the lists' classes hold « __ »: the admin kit's indented lists leave them alone) */
+.ext-import {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ext-import__tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  inline-size: 100%;
+  min-block-size: 3.25rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--motion-duration-fast) var(--motion-easing);
+}
+.ext-import__tile:hover,
+.ext-import__tile:focus-within {
+  border-color: var(--color-accent);
+}
+.ext-import__tile:disabled,
+.ext-import__tile[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.6;
+}
+.ext-import__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+.ext-import__text {
+  display: grid;
+  min-inline-size: 0;
+}
+.ext-import__text > span {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* a .zip source: the whole tile is the file picker (its input laid over it, unseen) */
+label.ext-import__tile {
+  position: relative;
+}
+.ext-import__file {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.ext-import__result {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.ext-import__found {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ext-import__found > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+@media (max-width: 47.99rem) {
+  .ext-import {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ext-import__tile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+  .ext-import__text > span {
+    display: none;
+  }
+}
+
+/* Extensions → Modules: the kernel's names in one line, the other modules one short row each */
+.mod-kernel {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.mod-kernel strong {
+  color: var(--color-text);
+}
+.mod-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mod-list > li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+.mod-list > li:last-child {
+  border-block-end: 0;
+}
+.mod-list__name {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  min-inline-size: 0;
+}
+.mod-list__name > span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+@media (max-width: 47.99rem) {
+  .mod-kernel,
+  .mod-list > li {
+    padding-inline: var(--space-3);
+  }
+}

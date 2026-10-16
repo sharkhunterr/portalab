@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../api/client";
+import { api, CSRF_COOKIE, CSRF_HEADER } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { ApiError } from "../../state/regions";
 
@@ -123,5 +123,32 @@ export function useModules() {
   return useQuery({
     queryKey: [...KEY, "modules"],
     queryFn: async () => ((await api.GET("/api/v1/admin/modules")).data ?? []) as unknown as ModuleRow[],
+  });
+}
+
+/** 028 (issue 138): a plugin's .zip sent from the browser — it lands in ``plugins/available`` and is installed
+ * awaiting review (its review comes back, to be consented to). */
+export function useUploadPlugin() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const token = document.cookie
+        .split("; ")
+        .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
+        ?.slice(CSRF_COOKIE.length + 1);
+      const response = await fetch(`/api/v1/admin/plugins/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/zip",
+          ...(token ? { [CSRF_HEADER]: decodeURIComponent(token) } : {}),
+        },
+        body: file,
+      });
+      const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok) throw new Error(String(data.detail ?? data.title ?? response.statusText));
+      return data as { review: Review };
+    },
+    onSettled: () => client.invalidateQueries({ queryKey: KEY }),
   });
 }

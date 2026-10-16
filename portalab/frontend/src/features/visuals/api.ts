@@ -72,6 +72,27 @@ export interface PackRow {
   versions: VersionRow[];
   /** how many times its elements failed in members' pages (a script not answering, or breaking) */
   failures?: number;
+  /** 028: what it brings for the dashboard — widgets, widget looks and options (its live version's) */
+  widgets?: PackWidgetElement[];
+}
+
+export interface PackWidgetElement {
+  product: string;
+  type: "widget" | "widget_style" | "widget_option";
+  look: string | null;
+  kind: string;
+  names: Record<string, string>;
+  widget: {
+    for?: string | null;
+    setting?: string;
+    value?: string;
+    place?: string | null;
+    sizes?: unknown[];
+  } | null;
+  contracts: string[];
+  sold: boolean;
+  price: number | null;
+  rarity: string;
 }
 
 export interface Finding {

@@ -1,0 +1,134 @@
+{
+  "report": {
+    "summary": {
+      "blocking": 1,
+      "warning": 0,
+      "info": 2,
+      "elements": 1,
+      "hd": false,
+      "script": false,
+      "publishable": false,
+      "security": {
+        "blocking": 0,
+        "warning": 0,
+        "info": 0
+      }
+    },
+    "pack": {
+      "format": 1,
+      "id": "brouillon",
+      "version": "1.0.0",
+      "names": {
+        "fr": "T",
+        "en": "T"
+      },
+      "descriptions": {
+        "fr": "",
+        "en": ""
+      },
+      "author": null,
+      "license": null,
+      "homepage": null,
+      "elements": null
+    },
+    "items": [
+      {
+        "level": "info",
+        "code": "pack.no_license",
+        "category": "analysis",
+        "element": null,
+        "params": {}
+      },
+      {
+        "level": "blocking",
+        "code": "file.missing",
+        "category": "analysis",
+        "element": "frame_tiny",
+        "params": {
+          "file": "missing.css"
+        }
+      },
+      {
+        "level": "info",
+        "code": "element.no_preview",
+        "category": "analysis",
+        "element": "frame_tiny",
+        "params": {}
+      }
+    ],
+    "elements": [
+      {
+        "folder": "elements/frame",
+        "product": "frame_tiny",
+        "type": "avatar_frame",
+        "look": "tiny",
+        "kind": "css",
+        "folder_files": ["missing.css"],
+        "contracts": [],
+        "free": false,
+        "hd": false,
+        "script": false,
+        "names": {
+          "fr": "Petit",
+          "en": "Tiny"
+        },
+        "descriptions": {
+          "fr": "",
+          "en": ""
+        },
+        "economy": {
+          "price": 400,
+          "rarity": "rare",
+          "level": null,
+          "supply": null,
+          "collection": null,
+          "icon": null,
+          "repeatable": false,
+          "season": null,
+          "limit": null,
+          "featured": false,
+          "reward_only": false,
+          "contribution": null,
+          "sold": true
+        },
+        "payload": {},
+        "render": {
+          "kind": "css",
+          "file": null,
+          "css": ["missing.css"],
+          "stage": false,
+          "shape": 0,
+          "radius": null,
+          "reveal": null,
+          "duration": null,
+          "nav": null,
+          "renderer": null,
+          "params": {},
+          "rarity": null,
+          "place": null
+        },
+        "palette": null,
+        "preview": null,
+        "replaces": false,
+        "bytes": 0
+      }
+    ]
+  },
+  "elements": [
+    {
+      "pack": "brouillon",
+      "sha": "0123456789abcdef",
+      "product": "frame_tiny",
+      "type": "avatar_frame",
+      "look": "tiny",
+      "kind": "css",
+      "names": {
+        "fr": "Petit",
+        "en": "Tiny"
+      },
+      "css": ["/api/v1/admin/visuals/files/brouillon/0123456789abcdef/elements/frame/missing.css"],
+      "stage": false,
+      "shape": 0
+    }
+  ]
+}

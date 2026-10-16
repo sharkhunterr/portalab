@@ -57,3 +57,18 @@ export async function sandboxTexts(page: Page): Promise<string[]> {
 export function packFile(folder: string, path: string): string {
   return readFileSync(resolve(ROOT, "examples/visual-packs", folder, "elements", path), "utf8");
 }
+
+/** The interface's real English words (the backend's catalogs), for journeys that read labels. */
+export async function serveCatalogs(page: Page): Promise<void> {
+  await page.route("**/api/v1/i18n/catalogs/**", (route) => {
+    const namespace = new URL(route.request().url()).pathname.split("/").pop() ?? "";
+    try {
+      const messages = JSON.parse(
+        readFileSync(resolve(ROOT, "backend/locales/en", `${namespace}.json`), "utf8"),
+      );
+      return route.fulfill({ json: { namespace, language: "en", messages } });
+    } catch {
+      return route.fulfill({ json: { namespace, language: "en", messages: {} } });
+    }
+  });
+}

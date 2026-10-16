@@ -88,6 +88,7 @@ const WikiAdmin = lazy(() => import("../../features/wiki/WikiAdmin"));
 const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
 const VisualsAdmin = lazy(() => import("../../features/visuals/VisualsAdmin")); // 028
 const VersionWorkflow = lazy(() => import("../../features/visuals/VersionWorkflow")); // 028
+const WidgetPacksAdmin = lazy(() => import("../../features/visuals/WidgetPacksAdmin")); // 028
 const SecurityBlocks = lazy(() => import("../../features/security/SecurityBlocks")); // issue 1 (POC)
 const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAdmin"));
 const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
@@ -385,6 +386,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
             { path: "visuals", element: <VisualsAdmin />, handle: h({ crumb: "Visual packs" }) },
+            { path: "widgets", element: <WidgetPacksAdmin />, handle: h({ crumb: "Widgets" }) },
             {
               path: "visuals/:pack/:version",
               element: <VersionWorkflow />,

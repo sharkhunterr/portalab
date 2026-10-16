@@ -50,12 +50,13 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
         "engagement",
         "shop",
         "automations",  # 027: a hub of its own
+        "extensions",  # 028: visual packs, widgets, plugins, modules
         "system",
     ]
     assert {"automations.admin", "automations.history"} <= topics["automations"]
     assert {"authz.roles", "identity.members"} <= topics["members"] and "authz.audit" in topics["pilot"]
     assert {"support.queue", "wiki.admin"} <= topics["support"]
-    assert "plugins.modules" in topics["system"]
+    assert "plugins.modules" in topics["extensions"]  # 028: what extends Portalab, one hub
     hubs = {t["key"]: t for t in by_key["admin"]["topics"]}
     assert hubs["pilot"]["route"] == "/admin" and hubs["pilot"]["icon"] == "gauge"
     assert not by_key["admin"]["entries"]  # every built-in admin entry has a topic

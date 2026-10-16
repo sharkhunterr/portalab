@@ -6,7 +6,15 @@ import { TextField } from "../../../design-system/components/Field";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
-import { type Review, useDiscovery, usePluginActions, usePluginDetail, usePlugins } from "../api";
+import { ImportPanel } from "../../extensions/ImportPanel";
+import {
+  type Review,
+  useDiscovery,
+  usePluginActions,
+  usePluginDetail,
+  usePlugins,
+  useUploadPlugin,
+} from "../api";
 import { Diagnostics } from "../diagnostics/Diagnostics";
 import { ReviewConsent } from "../review/ReviewConsent";
 
@@ -105,7 +113,6 @@ function PluginDetail({ pluginKey }: { pluginKey: string }) {
 export default function PluginsAdmin() {
   const t = useT();
   const plugins = usePlugins();
-  const discovery = useDiscovery();
   const action = usePluginActions();
   const [open, setOpen] = useState<string | null>(null);
   const [review, setReview] = useState<Review | null>(null);
@@ -118,6 +125,7 @@ export default function PluginsAdmin() {
   return (
     <AdminPage icon="plug" title={t("plugins:title")} description={t("plugins:description")}>
       {restart ? <FunctionalState state="maintenance" label={t("plugins:restartBanner")} /> : null}
+      <PluginImport onReview={setReview} onInstall={install} />
       {review ? (
         <ReviewConsent
           review={review}
@@ -163,26 +171,99 @@ export default function PluginsAdmin() {
           ))}
         </ul>
       </AdminSection>
-      <AdminSection title={t("plugins:discovery")} description={t("plugins:discoveryHint")} icon="compass">
-        <ul className="ds-stack">
-          {(discovery.data ?? []).map((item) => (
-            <li key={item.package} className="ds-card ds-stack--row">
+    </AdminPage>
+  );
+}
+
+/**
+ * 028 (issue 138): Extensions → Plugins opens with its « Import »: the ``plugins/available`` folder read again
+ * (what is found there, each with its compatibility, installed on demand) or a .zip sent; an install comes
+ * back with its review to consent to. Nothing is ever downloaded on its own.
+ */
+function PluginImport({
+  onReview,
+  onInstall,
+}: {
+  onReview: (review: Review) => void;
+  onInstall: (pkg: string) => void;
+}) {
+  const t = useT();
+  const discovery = useDiscovery();
+  const upload = useUploadPlugin();
+  const [read, setRead] = useState(false);
+  const found = (discovery.data ?? []).filter((item) => !item.state);
+  return (
+    <ImportPanel
+      title={t("admin:extensions.import")}
+      description={t("plugins:discoveryHint")}
+      sources={[
+        {
+          key: "folder",
+          icon: "folder",
+          label: t("plugins:import.folder"),
+          hint: "plugins/available",
+          render: ({ className, children }) => (
+            <button
+              type="button"
+              className={className}
+              disabled={discovery.isFetching}
+              onClick={async () => {
+                await discovery.refetch();
+                setRead(true);
+              }}
+            >
+              {children}
+            </button>
+          ),
+        },
+        {
+          key: "zip",
+          icon: "inbox",
+          label: t("plugins:import.zip"),
+          hint: t("plugins:import.zipHint"),
+          render: ({ className, children }) => (
+            <label className={className}>
+              <input
+                className="ext-import__file"
+                type="file"
+                accept=".zip,application/zip"
+                onChange={(event) => {
+                  const chosen = event.target.files?.[0];
+                  event.target.value = "";
+                  if (chosen) upload.mutate(chosen, { onSuccess: (data) => onReview(data.review) });
+                }}
+              />
+              {children}
+            </label>
+          ),
+        },
+      ]}
+    >
+      {upload.isError ? <FunctionalState state="error" label={upload.error.message} /> : null}
+      {read && !found.length ? (
+        <p className="ext-import__result" role="status">
+          {t("plugins:import.nothing")}
+        </p>
+      ) : null}
+      {found.length ? (
+        <ul className="ext-import__found">
+          {found.map((item) => (
+            <li key={item.package}>
               <span>
-                {item.name ?? item.package} {item.version ?? ""}{" "}
+                <strong>{item.name ?? item.package}</strong> {item.version ?? ""}{" "}
                 {item.maturity ? <Badge>{t(`plugins:maturity.${item.maturity}`)}</Badge> : null}
               </span>
               {!item.valid ? <FunctionalState state="error" label={t("plugins:invalidPackage")} /> : null}
               {item.compatibility?.length ? (
                 <FunctionalState state="error" label={item.compatibility.join("; ")} />
               ) : null}
-              {item.deprecation_notice ? <span>{item.deprecation_notice}</span> : null}
-              {item.valid && !item.state ? (
-                <Button onClick={() => install(item.package)}>{t("plugins:actions.install")}</Button>
+              {item.valid && !item.compatibility?.length ? (
+                <Button onClick={() => onInstall(item.package)}>{t("plugins:actions.install")}</Button>
               ) : null}
             </li>
           ))}
         </ul>
-      </AdminSection>
-    </AdminPage>
+      ) : null}
+    </ImportPanel>
   );
 }

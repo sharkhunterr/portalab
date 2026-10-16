@@ -1,35 +1,4 @@
 /* 028: the visual packs' administration — the pack list and the six steps of a version */
-.visuals-sources {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: var(--space-4);
-}
-.visuals-source {
-  display: grid;
-  align-content: start;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-.visuals-source__title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  font-weight: 700;
-}
-.visuals-source__path {
-  overflow-wrap: anywhere;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
-.visuals-updates {
-  margin: 0;
-  padding-inline-start: 1.1rem;
-  font-size: 0.85rem;
-}
 .visuals-empty {
   padding: var(--space-4);
   color: var(--color-text-muted);
@@ -350,30 +319,12 @@
   gap: var(--space-3);
   margin-block-start: var(--space-4);
 }
-.visuals-filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 0.85rem;
-}
-.visuals-filter label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
 .visuals-version__next {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   font-size: 0.85rem;
   color: var(--color-text-muted);
-}
-.visuals-pack__outcome {
-  margin: var(--space-2) 0 0;
-  font-size: 0.9rem;
 }
 .visuals-economy-table {
   overflow-x: auto;
@@ -459,4 +410,295 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
+}
+
+/* 028 (issue 138): Extensions → Widgets — each pack's elements as small cards */
+.wp-group {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+.wp-group:last-child {
+  border-block-end: 0;
+}
+.wp-group__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.wp-group__review {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-inline-start: auto;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+.wp-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wp-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.wp-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.wp-card__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+.wp-card[data-kind="widget"] .wp-card__icon {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.wp-card__title {
+  display: grid;
+  min-inline-size: 0;
+}
+.wp-card__title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wp-card__title span,
+.wp-card__line {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.wp-card__line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  margin: 0;
+}
+.wp-card__line .ds-icon {
+  flex: none;
+  margin-block-start: 1px;
+}
+.wp-card__price {
+  justify-self: start;
+  margin: var(--space-1) 0 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+.wp-card__price[data-given] {
+  background: var(--state-available-bg);
+  color: var(--state-available-fg);
+}
+@media (max-width: 47.99rem) {
+  .wp-group {
+    padding: var(--space-3);
+  }
+  .wp-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 028 (issue 138): the packs, compact — a toolbar (imported / Portalab's, a search), one card per pack */
+.vp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+.vp-toolbar .admin-search {
+  flex: 1 1 12rem;
+}
+.vp-tabs {
+  display: inline-flex;
+  margin: 0;
+  padding: 3px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+.vp-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2.25rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.vp-tabs button[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.vp-tabs__count {
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+}
+.vp-message {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.vp-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vp-card {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+.vp-card:last-child {
+  border-block-end: 0;
+}
+.vp-card[data-state="disabled"] .vp-card__name {
+  color: var(--color-text-muted);
+}
+.vp-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.vp-card__title {
+  display: grid;
+  min-inline-size: 0;
+}
+.vp-card__name {
+  overflow: hidden;
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.vp-card__name:hover {
+  color: var(--color-accent);
+}
+.vp-card__meta {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vp-card__meta code {
+  margin-inline-end: 0.15em;
+}
+.vp-card__state {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+.vp-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.vp-waiting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+.vp-waiting > span {
+  flex: 1;
+}
+.vp-waiting[data-blocked] {
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+.vp-history summary {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.vp-history ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.vp-history li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.vp-history__version {
+  min-inline-size: 3.5rem;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+}
+.vp-history__action {
+  margin-inline-start: auto;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+.vp-history__action + .vp-history__action {
+  margin-inline-start: 0;
+}
+@media (max-width: 47.99rem) {
+  .vp-toolbar,
+  .vp-card {
+    padding: var(--space-3);
+  }
+  .vp-tabs {
+    inline-size: 100%;
+  }
+  .vp-tabs button {
+    flex: 1;
+    justify-content: center;
+  }
 }
