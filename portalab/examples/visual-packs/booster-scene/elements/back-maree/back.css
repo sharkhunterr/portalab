@@ -1,0 +1,50 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. The shape
+   is set on the back itself: the card turns in 3D, never clip the turning part. */
+[data-card-back="maree"] .booster-card__back {
+  isolation: isolate;
+  clip-path: polygon(9% 0, 91% 0, 100% 6.5%, 100% 93.5%, 91% 100%, 9% 100%, 0 93.5%, 0 6.5%);
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 46%, rgba(160, 240, 255, 0.28), transparent 70%),
+    radial-gradient(circle at 50% 0, transparent 0 7px, rgba(255, 255, 255, 0.07) 8px, transparent 9px) 0 0 / 16px 10px,
+    linear-gradient(150deg, #0b4256 0%, #126f86 30%, #3b2f6e 62%, #0a3346 100%);
+  box-shadow: inset 0 0 0 2px rgba(230, 250, 255, 0.55), inset 0 0 1.6rem rgba(0, 20, 40, 0.65);
+}
+/* the iridescent glint gliding over it */
+[data-card-back="maree"] .booster-card__back::after {
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.28) 47%, rgba(255, 190, 245, 0.22) 50%, rgba(140, 240, 255, 0.2) 53%, transparent 60%);
+}
+/* the filigree frame, its cut corners following the plate */
+[data-card-back="maree"] .booster-card__back-pattern {
+  inset: 0.5rem;
+  clip-path: polygon(8% 0, 92% 0, 100% 5.5%, 100% 94.5%, 92% 100%, 8% 100%, 0 94.5%, 0 5.5%);
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(rgba(240, 225, 190, 0.85), rgba(240, 225, 190, 0.85)) top / 100% 1px no-repeat,
+    linear-gradient(rgba(240, 225, 190, 0.85), rgba(240, 225, 190, 0.85)) bottom / 100% 1px no-repeat,
+    linear-gradient(rgba(240, 225, 190, 0.85), rgba(240, 225, 190, 0.85)) left / 1px 100% no-repeat,
+    linear-gradient(rgba(240, 225, 190, 0.85), rgba(240, 225, 190, 0.85)) right / 1px 100% no-repeat,
+    radial-gradient(circle at 0 0, rgba(240, 225, 190, 0.7) 0 6px, transparent 7px) top left / 18px 18px no-repeat,
+    radial-gradient(circle at 100% 0, rgba(240, 225, 190, 0.7) 0 6px, transparent 7px) top right / 18px 18px no-repeat,
+    radial-gradient(circle at 0 100%, rgba(240, 225, 190, 0.7) 0 6px, transparent 7px) bottom left / 18px 18px no-repeat,
+    radial-gradient(circle at 100% 100%, rgba(240, 225, 190, 0.7) 0 6px, transparent 7px) bottom right / 18px 18px no-repeat;
+}
+/* the emblem: a scallop shell of nacre with its pearl */
+[data-card-back="maree"] .booster-card__back-sigil {
+  inline-size: 52%;
+  aspect-ratio: 1.05;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 98%, 6% 40%, 10% 26%, 20% 14%, 32% 6%, 50% 2%, 68% 6%, 80% 14%, 90% 26%, 94% 40%);
+  background:
+    radial-gradient(circle at 50% 70%, #fffaf3 0 7%, #e8dbe9 9%, rgba(0, 0, 0, 0) 12%),
+    repeating-conic-gradient(from -50deg at 50% 98%, rgba(255, 255, 255, 0.55) 0deg 1.5deg, rgba(255, 255, 255, 0) 1.5deg 9deg),
+    linear-gradient(170deg, #f7fdff, #a9e6f2 45%, #e9c9e6 75%, #9fd4e6);
+  filter: drop-shadow(0 0 0.5rem rgba(200, 250, 255, 0.6));
+}
+[data-card-back="maree"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

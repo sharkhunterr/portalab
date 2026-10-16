@@ -136,6 +136,12 @@ async def report(principal: Member, packs: Packs, body: ReportIn) -> None:
     await packs.report_failure(principal, body.pack, body.sha, body.element, body.reason)
 
 
+@members.get("/visuals/scenes/{booster_key}")
+async def scene(_: Member, packs: Packs, booster_key: str) -> dict[str, Any]:
+    """The scene a booster opens with (``null``: Portalab's own)."""
+    return {"scene": await packs.scene_for(booster_key)}
+
+
 @members.get("/visuals/files/{pack}/{sha}/{name:path}")
 async def live_file(_: Member, packs: Packs, pack: str, sha: str, name: str) -> FileResponse:
     return _file(await packs.served(pack, sha, name, manager=False), live=True)
@@ -255,6 +261,19 @@ async def refuse(principal: Manager, packs: Packs, pack: str, version: str, body
 class StateIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     state: Literal["enabled", "disabled"]
+
+
+class SceneIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    pack: str | None = Field(default=None, max_length=48)
+    look: str | None = Field(default=None, max_length=48)
+
+
+@admin.put("/admin/visuals/scenes/{booster_key}", status_code=204)
+async def bind(principal: Manager, packs: Packs, booster_key: str, body: SceneIn) -> None:
+    """Binds a published scene to a booster (``*``: every booster without its own); no scene: unbinds."""
+    target = (body.pack, body.look) if body.pack and body.look else None
+    await packs.bind_scene(principal, booster_key[:64], target)
 
 
 @admin.post("/admin/visuals/builtin/state")

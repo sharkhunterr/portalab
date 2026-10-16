@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "maree-coffre",
+  "names": {
+    "fr": "Le coffre s'ouvre",
+    "en": "The chest opens"
+  },
+  "descriptions": {
+    "fr": "Le coffre maudit tremble et souffle des bulles par sa jointure, puis son couvercle bascule : un éclat spectral, des rayons de lumière verdâtre, des gerbes de bulles, des pièces d'or qui s'envolent, et les cartes qui s'en échappent (HD).",
+    "en": "The cursed chest shudders and breathes bubbles out of its seam, then its lid swings open: a ghostly flash, shafts of green light, sprays of bubbles, gold coins flying, and the cards escaping from it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "treasure.glsl",
+    "css": [
+      "lid.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

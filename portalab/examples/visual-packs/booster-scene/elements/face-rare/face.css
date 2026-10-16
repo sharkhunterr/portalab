@@ -1,0 +1,36 @@
+/* A rare card: an arch of polished sea glass with bubbles caught in it (its hook: the card once turned, data-card-face). The shape is the face's own: the card turns
+   in 3D, never clip the turning part. A frame (the face) around a panel (its ::before), Portalab's art and
+   words above. */
+[data-card-face="maree-rare-face"] .booster-card__face {
+  isolation: isolate;
+  border-radius: 0;
+  clip-path: inset(0 round 48% 48% 0.7rem 0.7rem / 20% 20% 0.7rem 0.7rem);
+  background: linear-gradient(170deg, #d8fbff, #4fd2e0 35%, #1d8fa8 70%, #a6f0f5);
+  box-shadow: none;
+}
+[data-card-face="maree-rare-face"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: inset(0 round 48% 48% 0.7rem 0.7rem / 20% 20% 0.7rem 0.7rem);
+  background: radial-gradient(ellipse 90% 60% at 50% 18%, rgba(140, 240, 250, 0.35), transparent 70%), linear-gradient(180deg, #0f4d5c, #082c38);
+}
+[data-card-face="maree-rare-face"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 48% 48% 0.6rem 0.6rem / 20% 20% 0.6rem 0.6rem;
+  background:
+    radial-gradient(circle at 18% 72%, rgba(255, 255, 255, 0.5) 0 3px, transparent 4px),
+    radial-gradient(circle at 80% 64%, rgba(255, 255, 255, 0.4) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 86%, rgba(255, 255, 255, 0.45) 0 4px, rgba(255, 255, 255, 0.1) 5px, transparent 6px),
+    radial-gradient(circle at 28% 88%, rgba(255, 255, 255, 0.35) 0 2px, transparent 3px),
+    linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.16) 45%, transparent 60%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 300% 100%;
+  animation: maree-glass 4.5s ease-in-out infinite;
+}
+@keyframes maree-glass {
+  50% { background-position: 0 -6px, 0 -10px, 0 -8px, 0 -5px, 100% 0; }
+}

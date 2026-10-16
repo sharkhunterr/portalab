@@ -1,0 +1,33 @@
+/* An epic card: a frame of carved violet coral, notched at its waist (its hook: the card once turned, data-card-face). The shape is the face's own: the card turns
+   in 3D, never clip the turning part. A frame (the face) around a panel (its ::before), Portalab's art and
+   words above. */
+[data-card-face="maree-epic-face"] .booster-card__face {
+  isolation: isolate;
+  border-radius: 0;
+  clip-path: polygon(7% 0, 93% 0, 100% 5%, 100% 44%, 97% 50%, 100% 56%, 100% 95%, 93% 100%, 7% 100%, 0 95%, 0 56%, 3% 50%, 0 44%, 0 5%);
+  background: linear-gradient(160deg, #ffb3d1, #c04a9a 30%, #6a2c9e 60%, #ff8fb8 85%, #ffd1e4);
+  box-shadow: none;
+}
+[data-card-face="maree-epic-face"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: polygon(7% 0, 93% 0, 100% 5%, 100% 44%, 97% 50%, 100% 56%, 100% 95%, 93% 100%, 7% 100%, 0 95%, 0 56%, 3% 50%, 0 44%, 0 5%);
+  background: radial-gradient(ellipse 80% 55% at 50% 30%, rgba(255, 120, 190, 0.28), transparent 70%), linear-gradient(175deg, #3a1450, #1a0a2c);
+}
+/* coral branches growing up the panel's sides */
+[data-card-face="maree-epic-face"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(62deg, rgba(255, 140, 200, 0.22) 0 2px, transparent 2px 13px) left bottom / 22% 70% no-repeat,
+    repeating-linear-gradient(-62deg, rgba(255, 140, 200, 0.22) 0 2px, transparent 2px 13px) right bottom / 22% 70% no-repeat;
+  mask: linear-gradient(to top, #000, transparent 75%);
+}
+[data-card-face="maree-epic-face"] .booster-card__rarity {
+  color: #ffc4e1;
+  text-shadow: 0 0 0.6rem rgba(255, 110, 190, 0.8);
+}

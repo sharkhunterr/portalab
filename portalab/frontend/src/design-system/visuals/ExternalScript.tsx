@@ -14,23 +14,23 @@ export function ExternalScript({
   className,
 }: {
   element: ExternalElement;
-  context: { reducedMotion: boolean; level?: number; text?: string };
+  /** what it may know: a moment's level or text; a booster scene's phase, rarity and position (028) */
+  context: { reducedMotion: boolean } & Record<string, string | number | boolean | undefined>;
   className?: string;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { reducedMotion, level, text } = context;
+  const known = JSON.stringify(context);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: started again only when what it knows changes
   useEffect(() => {
     const target = frame.current;
     if (!target) return;
     const sandbox = runSandbox(target, element, {
       type: element.type,
       look: element.look,
-      reducedMotion,
-      ...(level === undefined ? {} : { level }),
-      ...(text === undefined ? {} : { text }),
+      ...Object.fromEntries(Object.entries(context).filter(([, value]) => value !== undefined)),
     });
     return () => sandbox.stop();
-  }, [element, reducedMotion, level, text]);
+  }, [element, known]);
   return (
     <iframe
       ref={frame}

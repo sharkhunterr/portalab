@@ -22,7 +22,7 @@ import { guardedSheet } from "./cssGuard";
  */
 
 export type ExternalKind = "css" | "glsl" | "js" | "theme" | "renderer" | "data" | "none";
-export type Scope = "live" | "preview";
+export type Scope = "live" | "preview" | "scene";
 
 export interface NavPlace {
   position: "top" | "bottom" | "left" | "right" | "floating";
@@ -86,7 +86,11 @@ export interface ExternalFx {
   ambient: boolean;
 }
 
-const scopes: Record<Scope, Map<string, ExternalElement>> = { live: new Map(), preview: new Map() };
+const scopes: Record<Scope, Map<string, ExternalElement>> = {
+  live: new Map(),
+  preview: new Map(),
+  scene: new Map(),
+};
 const shaders = new Map<string, ExternalFx>();
 // the definitions of imported interfaces (element ``theme``), by key, parsed
 const interfaces = new Map<string, ThemeDefinition>();
@@ -101,8 +105,10 @@ function notify() {
 }
 
 /** The name an external GLSL look is registered under (its fingerprint in it: a new version recompiles). */
-export function fxName(element: Pick<ExternalElement, "pack" | "sha" | "look">): string {
-  return `ext:${element.pack}.${element.sha}:${element.look}`;
+export function fxName(element: Pick<ExternalElement, "pack" | "sha" | "look" | "type">): string {
+  // 028: its type too — two elements of one pack may share a look's key (a scene's background and its
+  // booster's look, both « maree »): each keeps its own shader
+  return `ext:${element.pack}.${element.sha}:${element.type}:${element.look}`;
 }
 
 export function externalFx(name: string): ExternalFx | undefined {
@@ -113,7 +119,7 @@ export function externalFx(name: string): ExternalFx | undefined {
 export function externalLook(type: string, look: string | null | undefined): ExternalElement | undefined {
   if (!look) return undefined;
   const key = keyOf(type, look);
-  return scopes.preview.get(key) ?? scopes.live.get(key);
+  return scopes.preview.get(key) ?? scopes.scene.get(key) ?? scopes.live.get(key);
 }
 
 export function externalLooks(type: string): ExternalElement[] {
@@ -138,13 +144,13 @@ export function useExternalRevision(): number {
 }
 
 // the packs' stylesheets, guarded (``cssGuard``) and adopted by the document — never linked as they are
-const sheets: Record<Scope, CSSStyleSheet[]> = { live: [], preview: [] };
+const sheets: Record<Scope, CSSStyleSheet[]> = { live: [], preview: [], scene: [] };
 
 function adopt() {
   if (typeof document === "undefined" || !("adoptedStyleSheets" in document)) return;
-  const ours = new Set([...sheets.live, ...sheets.preview]);
+  const ours = new Set([...sheets.live, ...sheets.preview, ...sheets.scene]);
   const others = document.adoptedStyleSheets.filter((sheet) => !ours.has(sheet) && !retired.has(sheet));
-  document.adoptedStyleSheets = [...others, ...sheets.live, ...sheets.preview];
+  document.adoptedStyleSheets = [...others, ...sheets.live, ...sheets.scene, ...sheets.preview];
   retired.clear();
 }
 const retired = new Set<CSSStyleSheet>();

@@ -185,13 +185,13 @@ keyboard; a failing navigation is replaced within 5 s; administration shows the 
 **Independent Test**: a pack scene bound to one booster plays its parts; missing parts use the default;
 cards and rarities equal the draw; another booster opens with the default; reduced motion: no animation.
 
-- [ ] T069 [P] [US5] `backend/tests/integration/visuals/test_scenes.py`: scene analysis (unknown part, durations), binding API, `GET /visuals/scenes/{booster}` default when unbound, composition-only pack publishes a booster with its odds, admin-created boosters untouched
+- [X] T069 [P] [US5] `backend/tests/integration/visuals/test_scenes.py`: scene analysis (unknown part, durations), binding API, `GET /visuals/scenes/{booster}` default when unbound, composition-only pack publishes a booster with its odds, admin-created boosters untouched
 - [ ] T070 [P] [US5] `frontend/tests/e2e/visual-packs/booster-scene.spec.ts`: 50 openings, displayed cards/rarities equal the API's draw; partial scene uses default parts; reduced motion
-- [ ] T071 [US5] Element types `booster_scene`, `booster_look`, `booster_opening`, `card_reveal`, `card_face`, `card_back` in `modules/visuals/manifest.py` and `analysis.py` (payload rules of pack-format.md, durations ≤ 4 s/3 s) (R23)
-- [ ] T072 [US5] Scene bindings `modules/visuals/scenes.py` + `PUT /admin/visuals/scenes/{booster_key}` and Review step bindings (draft/publish) + `GET /visuals/scenes/{booster_key}`
-- [ ] T073 [US5] `frontend/src/features/marketplace/boosters/scene/{SceneHost.tsx,parts.ts}`: resolves parts (pack or default), drives phases from `BoosterReveal.tsx` (which keeps drawing cards), renders css/glsl/js parts with context `{phase, rarity, index, count, reducedMotion}` only; default parts extracted from `boosters.css` into the socle (T036)
-- [ ] T074 [US5] Booster composition elements published through `CatalogWriter` (odds kept by administrators after creation, rule #81) — verify in `modules/marketplace/products/sync.py`; Review step shows pool/odds
-- [ ] T075 [P] [US5] Example pack `examples/visual-packs/booster-scene/` (booster look, opening, legendary reveal, card back) with its README section
+- [X] T071 [US5] Element types `booster_scene`, `booster_look`, `booster_opening`, `card_reveal`, `card_face`, `card_back` in `modules/visuals/manifest.py` and `analysis.py` (payload rules of pack-format.md, durations ≤ 4 s/3 s) (R23)
+- [X] T072 [US5] Scene bindings `modules/visuals/scenes.py` + `PUT /admin/visuals/scenes/{booster_key}` and Review step bindings (draft/publish) + `GET /visuals/scenes/{booster_key}`
+- [X] T073 [US5] `frontend/src/features/marketplace/boosters/scene/{SceneHost.tsx,parts.ts}`: resolves parts (pack or default), drives phases from `BoosterReveal.tsx` (which keeps drawing cards), renders css/glsl/js parts with context `{phase, rarity, index, count, reducedMotion}` only; default parts extracted from `boosters.css` into the socle (T036)
+- [X] T074 [US5] Booster composition elements published through `CatalogWriter` (odds kept by administrators after creation, rule #81) — verify in `modules/marketplace/products/sync.py`; Review step shows pool/odds
+- [X] T075 [P] [US5] Example pack `examples/visual-packs/booster-scene/` (booster look, opening, legendary reveal, card back) with its README section
 
 **Checkpoint**: SC-008 holds.
 

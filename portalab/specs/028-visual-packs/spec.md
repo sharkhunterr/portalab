@@ -425,8 +425,8 @@ analysis reports no blocking finding; it imports and publishes.
 
 **Booster scenes**
 
-- **FR-030**: The booster scene MUST be made of parts — booster look, opening, reveal effect per rarity, card
-  face and back per rarity — each provided by the default scene or by a pack; a scene MAY be bound to one
+- **FR-030**: The booster scene MUST be made of parts — booster look, the stage's animated background,
+  opening, reveal effect per rarity, card face and back per rarity — each provided by the default scene or by a pack; a scene MAY be bound to one
   booster or offered as the default for every booster.
 - **FR-031**: The cards drawn, their rarities, refunds of duplicates and limits MUST be the portal's draw
   whatever scene plays; a scene only shows them.

@@ -3833,6 +3833,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/visuals/scenes/{booster_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Bind
+         * @description Binds a published scene to a booster (``*``: every booster without its own); no scene: unbinds.
+         */
+        put: operations["bind_api_v1_admin_visuals_scenes__booster_key__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/visuals/updates": {
         parameters: {
             query?: never;
@@ -9141,6 +9161,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/visuals/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report
+         * @description A pack's element failed in this member's page (counted for the administrators, an hour apart).
+         */
+        post: operations["report_api_v1_visuals_reports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/visuals/scenes/{booster_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Scene
+         * @description The scene a booster opens with (``null``: Portalab's own).
+         */
+        get: operations["scene_api_v1_visuals_scenes__booster_key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/widgets/{key}/data": {
         parameters: {
             query?: never;
@@ -14433,6 +14493,20 @@ export interface components {
             /** To Occurred At */
             to_occurred_at?: string | null;
         };
+        /** ReportIn */
+        ReportIn: {
+            /** Element */
+            element: string;
+            /** Pack */
+            pack: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "timeout" | "error" | "unresponsive";
+            /** Sha */
+            sha: string;
+        };
         /** RequestDecisionIn */
         RequestDecisionIn: {
             /** Reason */
@@ -14542,6 +14616,13 @@ export interface components {
             samples: {
                 [key: string]: unknown;
             }[];
+        };
+        /** SceneIn */
+        SceneIn: {
+            /** Look */
+            look?: string | null;
+            /** Pack */
+            pack?: string | null;
         };
         /** SearchFacetOut */
         SearchFacetOut: {
@@ -23922,6 +24003,39 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    bind_api_v1_admin_visuals_scenes__booster_key__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booster_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SceneIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -34025,6 +34139,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    report_api_v1_visuals_reports_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scene_api_v1_visuals_scenes__booster_key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booster_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

@@ -1,0 +1,123 @@
+/* Marée — the sealed booster as a cursed pirate's chest sunk on the ocean floor (its hook: the scene's pack,
+   data-booster-look). The pack's body is the chest, its strip (``booster-pack__flap``) the lid — it swings
+   open at the opening —, its emblem the skull on the lock, its name a tarnished plate. */
+[data-booster-look="maree"] .booster-stage__tear {
+  filter: drop-shadow(0 1.4rem 1.6rem rgba(0, 0, 0, 0.9)) drop-shadow(0 0 1.4rem rgba(90, 255, 180, 0.18));
+}
+/* the dark silt it sinks into, a few coins and a pearl spilled round it */
+[data-booster-look="maree"] .booster-stage__tear::before {
+  content: "";
+  position: absolute;
+  inset: auto -38% -9% -38%;
+  z-index: -1;
+  block-size: 30%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 19% 44%, #c9a24a 0 3.2%, #5e4614 4.2%, transparent 5.2%),
+    radial-gradient(circle at 26% 62%, #b48d38 0 2.6%, #4f3a10 3.6%, transparent 4.6%),
+    radial-gradient(circle at 80% 50%, #c9a24a 0 3.2%, #5e4614 4.2%, transparent 5.2%),
+    radial-gradient(circle at 87% 66%, #d8d4dc 0 2.2%, #6f6a78 3%, transparent 3.8%),
+    radial-gradient(circle at 70% 72%, #a8822e 0 2.4%, #4a360f 3.4%, transparent 4.4%),
+    radial-gradient(ellipse 50% 60% at 50% 40%, #3b382c, #23221a 55%, rgba(10, 12, 10, 0) 72%);
+}
+[data-booster-look="maree"] .booster-pack {
+  overflow: visible;
+  inline-size: 16rem;
+  aspect-ratio: 1.32 / 1;
+  border-radius: 0.5rem 0.5rem 0.7rem 0.7rem;
+  background:
+    /* seaweed, rot and barnacles clinging to it */
+    radial-gradient(ellipse 24% 34% at 6% 94%, rgba(20, 70, 40, 0.9), rgba(20, 70, 40, 0) 70%),
+    radial-gradient(ellipse 18% 26% at 95% 88%, rgba(18, 62, 36, 0.85), rgba(18, 62, 36, 0) 70%),
+    radial-gradient(ellipse 60% 22% at 50% 100%, rgba(30, 60, 30, 0.55), rgba(30, 60, 30, 0) 80%),
+    radial-gradient(circle at 11% 80%, #8a857a 0 2.2%, #3a3631 2.8%, transparent 3.4%),
+    radial-gradient(circle at 15% 86%, #8a857a 0 1.6%, #3a3631 2.2%, transparent 2.8%),
+    radial-gradient(circle at 90% 74%, #8a857a 0 1.8%, #3a3631 2.4%, transparent 3%),
+    /* rust-eaten iron bands */
+    linear-gradient(90deg, transparent 13%, #0f0d0b 13% 14%, #2c2622 14% 17%, #4d2614 17% 19%, #0f0d0b 19% 20%, transparent 20% 80%, #0f0d0b 80% 81%, #2c2622 81% 84%, #4d2614 84% 87%, #0f0d0b 87% 88%, transparent 88%),
+    /* rivets along the bands */
+    radial-gradient(circle, #5a514a 0 1.5px, #15120f 2.5px, transparent 3px) 15.6% 30% / 4% 14% repeat-y,
+    radial-gradient(circle, #5a514a 0 1.5px, #15120f 2.5px, transparent 3px) 83.4% 30% / 4% 14% repeat-y,
+    /* the blackened planks, their split grain, darker still at the bottom */
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.7)),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 17.5%, rgba(0, 0, 0, 0.85) 17.5% 18.6%),
+    repeating-linear-gradient(176deg, rgba(150, 120, 90, 0.05) 0 2px, rgba(0, 0, 0, 0.12) 2px 5px),
+    linear-gradient(90deg, #160e08, #2a1b10 30%, #20150c 60%, #2c1d11 85%, #140c07);
+  box-shadow:
+    inset 0 0 0 3px #0a0806,
+    inset 0 -1.4rem 1.8rem rgba(0, 0, 0, 0.7),
+    inset 0 0.5rem 1rem rgba(120, 255, 190, 0.06);
+  animation: maree-rest 6s ease-in-out infinite;
+}
+@keyframes maree-rest {
+  50% { transform: rotate(-0.5deg) translateY(1px); }
+}
+[data-booster-look="maree"] .booster-pack__foil,
+[data-booster-look="maree"] .booster-pack__stars {
+  display: none;
+}
+/* the lid: domed, its own planks and bands, a sickly light leaking from under it */
+[data-booster-look="maree"] .booster-pack__flap {
+  inset: -18% -3% auto -3%;
+  block-size: 58%;
+  border: 0;
+  border-radius: 48% 48% 0.4rem 0.4rem / 60% 60% 0.4rem 0.4rem;
+  clip-path: none;
+  transform-origin: 50% 100%;
+  background:
+    linear-gradient(90deg, transparent 13%, #0f0d0b 13% 14%, #2c2622 14% 17%, #4d2614 17% 19%, #0f0d0b 19% 20%, transparent 20% 80%, #0f0d0b 80% 81%, #2c2622 81% 84%, #4d2614 84% 87%, #0f0d0b 87% 88%, transparent 88%),
+    linear-gradient(180deg, transparent 84%, #0f0d0b 84% 86%, #332c27 86% 94%, #0f0d0b 94%),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 15.5%, rgba(0, 0, 0, 0.8) 15.5% 16.6%),
+    radial-gradient(ellipse 60% 50% at 30% 30%, rgba(40, 90, 50, 0.35), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% 20%, rgba(160, 140, 110, 0.1), transparent 70%),
+    linear-gradient(180deg, #2c1c10, #1e130a 70%, #150d07);
+  box-shadow: inset 0 0 0 3px #0a0806, 0 0.35rem 0.6rem rgba(0, 0, 0, 0.7), 0 0.25rem 0.9rem rgba(90, 255, 180, 0.3);
+}
+/* the lock: a black iron plate, a skull on it whose sockets glow */
+[data-booster-look="maree"] .booster-pack__emblem {
+  position: absolute;
+  inset: 27% auto auto 50%;
+  translate: -50% 0;
+  z-index: 3;
+  inline-size: 18%;
+  aspect-ratio: 0.82;
+  border-radius: 0.3rem 0.3rem 45% 45%;
+  background:
+    radial-gradient(circle at 36% 40%, #b8ffd9 0 3%, #2bd18a 5%, #050403 7.5% 11%, rgba(0, 0, 0, 0) 12%),
+    radial-gradient(circle at 64% 40%, #b8ffd9 0 3%, #2bd18a 5%, #050403 7.5% 11%, rgba(0, 0, 0, 0) 12%),
+    radial-gradient(ellipse 5% 6% at 50% 54%, #050403 0 90%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 38%, #3a3328 38% 40%, rgba(0, 0, 0, 0) 40% 46%, #3a3328 46% 48%, rgba(0, 0, 0, 0) 48% 52%, #3a3328 52% 54%, rgba(0, 0, 0, 0) 54% 60%, #3a3328 60% 62%, rgba(0, 0, 0, 0) 62%) 50% 68% / 100% 10% no-repeat,
+    linear-gradient(#c9bfa6, #8f8670) 50% 67% / 34% 16% no-repeat,
+    radial-gradient(circle at 50% 42%, #ddd3ba 0 24%, #9b917a 31%, rgba(0, 0, 0, 0) 32%),
+    linear-gradient(160deg, #3b3631, #1a1714 45%, #0b0a09 80%, #2a2420);
+  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(160, 150, 130, 0.35), 0 0 0.9rem rgba(70, 230, 150, 0.35);
+  filter: none;
+  color: transparent;
+}
+[data-booster-look="maree"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+/* its name on a tarnished plate */
+[data-booster-look="maree"] .booster-pack__name {
+  inset: auto 8% 10% 8%;
+  z-index: 3;
+  overflow: hidden;
+  padding: 0.15rem 0.3rem;
+  border-radius: 0.2rem;
+  background: linear-gradient(160deg, #5c5026, #2e2810 55%, #4a4220);
+  box-shadow: inset 0 0 0 1px rgba(200, 180, 120, 0.35), 0 0.15rem 0.3rem rgba(0, 0, 0, 0.7);
+  color: #cdbd86;
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+}
+/* how many cards: scratched on the lid */
+[data-booster-look="maree"] .booster-pack__count {
+  inset: -8% 8% auto auto;
+  z-index: 3;
+  background: rgba(8, 6, 4, 0.75);
+  box-shadow: inset 0 0 0 1px rgba(160, 255, 210, 0.35);
+  color: #a8f0c8;
+}

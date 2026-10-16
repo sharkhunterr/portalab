@@ -28,6 +28,7 @@ from portalab.modules.visuals.manifest import (
     LOOK_FIELD,
     PAYLOAD_FIELDS,
     RARITIES,
+    SCENE_PARTS,
     TYPES,
     Element,
     ManifestError,
@@ -48,6 +49,9 @@ DYNAMIC = re.compile(r"\beval\s*\(|\bnew\s+Function\s*\(")
 # warning: what a member confirms stays Portalab's words)
 VOCABULARY = re.compile(r"nav:nav\.[\w.]+|[a-z]+:([\w.]+\.)?title|gamification:value\.\w+")
 GLSL_RESERVED = re.compile(r"\b(?:float|vec[234]|int)\s+(out|in|input|output|sample|filter|active)\b")
+# what the portal declares before a look's body (``p``, ``ax``, ``d``, ``t``, ``o``): declared again at the
+# body's own level, it does not compile (a loop or a block of its own may shadow them)
+GLSL_GIVEN = re.compile(r"\b(?:float|int|bool|vec[234]|mat[234])\s+(p|ax|d|t|o)\s*[=;,]")
 # what the Security step shows: what a pack's files would try and what Portalab refuses
 SECURITY_CODES = re.compile(
     r"^(css\.|js\.|file\.(unsafe|kind)|theme\.vocabulary|look\.(replaces|builtin|taken))"
@@ -154,7 +158,7 @@ def analyse(
             elements.append((folder, parse_element(data, folder)))
         except ManifestError as error:
             report.add("blocking", "element.invalid", folder=folder, detail=str(error))
-    keys = [element.product_key for _, element in elements]
+    keys = [element.product_key for _, element in elements if element.sold]
     for key in {k for k in keys if keys.count(k) > 1}:
         report.add("blocking", "element.duplicate", key)
     own_products = set(keys)
@@ -171,6 +175,7 @@ def analyse(
             own_looks,
             interfaces=interfaces,
             builtin=builtin,
+            scene_parts={f: e.type for f, e in elements if e.type in SCENE_PARTS},
         )
     return report.out(pack)
 
@@ -193,6 +198,7 @@ def _element(
     *,
     interfaces: InterfaceRegistry | None = None,
     builtin: bool = False,
+    scene_parts: dict[str, str] | None = None,
 ) -> None:
     key = element.product_key
     kind = element.render.kind
@@ -267,6 +273,12 @@ def _element(
         report.add("blocking", "payload.fields", key, fields=extra)
     if element.type == "bundle":
         _bundle(report, key, element, own_products)
+    if element.type == "booster_scene":
+        _scene(report, key, element, scene_parts)
+    if element.type in ("booster_opening", "card_reveal") and (element.render.duration or 0) > (
+        4 if element.type == "booster_opening" else 3
+    ):
+        report.add("blocking", "scene.duration", key, seconds=element.render.duration)
     if element.type == "palette" and kind != "renderer":  # a built-in palette's colours are in its renderer
         _palette(report, key, element)
     report.elements.append(
@@ -390,10 +402,29 @@ def _glsl(report: Report, key: str, element: Element, source: str) -> None:
         report.add("warning", "glsl.not_stage", key)
     for name in sorted(set(GLSL_RESERVED.findall(source))):
         report.add("blocking", "glsl.reserved", key, name=name)
+    if element.type not in ("ambient", "profile_background"):
+        for name in sorted(_redeclared(source)):
+            report.add("blocking", "glsl.reserved", key, name=name)
     if len(source) > 60_000:
         report.add("warning", "glsl.large", key, size=len(source))
     if element.type in ("level_up", "effect") and "u_age" not in source:
         report.add("info", "glsl.no_timeline", key)
+
+
+def _redeclared(source: str) -> set[str]:
+    """The given names a body declares again at its own level (outside any block of its own)."""
+    text = re.sub(r"//[^\n]*|/\*.*?\*/", "", source, flags=re.S)
+    text = re.sub(r"\bfor\s*\([^)]*\)", "for", text)  # a loop's own counter is its own
+    found: set[str] = set()
+    depth = 0
+    start = 0
+    for index, char in enumerate(text + "{"):
+        if char in "{}":
+            if depth == 0:
+                found.update(GLSL_GIVEN.findall(text[start:index]))
+            depth = max(0, depth + (1 if char == "{" else -1))
+            start = index + 1
+    return found
 
 
 def _js(report: Report, key: str, source: str) -> None:
@@ -485,6 +516,37 @@ def _bundle(report: Report, key: str, element: Element, own_products: set[str]) 
     foreign = [p for p in held if isinstance(p, str) and p not in own_products]
     if foreign:
         report.add("info", "bundle.outside", key, products=foreign[:8])
+
+
+SLOT_TYPES = {
+    "booster_look": "booster_look",
+    "backdrop": "booster_backdrop",
+    "opening": "booster_opening",
+    "reveal": "card_reveal",
+    "face": "card_face",
+    "back": "card_back",
+}
+
+
+def _scene(report: Report, key: str, element: Element, parts: dict[str, str] | None) -> None:
+    """A booster scene names its parts — folders of its own pack, of the right type, per rarity where a part
+    depends on it."""
+    named = element.payload.get("parts")
+    if not isinstance(named, dict) or not named:
+        report.add("blocking", "scene.empty", key)
+        return
+    folders = {f.removeprefix("elements/"): t for f, t in (parts or {}).items()}
+    for slot, value in named.items():
+        wanted = SLOT_TYPES.get(slot)
+        if wanted is None:
+            report.add("blocking", "scene.slot", key, slot=slot)
+            continue
+        targets = value.items() if isinstance(value, dict) else [("all", value)]
+        for rarity, folder in targets:
+            if rarity != "all" and rarity not in RARITIES:
+                report.add("blocking", "scene.rarity", key, slot=slot, rarity=rarity)
+            if folders.get(str(folder).removeprefix("elements/")) != wanted:
+                report.add("blocking", "scene.part", key, slot=slot, part=str(folder))
 
 
 def _palette(report: Report, key: str, element: Element) -> None:

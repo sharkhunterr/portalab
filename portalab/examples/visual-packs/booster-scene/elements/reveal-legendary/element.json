@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "maree-legendary",
+  "names": {
+    "fr": "Raz-de-marée de lumière",
+    "en": "Tidal wave of light"
+  },
+  "descriptions": {
+    "fr": "Des rayons d'or tournent derrière la carte, une vague de lumière déferle et retombe en pluie de gouttes (HD).",
+    "en": "Golden rays turn behind the card, a wave of light rolls out and falls back as a shower of drops (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.8,
+    "rarity": "legendary"
+  }
+}

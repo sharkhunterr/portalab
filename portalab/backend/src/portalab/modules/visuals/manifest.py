@@ -39,11 +39,13 @@ TYPES: dict[str, tuple[frozenset[str], str]] = {
     "booster": (frozenset({"data"}), "booster"),
     # the booster scene and its parts (drawn around the cards Portalab draws itself)
     "booster_scene": (frozenset({"data"}), "scene"),
-    "booster_look": (frozenset({"css", "glsl"}), "scene"),
-    "booster_opening": (frozenset({"css", "glsl", "js"}), "scene"),
-    "card_reveal": (frozenset({"css", "glsl", "js"}), "scene"),
-    "card_face": (frozenset({"css", "glsl"}), "scene"),
-    "card_back": (frozenset({"css", "glsl"}), "scene"),
+    "booster_look": (frozenset({"css", "glsl"}), "booster_look"),
+    # the stage's animated background
+    "booster_backdrop": (frozenset({"css", "glsl", "js"}), "booster_backdrop"),
+    "booster_opening": (frozenset({"css", "glsl", "js"}), "booster_opening"),
+    "card_reveal": (frozenset({"css", "glsl", "js"}), "card_reveal"),
+    "card_face": (frozenset({"css", "glsl"}), "card_face"),
+    "card_back": (frozenset({"css", "glsl"}), "card_back"),
     # widgets: a style for the existing ones, or a widget of its own (a script fed by data contracts)
     "widget_style": (frozenset({"css"}), "widget_style"),
     "widget": (frozenset({"js"}), "widget"),
@@ -58,6 +60,7 @@ NOT_SOLD = frozenset(
     {
         "navigation",
         "booster_scene",
+        "booster_backdrop",
         "booster_look",
         "booster_opening",
         "card_reveal",
@@ -66,7 +69,9 @@ NOT_SOLD = frozenset(
     }
 )
 # the parts of a booster scene, and the rarities a part may be bound to
-SCENE_PARTS = frozenset({"booster_look", "booster_opening", "card_reveal", "card_face", "card_back"})
+SCENE_PARTS = frozenset(
+    {"booster_look", "booster_backdrop", "booster_opening", "card_reveal", "card_face", "card_back"}
+)
 # the payload field naming the look, per type (packs, boosters: their own payload)
 LOOK_FIELD = {
     "level_up": "animation",

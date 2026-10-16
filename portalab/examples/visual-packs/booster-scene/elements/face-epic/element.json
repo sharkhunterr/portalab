@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "maree-epic-face",
+  "names": {
+    "fr": "Face de corail ciselé",
+    "en": "Carved coral face"
+  },
+  "descriptions": {
+    "fr": "Un cadre de corail violet ciselé, ses encoches, ses ramures.",
+    "en": "A frame of carved violet coral, its notches, its branches."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

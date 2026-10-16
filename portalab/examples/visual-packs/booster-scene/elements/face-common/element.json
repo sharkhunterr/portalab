@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "maree-common-face",
+  "names": {
+    "fr": "Face de perle",
+    "en": "Pearl face"
+  },
+  "descriptions": {
+    "fr": "Une plaque claire bordée d'un liseré de perle.",
+    "en": "A light plate edged with a pearl bead."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

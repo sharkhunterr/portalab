@@ -36,7 +36,8 @@ no `..`, no absolute path, no link, no NUL, no other extension, folder names `^[
   namespaced by the portal (R15).
 - **glsl** — POC contracts: *shape* (`p`, `d`, `ax`, `t`, `u_age`, helpers; writes `vec4 o`), *stage*
   (`gl_FragCoord`, `u_res`, `u_age`), *ambient* (full shader after helpers, premultiplied `gl_FragColor`).
-  Reserved names refused; compile measured at Test.
+  Reserved names refused, and so is declaring again, at the body's own level, a name the portal gives it
+  (`p`, `ax`, `d`, `t`, `o` — a loop or a block of its own may shadow them); compile measured at Test.
 - **js** — one ES module, no `import`, default export `mount(root, api)` returning a stop function; runs in
   the sandbox (see `sandbox-protocol.md`). Any `js` element requires the `scripts` confirmation.
 - **theme** — an interface definition (theme schema v2 of 022/027): colours, fonts, layout, navigation (a
@@ -53,8 +54,10 @@ no `..`, no absolute path, no link, no NUL, no other extension, folder names `^[
 | `badge`, `title` | `{label{fr,en}, icon, style}` |
 | `bundle`, `theme_pack` | `{products: [key…]}` — products of this pack, of the socle or of the « base collection » |
 | `booster` | `{pool: {collections[], seasons[], packs[]}, packs, cards, odds{rarity: %}, guarantee?}` |
-| `booster_scene` | `{parts: {booster_look?, opening?, reveal{common?,rare?,epic?,legendary?}, face{…}, back{…}}}` — element folders of this pack |
-| `booster_look`, `card_face`, `card_back` | none (render `shape`); `render.rarity` for faces/backs |
+| `booster_scene` | `{parts: {booster_look?, backdrop?, opening?, reveal{common?,rare?,epic?,legendary?}, face{…}, back{…}}}` — element folders of this pack |
+| `booster_backdrop` | the stage's animated background (css under its hook, a GLSL stage or ambience, or a script); replaces Portalab's mist, beams and glow |
+| `booster_look`, `card_face`, `card_back` | none; `render.rarity` for faces and backs. Their CSS may change the **shape** too (outline, `clip-path`, `border-radius`, proportions), not only the dressing — a hexagonal legendary card, a rounded booster — set on `.booster-card__face` / `.booster-card__back` themselves, never on the part that turns in 3D (`.booster-card__inner`: a clip or `overflow` there flattens the turn). Face down, a card always wears the `common` back (a back never tells the rarity) |
+| `booster_opening` with `duration` | **replaces** Portalab's tear (a booster inflating then bursting, a chest's lid swinging open…): its `duration` (≤ 4 s) is the time before the cards come. Portalab stills its own strip, glow and rising cards meanwhile; the opening's CSS may bring them back with its own movement (a lid swinging, cards escaping) |
 | `booster_opening` | render `stage`, `duration` ≤ 4 s |
 | `card_reveal` | render `stage`, `rarity`, `duration` ≤ 3 s |
 | `widget` | `{sizes: [{w,h}], refresh_s, empty{fr,en}}` + `contracts` |

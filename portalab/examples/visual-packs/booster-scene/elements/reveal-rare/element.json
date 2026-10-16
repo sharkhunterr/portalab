@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "maree-rare",
+  "names": {
+    "fr": "Couronne de bulles",
+    "en": "Crown of bubbles"
+  },
+  "descriptions": {
+    "fr": "Une couronne de bulles jaillit autour de la carte et éclate en scintillant (HD).",
+    "en": "A crown of bubbles bursts out round the card and pops, glittering (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.6,
+    "rarity": "rare"
+  }
+}

@@ -13985,6 +13985,44 @@
         "title": "ReplayIn",
         "type": "object"
       },
+      "ReportIn": {
+        "additionalProperties": false,
+        "properties": {
+          "element": {
+            "maxLength": 64,
+            "title": "Element",
+            "type": "string"
+          },
+          "pack": {
+            "maxLength": 48,
+            "title": "Pack",
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "timeout",
+              "error",
+              "unresponsive"
+            ],
+            "title": "Reason",
+            "type": "string"
+          },
+          "sha": {
+            "maxLength": 64,
+            "minLength": 16,
+            "title": "Sha",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pack",
+          "sha",
+          "element",
+          "reason"
+        ],
+        "title": "ReportIn",
+        "type": "object"
+      },
       "RequestDecisionIn": {
         "additionalProperties": false,
         "properties": {
@@ -14286,6 +14324,37 @@
           "samples"
         ],
         "title": "RuleSimulateIn",
+        "type": "object"
+      },
+      "SceneIn": {
+        "additionalProperties": false,
+        "properties": {
+          "look": {
+            "anyOf": [
+              {
+                "maxLength": 48,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Look"
+          },
+          "pack": {
+            "anyOf": [
+              {
+                "maxLength": 48,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack"
+          }
+        },
+        "title": "SceneIn",
         "type": "object"
       },
       "SearchFacetOut": {
@@ -30015,6 +30084,52 @@
         ]
       }
     },
+    "/api/v1/admin/visuals/scenes/{booster_key}": {
+      "put": {
+        "description": "Binds a published scene to a booster (``*``: every booster without its own); no scene: unbinds.",
+        "operationId": "bind_api_v1_admin_visuals_scenes__booster_key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "booster_key",
+            "required": true,
+            "schema": {
+              "title": "Booster Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SceneIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Bind",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
     "/api/v1/admin/visuals/updates": {
       "post": {
         "operationId": "updates_api_v1_admin_visuals_updates_post",
@@ -45426,6 +45541,86 @@
           }
         },
         "summary": "Live File",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/visuals/reports": {
+      "post": {
+        "description": "A pack's element failed in this member's page (counted for the administrators, an hour apart).",
+        "operationId": "report_api_v1_visuals_reports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/visuals/scenes/{booster_key}": {
+      "get": {
+        "description": "The scene a booster opens with (``null``: Portalab's own).",
+        "operationId": "scene_api_v1_visuals_scenes__booster_key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "booster_key",
+            "required": true,
+            "schema": {
+              "title": "Booster Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Scene Api V1 Visuals Scenes  Booster Key  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Scene",
         "tags": [
           "visuals"
         ]

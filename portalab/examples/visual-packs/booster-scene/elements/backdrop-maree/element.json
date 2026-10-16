@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "maree",
+  "names": {
+    "fr": "Les abysses",
+    "en": "The deep"
+  },
+  "descriptions": {
+    "fr": "Toute la scène au fond de l'océan : quelques rayons de lumière venus de loin, des particules qui dérivent, l'eau qui sombre dans le noir en s'éloignant (HD).",
+    "en": "The whole stage at the bottom of the ocean: a few shafts of light from far above, drifting motes, the water sinking into black into the distance (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "sea.glsl",
+    "stage": true
+  }
+}

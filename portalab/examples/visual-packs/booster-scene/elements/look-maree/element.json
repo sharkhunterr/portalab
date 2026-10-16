@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "maree",
+  "names": {
+    "fr": "Coffre maudit",
+    "en": "Cursed chest"
+  },
+  "descriptions": {
+    "fr": "Le booster devient un coffre de pirate maudit, englouti au fond de l'océan : bois noirci et pourri, ferrures rongées de rouille, algues et bernacles, un crâne sur la serrure aux orbites qui luisent, une lueur verdâtre et des bulles qui s'échappent de sa jointure (HD).",
+    "en": "The booster becomes a cursed pirate's chest sunk at the bottom of the ocean: blackened rotting wood, rust-eaten iron, seaweed and barnacles, a skull on the lock with glowing sockets, a sickly green glow and bubbles escaping from its seam (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "seam.glsl",
+    "css": [
+      "chest.css"
+    ],
+    "stage": true
+  }
+}

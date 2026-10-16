@@ -887,5 +887,17 @@
   "visuals.builtinOn": "Allumer tous ceux de Portalab",
   "visuals.builtinOff": "Tout couper sauf le socle",
   "visuals.builtinChanged": "{count, plural, =0 {Rien à changer} one {# pack modifié} other {# packs modifiés}}",
-  "visuals.failures": "{count, plural, one {# échec chez les membres} other {# échecs chez les membres}}"
+  "visuals.failures": "{count, plural, one {# échec chez les membres} other {# échecs chez les membres}}",
+  "visuals.type.booster_backdrop": "Arrière-plan de booster",
+  "visuals.check.scene.empty": "La scène ne nomme aucune partie.",
+  "visuals.check.scene.slot": "Partie de scène inconnue : {slot}.",
+  "visuals.check.scene.rarity": "Rareté inconnue pour {slot} : {rarity}.",
+  "visuals.check.scene.part": "La partie {slot} ({part}) n'est pas un élément du bon type dans ce pack.",
+  "visuals.check.scene.duration": "Trop long ({seconds} s) : une ouverture dure 4 s au plus, une révélation 3 s.",
+  "visuals.check.render.builtin_reserved": "Seuls les packs de Portalab peuvent utiliser son rendu intégré.",
+  "visuals.review.scenes": "Scènes de booster",
+  "visuals.review.sceneAll": "Tous les boosters (sans scène propre)",
+  "visuals.review.sceneOne": "Un booster",
+  "visuals.review.sceneNone": "Aucun pour l'instant",
+  "visuals.review.sceneBooster": "La clé produit du booster"
 }

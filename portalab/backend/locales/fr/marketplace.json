@@ -739,5 +739,6 @@
   "type.card_face": "Face de carte",
   "type.card_back": "Dos de carte",
   "type.widget_style": "Style de widget",
-  "type.theme_pack": "Pack de thème"
+  "type.theme_pack": "Pack de thème",
+  "type.booster_backdrop": "Arrière-plan de booster"
 }

@@ -1,0 +1,86 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the chest shudders, its lid swings
+   open on its hinge, a sickly light pours out and the cards escape from it, rising out of the seam. The selectors
+   are long on purpose: they win over Portalab's own rules for a scene's opening (which still the strip). */
+[data-opening="maree-coffre"] .booster-stage__tear .booster-pack {
+  animation: maree-shudder 2.6s linear both;
+}
+[data-opening="maree-coffre"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap {
+  visibility: visible;
+  animation: maree-lid 2.6s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+/* the light from inside, rising behind the open lid */
+[data-opening="maree-coffre"] .booster-stage__tear::after {
+  content: "";
+  position: absolute;
+  inset: -70% -20% 52% -20%;
+  z-index: 1;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 100%, rgba(225, 255, 240, 0.95), rgba(110, 255, 180, 0.55) 45%, rgba(40, 200, 130, 0) 100%),
+    radial-gradient(ellipse 60% 90% at 50% 100%, rgba(80, 230, 160, 0.3), rgba(80, 230, 160, 0) 70%);
+  mix-blend-mode: screen;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  animation: maree-gleam 2.6s ease-out both;
+}
+/* the cards escaping: they rise out of the seam (clipped below it), fanning out */
+[data-opening="maree-coffre"][data-booster-look] .booster-stage__tear .booster-stage__rising {
+  inset: auto 33% 60% 33%;
+  z-index: 4;
+  block-size: 84%;
+  clip-path: inset(-500% -400% 0 -400%);
+}
+[data-opening="maree-coffre"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
+  border: 1px solid rgba(200, 255, 230, 0.75);
+  border-radius: 0.45rem;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.9) 0 7%, rgba(255, 255, 255, 0) 8%),
+    radial-gradient(ellipse 60% 45% at 50% 50%, rgba(255, 220, 240, 0.5), rgba(255, 220, 240, 0) 70%),
+    linear-gradient(150deg, #f4eefc, #cfe3f2 40%, #e9d4ee 70%, #d4f0ec);
+  box-shadow: 0 0 1.1rem rgba(110, 255, 190, 0.6);
+  animation: maree-escape 2.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.07s);
+}
+@keyframes maree-shudder {
+  0% { transform: none; }
+  8%, 16%, 24%, 32% { transform: translateX(-2px) rotate(-1deg); }
+  12%, 20%, 28%, 36% { transform: translateX(2px) rotate(1deg); }
+  40% { transform: translateY(-3px) scale(1.02, 0.98); }
+  46% { transform: translateY(2px) scale(0.98, 1.03); }
+  52%, 100% { transform: none; }
+}
+@keyframes maree-lid {
+  0%, 30% { transform: none; }
+  34% { transform: translateY(-3%) rotate(-2deg); }
+  38% { transform: translateY(-1%) rotate(1.5deg); }
+  44% { transform: translateY(-6%) rotate(-1deg); }
+  /* thrown open: lifted on its hinge at the back, its front edge lit by the cursed treasure */
+  58% {
+    transform: perspective(30rem) translateY(-62%) rotateX(42deg) rotate(-3deg);
+    box-shadow: inset 0 0 0 3px #0a0806, 0 0.6rem 1.4rem rgba(110, 255, 180, 0.85);
+    filter: brightness(1.3);
+  }
+  66% { transform: perspective(30rem) translateY(-54%) rotateX(36deg) rotate(-2deg); }
+  100% {
+    transform: perspective(30rem) translateY(-57%) rotateX(38deg) rotate(-2deg);
+    box-shadow: inset 0 0 0 3px #0a0806, 0 0.5rem 1.2rem rgba(110, 255, 180, 0.6);
+    filter: brightness(1.15);
+  }
+}
+@keyframes maree-gleam {
+  0%, 40% { opacity: 0; transform: scaleY(0.1); }
+  52% { opacity: 1; transform: scaleY(1.1); }
+  100% { opacity: 0.85; transform: scaleY(1); }
+}
+@keyframes maree-escape {
+  0%, 52% { opacity: 0; transform: translateY(105%) rotate(0deg); }
+  56% { opacity: 1; }
+  100% {
+    opacity: 1;
+    transform: translate(calc((var(--i, 0) - 2) * 38%), -20%) rotate(calc((var(--i, 0) - 2) * 9deg));
+  }
+}
+[data-opening="maree-coffre"] .booster-pack__count {
+  opacity: 0;
+  transition: opacity 0.3s;
+}

@@ -94,6 +94,22 @@ def test_js_and_glsl_contracts() -> None:
     assert {"glsl.shape_contract", "glsl.reserved"} <= codes
 
 
+def test_a_glsl_body_never_declares_again_what_the_portal_gives_it() -> None:
+    render = {"kind": "glsl", "file": "z.glsl", "stage": True}
+    files = tiny_pack(type="booster_opening", look="zap", render=render)
+
+    def reserved(source: str) -> set[str]:
+        files["elements/frame/z.glsl"] = source
+        items = analyse(files_of(files))["items"]
+        return {i["params"]["name"] for i in items if i["code"] == "glsl.reserved"}
+
+    # at the body's own level ``d`` is already declared (the badge's distance): it would not compile
+    assert reserved("vec2 d = gl_FragCoord.xy;\no = vec4(d, 0.0, 1.0);") == {"d"}
+    # a block or a loop of its own may shadow it; a comment is not code
+    assert reserved("for (int t = 0; t < 3; t++) { float d = 1.0; o += vec4(d); }\n// float o;\n") == set()
+    assert reserved("vec2 dv = vec2(0.0);\no = vec4(dv, 0.0, 1.0);") == set()
+
+
 def test_the_proof_of_concepts_none_is_data() -> None:
     element = parse_element(
         json.dumps({"type": "badge", "names": {"en": "B"}, "render": {"kind": "none"}}), "b"

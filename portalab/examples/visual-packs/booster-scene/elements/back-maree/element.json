@@ -1,0 +1,10 @@
+{
+  "type": "card_back",
+  "look": "maree",
+  "names": { "fr": "Dos de nacre gravée", "en": "Engraved pearl back" },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une plaque de nacre aux coins taillés : écailles gravées, filigrane, un coquillage et sa perle au centre, des reflets qui glissent.",
+    "en": "Face down, every card is a mother-of-pearl plate with cut corners: engraved scales, filigree, a shell and its pearl in the middle, gliding glints."
+  },
+  "render": { "kind": "css", "css": ["back.css"], "rarity": "common" }
+}

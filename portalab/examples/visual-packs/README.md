@@ -1,11 +1,15 @@
 # Visual packs (issue 1, POC)
 
 Every customizable look of Portalab can come from outside, its animations in its own files: Portalab only
-provides the renderers and the contracts below. Two complete examples:
+provides the renderers and the contracts below. Three complete examples:
 
 - `nordlys/`: an interface (on a built-in navigation), a GPU level-up, GPU and CSS frames, a name style with its
   own font, a JavaScript celebration, a GPU ambience, a palette, a title, a badge, the theme pack and a booster;
-- `abysses/`: the same, and **a navigation of its own** (`nav-sonar/`: a sonar bar that opens on the depths).
+- `abysses/`: the same, and **a navigation of its own** (`nav-sonar/`: a sonar bar that opens on the depths);
+- `booster-scene/` (`maree`): **a whole booster scene** (spec 028, US5) — the deep as the stage's background, the
+  booster as a cursed pirate's chest (its strip becomes the lid, its emblem a skull on the lock), an opening
+  of its own that replaces Portalab's tear (the lid swings open, light, bubbles and coins, the cards escaping),
+  card faces and backs shaped per rarity and GPU reveals for rare, epic and legendary cards.
 
 ## Where packs come from
 

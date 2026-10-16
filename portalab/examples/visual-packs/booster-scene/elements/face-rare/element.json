@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "maree-rare-face",
+  "names": {
+    "fr": "Face de verre de mer",
+    "en": "Sea-glass face"
+  },
+  "descriptions": {
+    "fr": "Une arche de verre de mer poli, des bulles prisonnières.",
+    "en": "An arch of polished sea glass, bubbles caught in it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

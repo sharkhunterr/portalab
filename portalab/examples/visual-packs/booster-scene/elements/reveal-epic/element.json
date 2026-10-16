@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "maree-epic",
+  "names": {
+    "fr": "Tourbillon",
+    "en": "Whirlpool"
+  },
+  "descriptions": {
+    "fr": "L'eau tourbillonne autour de la carte, des embruns violets jaillissent (HD).",
+    "en": "The water whirls round the card, violet spray flying (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

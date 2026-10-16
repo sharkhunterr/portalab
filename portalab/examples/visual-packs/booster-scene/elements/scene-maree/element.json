@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "maree",
+  "names": {
+    "fr": "Scène Marée",
+    "en": "Tide scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture dans les abysses : l'eau noire, un coffre de pirate maudit dans la vase, son couvercle qui bascule dans une lueur spectrale, des bulles et des pièces d'or, des cartes de nacre et des révélations qui montent avec la rareté (HD). Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in the deep: the black water, a cursed pirate's chest in the silt, its lid swinging open in a ghostly glow, bubbles and gold coins, pearl cards and reveals growing with the rarity (HD). The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-maree",
+      "backdrop": "backdrop-maree",
+      "opening": "opening-coffre",
+      "back": {
+        "common": "back-maree"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

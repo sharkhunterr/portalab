@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "maree-legendary-face",
+  "names": {
+    "fr": "Face d'or festonné",
+    "en": "Scalloped gold face"
+  },
+  "descriptions": {
+    "fr": "Or festonné et coins taillés comme une gemme, un éclat qui passe.",
+    "en": "Scalloped gold and gem-cut corners, a gleam passing over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

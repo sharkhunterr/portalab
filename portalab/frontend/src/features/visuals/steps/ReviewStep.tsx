@@ -26,6 +26,13 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
     contracts: detail.draft?.confirmations?.contracts ?? [],
   }));
   const [error, setError] = useState<string | null>(null);
+  // 028: the booster scenes, bound to every booster (« * »), one booster (its key) or none
+  const scenes = detail.report.elements.filter((e) => e.type === "booster_scene" && e.look);
+  const [modes, setModes] = useState<Record<string, "all" | "one" | "none">>({});
+  const [bindings, setBindings] = useState<Record<string, string>>(() => ({
+    ...Object.fromEntries(scenes.map((s) => [s.look as string, "*"])),
+    ...((detail.draft as { bindings?: Record<string, string> } | null)?.bindings ?? {}),
+  }));
   const number = (value: string) => (value.trim() === "" ? null : Math.max(0, Math.round(Number(value))));
   const decide = (product: string, change: Partial<Economy>) =>
     setEconomy((all) => ({ ...all, [product]: { ...(all[product] ?? {}), ...change } }));
@@ -42,7 +49,7 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
       await action.mutateAsync({
         path: `${packPath(detail.pack, detail.version)}/draft`,
         method: "PUT",
-        body: { economy, confirmations },
+        body: { economy, confirmations, bindings },
       });
       onSaved();
     } catch (failure) {
@@ -130,6 +137,47 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
           </table>
         </section>
       </AdminSection>
+      {scenes.length ? (
+        <AdminSection title={t("admin:visuals.review.scenes")} icon="gift">
+          <div className="visuals-confirmations">
+            {scenes.map((scene) => {
+              const look = scene.look as string;
+              const value = bindings[look] ?? "";
+              const mode = modes[look] ?? (value === "*" ? "all" : value ? "one" : "none");
+              return (
+                <label key={look}>
+                  {nameOf(scene.names, look)}
+                  <select
+                    disabled={closed}
+                    value={mode}
+                    onChange={(event) => {
+                      const next = event.target.value as "all" | "one" | "none";
+                      setModes((all) => ({ ...all, [look]: next }));
+                      setBindings((all) => ({ ...all, [look]: next === "all" ? "*" : "" }));
+                    }}
+                  >
+                    <option value="all">{t("admin:visuals.review.sceneAll")}</option>
+                    <option value="one">{t("admin:visuals.review.sceneOne")}</option>
+                    <option value="none">{t("admin:visuals.review.sceneNone")}</option>
+                  </select>
+                  {mode === "one" ? (
+                    <input
+                      type="text"
+                      disabled={closed}
+                      aria-label={t("admin:visuals.review.sceneBooster")}
+                      placeholder={t("admin:visuals.review.sceneBooster")}
+                      value={value}
+                      onChange={(event) =>
+                        setBindings((all) => ({ ...all, [look]: event.target.value.trim() }))
+                      }
+                    />
+                  ) : null}
+                </label>
+              );
+            })}
+          </div>
+        </AdminSection>
+      ) : null}
       {needed.scripts || needed.replaces.length || needed.contracts.length ? (
         <AdminSection title={t("admin:visuals.review.confirmations")} icon="shield">
           <div className="visuals-confirmations">

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "maree",
+  "version": "1.4.1",
+  "names": {
+    "fr": "Marée — scène de booster",
+    "en": "Tide — a booster scene"
+  },
+  "descriptions": {
+    "fr": "Une scène d'ouverture de booster complète : un coffre de pirate maudit au fond des abysses, l'eau noire animée, des dos de cartes en nacre et une vague de lumière pour les cartes légendaires.",
+    "en": "A whole booster opening scene: a cursed pirate's chest at the bottom of the deep, animated black water, mother-of-pearl card backs and a wave of light for legendary cards."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

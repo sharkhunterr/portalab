@@ -13,6 +13,7 @@ import { useProgression } from "../../gamification/api";
 import { ProductArt } from "../catalog/ProductArt";
 import { type Booster, type BoosterCard, localized, requestKey, useOpenBooster } from "./api";
 import { BoosterPack, useCanOpen } from "./Boosters";
+import { hookOf, type Rarity, type Scene, ScenePart, useBoosterScene } from "./scene/scene";
 
 type Phase = "sealed" | "tearing" | "emerging" | "spread" | "done";
 type CardState = "hidden" | "charging" | "revealed";
@@ -111,17 +112,27 @@ function Card({
   total,
   state,
   onReveal,
+  scene,
+  reduced = false,
 }: {
   card: BoosterCard;
   index: number;
   total: number;
   state: CardState;
   onReveal: () => void;
+  /** 028: a pack's scene — its faces, backs and reveal effects per rarity (Portalab's own where it brings none) */
+  scene?: Scene | null;
+  reduced?: boolean;
 }) {
   const t = useT();
   const format = useFormat();
   const rarity = card.product.rarity ?? "common";
   const rank = RANK[rarity] ?? 0;
+  const parts = scene?.parts;
+  // face down, its back tells nothing: the « common » back until it starts turning
+  const back = parts?.back?.[(state === "hidden" ? "common" : rarity) as Rarity] ?? parts?.back?.common;
+  const face = parts?.face?.[rarity as Rarity] ?? parts?.face?.common;
+  const reveal = parts?.reveal?.[rarity as Rarity];
   const label =
     state === "revealed"
       ? `${card.product.name} — ${t(`marketplace:rarity.${rarity}`)} — ${t(
@@ -140,9 +151,19 @@ function Card({
       data-state={state}
       data-duplicate={(state === "revealed" && card.duplicate) || undefined}
       data-outcome={state === "revealed" ? card.outcome : undefined}
+      data-card-back={hookOf(back)}
+      data-card-face={state === "hidden" ? undefined : hookOf(face)}
+      data-reveal={state === "revealed" ? hookOf(reveal) : undefined}
       style={{ "--i": index, "--offset": index - (total - 1) / 2 } as CSSProperties}
     >
-      {state !== "hidden" && rank >= 1 ? (
+      {state === "revealed" && reveal ? (
+        <ScenePart
+          element={reveal}
+          className="booster-fx__scene"
+          context={{ reducedMotion: reduced, phase: "reveal", rarity, index, count: total }}
+        />
+      ) : null}
+      {!reveal && state !== "hidden" && rank >= 1 ? (
         <span className="booster-fx" aria-hidden="true">
           <span className="booster-fx__ring" />
           {rank >= 2 ? <span className="booster-fx__vortex" /> : null}
@@ -197,13 +218,13 @@ function Card({
           </span>
         </span>
       </button>
-      {state === "revealed" && GPU_BURST[rank] ? (
+      {!reveal && state === "revealed" && GPU_BURST[rank] ? (
         // HD: electricity around a rare card, plasma around an epic one
         <span className="booster-fx__gpu" aria-hidden="true">
           <FxLayer effect={GPU_BURST[rank] ?? ""} aura className="booster-fx__gpu-canvas" />
         </span>
       ) : null}
-      {state === "revealed" ? (
+      {!reveal && state === "revealed" ? (
         <>
           <span className="booster-fx__wave" aria-hidden="true" />
           {rank >= 2 ? <span className="booster-fx__wave booster-fx__wave--late" aria-hidden="true" /> : null}
@@ -256,6 +277,7 @@ export function BoosterReveal({
   const { locale } = useLocaleContext();
   const reduced = useTheme().effective.reducedMotion;
   const opening = useOpenBooster();
+  const scene = useBoosterScene(booster.key); // 028: a pack's scene, Portalab's own otherwise
   // one key per opening: a replayed request is answered without charging twice
   const attempt = useRef(requestKey());
   const coins = useProgression().data?.coins;
@@ -312,8 +334,11 @@ export function BoosterReveal({
       return;
     }
     setPhase("tearing");
-    later(() => setPhase("emerging"), TEAR_MS);
-    later(() => setPhase("spread"), TEAR_MS + EMERGE_MS);
+    // 028: a scene's own opening (a booster inflating then bursting…) takes Portalab's tear's place and time
+    const own = scene?.parts.opening;
+    const tearMs = own ? Math.min(4000, Math.max(300, (own.duration ?? 1.5) * 1000)) : TEAR_MS;
+    later(() => setPhase("emerging"), tearMs);
+    later(() => setPhase("spread"), tearMs + (own ? 250 : EMERGE_MS));
   };
   // a tap opens it for real: charged and drawn on the server, then it tears
   const open = () => {
@@ -376,9 +401,22 @@ export function BoosterReveal({
       data-moment={moment ?? undefined}
       data-best={phase === "done" ? RARITIES[best] : undefined}
       data-reduced={reduced || undefined}
+      data-scene={scene?.look}
+      data-own-opening={scene?.parts.opening ? "" : undefined}
     >
-      <Atmosphere />
-      {moment === "legendary" ? (
+      {scene?.parts.backdrop ? (
+        // 028: the scene's own animated background in place of the mist, the beams and the glow
+        <span className="booster-stage__backdrop" data-booster-backdrop={hookOf(scene.parts.backdrop)}>
+          <ScenePart
+            element={scene.parts.backdrop}
+            className="booster-stage__backdrop-layer"
+            context={{ reducedMotion: reduced, phase }}
+          />
+        </span>
+      ) : (
+        <Atmosphere />
+      )}
+      {moment === "legendary" && !scene?.parts.reveal?.legendary ? (
         // HD: the dark closing in, motes drawn to the middle, then a flash, rings, rays and embers as it turns
         <span className="booster-stage__gpu" aria-hidden="true">
           <FxLayer effect="radiance" maxSide={1100} className="booster-stage__gpu-canvas" />
@@ -400,7 +438,23 @@ export function BoosterReveal({
       ) : null}
 
       {phase === "sealed" || phase === "tearing" || phase === "emerging" ? (
-        <div className="booster-stage__pack">
+        <div
+          className="booster-stage__pack"
+          data-booster-look={hookOf(scene?.parts.booster_look)}
+          data-opening={phase !== "sealed" ? hookOf(scene?.parts.opening) : undefined}
+        >
+          <ScenePart
+            element={scene?.parts.booster_look}
+            className="booster-stage__look"
+            context={{ reducedMotion: reduced, phase }}
+          />
+          {phase !== "sealed" ? (
+            <ScenePart
+              element={scene?.parts.opening}
+              className="booster-stage__opening"
+              context={{ reducedMotion: reduced, phase }}
+            />
+          ) : null}
           <button
             type="button"
             className="booster-stage__tear"
@@ -442,6 +496,8 @@ export function BoosterReveal({
                 index={index}
                 total={cards.length}
                 state={states[index] ?? "hidden"}
+                scene={scene}
+                reduced={reduced}
                 onReveal={() => {
                   if (!busy) revealOne(index);
                 }}

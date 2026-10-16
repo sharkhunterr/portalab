@@ -45,7 +45,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.visuals.analysis import analyse, looks_of
 from portalab.modules.visuals.github import GitHub, GitHubError, parse_address
 from portalab.modules.visuals.manifest import LOOK_FIELD, NOT_SOLD, ManifestError, parse_pack, version_key
-from portalab.modules.visuals.models import Element, LookClaim, Pack, PackVersion, RegistryEpoch
+from portalab.modules.visuals.models import Element, LookClaim, Pack, PackVersion, RegistryEpoch, SceneBinding
 from portalab.modules.visuals.store import Files, PackageError, Store, read_folder, read_source, read_zip
 
 SOCLE = "portalab-socle"
@@ -756,6 +756,10 @@ class VisualPacks:
             holder.current_version_id = row.id
             if enable:
                 holder.state = "enabled"
+            for look, booster in ((row.draft or {}).get("bindings") or {}).items():
+                if booster:  # the scenes the Review step bound (a booster's key, or ``*`` for all)
+                    await session.flush()
+                    await self.bind_scene(actor, str(booster), (pack, str(look)), session=session)
             holder.updated_at = utc_now(self.clock)
             await self._bump(session)
             await self._announce(session, "published", actor, pack=pack, version=version)
@@ -770,6 +774,83 @@ class VisualPacks:
             trusted=trusted,
         )
         return {"pack": pack, "version": version, "products": products}
+
+    # --- booster scenes ---------------------------------------------------------------------------------
+    async def bind_scene(
+        self,
+        actor: Principal,
+        booster_key: str,
+        scene: tuple[str, str] | None,
+        *,
+        session: AsyncSession | None = None,
+    ) -> None:
+        """The scene a booster opens with (``*``: every booster without one of its own); ``None`` unbinds."""
+
+        async def work(db: AsyncSession) -> None:
+            await db.execute(delete(SceneBinding).where(SceneBinding.booster_key == booster_key))
+            if scene is None:
+                return
+            pack, look = scene
+            element_id = (
+                await db.execute(
+                    select(Element.id)
+                    .join(PackVersion, PackVersion.id == Element.version_id)
+                    .join(Pack, Pack.current_version_id == PackVersion.id)
+                    .where(Pack.id == pack, Element.type == "booster_scene", Element.look == look)
+                )
+            ).scalar_one_or_none()
+            if element_id is None:
+                raise NotFound("This scene is not published.", code="ui.visual_scene_not_found")
+            db.add(
+                SceneBinding(
+                    booster_key=booster_key,
+                    element_id=element_id,
+                    bound_by=actor.user_id,
+                    bound_at=utc_now(self.clock),
+                )
+            )
+            await self._bump(db)
+
+        if session is not None:
+            await work(session)
+        else:
+            async with self.database.unit_of_work() as uow:
+                await work(uow.session)
+        await self._audited(
+            actor, "scene_bound", booster=booster_key, scene=":".join(scene) if scene else None
+        )
+
+    async def scene_for(self, booster_key: str) -> dict[str, Any] | None:
+        """The scene a booster opens with — its own, else the default one bound to every booster, else none
+        (Portalab's own scene). Only a live pack's scene counts; its parts are drawn by their own kind."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(SceneBinding.booster_key, Pack.id, PackVersion, Element)
+                    .join(Element, Element.id == SceneBinding.element_id)
+                    .join(PackVersion, PackVersion.id == Element.version_id)
+                    .join(Pack, Pack.current_version_id == PackVersion.id)
+                    .where(SceneBinding.booster_key.in_((booster_key, "*")), Pack.state == "enabled")
+                )
+            ).all()
+            if not rows:
+                return None
+            _, pack_id, version, scene = sorted(rows, key=lambda r: r[0] == "*")[0]
+            by_folder = {
+                e.folder.removeprefix("elements/"): e for e in await self._elements(session, version.id)
+            }
+
+        def part(folder: Any) -> dict[str, Any] | None:
+            element = by_folder.get(str(folder).removeprefix("elements/"))
+            return self.render_list(pack_id, version, [element.data])[0] if element else None
+
+        parts: dict[str, Any] = {}
+        for slot, value in ((scene.data.get("payload") or {}).get("parts") or {}).items():
+            if isinstance(value, dict):
+                parts[slot] = {rarity: part(folder) for rarity, folder in value.items() if part(folder)}
+            elif part(value):
+                parts[slot] = part(value)
+        return {"pack": pack_id, "look": scene.look, "names": scene.data.get("names"), "parts": parts}
 
     # --- the pack's life ------------------------------------------------------------------------------------
     async def set_state(self, actor: Principal, pack: str, enabled: bool) -> None:

@@ -887,5 +887,17 @@
   "visuals.builtinOn": "Switch on all of Portalab's",
   "visuals.builtinOff": "Switch off all but the socle",
   "visuals.builtinChanged": "{count, plural, =0 {Nothing to change} one {# pack changed} other {# packs changed}}",
-  "visuals.failures": "{count, plural, one {# failure in members' pages} other {# failures in members' pages}}"
+  "visuals.failures": "{count, plural, one {# failure in members' pages} other {# failures in members' pages}}",
+  "visuals.type.booster_backdrop": "Booster background",
+  "visuals.check.scene.empty": "The scene names no part.",
+  "visuals.check.scene.slot": "Unknown scene part: {slot}.",
+  "visuals.check.scene.rarity": "Unknown rarity for {slot}: {rarity}.",
+  "visuals.check.scene.part": "The part {slot} ({part}) is not an element of the right type in this pack.",
+  "visuals.check.scene.duration": "Too long ({seconds} s): an opening lasts 4 s at most, a reveal 3 s.",
+  "visuals.check.render.builtin_reserved": "Only Portalab's own packs may use its built-in renderer.",
+  "visuals.review.scenes": "Booster scenes",
+  "visuals.review.sceneAll": "Every booster (without a scene of its own)",
+  "visuals.review.sceneOne": "One booster",
+  "visuals.review.sceneNone": "None for now",
+  "visuals.review.sceneBooster": "The booster's product key"
 }
