@@ -17,6 +17,7 @@ import "../widgets/leaving";
 import "../widgets/service-status";
 import "../../gamification/widget";
 import "../../community/widget";
+import "../widgets/pack/PackWidget"; // 028: packs' widgets
 import "../widgets/skins"; // 027 (#30): last — the looks wrap the widgets above, a look's product shows it
 
 /**

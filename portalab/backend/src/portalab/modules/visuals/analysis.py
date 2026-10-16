@@ -8,11 +8,12 @@ Each finding has a level — ``blocking`` (the version cannot be published), ``w
 - CSS: imports and addresses outside the pack, rules not scoped to the look (they could restyle the whole
   site), fixed positions;
 - GLSL: the contract of its kind (a stage or a shape writes ``o``; an ambience has its own ``main``), names
-  GLSL reserves;
+  GLSL reserves or the portal already declares;
 - JS (the administrator's responsibility, flagged ``script``): network calls, Portalab's API, the browser's
   storage and cookies, ``eval``, the default export the interface mounts;
 - the economy each element proposes (rarity, price, level against Portalab's own rules) and its texts;
-- packs and boosters: the products they hold.
+- packs and boosters: the products they hold; booster scenes: their parts and durations;
+- widgets: the data contracts they ask for (only the portal's), their sizes and pace.
 
 The simulation (compiling, frames per second in a real browser) is added later by the sandbox.
 """
@@ -23,8 +24,9 @@ from collections.abc import Iterable, Mapping
 from pathlib import PurePosixPath
 from typing import Any
 
-from portalab.capabilities.visuals import LOOK_TYPES, PACK_LOOKS, InterfaceRegistry
+from portalab.capabilities.visuals import LOOK_TYPES, PACK_LOOKS, InterfaceRegistry, contract_known
 from portalab.modules.visuals.manifest import (
+    GIVEABLE,
     LOOK_FIELD,
     PAYLOAD_FIELDS,
     RARITIES,
@@ -176,6 +178,7 @@ def analyse(
             interfaces=interfaces,
             builtin=builtin,
             scene_parts={f: e.type for f, e in elements if e.type in SCENE_PARTS},
+            widgets={e.look: e.payload.get("options") for _, e in elements if e.type == "widget" and e.look},
         )
     return report.out(pack)
 
@@ -199,6 +202,7 @@ def _element(
     interfaces: InterfaceRegistry | None = None,
     builtin: bool = False,
     scene_parts: dict[str, str] | None = None,
+    widgets: Mapping[str, Any] | None = None,
 ) -> None:
     key = element.product_key
     kind = element.render.kind
@@ -279,6 +283,16 @@ def _element(
         4 if element.type == "booster_opening" else 3
     ):
         report.add("blocking", "scene.duration", key, seconds=element.render.duration)
+    if not element.economy.sold and element.type not in GIVEABLE:
+        report.add("blocking", "economy.not_giveable", key, type=element.type)
+    if element.type == "widget_option":
+        _widget_option(report, key, element, widgets or {})
+    if element.type == "widget":
+        _widget(report, key, element)
+    elif element.type == "widget_option" and element.render.kind == "js":
+        _contracts(report, key, element)
+    elif element.contracts:
+        report.add("blocking", "widget.contracts_elsewhere", key)  # only a widget is handed data
     if element.type == "palette" and kind != "renderer":  # a built-in palette's colours are in its renderer
         _palette(report, key, element)
     report.elements.append(
@@ -330,7 +344,8 @@ def selectors_of(text: str) -> list[str]:
     return [s for s in out if s]
 
 
-ESCAPES = re.compile(r"[~+]|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b")
+# a sibling combinator (``~``, ``+`` — not the attribute operator ``~=``), :has(), the document's root
+ESCAPES = re.compile(r"\+|~(?!=)|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b")
 
 
 def _first_compound(selector: str) -> str:
@@ -343,10 +358,11 @@ def _first_compound(selector: str) -> str:
 
 
 def look_selector_ok(selector: str, look: str) -> bool:
-    """A look styles its own element only: its hook (``[data-…="<look>"]``) on the selector's first part, then
-    only what is inside it (no sibling combinator, no :has(), never the document's root)."""
+    """A look styles its own element only: its hook (``[data-…="<look>"]``, or ``~=`` where an element wears
+    several — a widget's options) on the selector's first part, then only what is inside it (no sibling
+    combinator, no :has(), never the document's root)."""
     hook = re.search(
-        r"\[data-[\w-]+=(?:\""
+        r"\[data-[\w-]+~?=(?:\""
         + re.escape(look)
         + r"\"|'"
         + re.escape(look)
@@ -409,6 +425,115 @@ def _glsl(report: Report, key: str, element: Element, source: str) -> None:
         report.add("warning", "glsl.large", key, size=len(source))
     if element.type in ("level_up", "effect") and "u_age" not in source:
         report.add("info", "glsl.no_timeline", key)
+
+
+def _widget(report: Report, key: str, element: Element) -> None:
+    """A pack's widget: the data it asks for among the portal's contracts, the sizes it may take on the
+    dashboard (columns of 12, rows), how often it is read again."""
+    _contracts(report, key, element)
+    if not element.contracts:
+        report.add("info", "widget.no_contract", key)  # a clock, a picture: it needs nothing of the portal
+    sizes = element.payload.get("sizes")
+    valid = isinstance(sizes, list) and 0 < len(sizes) <= 6
+    for size in sizes if isinstance(sizes, list) else []:
+        w = size.get("w") if isinstance(size, dict) else None
+        h = size.get("h") if isinstance(size, dict) else None
+        if not (isinstance(w, int) and isinstance(h, int) and 1 <= w <= 12 and 1 <= h <= 6):
+            valid = False
+    if sizes is not None and not valid:
+        report.add("blocking", "widget.size", key)
+    refresh = element.payload.get("refresh_s")
+    if refresh is not None and not (isinstance(refresh, int) and 30 <= refresh <= 3600):
+        report.add("blocking", "widget.refresh", key)
+    empty = element.payload.get("empty")
+    if empty is not None and not (
+        isinstance(empty, dict) and all(isinstance(v, str) and len(v) <= 200 for v in empty.values())
+    ):
+        report.add("blocking", "widget.empty", key)
+    if element.payload.get("options") is not None and settings_of(element.payload.get("options")) is None:
+        report.add("blocking", "widget.options", key)
+
+
+SETTING = re.compile(r"^[a-z][a-z0-9_-]{0,23}$")
+
+
+def _texts_ok(value: Any) -> bool:
+    return isinstance(value, dict) and all(isinstance(v, str) and len(v) <= 80 for v in value.values())
+
+
+def settings_of(options: Any) -> dict[str, tuple[list[str], str]] | None:
+    """A pack widget's own settings (``payload.options``): each its key, its values and its default — or
+    ``None`` when they are not well formed (6 settings at most, 2 to 12 values each, names short)."""
+    if not isinstance(options, list) or len(options) > 6:
+        return None
+    out: dict[str, tuple[list[str], str]] = {}
+    for option in options:
+        if not isinstance(option, dict) or not SETTING.fullmatch(str(option.get("key", ""))):
+            return None
+        values = option.get("values")
+        if not isinstance(values, list) or not 2 <= len(values) <= 12:
+            return None
+        keys = []
+        for value in values:
+            if not isinstance(value, dict) or not SETTING.fullmatch(str(value.get("value", ""))):
+                return None
+            if not _texts_ok(value.get("names", {})):
+                return None
+            keys.append(str(value["value"]))
+        default = str(option.get("default", keys[0]))
+        if len(set(keys)) != len(keys) or default not in keys or not _texts_ok(option.get("names", {})):
+            return None
+        out[str(option["key"])] = (keys, default)
+    return out
+
+
+def _contracts(report: Report, key: str, element: Element) -> None:
+    for contract in element.contracts:
+        if not contract_known(contract):
+            report.add("blocking", "widget.unknown_contract", key, contract=contract)
+    if len(set(element.contracts)) != len(element.contracts):
+        report.add("warning", "widget.contract_twice", key)
+
+
+def own_widget(target: Any) -> str | None:
+    """The look of this pack's widget an option names (``<look>`` or ``pack.<look>``)."""
+    if not isinstance(target, str):
+        return None
+    return target.removeprefix("pack.") if target.startswith("pack.") or "." not in target else None
+
+
+def _widget_option(report: Report, key: str, element: Element, widgets: Mapping[str, Any]) -> None:
+    """An option of a widget. A value of one of this pack's widgets' own settings (``setting``, ``value``:
+    data only; its default is everyone's, never sold), or an add-on a widget wears — Portalab's (its key),
+    this pack's, or any (``*``): a stylesheet under ``[data-widget-option~="<look>"]`` (animations, another
+    look) and/or a script in the sandbox, shown instead of the widget's content or drawn over it (``place``),
+    handed the widget's own data and the contracts it declares."""
+    payload = element.payload
+    if "setting" not in payload:
+        target = payload.get("widget")
+        valid_target = target == "*" or (
+            isinstance(target, str)
+            and re.fullmatch(r"[a-z0-9][a-z0-9_.:-]{0,95}", target) is not None
+            and (own_widget(target) in widgets if own_widget(target) is not None else "." in target)
+        )
+        if not valid_target:
+            report.add("blocking", "widget.option_target", key, widget=str(target))
+        if not element.look:
+            report.add("blocking", "element.no_look", key)
+        if element.render.kind == "data":
+            report.add("blocking", "widget.option_empty", key)  # an add-on brings a stylesheet or a script
+        if element.render.kind == "js" and element.render.place is None:
+            report.add("blocking", "widget.option_place", key)
+        return
+    if element.render.kind != "data":
+        report.add("blocking", "widget.option_value_drawn", key)  # the widget's own script draws its values
+    widget = own_widget(payload.get("widget"))
+    settings = settings_of(widgets.get(widget)) if widget is not None and widget in widgets else None
+    known = settings.get(str(payload.get("setting"))) if settings else None
+    if known is None or str(payload.get("value")) not in known[0]:
+        report.add("blocking", "widget.option_unknown", key, widget=str(widget))
+    elif str(payload.get("value")) == known[1]:
+        report.add("warning", "widget.option_default", key)
 
 
 def _redeclared(source: str) -> set[str]:
@@ -496,6 +621,9 @@ def _economy(report: Report, key: str, element: Element) -> None:
     economy = element.economy
     if economy.rarity not in RARITIES:
         report.add("blocking", "economy.rarity", key, rarity=economy.rarity)
+        return
+    if not economy.sold:
+        report.add("info", "economy.given", key)  # 028: offered to everyone, never a shop product
         return
     if economy.price is None and element.type not in ("bundle",):
         report.add("info", "economy.reward_only", key)

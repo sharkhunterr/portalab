@@ -544,11 +544,19 @@
   gap: 0.15rem;
   min-inline-size: 0;
 }
-.widget-gallery__text > span:not(.widget-gallery__size) {
+.widget-gallery__text > span:not(.widget-gallery__size, .widget-gallery__needs) {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
 .widget-gallery__size {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+/* 028: what a pack's widget reads of the member's data */
+.widget-gallery__needs {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;

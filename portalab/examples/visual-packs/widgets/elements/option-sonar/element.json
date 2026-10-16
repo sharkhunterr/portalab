@@ -1,0 +1,25 @@
+{
+  "type": "widget_option",
+  "look": "sonar",
+  "names": {
+    "fr": "Le sonar",
+    "en": "The sonar"
+  },
+  "descriptions": {
+    "fr": "Pour n'importe quel widget : un balayage de sonar passe sur lui, des échos s'allument et s'effacent (par-dessus, sans jamais gêner un clic).",
+    "en": "For any widget: a sonar sweep passes over it, echoes lighting up and fading (drawn over it, never in the way of a click)."
+  },
+  "payload": {
+    "widget": "*"
+  },
+  "render": {
+    "kind": "js",
+    "file": "sonar.js",
+    "place": "overlay"
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "epic",
+    "icon": "target"
+  }
+}

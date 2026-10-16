@@ -49,6 +49,9 @@ TYPES: dict[str, tuple[frozenset[str], str]] = {
     # widgets: a style for the existing ones, or a widget of its own (a script fed by data contracts)
     "widget_style": (frozenset({"css"}), "widget_style"),
     "widget": (frozenset({"js"}), "widget"),
+    # an option of a widget — Portalab's or a pack's: an add-on it wears (a stylesheet, animations; a script
+    # showing it otherwise, with more data, or drawing over it) or a value of a pack widget's own setting
+    "widget_option": (frozenset({"data", "css", "js"}), "widget_option"),
     # an interface: its definition (``theme.json``: colours, fonts, layout, navigation, vocabulary, the
     # looks it wears) and stylesheets of its own
     "theme": (frozenset({"theme"}), "theme"),
@@ -72,6 +75,9 @@ NOT_SOLD = frozenset(
 SCENE_PARTS = frozenset(
     {"booster_look", "booster_backdrop", "booster_opening", "card_reveal", "card_face", "card_back"}
 )
+# what the administrator may give everyone rather than sell (``economy.sold: false``): no shop product, every
+# member may use it — a widget, its looks and its settings' values
+GIVEABLE = frozenset({"widget", "widget_style", "widget_option"})
 # the payload field naming the look, per type (packs, boosters: their own payload)
 LOOK_FIELD = {
     "level_up": "animation",
@@ -98,7 +104,8 @@ PAYLOAD_FIELDS: dict[str, frozenset[str]] = {
     "theme_pack": frozenset({"products"}),
     "booster_scene": frozenset({"parts"}),
     "widget_style": frozenset({"widget"}),
-    "widget": frozenset({"sizes", "refresh_s", "empty"}),
+    "widget": frozenset({"sizes", "refresh_s", "empty", "options"}),
+    "widget_option": frozenset({"widget", "setting", "value"}),
     "booster": frozenset(
         {"pool", "season", "packs", "cards", "odds", "guarantee", "refunds", "per_member", "look"}
     ),
@@ -135,6 +142,8 @@ class Render(BaseModel):
     renderer: str | None = Field(default=None, max_length=40)  # ``renderer``: the portal renderer drawing it
     params: dict[str, Any] = Field(default_factory=dict)  # ``renderer``: its parameters
     rarity: Literal["common", "rare", "epic", "legendary"] | None = None  # scene parts: the rarity it is for
+    # a widget option's script: shown instead of the widget's content, or drawn over it (animations)
+    place: Literal["replace", "overlay"] | None = None
 
     @field_validator("kind")
     @classmethod
@@ -157,6 +166,8 @@ class Economy(BaseModel):
     featured: bool = False
     reward_only: bool = False  # given by an achievement or a level, never sold
     contribution: int | None = Field(default=None, ge=0)
+    # 028 (US6): ``false`` — given to everyone, never a shop product (widgets, their looks and options only)
+    sold: bool = True
 
 
 class Element(BaseModel):
@@ -187,6 +198,9 @@ class Element(BaseModel):
         if self.product:
             return self.product
         prefix = TYPES.get(self.type, (frozenset(), self.type))[1]
+        if self.type == "widget_option" and not self.look:  # named by what it sells: its widget's value
+            what = f"{self.payload.get('widget', 'item')}_{self.payload.get('value', '')}"
+            return f"{prefix}_{re.sub(r'[^a-z0-9_]', '_', what.lower())}"[:64]
         return f"{prefix}_{(self.look or 'item').replace('-', '_')}"
 
     @property

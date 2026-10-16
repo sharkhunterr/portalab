@@ -222,14 +222,14 @@ v1; switch off/on; remove with owners archives; remove without owners removes.
 **Independent Test**: a pack with a widget style and a widget needing `me.progression`: the style applies; the
 widget shows the member's own progression only; an undeclared or forbidden contract yields nothing / empty.
 
-- [ ] T082 [P] [US6] `frontend/tests/unit/visuals/widget-contracts.test.ts`: projection per contract (only schema fields), forbidden → `{state: "forbidden"}`, undeclared contract never fetched
-- [ ] T083 [P] [US6] `backend/tests/unit/visuals/test_widget_contracts.py`: analysis refuses unknown contracts; Review requires each contract's acceptance; `GET /admin/visuals/contracts`
+- [X] T082 [P] [US6] `frontend/tests/unit/visuals/widget-contracts.test.ts`: projection per contract (only schema fields), forbidden → `{state: "forbidden"}`, undeclared contract never fetched
+- [X] T083 [P] [US6] `backend/tests/unit/visuals/test_widget_contracts.py`: analysis refuses unknown contracts; Review requires each contract's acceptance; `GET /admin/visuals/contracts`
 - [ ] T084 [P] [US6] `frontend/tests/e2e/visual-packs/widgets.spec.ts`
-- [ ] T085 [US6] `WIDGET_CONTRACTS` catalog in `backend/src/portalab/capabilities/visuals.py` (`me.progression`, `me.watching`, `media.recently_added`, `me.statistics`: permission, refresh, fields, plain-words description) + `GET /admin/visuals/contracts` (R26)
-- [ ] T086 [US6] Element types `widget` and `widget_style` in `manifest.py`/`analysis.py`; `widget_style` published as `widget_option` products; `skins.css` looks extracted to built-in packs (T036) with hook `[data-widget-style="<look>"]` set by the widget frame (`frontend/src/features/dashboard/frame/`) (R25)
-- [ ] T087 [US6] Contract projections `frontend/src/features/dashboard/contracts/{index.ts,progression.ts,watching.ts,recentlyAdded.ts,statistics.ts}` (zod schemas over the existing query hooks)
-- [ ] T088 [US6] `frontend/src/features/dashboard/widgets/pack/PackWidget.tsx`: sandboxed frame, posts projected data per sandbox-protocol.md, sizes clamped, empty state; registered in the widget gallery with its data needs listed (`frontend/src/features/dashboard/edit/WidgetGallery.tsx`)
-- [ ] T089 [P] [US6] Example pack `examples/visual-packs/widgets/` (a widget style + a progression widget)
+- [X] T085 [US6] `WIDGET_CONTRACTS` catalog in `backend/src/portalab/capabilities/visuals.py` (`me.progression`, `me.watching`, `media.recently_added`, `me.statistics`: permission, refresh, fields, plain-words description) + `GET /admin/visuals/contracts` (R26)
+- [X] T086 [US6] Element types `widget`, `widget_style` and `widget_option` (add-ons worn through `_options`, css and/or sandboxed js `replace`/`overlay`; values of a pack widget's own settings) in `manifest.py`/`analysis.py`; `economy.sold: false` offers them to everyone; `widget_style` and `widget_option` published as `widget_option` products; `skins.css` looks extracted to built-in packs (T036) with hook `[data-widget-style="<look>"]` set by the widget frame (`frontend/src/features/dashboard/frame/`) (R25)
+- [X] T087 [US6] Contract projections `frontend/src/features/dashboard/contracts/{index.ts,progression.ts,watching.ts,recentlyAdded.ts,statistics.ts,widgetData.ts}` (zod schemas over the existing query hooks; `widget:<key>`: any dashboard widget's data)
+- [X] T088 [US6] `frontend/src/features/dashboard/widgets/pack/{PackFrame,PackWidget,WidgetAddons}.tsx`: sandboxed frame, posts projected data, settings and form (`line|column|block|tall`) per sandbox-protocol.md, empty state; options worn on any widget (`_options`) and frame looks (`_skin`) chosen in the widget's settings; data needs listed in the widget catalog (`catalog/CatalogDrawer.tsx`)
+- [X] T089 [P] [US6] Example pack `examples/visual-packs/widgets/` (a widget style + a progression widget)
 
 **Checkpoint**: SC-009 holds.
 

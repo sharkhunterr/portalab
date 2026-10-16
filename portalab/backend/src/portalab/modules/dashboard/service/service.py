@@ -33,7 +33,7 @@ from portalab.modules.dashboard.arrangement import Size as GridSize
 from portalab.modules.dashboard.arrangement import move as grid_move
 from portalab.modules.dashboard.arrangement import resize as grid_resize
 from portalab.modules.dashboard.conditions.evaluator import ConditionEvaluator, parse_condition
-from portalab.modules.dashboard.gateway.gateway import FRAME_KEYS, WidgetGateway, config_errors
+from portalab.modules.dashboard.gateway.gateway import FRAME_KEYS, WidgetGateway, config_errors, worn
 from portalab.modules.dashboard.models import UserDashboard, WidgetInstance
 from portalab.modules.dashboard.observability import log, metrics
 from portalab.modules.dashboard.overlay.overlay import (
@@ -344,7 +344,10 @@ class DashboardService:
             return
         key = widget.definition.key
         refused = sorted(
-            f"{field}={value}" for field, value in values.items() if f"{key}:{field}={value}" in locked
+            f"{field}={value}"
+            for field, value in worn(values)
+            # 028: a pack's widget style is sold for every widget (``*``)
+            if f"{key}:{field}={value}" in locked or f"*:{field}={value}" in locked
         )
         if refused:
             raise OptionLocked(

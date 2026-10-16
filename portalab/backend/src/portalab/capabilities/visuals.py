@@ -11,10 +11,17 @@ JS), never in the application's code.
   and off — the registry of interfaces stays UI's.
 - ``CatalogWriter`` (provided by Marketplace 015): publishes an element as a shop product — the same path the
   demo catalog takes — takes it off sale or puts it back, counts its owners, retires it for good.
+- ``WIDGET_CONTRACTS``: the data a pack's widget may ask for (R26). The widget never calls the portal: the
+  member's own page reads each contract through the portal's usual routes (the member's session, the member's
+  permissions) and hands the widget only the contract's fields; any dashboard widget's data is a contract too
+  (``widget:<key>``). The analysis refuses any other contract and the administrator accepts each one at the
+  Review step.
 """
 
+import re
 from collections.abc import Iterable, Mapping
 from contextvars import ContextVar
+from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
 from portalab.capabilities.registry import CapabilitySpec
@@ -61,6 +68,99 @@ LOOK_TYPES: dict[str, tuple[str, tuple[str, ...]]] = {
     # not sold on its own — an interface wears it
     "navigation": ("nav", NAVIGATIONS),
 }
+
+
+@dataclass(frozen=True, slots=True)
+class WidgetContract:
+    """A set of data the portal offers packs' widgets: what it holds (its fields, nothing else ever reaches
+    the widget), the permission the member viewing it needs, how often it is read again."""
+
+    key: str
+    permission: str
+    refresh_s: int
+    fields: tuple[str, ...]
+    descriptions: Mapping[str, str] = field(default_factory=dict)  # plain words, fr/en
+
+    def out(self) -> dict[str, Any]:
+        return {
+            "key": self.key,
+            "permission": self.permission,
+            "refresh_s": self.refresh_s,
+            "fields": list(self.fields),
+            "descriptions": dict(self.descriptions),
+        }
+
+
+# v1 (R26): each reuses data the dashboard already shows, read with the member's own session
+WIDGET_CONTRACTS: dict[str, WidgetContract] = {
+    contract.key: contract
+    for contract in (
+        WidgetContract(
+            "me.progression",
+            "users.self.manage",
+            60,
+            ("level", "xp", "level_floor", "next_level_at", "coins", "contribution"),
+            {
+                "en": "Your own progression: your level, your experience towards the next one, your "
+                "coins and your contribution.",
+                "fr": "Votre propre progression : votre niveau, votre expérience vers le suivant, vos "
+                "pièces et votre contribution.",
+            },
+        ),
+        WidgetContract(
+            "me.watching",
+            "users.self.manage",
+            120,
+            ("items[].title", "items[].kind", "items[].percent"),
+            {
+                "en": "What you are watching or reading: each title, its kind and how far you are.",
+                "fr": "Ce que vous regardez ou lisez : chaque titre, son genre et où vous en êtes.",
+            },
+        ),
+        WidgetContract(
+            "media.recently_added",
+            "media.read",
+            600,
+            ("items[].title", "items[].kind", "items[].year"),
+            {
+                "en": "What was recently added to the library: titles, kinds and years.",
+                "fr": "Ce qui est arrivé récemment dans la bibliothèque : titres, genres et années.",
+            },
+        ),
+        WidgetContract(
+            "me.statistics",
+            "users.self.manage",
+            300,
+            ("streak_days", "streak_multiplier", "achievements"),
+            {
+                "en": "Your own figures: your streak of days, its bonus and how many achievements you "
+                "unlocked.",
+                "fr": "Vos propres chiffres : votre série de jours, son bonus et le nombre de succès "
+                "débloqués.",
+            },
+        ),
+    )
+}
+
+# any dashboard widget's own data is a contract too (``widget:<key>``): what that widget shows the member,
+# read with the member's session through the dashboard (its permission, and its purchase when it is sold)
+WIDGET_DATA = "widget:"
+_WIDGET_DATA_KEY = re.compile(r"^[a-z0-9][a-z0-9_.:-]{1,95}$")
+
+
+def contract_known(key: str) -> bool:
+    """A contract the portal offers: one of the catalog's, or a widget's data (never a pack's own widget,
+    which holds no data of its own)."""
+    if key in WIDGET_CONTRACTS:
+        return True
+    widget = key.removeprefix(WIDGET_DATA)
+    return (
+        key.startswith(WIDGET_DATA)
+        and bool(_WIDGET_DATA_KEY.fullmatch(widget))
+        and "." in widget
+        and not widget.startswith("pack.")
+    )
+
 
 # while a pack is analysed or published: the (type, look) pairs it brings itself
 PACK_LOOKS: ContextVar[frozenset[tuple[str, str]]] = ContextVar("pack_looks", default=frozenset())

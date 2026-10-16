@@ -90,6 +90,8 @@ export interface Economy {
   collection: string | null;
   icon: string | null;
   season?: string | null;
+  /** 028 (US6): ``false`` — given to everyone, never a shop product (widgets, their looks and options) */
+  sold?: boolean;
 }
 
 export interface ElementReport {
@@ -233,3 +235,33 @@ export function nextStep(version: Pick<VersionRow, "step" | "outcomes">): StepKe
 
 export const STEPS = ["import", "analysis", "security", "test", "review", "validation"] as const;
 export type StepKey = (typeof STEPS)[number];
+
+/** 028 (US6): a data contract packs' widgets may ask for, as the portal describes it. */
+export interface WidgetContract {
+  key: string;
+  permission: string;
+  refresh_s: number;
+  fields: string[];
+  descriptions: Record<string, string>;
+}
+
+/** Every dashboard widget's data, offered as a contract (``widget:<key>``). */
+export interface WidgetDataContract {
+  key: string;
+  widget: string;
+  title_key: string;
+  permission: string;
+}
+
+export function useWidgetContracts(enabled = true) {
+  return useQuery({
+    queryKey: ["visuals", "contracts"],
+    enabled,
+    staleTime: 10 * 60_000,
+    queryFn: async () =>
+      (await api.GET("/api/v1/admin/visuals/contracts")).data as unknown as {
+        contracts: WidgetContract[];
+        widgets: WidgetDataContract[];
+      },
+  });
+}

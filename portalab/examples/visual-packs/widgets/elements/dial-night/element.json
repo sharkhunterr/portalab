@@ -1,0 +1,24 @@
+{
+  "type": "widget_option",
+  "names": {
+    "fr": "Cadran de nuit",
+    "en": "Night dial"
+  },
+  "descriptions": {
+    "fr": "Pour « Le cap » : un cadran noir aux graduations phosphorescentes, l'aiguille qui luit.",
+    "en": "For « Heading »: a black dial with glowing marks, its needle shining."
+  },
+  "payload": {
+    "widget": "vigie-cap",
+    "setting": "dial",
+    "value": "night"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "economy": {
+    "rarity": "epic",
+    "icon": "moon",
+    "sold": false
+  }
+}

@@ -2,7 +2,7 @@
  * issue 1: what an imported pack's stylesheet may style — enforced in the browser, on the browser's own
  * reading of the sheet (its CSS object model), whatever the analysis said:
  *
- * - a **look** styles its own element only: each selector starts on its hook (``[data-…="<look>"]``) and goes
+ * - a **look** styles its own element only: each selector starts on its hook (``[data-…="<look>"]``, or ``~=``) and goes
  *   no further than inside it — no sibling (``~``, ``+``), no ``:has()``, never the document's root;
  * - an **interface** styles the whole interface under its own key (``[data-theme="<key>"] …``), never a
  *   protected surface: each selector is made to skip ``[data-protected]`` and what is inside it (the
@@ -13,7 +13,8 @@
  *   Portalab's), and a ``@font-face`` may not take the name of one of Portalab's own fonts.
  */
 
-const ESCAPES = /[~+]|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b/i;
+// a sibling combinator (``~``, ``+`` — not the attribute operator ``~=``), :has(), the document's root
+const ESCAPES = /\+|~(?!=)|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b/i;
 const PSEUDO_ELEMENT =
   /(::?(?:before|after|first-line|first-letter|placeholder|marker|selection|backdrop|file-selector-button)|::[\w-]+(?:\([^)]*\))?)$/i;
 const PROTECTED = ":not([data-protected]):not([data-protected] *)";
@@ -57,7 +58,8 @@ function escapeRegExp(text: string): string {
 
 export function lookSelectorOk(selector: string, look: string): boolean {
   const value = escapeRegExp(look);
-  const hook = new RegExp(`\\[data-[\\w-]+=(?:"${value}"|'${value}'|${value})\\]`);
+  // its hook, ``=`` or ``~=`` where an element wears several looks (a widget's options, 028)
+  const hook = new RegExp(`\\[data-[\\w-]+~?=(?:"${value}"|'${value}'|${value})\\]`);
   return hook.test(firstCompound(selector)) && !ESCAPES.test(selector);
 }
 

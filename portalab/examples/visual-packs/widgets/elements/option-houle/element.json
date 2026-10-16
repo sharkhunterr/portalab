@@ -1,0 +1,26 @@
+{
+  "type": "widget_option",
+  "look": "houle",
+  "names": {
+    "fr": "La houle",
+    "en": "The swell"
+  },
+  "descriptions": {
+    "fr": "Pour n'importe quel widget : il tangue doucement sur la houle, une lanterne pulse dans son coin.",
+    "en": "For any widget: it gently rolls on the swell, a lantern pulsing in its corner."
+  },
+  "payload": {
+    "widget": "*"
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "swell.css"
+    ]
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "icon": "sparkles"
+  }
+}

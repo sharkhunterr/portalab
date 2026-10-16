@@ -1,0 +1,12 @@
+{
+  "format": 1,
+  "id": "vigie",
+  "version": "1.1.2",
+  "names": { "fr": "Vigie — widgets", "en": "Lookout — widgets" },
+  "descriptions": {
+    "fr": "Un cadre de laque et de laiton pour n'importe quel widget du tableau de bord, et un widget « Le cap » : un compas qui montre votre niveau et votre route vers le suivant, vos pièces et votre série.",
+    "en": "A lacquer-and-brass frame for any dashboard widget, and a « Heading » widget: a compass showing your level and your course to the next one, your coins and your streak."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

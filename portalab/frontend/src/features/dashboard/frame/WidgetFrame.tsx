@@ -12,11 +12,13 @@ import {
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
+import { externalLook, useExternalRevision } from "../../../design-system/visuals/registry";
 import { useT } from "../../../i18n/hooks/useT";
 import { type Instance, useWidgetData } from "../api";
 import { keyOf } from "../edit/EditSession";
 import { TEMPLATES } from "../templates/Templates";
 import { useOffscreen } from "../widgets/motion";
+import { AddonFrame, wornAddons } from "../widgets/pack/WidgetAddons";
 import { widgetComponent } from "../widgets/registry";
 import { HeaderSlot, WidgetHeaderAction } from "./actions";
 import { useEmptyReport } from "./emptiness";
@@ -218,6 +220,18 @@ export function WidgetFrame({
   const title = instance.widget ? t(instance.widget.title_key) : instance.widget_key;
   // 027: the member may show the content alone — without its title, without its box, or both
   const frame = (instance.config ?? {}) as Record<string, unknown>;
+  // 028: a pack's look for the frame, while its pack is live (the server falls back when not owned)
+  useExternalRevision();
+  // 028: the options packs bring it, as the member put them on (a script one may show it otherwise)
+  const addons = wornAddons(instance);
+  const replacing = addons.find((a) => a.kind === "js" && a.widget?.place === "replace");
+  const overlays = addons.filter((a) => a.kind === "js" && a.widget?.place === "overlay");
+  const [fallback, setFallback] = useState(false);
+  const worn = typeof frame._skin === "string" ? externalLook("widget_style", frame._skin) : undefined;
+  const skin =
+    worn && (!worn.widget?.for || worn.widget.for === instance.widget_key)
+      ? (worn.look ?? undefined)
+      : undefined;
   return (
     <section
       aria-labelledby={headingId}
@@ -226,6 +240,8 @@ export function WidgetFrame({
       data-tile={height <= 1 || undefined}
       data-no-title={frame._hide_title === true || undefined}
       data-no-box={frame._no_box === true || undefined}
+      data-widget-style={skin}
+      data-widget-option={addons.map((a) => a.look).join(" ") || undefined}
       style={{ "--widget-w": instance.w, "--widget-h": height } as React.CSSProperties}
     >
       {handles}
@@ -280,7 +296,19 @@ export function WidgetFrame({
           <HeaderSlot.Provider value={slot}>
             <FrameBoundary fallback={<FunctionalState state="error" />}>
               <Suspense fallback={<FunctionalState state="loading" />}>
-                <Body instance={instance} rows={height} />
+                {replacing && !fallback ? (
+                  <AddonFrame
+                    instance={instance}
+                    element={replacing}
+                    rows={height}
+                    onFailed={() => setFallback(true)}
+                  />
+                ) : (
+                  <Body instance={instance} rows={height} />
+                )}
+                {overlays.map((overlay) => (
+                  <AddonFrame key={overlay.look} instance={instance} element={overlay} rows={height} />
+                ))}
               </Suspense>
             </FrameBoundary>
           </HeaderSlot.Provider>

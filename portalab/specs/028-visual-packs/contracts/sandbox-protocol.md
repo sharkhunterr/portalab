@@ -12,7 +12,7 @@ Messages are accepted only from the expected window (`event.source`), never by o
 
 | message | when |
 |---|---|
-| `{type: "run", source, element: {type, look}, context}` | after `loaded`; `source` = module text fetched by the host |
+| `{type: "run", source, element: {type, look}, context}` | after `loaded`; `source` = module text fetched by the host; `context` = what it knows **now** (an update while the frame loaded is never lost) |
 | `{type: "context", context}` | what the element knows changed |
 | `{type: "asset", id, buffer, mime}` / `{type: "asset", id, error}` | answer to an asset request (own element folder only) |
 | `{type: "ping", n}` | every 2 s (R14) |
@@ -26,7 +26,6 @@ Messages are accepted only from the expected window (`event.source`), never by o
 | `asset {id, path}` | relative path inside the element's folder (`safeAssetPath`) |
 | `navigate {key}` | navigation only; key must be one of `context.sections[].entries[].key` / section keys; ≤ 1 per 400 ms |
 | `expand {open}` | navigation only; within the declared `nav.expands` |
-| `size {w, h}` | widgets only; clamped to the declared sizes |
 
 ## Context per element type
 
@@ -35,7 +34,8 @@ Messages are accepted only from the expected window (`event.source`), never by o
 | `navigation` | `sections[{key, label, icon (SVG markup from the portal), active, entries[{key, label, icon, active}]}]`, `current`, `colors`, `fonts`, `strings{open, close, mainNav}`, `counts{unread}`, `me{level, coins}`, `device`, `layout`, `reducedMotion` |
 | `level_up`, `effect` | `{level?, text?, reducedMotion}` |
 | `booster_opening`, `card_reveal` | `{phase, rarity?, index?, count, reducedMotion}` — never product data (R23) |
-| `widget` | `{data: {<contract>: projected value \| {state: "forbidden"\|"error"\|"loading"}}, size, colors, fonts, locale, reducedMotion}` (R26) |
+| `widget` | `{data: {<contract>: projected value \| {state: "forbidden"\|"error"\|"loading"}}, config, size {width, height, rows, form: line\|column\|block\|tall}, colors, fonts, locale, reducedMotion}` (R26); the member resizes it within its declared sizes |
+| `widget_option` (js) | the same, and `widget {key, state, data}`: the widget it is shown on and that widget's own data |
 | `ambient` (js) | `{reducedMotion, size}` |
 
 Reduced motion: the host passes `reducedMotion: true`; moments show their still frame or nothing; the host

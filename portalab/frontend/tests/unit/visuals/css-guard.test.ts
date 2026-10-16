@@ -66,4 +66,11 @@ describe("visual packs — sandbox files", () => {
       expect(safeAssetPath(path)).toBeNull();
     }
   });
+
+  it("028: accepts the hook of an element wearing several looks (~=), never a sibling", () => {
+    expect(lookSelectorOk('.widget-frame[data-widget-option~="houle"]::after', "houle")).toBe(true);
+    expect(lookSelectorOk('[data-widget-option~="houle"] .widget-rows', "houle")).toBe(true);
+    expect(lookSelectorOk('[data-widget-option~="houle"] ~ .widget-frame', "houle")).toBe(false);
+    expect(lookSelectorOk('[data-widget-option~="other"]', "houle")).toBe(false);
+  });
 });

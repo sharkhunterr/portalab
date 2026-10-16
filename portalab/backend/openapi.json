@@ -29960,6 +29960,30 @@
         ]
       }
     },
+    "/api/v1/admin/visuals/contracts": {
+      "get": {
+        "description": "The data contracts offered to packs' widgets: what each holds, the permission it needs, its pace \u2014\nand every dashboard widget's own data (``widget:<key>``: what that widget shows the member).",
+        "operationId": "contracts_api_v1_admin_visuals_contracts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Contracts Api V1 Admin Visuals Contracts Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Contracts",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
     "/api/v1/admin/visuals/files/{pack}/{sha}/{name}": {
       "get": {
         "operationId": "any_file_api_v1_admin_visuals_files__pack___sha___name__get",

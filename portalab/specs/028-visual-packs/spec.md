@@ -70,6 +70,14 @@ underlying data (`009` and the owning modules). It chooses no technology.
 - Q: Can a pack (and its files) be removed for good? → A: a pack some member owns a product of is only
   archived (switched off, its files and versions kept, can be enabled again); it can be removed for good only
   once no member owns any of its products; versions never published can be purged at any time.
+- Q: Where does a widget's logic live? → A: entirely in its pack (the archive carries everything it does);
+  the portal only provides the generic means — the sandbox, the data contracts, its place on the dashboard —
+  never code of any pack's widget. A widget pack may bring new widgets (using any information of the
+  configured services and of Portalab the member may see), other looks of existing or new widgets, and new
+  options of existing or new widgets (showing other data, adding animations…); a new widget draws itself for
+  each form it is given (one line, a narrow column, a block, several rows).
+- Q: Who decides whether a widget pack's elements are sold? → A: each element carries its rarity and its price
+  — or « offered » — in the pack; at import the administrator accepts these values or changes them.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -225,8 +233,12 @@ booster created from the administration opens with the default scene.
 
 A pack may give existing dashboard widgets a style of its own, and may bring new widgets. A new widget is
 drawn by the pack and fed by the portal: it declares which data it needs among contracts the portal offers
-(the member's progression, what they are watching, what was recently added…), the administrator sees and
-accepts those needs at review, and the widget only ever receives that data, for the member looking at it.
+(the member's progression, what they are watching, what was recently added… and any dashboard widget's own
+data, so any information of the configured services), the administrator sees and accepts those needs at
+review, and the widget only ever receives that data, for the member looking at it. A pack may also bring
+options for existing or new widgets — another way to show a widget with more data, animations over it, or
+values of a new widget's own settings. Everything a widget, look or option does is in its pack; each element
+has its rarity and its price, or is offered to everyone, as the pack proposes and the administrator decides.
 
 **Why this priority**: widgets are the dashboard's building blocks; packs extend them once the safer
 elements are in place.
@@ -242,6 +254,13 @@ else; a widget asking for a contract the member may not read shows its empty sta
 2. **Given** a member placing that widget, **When** it shows, **Then** it receives only the declared data for
    that member, within what the member may see.
 3. **Given** a widget asking for data it did not declare, **When** it asks, **Then** it receives nothing.
+4. **Given** a pack element proposing a price or « offered », **When** the administrator reviews it, **Then**
+   they keep or change its rarity, price or offer; an offered element is no shop product and every member may
+   use it.
+5. **Given** a new widget placed on one row, in a narrow column or over several rows, **When** it shows,
+   **Then** it is told its form and draws itself for it.
+6. **Given** an option of an existing widget a member put on it, **When** the widget shows, **Then** the
+   option shows it otherwise or animates it, from the widget's own data and the contracts it declared.
 
 ---
 
@@ -435,10 +454,19 @@ analysis reports no blocking finding; it imports and publishes.
 
 **Widgets**
 
-- **FR-033**: A pack MUST be able to restyle existing widgets with styles members choose like any widget look.
+- **FR-033**: A pack MUST be able to restyle existing widgets (and its own) with styles members choose like any
+  widget look, and MAY bring options for existing or new widgets — a stylesheet (animations, another look), a
+  script showing the widget otherwise or drawing over it (handed the widget's own data and the contracts it
+  declares), or values of a new widget's own settings; members put them on in the widget's settings.
 - **FR-034**: A pack MAY bring new widgets; a new widget MUST declare the data contracts it needs among those
   the portal offers, MUST only receive that data, for the member viewing it, within what that member may see,
-  and MUST never request the portal itself.
+  and MUST never request the portal itself; besides the portal's named contracts, any dashboard widget's own
+  data is a contract (what that widget shows the member, its permission and purchase applying). Everything a
+  widget, a widget look or an option does MUST be in its pack (no code of a pack's widget in the portal); a
+  new widget is told its form (one line, narrow column, block, several rows) and the sizes it may take are
+  those it declares.
+- **FR-035a**: Each element of a widget pack MUST carry its rarity and its price, or be offered to everyone;
+  the administrator MUST be able to keep or change these at review; an offered element is no shop product.
 - **FR-035**: The portal MUST describe each data contract it offers (what it contains, which permission it
   requires, how often it refreshes).
 

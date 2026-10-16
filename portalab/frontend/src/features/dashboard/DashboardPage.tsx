@@ -40,6 +40,7 @@ import "./widgets/downloads";
 import "./widgets/leaving";
 import "./widgets/service-status";
 import "../services/HostWidgets";
+import "./widgets/pack/PackWidget"; // 028: packs' widgets
 import "./widgets/skins"; // 027 (#31): last — the other looks wrap the widgets registered above
 
 const ONBOARDED = "portalab.onboarding.dashboard";

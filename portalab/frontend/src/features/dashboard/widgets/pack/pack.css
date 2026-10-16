@@ -1,0 +1,24 @@
+/* 028: a pack's widget — its sandboxed frame fills the widget's body (it draws everything inside) */
+.pack-widget {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 6rem;
+  border: 0;
+  background: transparent;
+  color-scheme: normal;
+}
+/* 028: an option's script drawn over its widget (animations): it never takes a click */
+.widget-frame__body:has(> .pack-addon--overlay) {
+  position: relative;
+}
+.pack-addon--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}

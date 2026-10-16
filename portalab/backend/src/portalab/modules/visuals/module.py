@@ -8,9 +8,10 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditRecord, AuditSink
-from portalab.core.authz_port import Principal, ResourceRef
+from portalab.core.authz_port import Authorizer, Principal, ResourceRef
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
@@ -18,6 +19,7 @@ from portalab.modules.visuals import event_types as _event_types  # noqa: F401 â
 from portalab.modules.visuals.builtin import BuiltinSync, builtin_root
 from portalab.modules.visuals.github import GitHub
 from portalab.modules.visuals.service import VisualPacks
+from portalab.modules.visuals.widgets import PackWidgets
 
 OWNER = "module:visuals"
 REFRESH_EVERY = 10.0  # seconds: how often a process checks the registry's epoch on its own
@@ -35,6 +37,8 @@ class VisualsModule:
         root: Path,
         github: GitHub | None = None,
         clock: Clock | None = None,
+        authorizer: Authorizer | None = None,
+        widgets: WidgetRegistry = default_widgets,
     ) -> None:
         self.database = database
         self.events = events
@@ -49,6 +53,7 @@ class VisualsModule:
             audit=self._audit,
             announce=self._announce,
             clock=clock,
+            widgets=PackWidgets(widgets, authorizer),
         )
         self._refresher: asyncio.Task[None] | None = None
         self._syncing: asyncio.Task[None] | None = None

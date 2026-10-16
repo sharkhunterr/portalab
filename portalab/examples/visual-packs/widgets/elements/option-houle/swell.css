@@ -1,0 +1,32 @@
+/* Vigie — « La houle »: any widget wearing it rolls gently and a lantern glows in its corner (its hook: the
+   widget's frame, data-widget-option ~= its key). Still for those who asked for less motion. */
+.widget-frame[data-widget-option~="houle"] {
+  animation: roll 7s ease-in-out infinite;
+  transform-origin: 50% 120%;
+}
+.widget-frame[data-widget-option~="houle"]::after {
+  content: "";
+  position: absolute;
+  inset: 0.5rem 0.5rem auto auto;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3c4 0 30%, #f0b54a 60%, rgba(240, 181, 74, 0) 72%);
+  box-shadow: 0 0 0.8rem 0.3rem rgba(240, 181, 74, 0.45);
+  animation: lantern 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes roll {
+  0%, 100% { transform: rotate(-0.35deg) translateY(0); }
+  50% { transform: rotate(0.35deg) translateY(-2px); }
+}
+@keyframes lantern {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .widget-frame[data-widget-option~="houle"],
+  .widget-frame[data-widget-option~="houle"]::after {
+    animation: none;
+  }
+}

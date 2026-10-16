@@ -12,8 +12,10 @@ import {
 } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
+import { externalLooks, useExternalRevision } from "../../../design-system/visuals/registry";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Change, Instance } from "../api";
+import { addonsFor } from "../widgets/pack/WidgetAddons";
 
 /**
  * Edit controls of one widget (spec 009 T019; 027): moving and resizing are done on the grid itself (drag
@@ -99,10 +101,24 @@ function ConfigDialog({
       ((await api.GET("/api/v1/dashboard/locked-options")).data as unknown as { locked: string[] }).locked,
   });
   const isLocked = (name: string, option: unknown) =>
-    Boolean(lockedOptions.data?.includes(`${instance.widget_key}:${name}=${String(option)}`));
-  const hasLocked = Object.entries(properties).some(([name, schema]) =>
-    (schema.enum ?? []).some((option) => isLocked(name, option)),
+    Boolean(
+      lockedOptions.data?.includes(`${instance.widget_key}:${name}=${String(option)}`) ||
+        // 028: a pack's widget style is sold for every widget
+        lockedOptions.data?.includes(`*:${name}=${String(option)}`),
+    );
+  // 028: the frame's looks the live packs bring
+  useExternalRevision();
+  const addons = addonsFor(instance.widget_key);
+  const wornOptions = Array.isArray(draft._options) ? (draft._options as string[]) : [];
+  const skins = externalLooks("widget_style").filter(
+    (skin) => !skin.widget?.for || skin.widget.for === instance.widget_key,
   );
+  const hasLocked =
+    Object.entries(properties).some(([name, schema]) =>
+      (schema.enum ?? []).some((option) => isLocked(name, option)),
+    ) ||
+    skins.some((skin) => isLocked("_skin", skin.look)) ||
+    addons.some((addon) => isLocked("_options", addon.look));
   // 027: labels from the widget's catalog (« <ns>:widget.<name>.config.<field>[.<option>] »), else raw
   const [ns, ...rest] = instance.widget_key.split(".");
   const base = `${ns}:widget.${rest.join(".")}.config`;
@@ -244,6 +260,44 @@ function ConfigDialog({
             checked={Boolean(draft._no_box)}
             onChange={(e) => setDraft({ ...draft, _no_box: e.target.checked })}
           />
+          {skins.length ? (
+            <SelectField
+              label={t("dashboard:frame.skin")}
+              hint={t("dashboard:frame.skinHint")}
+              value={typeof draft._skin === "string" ? draft._skin : ""}
+              onChange={(e) => setDraft({ ...draft, _skin: e.target.value })}
+            >
+              <option value="">{t("dashboard:frame.skinNone")}</option>
+              {skins.map((skin) => (
+                <option key={skin.look} value={skin.look ?? ""} disabled={isLocked("_skin", skin.look)}>
+                  {isLocked("_skin", skin.look) ? "🔒 " : ""}
+                  {t(`dashboard:packStyle.${skin.look}`)}
+                  {isLocked("_skin", skin.look) ? ` · ${t("dashboard:inShop")}` : ""}
+                </option>
+              ))}
+            </SelectField>
+          ) : null}
+          {addons.map((addon) => {
+            const look = addon.look ?? "";
+            const locked = isLocked("_options", look) && !wornOptions.includes(look);
+            return (
+              <CheckboxField
+                key={look}
+                label={`${locked ? "🔒 " : ""}${t(`dashboard:packOption.${look}`)}${locked ? ` · ${t("dashboard:inShop")}` : ""}`}
+                hint={t("dashboard:frame.addonHint")}
+                disabled={locked}
+                checked={wornOptions.includes(look)}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    _options: e.target.checked
+                      ? [...new Set([...wornOptions, look])]
+                      : wornOptions.filter((x) => x !== look),
+                  })
+                }
+              />
+            );
+          })}
           <CheckboxField
             label={t("dashboard:hideWhenEmpty")}
             hint={t("dashboard:hideWhenEmptyHint")}

@@ -4,8 +4,8 @@ Members: ``GET /visuals/active`` (the elements their interface loads), the files
 sandbox page pack scripts run in (a session is needed for all three: nothing of a pack reaches a visitor).
 The Admin (``visuals.manage``, reserved): the packs, their versions and every step of their workflow, the
 inbox read again, an upload, a GitHub address, the updates on offer, the Test step's measures, the Review
-draft, publication, refusal, switching a pack off and on, rollback, removal, purge — and every version's
-files, to show them before they are validated.
+draft, publication, refusal, switching a pack off and on, rollback, removal, purge, every version's files (to
+show them before they are validated) and the data contracts packs' widgets may ask for.
 """
 
 import mimetypes
@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, Query, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, ConfigDict, Field
 
+from portalab.capabilities.visuals import WIDGET_CONTRACTS, WIDGET_DATA, contract_known
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
@@ -155,6 +156,24 @@ async def any_file(_: Manager, packs: Packs, pack: str, sha: str, name: str) -> 
 @admin.get("/admin/visuals")
 async def listing(_: Manager, packs: Packs) -> dict[str, Any]:
     return {"packs": await packs.listing(), "inbox": str(packs.store.inbox)}
+
+
+@admin.get("/admin/visuals/contracts")
+async def contracts(_: Manager, packs: Packs) -> dict[str, Any]:
+    """The data contracts offered to packs' widgets: what each holds, the permission it needs, its pace —
+    and every dashboard widget's own data (``widget:<key>``: what that widget shows the member)."""
+    registry = packs.widgets.registry if packs.widgets is not None else None
+    widgets = [
+        {
+            "key": f"{WIDGET_DATA}{entry.definition.key}",
+            "widget": entry.definition.key,
+            "title_key": entry.definition.title_key,
+            "permission": entry.definition.required_permission,
+        }
+        for entry in (registry.widgets() if registry is not None else [])
+        if contract_known(f"{WIDGET_DATA}{entry.definition.key}")
+    ]
+    return {"contracts": [contract.out() for contract in WIDGET_CONTRACTS.values()], "widgets": widgets}
 
 
 @admin.post("/admin/visuals/scan")

@@ -54,6 +54,23 @@ export interface ExternalElement {
   rarity?: string | null;
   parts?: Record<string, unknown> | null;
   contracts?: string[] | null;
+  /** 028: a widget (its sizes, pace, words when empty, own settings), a widget style or option (the widget
+   * it is for — every one when absent —, an option's setting and value, or its script's place) */
+  widget?: {
+    sizes?: Array<{ w: number; h: number }>;
+    refresh_s?: number;
+    empty?: Record<string, string>;
+    options?: Array<{
+      key: string;
+      names?: Record<string, string>;
+      default?: string;
+      values: Array<{ value: string; names?: Record<string, string> }>;
+    }>;
+    for?: string | null;
+    setting?: string;
+    value?: string;
+    place?: "replace" | "overlay" | null;
+  } | null;
 }
 
 /** An element as the API sends it (empty fields left out), completed. */
@@ -224,7 +241,15 @@ const NAME_KEYS: Record<string, string> = {
   notification_style: "notifications:looks.styles",
   notification_animation: "notifications:looks.animations",
   palette: "notifications:palette.names",
+  // 028: packs' widgets and widget styles (the dashboard's catalog and settings name them)
+  widget: "dashboard:packWidget",
+  widget_style: "dashboard:packStyle",
+  widget_option: "dashboard:packOption",
 };
+
+function said(names: Record<string, string> | undefined, language: string): string | undefined {
+  return names?.[language.split("-")[0] ?? "en"] || names?.en || names?.fr;
+}
 
 /** The names the packs give their looks, as catalog messages for ``language`` (merged over the catalogs). */
 export function externalMessages(language: string): Record<string, string> {
@@ -234,6 +259,16 @@ export function externalMessages(language: string): Record<string, string> {
       const prefix = NAME_KEYS[element.type];
       const name = element.names[language.split("-")[0] ?? "en"] || element.names.en || element.names.fr;
       if (prefix && element.look && name) out[`${prefix}.${element.look}`] = name;
+      // 028: a pack widget's own settings, named where the widget's settings look for them
+      for (const option of element.type === "widget" ? (element.widget?.options ?? []) : []) {
+        const base = `pack:widget.${element.look}.config.${option.key}`;
+        const label = said(option.names, language);
+        if (label) out[base] = label;
+        for (const value of option.values) {
+          const word = said(value.names, language);
+          if (word) out[`${base}.${value.value}`] = word;
+        }
+      }
     }
   }
   return out;

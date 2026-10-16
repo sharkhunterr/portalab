@@ -44,13 +44,23 @@ from portalab.core.live import publish_live
 from portalab.core.time import Clock, utc_now
 from portalab.modules.visuals.analysis import analyse, looks_of
 from portalab.modules.visuals.github import GitHub, GitHubError, parse_address
-from portalab.modules.visuals.manifest import LOOK_FIELD, NOT_SOLD, ManifestError, parse_pack, version_key
+from portalab.modules.visuals.manifest import (
+    GIVEABLE,
+    LOOK_FIELD,
+    NOT_SOLD,
+    ManifestError,
+    parse_pack,
+    version_key,
+)
 from portalab.modules.visuals.models import Element, LookClaim, Pack, PackVersion, RegistryEpoch, SceneBinding
 from portalab.modules.visuals.store import Files, PackageError, Store, read_folder, read_source, read_zip
+from portalab.modules.visuals.widgets import PackWidgets, pack_widget_key
 
 SOCLE = "portalab-socle"
 RESERVED_PREFIX = "portalab-"
-ECONOMY_FIELDS = ("price", "rarity", "level", "supply", "collection", "icon", "season", "limit", "featured")
+ECONOMY_FIELDS = (
+    "price", "rarity", "level", "supply", "collection", "icon", "season", "limit", "featured", "sold"
+)  # fmt: skip
 DEFAULT_COLLECTIONS = {
     "level_up": "levels",
     "level_badge": "levels",
@@ -71,8 +81,38 @@ DEFAULT_COLLECTIONS = {
     "theme": "themes",
     "widget": "widgets",
     "widget_style": "widgets",
+    "widget_option": "widgets",
 }
-PRODUCT_TYPES = {"theme_pack": "bundle", "widget_style": "widget_option"}
+PRODUCT_TYPES = {"theme_pack": "bundle", "widget_style": "widget_option", "widget_option": "widget_option"}
+SKIN = "_skin"  # the widget frame's setting naming a pack's widget style
+OPTIONS = "_options"  # the widget frame's setting listing the add-ons (packs' options) it wears
+
+
+def widget_render(element: Mapping[str, Any]) -> dict[str, Any] | None:
+    """What the interface needs of a widget, a widget style or a widget option besides its files."""
+    payload = element.get("payload") or {}
+    render = element.get("render") or {}
+    if element["type"] == "widget":  # its sizes, pace, words when empty, its own settings
+        return {k: v for k, v in payload.items() if k in ("sizes", "refresh_s", "empty", "options")}
+    if element["type"] == "widget_style":  # the widget it is for (every widget: none)
+        target = widget_target(payload.get("widget"))
+        return {"for": target} if target != "*" else None
+    if element["type"] == "widget_option":
+        target = widget_target(payload.get("widget"))
+        if "setting" in payload:  # a value of a pack widget's own setting
+            return {"for": target, "setting": payload.get("setting"), "value": payload.get("value")}
+        return {"for": None if target == "*" else target, "place": render.get("place")}
+    return None
+
+
+def widget_target(target: Any) -> str:
+    """The dashboard key an element of a pack names: ``*`` (every widget), a widget's key, or this pack's own
+    widget (its look, or ``pack.<look>``)."""
+    if not isinstance(target, str) or not target or target == "*":
+        return "*"
+    return target if "." in target else pack_widget_key(target)
+
+
 # the steps a version moves forward through (refused, superseded and purged end it)
 ORDER = ("imported", "analysed", "tested", "reviewed", "published")
 REFRESH_SECONDS = 2.0
@@ -115,8 +155,10 @@ class VisualPacks:
         audit: Audit | None = None,
         announce: Announce | None = None,
         clock: Clock | None = None,
+        widgets: PackWidgets | None = None,
     ) -> None:
         self.database = database
+        self.widgets = widgets  # the live packs' widgets on this process's dashboard
         self.store = Store(root)
         self.capabilities = capabilities
         self.github = github or GitHub()
@@ -488,7 +530,19 @@ class VisualPacks:
         if field and element.get("look"):
             payload[field] = element["look"]
         if element["type"] == "widget_style":
-            payload = {"option": f"{payload.get('widget') or '*'}:style={element.get('look')}"}
+            # a frame's look worn by any widget (``*``) or the one it names: ``_skin`` (a frame setting)
+            payload = {"option": f"{widget_target(payload.get('widget'))}:{SKIN}={element.get('look')}"}
+        if element["type"] == "widget":
+            payload = {"widget": pack_widget_key(str(element.get("look")))}
+        if element["type"] == "widget_option":
+            option = element.get("payload") or {}
+            target = widget_target(option.get("widget"))
+            if (
+                "setting" in option
+            ):  # a value of a pack widget's own setting: ``pack.<widget>:<setting>=<value>``
+                payload = {"option": f"{target}:{option.get('setting')}={option.get('value')}"}
+            else:  # an add-on a widget wears (``_options``, the frame's list of them)
+                payload = {"option": f"{target}:{OPTIONS}={element.get('look')}"}
         return {
             "key": element["product"],
             "type": PRODUCT_TYPES.get(element["type"], element["type"]),
@@ -634,7 +688,14 @@ class VisualPacks:
             await self._interface(actor, holder.id, version, element.data, enabled=True)
             if element.product_key is None:
                 continue
-            product = self.product_of(element.data, economy.get(element.product_key, {}))
+            decided = economy.get(element.product_key, {})
+            if element.type in GIVEABLE and not {**element.data["economy"], **decided}.get("sold", True):
+                # given to everyone: no product — one sold before goes off sale (its owners keep it)
+                if element.product_key in await writer.existing([element.product_key]):
+                    await writer.withdraw(actor, element.product_key)
+                outcomes[element.product_key] = "given"
+                continue
+            product = self.product_of(element.data, decided)
             if holder.builtin:
                 product["resume"] = element.product_key in withdrawn
             outcomes[element.product_key] = await writer.publish(actor, product)
@@ -1109,6 +1170,8 @@ class VisualPacks:
                 "rarity": render.get("rarity"),
                 "parts": (element.get("payload") or {}).get("parts"),
                 "contracts": element.get("contracts") or None,
+                # a widget: the sizes it takes and what it shows when it has nothing (its data: contracts)
+                "widget": widget_render(element),
             }
             out.append(
                 {k: v for k, v in entry.items() if v not in (None, [], {})} | {"names": element["names"]}
@@ -1197,6 +1260,19 @@ class VisualPacks:
                 if (kind, look) not in live:
                     withheld.setdefault(str(kind), []).append(str(look))
             live_looks.replace(by_type, epoch)
+            if self.widgets is not None:
+                self.widgets.sync(
+                    {
+                        "pack": pack_id,
+                        "sha": version.sha256[:16],
+                        "look": element.look,
+                        "contracts": element.data.get("contracts") or [],
+                        "payload": element.data.get("payload") or {},
+                        "economy": element.data.get("economy") or {},
+                    }
+                    for pack_id, version, element in rows
+                    if element.type == "widget"
+                )
             self.withheld = {kind: frozenset(looks) for kind, looks in withheld.items()}
             self._live = {(pack_id, version.sha256[:16]): version.sha256 for pack_id, version, _ in rows}
             self._manifest = {

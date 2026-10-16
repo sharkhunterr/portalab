@@ -27,6 +27,9 @@ export function missingConfirmations(detail: VersionDetail, given: Partial<Confi
   ];
 }
 
+/** 028 (US6): what the administrator may give everyone rather than sell (no shop product). */
+export const GIVEABLE = new Set(["widget", "widget_style", "widget_option"]);
+
 export const NOT_SOLD = new Set([
   "navigation",
   "booster_scene",

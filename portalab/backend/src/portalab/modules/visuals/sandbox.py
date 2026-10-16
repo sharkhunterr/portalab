@@ -18,7 +18,7 @@ The bootstrap speaks to the interface by messages only, from and to the window t
   stops answering is stopped, its default takes over);
 - out: ``ready``, ``error``, ``asset`` (a file of its own element, by relative path), and for a navigation
   ``navigate`` (a page's key among those it was given — the interface checks it), ``expand`` (cover the screen
-  while open), ``size``.
+  while open). A widget is placed and resized by the member within the sizes its element declares.
 """
 
 import base64

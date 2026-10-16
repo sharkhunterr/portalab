@@ -3782,6 +3782,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/visuals/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contracts
+         * @description The data contracts offered to packs' widgets: what each holds, the permission it needs, its pace —
+         *     and every dashboard widget's own data (``widget:<key>``: what that widget shows the member).
+         */
+        get: operations["contracts_api_v1_admin_visuals_contracts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/visuals/files/{pack}/{sha}/{name}": {
         parameters: {
             query?: never;
@@ -23913,6 +23934,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contracts_api_v1_admin_visuals_contracts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

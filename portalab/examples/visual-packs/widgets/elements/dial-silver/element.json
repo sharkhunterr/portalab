@@ -1,0 +1,24 @@
+{
+  "type": "widget_option",
+  "names": {
+    "fr": "Cadran d'argent",
+    "en": "Silver dial"
+  },
+  "descriptions": {
+    "fr": "Pour « Le cap » : un compas d'argent poli et une face d'acier bleui.",
+    "en": "For « Heading »: a polished silver compass and a blued-steel face."
+  },
+  "payload": {
+    "widget": "vigie-cap",
+    "setting": "dial",
+    "value": "silver"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "icon": "compass"
+  }
+}

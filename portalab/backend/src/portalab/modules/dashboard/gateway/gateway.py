@@ -5,6 +5,7 @@ every call (hiding a widget in the UI is not security): widget permission, modul
 Marketplace entitlement."""
 
 import asyncio
+import re
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import replace
@@ -34,15 +35,44 @@ from portalab.modules.dashboard.settings import DashboardConfig
 # 027: the frame's own settings, kept with a widget's but never part of its schema — « hide when empty »,
 # « no title », « no box » (the raw content on the page)
 FRAME_KEYS = frozenset({"_hide_empty", "_hide_title", "_no_box"})
+# 028: the frame's look brought by a visual pack (``widget_style``), sold for every widget as a
+# ``widget_option`` (``*:_skin=<look>``): a look's key, or nothing
+SKIN = "_skin"
+_SKIN_VALUE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,47}$")
+# 028: the add-ons a widget wears (packs' ``widget_option`` with a stylesheet or a script): their keys, each
+# sold for every widget (``*:_options=<look>``) or for this one (``<widget>:_options=<look>``)
+OPTIONS = "_options"
+MAX_OPTIONS = 8
+
+
+def worn(config: Mapping[str, Any]) -> list[tuple[str, Any]]:
+    """Each setting value as the shop sells it: a list (the add-ons worn) counts value by value."""
+    out: list[tuple[str, Any]] = []
+    for name, value in config.items():
+        if name == OPTIONS and isinstance(value, list):
+            out.extend((name, item) for item in value)
+        else:
+            out.append((name, value))
+    return out
 
 
 def config_errors(widget: RegisteredWidget, config: Mapping[str, Any]) -> list[str]:
     validator = Draft202012Validator(dict(widget.definition.config_schema))
-    own = {k: v for k, v in config.items() if k not in FRAME_KEYS}
+    own = {k: v for k, v in config.items() if k not in FRAME_KEYS and k not in (SKIN, OPTIONS)}
     errors = [error.message for error in validator.iter_errors(own)]
     for key in sorted(FRAME_KEYS):
         if key in config and not isinstance(config[key], bool):
             errors.append(f"{key} must be true or false")
+    skin = config.get(SKIN)
+    if skin is not None and skin != "" and not (isinstance(skin, str) and _SKIN_VALUE.fullmatch(skin)):
+        errors.append(f"{SKIN} must be a look's key")
+    options = config.get(OPTIONS)
+    if options is not None and not (
+        isinstance(options, list)
+        and len(options) <= MAX_OPTIONS
+        and all(isinstance(o, str) and _SKIN_VALUE.fullmatch(o) for o in options)
+    ):
+        errors.append(f"{OPTIONS} must list looks' keys ({MAX_OPTIONS} at most)")
     return errors
 
 
@@ -156,8 +186,17 @@ class WidgetGateway:
         widget = self.registry.get(key)
         defaults = widget.definition.config_defaults if widget is not None else {}
         out = dict(config)
+        if isinstance(config.get(OPTIONS), list):  # 028: the add-ons worn, one by one
+            out[OPTIONS] = [
+                o
+                for o in config[OPTIONS]
+                if f"{key}:{OPTIONS}={o}" not in locked and f"*:{OPTIONS}={o}" not in locked
+            ]
         for name, value in config.items():
-            if f"{key}:{name}={value}" in locked:
+            if name == OPTIONS:
+                continue
+            # 028: a pack's widget style (``_skin``) is sold for every widget (``*``) or for one
+            if f"{key}:{name}={value}" in locked or f"*:{name}={value}" in locked:
                 if name in defaults:
                     out[name] = defaults[name]
                 else:

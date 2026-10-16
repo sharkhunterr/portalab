@@ -1,0 +1,23 @@
+{
+  "type": "widget_style",
+  "look": "vigie",
+  "names": {
+    "fr": "Laque et laiton",
+    "en": "Lacquer and brass"
+  },
+  "descriptions": {
+    "fr": "Le cadre d'un instrument de bord : laque bleu nuit, liseré et coins de laiton rivetés, le titre gravé sur une plaque. Pour n'importe quel widget.",
+    "en": "The frame of a ship's instrument: midnight-blue lacquer, a brass edge and riveted brass corners, the title engraved on a plate. For any widget."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "frame.css"
+    ]
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "rare",
+    "icon": "sparkles"
+  }
+}

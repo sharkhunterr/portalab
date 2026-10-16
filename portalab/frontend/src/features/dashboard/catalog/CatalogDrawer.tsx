@@ -3,10 +3,12 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
+import { externalLook } from "../../../design-system/visuals/registry";
 import { useT } from "../../../i18n/hooks/useT";
 import { InShop } from "../../appearance/InShop";
 import "../../appearance/notification-looks.css";
 import { type CatalogEntry, type Change, useCatalog } from "../api";
+import { PACK_PREFIX } from "../widgets/pack/keys";
 import { WidgetPreview } from "./WidgetPreview";
 
 /**
@@ -34,6 +36,7 @@ export function CatalogDrawer({ apply }: { apply: (change: Change) => void }) {
       .sort((a, b) => t(a.widget.title_key).localeCompare(t(b.widget.title_key)));
     return { toAdd: usable.filter((e) => !e.placed), placed: usable.filter((e) => e.placed) };
   }, [entries, query, t]);
+  const titles = Object.fromEntries(entries.map((e) => [e.key, t(e.widget.title_key)]));
   const card = (entry: CatalogEntry) => {
     const again = entry.placed && entry.widget.multiple;
     const done = entry.placed && !entry.widget.multiple;
@@ -52,6 +55,7 @@ export function CatalogDrawer({ apply }: { apply: (change: Change) => void }) {
         <span className="widget-gallery__text">
           <strong>{title}</strong>
           {entry.widget.description_key ? <span>{t(entry.widget.description_key)}</span> : null}
+          <DataNeeds widgetKey={entry.key} titles={titles} />
           <span className="widget-gallery__size">
             <Icon name="maximize" size={11} />
             {t("dashboard:gallery.sizes", {
@@ -127,5 +131,29 @@ export function CatalogDrawer({ apply }: { apply: (change: Change) => void }) {
         ) : null}
       </div>
     </Dialog>
+  );
+}
+
+/** 028: what a pack's widget reads of the member's data — said before it is added (its data contracts). */
+function DataNeeds({ widgetKey, titles }: { widgetKey: string; titles: Record<string, string> }) {
+  const t = useT();
+  if (!widgetKey.startsWith(PACK_PREFIX)) return null;
+  const contracts = externalLook("widget", widgetKey.slice(PACK_PREFIX.length))?.contracts ?? [];
+  return (
+    <span className="widget-gallery__needs">
+      <Icon name="shield" size={11} />
+      {contracts.length
+        ? t("dashboard:gallery.needs", {
+            list: contracts
+              .map((c) =>
+                // a widget's data: named after that widget
+                c.startsWith("widget:")
+                  ? `${t("dashboard:contract.widget")} « ${titles[c.slice(7)] ?? c.slice(7)} »`
+                  : t(`dashboard:contract.${c}`),
+              )
+              .join(", "),
+          })
+        : t("dashboard:gallery.nothingRead")}
+    </span>
   );
 }

@@ -1,0 +1,88 @@
+{
+  "type": "widget",
+  "look": "vigie-cap",
+  "names": {
+    "fr": "Le cap",
+    "en": "Heading"
+  },
+  "descriptions": {
+    "fr": "Un compas de laiton : son aiguille montre votre route vers le niveau suivant, votre niveau au centre ; à côté, votre expérience, vos pièces, votre série de jours et, en grand, le dernier titre arrivé. Sur une ligne, l'essentiel ; dans une colonne, le compas au-dessus.",
+    "en": "A brass compass: its needle shows your course to the next level, your level in its middle; beside it your experience, coins, streak of days and, when large, the last title that arrived. On one line, the essentials; in a column, the compass on top."
+  },
+  "render": {
+    "kind": "js",
+    "file": "cap.js"
+  },
+  "contracts": [
+    "me.progression",
+    "me.statistics",
+    "widget:media.recently_added"
+  ],
+  "payload": {
+    "sizes": [
+      {
+        "w": 4,
+        "h": 2
+      },
+      {
+        "w": 4,
+        "h": 1
+      },
+      {
+        "w": 2,
+        "h": 3
+      },
+      {
+        "w": 3,
+        "h": 2
+      },
+      {
+        "w": 6,
+        "h": 3
+      }
+    ],
+    "refresh_s": 60,
+    "empty": {
+      "fr": "Votre cap apparaîtra dès que votre progression sera visible.",
+      "en": "Your heading shows as soon as your progression can be seen."
+    },
+    "options": [
+      {
+        "key": "dial",
+        "names": {
+          "fr": "Cadran",
+          "en": "Dial"
+        },
+        "default": "brass",
+        "values": [
+          {
+            "value": "brass",
+            "names": {
+              "fr": "Laiton",
+              "en": "Brass"
+            }
+          },
+          {
+            "value": "silver",
+            "names": {
+              "fr": "Argent",
+              "en": "Silver"
+            }
+          },
+          {
+            "value": "night",
+            "names": {
+              "fr": "Nuit phosphorescente",
+              "en": "Glowing night"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "economy": {
+    "price": 800,
+    "rarity": "epic",
+    "icon": "compass"
+  }
+}

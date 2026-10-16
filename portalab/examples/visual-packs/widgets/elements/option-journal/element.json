@@ -1,0 +1,28 @@
+{
+  "type": "widget_option",
+  "look": "journal",
+  "names": {
+    "fr": "Le journal de bord",
+    "en": "The logbook"
+  },
+  "descriptions": {
+    "fr": "Pour « Récemment ajoutés » : les arrivées écrites dans un journal de bord, à la plume, avec l'heure de chaque entrée — et, en tête, combien de titres vous attendent en cours.",
+    "en": "For « Recently added »: the arrivals written in a ship's logbook, in ink, each entry with its time — and, on top, how many titles await you in progress."
+  },
+  "payload": {
+    "widget": "media.recently_added"
+  },
+  "render": {
+    "kind": "js",
+    "file": "journal.js",
+    "place": "replace"
+  },
+  "contracts": [
+    "me.watching"
+  ],
+  "economy": {
+    "price": 600,
+    "rarity": "epic",
+    "icon": "book"
+  }
+}

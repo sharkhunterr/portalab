@@ -4,9 +4,17 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { type Confirmations, type Economy, packPath, useVisualAction, type VersionDetail } from "../api";
+import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
+import {
+  type Confirmations,
+  type Economy,
+  packPath,
+  useVisualAction,
+  useWidgetContracts,
+  type VersionDetail,
+} from "../api";
 import { nameOf, RARITIES } from "../parts";
-import { confirmationsNeeded, NOT_SOLD } from "./review";
+import { confirmationsNeeded, GIVEABLE, NOT_SOLD } from "./review";
 
 /** Review: the economy each element proposes — price, rarity, level, copies — changed if wanted, and the
  * confirmations the version needs (its scripts, a look it takes over, the data a widget asks for). Saved
@@ -77,17 +85,35 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
                 const label = nameOf(element.names, element.product);
                 const changed = (field: keyof Economy) =>
                   decided[field] !== element.economy[field] || undefined;
+                // 028: a widget, its looks and options may be given to everyone rather than sold
+                const giveable = GIVEABLE.has(element.type);
+                const given = giveable && decided.sold === false;
                 return (
                   <tr key={element.product}>
                     <th scope="row">
                       {label}
                       <span className="visuals-element__type">{t(`admin:visuals.type.${element.type}`)}</span>
+                      {giveable ? (
+                        <select
+                          className="visuals-element__sale"
+                          disabled={closed}
+                          data-changed={changed("sold")}
+                          aria-label={`${t("admin:visuals.review.sale")} — ${label}`}
+                          value={given ? "given" : "sold"}
+                          onChange={(event) =>
+                            decide(element.product, { sold: event.target.value === "sold" })
+                          }
+                        >
+                          <option value="sold">{t("admin:visuals.review.sold")}</option>
+                          <option value="given">{t("admin:visuals.review.given")}</option>
+                        </select>
+                      ) : null}
                     </th>
                     <td data-changed={changed("price")}>
                       <input
                         type="number"
                         min={0}
-                        disabled={closed}
+                        disabled={closed || given}
                         aria-label={`${t("admin:visuals.price")} — ${label}`}
                         value={decided.price ?? ""}
                         placeholder={t("admin:visuals.review.rewardOnly")}
@@ -113,7 +139,7 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
                         type="number"
                         min={1}
                         max={100}
-                        disabled={closed}
+                        disabled={closed || given}
                         aria-label={`${t("admin:visuals.minLevel")} — ${label}`}
                         value={decided.level ?? ""}
                         onChange={(event) => decide(element.product, { level: number(event.target.value) })}
@@ -123,7 +149,7 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
                       <input
                         type="number"
                         min={1}
-                        disabled={closed}
+                        disabled={closed || given}
                         aria-label={`${t("admin:visuals.supply")} — ${label}`}
                         value={decided.supply ?? ""}
                         placeholder="∞"
@@ -211,7 +237,10 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
                   checked={confirmations.contracts.includes(value)}
                   onChange={(event) => toggle("contracts", value, event.target.checked)}
                 />
-                {t("admin:visuals.review.contract", { contract: value })}
+                <span>
+                  {t("admin:visuals.review.contract", { contract: value })}
+                  <ContractAbout contract={value} />
+                </span>
               </label>
             ))}
           </div>
@@ -226,5 +255,31 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
         </div>
       ) : null}
     </>
+  );
+}
+
+/** 028 (US6): what a data contract holds, in plain words, the permission it needs and its pace. */
+function ContractAbout({ contract }: { contract: string }) {
+  const t = useT();
+  const { language } = useLocaleContext();
+  const offered = useWidgetContracts().data;
+  const widget = offered?.widgets.find((c) => c.key === contract);
+  if (widget)
+    return (
+      <small className="visuals-contract">
+        {t("admin:visuals.review.widgetData", { widget: t(widget.title_key), permission: widget.permission })}
+      </small>
+    );
+  const known = offered?.contracts.find((c) => c.key === contract);
+  if (!known) return null;
+  const words = known.descriptions[language.split("-")[0] ?? "en"] ?? known.descriptions.en ?? "";
+  return (
+    <small className="visuals-contract">
+      {t("admin:visuals.review.contractAbout", {
+        description: words,
+        permission: known.permission,
+        seconds: known.refresh_s,
+      })}
+    </small>
   );
 }

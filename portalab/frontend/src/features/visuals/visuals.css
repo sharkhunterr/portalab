@@ -411,6 +411,10 @@
   align-items: flex-start;
   gap: var(--space-2);
 }
+.visuals-contract {
+  display: block;
+  color: var(--color-text-muted);
+}
 .visuals-rules {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));

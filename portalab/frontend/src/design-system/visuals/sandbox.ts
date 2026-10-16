@@ -84,6 +84,8 @@ export function runSandbox(
 ): Sandbox {
   let stopped = false;
   let started = false;
+  // what it knows now: an update before the frame has loaded is what it starts with (never a stale one)
+  let current = context;
   let lastNavigation = 0;
   let pinged = 0;
   let answered = 0;
@@ -112,7 +114,7 @@ export function runSandbox(
           handlers.onError?.("the module could not be loaded");
           return;
         }
-        post({ type: "run", source, context, element: { type: element.type, look: element.look } });
+        post({ type: "run", source, context: current, element: { type: element.type, look: element.look } });
         return;
       }
       case "ready":
@@ -175,6 +177,7 @@ export function runSandbox(
   frame.src = SANDBOX_URL;
   return {
     update: (next) => {
+      current = next;
       if (!stopped && started) post({ type: "context", context: next });
     },
     stop: () => {
