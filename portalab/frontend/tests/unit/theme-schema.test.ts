@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import { parseTheme, themeJsonSchema } from "../../src/design-system/themes/schema";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 022 T005 — closed theme schema: valid passes; unknown keys, script/URL values, missing state rejected.
 // The JSON Schema shared with the backend must match (regenerate with UPDATE_THEME_SCHEMA=1).

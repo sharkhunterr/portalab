@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_POLICY, DEFAULT_PREFERENCES } from "../../src/design-system/a11y/preferences";
 import { applyToDocument, resolve } from "../../src/design-system/themes/apply";
-import { BUILTIN_THEMES, builtinTheme } from "../../src/design-system/themes/builtin";
 import { floorReport } from "../../src/design-system/themes/floor";
 import { parseTheme, presentationOf, THEME_SCHEMA_VERSION } from "../../src/design-system/themes/schema";
+import { BUILTIN_THEMES, builtinTheme } from "../support/themes";
 
 // 027 T005 — theme v2: layout/motion/sound vocabulary (incl. principle-changing arrangements), refusal of
 // unknown values with their path, v1 upgrade with defaults, families resolved by the color mode.

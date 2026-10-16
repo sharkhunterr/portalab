@@ -3,10 +3,10 @@ import axe from "axe-core";
 import { describe, expect, it } from "vitest";
 import { PreferencesProvider } from "../../src/design-system/a11y/PreferencesProvider";
 import { FUNCTIONAL_STATES, FunctionalState, STATE_LABELS } from "../../src/design-system/FunctionalState";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import { contrast } from "../../src/design-system/themes/contrast";
 import { floorReport } from "../../src/design-system/themes/floor";
 import { ThemeProvider } from "../../src/design-system/themes/ThemeProvider";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 001 T053, updated by 022: every functional state renders a non-color cue (icon + text) and passes axe
 // under every built-in theme; every built-in theme passes the WCAG 2.2 AA floor.

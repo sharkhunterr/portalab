@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { BUILTIN_THEMES } from "../../../src/design-system/themes/builtin";
 import { floorReport } from "../../../src/design-system/themes/floor";
 import { parseTheme } from "../../../src/design-system/themes/schema";
 import { formatBytes, severity } from "../../../src/features/admin/ControlCenter";
 import { duplicate } from "../../../src/features/appearance/studio/ThemeStudio";
+import { BUILTIN_THEMES } from "../../support/themes";
 
 // 027 T096/T094 — a duplicated theme stands on its own (valid, accessible, new key, no family); the Control
 // Center ranks problems by impact/criticality and prints sizes for humans.

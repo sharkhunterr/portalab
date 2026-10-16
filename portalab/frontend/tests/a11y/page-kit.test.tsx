@@ -8,8 +8,8 @@ import { Card } from "../../src/design-system/components/Content";
 import { Icon } from "../../src/design-system/components/Icon";
 import { PageHeader } from "../../src/design-system/components/PageHeader";
 import { EmptyState, Skeleton } from "../../src/design-system/components/Placeholders";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import { ThemeProvider } from "../../src/design-system/themes/ThemeProvider";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 027 T016 — the page kit has no axe violations under every built-in theme (contrast is checked by the
 // floor tests and by Playwright in a real browser).

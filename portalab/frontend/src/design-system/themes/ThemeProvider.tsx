@@ -12,6 +12,7 @@ import {
   resolveLooks,
 } from "./apply";
 import { BUILTIN_THEMES, builtinTheme } from "./builtin";
+import { mirrorTheme } from "./mirror";
 import { parseTheme, type ThemeDefinition } from "./schema";
 
 /**
@@ -80,6 +81,7 @@ export function ThemeProvider({ children, themes, overlay = null, root, lockedLo
     sound.sounds = { ...(effective.theme.sounds ?? {}) }; // the theme's sound set (027 R18)
     try {
       applyToDocument(effective, preferences, root, lockedLooks);
+      if (!root) mirrorTheme(effective.theme); // 028: the next first paint draws it before the server answers
     } catch {
       const fallback = builtinTheme(policy.defaultTheme) ?? (BUILTIN_THEMES[0] as ThemeDefinition);
       applyToDocument({ ...effective, theme: fallback }, preferences, root, lockedLooks);

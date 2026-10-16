@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_PREFERENCES } from "../../src/design-system/a11y/preferences";
 import { type Effective, FREE_LOOKS, resolveLooks } from "../../src/design-system/themes/apply";
-import { builtinTheme } from "../../src/design-system/themes/builtin";
 import type { ThemeDefinition } from "../../src/design-system/themes/schema";
+import { builtinTheme } from "../support/themes";
 
 // 027 — a universe theme alone brings its colours, layout and words; its sold looks (ambience,
 // notifications, celebration, level-up) are worn with its universe's pack, else the free defaults show.

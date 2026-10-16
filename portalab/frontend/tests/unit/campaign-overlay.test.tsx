@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_POLICY, DEFAULT_PREFERENCES } from "../../src/design-system/a11y/preferences";
 import { resolve } from "../../src/design-system/themes/apply";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 022 T041 (F8) — a campaign theme overlay applies only when allowed by the preference, never over high
 // contrast (accessibility wins), and never when it breaks the accessibility floor.

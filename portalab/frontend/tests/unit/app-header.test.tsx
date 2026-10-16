@@ -16,11 +16,11 @@ vi.mock("../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { builtinTheme } from "../../src/design-system/themes/builtin";
 import { presentationOf } from "../../src/design-system/themes/schema";
 import { applyChange, PROGRESSION_KEY } from "../../src/shell/header/useHeaderData";
 import { arrangementFor } from "../../src/shell/nav/NavFrame";
 import { json, ME } from "../support/fake-api";
+import { builtinTheme } from "../support/themes";
 import { renderShell, setViewport, VIEW } from "./shell/harness";
 
 const PROGRESSION = {

@@ -20,9 +20,9 @@ vi.mock("../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import ThemeStudio from "../../src/features/appearance/studio/ThemeStudio";
 import { json } from "../support/fake-api";
+import { BUILTIN_THEMES } from "../support/themes";
 
 function withClient(children: ReactNode) {
   const client = new QueryClient({

@@ -5,8 +5,8 @@ import { PreferencesProvider } from "../../src/design-system/a11y/PreferencesPro
 import { DEFAULT_POLICY, DEFAULT_PREFERENCES, sanitize } from "../../src/design-system/a11y/preferences";
 import { effectiveTextScale } from "../../src/design-system/a11y/textScale";
 import { resolve } from "../../src/design-system/themes/apply";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import { ThemeProvider } from "../../src/design-system/themes/ThemeProvider";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 022 T016 — reduced motion (system and explicit) removes animation; high contrast overrides the theme;
 // text scale is bounded 0.85–2.0 and reflows; an admin-forced reduced motion wins.

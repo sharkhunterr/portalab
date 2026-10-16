@@ -16,10 +16,10 @@ vi.mock("../../src/api/client", async (importOriginal) => {
 });
 
 import { PreferencesProvider } from "../../src/design-system/a11y/PreferencesProvider";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import { ThemeProvider } from "../../src/design-system/themes/ThemeProvider";
 import { StatCard } from "../../src/features/statistics/cards/StatCard";
 import { json } from "../support/fake-api";
+import { BUILTIN_THEMES } from "../support/themes";
 
 globalThis.ResizeObserver ??= class {
   observe() {}

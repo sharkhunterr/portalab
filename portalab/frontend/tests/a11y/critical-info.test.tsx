@@ -2,11 +2,11 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PreferencesProvider } from "../../src/design-system/a11y/PreferencesProvider";
 import { FunctionalState } from "../../src/design-system/state/FunctionalState";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import { contrast } from "../../src/design-system/themes/contrast";
 import { floorReport } from "../../src/design-system/themes/floor";
 import { CRITICAL_STATES, type ThemeDefinition } from "../../src/design-system/themes/schema";
 import { ThemeProvider } from "../../src/design-system/themes/ThemeProvider";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 022 T026 — under every theme and high contrast, critical states stay visible with ≥ 3:1 against the
 // surface and a non-color cue; a theme hiding or fading a critical state is rejected by the floor.

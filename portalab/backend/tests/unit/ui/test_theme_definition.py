@@ -18,9 +18,15 @@ def _theme(key: str = "light") -> dict[str, object]:
     return interface_document(key)  # 028: from its pack
 
 
-@pytest.mark.parametrize(
-    "key", ["portalab-dark", "portalab-light", "orbit", "studio", "light", "dark", "high-contrast"]
-)
+@pytest.mark.parametrize("key", ["orbit", "studio"])
+def test_the_base_collection_s_interfaces_are_valid_and_pass_the_floor(key: str) -> None:
+    theme, errors = validate_definition(_theme(key))
+    assert errors == [] and theme is not None
+    assert floor_report(theme)["violations"] == []
+
+
+# 028: the socle's interfaces ship in the interface's code too (first paint): both copies identical
+@pytest.mark.parametrize("key", ["portalab-dark", "portalab-light", "light", "dark", "high-contrast"])
 def test_builtins_valid_pass_floor_and_match_frontend(key: str) -> None:
     theme, errors = validate_definition(_theme(key))
     assert errors == [] and theme is not None

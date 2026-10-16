@@ -2,9 +2,9 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PreferencesProvider } from "../../src/design-system/a11y/PreferencesProvider";
 import { FUNCTIONAL_STATES, FunctionalState } from "../../src/design-system/state/FunctionalState";
-import { BUILTIN_THEMES } from "../../src/design-system/themes/builtin";
 import type { ThemeDefinition } from "../../src/design-system/themes/schema";
 import { ThemeProvider } from "../../src/design-system/themes/ThemeProvider";
+import { BUILTIN_THEMES } from "../support/themes";
 
 // 022 T011 — a closed set of ten states; a theme's state map changes color/icon only; the accessible name,
 // role and data-state stay identical across themes; unknown states are rejected.
