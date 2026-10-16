@@ -6,8 +6,8 @@
     "fr": "meteor"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "meteor.glsl"
   },
   "free": true
 }

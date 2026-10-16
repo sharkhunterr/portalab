@@ -10,8 +10,8 @@
     "fr": "Un film arc-en-ciel qui glisse avec la lumière."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "holo.glsl"
   },
   "economy": {
     "price": 1200,

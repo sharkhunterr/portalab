@@ -10,8 +10,8 @@
     "fr": "Des glyphes qui tombent dans votre niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "matrix.glsl"
   },
   "economy": {
     "price": 1200,

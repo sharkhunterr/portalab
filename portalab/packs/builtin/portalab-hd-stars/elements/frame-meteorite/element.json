@@ -10,8 +10,9 @@
     "fr": "Des étoiles filantes qui traversent un ciel nocturne de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "meteor.glsl",
+    "shape": 3
   },
   "economy": {
     "price": 750,

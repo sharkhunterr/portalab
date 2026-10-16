@@ -10,8 +10,8 @@
     "fr": "« Moonchild » sous votre nom, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "lunar.glsl"
   },
   "economy": {
     "price": 800,

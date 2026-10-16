@@ -10,8 +10,8 @@
     "fr": "Une police et un effet pour votre nom sur votre profil."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "blaze.glsl"
   },
   "economy": {
     "price": 1100,

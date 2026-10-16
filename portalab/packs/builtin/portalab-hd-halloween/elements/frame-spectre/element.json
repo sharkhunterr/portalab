@@ -10,10 +10,12 @@
     "fr": "Des volutes spectrales qui s'élèvent autour de votre avatar, dessinées par la puce graphique."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "spectre.glsl",
     "css": [
       "look.css"
-    ]
+    ],
+    "shape": 3
   },
   "economy": {
     "price": 1200,

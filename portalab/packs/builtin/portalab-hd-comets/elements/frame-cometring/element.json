@@ -10,8 +10,9 @@
     "fr": "Une comète qui fait le tour, ses queues derrière elle de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "comet.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 850,

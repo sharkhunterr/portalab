@@ -10,8 +10,8 @@
     "fr": "« Child of the Sun » sous votre nom, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "solar.glsl"
   },
   "economy": {
     "price": 800,

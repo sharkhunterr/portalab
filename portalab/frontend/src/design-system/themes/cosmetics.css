@@ -353,18 +353,6 @@
 .ds-level[data-fx][data-fx-failed] > .ds-level__fx {
   display: none;
 }
-.ds-level[data-fx="blaze"][data-fx-failed] {
-  background: linear-gradient(0deg, #7f1d1d, #f97316 70%, #facc15);
-}
-.ds-level[data-fx="voltage"][data-fx-failed] {
-  background: linear-gradient(135deg, #0b1d4d, #2563eb 60%, #a5f3fc);
-}
-.ds-level[data-fx="aqua"][data-fx-failed] {
-  background: linear-gradient(0deg, #075985, #22d3ee 55%, #0f172a 56%);
-}
-.ds-level[data-fx="magma"][data-fx-failed] {
-  background: linear-gradient(0deg, #1c0a05, #b91c1c 60%, #f59e0b);
-}
 
 /* #78: looks drawn by the GPU — notifications, titles, badges, avatar frames and level-up stages carry a
    canvas behind them (spread around for what reaches out: flames, arcs, smoke); the element itself is
@@ -620,19 +608,6 @@
   .ds-notification[data-teleport] > :not(canvas) {
     animation: none !important;
   }
-}
-
-/* ---------------------------------------------------------------- #81: the seasons */
-
-/* #81: the seasons' looks drawn by the GPU — without WebGL, a CSS look of the same */
-.ds-level[data-fx="spectre"][data-fx-failed] {
-  background: linear-gradient(0deg, #0f0a1f, #2f6b66 70%, #c8fff0);
-}
-.ds-level[data-fx="tinsel"][data-fx-failed] {
-  background: repeating-linear-gradient(135deg, #e8b22c 0 4px, #1f8f4e 4px 8px);
-}
-.ds-level[data-fx="verdant"][data-fx-failed] {
-  background: linear-gradient(0deg, #14532d, #4ade80 70%, #ecfccb);
 }
 
 /* ---------------------------------------------------------------- #89: funk, the beach, spring */

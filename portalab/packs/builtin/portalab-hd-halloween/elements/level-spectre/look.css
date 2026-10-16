@@ -1,0 +1,6 @@
+/* Portalab — level_badge/spectre: moved from Portalab's stylesheets (spec 028, B2) */
+
+/* without WebGL: a CSS look of the same */
+.ds-level[data-look="spectre"][data-fx-failed] {
+  background: linear-gradient(0deg, #0f0a1f, #2f6b66 70%, #c8fff0);
+}

@@ -10,8 +10,8 @@
     "fr": "Des notifications à la forme bien à elles : la couronne d'une éclipse totale, l'anneau de diamant qui étincelle, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "totality.glsl"
   },
   "economy": {
     "price": 1200,

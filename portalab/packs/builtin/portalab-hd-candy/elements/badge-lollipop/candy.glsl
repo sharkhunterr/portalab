@@ -1,0 +1,23 @@
+// Portalab — badge/candy: the « candy » effect (spec 028, B2)
+  float a = atan(p.y, p.x / max(ax, 1.0));
+  float r = length(vec2(p.x / max(ax, 1.0), p.y));
+  float k = fract((a * 3.0 + r * 5.0 - t * 1.6) / 6.2831);
+  vec3 c1 = vec3(1.0, 0.45, 0.7);
+  vec3 c2 = vec3(0.5, 0.82, 1.0);
+  vec3 c3 = vec3(1.0, 0.88, 0.45);
+  vec3 body = k < 0.33 ? mix(c1, c2, smoothstep(0.28, 0.33, k)) : k < 0.66 ? mix(c2, c3, smoothstep(0.61, 0.66, k)) : mix(c3, c1, smoothstep(0.95, 1.0, k));
+  vec2 sg = p * 5.0;
+  vec2 sid = floor(sg);
+  float sa = hash(sid) * 3.1416;
+  vec2 sq = mat2(cos(sa), -sin(sa), sin(sa), cos(sa)) * (fract(sg) - 0.5);
+  float sprinkle = step(0.55, hash(sid + 3.0)) * smoothstep(0.05, 0.0, abs(sq.y)) * step(abs(sq.x), 0.2);
+  body = mix(body, 0.5 + 0.5 * cos(6.2831 * (hash(sid + 5.0) + vec3(0.0, 0.33, 0.67))), sprinkle);
+  body = mix(body, vec3(0.25, 0.1, 0.3), 0.25);
+  body += vec3(1.0) * smoothstep(0.15, 0.0, abs(p.y - 0.6)) * smoothstep(-0.05, -0.3, d) * 0.35;
+  body += vec3(1.0, 0.9, 1.0) * smoothstep(-0.15, 0.0, d) * 0.5;
+  o = over(o, body, smoothstep(0.03, -0.03, d));
+  vec2 tg = p * 3.0;
+  vec2 tc = fract(tg) - 0.5;
+  float tw = step(0.8, hash(floor(tg) + 9.0)) * (0.5 + 0.5 * sin(t * 4.0 + hash(floor(tg)) * 30.0));
+  float twinkle = (smoothstep(0.05, 0.0, abs(tc.x)) + smoothstep(0.05, 0.0, abs(tc.y))) * smoothstep(0.35, 0.0, length(tc));
+  o = over(o, vec3(1.0, 0.85, 0.95), twinkle * tw * step(0.05, d) * smoothstep(0.9, 0.2, d));

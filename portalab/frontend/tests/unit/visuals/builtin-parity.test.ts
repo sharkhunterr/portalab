@@ -32,7 +32,7 @@ interface Held {
   folder: string;
   type: string;
   look: string;
-  render: { kind: string; css?: string[] };
+  render: { kind: string; css?: string[]; file?: string; stage?: boolean };
 }
 
 function held(): Held[] {
@@ -42,7 +42,7 @@ function held(): Held[] {
     if (!existsSync(elements)) continue;
     for (const folder of readdirSync(elements)) {
       const element = JSON.parse(readFileSync(join(elements, folder, "element.json"), "utf8"));
-      if (element.look && element.type in HOOKS)
+      if (element.look && (element.type in HOOKS || element.render?.kind === "glsl"))
         out.push({ pack, folder: join(elements, folder), ...element });
     }
   }
@@ -81,4 +81,19 @@ describe("Portalab's looks in their packs", () => {
     }
     expect(cut).toEqual([]);
   }, 60_000); // ~500 stylesheets read and parsed
+
+  it("draws each GPU look by its own fragment, none left in the interface's code", () => {
+    const drawn = looks.filter((e) => e.render.kind === "glsl");
+    expect(drawn.length).toBeGreaterThan(150);
+    const wrong: string[] = [];
+    for (const element of drawn) {
+      const body = readFileSync(join(element.folder, element.render.file ?? "-"), "utf8");
+      if (!/\bo\s*=/.test(body)) wrong.push(`${element.type}:${element.look} draws nothing`);
+      if ((element.type === "level_up" || element.type === "effect") && !element.render.stage)
+        wrong.push(`${element.type}:${element.look} is not a stage`);
+    }
+    expect(wrong).toEqual([]);
+    const tables = readFileSync(join(THEMES, "premium", "fxLooks.ts"), "utf8");
+    expect(tables).not.toMatch(/export const FX_/);
+  });
 });

@@ -10,8 +10,9 @@
     "fr": "Des étoiles s'allument une à une autour de votre nouveau niveau et se relient en couronne d'étoiles."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "constellate.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1500,

@@ -10,8 +10,9 @@
     "fr": "Coup de tonnerre jaillissent quand vous gagnez une récompense ou un niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "thunderstrike.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1200,

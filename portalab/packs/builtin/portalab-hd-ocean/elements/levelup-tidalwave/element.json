@@ -10,8 +10,9 @@
     "fr": "L'eau monte et une vague géante déferle."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "tidalwave.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1300,

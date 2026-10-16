@@ -12,6 +12,9 @@
  * again. Only looks a built-in pack holds are moved — never the socle's (the fallbacks).
  *
  *   node scripts/extract-builtin-packs.mjs [--family avatar_frame,…] [--dry-run]
+ *
+ * Run once (2026-10-16): what it moved is no longer in the code — the packs are now the looks' source, and
+ * this script stays as the record of how they were moved.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";

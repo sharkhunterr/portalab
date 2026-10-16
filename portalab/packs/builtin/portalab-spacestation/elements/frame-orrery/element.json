@@ -10,8 +10,9 @@
     "fr": "Des planètes qui tournent sur leurs orbites, un petit soleil au milieu de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "orrery.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1200,

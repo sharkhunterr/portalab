@@ -10,8 +10,8 @@
     "fr": "Un badge « Meteorite » sur votre profil, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "meteor.glsl"
   },
   "economy": {
     "price": 350,

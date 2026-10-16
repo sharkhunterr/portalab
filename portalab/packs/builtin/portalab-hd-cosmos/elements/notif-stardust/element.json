@@ -10,8 +10,8 @@
     "fr": "Une galaxie les fait apparaître et disparaître en tourbillonnant. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "galaxy.glsl"
   },
   "economy": {
     "price": 1100,

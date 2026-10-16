@@ -10,10 +10,12 @@
     "fr": "Une guirlande dorée et verte qui scintille autour de votre avatar, dessinée par la puce graphique."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "tinsel.glsl",
     "css": [
       "look.css"
-    ]
+    ],
+    "shape": 4
   },
   "economy": {
     "price": 1700,

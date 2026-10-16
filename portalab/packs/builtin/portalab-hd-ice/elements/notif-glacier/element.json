@@ -10,8 +10,9 @@
     "fr": "Des facettes de glace et du givre qui pousse. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "glacier.glsl",
+    "shape": 6
   },
   "economy": {
     "price": 1100,

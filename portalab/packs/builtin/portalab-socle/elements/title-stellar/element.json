@@ -6,8 +6,8 @@
     "fr": "stellar"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "stellar.glsl"
   },
   "free": true
 }

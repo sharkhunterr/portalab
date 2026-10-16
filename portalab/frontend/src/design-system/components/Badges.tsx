@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FX_LEVEL_BADGES } from "../themes/premium/fxLooks";
+import { useGpuLook } from "../visuals/gpu";
 import { FxLayer } from "./Fx";
 import { Icon } from "./Icon";
 
@@ -58,7 +58,8 @@ export function LevelBadge({
 }) {
   const worn = useWornLevelLook();
   const shown = look ?? worn;
-  const fx = shown ? FX_LEVEL_BADGES[shown] : undefined;
+  const gpu = useGpuLook("level_badge", shown); // 028: its pack's (Portalab's own included)
+  const fx = gpu?.effect;
   return (
     <span
       className="ds-level"
@@ -66,10 +67,10 @@ export function LevelBadge({
       aria-label={label}
       data-look={shown ?? undefined}
       data-fx={fx}
-      data-fx-cycle={fx === "chrono" || undefined}
+      data-fx-cycle={gpu?.cycle || undefined}
       data-tier={levelTier(level)}
     >
-      {fx ? <FxLayer effect={fx} cycle={fx === "chrono"} className="ds-level__fx" /> : null}
+      {fx ? <FxLayer effect={fx} cycle={gpu?.cycle} className="ds-level__fx" /> : null}
       <Icon name={levelTier(level) >= 8 ? "crown" : "star"} size={11} />
       <span aria-hidden="true">{level}</span>
     </span>

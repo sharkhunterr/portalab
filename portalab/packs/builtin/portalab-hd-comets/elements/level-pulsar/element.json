@@ -10,8 +10,8 @@
     "fr": "Votre niveau au cœur : les faisceaux d'un pulsar qui balaient comme un phare, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pulsar.glsl"
   },
   "economy": {
     "price": 1500,

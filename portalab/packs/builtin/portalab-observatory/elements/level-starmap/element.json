@@ -10,8 +10,8 @@
     "fr": "Votre niveau au cœur : une constellation qui se dessine sur une carte du ciel, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "starmap.glsl"
   },
   "economy": {
     "price": 1400,

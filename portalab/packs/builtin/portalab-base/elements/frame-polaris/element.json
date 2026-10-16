@@ -10,8 +10,9 @@
     "fr": "Une carte du ciel en forme d'étoile polaire autour de votre avatar. Offert au niveau 40."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "starmap.glsl",
+    "shape": 4
   },
   "economy": {
     "rarity": "legendary",

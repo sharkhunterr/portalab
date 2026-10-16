@@ -10,8 +10,9 @@
     "fr": "Un losange qui crépite d'électricité."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "voltage.glsl",
+    "shape": 2
   },
   "economy": {
     "price": 1200,

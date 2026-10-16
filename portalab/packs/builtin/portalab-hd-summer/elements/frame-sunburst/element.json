@@ -10,10 +10,12 @@
     "fr": "Un soleil d'été qui flamboie autour de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "sunburst.glsl",
     "css": [
       "look.css"
-    ]
+    ],
+    "radius": "50%"
   },
   "economy": {
     "price": 1200,

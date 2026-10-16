@@ -10,8 +10,8 @@
     "fr": "Un anneau de glyphes autour d'une brume qui tourbillonne."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "runes.glsl"
   },
   "economy": {
     "price": 1200,

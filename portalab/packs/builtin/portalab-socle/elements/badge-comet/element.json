@@ -6,8 +6,8 @@
     "fr": "comet"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "comet.glsl"
   },
   "free": true
 }

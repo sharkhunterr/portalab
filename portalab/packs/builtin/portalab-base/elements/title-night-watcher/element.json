@@ -10,8 +10,8 @@
     "fr": "Offert par un succès secret de la nuit."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "starmap.glsl"
   },
   "economy": {
     "rarity": "legendary",

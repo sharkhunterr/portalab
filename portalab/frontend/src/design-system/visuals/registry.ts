@@ -46,6 +46,10 @@ export interface ExternalElement {
   radius: string | null;
   reveal: number | null;
   duration: number | null;
+  /** GLSL stage: from when in its timeline it plays (seconds) */
+  start?: number | null;
+  /** GLSL: comes and goes over and over */
+  cycle?: boolean | null;
   palette: Record<string, Record<string, string>> | null;
   preview: string | null;
   nav?: NavPlace | null;
@@ -137,6 +141,14 @@ export function externalLook(type: string, look: string | null | undefined): Ext
   if (!look) return undefined;
   const key = keyOf(type, look);
   return scopes.preview.get(key) ?? scopes.scene.get(key) ?? scopes.live.get(key);
+}
+
+/** 028: the element selling ``product`` (the sandbox's version first), if a live or previewed pack holds it. */
+export function externalProduct(product: string | null | undefined): ExternalElement | undefined {
+  if (!product) return undefined;
+  for (const scope of ["preview", "scene", "live"] as const)
+    for (const element of scopes[scope].values()) if (element.product === product) return element;
+  return undefined;
 }
 
 export function externalLooks(type: string): ExternalElement[] {

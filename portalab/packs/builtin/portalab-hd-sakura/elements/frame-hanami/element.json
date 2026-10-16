@@ -10,8 +10,9 @@
     "fr": "Un anneau de pétales de cerisier qui dérivent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "sakura.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1200,

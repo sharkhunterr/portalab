@@ -10,8 +10,8 @@
     "fr": "Un badge « Pulsar » sur votre profil, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pulsar.glsl"
   },
   "economy": {
     "price": 450,

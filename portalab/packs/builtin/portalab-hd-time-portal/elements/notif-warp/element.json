@@ -10,8 +10,9 @@
     "fr": "Elles sortent d'un portail temporel triangulaire qui se referme derrière elles. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "chrono.glsl",
+    "cycle": true
   },
   "economy": {
     "price": 1500,

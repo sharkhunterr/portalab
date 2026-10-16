@@ -10,8 +10,8 @@
     "fr": "« Cosmonaut » sous votre nom, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "orrery.glsl"
   },
   "economy": {
     "price": 700,

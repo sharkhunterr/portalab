@@ -1,0 +1,20 @@
+// Portalab — level_up/supernova: the « supernova » effect (spec 028, B2)
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float r = length(c);
+  float tl = mod(u_age, 7.0);
+  float burst = 0.7;
+  float after = max(tl - burst, 0.0);
+  float gather = smoothstep(0.0, burst, tl) * step(tl, burst);
+  o = over(o, vec3(1.0, 0.95, 0.85), exp(-r * (40.0 - 30.0 * gather)) * (0.4 + 0.6 * gather));
+  float flash = exp(-after * 5.0) * step(burst, tl);
+  o = over(o, vec3(1.0, 0.97, 0.9), flash * exp(-r * 1.5) * 0.9);
+  float wave = after * 0.7;
+  o = over(o, vec3(0.6, 0.8, 1.0), exp(-abs(r - wave) * 30.0) * step(burst, tl) * exp(-after * 0.5));
+  float neb = fbm(c * 3.0 + vec2(after * 0.05, 0.0)) * smoothstep(wave, wave * 0.4, r) * step(burst, tl);
+  vec3 nc = mix(vec3(0.5, 0.15, 0.8), vec3(1.0, 0.45, 0.25), fbm(c * 5.0 + 3.0));
+  o = over(o, nc, neb * 0.75 * exp(-max(after - 2.5, 0.0) * 0.6));
+  float rays = pow(noise(vec2(atan(c.y, c.x) * 18.0, 1.0)), 6.0) * smoothstep(wave, wave * 0.5, r) * step(burst, tl);
+  o = over(o, vec3(1.0, 0.9, 0.7), rays * exp(-after * 0.8));
+  vec2 sg = c * 30.0;
+  o = over(o, vec3(1.0), step(0.985, hash(floor(sg))) * smoothstep(0.4, 0.0, length(fract(sg) - 0.5)) * 0.6);
+  o *= smoothstep(7.0, 6.0, tl);

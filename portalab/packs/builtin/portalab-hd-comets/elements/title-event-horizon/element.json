@@ -10,8 +10,8 @@
     "fr": "« Event horizon » sous votre nom, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "totality.glsl"
   },
   "economy": {
     "price": 1100,

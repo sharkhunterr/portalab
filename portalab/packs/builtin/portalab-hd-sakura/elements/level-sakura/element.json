@@ -10,8 +10,8 @@
     "fr": "Des pétales qui dérivent autour de votre niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "sakura.glsl"
   },
   "economy": {
     "price": 1200,

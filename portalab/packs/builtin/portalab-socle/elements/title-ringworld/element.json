@@ -6,8 +6,8 @@
     "fr": "ringworld"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "ringworld.glsl"
   },
   "free": true
 }

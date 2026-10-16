@@ -10,8 +10,9 @@
     "fr": "La couronne d'une éclipse totale, l'anneau de diamant qui étincelle de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "totality.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1400,

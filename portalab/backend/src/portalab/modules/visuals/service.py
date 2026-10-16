@@ -1168,6 +1168,8 @@ class VisualPacks:
                 "radius": render.get("radius"),
                 "reveal": render.get("reveal"),
                 "duration": render.get("duration"),
+                "start": render.get("start"),
+                "cycle": render.get("cycle") or None,
                 "palette": element.get("palette"),
                 "preview": f"{folder}/{element['preview']}" if element.get("preview") else None,
                 "nav": render.get("nav"),

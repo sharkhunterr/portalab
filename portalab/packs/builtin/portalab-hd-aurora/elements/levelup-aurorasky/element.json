@@ -10,8 +10,9 @@
     "fr": "La nuit s'ouvre sur des voiles de lumière."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "aurorasky.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1300,

@@ -11,8 +11,8 @@ import {
 import { Link, useInRouterContext } from "react-router";
 import { usePreferences } from "../a11y/PreferencesProvider";
 import { sound } from "../sound/SoundService";
-import { FX_NOTIFICATION_ANIMATIONS, FX_NOTIFICATION_SHAPES, FX_STYLES } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
+import { useGpuLook } from "../visuals/gpu";
 import { FxLayer } from "./Fx";
 import { Icon } from "./Icon";
 
@@ -120,6 +120,8 @@ export function Notification({
   fx,
   fxShape,
   burst,
+  teleport = false,
+  burstPortal = false,
 }: {
   item: NotificationItem;
   onDismiss?: () => void;
@@ -132,6 +134,10 @@ export function Notification({
   fxShape?: number | undefined;
   /** #78: the GPU effect bursting as it appears and as it leaves (its animation) */
   burst?: string | undefined;
+  /** the time portal: it dematerialises, then its portal closes */
+  teleport?: boolean | undefined;
+  /** its animation is the time portal: it opens and closes rather than bursting */
+  burstPortal?: boolean | undefined;
 }) {
   const tone = item.tone ?? item.severity;
   const internal = item.href?.startsWith("/") && !item.href.startsWith("//");
@@ -143,14 +149,20 @@ export function Notification({
       data-leaving={leaving || undefined}
       data-fx={fx}
       data-burst={burst ? "true" : undefined}
-      data-teleport={fx === "chrono" || burst === "chrono" || undefined}
+      data-teleport={teleport || undefined}
       data-fx-shape={fx ? (fxShape ?? 0) : undefined}
       role={item.severity === "critical" ? "alert" : "status"}
     >
       {fx ? <FxLayer effect={fx} calm shape={fxShape ?? 0} /> : null}
       {burst ? (
         // only around it: the notification keeps the look chosen for it — the animation is only its arrival
-        <FxLayer effect={`burst:${burst}`} shape={fxShape ?? 0} aura className="fx-layer fx-layer--burst" />
+        <FxLayer
+          effect={`burst:${burst}`}
+          shape={fxShape ?? 0}
+          aura
+          portal={burstPortal}
+          className="fx-layer fx-layer--burst"
+        />
       ) : null}
       <span className="ds-notification__icon" aria-hidden="true">
         <Icon name={item.icon ?? TONE_ICON[tone]} size={20} />
@@ -205,6 +217,11 @@ export function NotificationArea({ children }: { children: ReactNode }) {
   // 027: a notification leaves with its animation (sucked into a black hole, melting…) before it goes
   const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
   const reduced = effective.reducedMotion;
+  // 028: the GPU looks of the style and of the animation, found in their packs (Portalab's own included)
+  const styleFx = useGpuLook("notification_style", looks.notificationStyle);
+  const animationFx = useGpuLook("notification_animation", looks.notificationAnimation);
+  const teleport = Boolean(styleFx?.cycle || animationFx?.cycle);
+  const bursts = Boolean(animationFx);
   const dismiss = useCallback(
     (id: string) => {
       const remove = () => {
@@ -222,17 +239,10 @@ export function NotificationArea({ children }: { children: ReactNode }) {
       setLeaving((current) => new Set(current).add(id));
       // #78: an animation drawn by the GPU bursts again as it leaves — a little longer to see it
       // the time portal: it dematerialises, then its portal closes — longer still
-      const teleport =
-        FX_STYLES[looks.notificationStyle] === "chrono" ||
-        FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation] === "chrono";
-      const exit = teleport
-        ? TELEPORT_EXIT_MS
-        : FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation]
-          ? FX_EXIT_MS
-          : EXIT_MS;
+      const exit = teleport ? TELEPORT_EXIT_MS : bursts ? FX_EXIT_MS : EXIT_MS;
       window.setTimeout(remove, exit);
     },
-    [reduced, looks.notificationAnimation, looks.notificationStyle],
+    [reduced, teleport, bursts],
   );
   const notify = useCallback((item: Omit<NotificationItem, "id">) => {
     counter.current += 1;
@@ -274,9 +284,11 @@ export function NotificationArea({ children }: { children: ReactNode }) {
             onDismiss={() => dismiss(item.id)}
             durationMs={durationMs}
             leaving={leaving.has(item.id)}
-            fx={FX_STYLES[looks.notificationStyle]}
-            fxShape={FX_NOTIFICATION_SHAPES[looks.notificationStyle]}
-            burst={FX_NOTIFICATION_ANIMATIONS[looks.notificationAnimation]}
+            fx={styleFx?.effect}
+            fxShape={styleFx?.shape}
+            burst={animationFx?.effect}
+            teleport={teleport}
+            burstPortal={Boolean(animationFx?.cycle)}
           />
         ))}
       </section>

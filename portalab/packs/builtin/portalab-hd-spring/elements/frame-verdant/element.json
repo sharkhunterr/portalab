@@ -10,10 +10,12 @@
     "fr": "Des feuilles de lumière qui poussent autour de votre avatar, dessinées par la puce graphique."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "verdant.glsl",
     "css": [
       "look.css"
-    ]
+    ],
+    "shape": 1
   },
   "economy": {
     "price": 1200,

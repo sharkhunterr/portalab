@@ -10,8 +10,8 @@
     "fr": "Des notifications qui arrivent comme une étoile filante."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "meteor.glsl"
   },
   "economy": {
     "price": 750,

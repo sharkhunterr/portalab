@@ -12,6 +12,7 @@ export function FxLayer({
   maxSide,
   aura = false,
   cycle = false,
+  portal = false,
   from,
   className = "fx-layer",
 }: {
@@ -24,6 +25,8 @@ export function FxLayer({
   aura?: boolean;
   /** comes and goes over and over (the time portal as a teleporter) */
   cycle?: boolean;
+  /** a burst keeping its own timeline (the time portal opening and closing) */
+  portal?: boolean;
   /** seconds into its timeline it starts at */
   from?: number;
   className?: string;
@@ -37,11 +40,12 @@ export function FxLayer({
     let cancelled = false;
     void import("../themes/premium/badgeFx").then(({ attachFx }) => {
       if (cancelled) return;
-      stop = attachFx(element, host, effect as "blaze", {
+      stop = attachFx(element, host, effect, {
         calm,
         shape,
         aura,
         cycle,
+        portal,
         ...(maxSide ? { maxSide } : {}),
         ...(from ? { from } : {}),
       });
@@ -51,6 +55,6 @@ export function FxLayer({
       cancelled = true;
       stop?.();
     };
-  }, [effect, calm, shape, maxSide, aura, cycle, from]);
+  }, [effect, calm, shape, maxSide, aura, cycle, portal, from]);
   return <canvas ref={canvas} className={className} />;
 }

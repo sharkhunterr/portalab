@@ -10,8 +10,8 @@
     "fr": "Offert au niveau 26 (Or II)."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "comet.glsl"
   },
   "economy": {
     "rarity": "legendary",

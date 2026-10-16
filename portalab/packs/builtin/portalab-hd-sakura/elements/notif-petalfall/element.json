@@ -10,8 +10,8 @@
     "fr": "Une bourrasque de pétales les apporte et les emporte. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "sakura.glsl"
   },
   "economy": {
     "price": 900,

@@ -10,8 +10,8 @@
     "fr": "Elles jaillissent des flammes — et partent en fumée. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "blaze.glsl"
   },
   "economy": {
     "price": 1100,

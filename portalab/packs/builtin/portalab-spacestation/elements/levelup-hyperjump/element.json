@@ -10,8 +10,9 @@
     "fr": "Les étoiles s'étirent en traînées, un tunnel de lumière défile — un éclair — et vous arrivez devant une nébuleuse en fleur, à votre nouveau niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "hyperjump.glsl",
+    "stage": true
   },
   "economy": {
     "price": 2000,

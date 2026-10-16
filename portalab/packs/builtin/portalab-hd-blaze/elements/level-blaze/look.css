@@ -1,0 +1,6 @@
+/* Portalab — level_badge/blaze: moved from Portalab's stylesheets (spec 028, B2) */
+
+/* without WebGL: a CSS look of the same */
+.ds-level[data-look="blaze"][data-fx-failed] {
+  background: linear-gradient(0deg, #7f1d1d, #f97316 70%, #facc15);
+}

@@ -10,8 +10,9 @@
     "fr": "Un portail triangulaire se trace, s'ouvre sur le vortex du temps, éclate de lumière et se referme."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "timeportal.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1800,

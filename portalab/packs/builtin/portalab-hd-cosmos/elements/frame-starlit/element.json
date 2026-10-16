@@ -10,8 +10,9 @@
     "fr": "Un anneau d'étoiles et de nébuleuses qui tourne."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "galaxy.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1600,

@@ -10,8 +10,8 @@
     "fr": "Des filaments de plasma derrière chaque notification. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "plasma.glsl"
   },
   "economy": {
     "price": 1100,

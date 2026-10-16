@@ -10,8 +10,8 @@
     "fr": "Une aura autour de votre nom. Dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "sunburst.glsl"
   },
   "economy": {
     "price": 1700,

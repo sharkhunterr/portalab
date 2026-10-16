@@ -10,8 +10,9 @@
     "fr": "De l'acide qui bouillonne, des gouttes qui tombent. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "toxic.glsl",
+    "shape": 8
   },
   "economy": {
     "price": 1100,

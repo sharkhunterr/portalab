@@ -10,8 +10,10 @@
     "fr": "Faille temporelle jaillissent quand vous gagnez une récompense ou un niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "timeportal.glsl",
+    "stage": true,
+    "start": 0.8
   },
   "economy": {
     "price": 1800,

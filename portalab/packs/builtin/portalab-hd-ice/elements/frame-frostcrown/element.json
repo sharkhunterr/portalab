@@ -10,8 +10,9 @@
     "fr": "Une étoile de glace autour de votre avatar."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "glacier.glsl",
+    "shape": 4
   },
   "economy": {
     "price": 1200,

@@ -6,8 +6,8 @@
     "fr": "pulsar"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pulsar.glsl"
   },
   "free": true
 }

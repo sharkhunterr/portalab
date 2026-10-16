@@ -10,8 +10,8 @@
     "fr": "Un titre dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "galaxy.glsl"
   },
   "economy": {
     "price": 900,

@@ -10,8 +10,9 @@
     "fr": "Les faisceaux d'un pulsar qui balaient comme un phare de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "pulsar.glsl",
+    "shape": 2
   },
   "economy": {
     "price": 1100,

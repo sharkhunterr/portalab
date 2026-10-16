@@ -11,6 +11,7 @@ import {
 import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
 import { FRAME_CLIPS, fxFrameOf } from "../../design-system/themes/premium/fxLooks";
+import { useExternalRevision } from "../../design-system/visuals/registry";
 import { useProfileLooks } from "../../features/community/profile/looks";
 import { BannerArt } from "../../features/community/profile/ProfileHero";
 import { useT } from "../../i18n/hooks/useT";
@@ -42,8 +43,10 @@ export function ProfileCard({
   const { locale } = useLocaleContext();
   const me = data.me;
   const worn = useProfileLooks(Boolean(me)).data?.equipped;
+  useExternalRevision(); // 028: the frame's pack read, its GPU look drawn
   if (!me) return null;
   const frame = worn?.frame && worn.frame !== "none" ? worn.frame : undefined;
+  const frameFx = fxFrameOf(frame);
   const name = me.display_name ?? me.login ?? "";
   const progression = data.progression;
   const profile = `/community/members/${me.id}`;
@@ -69,23 +72,23 @@ export function ProfileCard({
         />
       ) : null}
       <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
-        {frame && fxFrameOf(frame) ? (
+        {frameFx ? (
           <span
             className="avatar-frame"
             data-frame={frame}
-            data-fx-frame={fxFrameOf(frame)?.shape ?? 0}
-            data-fx-cycle={fxFrameOf(frame)?.effect === "chrono" || undefined}
+            data-fx-frame={frameFx.shape ?? 0}
+            data-fx-cycle={frameFx.cycle || undefined}
             style={
               {
-                "--frame-clip": FRAME_CLIPS[fxFrameOf(frame)?.shape ?? 0] ?? "none",
-                "--frame-radius": fxFrameOf(frame)?.radius ?? "50%",
+                "--frame-clip": FRAME_CLIPS[frameFx.shape ?? 0] ?? "none",
+                "--frame-radius": frameFx.radius ?? "50%",
               } as CSSProperties
             }
           >
             <FxLayer
-              effect={fxFrameOf(frame)?.effect ?? "blaze"}
-              shape={fxFrameOf(frame)?.shape ?? 0}
-              cycle={fxFrameOf(frame)?.effect === "chrono"}
+              effect={frameFx.effect}
+              shape={frameFx.shape ?? 0}
+              cycle={Boolean(frameFx.cycle)}
               className="avatar-frame__fx"
             />
             <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />

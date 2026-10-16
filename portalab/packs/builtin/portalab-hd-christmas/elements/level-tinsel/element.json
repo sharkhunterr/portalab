@@ -10,8 +10,11 @@
     "fr": "Votre niveau enveloppé d'une guirlande scintillante, dessinée par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "tinsel.glsl",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1200,

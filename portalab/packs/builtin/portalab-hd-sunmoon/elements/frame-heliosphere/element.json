@@ -10,8 +10,9 @@
     "fr": "La surface en ébullition du soleil, sa couronne et ses protubérances autour de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "solar.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1300,

@@ -10,8 +10,9 @@
     "fr": "Des notifications à la forme bien à elles : du gaz lumineux, rose et turquoise, qui se replie autour, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "stellar.glsl",
+    "shape": 8
   },
   "economy": {
     "price": 1200,

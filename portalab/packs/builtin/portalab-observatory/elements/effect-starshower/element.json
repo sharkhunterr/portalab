@@ -10,8 +10,10 @@
     "fr": "Des dizaines d'étoiles filantes qui jaillissent de la récompense, des bolides verts et dorés."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "meteorstorm.glsl",
+    "stage": true,
+    "start": 0.2
   },
   "economy": {
     "price": 1100,

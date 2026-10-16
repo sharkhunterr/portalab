@@ -1,0 +1,25 @@
+// Portalab — badge/comet: the « comet » effect (spec 028, B2)
+  vec2 e = vec2(p.x / max(ax, 0.001), p.y);
+  float ang = atan(e.y, e.x);
+  float head = t * 0.9;
+  vec2 hp = vec2(cos(head), sin(head));
+  vec2 hpos = hp * vec2(max(ax, 0.001), 1.0) * 1.22;
+  float lag = mod(head - ang, 6.2832);
+  float band = abs(length(e) - 1.22);
+  float dust = exp(-band * mix(14.0, 5.0, clamp(lag / 1.8, 0.0, 1.0))) * smoothstep(1.9, 0.0, lag) * step(0.0, d);
+  o = over(o, vec3(1.0, 0.86, 0.62), dust * 0.75);
+  vec2 away = normalize(hp);
+  vec2 rel = p - hpos;
+  float along = dot(rel, away);
+  float across = abs(dot(rel, vec2(-away.y, away.x)));
+  float ion = smoothstep(0.03 + along * 0.08, 0.0, across) * smoothstep(0.0, 0.05, along) * exp(-along * 1.6);
+  o = over(o, vec3(0.45, 0.7, 1.0), ion * 0.8 * step(0.0, d));
+  float hd = length(rel);
+  o = over(o, vec3(0.75, 0.92, 1.0), exp(-hd * 9.0) * 0.8);
+  o = over(o, vec3(1.0), smoothstep(0.06, 0.03, hd));
+  vec3 core = mix(vec3(0.04, 0.08, 0.18), vec3(0.2, 0.42, 0.62), fbm(p * 2.5 + vec2(t * 0.1, 0.0)));
+  vec2 cg = p * 9.0;
+  float ch = hash(floor(cg));
+  core += vec3(0.85, 0.95, 1.0) * step(0.9, ch) * smoothstep(0.25, 0.0, length(fract(cg) - 0.5)) * (0.4 + 0.6 * sin(t * 3.0 + ch * 40.0));
+  core += vec3(0.6, 0.85, 1.0) * smoothstep(-0.25, 0.0, d) * 0.5;
+  o = over(o, core, smoothstep(0.03, -0.03, d));

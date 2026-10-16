@@ -10,8 +10,9 @@
     "fr": "Une étoile de fumée noire."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "shadow.glsl",
+    "shape": 4
   },
   "economy": {
     "price": 1200,

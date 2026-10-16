@@ -10,8 +10,9 @@
     "fr": "Un écusson d'or liquide."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "aurum.glsl",
+    "shape": 3
   },
   "economy": {
     "price": 1600,

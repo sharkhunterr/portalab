@@ -10,8 +10,8 @@
     "fr": "Des rayures de bonbon et des vermicelles. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "candy.glsl"
   },
   "economy": {
     "price": 1100,

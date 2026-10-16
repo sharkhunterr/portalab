@@ -10,8 +10,9 @@
     "fr": "Une étoile se contracte, explose, une onde de choc se propage."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "supernova.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1700,

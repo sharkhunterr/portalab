@@ -10,8 +10,9 @@
     "fr": "Une pluie de pièces qui tournoient, une lumière dorée qui jaillit."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "goldrush.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1300,

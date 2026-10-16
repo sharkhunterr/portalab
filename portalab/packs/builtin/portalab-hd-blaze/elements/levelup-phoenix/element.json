@@ -10,8 +10,9 @@
     "fr": "Le feu monte, un oiseau de flammes déploie ses ailes, des braises s'envolent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "phoenix.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1700,

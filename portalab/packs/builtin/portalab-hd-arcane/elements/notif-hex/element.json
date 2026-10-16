@@ -10,8 +10,8 @@
     "fr": "Des runes s'embrasent quand elles sont invoquées puis renvoyées. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "runes.glsl"
   },
   "economy": {
     "price": 1100,

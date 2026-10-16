@@ -10,8 +10,8 @@
     "fr": "Une fumée noire qui s'étend, des yeux qui s'ouvrent dans le noir."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "shadow.glsl"
   },
   "economy": {
     "price": 1200,

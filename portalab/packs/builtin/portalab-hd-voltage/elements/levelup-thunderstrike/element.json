@@ -10,8 +10,9 @@
     "fr": "L'orage gronde, la foudre frappe coup sur coup."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "thunderstrike.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1300,

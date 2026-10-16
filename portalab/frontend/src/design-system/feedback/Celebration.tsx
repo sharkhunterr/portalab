@@ -13,10 +13,10 @@ import { useAnnounce } from "../a11y/Announce";
 import { FxLayer } from "../components/Fx";
 import { Icon } from "../components/Icon";
 import { sound } from "../sound/SoundService";
-import { FX_CELEBRATIONS } from "../themes/premium/fxLooks";
 import { useTheme } from "../themes/ThemeProvider";
 import { ExternalScript } from "../visuals/ExternalScript";
-import { externalLook, fxName } from "../visuals/registry";
+import { gpuLook, useGpuLook } from "../visuals/gpu";
+import { externalLook } from "../visuals/registry";
 import "../themes/celebration.css";
 
 /**
@@ -158,7 +158,7 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
     const imported = externalLook("effect", looks.celebration)?.duration;
     const ms = imported
       ? imported * 1000
-      : DURATION_MS[shown.kind] + (FX_CELEBRATIONS[looks.celebration] ? 1200 : 0);
+      : DURATION_MS[shown.kind] + (gpuLook("effect", looks.celebration) ? 1200 : 0);
     const timer = window.setTimeout(() => setShown(queue.current.next()), ms);
     return () => window.clearTimeout(timer);
   }, [shown, announce, looks.celebration]);
@@ -192,11 +192,10 @@ export function CelebrationScene({
   reduced?: boolean;
   contained?: boolean;
 }) {
-  // issue 1: an imported pack's celebration — its GPU scene or its own script
+  // issue 1 / 028: a pack's celebration (Portalab's own included) — its GPU scene or its own script
   const imported = externalLook("effect", effect);
-  const gpu =
-    FX_CELEBRATIONS[effect] ??
-    (imported?.kind === "glsl" ? { effect: fxName(imported), from: 0 } : undefined);
+  const drawn = useGpuLook("effect", effect);
+  const gpu = drawn ? { effect: drawn.effect, from: drawn.start } : undefined;
   const spec = gpu
     ? { count: 0, layer: "badge" as const }
     : (EFFECTS[effect] ?? { count: 0, layer: "badge" as const });

@@ -10,8 +10,8 @@
     "fr": "Votre niveau au cœur : une planète à anneaux, ses nuages en bandes qui tournent, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "ringworld.glsl"
   },
   "economy": {
     "price": 1700,

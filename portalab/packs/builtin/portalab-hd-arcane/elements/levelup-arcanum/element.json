@@ -10,8 +10,9 @@
     "fr": "Un cercle magique se trace et s'embrase."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "arcanum.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1300,

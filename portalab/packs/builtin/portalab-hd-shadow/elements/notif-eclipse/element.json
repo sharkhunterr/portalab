@@ -10,8 +10,8 @@
     "fr": "Une fumée noire s'écarte pour les laisser sortir — et les avale. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "shadow.glsl"
   },
   "economy": {
     "price": 1100,

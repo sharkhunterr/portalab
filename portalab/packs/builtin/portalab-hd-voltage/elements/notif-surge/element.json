@@ -10,8 +10,8 @@
     "fr": "L'électricité crépite autour d'elles à l'arrivée et au départ. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "voltage.glsl"
   },
   "economy": {
     "price": 1100,

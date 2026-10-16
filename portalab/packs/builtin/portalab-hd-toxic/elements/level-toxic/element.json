@@ -10,8 +10,8 @@
     "fr": "De l'acide vert qui bouillonne, des gouttes qui tombent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "toxic.glsl"
   },
   "economy": {
     "price": 1200,

@@ -10,8 +10,9 @@
     "fr": "Des notifications à la forme bien à elles : des étoiles filantes qui traversent un ciel nocturne, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "meteor.glsl",
+    "shape": 7
   },
   "economy": {
     "price": 700,

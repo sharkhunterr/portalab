@@ -10,8 +10,8 @@
     "fr": "Votre niveau au cœur : une comète qui fait le tour, ses queues derrière elle, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "comet.glsl"
   },
   "economy": {
     "price": 1300,

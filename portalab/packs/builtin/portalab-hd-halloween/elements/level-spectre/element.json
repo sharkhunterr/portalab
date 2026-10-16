@@ -10,8 +10,11 @@
     "fr": "Votre niveau hanté par une flamme spectrale, dessinée par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "spectre.glsl",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1700,

@@ -8,7 +8,8 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { Dialog } from "../../../design-system/components/Overlays";
-import { FX_NAMES, FX_STYLES, fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
+import { fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
+import { gpuLook } from "../../../design-system/visuals/gpu";
 import { useT } from "../../../i18n/hooks/useT";
 import { InShop } from "../../appearance/InShop";
 import { HdTag, isHdAmbient, isHdLevelBadge, RarityTag } from "../../appearance/Rarity";
@@ -47,7 +48,7 @@ function isHdLook(slot: DesignSlot, key: string): boolean {
   if (slot === "banner") return key.startsWith("live-") && isHdAmbient(key.slice(5));
   if (slot === "background") return isHdAmbient(key);
   if (slot === "level") return isHdLevelBadge(key);
-  if (slot === "name") return Boolean(FX_NAMES[key]);
+  if (slot === "name") return Boolean(gpuLook("name_style", key));
   return false;
 }
 
@@ -346,7 +347,7 @@ function ItemTags({ item }: { item: WornItem }) {
   return (
     <span className="looks-list__tags">
       <RarityTag rarity={item.rarity} />
-      {item.style && FX_STYLES[item.style] ? <HdTag /> : null}
+      {gpuLook("badge", item.style) ? <HdTag /> : null}
     </span>
   );
 }

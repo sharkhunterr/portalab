@@ -10,8 +10,9 @@
     "fr": "Une bourrasque emporte des centaines de pétales."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "sakurastorm.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1300,

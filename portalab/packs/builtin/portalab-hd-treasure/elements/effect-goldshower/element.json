@@ -10,8 +10,9 @@
     "fr": "Pluie d'or jaillissent quand vous gagnez une récompense ou un niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "goldrush.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1200,

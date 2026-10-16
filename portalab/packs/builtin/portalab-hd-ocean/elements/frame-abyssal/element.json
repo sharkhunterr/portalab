@@ -10,8 +10,9 @@
     "fr": "Un anneau de verre rempli d'eau qui bouge."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "aqua.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1200,

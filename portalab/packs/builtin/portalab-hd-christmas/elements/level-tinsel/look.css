@@ -1,0 +1,6 @@
+/* Portalab — level_badge/tinsel: moved from Portalab's stylesheets (spec 028, B2) */
+
+/* without WebGL: a CSS look of the same */
+.ds-level[data-look="tinsel"][data-fx-failed] {
+  background: repeating-linear-gradient(135deg, #e8b22c 0 4px, #1f8f4e 4px 8px);
+}

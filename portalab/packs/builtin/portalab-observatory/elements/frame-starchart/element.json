@@ -10,8 +10,9 @@
     "fr": "Une constellation qui se dessine sur une carte du ciel de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "starmap.glsl",
+    "shape": 1
   },
   "economy": {
     "price": 900,

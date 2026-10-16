@@ -10,8 +10,8 @@
     "fr": "Elles surgissent d'une éclaboussure — et y replongent. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "aqua.glsl"
   },
   "economy": {
     "price": 1000,

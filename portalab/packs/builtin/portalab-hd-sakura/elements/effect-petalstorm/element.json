@@ -10,8 +10,10 @@
     "fr": "Tempête de pétales jaillissent quand vous gagnez une récompense ou un niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "sakurastorm.glsl",
+    "stage": true,
+    "start": 0.3
   },
   "economy": {
     "price": 1100,

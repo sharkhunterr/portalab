@@ -10,8 +10,8 @@
     "fr": "Une galaxie spirale qui tourne dans votre niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "galaxy.glsl"
   },
   "economy": {
     "price": 1200,

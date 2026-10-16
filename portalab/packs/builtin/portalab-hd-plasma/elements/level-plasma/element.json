@@ -10,8 +10,8 @@
     "fr": "Des filaments de lumière qui partent d'un cœur brillant."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "plasma.glsl"
   },
   "economy": {
     "price": 1200,

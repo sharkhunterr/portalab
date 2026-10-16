@@ -6,8 +6,8 @@
     "fr": "totality"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "totality.glsl"
   },
   "free": true
 }

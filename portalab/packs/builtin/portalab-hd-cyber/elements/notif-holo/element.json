@@ -10,8 +10,9 @@
     "fr": "Un film arc-en-ciel et un bord néon. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "holo.glsl",
+    "shape": 7
   },
   "economy": {
     "price": 1100,

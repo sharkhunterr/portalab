@@ -10,8 +10,11 @@
     "fr": "De vraies flammes qui enveloppent votre niveau et montent au-dessus, des étincelles qui s'envolent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "blaze.glsl",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1600,

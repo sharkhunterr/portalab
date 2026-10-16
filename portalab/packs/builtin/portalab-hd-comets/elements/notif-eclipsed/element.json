@@ -10,8 +10,8 @@
     "fr": "Des notifications qui apparaissent quand la lune quitte le soleil, la couronne qui flamboie."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "totality.glsl"
   },
   "economy": {
     "price": 900,

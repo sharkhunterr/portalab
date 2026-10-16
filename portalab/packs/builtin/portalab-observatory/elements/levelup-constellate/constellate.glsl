@@ -1,0 +1,39 @@
+// Portalab — level_up/constellate: the « constellate » effect (spec 028, B2)
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
+  float tl = mod(u_age, 7.0);
+  float fade = smoothstep(0.0, 0.4, tl) * smoothstep(6.6, 5.6, tl);
+  float turn = tl * 0.03;
+  vec2 rc = mat2(cos(turn), -sin(turn), sin(turn), cos(turn)) * c;
+  vec2 sg = rc * 34.0;
+  float sh = hash(floor(sg));
+  o = over(o, vec3(0.02, 0.03, 0.1), 0.4 * fade);
+  o = over(o, vec3(0.85, 0.9, 1.0), step(0.982, sh) * smoothstep(0.35, 0.0, length(fract(sg) - 0.5)) * (0.5 + 0.5 * sin(tl * 3.0 + sh * 40.0)) * fade);
+  float lines = 0.0;
+  float stars = 0.0;
+  float done = smoothstep(3.6, 3.9, tl);
+  for (int i = 0; i < 10; i++) {
+    float fi = float(i);
+    float a = fi / 10.0 * 6.2832 + 1.5708;
+    float rad = mod(fi, 2.0) < 0.5 ? 0.42 : 0.3;
+    vec2 s = vec2(cos(a), sin(a)) * rad;
+    float a2 = (fi + 1.0) / 10.0 * 6.2832 + 1.5708;
+    float rad2 = mod(fi + 1.0, 2.0) < 0.5 ? 0.42 : 0.3;
+    vec2 s2 = vec2(cos(a2), sin(a2)) * rad2;
+    float born = 0.3 + fi * 0.3;
+    stars += exp(-length(c - s) * 70.0) * smoothstep(born, born + 0.2, tl) * (1.0 + 2.0 * exp(-abs(tl - born - 0.1) * 8.0));
+    vec2 ab = s2 - s;
+    float h = clamp(dot(c - s, ab) / dot(ab, ab), 0.0, 1.0);
+    float drawn = clamp((tl - born - 0.15) / 0.3, 0.0, 1.0);
+    lines += smoothstep(0.004, 0.0, length(c - s - ab * h)) * step(h, drawn);
+  }
+  float flash = exp(-abs(tl - 3.9) * 5.0);
+  o = over(o, vec3(0.6, 0.8, 1.0), exp(-abs(length(c) - 0.36) * 30.0) * flash * 0.5 * fade);
+  o = over(o, vec3(0.55, 0.78, 1.0), lines * (0.7 + 0.3 * done) * fade);
+  o = over(o, vec3(1.0, 0.95, 0.85), clamp(stars, 0.0, 1.0) * fade);
+  for (int i = 0; i < 24; i++) {
+    float fi = float(i);
+    float life = fract(tl * (0.2 + 0.15 * hash(vec2(fi, 131.0))) + hash(vec2(fi, 132.0)));
+    float a = hash(vec2(fi, 133.0)) * 6.2832;
+    vec2 pos = vec2(cos(a), sin(a)) * (0.36 + life * 0.4);
+    o = over(o, vec3(1.0, 0.9, 0.7), smoothstep(0.006, 0.0, length(c - pos)) * (1.0 - life) * done * fade);
+  }

@@ -1,0 +1,41 @@
+// Portalab — level_up/phoenix: the « phoenix » effect (spec 028, B2)
+  vec2 uv = gl_FragCoord.xy / u_res;
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float tl = mod(u_age, 7.0);
+  float tt = u_age;
+  float height = smoothstep(0.0, 1.2, tl) * 0.45;
+  float n = fbm(vec2(c.x * 4.0, c.y * 3.0 - tt * 2.2));
+  float floorFire = clamp((height - uv.y) / max(height, 0.01) + (n - 0.5) * 0.9, 0.0, 1.0);
+  vec3 fire = mix(vec3(0.7, 0.08, 0.02), vec3(1.0, 0.55, 0.08), floorFire);
+  fire = mix(fire, vec3(1.0, 0.92, 0.6), smoothstep(0.75, 1.0, floorFire));
+  o = over(o, fire, smoothstep(0.15, 0.5, floorFire) * 0.9);
+  float open = smoothstep(1.0, 2.4, tl);
+  float beat = sin(tt * 2.2) * 0.06 * open;
+  vec2 q = vec2(abs(c.x), c.y - 0.08);
+  float span = 0.8 * open + 0.001;
+  float x = clamp(q.x / span, 0.0, 1.0);
+  // the wing: a raised leading edge, long feathers hanging from it, ragged with flame
+  float top = (0.26 * sin(x * 2.6) - 0.1 * x * x) * open + beat * x;
+  float feathers = 0.07 + 0.16 * x + 0.16 * pow(abs(sin(x * 11.0 + 0.4)), 3.0) * x;
+  float flick = (fbm(vec2(q.x * 7.0, q.y * 5.0 - tt * 2.5)) - 0.5) * 0.08;
+  float wing = smoothstep(0.015, -0.015, q.y - top - flick) * smoothstep(-0.015, 0.015, q.y - (top - feathers) - flick);
+  wing *= smoothstep(span, span * 0.82, q.x);
+  float shade = clamp((q.y - (top - feathers)) / max(feathers, 0.01), 0.0, 1.0);
+  float body = smoothstep(0.075, 0.0, length((c - vec2(0.0, 0.07)) * vec2(1.5, 1.1))) * open;
+  float head = smoothstep(0.04, 0.0, length(c - vec2(0.0, 0.17 + beat * 0.3))) * open;
+  vec2 tq = c - vec2(0.0, 0.0);
+  float sway = sin(tq.y * 9.0 + tt * 4.0) * 0.025;
+  float tongue = (0.07 * (1.0 + tq.y * 2.4) - abs(tq.x + sway)) * 14.0 + (fbm(vec2(tq.x * 9.0, tq.y * 5.0 + tt * 3.5)) - 0.5) * 2.2;
+  float tail = smoothstep(0.1, 0.6, tongue) * step(tq.y, 0.02) * step(-0.42, tq.y) * open;
+  float bird = clamp(wing + body + head + tail, 0.0, 1.0);
+  vec3 bc = mix(vec3(0.95, 0.25, 0.04), vec3(1.0, 0.75, 0.25), shade);
+  bc = mix(bc, vec3(1.0, 0.95, 0.75), clamp(body + head, 0.0, 1.0) * 0.8);
+  o = over(o, vec3(1.0, 0.45, 0.1), exp(-length(c - vec2(0.0, 0.1)) * 3.0) * 0.35 * open);
+  o = over(o, bc, bird * 0.95);
+  for (int i = 0; i < 24; i++) {
+    float fi = float(i);
+    float life = fract(tt * (0.25 + 0.2 * hash(vec2(fi, 41.0))) + hash(vec2(fi, 42.0)));
+    vec2 e = vec2((hash(vec2(fi, 43.0)) - 0.5) * 1.8 + sin(life * 6.0 + fi) * 0.05, -0.55 + life * 1.2);
+    o = over(o, vec3(1.0, 0.65, 0.2), smoothstep(0.012, 0.0, length(c - e)) * (1.0 - life));
+  }
+  o *= smoothstep(7.0, 6.0, tl);

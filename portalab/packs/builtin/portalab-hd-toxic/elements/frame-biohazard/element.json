@@ -10,8 +10,9 @@
     "fr": "Un hexagone d'acide bouillonnant."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "toxic.glsl",
+    "shape": 1
   },
   "economy": {
     "price": 1200,

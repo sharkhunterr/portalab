@@ -1,0 +1,25 @@
+// Portalab — avatar_frame/ringedworld: the « ringworld » effect (spec 028, B2)
+  vec2 e = vec2(p.x / max(ax, 0.001), p.y);
+  float tilt = -0.32;
+  vec2 q = mat2(cos(tilt), -sin(tilt), sin(tilt), cos(tilt)) * p;
+  float lat = q.y + 0.06 * sin(q.x * 3.0 + t * 0.6);
+  float bands = sin(lat * 13.0 + fbm(vec2(q.x * 1.5 - t * 0.25, lat * 4.0)) * 2.5);
+  vec3 planet = mix(vec3(0.75, 0.55, 0.32), vec3(0.98, 0.88, 0.66), 0.5 + 0.5 * bands);
+  planet = mix(planet, vec3(0.62, 0.38, 0.22), smoothstep(0.6, 0.9, fbm(vec2(q.x * 3.0 - t * 0.4, lat * 9.0))) * 0.5);
+  vec2 spot = (q - vec2(0.25 * max(ax, 1.0) * sin(t * 0.25), -0.32)) * vec2(1.0, 1.8);
+  planet = mix(planet, vec3(0.85, 0.35, 0.22), smoothstep(0.16, 0.08, length(spot)) * 0.8);
+  float light = smoothstep(-1.1, 0.6, dot(normalize(vec2(-0.6, 0.5)), e)) * 0.85 + 0.15;
+  planet *= light * (1.0 - 0.45 * smoothstep(-0.35, 0.0, d));
+  vec2 rq = vec2(q.x / max(ax, 0.001), q.y * 4.2);
+  float rr = length(rq);
+  float ring = smoothstep(1.12, 1.16, rr) * smoothstep(1.75, 1.7, rr);
+  ring *= 0.55 + 0.45 * sin(rr * 40.0) * sin(rr * 13.0 + 1.0);
+  ring *= 1.0 - smoothstep(1.43, 1.46, rr) * smoothstep(1.5, 1.47, rr) * 0.9;
+  vec3 rcol = mix(vec3(0.8, 0.72, 0.6), vec3(1.0, 0.95, 0.85), smoothstep(1.2, 1.7, rr));
+  float front = step(q.y, 0.0);
+  float inside = smoothstep(0.03, -0.03, d);
+  float shadow = smoothstep(0.02, 0.0, abs(q.y - 0.12 - q.x * 0.05)) * 0.0;
+  o = over(o, vec3(0.95, 0.75, 0.45), exp(-max(d, 0.0) * 3.5) * 0.25 * step(0.0, d));
+  o = over(o, rcol * 0.85, ring * (1.0 - front) * (1.0 - inside));
+  o = over(o, planet * (1.0 - shadow), inside);
+  o = over(o, rcol, ring * front);

@@ -1,0 +1,6 @@
+/* Portalab — level_badge/verdant: moved from Portalab's stylesheets (spec 028, B2) */
+
+/* without WebGL: a CSS look of the same */
+.ds-level[data-look="verdant"][data-fx-failed] {
+  background: linear-gradient(0deg, #14532d, #4ade80 70%, #ecfccb);
+}

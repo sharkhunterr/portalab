@@ -10,10 +10,12 @@
     "fr": "Une lumière rose et rouge qui tourbillonne en cœurs autour de votre avatar, dessinée par la puce graphique."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "amour.glsl",
     "css": [
       "look.css"
-    ]
+    ],
+    "radius": "50%"
   },
   "economy": {
     "price": 1200,

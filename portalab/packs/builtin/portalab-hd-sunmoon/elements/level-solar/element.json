@@ -10,8 +10,8 @@
     "fr": "Votre niveau au cœur : la surface en ébullition du soleil, sa couronne et ses protubérances, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "solar.glsl"
   },
   "economy": {
     "price": 1600,

@@ -10,8 +10,8 @@
     "fr": "Des rayures pastel qui tourbillonnent, des vermicelles, un reflet brillant."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "candy.glsl"
   },
   "economy": {
     "price": 1200,

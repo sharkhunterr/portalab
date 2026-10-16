@@ -10,8 +10,9 @@
     "fr": "Un hexagone de flammes vives autour de votre avatar."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "blaze.glsl",
+    "shape": 1
   },
   "economy": {
     "price": 1200,

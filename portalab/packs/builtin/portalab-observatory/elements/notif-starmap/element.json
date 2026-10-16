@@ -10,8 +10,9 @@
     "fr": "Des notifications à la forme bien à elles : une constellation qui se dessine sur une carte du ciel, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "starmap.glsl",
+    "shape": 6
   },
   "economy": {
     "price": 850,

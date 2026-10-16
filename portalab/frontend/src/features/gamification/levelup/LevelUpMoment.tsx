@@ -7,10 +7,9 @@ import { LevelBadge } from "../../../design-system/components/Badges";
 import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { sound } from "../../../design-system/sound/SoundService";
-import { FX_LEVEL_UPS } from "../../../design-system/themes/premium/fxLooks";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { ExternalScript } from "../../../design-system/visuals/ExternalScript";
-import { externalLook, fxName } from "../../../design-system/visuals/registry";
+import { externalLook, fxName, useExternalRevision } from "../../../design-system/visuals/registry";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Product } from "../../marketplace/api";
@@ -389,9 +388,10 @@ function revealOf(look: string): Record<string, unknown> {
 /** The decoration of each look — layers and particles placed once, animated by CSS. */
 function LevelUpFx({ look, max, level }: { look: string; max?: number; level?: number }) {
   const reduced = useTheme().effective.reducedMotion;
+  useExternalRevision(); // 028: drawn again once its pack is read
   const imported = externalLook("level_up", look);
   if (imported?.kind === "glsl") {
-    // issue 1: an imported pack's scene, drawn by the GPU like the built-in ones
+    // issue 1 / 028: a pack's scene (Portalab's own included), drawn by the GPU
     return <FxLayer effect={fxName(imported)} maxSide={max ? 360 : 1100} className="levelup__gpu" />;
   }
   if (imported?.kind === "js") {
@@ -402,10 +402,6 @@ function LevelUpFx({ look, max, level }: { look: string; max?: number; level?: n
         context={{ reducedMotion: reduced, ...(level ? { level } : {}) }}
       />
     );
-  }
-  if (FX_LEVEL_UPS.has(look)) {
-    // #78: a full-stage moment drawn by the GPU (smaller in the shop's miniature)
-    return <FxLayer effect={look} maxSide={max ? 360 : 1100} className="levelup__gpu" />;
   }
   const count = Math.min(PARTICLES[look] ?? 18, max ?? Number.POSITIVE_INFINITY);
   const word = WORDS[look];

@@ -10,8 +10,8 @@
     "fr": "Un badge gelé à facettes, des pointes de givre qui poussent, des éclats."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "glacier.glsl"
   },
   "economy": {
     "price": 1200,

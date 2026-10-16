@@ -10,8 +10,9 @@
     "fr": "Les mers et les cratères de la lune, ses phases qui défilent autour de votre avatar, dessiné par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "lunar.glsl",
+    "radius": "50%"
   },
   "economy": {
     "price": 1200,

@@ -10,8 +10,9 @@
     "fr": "Un portail temporel triangulaire qui s'ouvre derrière votre niveau, le vortex du temps vu au travers."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "chrono.glsl",
+    "cycle": true
   },
   "economy": {
     "price": 1600,

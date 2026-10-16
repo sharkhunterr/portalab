@@ -10,8 +10,9 @@
     "fr": "Un point de lumière, un éclair aveuglant, une boule de feu qui refroidit en toile cosmique et ses premières galaxies."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "bigbang.glsl",
+    "stage": true
   },
   "economy": {
     "price": 1600,

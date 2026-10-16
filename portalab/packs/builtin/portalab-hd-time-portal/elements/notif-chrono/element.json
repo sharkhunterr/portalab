@@ -10,8 +10,10 @@
     "fr": "Chaque notification sort d'un portail temporel triangulaire qui s'ouvre, puis se referme derrière elle quand elle part."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "chrono.glsl",
+    "shape": 6,
+    "cycle": true
   },
   "economy": {
     "price": 1500,

@@ -7,7 +7,8 @@ import { LevelBadge } from "../../../design-system/components/Badges";
 import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
-import { FRAME_CLIPS, FX_NAMES, FX_STYLES, fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
+import { FRAME_CLIPS, fxFrameOf } from "../../../design-system/themes/premium/fxLooks";
+import { useGpuLook } from "../../../design-system/visuals/gpu";
 import { useExternalRevision } from "../../../design-system/visuals/registry";
 import { useT } from "../../../i18n/hooks/useT";
 import { backdropUrl, type Equipped, shownEquipped, type WornItem } from "./looks";
@@ -53,6 +54,7 @@ export function FramedAvatar({
   src?: string | null | undefined;
   size?: "sm" | "md" | "lg" | "xl";
 }) {
+  useExternalRevision(); // 028: its pack read, the frame drawn
   const fx = frame ? fxFrameOf(frame) : undefined;
   if (fx) {
     // #78: a frame drawn by the GPU, in a shape of its own — the avatar cut to the same shape
@@ -66,13 +68,13 @@ export function FramedAvatar({
         data-frame={frame}
         data-size={size}
         data-fx-frame={fx.shape ?? 0}
-        data-fx-cycle={fx.effect === "chrono" || undefined}
+        data-fx-cycle={fx.cycle || undefined}
         style={style}
       >
         <FxLayer
           effect={fx.effect}
           shape={fx.shape ?? 0}
-          cycle={fx.effect === "chrono"}
+          cycle={Boolean(fx.cycle)}
           className="avatar-frame__fx"
         />
         <Avatar name={name} userId={userId} src={src} size={size} decorative />
@@ -92,15 +94,16 @@ export function FramedAvatar({
 
 /** A name in the member's chosen style (font and effect). */
 export function StyledName({ name, style }: { name: string; style?: string | null | undefined }) {
-  const fx = style ? FX_NAMES[style] : undefined;
+  const gpu = useGpuLook("name_style", style); // 028: its pack's (Portalab's own included)
+  const fx = gpu?.effect;
   return (
     <span
       className="name-style"
       data-name={style && style !== "none" ? style : undefined}
       data-fx-name={fx ? "true" : undefined}
-      data-fx-cycle={fx === "chrono" || undefined}
+      data-fx-cycle={gpu?.cycle || undefined}
     >
-      {fx ? <FxLayer effect={fx} aura cycle={fx === "chrono"} className="fx-layer fx-layer--name" /> : null}
+      {fx ? <FxLayer effect={fx} aura cycle={gpu?.cycle} className="fx-layer fx-layer--name" /> : null}
       {fx ? <span>{name}</span> : name}
     </span>
   );
@@ -111,7 +114,8 @@ const TITLE_SHAPE = 6;
 
 /** A title or badge as worn, with its animated style. */
 export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "title" }) {
-  const fx = item.style ? FX_STYLES[item.style] : undefined;
+  const gpu = useGpuLook(kind, item.style); // 028: its pack's (a badge's and a title's styles are one)
+  const fx = gpu?.effect;
   // a title is a ribbon (pointed ends), never a pill like the badges beside it
   const shape = kind === "title" ? TITLE_SHAPE : 0;
   return (
@@ -120,9 +124,9 @@ export function WornBadge({ item, kind }: { item: WornItem; kind: "badge" | "tit
       data-style={item.style && item.style !== "none" ? item.style : undefined}
       data-fx={fx}
       data-fx-shape={fx && shape ? shape : undefined}
-      data-fx-cycle={fx === "chrono" || undefined}
+      data-fx-cycle={gpu?.cycle || undefined}
     >
-      {fx ? <FxLayer effect={fx} calm shape={shape} cycle={fx === "chrono"} /> : null}
+      {fx ? <FxLayer effect={fx} calm shape={shape} cycle={gpu?.cycle} /> : null}
       {kind === "badge" ? <Icon name={item.icon ?? "star"} size={14} /> : null}
       {item.label}
     </span>

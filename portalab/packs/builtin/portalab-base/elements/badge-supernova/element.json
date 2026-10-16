@@ -10,8 +10,8 @@
     "fr": "Offert au niveau 46 (Diamant II)."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "stellar.glsl"
   },
   "economy": {
     "rarity": "legendary",

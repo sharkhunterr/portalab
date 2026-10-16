@@ -27,10 +27,10 @@ TYPES: dict[str, tuple[frozenset[str], str]] = {
     "profile_background": (frozenset({"css", "glsl"}), "bg"),
     "avatar_frame": (frozenset({"css", "glsl"}), "frame"),
     "profile_banner": (frozenset({"css"}), "banner"),
-    "name_style": (frozenset({"css"}), "name"),
+    "name_style": (frozenset({"css", "glsl"}), "name"),
     "level_badge": (frozenset({"css", "glsl"}), "level"),
-    "notification_style": (frozenset({"css"}), "notif"),
-    "notification_animation": (frozenset({"css"}), "notif"),
+    "notification_style": (frozenset({"css", "glsl"}), "notif"),
+    "notification_animation": (frozenset({"css", "glsl"}), "notif"),
     "palette": (frozenset({"data"}), "palette"),
     "badge": (frozenset({"css", "glsl", "data"}), "badge"),
     "title": (frozenset({"css", "glsl", "data"}), "title"),
@@ -134,10 +134,14 @@ class Render(BaseModel):
     file: str | None = None  # the GLSL fragment or the JS module
     css: list[str] = Field(default_factory=list)  # stylesheets (fonts declared in them, relative URLs)
     stage: bool = False  # GLSL: drawn over the whole stage (level-ups, celebrations) rather than a shape
-    shape: int = Field(default=0, ge=0, le=5)  # GLSL frames: 0 rounded box, 1 hexagon, 2 diamond, 3 shield…
+    # GLSL: 0 rounded box, 1 hexagon, 2 diamond, 3 shield, 4 star, 5 triangle (frames); 6 pointed ends,
+    # 7 slanted, 8 wavy edges (wide shapes: notifications)
+    shape: int = Field(default=0, ge=0, le=8)
     radius: str | None = Field(default=None, max_length=12)
     reveal: float | None = Field(default=None, ge=0, le=20)  # level-up: when the card shows (seconds)
     duration: float | None = Field(default=None, ge=0.5, le=30)  # how long it plays (seconds)
+    start: float | None = Field(default=None, ge=0, le=20)  # GLSL stage: from when in its timeline it plays
+    cycle: bool = False  # GLSL: comes and goes over and over (a portal as a teleporter)
     nav: NavLayout | None = None  # a navigation's place
     renderer: str | None = Field(default=None, max_length=40)  # ``renderer``: the portal renderer drawing it
     params: dict[str, Any] = Field(default_factory=dict)  # ``renderer``: its parameters

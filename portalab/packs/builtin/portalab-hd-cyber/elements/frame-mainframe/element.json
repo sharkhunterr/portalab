@@ -10,8 +10,9 @@
     "fr": "Un carré de code qui tombe."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "matrix.glsl",
+    "radius": "14%"
   },
   "economy": {
     "price": 1200,

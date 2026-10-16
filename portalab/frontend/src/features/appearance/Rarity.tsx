@@ -1,6 +1,7 @@
 import { Icon } from "../../design-system/components/Icon";
-import { FX_LEVEL_BADGES, FX_PRODUCTS } from "../../design-system/themes/premium/fxLooks";
 import { isPremiumAmbient } from "../../design-system/themes/premium/PremiumAmbient";
+import { gpuLook } from "../../design-system/visuals/gpu";
+import { externalProduct } from "../../design-system/visuals/registry";
 import { useT } from "../../i18n/hooks/useT";
 
 /**
@@ -44,9 +45,18 @@ export function isHdAmbient(kind: string | null | undefined): boolean {
   return Boolean(kind) && (kind === "weather" || isPremiumAmbient(kind as string));
 }
 
-/** #73, #77: the level badges drawn by the graphics chip. */
+/** #73, #77: the level badges drawn by the graphics chip (028: their pack says it). */
 export function isHdLevelBadge(look: string | null | undefined): boolean {
-  return Boolean(look && FX_LEVEL_BADGES[look]);
+  return Boolean(gpuLook("level_badge", look));
+}
+
+/** 028: a product drawn by the graphics chip — its element's own fragment, or what it names: an ambience
+ * drawn in high quality, a live banner, a badge's or title's style. */
+function isHdKey(key: string): boolean {
+  if (externalProduct(key)?.kind === "glsl") return true;
+  if (key.startsWith("ambient_")) return isHdAmbient(key.slice(8));
+  if (key.startsWith("banner_live_")) return isHdAmbient(key.slice(12));
+  return false;
 }
 
 /** #71: whether a shop product is (or, for a pack, holds) an ambience drawn in high quality. */
@@ -55,18 +65,20 @@ export function isHdProduct(product: {
   type: string;
   preview?: Record<string, unknown> | null;
 }): boolean {
-  if (product.key && FX_PRODUCTS.has(product.key)) return true;
+  if (product.key && isHdKey(product.key)) return true;
   const preview = product.preview ?? {};
   if (product.type === "ambient" || product.type === "profile_background") {
     const kind = preview.ambient ?? preview.background;
     return typeof kind === "string" && isHdAmbient(kind);
   }
+  if (product.type === "profile_banner" && typeof preview.banner === "string") {
+    return preview.banner.startsWith("live-") && isHdAmbient(preview.banner.slice(5));
+  }
+  if ((product.type === "badge" || product.type === "title") && typeof preview.style === "string") {
+    return Boolean(gpuLook(product.type, preview.style));
+  }
   if (product.type === "bundle" && Array.isArray(preview.products)) {
-    return (preview.products as unknown[]).some(
-      (key) =>
-        typeof key === "string" &&
-        (FX_PRODUCTS.has(key) || (key.startsWith("ambient_") && isHdAmbient(key.slice(8)))),
-    );
+    return (preview.products as unknown[]).some((key) => typeof key === "string" && isHdKey(key));
   }
   return false;
 }

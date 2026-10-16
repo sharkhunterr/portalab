@@ -10,8 +10,10 @@
     "fr": "Renaissance du phénix jaillissent quand vous gagnez une récompense ou un niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "phoenix.glsl",
+    "stage": true,
+    "start": 0.9
   },
   "economy": {
     "price": 1600,

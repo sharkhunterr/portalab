@@ -10,8 +10,11 @@
     "fr": "De la roche en fusion qui coule sous une croûte fissurée, sa chaleur rougeoie autour."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "magma.glsl",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1200,

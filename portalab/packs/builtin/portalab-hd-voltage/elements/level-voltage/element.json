@@ -10,8 +10,11 @@
     "fr": "Un badge chargé : des arcs courent sur son bord et s'en échappent, des étincelles crépitent dedans."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "voltage.glsl",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1200,

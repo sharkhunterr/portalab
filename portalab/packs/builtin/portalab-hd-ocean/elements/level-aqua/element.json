@@ -10,8 +10,11 @@
     "fr": "Un badge de verre à moitié rempli d'eau qui tangue, des reflets et des bulles qui montent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "aqua.glsl",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1100,

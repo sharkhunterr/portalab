@@ -1,0 +1,30 @@
+// Portalab — level_up/thunderstrike: the « thunderstrike » effect (spec 028, B2)
+  vec2 uv = gl_FragCoord.xy / u_res;
+  vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float tl = mod(u_age, 7.0);
+  float tt = u_age;
+  float cloud = fbm(vec2(c.x * 2.0 + tt * 0.1, c.y * 3.0)) * smoothstep(0.2, 0.9, uv.y);
+  float flash = 0.0;
+  float bolts = 0.0;
+  for (int k = 0; k < 6; k++) {
+    float fk = float(k);
+    float at = 0.3 + fk * 0.95;
+    float age = tl - at;
+    float on = step(0.0, age) * step(age, 0.5) * step(0.25, noise(vec2(age * 30.0, fk)));
+    flash += exp(-max(age, 0.0) * 6.0) * step(0.0, age);
+    float x0 = (hash(vec2(fk, floor(u_age / 7.0))) - 0.5) * 1.2;
+    float y = c.y;
+    float path = x0 + (fbm(vec2(y * 6.0, fk * 9.0 + floor(u_age / 7.0))) - 0.5) * 0.35 * (0.5 - y);
+    float branch = x0 + (fbm(vec2(y * 7.0, fk * 4.0)) - 0.5) * 0.5 * (0.5 - y) + (0.3 - y) * 0.4 * (hash(vec2(fk, 2.0)) - 0.5);
+    float bolt = 0.004 / (abs(c.x - path) + 0.004) + 0.4 * step(y, 0.3) * 0.003 / (abs(c.x - branch) + 0.003) * step(-0.1, y);
+    bolts += bolt * on * step(-0.5, y);
+  }
+  vec3 sky = mix(vec3(0.05, 0.06, 0.1), vec3(0.25, 0.27, 0.35), cloud);
+  o = over(o, sky, smoothstep(0.35, 0.8, uv.y) * 0.85);
+  o = over(o, vec3(0.75, 0.8, 1.0), clamp(flash, 0.0, 1.0) * 0.35);
+  o = over(o, mix(vec3(0.6, 0.7, 1.0), vec3(1.0), smoothstep(1.0, 3.0, bolts)), smoothstep(0.4, 1.5, bolts));
+  float rx = floor(gl_FragCoord.x / 5.0);
+  float ry = gl_FragCoord.y / 26.0 + tt * 26.0 + hash(vec2(rx, 1.0)) * 20.0;
+  float rain = step(0.985, hash(vec2(rx, floor(ry)))) * smoothstep(1.2, 0.0, abs(mod(gl_FragCoord.x, 5.0) - 2.5)) * smoothstep(0.0, 0.6, fract(ry));
+  o = over(o, vec3(0.65, 0.75, 0.95), rain * 0.25);
+  o *= smoothstep(7.0, 6.0, tl);

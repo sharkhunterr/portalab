@@ -10,8 +10,9 @@
     "fr": "De la fumée et des yeux dans le noir. Dessinées par la puce graphique."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "glsl",
+    "file": "shadow.glsl",
+    "shape": 8
   },
   "economy": {
     "price": 1100,

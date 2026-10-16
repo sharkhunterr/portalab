@@ -7,8 +7,9 @@ import { Button } from "../../design-system/components/Button";
 import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
-import { FX_NOTIFICATION_SHAPES, FX_STYLES } from "../../design-system/themes/premium/fxLooks";
 import { useTheme } from "../../design-system/themes/ThemeProvider";
+import { gpuLook } from "../../design-system/visuals/gpu";
+import { useExternalRevision } from "../../design-system/visuals/registry";
 import { useT } from "../../i18n/hooks/useT";
 import { InShop } from "./InShop";
 import { RarityTag, rarityIn } from "./Rarity";
@@ -44,6 +45,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
   const notify = useNotify();
   const { preferences, setPreference } = usePreferences();
   const looks = useLooks();
+  useExternalRevision(); // 028: the styles' packs read, their GPU looks drawn
   const themeNotification = useTheme().effective.theme.notification;
   const locked = (list: Choice[] | undefined, key: string) =>
     Boolean(list?.find((c) => c.key === key)?.locked);
@@ -53,6 +55,7 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
   const inPack =
     locked(looks.data?.styles, ownStyle) ||
     locked(looks.data?.animations, themeNotification?.animation ?? "slide");
+  const gpuOf = (style: string) => gpuLook("notification_style", style === "theme" ? themeStyle : style);
   const tryIt = () =>
     notify({
       severity: "success",
@@ -119,14 +122,10 @@ export function NotificationLooks({ position }: { position?: ReactNode }) {
                 <span
                   className="ds-notification"
                   data-tone="info"
-                  data-fx={FX_STYLES[style === "theme" ? themeStyle : style]}
+                  data-fx={gpuLook("notification_style", style === "theme" ? themeStyle : style)?.effect}
                 >
-                  {FX_STYLES[style === "theme" ? themeStyle : style] ? (
-                    <FxLayer
-                      effect={FX_STYLES[style === "theme" ? themeStyle : style] as string}
-                      calm
-                      shape={FX_NOTIFICATION_SHAPES[style === "theme" ? themeStyle : style] ?? 0}
-                    />
+                  {gpuOf(style) ? (
+                    <FxLayer effect={gpuOf(style)?.effect ?? ""} calm shape={gpuOf(style)?.shape ?? 0} />
                   ) : null}
                   <span className="ds-notification__icon">
                     <Icon name="bell" size={14} />
