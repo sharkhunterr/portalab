@@ -244,8 +244,8 @@ offline analysis reports no blocking finding; it imports and publishes.
 
 - [X] T090 [P] [US8] `backend/tests/unit/visuals/test_cli_analyse.py`: exit codes 0/1/2, `--json` equals the report the import stores
 - [X] T091 [US8] `portalab visuals analyse` and `portalab visuals builtin sync [--dry-run]` in `backend/src/portalab/modules/visuals/cli.py`, registered in `backend/src/portalab/app/cli.py` (R32)
-- [ ] T092 [US8] `docs/visual-packs.md`: format, every element type's contract with an example, sandbox protocol, analysis codes, workflow; `examples/visual-packs/README.md` points to it
-- [ ] T093 [US8] Examples complete: Nordlys and Abysses on the final format, plus booster-scene (T075) and widgets (T089); `backend/tests/unit/visuals/test_examples.py` analyses each with 0 blocking finding
+- [X] T092 [US8] `docs/visual-packs.md`: format, every element type's contract with an example, sandbox protocol, analysis codes, workflow; `examples/visual-packs/README.md` points to it
+- [X] T093 [US8] Examples complete: Nordlys and Abysses on the final format, plus booster-scene (T075) and widgets (T089); `backend/tests/unit/visuals/test_examples.py` analyses each with 0 blocking finding
 
 ---
 

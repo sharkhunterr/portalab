@@ -1,7 +1,7 @@
 # Portalab's own visual packs (spec 028)
 
 `builtin/` holds Portalab's own catalog as visual packs — the same format as any pack
-(`examples/visual-packs/README.md`, `specs/028-visual-packs/contracts/pack-format.md`). The image ships them
+(`docs/visual-packs.md`, `specs/028-visual-packs/contracts/pack-format.md`). The image ships them
 at `/app/packs/builtin` (`PORTALAB_BUILTIN_PACKS_DIR` elsewhere); `portalab migrate`, every start of `serve`
 and `portalab visuals builtin sync [--dry-run]` synchronise them.
 
