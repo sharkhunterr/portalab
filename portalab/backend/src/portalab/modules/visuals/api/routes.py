@@ -8,6 +8,7 @@ draft, publication, refusal, switching a pack off and on, rollback, removal, pur
 show them before they are validated) and the data contracts packs' widgets may ask for.
 """
 
+import json
 import mimetypes
 from pathlib import Path
 from typing import Annotated, Any, Literal
@@ -146,6 +147,30 @@ async def scene(_: Member, packs: Packs, booster_key: str) -> dict[str, Any]:
 @members.get("/visuals/files/{pack}/{sha}/{name:path}")
 async def live_file(_: Member, packs: Packs, pack: str, sha: str, name: str) -> FileResponse:
     return _file(await packs.served(pack, sha, name, manager=False), live=True)
+
+
+@members.get("/visuals/bundle/{pack}/{sha}")
+async def live_bundle(_: Member, packs: Packs, pack: str, sha: str) -> Response:
+    """A live version's stylesheets and shaders in one answer (immutable: its address is its fingerprint)."""
+    return _bundle(await packs.bundle(pack, sha, manager=False), live=True)
+
+
+@admin.get("/admin/visuals/bundle/{pack}/{sha}")
+async def any_bundle(_: Manager, packs: Packs, pack: str, sha: str) -> Response:
+    return _bundle(await packs.bundle(pack, sha, manager=True), live=False)
+
+
+def _bundle(files: dict[str, str] | None, *, live: bool) -> Response:
+    if files is None:
+        raise NotFound("This version is not available.", code="ui.visual_file_not_found")
+    return Response(
+        json.dumps({"files": files}, ensure_ascii=False),
+        media_type="application/json",
+        headers={
+            **FILE_HEADERS,
+            "Cache-Control": "private, max-age=31536000, immutable" if live else "private, no-store",
+        },
+    )
 
 
 @admin.get("/admin/visuals/files/{pack}/{sha}/{name:path}")

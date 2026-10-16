@@ -248,3 +248,21 @@ async def test_a_failing_element_is_counted_for_the_administrators(
     )  # an hour
     assert not await service.report_failure(member, "tiny", "0" * 16, "frame_tiny", "error")  # not live
     assert (await service.listing())[0]["failures"] == 1
+
+
+async def test_a_versions_stylesheets_and_shaders_come_in_one_bundle(
+    database: Database, tmp_path: Path
+) -> None:
+    """028 B2: one answer per version for its texts — a member's for live versions, a manager's for any."""
+    service, _, _ = _service(database, tmp_path)
+    shutil.copytree(EXAMPLES / "nordlys", tmp_path / "inbox" / "nordlys")
+    await service.scan(ADMIN)
+    detail = await service.detail("nordlys", "1.0.0")
+    sha = detail["sha"][:16]
+    assert await service.bundle("nordlys", sha, manager=False) is None  # not live yet
+    files = await service.bundle("nordlys", sha, manager=True)
+    assert files is not None
+    assert any(name.endswith(".glsl") for name in files) and any(name.endswith(".css") for name in files)
+    assert not any(name.endswith((".js", ".json", ".woff2")) for name in files)  # texts of looks only
+    await service.publish(ADMIN, "nordlys", "1.0.0", confirmations={"scripts": True})
+    assert await service.bundle("nordlys", sha, manager=False) == files

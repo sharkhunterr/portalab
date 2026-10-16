@@ -172,13 +172,42 @@ function adopt() {
 }
 const retired = new Set<CSSStyleSheet>();
 
-async function text(url: string): Promise<string | null> {
+async function fetched(url: string): Promise<string | null> {
   try {
     const response = await fetch(url, { credentials: "same-origin" });
     return response.ok ? await response.text() : null;
   } catch {
     return null;
   }
+}
+
+// 028 (B2): a version's stylesheets and shaders come in one answer — its « bundle » — rather than one request
+// per file (Portalab's own packs hold hundreds of looks); a file it does not hold is fetched on its own
+const FILE = /^(\/api\/v1(?:\/admin)?\/visuals)\/files\/([^/]+)\/([^/]+)\/(.+)$/;
+const bundles = new Map<string, Promise<Record<string, string> | null>>();
+
+function bundleOf(base: string, pack: string, sha: string): Promise<Record<string, string> | null> {
+  const address = `${base}/bundle/${pack}/${sha}`;
+  let known = bundles.get(address);
+  if (!known) {
+    known = fetch(address, { credentials: "same-origin" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => (data?.files as Record<string, string> | undefined) ?? null)
+      .catch(() => null);
+    bundles.set(address, known);
+  }
+  return known;
+}
+
+async function text(url: string): Promise<string | null> {
+  const parts = FILE.exec(url);
+  if (parts) {
+    const [, base, pack, sha, path] = parts as unknown as [string, string, string, string, string];
+    const files = await bundleOf(base, pack, sha);
+    const found = files?.[decodeURIComponent(path)];
+    if (found !== undefined) return found;
+  }
+  return fetched(url);
 }
 
 /** Installs a list of elements in a scope (replacing what that scope held): stylesheets, GPU looks. */

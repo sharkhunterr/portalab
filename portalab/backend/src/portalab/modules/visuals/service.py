@@ -116,6 +116,8 @@ def widget_target(target: Any) -> str:
 # the steps a version moves forward through (refused, superseded and purged end it)
 ORDER = ("imported", "analysed", "tested", "reviewed", "published")
 REFRESH_SECONDS = 2.0
+BUNDLED = frozenset({".css", ".glsl", ".frag"})  # what a version's bundle holds (its scripts load apart)
+BUNDLE_MAX = 8 * 1024 * 1024
 
 Audit = Callable[[Principal | None, str, dict[str, Any]], Awaitable[None]]
 Announce = Callable[[AsyncSession, str, dict[str, Any], Principal | None], Awaitable[None]]
@@ -171,6 +173,7 @@ class VisualPacks:
         self.withheld: dict[str, frozenset[str]] = {}  # Portalab's own looks whose pack is off, per type
         self._checked = 0.0
         self._refreshing = asyncio.Lock()
+        self._bundles: dict[str, dict[str, str]] = {}  # a version's folder → its texts (immutable)
 
     # --- infrastructure ----------------------------------------------------------------------------------
     @staticmethod
@@ -1317,6 +1320,31 @@ class VisualPacks:
         if not (manager or live):
             return None
         return self.store.file(pack, version.sha256, name)
+
+    async def bundle(self, pack: str, sha: str, *, manager: bool) -> dict[str, str] | None:
+        """A version's stylesheets and shaders in one answer (028 B2: Portalab's own packs hold hundreds of
+        looks — one request per pack version rather than one per file); the same rights as ``served``."""
+        manifest = await self.served(pack, sha, "pack.json", manager=manager)
+        if manifest is None:
+            return None
+        folder = manifest.parent
+        cached = self._bundles.get(str(folder))
+        if cached is not None:
+            return cached
+        out: dict[str, str] = {}
+        size = 0
+        for path in sorted(folder.rglob("*")):
+            if path.suffix.lower() not in BUNDLED or not path.is_file():
+                continue
+            text_ = path.read_text(encoding="utf-8", errors="replace")
+            size += len(text_)
+            if size > BUNDLE_MAX:
+                break  # the rest is fetched file by file
+            out[path.relative_to(folder).as_posix()] = text_
+        if len(self._bundles) > 256:
+            self._bundles.clear()
+        self._bundles[str(folder)] = out
+        return out
 
     # --- the proof of concept's registry --------------------------------------------------------------------
     async def import_poc_state(self, actor: Principal) -> int:

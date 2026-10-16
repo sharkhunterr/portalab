@@ -138,7 +138,7 @@ EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # Read-only, cacheable documents the SPA fetches by the dozen on every full load (one catalog per i18n
 # namespace): counting them would rate-limit a member who simply reloads a few pages (027).
 # 028: and the files of the live visual packs (immutable, fingerprinted, a page shows dozens of them)
-EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/", "/api/v1/visuals/files/")
+EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/", "/api/v1/visuals/files/", "/api/v1/visuals/bundle/")
 SESSION_COOKIE_NAME = "__Host-portalab_session"
 _ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until done)
 
