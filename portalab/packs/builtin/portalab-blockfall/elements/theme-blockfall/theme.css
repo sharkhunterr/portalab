@@ -1,0 +1,46 @@
+/* Portalab — the « blockfall » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="blockfall"] .shell-tabs__item {
+  --block: #00e5ff;
+  border: 0.3rem solid;
+  border-color: color-mix(in srgb, var(--block) 55%, #ffffff) color-mix(in srgb, var(--block) 60%, #000000)
+    color-mix(in srgb, var(--block) 60%, #000000) color-mix(in srgb, var(--block) 55%, #ffffff);
+  border-radius: 0;
+  background: var(--block);
+  color: #0b0b2a;
+  font-weight: 700;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 2) .shell-tabs__item {
+  --block: #ffd23f;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 3) .shell-tabs__item {
+  --block: #c77dff;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 4) .shell-tabs__item {
+  --block: #3ddc84;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 5) .shell-tabs__item {
+  --block: #ff5c5c;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 6) .shell-tabs__item {
+  --block: #5c8cff;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__list li:nth-child(7n + 7) .shell-tabs__item {
+  --block: #ff9f40;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__item[data-active] {
+  outline: 0.2rem solid #ffffff;
+  outline-offset: 0.15rem;
+}
+
+:root[data-theme="blockfall"] .shell-tabs__item[aria-expanded="true"] {
+  outline: 0.2rem solid #ffffff;
+  outline-offset: 0.15rem;
+}

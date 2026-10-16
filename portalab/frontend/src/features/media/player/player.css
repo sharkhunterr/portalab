@@ -700,21 +700,6 @@ html[data-corners="square"] .player-icon {
 }
 
 /* Nostromo: MU/TH/UR's console — monospace read-outs, an amber phosphor bar */
-html[data-theme="nostromo"] .player {
-  --player-font: "JetBrains Mono", ui-monospace, monospace;
-  --player-title-font: "JetBrains Mono", ui-monospace, monospace;
-  --player-radius: 0;
-}
-
-html[data-theme="nostromo"] .player-title strong {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-
-html[data-theme="nostromo"] .player-bar input[type="range"] {
-  border-radius: 0;
-  box-shadow: 0 0 0.6rem color-mix(in srgb, var(--player-accent) 60%, transparent);
-}
 
 @media (prefers-reduced-motion: reduce) {
   .player-spinner {

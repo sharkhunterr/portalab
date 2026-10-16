@@ -52,25 +52,6 @@ COSMETICS = "marketplace.cosmetics"
 # (Portalab's own packs included), the open vocabulary of ``capabilities.visuals.live_looks``; a design no
 # product sells is free for everyone.
 
-UNIVERSE_THEMES: tuple[str, ...] = (
-    "wizard", "galaxy", "matrix", "desert", "horror", "halloween", "christmas", "comic", "manga", "cartoon",
-    "cozy", "futuristic", "minimal", "alien", "heroes", "neowave", "disco", "cyberpunk", "sincity", "plex",
-    "upsidedown", "middleearth",
-    "vhs", "nova",
-    "vhs", "nostromo",
-    # #89: the universes
-    "academy", "caribbean", "mecha",
-    # #89: the desktop, the fruit company, the social network
-    "classicdesk", "cupertino", "social",
-    # #89: music streaming, series streaming, the newspaper
-    "groove", "binge", "gazette",
-    # #89: the retro games
-    "pocket", "blockfall", "invaders", "mazechase", "platformer",
-    # #89: funk, the beach, spring
-    "funky", "beach", "blossom",
-    # #130: the cosmos
-    "observatory", "spacestation", "starship",
-)  # fmt: skip
 PROFILE_SLOTS = {
     "banner": ("profile_banner", "banner"),
     "frame": ("avatar_frame", "frame"),
@@ -102,6 +83,3 @@ COSMETICS_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Cosmetic choices sold in the Marketplace and the ones a user owns (027)",
 )
-
-# some keys were listed twice over the specs' merges: each list keeps one of each, in order
-UNIVERSE_THEMES = tuple(dict.fromkeys(UNIVERSE_THEMES))

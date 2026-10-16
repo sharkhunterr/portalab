@@ -10,8 +10,8 @@
     "fr": "Un studio calme : barre du haut, cartes plates, largeur de lecture étroite."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 600,

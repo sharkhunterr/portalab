@@ -2,19 +2,16 @@
 enabling an external theme is audited; a theme cannot change permissions or data; /ui routes in the
 permission matrix (anonymous 401, users read their catalog only)."""
 
-import json
-from pathlib import Path
-
 import httpx
 import pytest
 from fastapi import FastAPI
 
+from portalab.capabilities.visuals import interface_document
 from portalab.modules.ui.settings import BUILTIN_KEYS
 from tests.integration.identity.helpers import create_user, login, module_of
 from tests.ui_fixtures import UiHarness
 
 pytestmark = pytest.mark.integration
-BUILTIN = Path(__file__).resolve().parents[3] / "src" / "portalab" / "modules" / "ui" / "themes" / "builtin"
 ADMIN_ROUTES = [
     ("GET", "/api/v1/admin/ui/themes"),
     ("POST", "/api/v1/admin/ui/themes"),
@@ -40,7 +37,7 @@ async def test_themes_are_inert_and_bounded(ui: UiHarness) -> None:
     from portalab.modules.ui.themes.service import InvalidTheme
     from tests.authz_fixtures import SYSTEM_ACTOR
 
-    theme = json.loads((BUILTIN / "dark.json").read_text(encoding="utf-8"))
+    theme = interface_document("dark")  # 028: from its pack
     for payload in (
         {**theme, "key": "evil", "script": "alert(1)"},
         {**theme, "key": "evil", "permissions": ["users.admin.transfer"]},

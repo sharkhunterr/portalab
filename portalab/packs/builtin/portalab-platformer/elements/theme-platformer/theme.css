@@ -1,0 +1,103 @@
+/* Portalab — the « platformer » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="platformer"] body {
+  background:
+    radial-gradient(ellipse 70% 20% at 20% 110%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%) fixed,
+    radial-gradient(ellipse 50% 16% at 85% 112%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%) fixed,
+    linear-gradient(180deg, #6fb2ff, #a8d4ff 55%, #cfe7ff) fixed;
+}
+
+:root[data-theme="platformer"] .shell-header {
+  background: #c84c0c;
+  background-image:
+    linear-gradient(#00000055 0 2px, transparent 2px) 0 0 / 2rem 1rem,
+    linear-gradient(90deg, #00000055 0 2px, transparent 2px) 0 0 / 2rem 1rem;
+  color: #ffffff;
+  border-block-end: 3px solid #000000;
+}
+
+:root[data-theme="platformer"] .shell-launcher__start {
+  border: 3px solid #000000;
+  border-radius: 0.2rem;
+  background:
+    radial-gradient(circle 2px at 6px 6px, #7a3a00 96%, transparent),
+    radial-gradient(circle 2px at calc(100% - 6px) 6px, #7a3a00 96%, transparent),
+    radial-gradient(circle 2px at 6px calc(100% - 6px), #7a3a00 96%, transparent),
+    radial-gradient(circle 2px at calc(100% - 6px) calc(100% - 6px), #7a3a00 96%, transparent), #f8b800;
+  color: #5a2a00;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+  box-shadow:
+    inset 3px 3px 0 #ffe08a,
+    inset -3px -3px 0 #c47a00,
+    0.25rem 0.25rem 0 #00000055;
+}
+
+:root[data-theme="platformer"] .shell-launcher__tile {
+  border: 3px solid #000000;
+  border-radius: 0;
+  background:
+    linear-gradient(#00000044 0 3px, transparent 3px) 0 0 / 2.4rem 1.2rem,
+    linear-gradient(90deg, #00000044 0 3px, transparent 3px) 0 0 / 2.4rem 2.4rem,
+    linear-gradient(90deg, #00000044 0 3px, transparent 3px) 1.2rem 1.2rem / 2.4rem 2.4rem,
+    #c84c0c;
+  color: #ffffff;
+  box-shadow: 0.3rem 0.3rem 0 #00000044;
+}
+
+:root[data-theme="platformer"] .shell-launcher__tile[data-active] {
+  background:
+    linear-gradient(90deg, #ffffff33 0 0.4rem, transparent 0.4rem), linear-gradient(180deg, #3cb83c, #1e7a1e);
+}
+
+:root[data-theme="platformer"] .shell-launcher__head {
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+:root[data-theme="platformer"] .shell-launcher__icon {
+  border-radius: 0.2rem;
+  background: #f8b800;
+  color: #5a2a00;
+  box-shadow:
+    inset 3px 3px 0 #ffe08a,
+    inset -3px -3px 0 #c47a00;
+}
+
+:root[data-theme="platformer"] .shell-launcher__pages .shell-entry {
+  border-color: #000000;
+  background: #fff8e8;
+  color: #1a1a2e;
+}
+
+:root[data-theme="platformer"] .ds-dialog:has(.shell-launcher__grid) {
+  background:
+    radial-gradient(ellipse 30% 14% at 15% 100%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%),
+    radial-gradient(ellipse 24% 10% at 80% 100%, #5cb85c 0 60%, #3c8c3c 62%, transparent 63%),
+    radial-gradient(ellipse 6% 4% at 70% 16%, #ffffff 96%, transparent),
+    radial-gradient(ellipse 4% 3% at 73% 13%, #ffffff 96%, transparent),
+    linear-gradient(180deg, #6fb2ff, #a8d4ff);
+}
+
+:root[data-theme="platformer"] .ds-dialog:has(.shell-launcher__grid) > h2 {
+  color: #ffffff;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+:root[data-theme="platformer"] .shell-launcher__head span:last-child {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+:root[data-theme="platformer"] .shell-launcher__head {
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 0.6rem;
+}
+
+:root[data-theme="platformer"] .ds-dialog:has(.shell-launcher__grid) .ds-dialog__footer {
+  background: transparent;
+}

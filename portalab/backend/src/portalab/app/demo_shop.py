@@ -7,17 +7,22 @@ Prices follow the rarity (common about 100 to 200, rare 250 to 450, epic 500 to 
 the rarest need a level; a pack costs about 80 % of what it contains. Copies come from the rarity's supply
 unless a product sets its own (interfaces and theme packs have a few more). Demo data only."""
 
-import json
-from pathlib import Path
 from typing import Any
 
 from portalab.app.demo_economy import LEVEL_REWARDS
-from portalab.capabilities.themes import UNIVERSE_THEMES
+from portalab.capabilities.visuals import SOCLE, builtin_interfaces, interface_document
 from portalab.modules.marketplace.products.sync import definition as sync_definition
-from portalab.modules.ui import themes as themes_package
 
 Product = dict[str, Any]
-BUILTIN_THEMES = Path(themes_package.__file__).parent / "builtin"
+# 028: the interfaces are their packs' — the universes are those in a pack of their own (neither the socle
+# nor the base collection), their definitions in their element (``theme.json``)
+UNIVERSE_THEMES = tuple(k for k, pack in builtin_interfaces().items() if pack not in (SOCLE, "portalab-base"))
+
+
+def theme_definition(theme: str) -> dict[str, Any]:
+    """An interface's definition, from its built-in pack."""
+    return interface_document(theme)
+
 
 SHOP: list[Product] = []
 # 027: products taken out of the shop — archived (no longer sold, their option no longer offered)
@@ -3237,7 +3242,7 @@ def with_widgets(looks: tuple[str, ...] | list[str]) -> list[str]:
 def theme_looks(theme: str) -> list[str]:
     """The sold products a universe theme's own looks need (its notification style and entrance, ambience,
     celebration and level-up): the interface alone shows the free defaults instead, its theme pack has them."""
-    definition = json.loads((BUILTIN_THEMES / f"{theme}.json").read_text(encoding="utf-8"))
+    definition = theme_definition(theme)
     wanted = {
         ("notification_style", "style", definition.get("notification", {}).get("style")),
         ("notification_animation", "animation", definition.get("notification", {}).get("animation")),

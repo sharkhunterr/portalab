@@ -1,0 +1,24 @@
+/* Portalab — the « gazette » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="gazette"] .shell-masthead {
+  background: #fbf8f1;
+}
+
+:root[data-theme="gazette"] .shell-masthead__title {
+  font-family: "UnifrakturMaguntia", "Playfair Display", serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+:root[data-theme="gazette"] .shell-masthead__section {
+  font-family: "Playfair Display", Georgia, serif;
+  font-variant: small-caps;
+  text-transform: none;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+}
+
+:root[data-theme="gazette"] .shell-header {
+  background: #fbf8f1;
+  border-block-end: 1px solid #1a1a1a;
+}

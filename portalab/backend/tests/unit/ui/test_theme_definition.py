@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from portalab.capabilities.visuals import interface_document
 from portalab.modules.ui.themes.definition import contrast, floor_report, validate_definition
 
 BACKEND = Path(__file__).resolve().parents[3]
@@ -14,7 +15,7 @@ FRONTEND = BACKEND.parent / "frontend" / "src" / "design-system" / "themes" / "b
 
 
 def _theme(key: str = "light") -> dict[str, object]:
-    return json.loads((BUILTIN / "builtin" / f"{key}.json").read_text(encoding="utf-8"))
+    return interface_document(key)  # 028: from its pack
 
 
 @pytest.mark.parametrize(

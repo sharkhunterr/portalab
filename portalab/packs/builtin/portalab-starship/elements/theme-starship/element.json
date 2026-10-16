@@ -10,8 +10,8 @@
     "fr": "Aux commandes d'un vaisseau spatial : acier et ambre, le vaisseau vu de profil en bas de l'écran — ses moteurs allumés, un compartiment par rubrique, la jauge d'énergie et le voyant des communications —, des astéroïdes qui défilent, des notifications du contrôle de mission qui décollent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 1600,

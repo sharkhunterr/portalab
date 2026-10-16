@@ -10,8 +10,11 @@
     "fr": "La poursuite dans le labyrinthe : des couloirs bleus sur noir, les rubriques en rangée de gommes avec le glouton sur la rubrique courante, des fantômes qui flottent, des notifications croquées. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 600,

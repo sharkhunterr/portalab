@@ -1,0 +1,65 @@
+/* Portalab — the « beach » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="beach"] .shell-lights {
+  border-block-end: 0;
+  background: linear-gradient(180deg, #bfe7f2, #fbf1dc);
+}
+
+:root[data-theme="beach"] .shell-lights__wall {
+  padding-block: 2rem 0.6rem;
+}
+
+:root[data-theme="beach"] .shell-lights__wall::before {
+  inset-block-start: 0.5rem;
+  block-size: 3px;
+  background: repeating-linear-gradient(90deg, #a07a4a 0 6px, #c9a46a 6px 10px);
+}
+
+:root[data-theme="beach"] .shell-lights__wall > li {
+  --bulb: hsl(calc(190 + var(--i) * 70) 75% 48%);
+}
+
+:root[data-theme="beach"] .shell-lights__bulb {
+  inset-block-start: -1.5rem;
+  inline-size: 1.5rem;
+  block-size: 1.3rem;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--bulb) 0 0.25rem, #ffffff 0.25rem 0.5rem);
+  box-shadow: none;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  animation: beach-flutter calc(1.6s + var(--i) * 0.2s) ease-in-out infinite alternate;
+}
+
+:root[data-theme="beach"] .shell-lights__wall > li:has([data-active]) .shell-lights__bulb {
+  block-size: 1.8rem;
+  background: repeating-linear-gradient(90deg, #c2410c 0 0.25rem, #ffffff 0.25rem 0.5rem);
+  box-shadow: none;
+  animation: beach-flutter 0.8s ease-in-out infinite alternate;
+}
+
+:root[data-theme="beach"] .shell-lights__item {
+  color: #3f5a6b;
+  font-family: Pacifico, Fredoka, cursive;
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: none;
+}
+
+:root[data-theme="beach"] .shell-lights__item[data-active] {
+  color: #c2410c;
+  text-shadow: none;
+}
+
+:root[data-theme="beach"] .shell-lights__panel {
+  background: #fffaf0;
+}
+
+@keyframes beach-flutter {
+  from {
+    rotate: -6deg;
+  }
+  to {
+    rotate: 6deg;
+  }
+}

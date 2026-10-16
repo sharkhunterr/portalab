@@ -1,0 +1,28 @@
+/* Portalab — the « groove » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="groove"] body {
+  background: #000000;
+}
+
+:root[data-theme="groove"] .shell-player-library {
+  background: #121212;
+}
+
+:root[data-theme="groove"] .shell-player {
+  background: #121212;
+}
+
+:root[data-theme="groove"] .shell-player {
+  border-block-start-color: #282828;
+  background: #000000;
+}
+
+:root[data-theme="groove"] .shell-player__cover {
+  background: linear-gradient(135deg, #1ed760, #0e7a37);
+  color: #000000;
+}
+
+:root[data-theme="groove"] .shell-header {
+  background: #000000;
+  border-block-end-color: #121212;
+}

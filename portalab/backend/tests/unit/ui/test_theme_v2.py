@@ -1,18 +1,14 @@
 """027 T008 — theme v2 (backend twin): layout/motion/sound vocabulary incl. principle-changing arrangements,
 unknown values refused with their path, v1 upgraded on validation, floor on gamification accents."""
 
-import json
-from pathlib import Path
-
 import pytest
 
+from portalab.capabilities.visuals import interface_document
 from portalab.modules.ui.themes.definition import SCHEMA_VERSION, floor_report, validate_definition
-
-BUILTIN = Path(__file__).resolve().parents[3] / "src" / "portalab" / "modules" / "ui" / "themes" / "builtin"
 
 
 def _theme(key: str) -> dict[str, object]:
-    return json.loads((BUILTIN / f"{key}.json").read_text(encoding="utf-8"))
+    return interface_document(key)  # 028: from its pack
 
 
 def test_principle_changing_arrangements_are_accepted() -> None:

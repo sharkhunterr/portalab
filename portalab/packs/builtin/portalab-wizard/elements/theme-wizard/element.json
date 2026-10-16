@@ -10,8 +10,8 @@
     "fr": "Une école de sorcellerie : navigation en marque-pages, cartes dorées, notifications parchemin, clochettes magiques et tout un vocabulaire. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 1500,

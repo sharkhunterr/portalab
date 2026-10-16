@@ -10,8 +10,11 @@
     "fr": "Épuré et lumineux comme un portable à la pomme : verre dépoli, un dock qui gonfle sous le pointeur, des boutons de fenêtre en trois couleurs, des notifications qui sortent d'une lampe de génie. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 900,

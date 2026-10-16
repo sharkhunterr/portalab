@@ -10,8 +10,11 @@
     "fr": "L'écran vert d'une console de poche : quatre nuances de vert, des caractères en pixels, une croix directionnelle en bas pour passer d'une rubrique et d'une page à l'autre, A pour le menu, B pour revenir. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 900,

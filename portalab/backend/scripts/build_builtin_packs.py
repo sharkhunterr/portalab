@@ -32,7 +32,6 @@ from portalab.modules.visuals.manifest import LOOK_FIELD
 BACKEND = Path(__file__).resolve().parents[1]
 OUT = BACKEND.parent / "packs" / "builtin"
 LOCALES = BACKEND / "locales"
-THEMES = BACKEND / "src" / "portalab" / "modules" / "ui" / "themes" / "builtin"
 VERSION = "1.0.0"
 VISUAL = {*LOOK_FIELD, "badge", "title", "bundle", "booster"} - {"profile_background", "widget_style"}
 # where the interface names each type's looks (the same catalogs the SPA reads)
@@ -213,11 +212,12 @@ def build(out: Path) -> dict[str, int]:
                     "free": True,
                 }
             )
-    for path in sorted(THEMES.glob("*.json")):
-        key = path.stem
+    # the interfaces no product sells, from the packs too (each element holds its definition: theme.json)
+    for path in sorted(out.glob("*/elements/*/theme.json")):
+        document = json.loads(path.read_text(encoding="utf-8"))
+        key = str(document.get("key") or path.parent.name)
         if key in sold["theme"]:
             continue
-        document = json.loads(path.read_text(encoding="utf-8"))
         name = str(document.get("name") or key)
         free.append(
             {

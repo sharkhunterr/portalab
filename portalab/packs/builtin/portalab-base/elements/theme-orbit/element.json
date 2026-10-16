@@ -10,8 +10,8 @@
     "fr": "La navigation dans une bulle en orbite, l'en-tête en bas, des animations joueuses."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 900,

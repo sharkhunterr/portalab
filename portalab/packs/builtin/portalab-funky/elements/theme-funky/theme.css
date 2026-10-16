@@ -1,0 +1,52 @@
+/* Portalab — the « funky » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="funky"] .shell-dock__bar {
+  counter-reset: jukebox;
+  padding: 0.7rem 1.2rem 0.5rem;
+  border: 3px solid #e8e0d0;
+  border-radius: 3rem 3rem 0.9rem 0.9rem;
+  background:
+    linear-gradient(90deg, #ff8c1a, #ffd23f, #ff5ca8, #ffd23f, #ff8c1a) top / 100% 0.35rem no-repeat,
+    repeating-linear-gradient(90deg, #5a2f14 0 6px, #6b3a1c 6px 9px),
+    #5a2f14;
+  box-shadow:
+    0 0 0 2px #8a8278,
+    0 0 1.6rem #ff8c1a66,
+    inset 0 0.4rem 0.8rem #ffd23f44;
+}
+
+:root[data-theme="funky"] .shell-dock__bar > li {
+  counter-increment: jukebox;
+}
+
+:root[data-theme="funky"] .shell-dock__item-icon {
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, #fff1dc, #e6c9a3);
+  color: #5a2f14;
+}
+
+:root[data-theme="funky"] .shell-dock__item-label {
+  color: #fff1dc;
+}
+
+:root[data-theme="funky"] .shell-dock__item-label::before {
+  content: "A" counter(jukebox) " · ";
+  color: #ffd23f;
+  font-weight: 800;
+}
+
+:root[data-theme="funky"] .shell-dock__item[data-active] .shell-dock__item-icon {
+  background: linear-gradient(180deg, #ffd23f, #ff8c1a);
+  color: #2a1000;
+  box-shadow: 0 0 0.8rem #ffd23f;
+}
+
+:root[data-theme="funky"] .shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: linear-gradient(180deg, #ffd23f, #ff8c1a);
+  color: #2a1000;
+  box-shadow: 0 0 0.8rem #ffd23f;
+}
+
+:root[data-theme="funky"] .shell-dock__item[data-active]::after {
+  background: #ffd23f;
+}

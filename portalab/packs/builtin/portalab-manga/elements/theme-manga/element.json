@@ -10,8 +10,8 @@
     "fr": "Lignes de vitesse, pétales de sakura et onglets de chapitres, sur papier blanc. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 600,

@@ -10,8 +10,8 @@
     "fr": "À bord d'une station spatiale : des écrans cyan sur fond noir, vos rubriques en planètes sur leur orbite — ouvrez-en une et ses pages tournent autour comme des lunes —, le système solaire qui tourne derrière, un saut dans l'hyperespace à chaque niveau. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 1500,

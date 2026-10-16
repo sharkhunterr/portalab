@@ -10,8 +10,8 @@
     "fr": "Les pirates des îles : un port de cartes et de lanternes, des bouteilles à la mer, la fumée des canons et des doublons. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 900,

@@ -10,8 +10,11 @@
     "fr": "Le portail en journal : son grand titre et sa date, les rubriques en colonnes, des caractères à empattements sur papier, des télégrammes et une édition spéciale qui tourne. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 600,

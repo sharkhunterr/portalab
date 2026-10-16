@@ -10,8 +10,11 @@
     "fr": "Un jardin au printemps : des verts frais et du rose, une liane sur le côté avec une feuille par rubrique, des aigrettes de pissenlit qui flottent, des notifications en sachets de graines qui poussent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 600,

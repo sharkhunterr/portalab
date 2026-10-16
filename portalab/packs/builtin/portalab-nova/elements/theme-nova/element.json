@@ -10,8 +10,8 @@
     "fr": "Ultra moderne, comme un téléphone : un bouton rond en bas ouvre un volet d'icônes d'applications, du verre dépoli, des couleurs douces et un îlot pour les notifications. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 1500,

@@ -1,0 +1,41 @@
+/* Portalab — the « pocket » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="pocket"] .shell-dpad {
+  border-color: #9a968f;
+  background: linear-gradient(180deg, #d6d3cd, #bdb9b2);
+}
+
+:root[data-theme="pocket"] .shell-dpad__pad button {
+  background: #2b2b2b;
+  color: #d6d3cd;
+}
+
+:root[data-theme="pocket"] .shell-dpad__hub {
+  background: #2b2b2b;
+  color: #d6d3cd;
+}
+
+:root[data-theme="pocket"] .shell-dpad__screen {
+  border-color: #5f5d6b;
+  background: #9bbc0f;
+  color: #0f380f;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.62rem;
+  line-height: 1.6;
+}
+
+:root[data-theme="pocket"] .shell-dpad__screen small {
+  color: #306230;
+}
+
+:root[data-theme="pocket"] .shell-dpad__buttons button {
+  background: #8b1e4f;
+  color: #f2d7e3;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+}
+
+:root[data-theme="pocket"] .shell-header {
+  background: #9bbc0f;
+  border-block-end: 3px solid #0f380f;
+}

@@ -3,11 +3,8 @@ delete); policy-filtered catalog for users. Registrations are owner-tagged (``mo
 ``plugin:<key>``, ``marketplace:<product>``) so all of an owner's themes can be withdrawn at once.
 Enabling an external (marketplace) theme is a sensitive, audited action."""
 
-import asyncio
-import json
 from collections.abc import Mapping
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 from uuid import UUID
 
@@ -198,53 +195,6 @@ class ThemeService:
                 uow.session, actor, "theme.updated", row, sensitive=external or enabled is not None
             )
             return theme_out(row, admin=True)
-
-    async def sync_builtin(self, directory: Path) -> int:
-        documents = await asyncio.to_thread(
-            lambda: [json.loads(p.read_text(encoding="utf-8")) for p in sorted(directory.glob("*.json"))]
-        )
-        return await self._sync_builtin(documents)
-
-    async def _sync_builtin(self, documents: list[Any]) -> int:
-        """027: built-in themes follow the files shipped with the portal — a built-in row whose definition
-        differs from its file is updated (version bumped); new files are registered. Returns the changes."""
-        changed = 0
-        now = utc_now(self.clock)
-        async with self.database.unit_of_work() as uow:
-            rows = {
-                row.key: row
-                for row in (
-                    await uow.session.execute(select(Theme).where(Theme.source == "builtin"))
-                ).scalars()
-            }
-            for document in documents:
-                definition, report = self.check(document)
-                row = rows.get(definition["key"])
-                if row is None:
-                    if await uow.session.scalar(select(Theme.id).where(Theme.key == definition["key"])):
-                        continue  # a non-built-in theme owns the key
-                    uow.session.add(
-                        Theme(
-                            key=definition["key"],
-                            name=definition["name"],
-                            source="builtin",
-                            owner="core",
-                            definition=definition,
-                            schema_version=definition["schemaVersion"],
-                            version=1,
-                            enabled=True,
-                            floor_report=report,
-                            created_at=now,
-                            updated_at=now,
-                        )
-                    )
-                    changed += 1
-                elif row.definition != definition or row.name != definition["name"]:
-                    row.definition, row.floor_report, row.name = definition, report, definition["name"]
-                    row.version += 1
-                    row.updated_at = now
-                    changed += 1
-        return changed
 
     async def get(self, key: str) -> Theme:
         async with self.database.session() as session:

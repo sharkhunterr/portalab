@@ -10,8 +10,11 @@
     "fr": "Le jeu de tir d'arcade : vert phosphore sur noir, une flotte qui avance au-dessus, les rubriques en bunkers de votre canon et des notifications qui arrivent en marchant. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 600,

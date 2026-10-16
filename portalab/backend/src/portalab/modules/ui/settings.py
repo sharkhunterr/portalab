@@ -8,7 +8,7 @@ from typing import Annotated, Any, Literal, cast
 
 from pydantic import Field
 
-from portalab.capabilities.themes import UNIVERSE_THEMES
+from portalab.capabilities.visuals import builtin_interfaces
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:ui"
@@ -24,16 +24,9 @@ def _one_of(values: tuple[str, ...]) -> Any:
 LOOK = Annotated[str, Field(min_length=1, max_length=64, pattern=r"^[a-z0-9][a-z0-9_.-]*$")]
 
 
-BUILTIN_KEYS = (
-    "portalab-dark",
-    "portalab-light",
-    "orbit",
-    "studio",
-    "light",
-    "dark",
-    "high-contrast",
-    *UNIVERSE_THEMES,  # 027: universe themes (built in, most sold in the shop)
-)
+# 028: the interfaces Portalab ships are its packs' (the socle's defaults, then the universes) — none is
+# listed in the code
+BUILTIN_KEYS = tuple(builtin_interfaces())
 DEFAULT_THEME = "portalab"  # a theme family (spec 027 R8): resolved to its member for the color mode
 
 GLOBAL_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (

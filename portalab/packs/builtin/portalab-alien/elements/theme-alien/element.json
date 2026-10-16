@@ -10,8 +10,8 @@
     "fr": "L'ordinateur de bord : ligne de commande, spores dans le noir, vocabulaire de l'équipage. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "economy": {
     "price": 900,

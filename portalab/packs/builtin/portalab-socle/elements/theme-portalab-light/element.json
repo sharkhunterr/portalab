@@ -6,8 +6,8 @@
     "fr": "Portalab (light)"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json"
   },
   "free": true
 }

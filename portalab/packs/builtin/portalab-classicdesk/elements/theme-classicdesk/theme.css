@@ -1,0 +1,74 @@
+/* Portalab — the « classicdesk » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="classicdesk"] body {
+  background:
+    radial-gradient(ellipse 140% 60% at 30% 118%, #7cc35c 0 46%, #4f9a35 52%, transparent 53%),
+    linear-gradient(180deg, #8fb8ea, #c4dbf5 45%, #e8f1fb 78%) fixed;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__bar {
+  border: 0;
+  background: linear-gradient(180deg, #3f8cf3, #245edb 12%, #1f55c8 80%, #1941a5);
+  box-shadow: inset 0 1px 0 #6aa6ff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__start {
+  padding-inline: 0.7rem 1.4rem;
+  background: radial-gradient(ellipse at 30% 0%, #8fe07a, #3c9a2b 45%, #2c7a1f);
+  color: #ffffff;
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-size: 1.15rem;
+  text-shadow: 1px 1px 1px #0b3d06;
+  box-shadow: inset -2px 0 3px #0b3d0688;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__task {
+  border-color: #0f3fa0;
+  background: linear-gradient(180deg, #4d98f7, #2a6fe3);
+  color: #ffffff;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__task[data-active] {
+  background: linear-gradient(180deg, #1a48b5, #1e56c9);
+  box-shadow: inset 1px 1px 3px #0a2a75;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__task[aria-expanded="true"] {
+  background: linear-gradient(180deg, #1a48b5, #1e56c9);
+  box-shadow: inset 1px 1px 3px #0a2a75;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__tray {
+  border-inline-start: 1px solid #0f3fa0;
+  background: linear-gradient(180deg, #2fa4f3, #0f8ae6 15%, #0d78d4);
+  color: #ffffff;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__menu {
+  border: 2px solid #0831d9;
+  border-start-end-radius: 0.6rem;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__menu-title {
+  background: linear-gradient(180deg, #3d8af7, #0a5fe8 30%, #0451d6);
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-size: 1.05rem;
+  text-shadow: 1px 1px 1px #0a2a75;
+}
+
+:root[data-theme="classicdesk"] .shell-taskbar__pages {
+  background: #d3e5fa;
+  border-inline-start-color: #95bdee;
+}
+
+:root[data-theme="classicdesk"] .shell-header {
+  background: linear-gradient(180deg, #3d8af7, #0a5fe8 30%, #0451d6 85%, #0831d9);
+  color: #ffffff;
+  border-block-end: 0;
+}
+
+:root[data-theme="classicdesk"] .shell-header :is(a, button):not(.ds-button, .shell-search *) {
+  color: #ffffff;
+}

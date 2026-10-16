@@ -1,0 +1,66 @@
+/* Portalab — the « mazechase » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="mazechase"] .shell-lights {
+  border-block-end: 0;
+  background: #000000;
+}
+
+:root[data-theme="mazechase"] .shell-lights__wall {
+  padding-block: 1.5rem 0.7rem;
+  border-block: 3px double #2121de;
+}
+
+:root[data-theme="mazechase"] .shell-lights__wall::before {
+  display: none;
+}
+
+:root[data-theme="mazechase"] .shell-lights__bulb {
+  inset-block-start: -1rem;
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: 50%;
+  background: #ffb897;
+  box-shadow: none;
+  animation: none;
+}
+
+:root[data-theme="mazechase"] .shell-lights__wall > li:has([data-active]) .shell-lights__bulb {
+  inset-block-start: -1.3rem;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  background: conic-gradient(from 60deg, transparent 0 60deg, #ffe14d 60deg);
+  box-shadow: 0 0 0.6rem #ffe14d88;
+  animation: maze-chomp 0.35s steps(1, end) infinite;
+}
+
+:root[data-theme="mazechase"] .shell-lights__wall > li:is(:hover, :focus-within) .shell-lights__bulb {
+  background: #ffffff;
+  box-shadow: 0 0 0.5rem #ffffff;
+}
+
+:root[data-theme="mazechase"] .shell-lights__item {
+  color: #c4c4f0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  line-height: 1.6;
+}
+
+:root[data-theme="mazechase"] .shell-lights__item[data-active] {
+  color: #ffe14d;
+  text-shadow: none;
+}
+
+:root[data-theme="mazechase"] .shell-lights__panel {
+  border-block-end: 3px double #2121de;
+  background: #000000;
+}
+
+:root[data-theme="mazechase"] .shell-lights__item {
+  text-transform: none;
+}
+
+@keyframes maze-chomp {
+  50% {
+    background: #ffe14d;
+  }
+}

@@ -10,8 +10,11 @@
     "fr": "Le fil d'un réseau social : des onglets au milieu, vos raccourcis à gauche, des notifications en bulles de discussion, des j'aime et des réactions qui s'envolent. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 600,

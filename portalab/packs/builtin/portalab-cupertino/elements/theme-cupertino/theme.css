@@ -1,0 +1,39 @@
+/* Portalab — the « cupertino » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="cupertino"] .shell-dock__bar {
+  padding: 0.4rem 0.5rem;
+  border-color: #ffffff99;
+  border-radius: 1.3rem;
+  background: #ffffff8c;
+  box-shadow:
+    0 0.6rem 2rem #0000002e,
+    inset 0 0 0 1px #ffffff66;
+}
+
+:root[data-theme="cupertino"] .shell-dock__item-icon {
+  border-radius: 22%;
+  background: linear-gradient(180deg, #ffffff, #e8e8ed);
+  color: #1d1d1f;
+}
+
+:root[data-theme="cupertino"] .shell-dock__item[data-active] .shell-dock__item-icon {
+  background: linear-gradient(180deg, #3d9bff, #0066cc);
+  color: #ffffff;
+}
+
+:root[data-theme="cupertino"] .shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: linear-gradient(180deg, #3d9bff, #0066cc);
+  color: #ffffff;
+}
+
+:root[data-theme="cupertino"] .shell-dock__item[data-active]::after {
+  background: #1d1d1f;
+}
+
+:root[data-theme="cupertino"] .shell-dock__item-label {
+  display: none;
+}
+
+:root[data-theme="cupertino"] .shell-header {
+  background: #f5f5f7b8;
+}

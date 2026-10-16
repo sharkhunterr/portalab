@@ -1,0 +1,24 @@
+/* Portalab — the « blossom » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="blossom"] .shell-side {
+  border-inline-end: 0;
+  background:
+    linear-gradient(#5a9a4a, #5a9a4a) 1.05rem 0 / 3px 100% no-repeat,
+    radial-gradient(ellipse 0.55rem 0.28rem at 1.55rem 1.4rem, #7cc46a 96%, transparent) 0 0 / 100% 3rem,
+    radial-gradient(ellipse 0.55rem 0.28rem at 0.6rem 2.9rem, #6ab35a 96%, transparent) 0 0 / 100% 3rem,
+    linear-gradient(180deg, #eef7e8, #f3f8ee);
+}
+
+:root[data-theme="blossom"] .shell-section__head[data-active] {
+  background: #ffffffcc;
+  color: #1f3320;
+}
+
+:root[data-theme="blossom"] .shell-section__head[data-active] .ds-icon {
+  color: #b0306a;
+}
+
+:root[data-theme="blossom"] .shell-bottom-bar {
+  border-block-start: 3px solid #7cc46a;
+  background: #f3f8eef2;
+}

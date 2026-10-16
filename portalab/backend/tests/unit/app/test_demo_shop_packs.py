@@ -3,7 +3,6 @@
 universe."""
 
 import collections
-import json
 
 import pytest
 
@@ -29,7 +28,7 @@ def _sold() -> dict[tuple[str, str], set[str]]:
 
 @pytest.mark.parametrize("theme", sorted(demo_shop.UNIVERSES))
 def test_ultimate_pack_holds_the_sold_looks_of_its_theme(theme: str) -> None:
-    definition = json.loads((demo_shop.BUILTIN_THEMES / f"{theme}.json").read_text(encoding="utf-8"))
+    definition = demo_shop.theme_definition(theme)
     wanted = {
         ("notification_style", definition.get("notification", {}).get("style")),
         ("notification_animation", definition.get("notification", {}).get("animation")),

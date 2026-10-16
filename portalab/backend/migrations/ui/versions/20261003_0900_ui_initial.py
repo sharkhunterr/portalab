@@ -5,15 +5,15 @@ Revises:
 Create Date: 2026-10-03 09:00:00
 """
 
-import json
 import uuid
 from collections.abc import Sequence
 from datetime import UTC, datetime
-from pathlib import Path
 
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
+
+from portalab.capabilities.visuals import interface_document
 
 revision: str = "ui_0001"
 down_revision: str | Sequence[str] | None = None
@@ -21,7 +21,7 @@ branch_labels: str | Sequence[str] | None = ("ui",)
 depends_on: str | Sequence[str] | None = ("core_0005",)
 
 TZ = sa.DateTime(timezone=True)
-BUILTIN = Path(__file__).resolve().parents[3] / "src" / "portalab" / "modules" / "ui" / "themes" / "builtin"
+# 028: the interfaces' definitions are their packs' (``packs/builtin``), read where the release ships them
 
 
 def upgrade() -> None:
@@ -47,7 +47,7 @@ def upgrade() -> None:
     now = datetime.now(UTC)
     rows = []
     for key in ("light", "dark", "high-contrast"):
-        definition = json.loads((BUILTIN / f"{key}.json").read_text(encoding="utf-8"))
+        definition = interface_document(key)
         rows.append(
             {
                 "id": uuid.uuid4(),

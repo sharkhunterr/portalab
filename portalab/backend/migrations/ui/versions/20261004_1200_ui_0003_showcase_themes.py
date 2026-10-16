@@ -11,17 +11,18 @@ import json
 import uuid
 from collections.abc import Sequence
 from datetime import UTC, datetime
-from pathlib import Path
 
 import sqlalchemy as sa
 from alembic import op
+
+from portalab.capabilities.visuals import interface_document
 
 revision: str = "ui_0003"
 down_revision: str | Sequence[str] | None = "ui_0002"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-BUILTIN = Path(__file__).resolve().parents[3] / "src" / "portalab" / "modules" / "ui" / "themes" / "builtin"
+# 028: the interfaces' definitions are their packs' (``packs/builtin``), read where the release ships them
 KEYS = ("orbit", "studio")
 
 
@@ -32,7 +33,7 @@ def upgrade() -> None:
         exists = bind.execute(sa.text("SELECT 1 FROM ui.themes WHERE key = :k"), {"k": key}).scalar()
         if exists:
             continue
-        definition = json.loads((BUILTIN / f"{key}.json").read_text(encoding="utf-8"))
+        definition = interface_document(key)
         bind.execute(
             sa.text(
                 "INSERT INTO ui.themes (id, key, name, source, owner, definition, schema_version, version, "

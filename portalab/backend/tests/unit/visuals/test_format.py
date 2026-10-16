@@ -7,7 +7,13 @@ from typing import Any
 import httpx
 import pytest
 
-from portalab.modules.visuals.analysis import VOCABULARY, analyse, interface_selector_ok, look_selector_ok
+from portalab.modules.visuals.analysis import (
+    VOCABULARY,
+    analyse,
+    interface_selector_ok,
+    look_selector_ok,
+    vocabulary_key_ok,
+)
 from portalab.modules.visuals.github import GitHub, GitHubError, parse_address
 from portalab.modules.visuals.manifest import parse_element, version_key
 from portalab.modules.visuals.store import MAX_FILE_BYTES, Files, PackageError, Store, read_source, read_zip
@@ -238,3 +244,20 @@ def test_an_interface_naming_a_navigation_nobody_brings_is_refused(tmp_path: Pat
     assert "theme.invalid" in {i["code"] for i in report["items"] if i["level"] == "blocking"}
     # its own navigation (« sonar ») is fine
     assert analyse(read_source(EXAMPLES / "abysses"), interfaces=FakeInterfaces())["summary"]["publishable"]
+
+
+@pytest.mark.parametrize(
+    ("key", "ok"),
+    [
+        ("nav:nav.media", True),
+        ("media:page.title", True),
+        ("shell:menu", True),  # the menu button
+        ("shell:taskbar.start", True),  # a word of one of Portalab's navigations
+        ("shell:dpad.menu", True),
+        ("shell:nowhere.start", False),  # no such navigation
+        ("shell:signOut", False),  # an action
+        ("marketplace:buy", False),
+    ],
+)
+def test_an_interface_renames_its_navigation_and_titles_only(key: str, ok: bool) -> None:
+    assert vocabulary_key_ok(key) is ok

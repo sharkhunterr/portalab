@@ -70,6 +70,45 @@ def builtin_root(env: Mapping[str, str] | None = None) -> Path | None:
     return repository if repository.is_dir() else None
 
 
+def builtin_interfaces(root: Path | None = None) -> dict[str, str]:
+    """The interfaces Portalab's own packs hold: key → its pack (the socle's first) — none is listed in the
+    code; read once."""
+    if root is None and _INTERFACES:
+        return dict(_INTERFACES)
+    out: dict[str, str] = {}
+    base = root if root is not None else builtin_root()
+    if base is not None and base.is_dir():
+        files = sorted(base.glob("*/elements/*/element.json"), key=lambda f: (f.parts[-4] != SOCLE, str(f)))
+        for file in files:
+            try:
+                element = json.loads(file.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if element.get("type") == "theme" and isinstance(element.get("look"), str):
+                out.setdefault(element["look"], file.parts[-4])
+    if root is None:
+        _INTERFACES.update(out)
+    return out
+
+
+_INTERFACES: dict[str, str] = {}
+
+
+def interface_document(key: str, root: Path | None = None) -> dict[str, Any]:
+    """An interface Portalab ships: its definition, from its pack's element (``theme.json``) — read by the
+    migrations seeding the interfaces and by the demo catalog."""
+    base = root if root is not None else builtin_root()
+    pack = builtin_interfaces(base).get(key) if base is not None else None
+    if base is None or pack is None:
+        raise KeyError(key)
+    for file in sorted((base / pack / "elements").glob("*/element.json")):
+        element = json.loads(file.read_text(encoding="utf-8"))
+        if element.get("type") == "theme" and element.get("look") == key:
+            document: dict[str, Any] = json.loads((file.parent / "theme.json").read_text(encoding="utf-8"))
+            return document
+    raise KeyError(key)
+
+
 def shipped_looks(root: Path | None, pack: str = "*") -> dict[str, list[str]]:
     """The looks Portalab's own packs hold (or one of them: ``pack``), per type — read from their elements
     (the socle's first)."""

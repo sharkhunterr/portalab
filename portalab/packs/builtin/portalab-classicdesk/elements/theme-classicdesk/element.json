@@ -10,8 +10,11 @@
     "fr": "Le bureau des années 2000 : un ciel au-dessus d'une colline verte, des fenêtres à barre de titre bleue, une barre des tâches avec son bouton Démarrer et son horloge, des info-bulles qui sortent de la zone de notification. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 900,

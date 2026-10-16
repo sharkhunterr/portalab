@@ -10,8 +10,11 @@
     "fr": "L'ordinateur de bord d'un cargo spatial : phosphore et ambre sur noir, une console à quai en bas avec l'horloge du vaisseau et un battement de cœur, les transmissions de MU/TH/UR et les bips du détecteur de mouvement. L'interface seule : son fond animé, ses notifications, sa célébration et son passage de niveau sont dans son pack de thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "theme",
+    "file": "theme.json",
+    "css": [
+      "theme.css"
+    ]
   },
   "economy": {
     "price": 1500,

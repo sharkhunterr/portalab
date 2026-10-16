@@ -1,0 +1,44 @@
+/* Portalab — the « invaders » interface: moved from Portalab's stylesheets (spec 028, B2) */
+
+:root[data-theme="invaders"] .shell-dock__bar {
+  border: 0;
+  border-block-end: 3px solid #39ff14;
+  border-radius: 0;
+  background: #050805e6;
+  box-shadow: 0 0.4rem 1rem #39ff1433;
+}
+
+:root[data-theme="invaders"] .shell-dock__item-icon {
+  position: relative;
+  border-radius: 1.4rem 1.4rem 0 0;
+  background: #39ff14;
+  color: #001a00;
+  box-shadow: none;
+  clip-path: polygon(0 100%, 0 30%, 18% 0, 82% 0, 100% 30%, 100% 100%, 72% 100%, 72% 90%, 28% 90%, 28% 100%);
+}
+
+:root[data-theme="invaders"] .shell-dock__item[data-active] .shell-dock__item-icon {
+  background: #ffffff;
+  color: #001a00;
+  clip-path: polygon(0 100%, 0 30%, 18% 0, 82% 0, 100% 30%, 100% 100%);
+}
+
+:root[data-theme="invaders"] .shell-dock__item[aria-expanded="true"] .shell-dock__item-icon {
+  background: #ffffff;
+  color: #001a00;
+  clip-path: polygon(0 100%, 0 30%, 18% 0, 82% 0, 100% 30%, 100% 100%);
+}
+
+:root[data-theme="invaders"] .shell-dock__item[data-active]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.45rem;
+  inset-inline-start: calc(50% - 0.15rem);
+  inline-size: 0.3rem;
+  block-size: 0.5rem;
+  background: #ffffff;
+}
+
+:root[data-theme="invaders"] .shell-dock__item[data-active]::after {
+  background: #ff4d6d;
+}

@@ -56,6 +56,20 @@ DYNAMIC = re.compile(r"\beval\s*\(|\bnew\s+Function\s*\(")
 # an interface renames its navigation, its pages' titles and the value names (never an action, a price, a
 # warning: what a member confirms stays Portalab's words)
 VOCABULARY = re.compile(r"nav:nav\.[\w.]+|[a-z]+:([\w.]+\.)?title|gamification:value\.\w+")
+# 028: the words of a navigation's own chrome (``shell:<navigation>.<word>``: a taskbar's « Start », a d-pad's
+# « Menu »…) and the menu button — never an action, a price or a confirmation
+NAVIGATION_WORD = re.compile(r"shell:menu|shell:([a-z][a-z0-9-]*)\.\w+")
+
+
+def vocabulary_key_ok(key: str) -> bool:
+    """A text an interface may rename: a navigation's entry or title, a page's title, a value's label, a word
+    of one of Portalab's navigations."""
+    if VOCABULARY.fullmatch(key):
+        return True
+    word = NAVIGATION_WORD.fullmatch(key)
+    return bool(word) and (word.group(1) is None or word.group(1) in live_looks.shipped("navigation"))
+
+
 GLSL_RESERVED = re.compile(r"\b(?:float|vec[234]|int)\s+(out|in|input|output|sample|filter|active)\b")
 # what the portal declares before a look's body (``p``, ``ax``, ``d``, ``t``, ``o``): declared again at the
 # body's own level, it does not compile (a loop or a block of its own may shadow them)
@@ -617,7 +631,7 @@ def _theme(
         violations: list[Any] = list(found)
         report.add("blocking", "theme.floor", key, violations=[str(v) for v in violations][:4])
     words = (document.get("vocabulary") or {}).values()
-    foreign = sorted({k for language in words for k in language if not VOCABULARY.fullmatch(k)})
+    foreign = sorted({k for language in words for k in language if not vocabulary_key_ok(k)})
     if foreign:
         report.add("blocking", "theme.vocabulary", key, keys=foreign[:5])
     navigation = document.get("layout", {}).get("nav", {})
